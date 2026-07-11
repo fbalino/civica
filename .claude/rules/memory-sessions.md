@@ -655,3 +655,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   it did not call a model or invent historical multi-country judgments.
 - Cross-border DB fixtures, 801 tests, claims, build, and responsive light/dark
   checks pass. PUL-013 is next.
+
+## 2026-07-11 — PUL-013 exclusion evidence completed
+
+- `pulse-candidate-outcome/v1` retains six exclusion outcomes with complete decision context and append-only enforcement.
+- Ingestion duplicate attempts now persist individually; older aggregate duplicate counts remain unreconstructed.
+- A direct stable sampling view and rolled-back live fixture pass. PUL-014 is next.

@@ -10,6 +10,10 @@ const migration = readFileSync(
   "drizzle/migrations/0024_research_evidence_retention.sql",
   "utf8",
 ) + readFileSync("drizzle/authoritative/0003_mixed_mockingbird.sql", "utf8");
+const exclusionMigration = readFileSync(
+  "drizzle/authoritative/0020_attach_candidate_retention_trigger.sql",
+  "utf8",
+);
 const classify = readFileSync("src/lib/pulse/v2/classify.ts", "utf8");
 const subscriptionApply = readFileSync(
   "scripts/pulse-apply-classifications.ts",
@@ -17,9 +21,9 @@ const subscriptionApply = readFileSync(
 );
 
 test("every protected relation receives a synchronous retention trigger", () => {
-  assert.equal(new Set(RETAINED_EVIDENCE_RELATIONS).size, 30);
+  assert.equal(new Set(RETAINED_EVIDENCE_RELATIONS).size, 31);
   for (const relation of RETAINED_EVIDENCE_RELATIONS) {
-    assert.ok(migration.includes(`'${relation}'`) || migration.includes(`ON ${relation}`));
+    assert.ok(migration.includes(`'${relation}'`) || migration.includes(`ON ${relation}`) || exclusionMigration.includes(`ON ${relation}`));
   }
   assert.match(migration, /BEFORE UPDATE OR DELETE/);
   assert.match(migration, /to_jsonb\(OLD\)/);

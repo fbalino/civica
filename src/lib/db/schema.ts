@@ -14,6 +14,10 @@ import type {
   PulseEvidenceRightsSnapshot,
 } from "@/lib/pulse/v2/evidence-identity";
 import type { JurisdictionEntitySnapshot } from "@/lib/pulse/v2/jurisdiction-entities";
+import type {
+  PulseCandidateKind,
+  PulseCandidateOutcome,
+} from "@/lib/pulse/v2/candidate-outcome";
 import {
   pgTable,
   uuid,
@@ -2226,6 +2230,53 @@ export const pulseEventDecisions = pgTable(
     check(
       "pulse_event_decisions_contract_check",
       dsql`${table.schemaVersion} = 'pulse-decision-ledger/v1' AND ${table.decisionKey} ~ '^pulse-decision/sha256:[a-f0-9]{64}$' AND ${table.kind} IN ('event_existence','subject_attribution','category_labels','severity','calibration','corroboration','publication') AND ${table.verdict} IN ('affirmed','refuted','abstained','unresolved') AND ${table.rationale} <> '' AND jsonb_typeof(${table.payload}) = 'object' AND NOT (${table.payload} ? 'confidence') AND ((${table.kind} = 'event_existence' AND ${table.payload} ? 'disposition') OR (${table.kind} = 'subject_attribution' AND ${table.payload} ?& ARRAY['status','primaryJurisdictionId','affectedJurisdictionIds']) OR (${table.kind} = 'category_labels' AND ${table.payload} ?& ARRAY['categoryIds','dimensionIds']) OR (${table.kind} = 'severity' AND ${table.payload} ?& ARRAY['tier','value','direction']) OR (${table.kind} = 'calibration' AND ${table.payload} ?& ARRAY['standing','signals','targetDecisionKinds','validationReleaseId'] AND ${table.payload}->>'standing' = 'not_calibrated') OR (${table.kind} = 'corroboration' AND ${table.payload} ?& ARRAY['independentEvidenceGroups','contributingReports','confidenceWeight','calibrationStanding'] AND ${table.payload}->>'calibrationStanding' = 'heuristic_not_probability') OR (${table.kind} = 'publication' AND ${table.payload} ?& ARRAY['eligible','origin','gateReasons'])) AND jsonb_typeof(${table.actor}) = 'object' AND ${table.actor}->>'type' IN ('classifier','verifier','subject_attributor','calibration_assessor','corroborator','publication_gate','human_reviewer','legacy_projection')`,
+    ),
+  ],
+);
+
+/** Append-only evaluation ledger for every candidate excluded from a Pulse
+ * stage. Decision-derived rows preserve the decision key; ingest duplicates
+ * are recorded directly because no raw-event row is created for them. */
+export const pulseCandidateOutcomes = pgTable(
+  "pulse_candidate_outcomes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    outcomeKey: text("outcome_key").notNull(),
+    candidateKind: text("candidate_kind").$type<PulseCandidateKind>().notNull(),
+    candidateId: text("candidate_id").notNull(),
+    outcome: text("outcome").$type<PulseCandidateOutcome>().notNull(),
+    reasonCode: text("reason_code").notNull(),
+    reason: text("reason").notNull(),
+    actor: jsonb("actor").$type<PulseDecisionActor>().notNull(),
+    methodVersion: text("method_version").notNull(),
+    stageRunId: uuid("stage_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    decisionKey: text("decision_key").references(
+      () => pulseEventDecisions.decisionKey,
+      { onDelete: "restrict" },
+    ),
+    canonicalCandidateId: text("canonical_candidate_id"),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
+    occurredAt: timestamp("occurred_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_candidate_outcomes_key").on(table.outcomeKey),
+    index("idx_pulse_candidate_outcomes_sample").on(
+      table.outcome,
+      table.occurredAt,
+    ),
+    index("idx_pulse_candidate_outcomes_candidate").on(
+      table.candidateKind,
+      table.candidateId,
+    ),
+    index("idx_pulse_candidate_outcomes_run").on(table.stageRunId),
+    check(
+      "pulse_candidate_outcomes_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-candidate-outcome/v1' AND ${table.outcomeKey} ~ '^pulse-candidate-outcome/sha256:[a-f0-9]{64}$' AND ${table.candidateKind} IN ('raw_item','cluster','event','decision') AND ${table.outcome} IN ('duplicate','non_event','insufficient_evidence','invalid','refuted','rejected') AND ${table.reasonCode} <> '' AND ${table.reason} <> '' AND ${table.methodVersion} <> '' AND cardinality(${table.evidenceRefs}) > 0 AND jsonb_typeof(${table.actor}) = 'object' AND ${table.actor}->>'type' IN ('classifier','verifier','subject_attributor','calibration_assessor','corroborator','publication_gate','human_reviewer','legacy_projection') AND jsonb_typeof(${table.metadata}) = 'object' AND ((${table.outcome} = 'duplicate' AND ${table.canonicalCandidateId} IS NOT NULL) OR (${table.outcome} <> 'duplicate'))`,
     ),
   ],
 );

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T18:40:04.340Z",
-  "sha256": "ae7c8a0b85d637f45c1262722b3df138569283f5e349574580062e63b82f2acb",
+  "generatedAt": "2026-07-11T18:59:14.449Z",
+  "sha256": "43eead7c0839bb187fed41fec65f673437c57c5ebb84056300b88c8302ec41bb",
   "schema": {
     "columns": [
       {
@@ -5111,6 +5111,159 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "pulse_candidate_outcomes",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "outcome_key",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "candidate_kind",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "candidate_id",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "outcome",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "reason_code",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "reason",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "jsonb",
+        "name": "actor",
+        "type": "jsonb",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "uuid",
+        "name": "stage_run_id",
+        "type": "uuid",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "decision_key",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "canonical_candidate_id",
+        "type": "text",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "_text",
+        "name": "evidence_refs",
+        "type": "ARRAY",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "jsonb",
+        "name": "metadata",
+        "type": "jsonb",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "timestamp",
+        "name": "occurred_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_candidate_outcomes",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_candidate_outcomes",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_changelog",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -6159,6 +6312,150 @@
         "default": null,
         "nullable": "YES",
         "position": 27
+      },
+      {
+        "udt": "text",
+        "name": "outcome_key",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "evaluation_stratum",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "candidate_kind",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "candidate_id",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "canonical_candidate_id",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "outcome",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "reason_code",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "reason",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "jsonb",
+        "name": "actor",
+        "type": "jsonb",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "uuid",
+        "name": "stage_run_id",
+        "type": "uuid",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "decision_key",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "_text",
+        "name": "evidence_refs",
+        "type": "ARRAY",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "jsonb",
+        "name": "metadata",
+        "type": "jsonb",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "timestamp",
+        "name": "occurred_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "stable_sample_key",
+        "type": "text",
+        "table": "pulse_exclusion_evaluation_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
       },
       {
         "udt": "uuid",
@@ -7626,6 +7923,31 @@
         "definition": "CREATE UNIQUE INDEX persons_pkey ON public.persons USING btree (id)"
       },
       {
+        "name": "idx_pulse_candidate_outcomes_candidate",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE INDEX idx_pulse_candidate_outcomes_candidate ON public.pulse_candidate_outcomes USING btree (candidate_kind, candidate_id)"
+      },
+      {
+        "name": "idx_pulse_candidate_outcomes_key",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_candidate_outcomes_key ON public.pulse_candidate_outcomes USING btree (outcome_key)"
+      },
+      {
+        "name": "idx_pulse_candidate_outcomes_run",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE INDEX idx_pulse_candidate_outcomes_run ON public.pulse_candidate_outcomes USING btree (stage_run_id)"
+      },
+      {
+        "name": "idx_pulse_candidate_outcomes_sample",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE INDEX idx_pulse_candidate_outcomes_sample ON public.pulse_candidate_outcomes USING btree (outcome, occurred_at)"
+      },
+      {
+        "name": "pulse_candidate_outcomes_pkey",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE UNIQUE INDEX pulse_candidate_outcomes_pkey ON public.pulse_candidate_outcomes USING btree (id)"
+      },
+      {
         "name": "idx_pulse_changelog_event",
         "table": "pulse_changelog",
         "definition": "CREATE INDEX idx_pulse_changelog_event ON public.pulse_changelog USING btree (event_id)"
@@ -8093,6 +8415,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.hmac(text, text, text)\n RETURNS bytea\n LANGUAGE c\n IMMUTABLE PARALLEL SAFE STRICT\nAS '$libdir/pgcrypto', $function$pg_hmac$function$\n"
       },
       {
+        "name": "materialize_pulse_candidate_outcome",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.materialize_pulse_candidate_outcome()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  outcome_value text;\n  reason_code_value text;\n  candidate_kind_value text;\n  candidate_id_value text;\nBEGIN\n  IF NEW.kind = 'event_existence' AND NEW.verdict = 'refuted'\n     AND NEW.actor->>'type' = 'human_reviewer' THEN\n    outcome_value := 'rejected';\n    reason_code_value := 'human_event_rejection';\n  ELSIF NEW.kind = 'event_existence' AND NEW.payload->>'disposition' = 'non_event' THEN\n    outcome_value := 'non_event';\n    reason_code_value := 'event_existence_non_event';\n  ELSIF NEW.kind = 'event_existence'\n        AND NEW.payload->>'disposition' IN ('insufficient_evidence','unresolved') THEN\n    outcome_value := 'insufficient_evidence';\n    reason_code_value := 'event_existence_insufficient_evidence';\n  ELSIF NEW.verdict = 'refuted' THEN\n    outcome_value := 'refuted';\n    reason_code_value := 'decision_axis_refuted';\n  ELSE\n    RETURN NEW;\n  END IF;\n\n  candidate_kind_value := CASE WHEN NEW.event_id IS NULL THEN 'cluster' ELSE 'event' END;\n  candidate_id_value := COALESCE(NEW.event_id::text, NEW.cluster_id::text);\n  INSERT INTO pulse_candidate_outcomes (\n    schema_version, outcome_key, candidate_kind, candidate_id, outcome,\n    reason_code, reason, actor, method_version, stage_run_id, decision_key,\n    canonical_candidate_id, evidence_refs, metadata, occurred_at\n  ) VALUES (\n    'pulse-candidate-outcome/v1',\n    'pulse-candidate-outcome/sha256:' || encode(digest(\n      NEW.decision_key || '|' || outcome_value, 'sha256'\n    ), 'hex'),\n    candidate_kind_value,\n    candidate_id_value,\n    outcome_value,\n    reason_code_value,\n    NEW.rationale,\n    NEW.actor,\n    NEW.method_version,\n    NEW.stage_run_id,\n    NEW.decision_key,\n    NULL,\n    NEW.evidence_refs,\n    jsonb_build_object(\n      'decisionKind', NEW.kind,\n      'decisionVerdict', NEW.verdict,\n      'decisionPayload', NEW.payload\n    ),\n    NEW.decided_at\n  ) ON CONFLICT (outcome_key) DO NOTHING;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
         "name": "materialize_pulse_event_jurisdictions",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.materialize_pulse_event_jurisdictions()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  item jsonb;\nBEGIN\n  IF NEW.kind <> 'subject_attribution'\n     OR NEW.event_id IS NULL\n     OR NEW.payload->>'attributionVersion' IS DISTINCT FROM 'pulse-jurisdiction-attribution/v2' THEN\n    RETURN NEW;\n  END IF;\n\n  FOR item IN SELECT jsonb_array_elements(NEW.payload->'attributions')\n  LOOP\n    IF NOT (NEW.payload->'affectedJurisdictionIds' ? (item->>'jurisdictionId'))\n       OR (item->>'role' = 'primary' AND item->>'jurisdictionId' IS DISTINCT FROM NEW.payload->>'primaryJurisdictionId') THEN\n      RAISE EXCEPTION 'subject-attribution row is outside the declared projection';\n    END IF;\n    INSERT INTO pulse_event_jurisdictions (\n      decision_key, event_id, cluster_id, jurisdiction_id, role, rationale,\n      evidence_refs, entity_snapshot, attribution_version,\n      entity_catalog_version, entity_catalog_hash, alias_version\n    ) VALUES (\n      NEW.decision_key,\n      NEW.event_id,\n      NEW.cluster_id,\n      (item->>'jurisdictionId')::uuid,\n      item->>'role',\n      item->>'rationale',\n      ARRAY(SELECT jsonb_array_elements_text(item->'evidenceRefs')),\n      jsonb_build_object('jurisdictionId', item->>'jurisdictionId') || (item->'entity'),\n      NEW.payload->>'attributionVersion',\n      NEW.payload->>'entityCatalogVersion',\n      NEW.payload->>'entityCatalogHash',\n      NEW.payload->>'aliasVersion'\n    );\n  END LOOP;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -8211,6 +8538,11 @@
         "name": "pul_004_guard_raw_lineage",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.pul_004_guard_raw_lineage()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n\tIF OLD.ingest_run_id IS DISTINCT FROM NEW.ingest_run_id THEN\n\t\tRAISE EXCEPTION 'Raw-event ingest lineage is immutable';\n\tEND IF;\n\tIF OLD.cluster_run_id IS NOT NULL AND OLD.cluster_run_id IS DISTINCT FROM NEW.cluster_run_id THEN\n\t\tRAISE EXCEPTION 'Raw-event cluster lineage is write-once';\n\tEND IF;\n\tIF OLD.classification_run_id IS NOT NULL AND OLD.classification_run_id IS DISTINCT FROM NEW.classification_run_id THEN\n\t\tRAISE EXCEPTION 'Raw-event classification lineage is write-once';\n\tEND IF;\n\tRETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "reject_pulse_candidate_outcome_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.reject_pulse_candidate_outcome_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'pulse_candidate_outcomes is append-only';\nEND;\n$function$\n"
       },
       {
         "name": "reject_pulse_event_jurisdiction_mutation",
@@ -8381,6 +8713,16 @@
       },
       {
         "name": "dat_016_retain_mutation",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_candidate_outcomes FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "pulse_candidate_outcomes_append_only",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CREATE TRIGGER pulse_candidate_outcomes_append_only BEFORE DELETE OR UPDATE ON pulse_candidate_outcomes FOR EACH ROW EXECUTE FUNCTION reject_pulse_candidate_outcome_mutation()"
+      },
+      {
+        "name": "dat_016_retain_mutation",
         "table": "pulse_dimensional_deltas",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_dimensional_deltas FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
@@ -8388,6 +8730,11 @@
         "name": "pulse_event_decisions_append_only",
         "table": "pulse_event_decisions",
         "definition": "CREATE TRIGGER pulse_event_decisions_append_only BEFORE DELETE OR UPDATE ON pulse_event_decisions FOR EACH ROW EXECUTE FUNCTION civica_protect_pulse_event_decisions()"
+      },
+      {
+        "name": "pulse_event_decisions_materialize_candidate_outcome",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE TRIGGER pulse_event_decisions_materialize_candidate_outcome AFTER INSERT ON pulse_event_decisions FOR EACH ROW EXECUTE FUNCTION materialize_pulse_candidate_outcome()"
       },
       {
         "name": "pulse_event_decisions_materialize_jurisdictions",
@@ -8673,6 +9020,11 @@
       },
       {
         "kind": "r",
+        "name": "pulse_candidate_outcomes",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "pulse_changelog",
         "definition": null
       },
@@ -8715,6 +9067,11 @@
         "kind": "r",
         "name": "pulse_events_v2",
         "definition": null
+      },
+      {
+        "kind": "v",
+        "name": "pulse_exclusion_evaluation_candidates",
+        "definition": " SELECT outcome_key,\n        CASE\n            WHEN outcome = ANY (ARRAY['rejected'::text, 'refuted'::text]) THEN 'false_positive_candidate'::text\n            ELSE 'false_negative_candidate'::text\n        END AS evaluation_stratum,\n    candidate_kind,\n    candidate_id,\n    canonical_candidate_id,\n    outcome,\n    reason_code,\n    reason,\n    actor,\n    method_version,\n    stage_run_id,\n    decision_key,\n    evidence_refs,\n    metadata,\n    occurred_at,\n    encode(digest(outcome_key, 'sha256'::text), 'hex'::text) AS stable_sample_key\n   FROM pulse_candidate_outcomes o;"
       },
       {
         "kind": "r",
@@ -9523,6 +9880,30 @@
         "type": "p",
         "table": "persons",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_candidate_outcomes_contract_check",
+        "type": "c",
+        "table": "pulse_candidate_outcomes",
+        "definition": "CHECK (schema_version = 'pulse-candidate-outcome/v1'::text AND outcome_key ~ '^pulse-candidate-outcome/sha256:[a-f0-9]{64}$'::text AND (candidate_kind = ANY (ARRAY['raw_item'::text, 'cluster'::text, 'event'::text, 'decision'::text])) AND (outcome = ANY (ARRAY['duplicate'::text, 'non_event'::text, 'insufficient_evidence'::text, 'invalid'::text, 'refuted'::text, 'rejected'::text])) AND reason_code <> ''::text AND reason <> ''::text AND method_version <> ''::text AND cardinality(evidence_refs) > 0 AND jsonb_typeof(actor) = 'object'::text AND ((actor ->> 'type'::text) = ANY (ARRAY['classifier'::text, 'verifier'::text, 'subject_attributor'::text, 'calibration_assessor'::text, 'corroborator'::text, 'publication_gate'::text, 'human_reviewer'::text, 'legacy_projection'::text])) AND jsonb_typeof(metadata) = 'object'::text AND (outcome = 'duplicate'::text AND canonical_candidate_id IS NOT NULL OR outcome <> 'duplicate'::text))"
+      },
+      {
+        "name": "pulse_candidate_outcomes_decision_key_pulse_event_decisions_dec",
+        "type": "f",
+        "table": "pulse_candidate_outcomes",
+        "definition": "FOREIGN KEY (decision_key) REFERENCES pulse_event_decisions(decision_key) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_candidate_outcomes_pkey",
+        "type": "p",
+        "table": "pulse_candidate_outcomes",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_candidate_outcomes_stage_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_candidate_outcomes",
+        "definition": "FOREIGN KEY (stage_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_changelog_event_id_pulse_events_id_fk",

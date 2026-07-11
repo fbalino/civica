@@ -134,6 +134,20 @@
       "when": 1783794533547,
       "tag": "0018_rich_phalanx",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783796082671,
+      "tag": "0019_careless_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1783797000000,
+      "tag": "0020_attach_candidate_retention_trigger",
+      "breakpoints": true
     }
   ]
 }

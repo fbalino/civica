@@ -32,6 +32,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "persons",
   "pulse_dimensional_deltas",
   "pulse_events_v2",
+  "pulse_candidate_outcomes",
   "pulse_review_audit_log",
   "pulse_sources",
   "raw_events",
@@ -63,6 +64,25 @@ export interface EvaluationEvidenceRow {
   outcome: string;
   payload: unknown;
   recordedAt: string;
+}
+
+export interface PulseExclusionEvaluationCandidate {
+  outcomeKey: string;
+  evaluationStratum: "false_positive_candidate" | "false_negative_candidate";
+  candidateKind: string;
+  candidateId: string;
+  canonicalCandidateId: string | null;
+  outcome: string;
+  reasonCode: string;
+  reason: string;
+  actor: unknown;
+  methodVersion: string;
+  stageRunId: string;
+  decisionKey: string | null;
+  evidenceRefs: string[];
+  metadata: unknown;
+  occurredAt: string;
+  stableSampleKey: string;
 }
 
 function rows(result: unknown): Record<string, unknown>[] {
@@ -99,6 +119,36 @@ export async function getPulseEvaluationEvidence(): Promise<
       ORDER BY recorded_at DESC, evidence_id
     `),
   );
+}
+
+/** Direct, stable sampling frame for Pulse exclusions. Callers can filter by
+ * stratum/outcome and order by `stableSampleKey`; no joins to production
+ * projections or interpretation of classifier payloads are required. */
+export async function getPulseExclusionEvaluationCandidates(): Promise<
+  PulseExclusionEvaluationCandidate[]
+> {
+  const result = await db.execute(sql`
+    SELECT * FROM pulse_exclusion_evaluation_candidates
+    ORDER BY stable_sample_key
+  `);
+  return rows(result).map((row) => ({
+    outcomeKey: String(row.outcome_key),
+    evaluationStratum: String(row.evaluation_stratum) as PulseExclusionEvaluationCandidate["evaluationStratum"],
+    candidateKind: String(row.candidate_kind),
+    candidateId: String(row.candidate_id),
+    canonicalCandidateId: row.canonical_candidate_id ? String(row.canonical_candidate_id) : null,
+    outcome: String(row.outcome),
+    reasonCode: String(row.reason_code),
+    reason: String(row.reason),
+    actor: row.actor,
+    methodVersion: String(row.method_version),
+    stageRunId: String(row.stage_run_id),
+    decisionKey: row.decision_key ? String(row.decision_key) : null,
+    evidenceRefs: row.evidence_refs as string[],
+    metadata: row.metadata,
+    occurredAt: row.occurred_at instanceof Date ? row.occurred_at.toISOString() : String(row.occurred_at),
+    stableSampleKey: String(row.stable_sample_key),
+  }));
 }
 
 /** Internal research query. Non-active fact candidates and all recorded

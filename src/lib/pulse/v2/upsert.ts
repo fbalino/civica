@@ -17,6 +17,8 @@ import type * as schema from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import type { RawEventInput } from "./types";
 import { buildPulseEvidenceIdentity } from "./evidence-identity";
+import { persistPulseCandidateOutcomes } from "./candidate-outcome-store";
+import { PULSE_RUNTIME_METHOD_VERSION } from "./runtime-contract";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -102,7 +104,7 @@ export async function upsertRawEvents(
 
     if (externalId) {
       const existing = await db
-        .select({ id: rawEvents.id })
+        .select({ id: rawEvents.id, evidenceIdentityKey: rawEvents.evidenceIdentityKey })
         .from(rawEvents)
         .where(
           and(
@@ -113,13 +115,28 @@ export async function upsertRawEvents(
         .limit(1);
 
       if (existing[0]) {
+        await persistPulseCandidateOutcomes(db, [{
+          candidateKind: "raw_item",
+          candidateId: evidence[index].identity.evidenceIdentityKey,
+          outcome: "duplicate",
+          reasonCode: "source_external_id_duplicate",
+          reason: "The source and external identifier already resolve to a retained raw item.",
+          actor: { type: "classifier", provider: "civica", model: "ingest-deduplicator", reviewerId: null },
+          methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+          stageRunId: ingestRunId,
+          canonicalCandidateId: existing[0].evidenceIdentityKey,
+          evidenceRefs: [evidence[index].identity.evidenceIdentityKey, `raw-event:${existing[0].id}`],
+          metadata: { sourceId: row.sourceId, externalId },
+          occurredAt: evidence[index].retrievedAt.toISOString(),
+          nonce: `${ingestRunId}:${index}`,
+        }]);
         skippedDuplicate++;
         continue;
       }
     } else if (row.sourceUrl) {
       // No external id — fall back to (sourceId, sourceUrl) for dedup.
       const existing = await db
-        .select({ id: rawEvents.id })
+        .select({ id: rawEvents.id, evidenceIdentityKey: rawEvents.evidenceIdentityKey })
         .from(rawEvents)
         .where(
           and(
@@ -130,6 +147,21 @@ export async function upsertRawEvents(
         .limit(1);
 
       if (existing[0]) {
+        await persistPulseCandidateOutcomes(db, [{
+          candidateKind: "raw_item",
+          candidateId: evidence[index].identity.evidenceIdentityKey,
+          outcome: "duplicate",
+          reasonCode: "source_url_duplicate",
+          reason: "The source and canonical URL already resolve to a retained raw item.",
+          actor: { type: "classifier", provider: "civica", model: "ingest-deduplicator", reviewerId: null },
+          methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+          stageRunId: ingestRunId,
+          canonicalCandidateId: existing[0].evidenceIdentityKey,
+          evidenceRefs: [evidence[index].identity.evidenceIdentityKey, `raw-event:${existing[0].id}`],
+          metadata: { sourceId: row.sourceId, sourceUrl: row.sourceUrl },
+          occurredAt: evidence[index].retrievedAt.toISOString(),
+          nonce: `${ingestRunId}:${index}`,
+        }]);
         skippedDuplicate++;
         continue;
       }

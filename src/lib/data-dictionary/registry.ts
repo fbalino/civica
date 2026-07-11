@@ -711,6 +711,21 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
     deprecation: active,
   },
+  pulse_candidate_outcomes: {
+    definition:
+      "Append-only negative-evidence ledger for Pulse candidates excluded by ingestion, classification, verification, or human review.",
+    rowGrain:
+      "One duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+    cadence: "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+    vintageSemantics:
+      "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+    rights:
+      "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+    deprecation: active,
+  },
   pulse_event_jurisdictions: {
     definition:
       "Append-only, queryable primary and affected jurisdiction roles derived from versioned subject-attribution decisions.",

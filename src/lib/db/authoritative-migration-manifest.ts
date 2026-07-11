@@ -115,4 +115,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "707a399eedd5aed194c0812c99d50ffa61c72ccf2c74a3c0d2e897e0bbb7b80c",
     baseline: false,
   },
+  {
+    id: "0019_careless_avengers",
+    path: "drizzle/authoritative/0019_careless_avengers.sql",
+    sha256: "7872407367f01e55decc0be0bdfae24a5f90707b7ffd03a025cfc056a0d288e3",
+    baseline: false,
+  },
+  {
+    id: "0020_attach_candidate_retention_trigger",
+    path: "drizzle/authoritative/0020_attach_candidate_retention_trigger.sql",
+    sha256: "2f8d819d16e43b5e87113c2abd806ce372446a7d4d2623d1f6bd2046fc85c673",
+    baseline: false,
+  },
 ] as const;

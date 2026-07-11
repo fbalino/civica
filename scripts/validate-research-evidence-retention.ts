@@ -14,6 +14,10 @@ const migration = readFileSync(
   resolve(root, "drizzle/migrations/0024_research_evidence_retention.sql"),
   "utf8",
 ) + readFileSync(resolve(root, "drizzle/authoritative/0003_mixed_mockingbird.sql"), "utf8");
+const exclusionMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0019_careless_avengers.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -42,9 +46,20 @@ function sourceFiles(directory: string): string[] {
 }
 
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
-  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`)) {
+  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`) && !exclusionMigration.includes(`ON ${relation}`)) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
+}
+for (const required of [
+  "pulse_candidate_outcomes",
+  "pulse_exclusion_evaluation_candidates",
+  "pulse-candidate-outcome/v1",
+  "false_negative_candidate",
+  "false_positive_candidate",
+  "materialize_pulse_candidate_outcome",
+  "pulse_candidate_outcomes_append_only",
+]) {
+  if (!exclusionMigration.includes(required)) fail(`exclusion migration is missing ${required}`);
 }
 
 for (const path of DESTRUCTIVE_WRITE_PATHS) {

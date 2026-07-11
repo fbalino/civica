@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "eb4dcb4b50ddb18e80f2c7c86efe82f8714ab91de52e14c529ea06de59fe72b1",
+  "schemaFingerprint": "66339877ebfc08910afbcfc5c77742225113dee65695875dd5859d2dc625bebf",
   "summary": {
-    "tables": 58,
-    "columns": 776,
+    "tables": 59,
+    "columns": 793,
     "publicAtlasTables": 18,
-    "researchBetaTables": 17,
+    "researchBetaTables": 18,
     "supportTables": 11,
     "internalTables": 10,
     "privateTables": 2,
@@ -15161,6 +15161,461 @@
           "cadence": "Monthly and event-driven identity enrichment.",
           "vintageSemantics": "Current identity record; portrait credit and license describe the captured portrait file.",
           "rights": "Identity metadata follows its source; each portrait retains its own Commons license and credit.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_candidate_outcomes",
+      "exportName": "pulseCandidateOutcomes",
+      "definition": "Append-only negative-evidence ledger for Pulse candidates excluded by ingestion, classification, verification, or human review.",
+      "rowGrain": "One duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+      "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+      "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+      "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "actor",
+          "propertyName": "actor",
+          "definition": "Actor recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_id",
+          "propertyName": "candidateId",
+          "definition": "Candidate id recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_candidate_outcomes_candidate"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "Candidate id follows this table contract. occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_kind",
+          "propertyName": "candidateKind",
+          "definition": "Candidate kind recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_candidate_outcomes_candidate"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "Candidate kind follows this table contract. occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "canonical_candidate_id",
+          "propertyName": "canonicalCandidateId",
+          "definition": "Canonical candidate id recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "Canonical candidate id follows this table contract. occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decision_key",
+          "propertyName": "decisionKey",
+          "definition": "Decision key; relational link to pulse_event_decisions.decision_key.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_event_decisions.decision_key",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_event_decisions.decision_key; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_refs",
+          "propertyName": "evidenceRefs",
+          "definition": "Evidence refs recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "metadata",
+          "propertyName": "metadata",
+          "definition": "Structured metadata governed by this table's row contract.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "occurred_at",
+          "propertyName": "occurredAt",
+          "definition": "Occurred at recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_candidate_outcomes_sample"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "Occurred at follows this table contract. occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "outcome",
+          "propertyName": "outcome",
+          "definition": "Outcome recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_candidate_outcomes_sample"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "outcome_key",
+          "propertyName": "outcomeKey",
+          "definition": "Outcome key recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_candidate_outcomes_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_candidate_outcomes_key"
+            ]
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reason",
+          "propertyName": "reason",
+          "definition": "Recorded reason for the associated action or decision.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reason_code",
+          "propertyName": "reasonCode",
+          "definition": "Reason code recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the duplicate, non-event, insufficient-evidence, invalid, refuted, or rejected outcome for one candidate at one pipeline stage.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "stage_run_id",
+          "propertyName": "stageRunId",
+          "definition": "Stage run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_candidate_outcomes_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+          "vintageSemantics": "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
+          "rights": "Civica-generated evaluation metadata; referenced source evidence remains private or rights-filtered under its publisher-specific terms.",
           "deprecation": {
             "status": "active"
           }

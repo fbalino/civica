@@ -899,3 +899,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   unresolved or primary-less results cannot auto-publish.
 - Only primary roles feed the current experimental projection. Retained rows
   remain explicit legacy projections. Durable record: APR-D120.
+
+## 2026-07-11 — Pulse retains every future exclusion as evaluation evidence
+
+- `pulse-candidate-outcome/v1` records duplicate, non-event, insufficient-evidence, invalid, refuted, and rejected outcomes with reason, actor, method, run, time, and evidence.
+- Evaluation samples use the direct stable-strata view; historical individual duplicates are never inferred from old counters.
+- Rows are append-only and decision-derived outcomes materialize transactionally. Durable record: APR-D121.

@@ -15,19 +15,25 @@ const fixture: RawEventInput = {
 const ingestRunId = "11111111-1111-4111-8111-111111111111";
 
 function fakeDb() {
-  const state: RawEventInput[] = [];
+  const state: Array<Record<string, unknown>> = [];
+  const outcomes: Array<Record<string, unknown>> = [];
   let freshnessUpdates = 0;
   const db = {
     select: () => ({
       from: () => ({
         where: () => ({
-          limit: async () => (state.length ? [{ id: "existing" }] : []),
+          limit: async () => (state.length ? [{ id: "existing", evidenceIdentityKey: state[0].evidenceIdentityKey }] : []),
         }),
       }),
     }),
     insert: () => ({
-      values: async (value: RawEventInput) => {
+      values: (value: Record<string, unknown> | Array<Record<string, unknown>>) => {
+        if (Array.isArray(value)) {
+          outcomes.push(...value);
+          return { onConflictDoNothing: async () => undefined };
+        }
         state.push(value);
+        return Promise.resolve();
       },
     }),
     update: () => ({
@@ -38,7 +44,7 @@ function fakeDb() {
       }),
     }),
   };
-  return { db, state, freshnessUpdates: () => freshnessUpdates };
+  return { db, state, outcomes, freshnessUpdates: () => freshnessUpdates };
 }
 
 test("the real Pulse upsert is idempotent and duplicate reruns do not stamp freshness", async () => {
@@ -56,6 +62,9 @@ test("the real Pulse upsert is idempotent and duplicate reruns do not stamp fres
   );
   assert.deepEqual(harness.state, afterFirst);
   assert.equal(harness.state.length, 1);
+  assert.equal(harness.outcomes.length, 1);
+  assert.equal(harness.outcomes[0].outcome, "duplicate");
+  assert.equal(harness.outcomes[0].reasonCode, "source_external_id_duplicate");
   assert.deepEqual(first, {
     inserted: 1,
     skippedDuplicate: 0,
