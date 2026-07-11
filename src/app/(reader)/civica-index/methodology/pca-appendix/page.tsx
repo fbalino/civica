@@ -13,8 +13,8 @@ import pcaAnalysis from "@/lib/ci/pca-analysis.generated.json";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "PCA Appendix — Civica Index Weight Derivation",
-  description: `A limited single-year PCA used to inform the provisional Civica Index Beta weights across ${civicaIndex.dimensionCount} governance dimensions, with the underpowered panel and missing longitudinal tests stated explicitly.`,
+  title: "Historical PCA Weight Record — Civica Index",
+  description: `The limited ${civicaIndex.pca.panelSize}-country 2023 cross-section that informed the archived Civica Index Beta weights, with later temporal evidence and the unrun fifth-dimension test stated explicitly.`,
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pca-appendix",
   },
@@ -155,7 +155,7 @@ export default function PcaAppendixPage() {
       <EditorialPage>
         <SmartBreadcrumbs />
 
-        <h1 className="editorial-page-title">PCA appendix.</h1>
+        <h1 className="editorial-page-title">Historical PCA weight record.</h1>
         <div className="editorial-page-meta">
           <span>Empirical weight derivation</span>
           <span>·</span>
@@ -165,10 +165,10 @@ export default function PcaAppendixPage() {
         </div>
 
         <p className="meth-abstract">
-          The dimension weights used in the Civica Index are derived from
-          the data, not asserted. This page documents the principal
-          component analysis that produced them, with full disclosure
-          of methodology, sample size, and limitations.
+          This page preserves the limited 2023 cross-section that informed
+          the archived Beta weights. It documents the arithmetic and its
+          boundaries; it does not validate a general governance factor or
+          establish a longitudinal weighting model.
         </p>
 
         {/* ────────────────────────────────────────────────────── */}
@@ -179,34 +179,31 @@ export default function PcaAppendixPage() {
             <span className="meth-num">Section 1</span>Headline finding
           </h2>
           <p>
-            The {civicaIndex.dimensionCount} governance dimensions of
-            the Civica Index are <strong>highly correlated</strong>{" "}
-            (range {corrLow} to {corrHigh}). Principal component
-            analysis confirms a single dominant latent factor:{" "}
+            Within this {pca.panelSize}-country 2023 cross-section, the{" "}
+            {civicaIndex.dimensionCount} inputs are highly correlated
+            (range {corrLow} to {corrHigh}). The first principal component
+            is dominant in this sample:{" "}
             <strong>
               PC1 explains {pc1VariancePct}% of the variance
             </strong>{" "}
             in the panel, and all {civicaIndex.dimensionCount}{" "}
-            dimensions load on it with similar magnitude ({loadLow} to{" "}
+            inputs load on it with similar magnitude ({loadLow} to{" "}
             {loadHigh}). Components 2 through{" "}
-            {civicaIndex.dimensionCount} each have eigenvalues well
-            below the Kaiser threshold of 1.0, meaning the data does
-            not support breaking the governance core into multiple
-            distinct factors.
+            {civicaIndex.dimensionCount} fall below the Kaiser threshold
+            in this run. That result cannot establish the factor structure
+            for countries outside the sample, other years, annual change,
+            or an untested fifth indicator.
           </p>
           <p>
-            The {civicaIndex.dimensionCount}-dimension breakout is
-            therefore best understood as a{" "}
-            <strong>transparency device</strong> — it lets readers see
-            how each facet contributes — rather than as a claim that
-            the {civicaIndex.dimensionCount} are statistically
-            independent. The composite score is, in effect, a single
-            &ldquo;governance quality&rdquo; index disaggregated into{" "}
-            {civicaIndex.dimensionCount} interpretable sub-scores.
+            The {civicaIndex.dimensionCount}-dimension breakout is an
+            editorial transparency device. It shows which publisher input
+            contributes to the archived formula. The PCA does not make the
+            dimensions independent, and it does not turn their shared
+            variation into an original Civica measurement.
           </p>
           <p>
-            Weights are taken proportional to the squared PC1 loadings
-            (a standard practice in composite-index construction):
+            The historical recipe set weights proportional to the squared
+            PC1 loadings, then rounded the result:
           </p>
 
           <div className="editorial-table-scroll">
@@ -248,14 +245,14 @@ export default function PcaAppendixPage() {
           </div>
 
           <p>
-            The biggest revision is corruption control (0.20 →{" "}
+            In that historical recipe, the biggest revision is corruption control (0.20 →{" "}
             {(ADOPTED_WEIGHT_BY_ID.corruption_control ?? 0).toFixed(2)},
             +20% relative). Democratic quality drops slightly (0.30 →{" "}
             {(ADOPTED_WEIGHT_BY_ID.democratic_quality ?? 0).toFixed(2)}
             ). The other two are essentially unchanged. Because the
-            indicators are so correlated, the impact on country
-            rankings is small: the largest delta from the weight
-            revision alone is under one point.
+            indicators are highly correlated in the derivation sample, the
+            weight-only score change in that run is under one point. This is
+            not a stability result for later releases or other specifications.
           </p>
         </Reveal>
 
@@ -312,14 +309,11 @@ export default function PcaAppendixPage() {
             </table>
           </div>
           <p>
-            Every off-diagonal correlation is above {corrLow} — strong
-            by any reasonable threshold. Rule of law and corruption
-            control are nearly indistinguishable empirically (r ={" "}
-            {corrHigh}), which suggests the weight on those two could
-            be partially redundant. The 5th-dimension test in §6
-            partially addresses this question; a fuller answer requires
-            the ingestion of separate WGI Government Effectiveness
-            data.
+            Every off-diagonal correlation in this cross-section is above{" "}
+            {corrLow}. Rule of law and corruption control correlate at{" "}
+            {corrHigh} in these observations. This is evidence of overlap in
+            the derivation sample, not proof that the constructs are identical.
+            Section 6 records that the proposed fifth-dimension test was not run.
           </p>
         </Reveal>
 
@@ -362,9 +356,9 @@ export default function PcaAppendixPage() {
             </table>
           </div>
           <p>
-            The Kaiser criterion (retain components with eigenvalue
-            &gt; 1) selects only PC1. The scree plot makes the same
-            point visually:
+            Applied to this cross-section, the Kaiser criterion (retain
+            components with eigenvalue &gt; 1) selects only PC1. The scree
+            plot describes the same sample result:
           </p>
 
           <EigenvalueChart
@@ -411,20 +405,19 @@ export default function PcaAppendixPage() {
             </table>
           </div>
           <p>
-            On PC1 — the only component the data supports — the{" "}
+            On PC1, as selected by the Kaiser rule for this sample, the{" "}
             {civicaIndex.dimensionCount} loadings are tightly clustered
             ({loadLow} to {loadHigh}, range {loadRange}). All{" "}
-            {civicaIndex.dimensionCount} dimensions contribute roughly
-            equally to the single &ldquo;governance quality&rdquo;
-            latent factor. PC2 through PC{civicaIndex.dimensionCount}{" "}
-            represent residual variance below the noise floor.
+            {civicaIndex.dimensionCount} inputs contribute roughly equally
+            to the first component. PC2 through PC
+            {civicaIndex.dimensionCount} describe the remaining variance;
+            this run does not justify calling them noise.
           </p>
           <p>
             Squaring the PC1 loadings and normalizing them to sum to
-            1.00 gives the suggested weights in §1. Rounding to two
-            decimal places (and adjusting one weight by 0.01 to make
-            the rounded values sum exactly to 1.00) gives the adopted
-            weights.
+            1.00 gives the historical suggested weights in §1. Rounding
+            to two decimal places, including a 0.01 adjustment so the
+            displayed values sum to 1.00, produced the archived Beta weights.
           </p>
         </Reveal>
 

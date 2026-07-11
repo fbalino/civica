@@ -45,23 +45,23 @@
 
 **n = {{state.civicaIndex.pca.panelSize}} countries** with all {{state.civicaIndex.dimensionCount}} governance dimensions present. Data vintage: {{state.civicaIndex.pca.dataVintage}} (the most recent year fully ingested into Civica). Source: `ci_dimension_scores` table, normalized via the Beta fixed-bound transforms documented in the [main methodology](/civica-index/methodology#normalization).
 
-The countries are not a random sample — they are the ingested set, weighted toward larger democracies and authoritarian states with active governance research coverage. Coverage is sparser in small island states and in microstates. This is a known limitation of the panel and does not change the conclusion that the {{state.civicaIndex.dimensionCount}} indicators are highly correlated, but it does mean the absolute magnitude of the loadings might shift slightly with a broader sample.
+The countries are not a random sample. They are the ingested set, weighted toward larger states and places with more governance-research coverage. Small island states and microstates are under-represented. The correlations and loadings below describe these {{state.civicaIndex.pca.panelSize}} observations only; their magnitude and factor structure cannot be generalized to broader coverage from this run.
 
 ## Section 6 · The 5th-dimension test {#five-dim}
 
-The methodology spec considers adding a fifth dimension — *Administrative Capacity*, drawn from World Bank WGI Government Effectiveness and Regulatory Quality — if and only if it emerges as empirically distinct from Rule of Law in factor analysis.
+An earlier methodology proposal considered a fifth dimension, *Administrative Capacity*, using World Bank WGI Government Effectiveness and Regulatory Quality.
 
-**This phase does not test that question.** The WGI Government Effectiveness indicator is not yet ingested into Civica. The high correlation between Rule of Law and Corruption Control (r = {{ctx.corrHigh}}) hints that adding a related governance-quality indicator might simply load on the same factor as Rule of Law — but that's a hypothesis, not a finding. The test is deferred to a follow-up phase (after the indicator is ingested), at which point this appendix will be re-run and, if warranted, the methodology updated.
+**The n={{state.civicaIndex.pca.panelSize}} run did not include either proposed indicator, so it provides no fifth-dimension result.** No public Civica claim says Administrative Capacity is distinct from, or reducible to, Rule of Law. A future test would require a frozen five-indicator panel, a declared factor/rotation method, and a new versioned analysis.
 
 ## Section 7 · Limitations {#limitations}
 
-**Sample size.** The methodology spec envisions a panel of 2000–2024 country-years (thousands of observations). The current panel is {{state.civicaIndex.pca.panelSize}} countries from a single year and is underpowered for a stable cross-time weighting claim. The weights must be recomputed and compared when the historical panel is ingested; the current result does not establish that the same structure will hold across years or broader country coverage.
+**Sample size.** This weight-derivation run contains {{state.civicaIndex.pca.panelSize}} countries from one 2023 cross-section. It does not support a stable cross-time weighting claim or a population-wide factor claim.
 
-**Single-year panel.** A cross-sectional PCA captures shared variance at one moment in time. It does not test whether the same factor structure holds over decades. The historical panel will address this.
+**Later temporal evidence.** Civica subsequently ran a frozen multi-year analysis. It found a strong common component across country levels and a materially weaker one within countries and across annual changes. The defensible claim is narrower: the four publisher ratings share considerable cross-country level variation, while yearly movement does not behave as one dominant change factor. See the [versioned dimensionality summary](/civica-index/methodology#weights).
 
 **Source coverage.** The {{state.civicaIndex.pca.panelSize}} countries with all {{state.civicaIndex.dimensionCount}} dimensions are skewed toward larger states and active governance-research targets. Microstates and small island states are under-represented. The PCA findings should be understood as describing "the kinds of countries we currently have data for."
 
-**No source-substitution sensitivity test.** The spec calls for swapping each primary source with its secondary (e.g., V-Dem Liberal Democracy → V-Dem Polyarchy) and confirming rank stability. This requires the secondary sources to be ingested in parallel. Deferred to the same follow-up.
+**No five-variable rotation.** The old run contains four inputs, so rotation cannot answer the proposed Administrative Capacity question. The later four-input temporal PCA also cannot substitute for that unrun test.
 
 See the site-wide [known-limitations policy](/policies#known-limitations) for how this section relates to every other Civica research artifact, and the [versioning policy](/policies#versioning) for how a re-run of this analysis would be published.
 
@@ -76,4 +76,4 @@ The full Python pipeline that produced these numbers is checked into the reposit
 
 The figure in §4 is now rendered as an inline SVG (`src/components/methodology/EigenvalueChart.tsx`) sourced from the same `eigenvalues.csv` file, replacing the prior prerendered PNG.
 
-To re-run the analysis on updated data: `cd analysis/phase-5-3 && uv run python run_pca.py`. The Python environment is managed by [uv](https://docs.astral.sh/uv/) and the lockfile is committed for reproducibility.
+To reproduce the historical run against its original database extract: `cd analysis/phase-5-3 && uv run python run_pca.py`. Running the script against today&rsquo;s database would be a new analysis and must not overwrite this record. The separate temporal analysis is reproduced with `npm run validate:index-dimensionality`.

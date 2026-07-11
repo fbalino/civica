@@ -38,6 +38,9 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/ci/versioning.ts", category: "transform" },
   { path: "scripts/calculate-ci-v2.ts", category: "transform" },
   { path: "src/lib/ci/dimensions-v2.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/pca-analysis.generated.json", category: "weight_or_model" },
+  { path: "analysis/phase-5-3/results.json", category: "weight_or_model" },
+  { path: "analysis/phase-5-3/run_pca.py", category: "weight_or_model" },
   { path: "src/lib/ci/candidate-specifications.ts", category: "weight_or_model" },
   { path: "src/lib/ci/dimensionality-analysis.ts", category: "weight_or_model" },
   { path: "src/lib/ci/incremental-information-analysis.ts", category: "weight_or_model" },
@@ -77,6 +80,8 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/app/governance-evidence/page.tsx", category: "presentation" },
   { path: "src/app/api/governance-evidence/[slug]/route.ts", category: "presentation" },
   { path: "src/app/(reader)/civica-index/page.tsx", category: "presentation" },
+  { path: "src/app/(reader)/civica-index/methodology/page.tsx", category: "presentation" },
+  { path: "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx", category: "presentation" },
   { path: "src/app/(reader)/country/[slug]/civica-data/page.tsx", category: "presentation" },
   { path: "src/app/compare/page.tsx", category: "presentation" },
   { path: "src/app/rankings/RankingsMatrix.tsx", category: "presentation" },
@@ -94,6 +99,8 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/app/api/v1/index/methodology/route.ts", category: "presentation" },
   { path: "src/app/api/v1/index/rankings/route.ts", category: "presentation" },
   { path: "content/methodology-civica-index.md", category: "presentation" },
+  { path: "content/methodology-pca-appendix.md", category: "presentation" },
+  { path: "content/data-approach.md", category: "presentation" },
 ] as const;
 
 const INDEX_CHANGE_CONTROL_EXCLUSIONS = new Set([

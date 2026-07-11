@@ -200,7 +200,7 @@ export default async function MethodologyPage() {
         <div
           className="meth-weights-bar"
           role="img"
-          aria-label={`Dimension weight visualization (PCA-derived, adopted ${civicaIndex.lastRevision})`}
+          aria-label={`Historical dimension weights (PCA-informed by the limited 2023 cross-section, adopted ${civicaIndex.lastRevision})`}
         >
           {DIMENSIONS.map((d) => (
             <div
@@ -238,17 +238,16 @@ export default async function MethodologyPage() {
         </div>
 
         <p>
-          <strong>The weights above are PCA-derived and adopted.</strong>{" "}
-          They come from the empirical factor analysis described in §4
-          and documented in full at{" "}
+          <strong>The archived Beta weights are PCA-informed.</strong>{" "}
+          They were calculated from a {civicaIndex.pca.panelSize}-country
+          2023 cross-section, then rounded and adopted for the historical
+          Beta formula. The derivation record and its limitations are at{" "}
           <Link href="/civica-index/methodology/pca-appendix">
             /civica-index/methodology/pca-appendix
           </Link>
-          . A fifth dimension — <em>Administrative Capacity</em>,
-          drawn from World Bank WGI Government Effectiveness and
-          Regulatory Quality — is added if and only if it emerges as
-          empirically distinct from Rule of Law in a future re-run of
-          that analysis once the WGI indicator is ingested.
+          . The proposed fifth dimension, <em>Administrative Capacity</em>,
+          was not included in that run or the later four-input temporal
+          analysis. Civica has made no factor decision about it.
         </p>
       </Reveal>
 

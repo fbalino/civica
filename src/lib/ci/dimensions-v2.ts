@@ -5,28 +5,22 @@
  * the Beta governance core is FOUR dimensions, with Human Development and
  * Stability/Security moved out to the separate Civica Conditions layer.
  *
- * Weights below are derived from the Phase 5.3 PCA on 46 countries × 4
- * dimensions (full analysis at /civica-index/methodology/pca-appendix).
- * PC1 explains 90.7% of variance with all four dimensions loading
- * roughly equally — indicating one strong latent "governance quality"
- * factor. Final weights are the squared PC1 loadings, rounded to 2dp
- * and proven to sum to 1.00:
+ * Weights below preserve the historical Phase 5.3 recipe: squared PC1
+ * loadings from a 46-country, four-input 2023 cross-section, rounded to
+ * two decimals. This is a weight-derivation record, not validation of a
+ * general or longitudinal "governance quality" factor.
  *
  *   democratic_quality  0.27   (PCA suggested 0.266)
  *   rule_of_law         0.26   (PCA suggested 0.257)
  *   freedom_rights      0.23   (PCA suggested 0.229)
  *   corruption_control  0.24   (PCA suggested 0.248)
  *
- * The 5th-dimension test (Administrative Capacity from WGI Government
- * Effectiveness) is deferred — that indicator is not yet ingested.
- * When it is, re-run the analysis to test whether it loads on a
- * distinct factor or collapses into Rule of Law.
+ * The proposed Administrative Capacity fifth dimension was not present
+ * in this run. No distinctness or redundancy result exists for it.
  *
- * NOTE: the Phase 5.3 panel is statistically usable (n=46) but
- * underpowered relative to the spec's 2000–2024 target. Weights will
- * be re-validated when the historical panel is ingested. The
- * structural decision (4-dim core, near-equal weights) is unlikely
- * to change.
+ * A later frozen 2000–2024 analysis found a strong common component in
+ * cross-country levels and a much weaker one in annual changes. It did
+ * not revise these deployed historical weights or test a fifth input.
  */
 
 /** Subset of CI dimensions used in the Beta governance core. */
@@ -43,8 +37,8 @@ export const V2_DIMENSIONS: readonly CIDimensionV2[] = [
   "corruption_control",
 ] as const;
 
-/** Empirical weights — sum to 1.00. PCA-derived from Phase 5.3
- * (squared PC1 loadings, rounded to 2dp). See full analysis at
+/** Historical Beta weights — sum to 1.00. PCA-informed by Phase 5.3
+ * (squared PC1 loadings, rounded to 2dp). See the bounded record at
  * /civica-index/methodology/pca-appendix. */
 export const V2_WEIGHTS: Record<CIDimensionV2, number> = {
   democratic_quality: 0.27,

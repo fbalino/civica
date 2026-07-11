@@ -696,13 +696,6 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "getSiteStats().activeSources with a generic fallback",
   ),
   runtimeClaim(
-    "data-approach.method-counts",
-    "content/data-approach.md",
-    "reader:data-approach",
-    "{{state.civicaIndex.dimensionCount}} governance dimensions",
-    "registered site-state Civica Index and Pulse methodology configuration",
-  ),
-  runtimeClaim(
     "data-approach.single-source-coverage",
     "content/data-approach.md",
     "reader:data-approach",
@@ -769,14 +762,14 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "pca-appendix.dimension-limitation",
     "content/methodology-pca-appendix.md",
     "reader:methodology-pca-appendix",
-    "{{state.civicaIndex.dimensionCount}} indicators are highly correlated",
-    "site-state.civicaIndex.dimensionCount",
+    "describe these {{state.civicaIndex.pca.panelSize}} observations only",
+    "site-state.civicaIndex PCA panel size",
   ),
   runtimeClaim(
     "pca-appendix.sample-size",
     "content/methodology-pca-appendix.md",
     "reader:methodology-pca-appendix",
-    "current panel is {{state.civicaIndex.pca.panelSize}} countries",
+    "contains {{state.civicaIndex.pca.panelSize}} countries from one 2023 cross-section",
     "registered site-state Civica Index PCA panel and data vintage",
   ),
   runtimeClaim(

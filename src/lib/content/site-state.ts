@@ -74,7 +74,7 @@ const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
  *  Civica Index. Resolves the README/About "six dimensions" vs CI
  *  methodology page "four dimensions" inconsistency: the running v2
  *  Beta scores produced by `src/lib/ci/calculate-v2.ts` use FOUR
- *  dimensions with PCA-derived weights 27/26/23/24. Verified
+ *  dimensions with historically PCA-informed weights 27/26/23/24. Verified
  *  2026-05-05 against `src/lib/ci/dimensions-v2.ts`,
  *  `src/app/(reader)/civica-index/[slug]/page.tsx`, and
  *  `getCIRankings()` defaulting to the pinned current release version. */
@@ -90,7 +90,7 @@ export const civicaIndex = {
    *  Development + Stability/Security moved to Civica Conditions). */
   dimensionCount: 4 as const,
 
-  /** Adopted dimensions + PCA-derived weights. Numbers MUST match
+  /** Adopted dimensions + historically PCA-informed weights. Numbers MUST match
    *  `src/lib/ci/dimensions-v2.ts` V2_WEIGHTS — that file drives the
    *  scoring pipeline; this entry drives display copy. If you update
    *  one, update both. */

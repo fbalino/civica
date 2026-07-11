@@ -27,7 +27,7 @@
     "freedom_rights": 0.229,
     "corruption_control": 0.248
   },
-  "decision": "Keep 4-dimension governance core. PCA confirms strong shared variance across the four indicators (PC1 loads on all four), consistent with a single latent 'governance quality' factor \u2014 but also that each contributes roughly equally to that factor, supporting the 4-way breakout for interpretability.",
-  "fifth_dimension_test": "Administrative Capacity (WGI Government Effectiveness) is NOT tested in this phase because the indicator is not yet ingested. Deferred to a follow-up \u2014 when ingested, re-run this PCA to test whether it loads on a distinct factor or collapses into Rule of Law.",
-  "sample_size_caveat": "This PCA was run on n=46 country-year observations from a single recent year (2023). The spec calls for a 2000\u20132024 panel, which would yield thousands of observations. The current sample is statistically usable but underpowered. Final weights will be re-validated when the historical panel is ingested. The structural decision (4-dim core, weights proportional to loadings) is unlikely to change."
+  "decision": "Historical weight recipe only. The four inputs share strong variance in this 46-country 2023 cross-section, and squared PC1 loadings informed the archived Beta weights. The run does not validate a general or longitudinal governance factor.",
+  "fifth_dimension_test": "Not run. Administrative Capacity indicators were absent, so this analysis provides no distinctness, redundancy, factor, or rotation result for a fifth dimension.",
+  "sample_size_caveat": "This PCA contains 46 country observations from one 2023 cross-section. Its correlations, factor structure, and weights cannot be generalized across time or broader country coverage. A later frozen temporal analysis is reported separately and does not turn this run into a longitudinal model."
 }

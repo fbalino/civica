@@ -85,7 +85,7 @@ The data layer and reconciliation logic are real and load-bearing. The reader pa
 
 Some surfaces still carry a BETA marker. This means one of two things.
 
-The **Civica Index** composite scoring methodology (PCA-derived weights, {{state.civicaIndex.dimensionCount}} governance dimensions, frozen reference periods) is published but still in active development (a v2 methodology rebuild is in progress), and external academic review has not yet been completed. The page is in BETA pending review. The **Civica Pulse** includes {{state.pulse.backtest.cases.length}} hand-curated historical smoke-test scenarios, but the displayed run predates the current production ensemble and is not representative validation. **Reconciliation rules** are documented and live but the public-facing methodology page is being expanded as v1 closes out.
+The archived **Civica Index** composite methodology uses {{state.civicaIndex.dimensionCount}} governance inputs and weights informed by a limited 2023 cross-section. It remains preserved research and is not Civica&rsquo;s selected public comparison product. The **Civica Pulse** includes {{state.pulse.backtest.cases.length}} hand-curated historical smoke-test scenarios, but the displayed run predates the current production ensemble and is not representative validation. **Reconciliation rules** are documented and live but the public-facing methodology page is being expanded as v1 closes out.
 
 External methodologies that Civica cites — V-Dem Regimes of the World, World Bank country classifications, Bjørnskov-Rode regime taxonomy, the Cheibub-Gandhi-Vreeland classification — do not carry a BETA marker. They inherit the source institution's standing.
 
