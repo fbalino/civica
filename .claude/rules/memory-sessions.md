@@ -539,3 +539,11 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   mixed-rights source values.
 - Static/live validators, mutation probes, 672/672 tests, methodology browser
   verification, and the production build pass. IDX-007 is next.
+
+## 2026-07-11 — IDX-007 Index research charter completed
+
+- Adopted a governing charter that limits original measurement to auditable
+  institutional facts or measurement-ecosystem meta-measurement.
+- Candidates must add information and beat a relevant baseline on a locked user
+  task; the dashboard/no-score baseline and no-winner outcome remain valid.
+- Machine contract, validator, and 674/674 tests pass. IDX-008 is next.
