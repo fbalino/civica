@@ -1,0 +1,242 @@
+import { createHash } from "node:crypto";
+import { readFileSync, readdirSync } from "node:fs";
+
+export const INDEX_CHANGE_CATEGORIES = [
+  "input",
+  "transform",
+  "weight_or_model",
+  "missingness",
+  "uncertainty",
+  "band_or_rank",
+  "presentation",
+] as const;
+export type IndexChangeCategory = (typeof INDEX_CHANGE_CATEGORIES)[number];
+
+export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: IndexChangeCategory }> = [
+  { path: "src/lib/ci/atomic-ingestion.ts", category: "input" },
+  { path: "src/lib/ci/current-release.ts", category: "input" },
+  { path: "src/lib/ci/production-source-adapters.ts", category: "input" },
+  { path: "src/lib/ci/research-panel.ts", category: "input" },
+  { path: "src/lib/ci/k1-uncertainty-inputs.ts", category: "input" },
+  { path: "src/lib/ci/k4-practice-inputs.ts", category: "input" },
+  { path: "src/lib/ci/history-adapters.ts", category: "input" },
+  { path: "src/lib/ci/ingest.ts", category: "input" },
+  { path: "src/lib/ci/longitudinal-validation-inputs.ts", category: "input" },
+  { path: "src/lib/ci/source-utils.ts", category: "input" },
+  { path: "src/lib/ci/normalize.ts", category: "transform" },
+  { path: "src/lib/ci/normalize-v2.ts", category: "transform" },
+  { path: "src/lib/ci/calculate.ts", category: "transform" },
+  { path: "src/lib/ci/calculate-v2.ts", category: "transform" },
+  { path: "src/lib/ci/normalization-table.ts", category: "transform" },
+  { path: "src/lib/ci/reproduce-current-release.ts", category: "transform" },
+  { path: "src/lib/ci/versioning.ts", category: "transform" },
+  { path: "src/lib/ci/dimensions-v2.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/candidate-specifications.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/dimensionality-analysis.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/incremental-information-analysis.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/incremental-information-preregistration.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/longitudinal-analysis.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/longitudinal-preregistration.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/pca-analysis.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/reader-task-protocol.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/research-charter.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/source-ecosystem-dependence.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/subgroup-fairness.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-baselines.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-candidate-k1.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-candidate-k2.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-candidate-k3.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-candidate-k4.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-candidate-k5.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-evaluation-interface.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-decision.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-preregistration.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/tournament-results-package.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/types.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/validity-analysis.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/validity-preregistration.ts", category: "weight_or_model" },
+  { path: "src/lib/ci/missingness-policy.ts", category: "missingness" },
+  { path: "src/lib/ci/uncertainty-policy.ts", category: "uncertainty" },
+  { path: "src/lib/ci/monte-carlo.ts", category: "uncertainty" },
+  { path: "src/lib/ci/sensitivity-analysis.ts", category: "uncertainty" },
+  { path: "src/lib/ci/bands.ts", category: "band_or_rank" },
+  { path: "src/lib/ci/tiers.ts", category: "band_or_rank" },
+  { path: "src/lib/ci/rank-policy.ts", category: "band_or_rank" },
+  { path: "src/lib/ci/governance-evidence.ts", category: "presentation" },
+  { path: "src/lib/ci/dimension-colors.ts", category: "presentation" },
+  { path: "src/lib/ci/index-disposition.ts", category: "presentation" },
+  { path: "src/lib/ci/misuse-audit.ts", category: "presentation" },
+  { path: "src/components/governance-evidence/GovernanceEvidenceTable.tsx", category: "presentation" },
+  { path: "src/app/governance-evidence/page.tsx", category: "presentation" },
+  { path: "src/app/(reader)/civica-index/page.tsx", category: "presentation" },
+  { path: "src/app/(reader)/country/[slug]/civica-data/page.tsx", category: "presentation" },
+  { path: "src/app/compare/page.tsx", category: "presentation" },
+  { path: "src/app/rankings/RankingsMatrix.tsx", category: "presentation" },
+  { path: "src/lib/atlas/map-layers.ts", category: "presentation" },
+  { path: "src/app/embed/[slug]/route.ts", category: "presentation" },
+  { path: "src/lib/ci/quarantine-contract.ts", category: "presentation" },
+  { path: "content/methodology-civica-index.md", category: "presentation" },
+] as const;
+
+const INDEX_CHANGE_CONTROL_EXCLUSIONS = new Set([
+  "claims-docs-gate.ts",
+  "governance-evidence-review-package.ts",
+  "governance-evidence-review-packet.ts",
+  "index-change-control.ts",
+  "index-research-archive.ts",
+]);
+
+export function unclassifiedIndexSemanticFiles(): string[] {
+  const classified = new Set(INDEX_PROTECTED_FILES.map((row) => row.path));
+  return readdirSync("src/lib/ci")
+    .filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts") && !INDEX_CHANGE_CONTROL_EXCLUSIONS.has(name))
+    .map((name) => `src/lib/ci/${name}`)
+    .filter((path) => !classified.has(path))
+    .sort();
+}
+
+export const INDEX_CHANGE_EVIDENCE_ROLES = [
+  "documentation",
+  "registry",
+  "release_note",
+  "migration_plan",
+  "golden_test",
+  "contract_test",
+] as const;
+export type IndexChangeEvidenceRole = (typeof INDEX_CHANGE_EVIDENCE_ROLES)[number];
+
+export type IndexSnapshotFile = { path: string; category: IndexChangeCategory; sha256: string };
+export type IndexEvidenceFile = { path: string; sha256: string };
+export type IndexChangeEntry = {
+  id: string;
+  fromVersion: string;
+  toVersion: string;
+  parentSnapshotSha256: string | null;
+  snapshotSha256: string;
+  categories: IndexChangeCategory[];
+  changedPaths: string[];
+  protectedFiles: IndexSnapshotFile[];
+  evidence: Record<IndexChangeEvidenceRole, IndexEvidenceFile[]>;
+  validations: string[];
+};
+export type IndexChangeRegistry = {
+  schemaVersion: string;
+  policy: { appendOnly: boolean; updateCommand: string; ciCommand: string };
+  entries: IndexChangeEntry[];
+  currentSnapshotSha256: string;
+};
+
+const REQUIRED_VALIDATIONS: Record<IndexChangeCategory, readonly string[]> = {
+  input: ["validate:ci-current-release", "validate:ci-research-panel"],
+  transform: ["validate:index-research-archive"],
+  weight_or_model: ["validate:index-research-archive"],
+  missingness: ["validate:ci-missingness"],
+  uncertainty: ["validate:ci-uncertainty"],
+  band_or_rank: ["validate:ci-ranking"],
+  presentation: ["validate:index-quarantine", "validate:claims-docs"],
+};
+const ALWAYS_REQUIRED = [
+  "validate:index-disposition",
+  "validate:governance-evidence-review-packet",
+] as const;
+
+export function sha256(value: string | Buffer): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+export function currentIndexSnapshot(): IndexSnapshotFile[] {
+  return INDEX_PROTECTED_FILES.map((row) => ({
+    ...row,
+    sha256: sha256(readFileSync(row.path)),
+  }));
+}
+
+export function indexSnapshotSha256(files: readonly IndexSnapshotFile[]): string {
+  return sha256(JSON.stringify([...files].sort((a, b) => a.path.localeCompare(b.path))));
+}
+
+export function requiredIndexValidations(categories: readonly IndexChangeCategory[]): string[] {
+  return [...new Set([...ALWAYS_REQUIRED, ...categories.flatMap((category) => REQUIRED_VALIDATIONS[category])])].sort();
+}
+
+export function indexEvidence(paths: Record<IndexChangeEvidenceRole, string[]>): Record<IndexChangeEvidenceRole, IndexEvidenceFile[]> {
+  return Object.fromEntries(
+    INDEX_CHANGE_EVIDENCE_ROLES.map((role) => [
+      role,
+      paths[role].map((path) => ({ path, sha256: sha256(readFileSync(path)) })),
+    ]),
+  ) as Record<IndexChangeEvidenceRole, IndexEvidenceFile[]>;
+}
+
+function sameMembers(a: readonly string[], b: readonly string[]): boolean {
+  return [...a].sort().join("\n") === [...b].sort().join("\n");
+}
+
+function changedFiles(before: readonly IndexSnapshotFile[], after: readonly IndexSnapshotFile[]): IndexSnapshotFile[] {
+  const prior = new Map(before.map((row) => [row.path, row.sha256]));
+  return after.filter((row) => prior.get(row.path) !== row.sha256);
+}
+
+function evidenceChanged(before: IndexEvidenceFile[], after: IndexEvidenceFile[]): boolean {
+  const prior = new Set(before.map((row) => `${row.path}:${row.sha256}`));
+  return after.some((row) => !prior.has(`${row.path}:${row.sha256}`));
+}
+
+export function indexChangeControlErrors(
+  registry: IndexChangeRegistry,
+  currentFiles: readonly IndexSnapshotFile[] = currentIndexSnapshot(),
+): string[] {
+  const errors: string[] = [];
+  if (registry.schemaVersion !== "civica-index-change-control/v1") errors.push("schema version drifted");
+  if (!registry.policy.appendOnly) errors.push("change registry is not append-only");
+  if (registry.entries.length === 0) errors.push("change registry has no baseline");
+  for (const path of unclassifiedIndexSemanticFiles()) errors.push(`unclassified Index semantic file: ${path}`);
+  const protectedPaths = INDEX_PROTECTED_FILES.map((row) => row.path);
+  for (let index = 0; index < registry.entries.length; index += 1) {
+    const entry = registry.entries[index];
+    const prior = registry.entries[index - 1];
+    if (!entry.id.trim()) errors.push(`entry ${index} has no id`);
+    if (!entry.fromVersion.trim() || !entry.toVersion.trim() || entry.fromVersion === entry.toVersion) errors.push(`${entry.id}: methodology version did not advance`);
+    if (!sameMembers(entry.protectedFiles.map((row) => row.path), protectedPaths)) errors.push(`${entry.id}: protected file inventory is incomplete`);
+    if (entry.snapshotSha256 !== indexSnapshotSha256(entry.protectedFiles)) errors.push(`${entry.id}: snapshot hash drifted`);
+    if (!prior) {
+      if (entry.parentSnapshotSha256 !== null) errors.push(`${entry.id}: baseline parent must be null`);
+      if (!sameMembers(entry.changedPaths, protectedPaths)) errors.push(`${entry.id}: baseline must bind every protected path`);
+    } else {
+      if (entry.parentSnapshotSha256 !== prior.snapshotSha256) errors.push(`${entry.id}: snapshot chain is broken`);
+      if (entry.fromVersion !== prior.toVersion) errors.push(`${entry.id}: version chain is broken`);
+      const changed = changedFiles(prior.protectedFiles, entry.protectedFiles);
+      if (changed.length === 0) errors.push(`${entry.id}: empty methodology change record`);
+      if (!sameMembers(entry.changedPaths, changed.map((row) => row.path))) errors.push(`${entry.id}: changed path inventory is inaccurate`);
+      if (!sameMembers(entry.categories, [...new Set(changed.map((row) => row.category))])) errors.push(`${entry.id}: change categories do not match the snapshot diff`);
+      for (const role of INDEX_CHANGE_EVIDENCE_ROLES) {
+        if (!evidenceChanged(prior.evidence[role], entry.evidence[role])) errors.push(`${entry.id}: ${role} was not updated`);
+      }
+    }
+    for (const role of INDEX_CHANGE_EVIDENCE_ROLES) {
+      if (entry.evidence[role].length === 0) errors.push(`${entry.id}: ${role} evidence is missing`);
+      for (const file of entry.evidence[role]) {
+        try {
+          if (sha256(readFileSync(file.path)) !== file.sha256) errors.push(`${entry.id}: ${role} evidence drifted at ${file.path}`);
+        } catch {
+          errors.push(`${entry.id}: ${role} evidence is missing at ${file.path}`);
+        }
+      }
+    }
+    const required = requiredIndexValidations(entry.categories);
+    if (!required.every((command) => entry.validations.includes(command))) errors.push(`${entry.id}: declared validation set is incomplete`);
+    if (
+      prior &&
+      entry.categories.some((category) => category === "transform" || category === "weight_or_model") &&
+      !entry.validations.some((command) => command.startsWith("validate:index-") && !required.includes(command))
+    ) {
+      errors.push(`${entry.id}: model/transform change lacks a new version-specific Index validator`);
+    }
+  }
+  const latest = registry.entries.at(-1);
+  if (latest) {
+    if (registry.currentSnapshotSha256 !== latest.snapshotSha256) errors.push("registry head does not match latest entry");
+    if (!sameMembers(currentFiles.map((row) => `${row.path}:${row.sha256}`), latest.protectedFiles.map((row) => `${row.path}:${row.sha256}`))) errors.push("protected Index files changed without a new change record");
+  }
+  return errors;
+}
