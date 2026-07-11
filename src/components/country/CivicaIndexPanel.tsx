@@ -26,6 +26,7 @@ import { V2_WEIGHTS } from "@/lib/ci/dimensions-v2";
 import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import { assessCiCompleteness } from "@/lib/ci/missingness-policy";
 
 /**
  * Reusable Civica Index country body. Extracted from
@@ -533,6 +534,12 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
   const renderedDimensionCount = DIMENSION_ORDER.filter((dim) =>
     dimensions.some((d) => d.dimension === dim)
   ).length;
+  const completenessAssessment = assessCiCompleteness(
+    new Set(dimensions.map((dimension) => dimension.dimension)),
+  );
+  const unavailableDimensionLabels = completenessAssessment.missing.map(
+    (dimension) => DIMENSION_LABELS[dimension] ?? dimension.replaceAll("_", " "),
+  );
   const score = composite ? Math.round(composite.score) : null;
   const resolvedCapital =
     capitalFact?.canonical?.factValue ?? jurisdiction.capital ?? null;
@@ -567,6 +574,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
         totalRanked: composite.totalRanked ?? null,
         quarter: composite.quarter,
         isPartial: Boolean(composite.isPartial),
+        missingDimensions: composite.missingDimensions ?? [],
       }
     : null;
   const previousHistoryPoint =
@@ -673,7 +681,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
         ) : (
           <div className="cv-card" style={{ marginBottom: "var(--space-6)" }}>
             <p className="ci-country-empty-copy">
-              No CI score available for this country yet.
+              Insufficient data for the governance index. Missing: {unavailableDimensionLabels.join(", ")}.
             </p>
           </div>
         )}

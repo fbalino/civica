@@ -6,6 +6,7 @@ import { eq, sql, desc, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   shapeIndexRankingsItem,
   shapeIndexRankingsMeta,
@@ -204,14 +205,15 @@ export async function GET(request: Request) {
       );
 
       const filtered = rows
-        .map(({ jurisdictionId, ...row }) => ({
-          ...row,
-          // Normalize null->[] to match the sibling CI endpoints
-          // (index/[slug], index/compare), which never emit a null
-          // missingDimensions array.
-          missingDimensions: row.missingDimensions ?? [],
-          governmentClassification: classificationMap.get(jurisdictionId) ?? null,
-        }))
+        .map(({ jurisdictionId, ...row }) => {
+          const completeness = parsePublishedCiCompleteness(row);
+          return {
+            ...row,
+            ...completeness,
+            governmentClassification:
+              classificationMap.get(jurisdictionId) ?? null,
+          };
+        })
         .filter((row) => {
           const label =
             taxonomy === "regime"
@@ -263,13 +265,15 @@ export async function GET(request: Request) {
 
     return withStructuralFamilyDeprecation(
       apiResponse({
-        data: rows.map(({ jurisdictionId, ...row }) =>
-          shapeIndexRankingsItem({
+        data: rows.map(({ jurisdictionId, ...row }) => {
+          const completeness = parsePublishedCiCompleteness(row);
+          return shapeIndexRankingsItem({
             ...row,
-            missingDimensions: row.missingDimensions ?? [],
-            governmentClassification: classificationMap.get(jurisdictionId) ?? null,
-          }),
-        ),
+            ...completeness,
+            governmentClassification:
+              classificationMap.get(jurisdictionId) ?? null,
+          });
+        }),
         meta: shapeIndexRankingsMeta({
           total,
           limit,

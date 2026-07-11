@@ -31,6 +31,10 @@ import { BetaChip } from "@/components/editorial/BetaChip";
 import { Banner } from "@/components/editorial/Banner";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
 import { PageHero } from "@/components/PageHero";
+import {
+  V2_DIMENSION_LABELS,
+  type CIDimensionV2,
+} from "@/lib/ci/dimensions-v2";
 
 export const revalidate = 3600;
 
@@ -451,7 +455,18 @@ export default async function CivicaIndexPage({
 
                       <div className="ci-lb-dims" role="cell">
                         {r.completenessFlag === "partial" ? (
-                          <span>
+                          <span
+                            title={`Partial estimate — missing ${
+                              (r.missingDimensions ?? [])
+                                .map(
+                                  (dimension) =>
+                                    V2_DIMENSION_LABELS[
+                                      dimension as CIDimensionV2
+                                    ] ?? dimension.replaceAll("_", " "),
+                                )
+                                .join(", ")
+                            }`}
+                          >
                             {r.dimensionsAvailable}/{civicaIndex.dimensionCount}
                             <span className="ci-dim-warn" aria-hidden="true" />
                           </span>

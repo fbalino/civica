@@ -18,6 +18,7 @@ const ALL_DIMENSIONS: CIDimension[] = [
 ];
 
 const MIN_DIMENSIONS_REQUIRED = 3;
+export const LEGACY_CI_METHODOLOGY_VERSION = "v1.0" as const;
 
 interface DimensionRow {
   jurisdictionId: string;
@@ -83,9 +84,14 @@ function computeComposite(
 export async function calculateCompositeScores(
   db: Db,
   quarter: string,
-  methodologyVersionId?: string
+  methodologyVersionId: string,
 ): Promise<{ calculated: number; skippedInsufficient: number }> {
-  const versionId = methodologyVersionId ?? await getLatestVersion(db);
+  if (methodologyVersionId !== LEGACY_CI_METHODOLOGY_VERSION) {
+    throw new Error(
+      `The six-dimension legacy calculator is sealed to ${LEGACY_CI_METHODOLOGY_VERSION}; use calculate:ci:v2 for current Index releases.`,
+    );
+  }
+  const versionId = methodologyVersionId;
 
   const [methodology] = await db
     .select({ weights: ciMethodologyVersions.weights })
@@ -179,16 +185,4 @@ export async function calculateCompositeScores(
   }
 
   return { calculated: results.length, skippedInsufficient };
-}
-
-async function getLatestVersion(db: Db): Promise<string> {
-  const rows = await db
-    .select({ id: ciMethodologyVersions.id })
-    .from(ciMethodologyVersions)
-    .orderBy(dsql`${ciMethodologyVersions.publishedAt} DESC`)
-    .limit(1);
-  if (rows.length === 0) {
-    throw new Error("No methodology version found. Run seed-ci-methodology first.");
-  }
-  return rows[0].id;
 }

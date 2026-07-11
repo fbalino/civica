@@ -752,6 +752,13 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "site-state.civicaIndex.dimensionCount",
   ),
   runtimeClaim(
+    "index-methodology.publication-threshold",
+    "content/methodology-civica-index.md",
+    "reader:methodology-civica-index",
+    "at least {{state.civicaIndex.missingness.minimumDimensionsForPublication}} of the {{state.civicaIndex.dimensionCount}} dimensions",
+    "versioned site-state Civica Index missingness policy",
+  ),
+  runtimeClaim(
     "index-methodology.pca-panel",
     "content/methodology-civica-index.md",
     "reader:methodology-civica-index",

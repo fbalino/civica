@@ -19,7 +19,6 @@ import { ciDimensionScores, ciCompositeScores } from "../db/schema";
 import {
   V2_DIMENSIONS,
   V2_WEIGHTS,
-  V2_MANDATORY,
   isV2Dimension,
   type CIDimensionV2,
 } from "./dimensions-v2";
@@ -28,6 +27,11 @@ import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
 import { CI_BETA_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 import { assertSupersession, frozenContentHash, indexContentHash, parseIndexVintageLabel, stableStringify } from "../data/frozen-vintage";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
+import {
+  assessCiCompleteness,
+  CURRENT_CI_MISSINGNESS_POLICY,
+  type CiCompletenessFlag,
+} from "./missingness-policy";
 
 export const BETA_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
 
@@ -39,7 +43,8 @@ export const BETA_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
  * adjustment, not a statistical correction — see `classifyCompleteness`
  * for the upward-bias limitation it does not fully offset.
  */
-export const PARTIAL_WIDENING_FACTOR = 1.2;
+export const PARTIAL_WIDENING_FACTOR =
+  CURRENT_CI_MISSINGNESS_POLICY.partialRangeMultiplier;
 
 export interface DimensionRow {
   jurisdictionId: string;
@@ -48,7 +53,7 @@ export interface DimensionRow {
   sourceId: string;
 }
 
-export type CompletenessFlag = "full" | "partial" | "insufficient";
+export type CompletenessFlag = CiCompletenessFlag;
 
 export interface CompositeResult {
   jurisdictionId: string;
@@ -87,15 +92,8 @@ export function classifyCompleteness(present: Set<string>): {
   completeness: CompletenessFlag;
   missing: CIDimensionV2[];
 } {
-  const missing = V2_DIMENSIONS.filter((d) => !present.has(d));
-  const mandatoryMissing = V2_MANDATORY.some((d) => !present.has(d));
-  if (mandatoryMissing) {
-    return { completeness: "insufficient", missing };
-  }
-  if (missing.length === 0) {
-    return { completeness: "full", missing };
-  }
-  return { completeness: "partial", missing };
+  const { completeness, missing } = assessCiCompleteness(present);
+  return { completeness, missing };
 }
 
 /** Re-proportion v2 weights to sum to 1.00 over the dimensions present. */

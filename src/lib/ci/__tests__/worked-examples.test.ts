@@ -155,6 +155,14 @@ test("§14 beta/release presentation: methodology-version constant and beta stat
     "central_90_percent",
   );
   assert.equal(CI_METHODOLOGY_META.presentation.categorical_grades, false);
+  assert.equal(
+    CI_METHODOLOGY_META.missingness.policy_id,
+    civicaIndex.missingness.id,
+  );
+  assert.equal(
+    CI_METHODOLOGY_META.missingness.minimum_dimensions_for_publication,
+    3,
+  );
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -201,6 +209,22 @@ test("mandatory-dimension exclusion: missing rule_of_law yields insufficient / n
     ["democratic_quality", "freedom_rights", "corruption_control"],
     "test-insufficient",
   );
+  assert.equal(computeOne(rows, 500, seededRng()), null);
+});
+
+test("publication threshold: two mandatory dimensions alone remain insufficient", () => {
+  const rows = buildRows(
+    ["democratic_quality", "rule_of_law"],
+    "test-two-dimensions",
+  );
+  const assessment = classifyCompleteness(
+    new Set(rows.map((row) => row.dimension)),
+  );
+  assert.equal(assessment.completeness, "insufficient");
+  assert.deepEqual(assessment.missing, [
+    "freedom_rights",
+    "corruption_control",
+  ]);
   assert.equal(computeOne(rows, 500, seededRng()), null);
 });
 

@@ -58,6 +58,8 @@ import {
   shapePulseChangelogRow,
 } from "./shapes";
 import { COUNTRY_EXPORT_CSV_HEADER } from "./csv";
+import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 
 /* ────────────────────────────────────────────────────────────────
  * Shared fixture pieces
@@ -378,20 +380,7 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
     ],
   }),
   meta: {
-    methodology: {
-      status: "beta",
-      standing: "secondary_research_experiment",
-      independent_validation: false,
-      atlas_dependency: false,
-      last_revised: "2026-07-01",
-      reference: "https://civicaatlas.org/civica-index/methodology",
-      presentation: {
-        format: "numeric_position",
-        scale: { min: 0, max: 100 },
-        input_variation_range: "central_90_percent",
-        categorical_grades: false,
-      },
-    },
+    methodology: CI_METHODOLOGY_META,
     deprecations: [
       {
         identifier: "structural_family",
@@ -434,20 +423,7 @@ const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
     }),
   ],
   meta: {
-    methodology: {
-      status: "beta",
-      standing: "secondary_research_experiment",
-      independent_validation: false,
-      atlas_dependency: false,
-      last_revised: "2026-07-01",
-      reference: "https://civicaatlas.org/civica-index/methodology",
-      presentation: {
-        format: "numeric_position",
-        scale: { min: 0, max: 100 },
-        input_variation_range: "central_90_percent",
-        categorical_grades: false,
-      },
-    },
+    methodology: CI_METHODOLOGY_META,
   },
 });
 
@@ -570,20 +546,7 @@ const indexCompareExampleResponse = zIndexCompareResponse.parse({
   meta: {
     quarter: null,
     count: 2,
-    methodology: {
-      status: "beta",
-      standing: "secondary_research_experiment",
-      independent_validation: false,
-      atlas_dependency: false,
-      last_revised: "2026-07-01",
-      reference: "https://civicaatlas.org/civica-index/methodology",
-      presentation: {
-        format: "numeric_position",
-        scale: { min: 0, max: 100 },
-        input_variation_range: "central_90_percent",
-        categorical_grades: false,
-      },
-    },
+    methodology: CI_METHODOLOGY_META,
     deprecations: [
       {
         identifier: "structural_family",
@@ -612,7 +575,7 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
   .strict()
   .parse({
     data: shapeIndexMethodologyData({
-      id: "beta",
+      id: CURRENT_CI_METHODOLOGY_VERSION,
       publishedAt: "2026-05-15T00:00:00.000Z",
       weights: {
         democratic_quality: 0.3,
@@ -625,20 +588,7 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
       createdAt: "2026-05-15T00:00:00.000Z",
     }),
     meta: {
-      methodology: {
-        status: "beta",
-        standing: "secondary_research_experiment",
-        independent_validation: false,
-        atlas_dependency: false,
-        last_revised: "2026-07-01",
-        reference: "https://civicaatlas.org/civica-index/methodology",
-        presentation: {
-          format: "numeric_position",
-          scale: { min: 0, max: 100 },
-          input_variation_range: "central_90_percent",
-          categorical_grades: false,
-        },
-      },
+      methodology: CI_METHODOLOGY_META,
     },
   });
 

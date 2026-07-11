@@ -13,6 +13,7 @@ import {
 import { and, eq, sql, desc } from "drizzle-orm";
 import { shapeIndexCountryData } from "@/lib/api/contract/shapes";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 
 /**
  * This endpoint serves the current Beta methodology by default. Pass
@@ -103,6 +104,7 @@ export async function GET(
       sourceId: d.sourceId,
       valueStatus: "observed" as const,
     }));
+    const completeness = parsePublishedCiCompleteness(composite);
 
     // This endpoint surfaces `governmentClassification`, which still
     // carries the deprecated `structuralFamily` / `structuralSubtype`
@@ -122,12 +124,12 @@ export async function GET(
           score: composite.score,
           scoreLower: composite.scoreLower,
           scoreUpper: composite.scoreUpper,
-          completenessFlag: composite.completenessFlag,
+          completenessFlag: completeness.completenessFlag,
           rank: composite.rank,
           totalRanked: composite.totalRanked,
           isPartial: composite.isPartial,
-          missingDimensions: composite.missingDimensions ?? [],
-          dimensionsAvailable: composite.dimensionsAvailable,
+          missingDimensions: completeness.missingDimensions,
+          dimensionsAvailable: completeness.dimensionsAvailable,
           methodologyVersion: composite.methodologyVersion,
           dimensions,
         }),

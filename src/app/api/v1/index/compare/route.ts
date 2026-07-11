@@ -1,6 +1,7 @@
 import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   withStructuralFamilyDeprecation,
@@ -55,20 +56,23 @@ export async function GET(request: Request) {
             row.jurisdiction.governmentClassification ?? null,
         },
         composite: row.composite
-          ? {
+          ? (() => {
+              const completeness = parsePublishedCiCompleteness(row.composite);
+              return {
               quarter: row.composite.quarter,
               vintageLabel: row.composite.vintageLabel,
               score: row.composite.score,
               scoreLower: row.composite.scoreLower,
               scoreUpper: row.composite.scoreUpper,
-              completenessFlag: row.composite.completenessFlag,
+              completenessFlag: completeness.completenessFlag,
               rank: row.composite.rank,
               totalRanked: row.composite.totalRanked,
               isPartial: row.composite.isPartial,
-              missingDimensions: row.composite.missingDimensions ?? [],
-              dimensionsAvailable: row.composite.dimensionsAvailable,
+              missingDimensions: completeness.missingDimensions,
+              dimensionsAvailable: completeness.dimensionsAvailable,
               methodologyVersion: row.composite.methodologyVersion,
-            }
+              };
+            })()
           : null,
         dimensions: row.dimensions.map((d) => ({
           dimension: d.dimension,

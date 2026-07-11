@@ -119,6 +119,8 @@ export default async function MethodologyPage() {
     pc1VariancePct,
     corrLow,
     corrHigh,
+    partialRangeWideningPct:
+      (civicaIndex.missingness.partialRangeMultiplier - 1) * 100,
   };
 
   const state = { civicaIndex, disputeSla, pulse };

@@ -33,6 +33,19 @@ export const CI_METHODOLOGY_META = Object.freeze({
   atlas_dependency: false as const,
   last_revised: civicaIndex.lastRevisionIso,
   reference: "https://civicaatlas.org/civica-index/methodology",
+  missingness: Object.freeze({
+    policy_id: civicaIndex.missingness.id,
+    mandatory_dimensions: civicaIndex.missingness.mandatoryDimensions,
+    optional_dimensions: civicaIndex.missingness.optionalDimensions,
+    minimum_dimensions_for_publication:
+      civicaIndex.missingness.minimumDimensionsForPublication,
+    maximum_missing_optional_dimensions:
+      civicaIndex.missingness.maximumMissingOptionalDimensions,
+    partial_weight_treatment: civicaIndex.missingness.partialWeightTreatment,
+    partial_range_multiplier: civicaIndex.missingness.partialRangeMultiplier,
+    partial_comparability: civicaIndex.missingness.partialComparability,
+    insufficient_treatment: civicaIndex.missingness.insufficientTreatment,
+  }),
   presentation: Object.freeze({
     format: "numeric_position",
     scale: Object.freeze({ min: 0, max: 100 }),

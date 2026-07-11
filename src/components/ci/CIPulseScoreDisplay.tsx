@@ -12,6 +12,10 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import { Tooltip } from "@/components/editorial/Tooltip";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
+import {
+  V2_DIMENSION_LABELS,
+  type CIDimensionV2,
+} from "@/lib/ci/dimensions-v2";
 
 export interface CIScoreData {
   score: number;
@@ -22,6 +26,7 @@ export interface CIScoreData {
   totalRanked: number | null;
   quarter: string;
   isPartial: boolean;
+  missingDimensions: string[];
 }
 
 interface CIScoreDisplayProps {
@@ -279,6 +284,11 @@ export function CIScoreDisplay({
     ciScore && ciScore.scoreLower != null && ciScore.scoreUpper != null
       ? `Central 90% of simulations: ${ciScore.scoreLower}–${ciScore.scoreUpper}`
       : null;
+  const missingDimensionLabels = (ciScore?.missingDimensions ?? []).map(
+    (dimension) =>
+      V2_DIMENSION_LABELS[dimension as CIDimensionV2] ??
+      dimension.replaceAll("_", " "),
+  );
 
   const ciFooter = ciScore
     ? [
@@ -287,7 +297,7 @@ export function CIScoreDisplay({
           : null,
         `Composite of ${dimCount} governance dimensions.`,
         ciScore.completenessFlag === "partial"
-          ? "Partial — one optional dimension missing."
+          ? `Partial — missing ${missingDimensionLabels.join(", ")}. Not directly comparable with full estimates as if coverage were equal.`
           : "Updated quarterly.",
       ]
         .filter(Boolean)

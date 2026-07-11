@@ -64,6 +64,7 @@ export const currentVintage =
 
 import { getPcaAnalysisSummary as PCA_ANALYSIS_SUMMARY_FN } from "@/lib/ci/pca-analysis";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { CURRENT_CI_MISSINGNESS_POLICY } from "@/lib/ci/missingness-policy";
 /** Computed once at module load — pure, DB-free, no clock. See
  *  `civicaIndex.pca` below. */
 const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
@@ -79,6 +80,7 @@ const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
 export const civicaIndex = {
   status: "beta" as const,
   methodologyVersion: CURRENT_CI_METHODOLOGY_VERSION,
+  missingness: CURRENT_CI_MISSINGNESS_POLICY,
   scaleMin: 0,
   scaleMax: 100,
 
@@ -100,10 +102,10 @@ export const civicaIndex = {
   /** Last methodology-doc revision label. Pages prefer the database
    *  `methodology.publishedAt` value when present; this string is the
    *  fallback when the DB is unseeded. Pair with `lastRevisionIso`. */
-  lastRevision: "Apr 2026" as const,
+  lastRevision: "Jul 2026" as const,
   /** ISO-formatted (year-month) form of `lastRevision`. Used by API
    *  `meta.methodology.last_revised`. Update both fields together. */
-  lastRevisionIso: "2026-04" as const,
+  lastRevisionIso: "2026-07" as const,
 
   /** Phase 5.3 PCA results — the empirical justification for
    *  weights above. Single source of truth for both the methodology

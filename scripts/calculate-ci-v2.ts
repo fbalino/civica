@@ -70,7 +70,7 @@ async function main() {
   console.log(`Scored (full or partial):              ${summary.scored}`);
   console.log(`  Full:                                ${summary.scored - summary.partial}`);
   console.log(`  Partial:                             ${summary.partial}`);
-  console.log(`Skipped (insufficient mandatory dims): ${summary.insufficient}`);
+  console.log(`Skipped (insufficient under missingness policy): ${summary.insufficient}`);
 
   // ── Phase 5.6: CI/Pulse double-counting prevention ────────────────
   console.log(`\n=== Decouple absorbed Pulse events ===`);

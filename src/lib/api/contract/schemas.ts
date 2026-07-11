@@ -257,6 +257,23 @@ export const zCiMethodologyMeta = z
     atlas_dependency: z.literal(false),
     last_revised: z.string(),
     reference: z.literal("https://civicaatlas.org/civica-index/methodology"),
+    missingness: z
+      .object({
+        policy_id: z.string(),
+        mandatory_dimensions: z.array(z.string()).length(2),
+        optional_dimensions: z.array(z.string()).length(2),
+        minimum_dimensions_for_publication: z.literal(3),
+        maximum_missing_optional_dimensions: z.literal(1),
+        partial_weight_treatment: z.literal(
+          "renormalize_present_weights_to_one",
+        ),
+        partial_range_multiplier: z.literal(1.2),
+        partial_comparability: z.literal(
+          "not_directly_comparable_to_full_estimates_without_the_missingness_flag",
+        ),
+        insufficient_treatment: z.literal("withhold_composite"),
+      })
+      .strict(),
     presentation: z
       .object({
         format: z.literal("numeric_position"),
@@ -531,12 +548,21 @@ const zCiCompositeCore = {
   score: z.number(),
   scoreLower: z.number().nullable(),
   scoreUpper: z.number().nullable(),
-  completenessFlag: z.string().nullable(),
+  completenessFlag: z.enum(["full", "partial"]).nullable(),
   rank: z.number().nullable(),
   totalRanked: z.number().nullable(),
   isPartial: z.boolean(),
-  missingDimensions: z.array(z.string()),
-  dimensionsAvailable: z.number().nullable(),
+  missingDimensions: z
+    .array(
+      z.enum([
+        "democratic_quality",
+        "rule_of_law",
+        "freedom_rights",
+        "corruption_control",
+      ]),
+    )
+    .max(1),
+  dimensionsAvailable: z.number().int().min(3).max(4).nullable(),
   methodologyVersion: z.string(),
 };
 
@@ -701,11 +727,20 @@ export const zIndexRankingsItem = z
     score: z.number(),
     scoreLower: z.number().nullable(),
     scoreUpper: z.number().nullable(),
-    completenessFlag: z.string().nullable(),
+    completenessFlag: z.enum(["full", "partial"]).nullable(),
     vintageLabel: z.string().nullable(),
     isPartial: z.boolean(),
-    missingDimensions: z.array(z.string()),
-    dimensionsAvailable: z.number().nullable(),
+    missingDimensions: z
+      .array(
+        z.enum([
+          "democratic_quality",
+          "rule_of_law",
+          "freedom_rights",
+          "corruption_control",
+        ]),
+      )
+      .max(1),
+    dimensionsAvailable: z.number().int().min(3).max(4).nullable(),
     methodologyVersion: z.string(),
     slug: z.string(),
     name: z.string(),
