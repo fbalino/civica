@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 291
-- **Completed:** 75
+- **Total tasks:** 292
+- **Completed:** 76
 - **Remaining:** 216
-- **Progress:** 25.8%
-- **Priority mix:** P0 182 · P1 104 · P2 5
+- **Progress:** 26%
+- **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -116,6 +116,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-038** (P0) Correct the tournament panel's exact K1 input identities before outcome analysis. _Done when: a superseding immutable panel uses the hash-pinned `pr_cl_total` publisher series rather than `fh_total_score`, includes the exact WGI Voice & Accountability fallback alongside V-Dem, structural gaps and selection precedence remain explicit, the preregistration and baselines advance to corrected hashes, prior releases remain preserved, and exact live reproduction passes._
 - [x] **IDX-039** (P0) Freeze practice-specific external indicators required for constitution-to-practice testing. _Done when: a small codebook-justified set of publisher indicators is ingested with exact source/indicator identity, definition, vintage, retrieval hash, native unit, published uncertainty, rights, missingness, and temporal breaks; broad LDI/FH/WGI composites cannot substitute for a specific practice construct; K4 can read the frozen release without inspecting validation labels._
 - [x] **IDX-040** (P0) Freeze independent longitudinal change labels and revision vintages for IDX-017. _Done when: exact official BR/CGV time-series editions identify dated democracy-state changes, at least one prior K1 input vintage supports source-revision sensitivity, every capture has URL/version/hash/rights/missingness, and no label is used to tune K1._
+- [x] **IDX-041** (P0) Freeze publisher uncertainty inputs required for K1 sensitivity analysis. _Done when: exact 2024 V-Dem, WGI VA/RL, CPI intervals and Freedom House uncertainty absence are captured with URL/hash/rights/native scale/missingness; the release is immutable and explicitly supports sensitivity scenarios rather than a calibrated composite confidence interval._
 
 ## Area 05 — Pulse Event Ledger and Validation
 

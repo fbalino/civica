@@ -465,3 +465,8 @@ This is the durable decision log for the active master plan. New entries append;
 
 **Decision:** The preregistered final-fold audit confirms K1's original-information failure at R² 0.99985 and K2's stability failure at 63.2% drop-one-rater classification change. K3–K5 remain insufficient without external labels. The geographic holdout contains 25 jurisdictions and no continent or current-regime subgroup reaches n=30, so subgroup performance estimates are suppressed rather than pooled, extrapolated, or presented without adequate support.
 **Why:** A held-out result matters only if thresholds and folds remain fixed, including when it confirms an adverse development finding. Reporting small-cell counts without unstable performance numbers preserves the geographic test's limits and leaves subgroup fairness to a design with adequate samples.
+
+### APR-D093 — Composite uncertainty sensitivity retains published bounds and explicit absence
+
+**Decision:** `ci-k1-uncertainty-inputs-2024-v1` freezes V-Dem credible bounds, WGI 90% intervals for both K1-related series, CPI confidence bounds, and Freedom House's absence of a per-country probability distribution. Every source remains on its native scale with exact bytes and rights. The release is for scenario sensitivity only. It cannot support a calibrated composite confidence interval because one input lacks a distribution and cross-source covariance is unknown.
+**Why:** Treating every source as equally noisy or independent would manufacture precision. Retaining what publishers actually provide makes independence and perfect-correlation scenarios reproducible while keeping the unmeasured Freedom House component visible.

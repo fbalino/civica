@@ -68,6 +68,8 @@
     "validate:index-longitudinal": "tsx scripts/validate-index-longitudinal-analysis.ts",
     "generate:index-oos-validation": "tsx scripts/generate-index-oos-validation.ts",
     "validate:index-oos-validation": "tsx scripts/validate-index-oos-validation.ts",
+    "generate:k1-uncertainty-inputs": "tsx scripts/generate-k1-uncertainty-inputs.ts",
+    "validate:k1-uncertainty-inputs": "tsx scripts/validate-k1-uncertainty-inputs.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",
