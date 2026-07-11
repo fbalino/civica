@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { arch, platform, release } from "node:os";
 import { TOURNAMENT_ERROR_LEDGER, TOURNAMENT_PACKAGE_ARTIFACTS, TOURNAMENT_REPRODUCTION_COMMANDS, TOURNAMENT_RESULTS_PACKAGE_ID, buildArtifactInventoryCsv, packageSha256, tournamentResultsPackageErrors } from "../src/lib/ci/tournament-results-package";
 import { INDEX_READER_TASK_PROTOCOL_SHA256 } from "../src/lib/ci/reader-task-protocol";
@@ -34,12 +34,11 @@ const artifacts = TOURNAMENT_PACKAGE_ARTIFACTS.map((artifact) => {
 });
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
 const commandCodePaths = TOURNAMENT_REPRODUCTION_COMMANDS.map((command) => String(packageJson.scripts[command.script]).match(/scripts\/[^\s]+\.ts/)?.[0]).filter((path): path is string => Boolean(path));
-const codePaths = [...new Set([
-  ...readdirSync("src/lib/ci").filter((path) => path.endsWith(".ts") && !path.endsWith(".test.ts")).map((path) => `src/lib/ci/${path}`),
-  ...commandCodePaths,
-  "scripts/reproduce-index-tournament-package.ts",
-  "scripts/validate-index-tournament-package.ts",
-])].sort();
+const priorManifest = JSON.parse(readFileSync(`${outputDir}/manifest.v1.json`, "utf8"));
+const codePaths = priorManifest.code.files.map((row: { path: string }) => row.path) as string[];
+for (const path of [...commandCodePaths, "scripts/reproduce-index-tournament-package.ts", "scripts/validate-index-tournament-package.ts"]) {
+  if (!codePaths.includes(path)) throw new Error(`Frozen v1 code inventory does not include ${path}; create a new package release instead of widening v1.`);
+}
 const code = codePaths.map((path) => ({ path, sha256: packageSha256(readFileSync(path)) }));
 const inventory = buildArtifactInventoryCsv(artifacts);
 writeFileSync(`${outputDir}/artifact-inventory.v1.csv`, inventory);

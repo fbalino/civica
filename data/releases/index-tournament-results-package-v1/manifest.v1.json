@@ -86,7 +86,7 @@
       },
       {
         "path": "scripts/reproduce-index-tournament-package.ts",
-        "sha256": "b802dfdcf0c665c6b4be8922b001c26dd29df4087beb06d4e7aed5bfa21cda1e"
+        "sha256": "5d761ea5094280319a0d821cd5488cd8b603b9586dd57f06312a28a85f65abc2"
       },
       {
         "path": "scripts/validate-governance-evidence-dashboard.ts",
@@ -309,7 +309,7 @@
         "sha256": "9ef6876543377898e0f502352b02fdce5b51b73e2867861e2b934aafa0e15ad1"
       }
     ],
-    "treeSha256": "8baa2528c8effc49fcd6035274e3589e48b6b65b8ae345dee58aa1938e659ff9"
+    "treeSha256": "16c222076ed91fe0a03eaa237b3844c5218a2acd45d72e96969007a141769531"
   },
   "artifacts": [
     {
