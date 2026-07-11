@@ -917,3 +917,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - `pulse-country-day-evaluation-set/v1` links random country-days to retained evidence identities and three frozen search families before any label exists.
 - Search silence does not prove a true negative; coders distinguish events, misses, insufficient observation, and out-of-scope cases.
 - The checked repository retains rights-safe result metadata rather than publisher text. Durable record: APR-D123.
+
+## 2026-07-11 — Independent Pulse coding is blinded and non-gold by default
+
+- `pulse-independent-coding/v1` hides production, owner, model, peer, adjudication, and answer-key fields from each coder.
+- Raw labels and every disagreement remain immutable and visible; adjudication is separate and may remain unresolved.
+- Agent dry runs diagnose instructions only. Only qualified independent human coding may later enter a gold release. Durable record: APR-D124.

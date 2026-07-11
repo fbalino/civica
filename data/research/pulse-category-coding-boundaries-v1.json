@@ -1,0 +1,436 @@
+{
+  "schemaVersion": "pulse-category-coding-boundaries/v1",
+  "ontologyVersion": "pulse-event-ontology/v3.0",
+  "status": "draft_reviewed_before_human_pilot",
+  "sourceNote": "Operational coding boundaries derived from the adopted ontology; production direction is not a moral or country-quality judgment.",
+  "categories": [
+    {
+      "categoryId": "fair_election",
+      "operationalDefinition": "A completed election is supported as competitive and procedurally sound, with no documented irregularity material enough to change that assessment.",
+      "includeWhen": "Include only when an attributable election-monitoring or equivalent evidence source assesses the process and count, rather than inferring fairness from certification or acceptance.",
+      "excludeWhen": "Exclude when major irregularities place it in flawed_election or when the result is cancelled or constitutionally overturned.",
+      "commonConfusion": "flawed_election"
+    },
+    {
+      "categoryId": "flawed_election",
+      "operationalDefinition": "Election remains in effect but is materially contested due to procedural or fairness deficiencies.",
+      "includeWhen": "Include when reports show clear flaws plus official disputes or legal challenges that do not cancel the election.",
+      "excludeWhen": "Exclude when the process is deemed fully fair or the outcome is formally annulled.",
+      "commonConfusion": "disputed_election"
+    },
+    {
+      "categoryId": "election_cancellation",
+      "operationalDefinition": "Election process is delayed, suspended, or voided through official action before a valid conclusion.",
+      "includeWhen": "Include when legislation, decree, or court ruling stops an election from being held or completed on schedule.",
+      "excludeWhen": "Exclude candidate-level access changes or ordinary post-election disputes that leave the voting event intact.",
+      "commonConfusion": "constitutional_override_electoral"
+    },
+    {
+      "categoryId": "constitutional_override_electoral",
+      "operationalDefinition": "Constitutional mechanism is used to replace or nullify electoral outcomes.",
+      "includeWhen": "Include when documentary evidence shows a constitution-level act that negates or supersedes a validated mandate.",
+      "excludeWhen": "Exclude administrative postponements or routine election-process delays without mandate override.",
+      "commonConfusion": "term_extension"
+    },
+    {
+      "categoryId": "mass_disenfranchisement",
+      "operationalDefinition": "A large-scale, de facto or de-jure reduction of voting participation rights.",
+      "includeWhen": "Include when sources show broad voter purge, disenfranchising law, or mass suspension of voting eligibility.",
+      "excludeWhen": "Exclude normal boundary changes or narrow voter-administration adjustments.",
+      "commonConfusion": "electoral_access_change"
+    },
+    {
+      "categoryId": "peaceful_transfer",
+      "operationalDefinition": "Governing authority is actually handed from an incumbent to a successor without a coercive rupture.",
+      "includeWhen": "Include when the successor assumes office through the applicable institutional process and the handover occurs without forceful interruption.",
+      "excludeWhen": "Exclude an election result before handover, incumbent continuity, a coup, or a negotiated regime transition that has not completed an ordinary transfer.",
+      "commonConfusion": "disputed_election"
+    },
+    {
+      "categoryId": "term_extension",
+      "operationalDefinition": "Executive or leadership mandate is lengthened beyond planned term structure through constitutional or legal change.",
+      "includeWhen": "Include when legal text or decree extends tenure or postpones term limits for officeholders.",
+      "excludeWhen": "Exclude ordinary elections or temporary postponements that do not change mandate length.",
+      "commonConfusion": "constitutional_override_electoral"
+    },
+    {
+      "categoryId": "judicial_purge",
+      "operationalDefinition": "Large-scale removal of judges is implemented as an institutional action.",
+      "includeWhen": "Include when records show systematic dismissal, forced replacement, or mass retirement of judiciary members.",
+      "excludeWhen": "Exclude single cases or prosecutions that target individual judges without broad institutional purge.",
+      "commonConfusion": "judicial_independence_rollback"
+    },
+    {
+      "categoryId": "executive_constitutional_override",
+      "operationalDefinition": "Executive authority bypasses constitutional constraints via overriding legal architecture.",
+      "includeWhen": "Include when authoritative text documents executive action that displaces constitutional procedure.",
+      "excludeWhen": "Exclude non-executive compliance failures or ordinary judicial independence adjustments.",
+      "commonConfusion": "executive_court_defiance"
+    },
+    {
+      "categoryId": "anticorruption_conviction",
+      "operationalDefinition": "A high-profile corruption conviction is supported as an exercise of institutionally independent prosecution and adjudication.",
+      "includeWhen": "Include only when evidence supports both a final corruption judgment and the independence of the responsible prosecutorial or judicial process.",
+      "excludeWhen": "Use corruption_conviction for the judgment alone; do not infer institutional independence from conviction or sentencing.",
+      "commonConfusion": "corruption_conviction"
+    },
+    {
+      "categoryId": "judicial_independence_expansion",
+      "operationalDefinition": "Institutional rules increase judicial autonomy from political control.",
+      "includeWhen": "Include when reforms add tenure, appointment, budgetary, or removal safeguards for courts.",
+      "excludeWhen": "Exclude reforms that reduce judicial autonomy.",
+      "commonConfusion": "judicial_independence_rollback"
+    },
+    {
+      "categoryId": "judicial_independence_rollback",
+      "operationalDefinition": "Institutional change lowers judicial autonomy or increases political capture.",
+      "includeWhen": "Include when legal changes centralize judicial appointments, discipline, or executive influence over courts.",
+      "excludeWhen": "Exclude case-level court non-compliance events without structural redesign.",
+      "commonConfusion": "judicial_independence_expansion"
+    },
+    {
+      "categoryId": "martial_law",
+      "operationalDefinition": "Military jurisdiction is declared over civil life under a formal martial legal regime.",
+      "includeWhen": "Include when legal instruments apply military command to civilian governance and enforcement scope.",
+      "excludeWhen": "Exclude civilian emergency states without military control of civil administration.",
+      "commonConfusion": "emergency_declaration"
+    },
+    {
+      "categoryId": "journalist_arrest",
+      "operationalDefinition": "Journalist-specific arrest, detention, or killing is evidenced as a targeted event.",
+      "includeWhen": "Include when identity-linked reporting actors are specifically identified in detention or lethal actions.",
+      "excludeWhen": "Exclude broader non-journalist political detentions or generic crowd-control actions.",
+      "commonConfusion": "mass_detention"
+    },
+    {
+      "categoryId": "media_shutdown",
+      "operationalDefinition": "A media outlet is taken offline, closed, or legally forced to cease operations.",
+      "includeWhen": "Include when an identifiable outlet is revoked, sealed, or blocked as an institution.",
+      "excludeWhen": "Exclude partial platform filtering or full internet disruptions that do not target specific outlets.",
+      "commonConfusion": "internet_content_restriction"
+    },
+    {
+      "categoryId": "protest_crackdown",
+      "operationalDefinition": "State response to protest events includes coercive force and casualty outcomes.",
+      "includeWhen": "Include when state-directed protest suppression causes at least one documented death or physical injury; arrests alone do not satisfy this category.",
+      "excludeWhen": "Exclude partisan clashes without state-directed suppression.",
+      "commonConfusion": "electoral_violence"
+    },
+    {
+      "categoryId": "systematic_crackdown",
+      "operationalDefinition": "Sustained, patterned repression of civil space is documented across time or sectors.",
+      "includeWhen": "Include when evidence shows repeated coordinated abuse beyond isolated incidents.",
+      "excludeWhen": "Exclude single-event detentions or isolated arrests without sustained institutional pattern.",
+      "commonConfusion": "mass_detention"
+    },
+    {
+      "categoryId": "mass_detention",
+      "operationalDefinition": "A broad detention campaign targets political or opposition-linked persons.",
+      "includeWhen": "Include when source material shows large-scale rounding up, prolonged holds, or mass warrants.",
+      "excludeWhen": "Exclude isolated arrests or detainee-condition changes without mass-capture logic.",
+      "commonConfusion": "opposition_prosecution"
+    },
+    {
+      "categoryId": "press_freedom_expansion",
+      "operationalDefinition": "Legal or institutional change expands press operation and publication protections.",
+      "includeWhen": "Include when protections are added or censorship powers are repealed in law or policy.",
+      "excludeWhen": "Exclude journalist arrests or shutdowns that narrow operational space.",
+      "commonConfusion": "media_shutdown"
+    },
+    {
+      "categoryId": "assembly_rights_expansion",
+      "operationalDefinition": "Association or assembly protections are broadened through legal or policy reform.",
+      "includeWhen": "Include when permit barriers fall, rights broaden, or enforcement standards become less restrictive.",
+      "excludeWhen": "Exclude de jure restrictions, blanket bans, or permit tightening.",
+      "commonConfusion": "assembly_rights_restriction"
+    },
+    {
+      "categoryId": "internet_shutdown",
+      "operationalDefinition": "Large-scale internet connectivity is intentionally disabled or blocked.",
+      "includeWhen": "Include when sources confirm nationwide or broad-area total or near-total outage by authority action.",
+      "excludeWhen": "Exclude targeted content filtering or throttling without full network cut.",
+      "commonConfusion": "internet_content_restriction"
+    },
+    {
+      "categoryId": "corruption_conviction",
+      "operationalDefinition": "A high-level corruption offense in public office reaches a final adverse judgment.",
+      "includeWhen": "Include when a final judicial record or reliable account confirms a high-level public-corruption conviction; no inference about institutional independence is allowed.",
+      "excludeWhen": "Exclude allegations, investigations, unresolved proceedings, and the separate rule-of-law claim that the process was independent.",
+      "commonConfusion": "corruption_scandal"
+    },
+    {
+      "categoryId": "corruption_scandal",
+      "operationalDefinition": "Major corruption conduct is documented in public evidence but lacks finalized judicial closure.",
+      "includeWhen": "Include when attributable documentary, investigative, audit, or judicial evidence supports serious abuse of public office, whether or not an official acknowledges it.",
+      "excludeWhen": "Exclude cases already closed through conviction events.",
+      "commonConfusion": "corruption_conviction"
+    },
+    {
+      "categoryId": "anticorruption_law",
+      "operationalDefinition": "Legal framework for anti-corruption action is created or materially strengthened.",
+      "includeWhen": "Include when statute or constitutional change establishes new anti-corruption institutions or mandates.",
+      "excludeWhen": "Exclude enforcement actions or dismantling moves without new anti-corruption law architecture.",
+      "commonConfusion": "anticorruption_dismantling"
+    },
+    {
+      "categoryId": "anticorruption_dismantling",
+      "operationalDefinition": "Existing anti-corruption institutional capacity is reduced, weakened, or removed.",
+      "includeWhen": "Include when funding, authority, staffing, or mandate authority of anti-corruption units is cut.",
+      "excludeWhen": "Exclude broader accountability changes outside anti-corruption entities.",
+      "commonConfusion": "oversight_body_dismantling"
+    },
+    {
+      "categoryId": "armed_conflict",
+      "operationalDefinition": "Organized armed hostilities newly begin, resume, or materially cross into sustained conflict on the coded date.",
+      "includeWhen": "Include when evidence identifies an onset, resumption, or material escalation into sustained combat between organized actors, not merely another report from an ongoing conflict.",
+      "excludeWhen": "Exclude routine electoral violence, riots, and protest-response incidents.",
+      "commonConfusion": "electoral_violence"
+    },
+    {
+      "categoryId": "peace_agreement_signed",
+      "operationalDefinition": "Parties announce and sign a peace or ceasefire agreement.",
+      "includeWhen": "Include when official text or witnessed signing evidences a formalized accord.",
+      "excludeWhen": "Exclude later implementation milestones before execution is demonstrated.",
+      "commonConfusion": "peace_agreement_implemented"
+    },
+    {
+      "categoryId": "peace_agreement_implemented",
+      "operationalDefinition": "Signed peace commitments are being executed through verified compliance steps.",
+      "includeWhen": "Include when monitoring, withdrawal, disarmament, or institutional follow-through is observed.",
+      "excludeWhen": "Exclude mere signatures or declarations without execution evidence.",
+      "commonConfusion": "peace_agreement_signed"
+    },
+    {
+      "categoryId": "coup",
+      "operationalDefinition": "Power is seized by force or coercion through unconstitutional displacement of incumbents.",
+      "includeWhen": "Include when credible sources report abrupt de facto takeover by force-backed actors.",
+      "excludeWhen": "Exclude constitutional transfer crises that do not involve immediate coercive seizure.",
+      "commonConfusion": "constitutional_crisis"
+    },
+    {
+      "categoryId": "state_collapse",
+      "operationalDefinition": "Core state functions and continuity degrade to broad systemic breakdown.",
+      "includeWhen": "Include when governance, administration, and security authority lose effective nationwide operation.",
+      "excludeWhen": "Exclude coups and partial crises that do not reach full institutional collapse.",
+      "commonConfusion": "coup"
+    },
+    {
+      "categoryId": "disputed_election",
+      "operationalDefinition": "An election outcome receives a substantial, attributable challenge through formal proceedings or coordinated material contestation.",
+      "includeWhen": "Include when evidence documents a concrete challenge to the result; later resolution does not erase the dated dispute event.",
+      "excludeWhen": "Exclude clearly fair elections and annulments.",
+      "commonConfusion": "flawed_election"
+    },
+    {
+      "categoryId": "gerrymandering",
+      "operationalDefinition": "District and rule engineering is used to shape representation outcomes for incumbents.",
+      "includeWhen": "Include when official cartographic or legal actions alter boundaries with strategic representation effects.",
+      "excludeWhen": "Exclude voter ID, registration, or polling-station logistics unrelated to boundary design.",
+      "commonConfusion": "electoral_access_change"
+    },
+    {
+      "categoryId": "candidate_disqualification",
+      "operationalDefinition": "Candidates are prevented from running through legal or administrative exclusion.",
+      "includeWhen": "Include when verified notices or decisions remove specific candidates from ballots or filings.",
+      "excludeWhen": "Exclude generic voter-access reforms or broad disenfranchisement without candidate targeting.",
+      "commonConfusion": "electoral_access_change"
+    },
+    {
+      "categoryId": "electoral_access_change",
+      "operationalDefinition": "Voter eligibility and access framework is altered before election through law or administration.",
+      "includeWhen": "Include when rules on registration, IDs, polling access, or suffrage expand or contract participation.",
+      "excludeWhen": "Exclude isolated candidate disqualification and post-result dispute categories.",
+      "commonConfusion": "mass_disenfranchisement"
+    },
+    {
+      "categoryId": "negotiated_transition",
+      "operationalDefinition": "Actors jointly establish a political transition pathway toward democratic opening.",
+      "includeWhen": "Include when official pacts, roadmaps, or accords mark negotiated regime opening.",
+      "excludeWhen": "Exclude stability-side transition labels that are recorded as stability normalization outcomes.",
+      "commonConfusion": "negotiated_transition_stability"
+    },
+    {
+      "categoryId": "prosecutorial_independence",
+      "operationalDefinition": "Prosecutorial autonomy is materially strengthened or weakened in institutional design.",
+      "includeWhen": "Include when appointment, oversight, removal, or funding structures change prosecutorial insulation.",
+      "excludeWhen": "Exclude individual prosecutions without institutional redesign.",
+      "commonConfusion": "executive_court_defiance"
+    },
+    {
+      "categoryId": "executive_court_defiance",
+      "operationalDefinition": "Executive branch rejects or blocks implementation of authoritative judicial rulings.",
+      "includeWhen": "Include when official conduct explicitly defies binding court decisions.",
+      "excludeWhen": "Exclude structural court redesigns that do not involve refusal of existing rulings.",
+      "commonConfusion": "executive_constitutional_override"
+    },
+    {
+      "categoryId": "police_accountability",
+      "operationalDefinition": "Policies alter civilian oversight, complaint systems, or accountability of police institutions.",
+      "includeWhen": "Include when legal or administrative changes expand or weaken independent scrutiny over policing.",
+      "excludeWhen": "Exclude prosecution of named individuals without systemic oversight redesign.",
+      "commonConfusion": "oversight_body_dismantling"
+    },
+    {
+      "categoryId": "detention_conditions",
+      "operationalDefinition": "Legal or operational changes modify detention regime conditions, length, or treatment.",
+      "includeWhen": "Include when evidence documents shifts in pretrial duration, access rights, or confinement conditions.",
+      "excludeWhen": "Exclude mass arrest events without condition-specific information.",
+      "commonConfusion": "mass_detention"
+    },
+    {
+      "categoryId": "oversight_body_dismantling",
+      "operationalDefinition": "Non-anti-corruption oversight institutions are reduced or incapacitated.",
+      "includeWhen": "Include when independent auditors, ombudsmen, or ethics bodies lose authority or capacity.",
+      "excludeWhen": "Exclude changes to anti-corruption-specific agencies.",
+      "commonConfusion": "police_accountability"
+    },
+    {
+      "categoryId": "emergency_declaration",
+      "operationalDefinition": "A civilian emergency declaration materially activates exceptional authority, alters ordinary institutional process, or restricts protected activity.",
+      "includeWhen": "Include when the decree or its implementation documents a governance-relevant legal effect; a routine disaster announcement with no such effect is non-qualifying.",
+      "excludeWhen": "Exclude martial law or specific co-occurring effects such as term_extension and election_cancellation.",
+      "commonConfusion": "martial_law"
+    },
+    {
+      "categoryId": "opposition_prosecution",
+      "operationalDefinition": "A criminal or administrative prosecution of an opposition figure is supported as selectively or politically motivated.",
+      "includeWhen": "Include only when evidence beyond the person's opposition status supports selective motive, procedural manipulation, or political direction.",
+      "excludeWhen": "Exclude broad anti-corruption cases without opposition-specific targeting.",
+      "commonConfusion": "mass_detention"
+    },
+    {
+      "categoryId": "religious_freedom_change",
+      "operationalDefinition": "Legal or policy shifts alter religious expression, registration, or institutional practice.",
+      "includeWhen": "Include when statutes adjust licensing, worship rights, religious education, or conversion rules.",
+      "excludeWhen": "Exclude generic minority-status or media restriction changes without religious-specific effects.",
+      "commonConfusion": "minority_rights_change"
+    },
+    {
+      "categoryId": "minority_rights_change",
+      "operationalDefinition": "State rules over minority status rights change in a legally significant way.",
+      "includeWhen": "Include when citizenship, language, or minority-protection provisions are expanded or reduced.",
+      "excludeWhen": "Exclude targeted prosecutions or general expression controls not anchored to minority status.",
+      "commonConfusion": "lgbt_rights_change"
+    },
+    {
+      "categoryId": "lgbt_rights_change",
+      "operationalDefinition": "Legal status of LGBT rights expands or contracts through public rule changes.",
+      "includeWhen": "Include when formal law or constitutional practice alters anti-discrimination or recognition for LGBT persons.",
+      "excludeWhen": "Exclude broad anti-minority reforms that do not explicitly reference LGBT rights.",
+      "commonConfusion": "minority_rights_change"
+    },
+    {
+      "categoryId": "surveillance_regime_change",
+      "operationalDefinition": "State surveillance architecture gains or loses scope through institutional legal change.",
+      "includeWhen": "Include when records show expanded interception authority, mass-monitoring systems, or narrowed oversight.",
+      "excludeWhen": "Exclude narrow content-blocking controls or complete network outages without surveillance redesign.",
+      "commonConfusion": "internet_content_restriction"
+    },
+    {
+      "categoryId": "internet_content_restriction",
+      "operationalDefinition": "Online information channels are constrained through blocking, throttling, or content-law controls.",
+      "includeWhen": "Include when official or platform-level actions limit access to specific sites, platforms, or content categories.",
+      "excludeWhen": "Exclude full internet shutdowns or only back-end surveillance updates.",
+      "commonConfusion": "surveillance_regime_change"
+    },
+    {
+      "categoryId": "academic_freedom_change",
+      "operationalDefinition": "Academic institutions face legal or policy changes affecting autonomy and teaching research freedom.",
+      "includeWhen": "Include when university governance, funding, hiring, or publication controls shift by law or decree.",
+      "excludeWhen": "Exclude one-off expulsions or prosecutions without systemic policy redesign.",
+      "commonConfusion": "systematic_crackdown"
+    },
+    {
+      "categoryId": "ngo_restriction",
+      "operationalDefinition": "Civil-society legal constraints on NGO operation are tightened.",
+      "includeWhen": "Include when NGO registration, foreign funding, or operation rules newly restrict civil organizations.",
+      "excludeWhen": "Exclude incident-level protest arrests without new NGO-wide legal regime.",
+      "commonConfusion": "assembly_rights_restriction"
+    },
+    {
+      "categoryId": "movement_freedom_change",
+      "operationalDefinition": "Legal or operational constraints on movement and mobility are expanded or reduced.",
+      "includeWhen": "Include when travel permits, passport controls, exit rules, or curfews alter movement rights.",
+      "excludeWhen": "Exclude localized assembly restrictions without broader movement-rule impact.",
+      "commonConfusion": "assembly_rights_restriction"
+    },
+    {
+      "categoryId": "assembly_rights_restriction",
+      "operationalDefinition": "Assembly and protest freedoms are reduced through de jure measures.",
+      "includeWhen": "Include when permit burdens, bans, or prior-approval systems narrow lawful collective assembly.",
+      "excludeWhen": "Exclude single repression incidents lacking legal framework change.",
+      "commonConfusion": "assembly_rights_expansion"
+    },
+    {
+      "categoryId": "political_assassination",
+      "operationalDefinition": "Targeted killing or attempted killing of political actors is documented.",
+      "includeWhen": "Include when evidence identifies a named political actor and supports a political motive; an unsubstantiated inference is retained only as ambiguity.",
+      "excludeWhen": "Exclude general detentions or non-targeted civilian conflict deaths.",
+      "commonConfusion": "journalist_arrest"
+    },
+    {
+      "categoryId": "property_rights_change",
+      "operationalDefinition": "Property entitlement rules are materially altered in scope, security, or seizure authority.",
+      "includeWhen": "Include when law or executive action changes expropriation power, ownership protection, or restitution.",
+      "excludeWhen": "Exclude unrelated anti-corruption disclosures or ordinary criminal seizures.",
+      "commonConfusion": null
+    },
+    {
+      "categoryId": "whistleblower_protection_change",
+      "operationalDefinition": "Legal protections for whistleblowers are expanded or reduced.",
+      "includeWhen": "Include when statutes modify duties and anti-retaliation safeguards for protected disclosures.",
+      "excludeWhen": "Exclude ad hoc retaliation actions without rule-level change.",
+      "commonConfusion": "financial_disclosure_change"
+    },
+    {
+      "categoryId": "financial_disclosure_change",
+      "operationalDefinition": "Disclosure obligations for officials or beneficial ownership are added or removed.",
+      "includeWhen": "Include when reporting duties, registries, or asset declaration systems are materially altered.",
+      "excludeWhen": "Exclude corruption convictions without system-level disclosure framework change.",
+      "commonConfusion": "whistleblower_protection_change"
+    },
+    {
+      "categoryId": "constitutional_crisis",
+      "operationalDefinition": "Constitutional order is in unresolved institutional deadlock without military takeover.",
+      "includeWhen": "Include when branches lock into non-constitutional conflict absent a full coup event.",
+      "excludeWhen": "Exclude coups and routine parliamentary breakdowns.",
+      "commonConfusion": "coup"
+    },
+    {
+      "categoryId": "government_collapse",
+      "operationalDefinition": "Governing coalition or cabinet collapses via parliamentary failure mechanisms.",
+      "includeWhen": "Include when official no-confidence or coalition dissolution leaves executive authority formally collapsed.",
+      "excludeWhen": "Exclude coups and broader constitutional crises that bypass this parliamentary pathway.",
+      "commonConfusion": "constitutional_crisis"
+    },
+    {
+      "categoryId": "secession_or_territorial_dispute",
+      "operationalDefinition": "Territorial sovereignty or secession is contested through formal claims or de facto split processes.",
+      "includeWhen": "Include when credible events record independence claims, secession votes, or contested boundary control.",
+      "excludeWhen": "Exclude external occupation and generalized armed conflict absent territorial-status contest framing.",
+      "commonConfusion": "foreign_occupation"
+    },
+    {
+      "categoryId": "electoral_violence",
+      "operationalDefinition": "Partisan election-linked violence occurs below sustained armed-conflict threshold.",
+      "includeWhen": "Include when campaign or election-period clashes are politically targeted and non-constitutional in mechanism.",
+      "excludeWhen": "Exclude organized warfighting or state repression of protest as separate categories.",
+      "commonConfusion": "protest_crackdown"
+    },
+    {
+      "categoryId": "negotiated_transition_stability",
+      "operationalDefinition": "A negotiated transition agreement directly reduces an active risk of institutional rupture or organized political violence and establishes an orderly interim succession process.",
+      "includeWhen": "Include when evidence supports the stability effect separately from any democratic-opening facet.",
+      "excludeWhen": "Use negotiated_transition for democratic opening alone; the two categories require distinct facets and cannot duplicate one rationale.",
+      "commonConfusion": "negotiated_transition"
+    },
+    {
+      "categoryId": "foreign_occupation",
+      "operationalDefinition": "Foreign power assumes effective territorial administration or control.",
+      "includeWhen": "Include when sources show external actor exercising sustained sovereign control functions.",
+      "excludeWhen": "Exclude purely domestic constitutional breakdowns and self-contained secessionary disputes.",
+      "commonConfusion": "secession_or_territorial_dispute"
+    }
+  ],
+  "semanticSha256": "d9a29f801d8b80add2d7cd386912fbbc4b59e13e749167c256425d1a625b877c"
+}

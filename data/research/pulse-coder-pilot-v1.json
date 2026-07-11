@@ -1,0 +1,866 @@
+{
+  "schemaVersion": "pulse-coder-pilot/v1",
+  "codebookVersion": "pulse-independent-coding/v1",
+  "ontologyVersion": "pulse-event-ontology/v3.0",
+  "frozenOn": "2026-07-11",
+  "labelAccessAtFreeze": "none_for_blind_pilot",
+  "purpose": "Synthetic instruction and tooling pilot only; no packet may enter performance estimation or a gold release.",
+  "packets": [
+    {
+      "id": "TRAIN-ASTER-ELECTION",
+      "split": "training",
+      "synthetic": true,
+      "countryAlias": "Republic Aster",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "a1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "observer",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "An independent observer mission assessed the completed national election as competitive and procedurally sound, with no material count irregularity."
+        },
+        {
+          "id": "a2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "election_commission",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The election commission certified the count and published station totals."
+        },
+        {
+          "id": "a3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The successor accepted the certified result; inauguration is scheduled for a later date."
+        },
+        {
+          "id": "a4",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "rights_monitor",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Two campaign offices were attacked before polling, injuring six party workers."
+        },
+        {
+          "id": "a5",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Police opened investigations into the campaign attacks."
+        }
+      ],
+      "teachingAnswer": {
+        "packetOutcome": "qualifying_event",
+        "observationState": "sufficient_observation",
+        "categories": [
+          "fair_election",
+          "electoral_violence"
+        ],
+        "teachingPoint": "Separate the assessed election process from the independently evidenced violence facet; do not code peaceful_transfer before handover."
+      }
+    },
+    {
+      "id": "TRAIN-BRINDLE-COUP",
+      "split": "training",
+      "synthetic": true,
+      "countryAlias": "State Brindle",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "b1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Armed officers seized the executive offices and announced that the elected government had been removed."
+        },
+        {
+          "id": "b2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "official_notice",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The takeover council dissolved the elected legislature by decree."
+        },
+        {
+          "id": "b3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "press_monitor",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A separate order closed three national broadcasters."
+        }
+      ],
+      "teachingAnswer": {
+        "packetOutcome": "qualifying_event",
+        "observationState": "low_coverage",
+        "categories": [
+          "coup",
+          "constitutional_override_electoral",
+          "media_shutdown"
+        ],
+        "teachingPoint": "Low observation does not erase an observed event. Each cascade label needs its own evidence and facet."
+      }
+    },
+    {
+      "id": "TRAIN-CEDAR-DISASTER",
+      "split": "training",
+      "synthetic": true,
+      "countryAlias": "Commonwealth Cedar",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "c1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "emergency_office",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The disaster office issued a weather emergency notice without activating exceptional legal powers."
+        },
+        {
+          "id": "c2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "parliament",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Parliament met under its ordinary rules and took no emergency-power vote."
+        },
+        {
+          "id": "c3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Courts remained on their ordinary schedule."
+        },
+        {
+          "id": "c4",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The notice concerned road closures and shelter access."
+        },
+        {
+          "id": "c5",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "No election, rights, court, cabinet, or constitutional process changed that day."
+        }
+      ],
+      "teachingAnswer": {
+        "packetOutcome": "true_negative",
+        "observationState": "sufficient_observation",
+        "categories": [],
+        "teachingPoint": "A routine disaster notice with no governance-relevant legal effect is non-qualifying; true_negative remains audit-bounded."
+      }
+    },
+    {
+      "id": "TRAIN-DUNE-AMBIGUITY",
+      "split": "training",
+      "synthetic": true,
+      "countryAlias": "Federation Dune",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "d1",
+          "channel": "audit_search",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A court convicted an opposition leader of procurement corruption."
+        },
+        {
+          "id": "d2",
+          "channel": "context",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The defense alleged political targeting, while the judgment described documentary procurement evidence."
+        },
+        {
+          "id": "d3",
+          "channel": "context",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "No evidence in the packet assesses prosecutorial or judicial independence."
+        }
+      ],
+      "teachingAnswer": {
+        "packetOutcome": "insufficient_observation",
+        "observationState": "low_coverage",
+        "categories": [],
+        "candidateCategories": [
+          "corruption_conviction",
+          "opposition_prosecution"
+        ],
+        "teachingPoint": "Retain both plausible labels as candidates; neither the conviction nor opposition status resolves institutional independence or political motive."
+      }
+    },
+    {
+      "id": "TRAIN-ELM-RETRIEVAL",
+      "split": "training",
+      "synthetic": true,
+      "countryAlias": "Republic Elm",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "e1",
+          "channel": "audit_search",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The supreme court ordered the executive to restore the dismissed auditor."
+        },
+        {
+          "id": "e2",
+          "channel": "audit_search",
+          "sourceFamilyId": "official_notice",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The executive published a directive refusing to implement the binding order."
+        },
+        {
+          "id": "e3",
+          "channel": "context",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The refusal occurred on the sampled date."
+        }
+      ],
+      "teachingAnswer": {
+        "packetOutcome": "retrieval_miss",
+        "observationState": "low_coverage",
+        "categories": [
+          "executive_court_defiance"
+        ],
+        "teachingPoint": "An event supported only outside retained Pulse evidence is a retrieval miss even when general observation is low."
+      }
+    },
+    {
+      "id": "TRAIN-FERN-SILENCE",
+      "split": "training",
+      "synthetic": true,
+      "countryAlias": "Kingdom Fern",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "f1",
+          "channel": "context",
+          "sourceFamilyId": "search_provider",
+          "accessState": "metadata_only",
+          "reportedDate": null,
+          "text": "All three query families returned no result."
+        }
+      ],
+      "teachingAnswer": {
+        "packetOutcome": "insufficient_observation",
+        "observationState": "low_coverage",
+        "categories": [],
+        "teachingPoint": "Search silence is not a true negative."
+      }
+    },
+    {
+      "id": "PILOT-001",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Republic Garnet",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "g1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "election_commission",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The certified winner took the constitutional oath and the incumbent transferred the seals of office."
+        },
+        {
+          "id": "g2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The handover occurred without force or interruption."
+        },
+        {
+          "id": "g3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "parliament",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Parliament recorded the successor's assumption of office."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-002",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "State Harbor",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "h1",
+          "channel": "audit_search",
+          "sourceFamilyId": "network_monitor",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A government order disabled national mobile and fixed internet connectivity for nine hours."
+        },
+        {
+          "id": "h2",
+          "channel": "audit_search",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Connectivity measurements confirmed the national outage on the sampled date."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-003",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Commonwealth Indigo",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "i1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "parliament",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Parliament held a routine committee hearing."
+        },
+        {
+          "id": "i2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The high court issued an ordinary commercial judgment."
+        },
+        {
+          "id": "i3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "election_commission",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The commission published unchanged voter-information material."
+        },
+        {
+          "id": "i4",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Daily political coverage reported no institutional occurrence in scope."
+        },
+        {
+          "id": "i5",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A second independent newsroom reported the same quiet institutional calendar without copying the first."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-004",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Republic Juniper",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "j1",
+          "channel": "context",
+          "sourceFamilyId": "search_provider",
+          "accessState": "inaccessible",
+          "reportedDate": null,
+          "text": "The broad query returned one inaccessible result with no usable date or text."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-005",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Federation Kestrel",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": true,
+        "note": "The frozen telemetry records a complete source outage for the sampled day."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "k1",
+          "channel": "context",
+          "sourceFamilyId": "connector_telemetry",
+          "accessState": "metadata_only",
+          "reportedDate": null,
+          "text": "Every registered feed failed before returning documents."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-006",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Republic Lumen",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "restricted_sourced",
+      "evidence": [
+        {
+          "id": "l1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "press_monitor",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Authorities detained a named investigative journalist after publication of an official-corruption report."
+        },
+        {
+          "id": "l2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The detention order identifies the journalist and the sampled date."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-007",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "State Morrow",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "m1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "election_commission",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The commission disqualified a named parliamentary candidate by formal order."
+        },
+        {
+          "id": "m2",
+          "channel": "audit_search",
+          "sourceFamilyId": "wire_origin",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A wire report describes the same order."
+        },
+        {
+          "id": "m3",
+          "channel": "audit_search",
+          "sourceFamilyId": "wire_origin",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A newspaper republishes the same wire report without new evidence."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-008",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Republic Northstar",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "n1",
+          "channel": "audit_search",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A court-defiance event occurred on 2026-06-14, one day before the sampled date."
+        },
+        {
+          "id": "n2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "parliament",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Parliament met routinely on the sampled date."
+        },
+        {
+          "id": "n3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Courts published their ordinary docket on the sampled date."
+        },
+        {
+          "id": "n4",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "No new institutional occurrence was reported for the sampled date."
+        },
+        {
+          "id": "n5",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "official_notice",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The daily gazette contained no exceptional institutional action."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-009",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Commonwealth Ochre",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "o1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "foreign_ministry",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The foreign ministry imposed a tariff on imports from another state."
+        },
+        {
+          "id": "o2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "parliament",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Domestic institutions otherwise followed the ordinary calendar."
+        },
+        {
+          "id": "o3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Courts reported no related domestic proceeding."
+        },
+        {
+          "id": "o4",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Coverage concerned only the external trade dispute."
+        },
+        {
+          "id": "o5",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A second source reported no separate domestic institutional occurrence."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-010",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Republic Plover",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "p1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "disaster_office",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A flood warning activated shelters and road closures under ordinary disaster law."
+        },
+        {
+          "id": "p2",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "parliament",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "No exceptional legislative or executive authority was activated."
+        },
+        {
+          "id": "p3",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Courts retained ordinary jurisdiction and schedules."
+        },
+        {
+          "id": "p4",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "No rights restriction accompanied the warning."
+        },
+        {
+          "id": "p5",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Independent coverage confirmed only routine emergency logistics."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-011",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Federation Quartz",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "q1",
+          "channel": "audit_search",
+          "sourceFamilyId": "court",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "An opposition legislator was charged with bribery on the sampled date."
+        },
+        {
+          "id": "q2",
+          "channel": "audit_search",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The opposition called the charge political; prosecutors cited bank records that are not included in the packet."
+        },
+        {
+          "id": "q3",
+          "channel": "context",
+          "sourceFamilyId": "news_b",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "No source in the packet assesses selective motive, process independence, or the underlying bank records."
+        }
+      ]
+    },
+    {
+      "id": "PILOT-012",
+      "split": "blind_pilot",
+      "synthetic": true,
+      "countryAlias": "Republic Rowan",
+      "date": "2026-06-15",
+      "searchFamilies": [
+        "institutions",
+        "accountabilitySecurity",
+        "broadCountryDay"
+      ],
+      "telemetry": {
+        "outage": false,
+        "note": "No source outage is supplied in the packet."
+      },
+      "informationEnvironment": "not_supplied",
+      "evidence": [
+        {
+          "id": "r1",
+          "channel": "pulse_retained",
+          "sourceFamilyId": "news_a",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "Armed officers removed the elected government and occupied the executive offices."
+        },
+        {
+          "id": "r2",
+          "channel": "audit_search",
+          "sourceFamilyId": "official_notice",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "The takeover authority dissolved the elected legislature by decree."
+        },
+        {
+          "id": "r3",
+          "channel": "audit_search",
+          "sourceFamilyId": "press_monitor",
+          "accessState": "accessible",
+          "reportedDate": "2026-06-15",
+          "text": "A separate order closed the national broadcaster."
+        }
+      ]
+    }
+  ],
+  "semanticSha256": "253084b08f73fd0cc19122621a737ea0d6983c18066b943b660d7453d02ece55"
+}

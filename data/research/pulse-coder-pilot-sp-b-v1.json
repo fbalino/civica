@@ -1,0 +1,413 @@
+[
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-001",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "qualifying_event",
+    "observationState": "low_coverage",
+    "observationRationale": "The sampled day contains retained evidence of an uncontested power handover, but only three accessible retained documents were available.",
+    "events": [
+      {
+        "eventId": "PILOT-001-E1",
+        "eventDate": "2026-06-15",
+        "datePrecision": "exact",
+        "primaryJurisdiction": "Republic Garnet",
+        "affectedJurisdictions": [],
+        "evidenceIds": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "retrievalStatus": "pulse_retained",
+        "annotation": {
+          "ontologyVersion": "pulse-event-ontology/v3.0",
+          "disposition": "qualifying_event",
+          "labels": [
+            {
+              "categoryId": "peaceful_transfer",
+              "facetId": "peaceful_transfer",
+              "effectDirection": "expansive",
+              "severity": "material",
+              "evidenceIds": [
+                "g1",
+                "g2",
+                "g3"
+              ],
+              "rationale": "The evidence records the certified winner assuming office, oath-taking, and parliamentary acknowledgment of succession without force."
+            }
+          ],
+          "candidateLabels": [],
+          "ambiguityReason": null
+        }
+      }
+    ],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Single-country sovereign-day packet with retained handover event and no contradictions."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-002",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "retrieval_miss",
+    "observationState": "low_coverage",
+    "observationRationale": "A nationwide connectivity outage is supported only by audit-search evidence, while retained Pulse evidence is absent.",
+    "events": [
+      {
+        "eventId": "PILOT-002-E1",
+        "eventDate": "2026-06-15",
+        "datePrecision": "exact",
+        "primaryJurisdiction": "State Harbor",
+        "affectedJurisdictions": [],
+        "evidenceIds": [
+          "h1",
+          "h2"
+        ],
+        "retrievalStatus": "audit_search_only",
+        "annotation": {
+          "ontologyVersion": "pulse-event-ontology/v3.0",
+          "disposition": "qualifying_event",
+          "labels": [
+            {
+              "categoryId": "internet_shutdown",
+              "facetId": "internet_shutdown",
+              "effectDirection": "restrictive",
+              "severity": "major",
+              "evidenceIds": [
+                "h1",
+                "h2"
+              ],
+              "rationale": "The packet identifies a government order and independent measurements confirming a national internet shutdown for the sampled date."
+            }
+          ],
+          "candidateLabels": [],
+          "ambiguityReason": null
+        }
+      }
+    ],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "No retained evidence documents were available for this country-day."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-003",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "true_negative",
+    "observationState": "sufficient_observation",
+    "observationRationale": "Five accessible retained documents across multiple source families were reviewed and show no qualifying domestic institutional event on 2026-06-15.",
+    "events": [],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Routine institutional calendar and no-event confirmations are consistent with a coded non-event."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-004",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "insufficient_observation",
+    "observationState": "low_coverage",
+    "observationRationale": "The only returned item for one family was inaccessible context metadata, preventing sufficient observation against the sampled day.",
+    "events": [],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Search-provider output provided no usable content for the coded date."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-005",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "insufficient_observation",
+    "observationState": "source_outage",
+    "observationRationale": "Packet telemetry reports complete source failure on the sampled date, so no qualifying event can be confirmed.",
+    "events": [],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Observed packet-level outage overrides potential event inferences."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-006",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "qualifying_event",
+    "observationState": "restricted_information_environment",
+    "observationRationale": "Retained evidence supports a journalist arrest on the sampled date, and packet context flags a sourced restricted information environment.",
+    "events": [
+      {
+        "eventId": "PILOT-006-E1",
+        "eventDate": "2026-06-15",
+        "datePrecision": "exact",
+        "primaryJurisdiction": "Republic Lumen",
+        "affectedJurisdictions": [],
+        "evidenceIds": [
+          "l1",
+          "l2"
+        ],
+        "retrievalStatus": "pulse_retained",
+        "annotation": {
+          "ontologyVersion": "pulse-event-ontology/v3.0",
+          "disposition": "qualifying_event",
+          "labels": [
+            {
+              "categoryId": "journalist_arrest",
+              "facetId": "journalist_arrest",
+              "effectDirection": "restrictive",
+              "severity": "material",
+              "evidenceIds": [
+                "l1",
+                "l2"
+              ],
+              "rationale": "The retained record names a journalist who was detained on the sampled date after publication, with a direct detention order."
+            }
+          ],
+          "candidateLabels": [],
+          "ambiguityReason": null
+        }
+      }
+    ],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Sourced restriction is reflected in observation state rather than suppressing the codable event."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-007",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "qualifying_event",
+    "observationState": "low_coverage",
+    "observationRationale": "Retained and audit-search records converge on a candidate disqualification order, but the packet falls below retained observation minimums.",
+    "events": [
+      {
+        "eventId": "PILOT-007-E1",
+        "eventDate": "2026-06-15",
+        "datePrecision": "exact",
+        "primaryJurisdiction": "State Morrow",
+        "affectedJurisdictions": [],
+        "evidenceIds": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "retrievalStatus": "pulse_retained",
+        "annotation": {
+          "ontologyVersion": "pulse-event-ontology/v3.0",
+          "disposition": "qualifying_event",
+          "labels": [
+            {
+              "categoryId": "candidate_disqualification",
+              "facetId": "candidate_disqualification",
+              "effectDirection": "restrictive",
+              "severity": "material",
+              "evidenceIds": [
+                "m1",
+                "m2",
+                "m3"
+              ],
+              "rationale": "A formal disqualification order and derivative reporting identify the same official candidate exclusion on the sampled date."
+            }
+          ],
+          "candidateLabels": [],
+          "ambiguityReason": null
+        }
+      }
+    ],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Included both retained and reproduced coverage to preserve deduplication and the event's retained base."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-008",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "insufficient_observation",
+    "observationState": "low_coverage",
+    "observationRationale": "An apparent court-defiance report is dated to the prior day, while four retained documents for the sampled date confirm routine institution operation.",
+    "events": [],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Date mismatch evidence is outside the coded UTC day boundary."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-009",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "true_negative",
+    "observationState": "sufficient_observation",
+    "observationRationale": "Sufficient retained coverage shows external tariff activity and no domestic institutional occurrence for 2026-06-15.",
+    "events": [],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Foreign-policy coverage alone is excluded as out-of-scope."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-010",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "true_negative",
+    "observationState": "sufficient_observation",
+    "observationRationale": "Routine flood-warning coverage and ordinary institutional schedules indicate no governance-relevant emergency governance shift.",
+    "events": [],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Classified as non-qualifying routine emergency logistics."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-011",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "insufficient_observation",
+    "observationState": "low_coverage",
+    "observationRationale": "The packet provides only charge-level allegations and does not document final adjudication or selective-prosecution evidence on retained materials.",
+    "events": [],
+    "candidateEvents": [
+      {
+        "candidateId": "PILOT-011-C1",
+        "eventDate": "2026-06-15",
+        "evidenceIds": [
+          "q1",
+          "q2",
+          "q3"
+        ],
+        "candidateLabels": [
+          {
+            "categoryId": "corruption_conviction",
+            "reason": "The packet shows a bribery prosecution but not a final corruption judgment."
+          },
+          {
+            "categoryId": "opposition_prosecution",
+            "reason": "A political motive is alleged by defense sources but not established in sourced packet evidence."
+          }
+        ],
+        "ambiguityReason": "The occurrence appears plausible and dated, but packet evidence lacks independent proof of either completed corruption-conviction status or selective prosecution mechanics."
+      }
+    ],
+    "excludedEvidenceIds": [],
+    "coderNotes": "No confidently codable qualifying label is supported on this packet."
+  },
+  {
+    "schemaVersion": "pulse-independent-coding/v1",
+    "pilotVersion": "pulse-coder-pilot/v1",
+    "packetId": "PILOT-012",
+    "coderId": "SP-CODER-B",
+    "coderType": "agent_dry_pilot",
+    "useStatus": "dry_run_not_gold",
+    "submittedAt": "2026-07-11T23:55:00.000Z",
+    "locked": true,
+    "packetOutcome": "qualifying_event",
+    "observationState": "low_coverage",
+    "observationRationale": "Retained and audit-search evidence point to coordinated coercive takeover actions on the sampled date, including media-ordering effects, though full retained coverage is below observational threshold.",
+    "events": [
+      {
+        "eventId": "PILOT-012-E1",
+        "eventDate": "2026-06-15",
+        "datePrecision": "exact",
+        "primaryJurisdiction": "Republic Rowan",
+        "affectedJurisdictions": [],
+        "evidenceIds": [
+          "r1",
+          "r2",
+          "r3"
+        ],
+        "retrievalStatus": "pulse_retained",
+        "annotation": {
+          "ontologyVersion": "pulse-event-ontology/v3.0",
+          "disposition": "qualifying_event",
+          "labels": [
+            {
+              "categoryId": "coup",
+              "facetId": "coup",
+              "effectDirection": "restrictive",
+              "severity": "critical",
+              "evidenceIds": [
+                "r1",
+                "r2",
+                "r3"
+              ],
+              "rationale": "Armed officers removed the elected government and occupied executive offices, indicating non-constitutional coercive seizure."
+            },
+            {
+              "categoryId": "executive_constitutional_override",
+              "facetId": "executive_constitutional_override",
+              "effectDirection": "restrictive",
+              "severity": "major",
+              "evidenceIds": [
+                "r2"
+              ],
+              "rationale": "An order dissolving the elected legislature reflects executive action overriding constitutional parliamentary continuity."
+            },
+            {
+              "categoryId": "media_shutdown",
+              "facetId": "media_shutdown",
+              "effectDirection": "restrictive",
+              "severity": "material",
+              "evidenceIds": [
+                "r3"
+              ],
+              "rationale": "A separate order closed the national broadcaster, reducing independent media operation."
+            }
+          ],
+          "candidateLabels": [],
+          "ambiguityReason": null
+        }
+      }
+    ],
+    "candidateEvents": [],
+    "excludedEvidenceIds": [],
+    "coderNotes": "Single multi-facet coup package retained as one in-scope event with secondary labels."
+  }
+]

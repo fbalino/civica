@@ -673,3 +673,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Frozen 536 unlabeled country-day packets across 181 jurisdictions: 482 analysis candidates and 54 same-primary-stratum reserves.
 - Every packet carries three exact search families; 1,608 traces retain 6,086 rights-safe result records, while five all-zero packets remain evidence rather than true-negative labels.
 - Population, sample, trace, and packet hashes link exactly; 811 tests, claims, and the 98-page build pass. PUL-016 is next.
+
+## 2026-07-11 — PUL-016 independent coding protocol completed
+
+- Frozen 61 operational category boundaries, six worked examples, and 12 answer-free blinded pilot packets under `pulse-independent-coding/v1`.
+- Two separate GPT-5.3 Codex Spark dry runs passed the final contract; three disagreements remain visible and no agent output is eligible as gold.
+- Three rejected attempts improved the schema, packet naming, and affected-jurisdiction rule. 815 tests, claims, and the 98-page build pass. PUL-017 is next.

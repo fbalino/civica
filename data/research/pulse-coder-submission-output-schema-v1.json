@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["submissions"],
+  "properties": {
+    "submissions": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": { "$ref": "#/$defs/submission" }
+    }
+  },
+  "$defs": {
+    "label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["categoryId", "facetId", "effectDirection", "severity", "evidenceIds", "rationale"],
+      "properties": {
+        "categoryId": { "type": "string" },
+        "facetId": { "type": "string" },
+        "effectDirection": { "type": "string", "enum": ["expansive", "restrictive", "mixed", "unclear", "not_assessed"] },
+        "severity": { "type": "string", "enum": ["not_assessed", "limited", "material", "major", "critical"] },
+        "evidenceIds": { "type": "array", "items": { "type": "string" } },
+        "rationale": { "type": "string" }
+      }
+    },
+    "candidateLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["categoryId", "reason"],
+      "properties": {
+        "categoryId": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ontologyVersion", "disposition", "labels", "candidateLabels", "ambiguityReason"],
+      "properties": {
+        "ontologyVersion": { "type": "string", "const": "pulse-event-ontology/v3.0" },
+        "disposition": { "type": "string", "const": "qualifying_event" },
+        "labels": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/label" } },
+        "candidateLabels": { "type": "array", "items": { "$ref": "#/$defs/candidateLabel" } },
+        "ambiguityReason": { "type": ["string", "null"] }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "eventDate", "datePrecision", "primaryJurisdiction", "affectedJurisdictions", "evidenceIds", "retrievalStatus", "annotation"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "eventDate": { "type": "string" },
+        "datePrecision": { "type": "string", "enum": ["exact", "bounded"] },
+        "primaryJurisdiction": { "type": "string" },
+        "affectedJurisdictions": { "type": "array", "items": { "type": "string" } },
+        "evidenceIds": { "type": "array", "items": { "type": "string" } },
+        "retrievalStatus": { "type": "string", "enum": ["pulse_retained", "audit_search_only"] },
+        "annotation": { "$ref": "#/$defs/annotation" }
+      }
+    },
+    "candidateEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "eventDate", "evidenceIds", "candidateLabels", "ambiguityReason"],
+      "properties": {
+        "candidateId": { "type": "string" },
+        "eventDate": { "type": ["string", "null"] },
+        "evidenceIds": { "type": "array", "items": { "type": "string" } },
+        "candidateLabels": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/candidateLabel" } },
+        "ambiguityReason": { "type": "string" }
+      }
+    },
+    "submission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "pilotVersion", "packetId", "coderId", "coderType", "useStatus", "submittedAt", "locked", "packetOutcome", "observationState", "observationRationale", "events", "candidateEvents", "excludedEvidenceIds", "coderNotes"],
+      "properties": {
+        "schemaVersion": { "type": "string", "const": "pulse-independent-coding/v1" },
+        "pilotVersion": { "type": "string", "const": "pulse-coder-pilot/v1" },
+        "packetId": { "type": "string" },
+        "coderId": { "type": "string" },
+        "coderType": { "type": "string", "const": "agent_dry_pilot" },
+        "useStatus": { "type": "string", "const": "dry_run_not_gold" },
+        "submittedAt": { "type": "string" },
+        "locked": { "type": "boolean", "const": true },
+        "packetOutcome": { "type": "string", "enum": ["qualifying_event", "true_negative", "retrieval_miss", "insufficient_observation", "out_of_scope"] },
+        "observationState": { "type": "string", "enum": ["sufficient_observation", "low_coverage", "source_outage", "restricted_information_environment", "undetermined"] },
+        "observationRationale": { "type": "string" },
+        "events": { "type": "array", "items": { "$ref": "#/$defs/event" } },
+        "candidateEvents": { "type": "array", "items": { "$ref": "#/$defs/candidateEvent" } },
+        "excludedEvidenceIds": { "type": "array", "items": { "type": "string" } },
+        "coderNotes": { "type": "string" }
+      }
+    }
+  }
+}
