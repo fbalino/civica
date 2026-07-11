@@ -661,6 +661,8 @@ export const countryFactVintages = pgTable(
      *  `"Civica Atlas <YYYYQn>"` is preserved on existing rows for
      *  backwards compatibility. */
     vintageLabel: text("vintage_label").notNull(),
+    /** Required on corrected cuts of an already-published period. */
+    supersedesVintageLabel: text("supersedes_vintage_label"),
     /** The country_facts.id that won the resolver at vintage time. */
     canonicalFactId: uuid("canonical_fact_id")
       .references(() => countryFacts.id)
@@ -1276,6 +1278,10 @@ export const ciCompositeScores = pgTable(
     band: text("band"),
     completenessFlag: text("completeness_flag"),
     vintageLabel: text("vintage_label"),
+    /** Required when a corrected named release replaces an earlier vintage. */
+    supersedesVintageLabel: text("supersedes_vintage_label"),
+    /** SHA-256 of all score fields that define the named release row. */
+    contentHash: text("content_hash"),
     rank: integer("rank"),
     totalRanked: integer("total_ranked"),
     isPartial: boolean("is_partial").notNull().default(false),

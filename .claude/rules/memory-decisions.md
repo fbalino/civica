@@ -766,3 +766,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Do not describe missing historical publisher bytes as captured raw inputs.
 - Keep DOI, Index/Pulse replication, upstream ingestion replay, and substantive
   source validation outside this G2 Atlas candidate. Durable record: APR-D055.
+
+## 2026-07-11 — Named vintages are append-only citation handles
+
+- Exact reruns verify deterministic content and write nothing; changed content
+  under the same label fails at both application and database layers.
+- The stored methodology version must match the published label. Corrections
+  require a new version plus an explicit existing supersession target.
+- Keep unnamed Index rows mutable as pre-publication working state. Durable
+  record: APR-D056 in `plan/DECISIONS.md`.

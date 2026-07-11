@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-023_immutable_frozen_vintages"
+    "current_task": "DAT-024_frozen_snapshot_exports"
   },
   "budget": {
     "mode": "subscription_only",
@@ -626,6 +626,9 @@
     "data/releases/atlas-2026-07-11/manifest.v1.json",
     "data/releases/atlas-2026-07-11/atlas-export.v1.json.gz",
     "plan/evidence/DAT-018/README.md",
+    "plan/evidence/DAT-023/README.md",
+    "plan/evidence/DAT-023/live-audit.json",
+    "drizzle/migrations/0025_immutable_frozen_vintages.sql",
     "src/app/downloads/civica-atlas-2026-07-11.manifest.json/route.ts",
     "data/release-quality-report.v1.json",
     "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
@@ -647,11 +650,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "A new credential/cache/history-free checkout passed strict G2 reproduction, every validator, and the production build for DAT-022.",
-    "tests": "622/622 tests passed. The deterministic 16-file G2 bundle and archival ZIP reproduce the full normalized release hashes. Master plan is 41/288 complete (14.2%).",
-    "public_claims": "No new empirical claim was added. API documentation now links the checked BOM and states its concrete contents beside the registered Atlas release claim.",
-    "browser": "Local API documentation rendered the BOM link and tool-version description with zero console errors. The manifest route returned HTTP 200 JSON, immutable caching, and an attachment filename.",
-    "visual_review": "The BOM link composes the existing API-docs editorial typography; no new visual component or token was introduced."
+    "build": "Every validator, claims/documentation gate, TypeScript, and the production build passed for DAT-023.",
+    "tests": "626/626 tests passed. Live audit found 0 version/hash mismatches across 17,506 Atlas and 237 named Index rows. Master plan is 42/288 complete (14.6%).",
+    "public_claims": "No reader-facing empirical claim changed; the task hardened stored citation handles and release writers.",
+    "browser": "Not applicable: DAT-023 made no reader-facing UI change.",
+    "visual_review": "Not applicable: no visual component, layout, or token changed."
   },
-  "updated_at": "2026-07-11T04:10:00Z"
+  "updated_at": "2026-07-11T05:30:00Z"
 }

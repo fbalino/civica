@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T02:33:06.860Z",
+  "generatedAt": "2026-07-11T04:15:10.129Z",
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -102,7 +102,7 @@
       "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bill_summary_cache": 6141,
+        "bill_summary_cache": 6220,
         "contact_submissions": 1,
         "country_metrics": 7449,
         "election_results": 1351,
@@ -168,7 +168,7 @@
       "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bills": 6811
+        "bills": 6890
       },
       "writesPerformed": 0
     },
@@ -642,9 +642,30 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1122,
-        "research_evidence_history": 0,
+        "research_evidence_history": 237,
         "statements": 7891,
         "terms": 5475
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0025_immutable_frozen_vintages",
+      "artifact": "drizzle/migrations/0025_immutable_frozen_vintages.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "0a80449b022401a290b7165af79596a64384cefdee3de61548a936d035808147",
+      "affectedRelations": [
+        "ci_composite_scores",
+        "country_fact_vintages"
+      ],
+      "statementCount": 42,
+      "destructiveStatementCount": 4,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0025_immutable_frozen_vintages-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0025_immutable_frozen_vintages --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 286,
+        "country_fact_vintages": 17506
       },
       "writesPerformed": 0
     },

@@ -31,8 +31,11 @@ async function main() {
   // Useful when validating the helper before next quarterly fires.
   const decoupleDryRun = process.argv.includes("--decouple-dry-run");
 
-  let quarter = process.argv[2];
-  const sims = process.argv[3] ? parseInt(process.argv[3], 10) : undefined;
+  const positional = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+  let quarter = positional[0];
+  const sims = positional[1] ? parseInt(positional[1], 10) : undefined;
+  const methodologyVersion = process.argv.find((arg) => arg.startsWith("--methodology-version="))?.split("=").slice(1).join("=") ?? "beta";
+  const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=");
 
   if (!quarter) {
     quarter = (await latestQuarter(db)) ?? "";
@@ -46,7 +49,8 @@ async function main() {
   // Vintage label is the public citation handle. Convention:
   // "Civica Index 2023 Q4 (Beta)".
   const [year, q] = quarter.split("-Q");
-  const vintageLabel = `Civica Index ${year} Q${q} (Beta)`;
+  const publishedVersion = methodologyVersion === "beta" ? "Beta" : methodologyVersion;
+  const vintageLabel = `Civica Index ${year} Q${q} (${publishedVersion})`;
 
   console.log(`\n=== Civica Index — Beta calculation ===`);
   console.log(`Quarter:        ${quarter}`);
@@ -56,6 +60,8 @@ async function main() {
   const summary = await calculateCompositeV2(db, quarter, {
     sims,
     vintageLabel,
+    methodologyVersion,
+    supersedesVintageLabel,
   });
 
   console.log(`\n=== Done ===`);

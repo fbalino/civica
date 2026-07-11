@@ -434,3 +434,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   credentials or history; 622/622 tests and the production build pass.
 - The guarantee covers normalized released observations, not unretained raw
   publisher bytes. DAT-023 is next.
+
+## 2026-07-11 — DAT-023 frozen-vintage immutability completed
+
+- Repaired 17,506 Atlas rows to the version printed in their release label and
+  hashed all 237 named Index score rows before installing immutable triggers.
+- Exact reruns are deterministic no-ops; conflicts require a new explicitly
+  superseding version. Rollback-only mutation probes were rejected.
+- Migration gates, live audit, 626/626 tests, TypeScript, claims/docs, and the
+  production build pass. DAT-024 is next.

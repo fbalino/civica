@@ -48,6 +48,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
   shared("0022_pulse_event_idempotency", "drizzle/migrations/0022_pulse_event_idempotency.sql", "mixed", "legacy_unjournaled"),
   shared("0023_data_value_states", "drizzle/migrations/0023_data_value_states.sql", "schema", "journaled"),
   shared("0024_research_evidence_retention", "drizzle/migrations/0024_research_evidence_retention.sql", "mixed", "journaled"),
+  shared("0025_immutable_frozen_vintages", "drizzle/migrations/0025_immutable_frozen_vintages.sql", "mixed", "journaled"),
   ...[
     "backfill-cia-vintage", "backfill-election-results", "backfill-growth-methodology",
     "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels",

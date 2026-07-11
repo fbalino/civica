@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "51b30e3b10b79af76fdef12786afbd8b3ba0707c20c8dbde86f9348e4e41fa1e",
+  "schemaFingerprint": "9f75ec07507d21e584bf6240af06f828f46f382346b9b058e3f43f895c18e03d",
   "summary": {
     "tables": 50,
-    "columns": 590,
+    "columns": 593,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
     "supportTables": 9,
@@ -2089,6 +2089,31 @@
           }
         },
         {
+          "name": "content_hash",
+          "propertyName": "contentHash",
+          "definition": "Hash of the captured content used for deduplication and replay identity.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
+          "rights": "Derived output subject to the combined rights of included inputs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "derivation_version_key",
           "propertyName": "derivationVersionKey",
           "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
@@ -2426,6 +2451,31 @@
           "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
           "cadence": "Per named Index rebuild/release.",
           "vintageSemantics": "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
+          "rights": "Derived output subject to the combined rights of included inputs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersedes_vintage_label",
+          "propertyName": "supersedesVintageLabel",
+          "definition": "Supersedes vintage label recorded for the jurisdiction, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "Supersedes vintage label follows this table contract. data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
           "rights": "Derived output subject to the combined rights of included inputs.",
           "deprecation": {
             "status": "active"
@@ -4960,6 +5010,31 @@
           "sourceOrDerivation": "Captured source-lineage metadata. Snapshot of a country_facts selection plus resolver decision metadata.",
           "cadence": "Immutable per named release cut.",
           "vintageSemantics": "vintage names the Civica release cut; data year and as-of fields retain upstream observation time.",
+          "rights": "Inherits the selected source row's rights and release-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersedes_vintage_label",
+          "propertyName": "supersedesVintageLabel",
+          "definition": "Supersedes vintage label recorded for the canonical jurisdiction/fact selection in one named vintage.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Snapshot of a country_facts selection plus resolver decision metadata.",
+          "cadence": "Immutable per named release cut.",
+          "vintageSemantics": "Supersedes vintage label follows this table contract. vintage names the Civica release cut; data year and as-of fields retain upstream observation time.",
           "rights": "Inherits the selected source row's rights and release-manifest restrictions.",
           "deprecation": {
             "status": "active"

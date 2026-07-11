@@ -33,6 +33,7 @@ interface CliArgs {
   vintage?: string;
   dryRun: boolean;
   jurisdictionSlug?: string;
+  supersedesVintageLabel?: string;
 }
 
 function parseArgs(): CliArgs {
@@ -40,6 +41,7 @@ function parseArgs(): CliArgs {
   let vintage: string | undefined;
   let dryRun = false;
   let jurisdictionSlug: string | undefined;
+  let supersedesVintageLabel: string | undefined;
 
   for (const a of args) {
     if (a.startsWith("--vintage=")) vintage = a.slice("--vintage=".length);
@@ -47,17 +49,21 @@ function parseArgs(): CliArgs {
     else if (a.startsWith("--jurisdiction=")) {
       jurisdictionSlug = a.slice("--jurisdiction=".length);
     }
+    else if (a.startsWith("--supersedes=")) {
+      supersedesVintageLabel = a.slice("--supersedes=".length);
+    }
   }
 
-  return { vintage, dryRun, jurisdictionSlug };
+  return { vintage, dryRun, jurisdictionSlug, supersedesVintageLabel };
 }
 
 async function main() {
-  const { vintage, dryRun, jurisdictionSlug } = parseArgs();
+  const { vintage, dryRun, jurisdictionSlug, supersedesVintageLabel } = parseArgs();
 
   const summary = await snapshotCurrentVintage({
     vintageLabel: vintage,
     jurisdictionSlug,
+    supersedesVintageLabel,
     dryRun,
     onProgress: (line) => {
       if (line.startsWith("!")) console.error(line);
@@ -70,6 +76,7 @@ async function main() {
   console.log(`  cut_at:            ${summary.cutAt}`);
   console.log(`  scanned:           ${summary.scanned}`);
   console.log(`  snapshotted:       ${summary.snapshotted}`);
+  console.log(`  unchanged:         ${summary.unchanged}`);
   console.log(`  skipped (no key):  ${summary.skippedNoFactKey}`);
   console.log(`  skipped (no can.): ${summary.skippedNoCanonical}`);
   console.log(`  errors:            ${summary.errors.length}`);

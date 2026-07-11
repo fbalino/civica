@@ -27,6 +27,7 @@ import {
 import { normalizeV2, defaultUncertaintyV2 } from "./normalize-v2";
 import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
 import { CI_BETA_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
+import { assertSupersession, frozenContentHash, indexContentHash, parseIndexVintageLabel, stableStringify } from "../data/frozen-vintage";
 
 export const BETA_VERSION = "beta";
 
@@ -182,6 +183,7 @@ export function computeOne(
 
 interface RunSummary {
   scored: number;
+  unchanged: number;
   partial: number;
   insufficient: number;
   totalCountries: number;
@@ -195,10 +197,18 @@ interface RunSummary {
 export async function calculateCompositeV2(
   db: Db,
   quarter: string,
-  opts: { sims?: number; vintageLabel?: string } = {},
+  opts: { sims?: number; vintageLabel?: string; supersedesVintageLabel?: string; methodologyVersion?: string } = {},
 ): Promise<RunSummary> {
   const sims = opts.sims ?? DEFAULT_SIMS;
   const vintageLabel = opts.vintageLabel ?? null;
+  const methodologyVersion = opts.methodologyVersion ?? BETA_VERSION;
+  const identity = vintageLabel ? parseIndexVintageLabel(vintageLabel) : null;
+  if (identity && identity.period !== quarter) {
+    throw new Error(`${vintageLabel} publishes ${identity.period}, not requested quarter ${quarter}.`);
+  }
+  if (identity && identity.methodologyVersion !== methodologyVersion.toLowerCase()) {
+    throw new Error(`${vintageLabel} publishes methodology ${identity.methodologyVersion}, not ${methodologyVersion}.`);
+  }
 
   const rows = await db
     .select({
@@ -227,7 +237,11 @@ export async function calculateCompositeV2(
   const results: CompositeResult[] = [];
   let insufficient = 0;
   for (const [, dims] of byJurisdiction) {
-    const result = computeOne([...dims.values()], sims);
+    const result = computeOne(
+      [...dims.values()],
+      sims,
+      seededRng(`${vintageLabel ?? "live"}|${quarter}|${[...dims.values()][0]?.jurisdictionId}|${[...dims.keys()].sort().join("|")}|${[...dims.values()].map((row) => `${row.sourceId}:${row.rawValue}`).sort().join("|")}`),
+    );
     if (!result) {
       insufficient++;
       continue;
@@ -244,38 +258,93 @@ export async function calculateCompositeV2(
       a.jurisdictionId.localeCompare(b.jurisdictionId),
   );
   const totalRanked = results.length;
+  const existingRows = vintageLabel ? await db
+    .select({
+      jurisdictionId: ciCompositeScores.jurisdictionId,
+      quarter: ciCompositeScores.quarter,
+      score: ciCompositeScores.score,
+      scoreLower: ciCompositeScores.scoreLower,
+      scoreUpper: ciCompositeScores.scoreUpper,
+      completenessFlag: ciCompositeScores.completenessFlag,
+      vintageLabel: ciCompositeScores.vintageLabel,
+      supersedesVintageLabel: ciCompositeScores.supersedesVintageLabel,
+      contentHash: ciCompositeScores.contentHash,
+      rank: ciCompositeScores.rank,
+      totalRanked: ciCompositeScores.totalRanked,
+      isPartial: ciCompositeScores.isPartial,
+      dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
+      missingDimensions: ciCompositeScores.missingDimensions,
+      methodologyVersion: ciCompositeScores.methodologyVersion,
+      derivationVersionKey: ciCompositeScores.derivationVersionKey,
+      derivationVersions: ciCompositeScores.derivationVersions,
+    })
+    .from(ciCompositeScores)
+    .where(eq(ciCompositeScores.quarter, quarter)) : [];
+  const priorLabels = existingRows
+    .map((row) => row.vintageLabel)
+    .filter((label): label is string => Boolean(label && label !== vintageLabel));
+  if (vintageLabel) {
+    assertSupersession({ label: vintageLabel, supersedes: opts.supersedesVintageLabel, priorLabels });
+  }
+  const existingByJurisdiction = new Map(
+    existingRows
+      .filter((row) => row.vintageLabel === vintageLabel)
+      .map((row) => [row.jurisdictionId, row]),
+  );
+  let unchanged = 0;
 
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
     const sourceIds = [...new Set([...(byJurisdiction.get(r.jurisdictionId)?.values() ?? [])].map((row) => row.sourceId))];
     const versions = ciVersionEnvelope({
-      methodologyVersion: BETA_VERSION,
+      methodologyVersion,
       algorithmVersion: CI_BETA_COMPOSITE_ALGORITHM_VERSION,
       sourceIds,
     });
-    await db
-      .insert(ciCompositeScores)
-      .values({
+    const frozenFields = {
         jurisdictionId: r.jurisdictionId,
         quarter,
         score: r.scoreInteger,
         scoreLower: r.scoreLower,
         scoreUpper: r.scoreUpper,
-        // Public grading was retired on 2026-07-09. Keep the nullable
-        // historical column empty for every new or recomputed score.
-        band: null,
         completenessFlag: r.completeness,
         vintageLabel,
+        supersedesVintageLabel: opts.supersedesVintageLabel ?? null,
         rank: i + 1,
         totalRanked,
         isPartial: r.completeness === "partial",
         dimensionsAvailable: r.dimensionsAvailable,
         missingDimensions: r.missingDimensions,
-        methodologyVersion: BETA_VERSION,
+        methodologyVersion,
         derivationVersionKey: versions.key,
         derivationVersions: versions.envelope,
+    };
+    const contentHash = vintageLabel ? indexContentHash(frozenFields) : null;
+    const existing = existingByJurisdiction.get(r.jurisdictionId);
+    if (existing && vintageLabel) {
+      const comparable = {
+        ...frozenFields,
+        contentHash,
+      };
+      const stored = Object.fromEntries(
+        Object.keys(comparable).map((key) => [key, existing[key as keyof typeof existing] ?? null]),
+      );
+      if (stableStringify(stored) !== stableStringify(comparable)) {
+        throw new Error(`Frozen Civica Index conflict for ${vintageLabel}; publish a new superseding version instead.`);
+      }
+      unchanged += 1;
+      continue;
+    }
+    const insert = db
+      .insert(ciCompositeScores)
+      .values({
+        ...frozenFields,
+        contentHash,
       })
-      .onConflictDoUpdate({
+    if (vintageLabel) {
+      await insert.onConflictDoNothing();
+    } else {
+      await insert.onConflictDoUpdate({
         target: [
           ciCompositeScores.jurisdictionId,
           ciCompositeScores.quarter,
@@ -288,6 +357,8 @@ export async function calculateCompositeV2(
           band: null,
           completenessFlag: r.completeness,
           vintageLabel,
+          supersedesVintageLabel: null,
+          contentHash: null,
           rank: i + 1,
           totalRanked,
           isPartial: r.completeness === "partial",
@@ -298,13 +369,27 @@ export async function calculateCompositeV2(
           calculatedAt: dsql`NOW()`,
         },
       });
+    }
   }
 
   return {
     scored: results.length,
+    unchanged,
     partial: results.filter((r) => r.completeness === "partial").length,
     insufficient,
     totalCountries: byJurisdiction.size,
+  };
+}
+
+/** Small deterministic generator: a named release must reproduce byte-for-byte. */
+export function seededRng(seed: string): () => number {
+  let state = Number.parseInt(frozenContentHash(seed).slice(0, 8), 16) >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
 }
 

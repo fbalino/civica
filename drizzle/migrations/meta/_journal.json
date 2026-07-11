@@ -99,6 +99,13 @@
       "when": 1783736599000,
       "tag": "0024_research_evidence_retention",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1783764000000,
+      "tag": "0025_immutable_frozen_vintages",
+      "breakpoints": true
     }
   ]
 }

@@ -4,8 +4,8 @@
  * Walks every `(jurisdiction, fact_key)` pair tracked in
  * `country_facts`, runs the resolver to pick the canonical row,
  * and writes a `country_fact_vintages` row with the chosen value
- * frozen at the given vintage label. Idempotent on
- * `(jurisdiction_id, fact_key, vintage_label)`.
+ * frozen at the given vintage label. Exact reruns are no-ops;
+ * conflicting reruns fail and require a superseding version.
  *
  * The runtime-vs-snapshot split (resolution v1.0 § 2e):
  *
@@ -44,6 +44,7 @@ import { getFactKey } from "./fact-keys";
 import type { FactRow, ResolverOutput } from "./types";
 import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 import { reconciliationVersionEnvelope } from "./versioning";
+import { assertSupersession, parseAtlasVintageLabel, stableStringify } from "@/lib/data/frozen-vintage";
 
 type Db = typeof defaultDb;
 
@@ -52,11 +53,7 @@ type Db = typeof defaultDb;
  * ──────────────────────────────────────────────────────────────── */
 
 /**
- * The canonical methodology version used at vintage time. Phase
- * R.23 will flip this to `v0.2-beta` as part of the methodology
- * page rewrite. R.22 ships under `v0.2-beta` to align with the
- * R.23 cut-over plan; legacy `country_facts` rows still carry
- * `v0.1-beta` in their `methodology_version` column.
+ * The published release methodology version used at vintage time.
  */
 export const VINTAGE_METHODOLOGY_VERSION = "v0.2-beta";
 
@@ -220,6 +217,8 @@ export interface SnapshotOptions {
   /** Override the methodology version embedded in the auto-derived
    *  label. No effect when `vintageLabel` is supplied. */
   methodologyVersion?: string;
+  /** Explicit lineage for a corrected cut of an already-published quarter. */
+  supersedesVintageLabel?: string;
   /** Restrict the snapshot to a single jurisdiction by slug
    *  (diagnostic / smoke-test convenience — e.g. "argentina"). */
   jurisdictionSlug?: string;
@@ -232,6 +231,28 @@ export interface SnapshotOptions {
   pairs?: SnapshotPair[];
   disputedKeys?: Set<string>;
   readRows?: (pair: SnapshotPair) => Promise<FactRowDb[]>;
+  /** Test/controlled-run injection. Production reads existing frozen rows. */
+  existingFrozenRows?: ExistingFrozenFactRow[];
+}
+
+export interface ExistingFrozenFactRow {
+  jurisdictionId: string;
+  factKey: string;
+  vintageLabel: string;
+  supersedesVintageLabel: string | null;
+  canonicalFactId: string;
+  valueText: string | null;
+  valueNumeric: number | null;
+  valueUnit: string | null;
+  valueJson: unknown;
+  asOf: string | null;
+  sourceId: string;
+  methodologyVersion: string;
+  derivationVersionKey: string;
+  derivationVersions: unknown;
+  cutAtTimestamp: Date | string | null;
+  contentHash: string | null;
+  isDisputedAtCut: boolean | null;
 }
 
 export interface SnapshotPair {
@@ -246,6 +267,7 @@ export interface SnapshotSummary {
   cutAt: string;
   scanned: number;
   snapshotted: number;
+  unchanged: number;
   skippedNoFactKey: number;
   skippedNoCanonical: number;
   errors: Array<{ jurisdictionSlug: string; factKey: string; error: string }>;
@@ -378,10 +400,9 @@ async function readDisputedKeys(
  * Run the snapshot end-to-end. Returns a summary that the caller
  * (cron route or CLI script) renders as JSON / log.
  *
- * Idempotency: the unique index on `(jurisdiction_id, fact_key,
- * vintage_label)` collapses re-cuts of the same vintage label.
- * Re-runs against an existing label upsert the same rows; no
- * duplicates are produced.
+ * Idempotency: an exact existing row is verified and skipped. Any
+ * changed row under the same label fails. Database triggers also
+ * reject UPDATE/DELETE, including from code that bypasses this writer.
  *
  * Disputes: per-row `is_disputed_at_cut` is stamped from the
  * `data_disputes` table state at cut time. This is a *frozen
@@ -399,6 +420,10 @@ export async function snapshotCurrentVintage(
       cutDate,
       options.methodologyVersion ?? VINTAGE_METHODOLOGY_VERSION,
     );
+  const identity = parseAtlasVintageLabel(vintageLabel);
+  if (options.methodologyVersion && options.methodologyVersion !== identity.methodologyVersion) {
+    throw new Error(`Vintage label publishes ${identity.methodologyVersion}, not requested methodology ${options.methodologyVersion}.`);
+  }
   const onProgress = options.onProgress ?? (() => {});
 
   onProgress(
@@ -455,11 +480,45 @@ export async function snapshotCurrentVintage(
   //    table for every pair.
   const disputedKeys = options.disputedKeys ?? await readDisputedKeys(dbInstance, jurisdictionFilterId);
 
+  const existingFrozenRows = options.existingFrozenRows ?? await dbInstance
+    .select({
+      jurisdictionId: countryFactVintages.jurisdictionId,
+      factKey: countryFactVintages.factKey,
+      vintageLabel: countryFactVintages.vintageLabel,
+      supersedesVintageLabel: countryFactVintages.supersedesVintageLabel,
+      canonicalFactId: countryFactVintages.canonicalFactId,
+      valueText: countryFactVintages.valueText,
+      valueNumeric: countryFactVintages.valueNumeric,
+      valueUnit: countryFactVintages.valueUnit,
+      valueJson: countryFactVintages.valueJson,
+      asOf: countryFactVintages.asOf,
+      sourceId: countryFactVintages.sourceId,
+      methodologyVersion: countryFactVintages.methodologyVersion,
+      derivationVersionKey: countryFactVintages.derivationVersionKey,
+      derivationVersions: countryFactVintages.derivationVersions,
+      cutAtTimestamp: countryFactVintages.cutAtTimestamp,
+      contentHash: countryFactVintages.contentHash,
+      isDisputedAtCut: countryFactVintages.isDisputedAtCut,
+    })
+    .from(countryFactVintages)
+    .where(sql`${countryFactVintages.vintageLabel} = ${vintageLabel}
+      OR ${countryFactVintages.vintageLabel} LIKE ${`%vintage ${identity.period}`}`);
+  const priorLabels = existingFrozenRows
+    .filter((row) => row.vintageLabel !== vintageLabel)
+    .map((row) => row.vintageLabel);
+  assertSupersession({ label: vintageLabel, supersedes: options.supersedesVintageLabel, priorLabels });
+  const existingByKey = new Map(
+    existingFrozenRows
+      .filter((row) => row.vintageLabel === vintageLabel)
+      .map((row) => [`${row.jurisdictionId}\0${row.factKey}`, row]),
+  );
+
   const summary: SnapshotSummary = {
     vintageLabel,
     cutAt: cutDate.toISOString(),
     scanned: 0,
     snapshotted: 0,
+    unchanged: 0,
     skippedNoFactKey: 0,
     skippedNoCanonical: 0,
     errors: [],
@@ -502,10 +561,10 @@ export async function snapshotCurrentVintage(
         valueText: result.canonical.factValue,
         valueNumeric: result.canonical.factValueNumeric,
         asOf: result.canonical.asOf,
-        methodologyVersion: result.canonical.methodologyVersion,
+        methodologyVersion: identity.methodologyVersion,
       });
       const versions = reconciliationVersionEnvelope({
-        methodologyVersion: result.canonical.methodologyVersion,
+        methodologyVersion: identity.methodologyVersion,
         sourceIds: rows.map((row) => row.sourceId),
       });
 
@@ -517,12 +576,11 @@ export async function snapshotCurrentVintage(
         continue;
       }
 
-      await dbInstance
-        .insert(countryFactVintages)
-        .values({
+      const frozenValue = {
           jurisdictionId: pair.jurisdictionId,
           factKey: pair.factKey,
           vintageLabel,
+          supersedesVintageLabel: options.supersedesVintageLabel ?? null,
           canonicalFactId: result.canonical.id,
           valueText: result.canonical.factValue,
           valueNumeric: result.canonical.factValueNumeric,
@@ -530,36 +588,32 @@ export async function snapshotCurrentVintage(
           valueJson: result.canonical.valueJson as object | null,
           asOf: result.canonical.asOf,
           sourceId: result.canonical.sourceId,
-          methodologyVersion: result.canonical.methodologyVersion,
+          methodologyVersion: identity.methodologyVersion,
           derivationVersionKey: versions.key,
           derivationVersions: versions.envelope,
           cutAtTimestamp: cutDate,
           contentHash,
           isDisputedAtCut,
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryFactVintages.jurisdictionId,
-            countryFactVintages.factKey,
-            countryFactVintages.vintageLabel,
-          ],
-          set: {
-            canonicalFactId: result.canonical.id,
-            valueText: result.canonical.factValue,
-            valueNumeric: result.canonical.factValueNumeric,
-            valueUnit: result.canonical.factUnit,
-            valueJson: result.canonical.valueJson as object | null,
-            asOf: result.canonical.asOf,
-            sourceId: result.canonical.sourceId,
-            methodologyVersion: result.canonical.methodologyVersion,
-            derivationVersionKey: versions.key,
-            derivationVersions: versions.envelope,
-            snapshotAt: new Date(),
-            cutAtTimestamp: cutDate,
-            contentHash,
-            isDisputedAtCut,
-          },
+      };
+      const existing = existingByKey.get(`${pair.jurisdictionId}\0${pair.factKey}`);
+      if (existing) {
+        const normalize = (value: ExistingFrozenFactRow | typeof frozenValue) => ({
+          ...value,
+          cutAtTimestamp: value.cutAtTimestamp instanceof Date
+            ? value.cutAtTimestamp.toISOString()
+            : value.cutAtTimestamp,
         });
+        if (stableStringify(normalize(existing)) !== stableStringify(normalize(frozenValue))) {
+          throw new Error(`Frozen vintage conflict for ${vintageLabel}; publish a new superseding version instead.`);
+        }
+        summary.unchanged += 1;
+        continue;
+      }
+
+      await dbInstance
+        .insert(countryFactVintages)
+        .values(frozenValue)
+        .onConflictDoNothing();
 
       summary.snapshotted += 1;
     } catch (err) {

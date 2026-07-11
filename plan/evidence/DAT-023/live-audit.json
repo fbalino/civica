@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-07-11",
+  "migration": "0025_immutable_frozen_vintages",
+  "atlas": {
+    "rows": 17506,
+    "publishedLabel": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+    "storedMethodologyVersion": "v0.2-beta",
+    "versionMismatches": 0,
+    "nullContentHashes": 0,
+    "contentHashMismatches": 0
+  },
+  "civicaIndex": {
+    "namedRows": 237,
+    "versionMismatches": 0,
+    "periodMismatches": 0,
+    "nullContentHashes": 0,
+    "contentHashMismatches": 0
+  },
+  "databaseTriggers": {
+    "expected": 4,
+    "observed": 4,
+    "atlasMutationProbe": "rejected_and_rolled_back",
+    "indexMutationProbe": "rejected_and_rolled_back"
+  },
+  "writesPerformedByAudit": 0
+}

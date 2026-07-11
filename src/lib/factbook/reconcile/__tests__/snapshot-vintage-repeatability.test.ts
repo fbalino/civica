@@ -18,10 +18,17 @@ function harness() {
   const rows = new Map<string, Record<string, unknown>>();
   let writes = 0;
   const db = {
-    insert: () => ({ values: (value: Record<string, unknown>) => ({ onConflictDoUpdate: async () => {
+    select: () => ({ from: () => ({ where: async () => [...rows.values()].map((value) => {
+      const copy = { ...value };
+      delete copy.snapshotAt;
+      return copy;
+    }) }) }),
+    insert: () => ({ values: (value: Record<string, unknown>) => ({ onConflictDoNothing: async () => {
       const key = `${value.jurisdictionId}:${value.factKey}:${value.vintageLabel}`;
-      rows.set(key, { ...structuredClone(value), snapshotAt: new Date() });
-      writes++;
+      if (!rows.has(key)) {
+        rows.set(key, { ...structuredClone(value), snapshotAt: new Date() });
+        writes++;
+      }
     } }) }),
   };
   return { db: db as never, rows, writes: () => writes };
@@ -35,7 +42,7 @@ function canonical(rows: Map<string, Record<string, unknown>>) {
   });
 }
 
-const fixed = { vintageLabel: "Fixture 2026-Q1", cutDate: new Date("2026-04-15T04:00:00.000Z"), pairs: [pair], disputedKeys: new Set<string>(), readRows: async () => [row] as never };
+const fixed = { vintageLabel: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1", cutDate: new Date("2026-04-15T04:00:00.000Z"), pairs: [pair], disputedKeys: new Set<string>(), readRows: async () => [row] as never };
 
 test("vintage fixture applications converge on one canonical snapshot", async () => {
   const state = harness();
@@ -44,6 +51,7 @@ test("vintage fixture applications converge on one canonical snapshot", async ()
   await snapshotCurrentVintage(fixed, state.db);
   assert.deepEqual(canonical(state.rows), first);
   assert.equal(state.rows.size, 1);
+  assert.equal(state.writes(), 1);
 });
 
 test("vintage dry-run is stable and performs zero writes", async () => {
