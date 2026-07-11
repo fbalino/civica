@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-024_frozen_snapshot_exports"
+    "current_task": "DAT-025_temporal_field_separation"
   },
   "budget": {
     "mode": "subscription_only",
@@ -628,6 +628,8 @@
     "plan/evidence/DAT-018/README.md",
     "plan/evidence/DAT-023/README.md",
     "plan/evidence/DAT-023/live-audit.json",
+    "plan/evidence/DAT-024/README.md",
+    "plan/evidence/DAT-024/live-boundary-audit.json",
     "drizzle/migrations/0025_immutable_frozen_vintages.sql",
     "src/app/downloads/civica-atlas-2026-07-11.manifest.json/route.ts",
     "data/release-quality-report.v1.json",
@@ -650,11 +652,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "Every validator, claims/documentation gate, TypeScript, and the production build passed for DAT-023.",
-    "tests": "626/626 tests passed. Live audit found 0 version/hash mismatches across 17,506 Atlas and 237 named Index rows. Master plan is 42/288 complete (14.6%).",
-    "public_claims": "No reader-facing empirical claim changed; the task hardened stored citation handles and release writers.",
-    "browser": "Not applicable: DAT-023 made no reader-facing UI change.",
-    "visual_review": "Not applicable: no visual component, layout, or token changed."
+    "build": "Every validator, claims/documentation gate, TypeScript, and the production build passed for DAT-024.",
+    "tests": "628/628 tests passed. Live byte reproduction excluded 161 current post-cut differences. Master plan is 43/288 complete (14.9%).",
+    "public_claims": "The Atlas package claim now accurately describes 12,373 canonical rows from the named immutable Q1 snapshot and publishes its cutoff/hash/method boundary.",
+    "browser": "API docs rendered at desktop light and 390px dark; data and manifest downloads returned HTTP 200, immutable caching, and attachment names. A pre-existing country-search caret-style hydration warning repeated.",
+    "visual_review": "Revised bulk-data copy fits the existing editorial system at desktop and mobile; no new component or token was introduced."
   },
-  "updated_at": "2026-07-11T05:30:00Z"
+  "updated_at": "2026-07-11T06:35:00Z"
 }

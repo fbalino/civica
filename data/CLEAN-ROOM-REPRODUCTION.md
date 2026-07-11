@@ -1,6 +1,6 @@
 # Clean-room reproduction
 
-**Contract:** `civica-clean-room-fixture/v1`
+**Contract:** `civica-clean-room-fixture/v2`
 
 This fixture proves that Civica's published Atlas export logic can be installed
 and run from a clean checkout using only checked, legally shareable inputs. It
@@ -10,9 +10,9 @@ frozen release.
 ## What the fixture contains
 
 `data/fixtures/clean-room/atlas-input.v1.json` contains three jurisdiction rows
-and three fact observations, one each from CIA Factbook, Wikidata, and World
-Bank. These rows come from the public `atlas-2026-07-11` package and retain
-their stable IDs, source IDs, vintages, values, and value states.
+and three frozen canonical facts, one each from CIA Factbook, Wikidata, and
+World Bank. These rows come from the public `atlas-2026-07-11` package and
+retain their stable IDs, source IDs, vintage labels, cutoffs, values, and hashes.
 
 No publisher workbook, restricted text, image, Index score, Pulse record,
 private submission, database dump, or credential is included.
@@ -48,9 +48,9 @@ export builder, and compares exact bytes to the checked expectation.
 ## Expected result
 
 - fixture SHA-256:
-  `6813f95a781776d81b5235cc32b4c96d064fd0ccd9034e4fbe757b0e89125f0f`
+  `78d1bf5d5fa335aa98f8424f9387cb45b1d5bbc1158dff9d8686a3bd4a6f8113`
 - normalized export SHA-256:
-  `15a4fa61c5818d87941bc3a13de831548ad1e94c6fe626e4b00b573aae17c622`
+  `8ff633f5447f59b6771c7ae10b63b407df9af99aab632889967a073c6386e639`
 - rows: 3 jurisdictions, 3 facts, 3 source-rights records
 - tolerance: exact canonical JSON bytes
 - credentials used: none

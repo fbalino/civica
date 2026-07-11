@@ -744,7 +744,7 @@
           "exportRule": "blocked"
         }
       ],
-      "reason": "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; DAT-017 separately publishes a frozen Atlas source-observation package.",
+      "reason": "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; the bulk Atlas package separately publishes rights-cleared canonical rows from an immutable snapshot.",
       "requiresDerivationVersions": true
     },
     {
@@ -789,7 +789,7 @@
         "schemaVersion": "derivation-version-envelope/v1",
         "methodology": {
           "state": "versioned",
-          "id": "civica-atlas-export/v1"
+          "id": "civica-atlas-export/v2"
         },
         "algorithm": {
           "state": "versioned",

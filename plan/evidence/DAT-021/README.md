@@ -20,7 +20,7 @@ clusters, sockets, and temporary release copy were deleted after verification.
   present and `after-target` was absent.
 - Logical restore plus count verification took 3,319 ms from an available dump;
   physical base backup took 1,164 ms and PITR startup took 193 ms.
-- Atlas archive compressed/semantic hashes, byte sizes, and 253/16,451/3 row
+- Atlas archive compressed/semantic hashes, byte sizes, and 253/12,373/3 row
   counts matched `civica-release-bom/v1`.
 - Four external gaps are listed in `restore-drill.json`; the provider-managed
   Neon branch exercise and external-media disposition are in `MANUAL-CHECKS.md`.

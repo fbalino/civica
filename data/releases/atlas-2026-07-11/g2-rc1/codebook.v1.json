@@ -1,10 +1,10 @@
 {
   "schemaVersion": "civica-atlas-codebook/v1",
   "releaseId": "atlas-2026-07-11",
-  "exportSchemaVersion": "civica-atlas-export/v1",
+  "exportSchemaVersion": "civica-atlas-export/v2",
   "codebook": {
     "jurisdictions": "Stable Civica jurisdiction identity and sourced status classification.",
-    "facts": "Active source observations from verified bulk-export sources; rows are not presented as a canonical selection.",
+    "facts": "As-published canonical selections copied from the immutable named vintage; current post-cut values and alternate observations are excluded.",
     "sources": "Source-specific license, terms, attribution, and restriction records for every emitted fact row.",
     "joins": {
       "facts.jurisdiction_id": "jurisdictions.id",
@@ -31,7 +31,8 @@
         "status_disputed": "Whether the territorial/status record is disputed."
       },
       "facts": {
-        "id": "Stable source-observation UUID.",
+        "id": "Stable frozen-vintage row UUID.",
+        "canonical_fact_id": "Source-observation row selected at the cutoff.",
         "jurisdiction_id": "Foreign key to jurisdictions.id.",
         "fact_key": "Stable Civica fact identifier.",
         "fact_group": "Reconciliation group A, B, or C.",
@@ -49,9 +50,14 @@
         "data_vintage_year": "Underlying measurement year when different from the publisher stamp.",
         "retrieved_at": "Civica retrieval timestamp.",
         "upstream_vintage_label": "Publisher dataset/version label.",
-        "methodology_version": "Civica admission-method version.",
+        "methodology_version": "Published Civica vintage-method version.",
         "value_type": "Measured or projected source value.",
-        "growth_methodology": "Growth-rate basis where applicable."
+        "growth_methodology": "Growth-rate basis where applicable.",
+        "vintage_label": "Immutable Civica citation handle.",
+        "cut_at_timestamp": "Shared publication cutoff for the vintage.",
+        "content_hash": "SHA-256 of the frozen value, source, date, and method recipe.",
+        "is_disputed_at_cut": "Whether the canonical selection was disputed when frozen.",
+        "supersedes_vintage_label": "Earlier release replaced by this version, when applicable."
       },
       "sources": {
         "sourceId": "Stable source identifier.",

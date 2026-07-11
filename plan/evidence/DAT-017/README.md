@@ -3,17 +3,18 @@
 ## Outcome
 
 DAT-017 is complete. Release `atlas-2026-07-11` is downloadable as a
-gzip-compressed `civica-atlas-export/v1` JSON package from the API documentation.
+gzip-compressed `civica-atlas-export/v2` JSON package from the API documentation.
 
 The release contains three machine-readable tables:
 
 - 253 stable jurisdiction identity and status records;
-- 16,451 active source-observation fact rows;
+- 12,373 canonical fact rows from the immutable Q1 vintage;
 - three complete source-rights records: CIA Factbook, Wikidata, and World Bank.
 
 Every emitted field is documented in the embedded codebook. Fact rows retain
-stable IDs, source and jurisdiction joins, URLs, values and units, data-value
-states, observation/retrieval vintages, methodology version, and value type.
+stable IDs, source and jurisdiction joins, URLs, frozen values and units,
+vintage label, cutoff, content hash, published methodology version, and the
+selected source-observation ID.
 Ordering is deterministic. The generated and release dates are fixed to the
 named release.
 
@@ -27,13 +28,13 @@ old per-country JSON/CSV route remains blocked until DAT-027.
 ## Verification
 
 - Uncompressed semantic SHA-256:
-  `cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1`.
+  `8be96e97fef153736f98ce56c8ab59a697f6396c3f61d3b07b12ba7823904ba9`.
 - The release manifest also records compressed hash, compressed/uncompressed
   sizes, row counts, release date, schema version, and download path.
 - `npm run validate:atlas-export:live` rebuilt the package from Neon and matched
   the checked bytes exactly.
-- Three focused fixtures prove deterministic ordering, fail-closed pending
-  source handling, and preservation of observed zero.
+- Focused fixtures prove deterministic ordering, fail-closed pending-source
+  handling, observed-zero preservation, and post-cut value isolation.
 - 617/617 repository tests passed.
 - The aggregate claims/docs gate and production build passed.
 - The API documentation rendered the release ID, exclusions, hash, codebook

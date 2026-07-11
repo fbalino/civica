@@ -1,21 +1,21 @@
 {
-  "schemaVersion": "atlas-release-observation-inputs/v1",
+  "schemaVersion": "atlas-release-frozen-snapshot-inputs/v1",
   "releaseId": "atlas-2026-07-11",
-  "captureLevel": "normalized-release-observations",
+  "captureLevel": "immutable-civica-vintage-rows",
   "upstreamPublisherBytesRetained": false,
-  "reconstructionBoundary": "These records reproduce the frozen normalized Atlas export. They do not reconstruct upstream ingestion from publisher bytes that were not retained at release time.",
-  "exportSourceCommit": "1dc2891d669ba4cc96ca817c98f3425a37272546",
+  "reconstructionBoundary": "These records reproduce the immutable as-published canonical snapshot. They do not reconstruct upstream ingestion from publisher bytes that were not retained at release time.",
+  "exportSourceCommit": "7d853d95e4416e0cb0cc4bbf1bd5134779d063ad",
   "inputs": [
     {
       "sourceId": "cia_factbook",
-      "rowCount": 10699,
+      "rowCount": 8861,
       "upstreamVintageLabels": [
         "CIA Factbook 2026-01-frozen"
       ],
       "observationYearMin": 1994,
       "observationYearMax": 2026,
       "retrievedThrough": "2026-05-04 19:06:52.469",
-      "semanticSha256": "f5373eafef11d1b1316c605d2db2679f350a0f5704f31e1c7c5b9f5bcfcda155",
+      "semanticSha256": "8f762c49e69b0d80ecbc172dfc917d843f0103fee84612db404c9f615e1c0c50",
       "accessPath": "atlas-export.v1.json.gz",
       "recordPath": "tables.facts[source_id=cia_factbook]",
       "rights": {
@@ -38,14 +38,14 @@
     },
     {
       "sourceId": "wikidata",
-      "rowCount": 1270,
+      "rowCount": 9,
       "upstreamVintageLabels": [
         "Wikidata 2026-05 snapshot"
       ],
-      "observationYearMin": 1960,
+      "observationYearMin": 2024,
       "observationYearMax": 2026,
-      "retrievedThrough": "2026-07-01 06:08:18.725",
-      "semanticSha256": "2dc573eed08b308667720e033102130ceb11e5e725a2ff65fcd3cedb4499c2f1",
+      "retrievedThrough": "2026-07-01 06:08:08.973",
+      "semanticSha256": "67d1a5018a3e48a2486ed262c897d56ce4109846a9a2770fa50bc0b3df72bcc3",
       "accessPath": "atlas-export.v1.json.gz",
       "recordPath": "tables.facts[source_id=wikidata]",
       "rights": {
@@ -64,7 +64,7 @@
     },
     {
       "sourceId": "world_bank",
-      "rowCount": 4482,
+      "rowCount": 3503,
       "upstreamVintageLabels": [
         "WB Country Classifications FY2026",
         "World Bank WDI 2026Q3"
@@ -72,7 +72,7 @@
       "observationYearMin": 2016,
       "observationYearMax": 2026,
       "retrievedThrough": "2026-07-02 08:02:36.643",
-      "semanticSha256": "3a960593604b0d563dfcdbe1cb6999fc64c370da4e9fdb0f87d0d20ac6e2e696",
+      "semanticSha256": "2eafa0af41a5dd3dd72ab29ead2894c73b3ecec26aa4e5056651dcb9de61b7e2",
       "accessPath": "atlas-export.v1.json.gz",
       "recordPath": "tables.facts[source_id=world_bank]",
       "rights": {

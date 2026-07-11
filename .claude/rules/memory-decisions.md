@@ -716,10 +716,10 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   migration `0024`; do not imply that earlier deleted evidence was recovered.
   Durable record: APR-D049 in `plan/DECISIONS.md`.
 
-## 2026-07-11 — Atlas bulk export is a narrow frozen observation release
+## 2026-07-11 — Atlas bulk export is a narrow frozen canonical release
 
-- `civica-atlas-export/v1` contains stable jurisdiction records and permitted
-  active source observations from CIA Factbook, Wikidata, and World Bank.
+- `civica-atlas-export/v2` contains stable jurisdiction records and permitted
+  canonical rows from the named immutable Q1 vintage.
 - Embed the field codebook and source-specific rights. Exclude Index, Pulse,
   pending sources, images, constitution text, and publisher payloads.
 - Keep the legacy per-country mixed-source export blocked for DAT-027. Durable
@@ -759,10 +759,10 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Keep provider retention/branch restore and external media in the manual queue.
   Durable record: APR-D054 in `plan/DECISIONS.md`.
 
-## 2026-07-11 — G2 is an observation-release reconstruction boundary
+## 2026-07-11 — G2 is a canonical-snapshot reconstruction boundary
 
-- Freeze the rights-cleared normalized source-observation rows and exact export
-  builder so the Atlas release can be reproduced offline and hash-verified.
+- Freeze the rights-cleared canonical vintage rows and exact export builder so
+  the Atlas release can be reproduced offline and hash-verified.
 - Do not describe missing historical publisher bytes as captured raw inputs.
 - Keep DOI, Index/Pulse replication, upstream ingestion replay, and substantive
   source validation outside this G2 Atlas candidate. Durable record: APR-D055.
@@ -775,3 +775,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   require a new version plus an explicit existing supersession target.
 - Keep unnamed Index rows mutable as pre-publication working state. Durable
   record: APR-D056 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — As-published exports read the immutable vintage
+
+- Frozen value, source, hash, method, and cutoff must come from the named
+  `country_fact_vintages` rows, never current active observations.
+- Current source rows may temporarily supply only descriptive fields absent
+  from the vintage schema; DAT-025 owns closing that residual ambiguity.
+- Keep alternates out until DAT-027. Durable record: APR-D057.

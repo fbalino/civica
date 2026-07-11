@@ -380,9 +380,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 
 ## 2026-07-11 — DAT-017 frozen Atlas export completed
 
-- Published `atlas-2026-07-11`: 253 jurisdiction rows, 16,451 active fact
-  observations, and embedded rights records for CIA Factbook, Wikidata, and
-  World Bank in one deterministic gzip JSON package.
+- Published `atlas-2026-07-11`: 253 jurisdiction rows, 12,373 frozen canonical
+  facts, and embedded rights records for CIA Factbook, Wikidata, and World
+  Bank in one deterministic gzip JSON package.
 - The package carries a field codebook, stable joins, value states, vintages,
   source terms, ordering, dates, counts, and checked hashes. Index, Pulse,
   pending sources, images, constitution text, and publisher payloads stay out.
@@ -401,8 +401,8 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 
 ## 2026-07-11 — DAT-019 clean-room reproduction completed
 
-- Added a public three-jurisdiction fixture covering permitted CIA Factbook,
-  Wikidata, and World Bank observations through the production export builder.
+- Added a public three-jurisdiction fixture covering permitted frozen CIA
+  Factbook, Wikidata, and World Bank canonical rows through the export builder.
 - Exact fixture/export hashes, rights, row counts, and relational joins fail
   closed. The runbook explicitly does not claim full uncaptured-input replay.
 - A credential- and cache-free temporary checkout passed strict reproduction,
@@ -428,12 +428,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 
 ## 2026-07-11 — DAT-022 G2 Atlas candidate completed
 
-- Packaged a deterministic 16-file Atlas G2 candidate and 1.21 MB archival ZIP
+- Packaged a deterministic 16-file Atlas G2 candidate and 1.87 MB archival ZIP
   with versioned code, export, manifests, codebook, coverage, citation, and QA.
 - Clean-room reproduction matches the full semantic and file hashes with no
   credentials or history; 622/622 tests and the production build pass.
-- The guarantee covers normalized released observations, not unretained raw
-  publisher bytes. DAT-023 is next.
+- The guarantee covers immutable canonical vintage rows, not alternates or
+  unretained raw publisher bytes. DAT-023 is next.
 
 ## 2026-07-11 — DAT-023 frozen-vintage immutability completed
 
@@ -443,3 +443,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   superseding version. Rollback-only mutation probes were rejected.
 - Migration gates, live audit, 626/626 tests, TypeScript, claims/docs, and the
   production build pass. DAT-024 is next.
+
+## 2026-07-11 — DAT-024 as-published export boundary completed
+
+- `civica-atlas-export/v2` emits 12,373 rights-cleared canonical facts from the
+  immutable Q1 vintage with its label, cutoff, source-row ID, hash, and method.
+- 161 selected live source rows now differ from the cut; none can enter the old
+  release. The release, BOM, G2 bundle, clean-room and recovery evidence agree.
+- 628/628 tests, live reconstruction, all gates, build, and browser/download
+  checks pass. DAT-025 is next.

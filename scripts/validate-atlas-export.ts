@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { config } from "dotenv";
-import { ATLAS_EXPORT_RELEASE_ID, ATLAS_EXPORT_SCHEMA_VERSION, atlasExportSha256, buildAtlasExport, buildAtlasReleaseBom, loadAtlasExportInput, serializeAtlasExport } from "../src/lib/exports/atlas-release";
+import { ATLAS_EXPORT_RELEASE_ID, ATLAS_EXPORT_SCHEMA_VERSION, ATLAS_EXPORT_VINTAGE_LABEL, atlasExportSha256, buildAtlasExport, buildAtlasReleaseBom, loadAtlasExportInput, serializeAtlasExport } from "../src/lib/exports/atlas-release";
 import { evaluatePublicExport } from "../src/lib/rights/manifest";
 
 config({ path: ".env.local", override: true });
@@ -17,6 +17,7 @@ const fail = (message: string): never => { throw new Error(`DAT-017 atlas export
 
 if (release.schemaVersion !== ATLAS_EXPORT_SCHEMA_VERSION) fail("schema version drift");
 if (release.releaseId !== ATLAS_EXPORT_RELEASE_ID) fail("release id drift");
+if (release.vintageLabel !== ATLAS_EXPORT_VINTAGE_LABEL || !release.cutoffAt) fail("frozen vintage identity or cutoff drift");
 const file = manifest.files?.[0];
 if (manifest.schemaVersion !== "civica-release-bom/v1") fail("BOM schema drift");
 if (file?.semanticSha256 !== atlasExportSha256(serialized)) fail("content hash mismatch");
@@ -39,6 +40,7 @@ for (const fact of release.tables.facts) {
   if (!jurisdictionIds.has(String(fact.jurisdiction_id))) fail(`orphan fact ${fact.id}`);
   if (!sourceIds.has(String(fact.source_id))) fail(`fact ${fact.id} lacks rights row`);
   for (const prohibited of ["score", "rank", "pulse", "classifier_runs"]) if (prohibited in fact) fail(`fact ${fact.id} leaks ${prohibited}`);
+  if (fact.vintage_label !== release.vintageLabel || fact.methodology_version !== "v0.2-beta" || !/^[a-f0-9]{64}$/.test(String(fact.content_hash))) fail(`fact ${fact.id} is outside the frozen vintage/hash/method contract`);
 }
 const decision = evaluatePublicExport("atlas-reference-export-v1", [...sourceIds]);
 if (!decision.allowed) fail(decision.reason);
