@@ -30,7 +30,11 @@ import {
   HUMAN_REVIEW_TIERS,
   SCORE_WINDOW_DAYS,
 } from "./taxonomy";
-import { PULSE_DIMENSIONS, type PulseDimension, type SeverityTier } from "./types";
+import {
+  PULSE_DIMENSIONS,
+  type PulseDimension,
+  type SeverityTier,
+} from "./types";
 import {
   SUBJECT_ATTRIBUTION_MODEL,
   SUBJECT_ATTRIBUTION_PROVIDER,
@@ -121,6 +125,16 @@ export interface PulseRuntimeMethodContract {
     currentRows: string;
     legacyRows: string;
     comparisonWarning: string;
+  };
+  evidenceIdentity: {
+    schemaVersion: "pulse-raw-evidence/v1";
+    rawItemSnapshot: "immutable_private_payload_plus_hash";
+    requiredMetadata: string[];
+    unknownLanguage: "und";
+    eventTrace: "pulse_sources_to_raw_events";
+    publicPayloadDistribution: "blocked";
+    rightsRule: string;
+    legacyRule: string;
   };
   providers: {
     classify: {
@@ -357,6 +371,27 @@ export function buildPulseRuntimeMethod(
       comparisonWarning:
         "API version-set metadata marks legacy or mixed results as not comparable as one method series.",
     },
+    evidenceIdentity: {
+      schemaVersion: "pulse-raw-evidence/v1",
+      rawItemSnapshot: "immutable_private_payload_plus_hash",
+      requiredMetadata: [
+        "exact_item_url",
+        "source_family",
+        "publisher",
+        "retrieval_time",
+        "content_hash",
+        "language_or_und",
+        "jurisdiction_attribution_evidence",
+        "captured_rights_posture",
+      ],
+      unknownLanguage: "und",
+      eventTrace: "pulse_sources_to_raw_events",
+      publicPayloadDistribution: "blocked",
+      rightsRule:
+        "Free access, indexing, or citation never grants public redistribution of the retained publisher payload; a separate verified rights decision is required.",
+      legacyRule:
+        "Retained rows preserve their exact stored payload and ingest-time metadata under an explicit legacy hash/attribution method rather than receiving invented current provenance.",
+    },
     providers: {
       classify: {
         mode: "cross_vendor_ensemble",
@@ -441,7 +476,9 @@ export function buildPulseRuntimeMethod(
       numericSeverityAggregation:
         "median_of_winning_category_voters_then_tier_clamp",
       reviewGates: {
-        absoluteSeverityTiers: uniqueSorted(facts.humanReviewTiers) as SeverityTier[],
+        absoluteSeverityTiers: uniqueSorted(
+          facts.humanReviewTiers,
+        ) as SeverityTier[],
         deadlock: true,
         noQuorum: true,
         invalidConsensusCategory: true,
@@ -458,8 +495,7 @@ export function buildPulseRuntimeMethod(
             "not_event",
           ],
           weakConsensusRequiresNonUnanimous: true,
-          selfConfidenceAggregation:
-            "maximum_among_winning_category_voters",
+          selfConfidenceAggregation: "maximum_among_winning_category_voters",
           selfConfidenceBelow: 0.7,
           degradedRunAlsoWeak: true,
         },
@@ -548,7 +584,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "access_gated",
       defaultEnabled: false,
       observedInProduction: false,
-      activation: "Requires licensed academic API access and a registered account email.",
+      activation:
+        "Requires licensed academic API access and a registered account email.",
     },
     {
       feedId: "amnesty",
@@ -568,7 +605,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "configuration_gated",
       defaultEnabled: false,
       observedInProduction: false,
-      activation: "No working default feed; requires an explicitly configured feed URL.",
+      activation:
+        "No working default feed; requires an explicitly configured feed URL.",
     },
     {
       feedId: "civicus",
@@ -588,7 +626,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "active_observed",
       defaultEnabled: true,
       observedInProduction: true,
-      activation: "Default GDELT document API query with best-effort article enrichment.",
+      activation:
+        "Default GDELT document API query with best-effort article enrichment.",
     },
     {
       feedId: "hrw",
@@ -608,7 +647,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "sparse_scaffold",
       defaultEnabled: true,
       observedInProduction: false,
-      activation: "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
+      activation:
+        "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
     },
     {
       feedId: "reuters",
@@ -618,7 +658,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "configuration_gated",
       defaultEnabled: false,
       observedInProduction: false,
-      activation: "No working default feed; requires an explicitly configured feed URL.",
+      activation:
+        "No working default feed; requires an explicitly configured feed URL.",
     },
     {
       feedId: "rsf",
@@ -628,7 +669,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "configuration_gated",
       defaultEnabled: false,
       observedInProduction: false,
-      activation: "No public feed is configured; requires an approved ingestion surface.",
+      activation:
+        "No public feed is configured; requires an approved ingestion surface.",
     },
     {
       feedId: "vdem",
@@ -638,7 +680,8 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       status: "placeholder",
       defaultEnabled: true,
       observedInProduction: false,
-      activation: "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
+      activation:
+        "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
     },
   ],
   cadence: [
@@ -697,7 +740,8 @@ export const CURRENT_PULSE_RUNTIME_METHOD = buildPulseRuntimeMethod(
 );
 
 type JsonPrimitive = string | number | boolean | null;
-type JsonLike = JsonPrimitive | readonly JsonLike[] | { readonly [key: string]: JsonLike };
+type JsonLike =
+  JsonPrimitive | readonly JsonLike[] | { readonly [key: string]: JsonLike };
 
 /** Recursively sort object keys while preserving semantically ordered arrays. */
 export function canonicalizeJson<T>(value: T): T {
@@ -722,7 +766,8 @@ export function stableStringify(value: JsonLike | object): string {
 export function pulseContractHash(
   value: PulseRuntimeMethodContract | PulseRuntimeMethodSnapshot,
 ): string {
-  const { contractHash: _ignored, ...contract } = value as PulseRuntimeMethodSnapshot;
+  const { contractHash: _ignored, ...contract } =
+    value as PulseRuntimeMethodSnapshot;
   void _ignored;
   return createHash("sha256").update(stableStringify(contract)).digest("hex");
 }

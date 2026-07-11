@@ -16,6 +16,7 @@ import { rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import type { RawEventInput } from "./types";
+import { buildPulseEvidenceIdentity } from "./evidence-identity";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -34,8 +35,19 @@ export function rawEventInputErrors(row: RawEventInput): string[] {
     errors.push("sourceType must be specialist or news");
   }
   if (!row.title.trim()) errors.push("title is required");
-  if (!row.externalId?.trim() && !row.sourceUrl?.trim()) {
-    errors.push("externalId or sourceUrl is required for idempotent ingestion");
+  if (!row.sourceUrl?.trim()) {
+    errors.push(
+      "sourceUrl is required for evidence identity and idempotent ingestion",
+    );
+  } else {
+    try {
+      const url = new URL(row.sourceUrl);
+      if (url.protocol !== "http:" && url.protocol !== "https:") {
+        errors.push("sourceUrl must use http or https");
+      }
+    } catch {
+      errors.push("sourceUrl must be an absolute URL");
+    }
   }
   if (row.eventDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.eventDate)) {
     errors.push("eventDate must use YYYY-MM-DD");
@@ -66,14 +78,26 @@ export async function upsertRawEvents(
   for (const [index, row] of rows.entries()) {
     const errors = rawEventInputErrors(row);
     if (errors.length) {
-      throw new Error(`Invalid raw event at index ${index}: ${errors.join("; ")}`);
+      throw new Error(
+        `Invalid raw event at index ${index}: ${errors.join("; ")}`,
+      );
     }
   }
+
+  // Seal every identity before the first write so a missing rights/source
+  // contract fails the whole batch without leaving an untraceable raw row.
+  const evidence = rows.map((row) => {
+    const retrievedAt = new Date();
+    return {
+      retrievedAt,
+      identity: buildPulseEvidenceIdentity(row, retrievedAt),
+    };
+  });
 
   let inserted = 0;
   let skippedDuplicate = 0;
 
-  for (const row of rows) {
+  for (const [index, row] of rows.entries()) {
     const externalId = row.externalId ?? null;
 
     if (externalId) {
@@ -83,8 +107,8 @@ export async function upsertRawEvents(
         .where(
           and(
             eq(rawEvents.sourceId, row.sourceId),
-            eq(rawEvents.externalId, externalId)
-          )
+            eq(rawEvents.externalId, externalId),
+          ),
         )
         .limit(1);
 
@@ -100,8 +124,8 @@ export async function upsertRawEvents(
         .where(
           and(
             eq(rawEvents.sourceId, row.sourceId),
-            eq(rawEvents.sourceUrl, row.sourceUrl)
-          )
+            eq(rawEvents.sourceUrl, row.sourceUrl),
+          ),
         )
         .limit(1);
 
@@ -114,7 +138,7 @@ export async function upsertRawEvents(
     await db.insert(rawEvents).values({
       sourceId: row.sourceId,
       externalId,
-      sourceUrl: row.sourceUrl ?? null,
+      sourceUrl: row.sourceUrl!,
       sourceType: row.sourceType,
       jurisdictionId: row.jurisdictionId ?? null,
       rawCountryName: row.rawCountryName ?? null,
@@ -122,6 +146,8 @@ export async function upsertRawEvents(
       title: row.title,
       body: row.body ?? null,
       raw: row.raw,
+      retrievedAt: evidence[index].retrievedAt,
+      ...evidence[index].identity,
       ingestRunId,
     });
     inserted++;
@@ -132,7 +158,7 @@ export async function upsertRawEvents(
   // must not advance freshness on every source it merely re-checked.
   const sourcesStamped = await markSourcesSynced(
     Array.from(new Set(rows.map((r) => r.sourceId))),
-    { rowsWritten: inserted, executor: db }
+    { rowsWritten: inserted, executor: db },
   );
 
   return { inserted, skippedDuplicate, sourcesStamped };

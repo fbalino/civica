@@ -98,6 +98,14 @@ Raw items point to the ingest run that created them. Cluster and classification 
 
 Rows created before this contract point to fixed legacy stage records. Every unknown axis remains `legacy_unversioned`; the migration does not infer a modern method, ontology, prompt, provider, model, source basket, algorithm, or pipeline version. Event and delta APIs return exact row identities plus a version-set summary. A mixed or legacy result has `comparableAsSingleSeries: false` and cannot present as one continuous current-method series.
 
+## Evidence identity {#evidence-identity}
+
+Every raw item is a private, immutable evidence snapshot under `pulse-raw-evidence/v1`. It retains the exact item URL and retrieval time, the fetched source payload and extracted text used by the pipeline, a content hash, a content-addressed identity key, the source-declared language or `und`, the publisher and source family, the country label and jurisdiction resolution used at ingest, and the source-rights record as it stood at capture. Event-source rows must link back to one of these snapshots. The event and changelog APIs expose the evidence identity and its rights metadata, but never the stored publisher payload.
+
+The snapshot protects the audit trail when a link changes or disappears. Its hash identifies the stored evidence; it does not prove that the publisher's statement was accurate. Country attribution is the ingest-time result and may be `unresolved`. A later correction cannot rewrite the snapshot. It must create a separately recorded decision under the applicable attribution and correction contracts.
+
+Public payload redistribution is blocked for every capture. Free access, an RSS item, a GDELT record, or a citation does not grant permission to republish an underlying article. The captured rights record names the terms URL, review status, redistribution posture, and restrictions. A later public data release needs its own verified source-rights decision. Rows retained before this contract keep their actual stored payload and retrieval metadata under explicit legacy hash and attribution methods; the migration does not invent a language, license review, publisher permission, or current resolver result.
+
 ## Event ontology — {{ctx.ontologyVersion}} {#event-categories}
 
 The adopted research codebook is **{{ctx.ontologyVersion}}**. It carries forward all **{{ctx.ontologyCategoryCount}} event categories** from the production {{state.pulse.taxonomy.version}} taxonomy and permits several labels on one real-world event when the source record supports distinct facets. Each assigned label retains its own evidence references and rationale. Its dimension is derived from the category rather than chosen separately by a model.

@@ -59,7 +59,10 @@ import {
 } from "./shapes";
 import { COUNTRY_EXPORT_CSV_HEADER } from "./csv";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
-import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import {
+  CURRENT_CI_METHODOLOGY_VERSION,
+  CURRENT_CI_RELEASE_ID,
+} from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
 
 const currentCiSeries = resolveCiRelease(CURRENT_CI_RELEASE_ID).series;
@@ -221,7 +224,18 @@ const countriesExampleResponse = zCountriesListResponse.strict().parse({
     offset: 0,
     hasMore: true,
     taxonomy: "raw",
-    selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null },
+    selection: {
+      mode: "live",
+      asOf: "live",
+      vintage: null,
+      cutoffAt: null,
+      retrievedThrough: "2026-07-11T00:00:00.000Z",
+      methodologyVersions: ["v0.2-beta"],
+      candidateSetStatus: "live",
+      candidateSetChecksum: null,
+      winnerSetChecksum: null,
+      resolverVersionHash: null,
+    },
   }),
 });
 
@@ -314,7 +328,18 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
       governmentFormDescription: { status: "observed", reason: null },
     },
   }),
-  meta: shapeCountryDetailMeta({ mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null }),
+  meta: shapeCountryDetailMeta({
+    mode: "live",
+    asOf: "live",
+    vintage: null,
+    cutoffAt: null,
+    retrievedThrough: "2026-07-11T00:00:00.000Z",
+    methodologyVersions: ["v0.2-beta"],
+    candidateSetStatus: "live",
+    candidateSetChecksum: null,
+    winnerSetChecksum: null,
+    resolverVersionHash: null,
+  }),
 });
 
 /* ────────────────────────────────────────────────────────────────
@@ -638,7 +663,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       sourceName: "World Bank",
       description:
         "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with world_bank_income_group for the canonical material cohort. Refreshed annually each July.",
-      temporal: { observationReferenceYear: null, upstreamDatasetRelease: null, retrievedAt: null, civicaPublicationVersion: null },
+      temporal: {
+        observationReferenceYear: null,
+        upstreamDatasetRelease: null,
+        retrievedAt: null,
+        civicaPublicationVersion: null,
+      },
       values: [
         {
           value: "East Asia & Pacific",
@@ -661,7 +691,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       sourceName: "World Bank",
       description:
         "World Bank income group classification (4 tiers, low → high). Pairs with world_bank_region for the canonical material cohort. Refreshed annually each July.",
-      temporal: { observationReferenceYear: null, upstreamDatasetRelease: null, retrievedAt: null, civicaPublicationVersion: null },
+      temporal: {
+        observationReferenceYear: null,
+        upstreamDatasetRelease: null,
+        retrievedAt: null,
+        civicaPublicationVersion: null,
+      },
       values: [
         {
           value: "High income",
@@ -678,7 +713,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       sourceName: "V-Dem",
       description:
         "V-Dem Regimes of the World (Lührmann, Tannenberg & Lindberg 2018). Default governance peer lens — 4 tiers spanning closed autocracy through liberal democracy. Annual cadence.",
-      temporal: { observationReferenceYear: null, upstreamDatasetRelease: null, retrievedAt: null, civicaPublicationVersion: null },
+      temporal: {
+        observationReferenceYear: null,
+        upstreamDatasetRelease: null,
+        retrievedAt: null,
+        civicaPublicationVersion: null,
+      },
       values: [
         {
           value: "Liberal Democracy",
@@ -695,7 +735,13 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       sourceName: "Bjørnskov-Rode / CGV",
       description:
         "Bjørnskov-Rode / Cheibub-Gandhi-Vreeland regime classification (6 categories). Optional alternate governance lens distinguishing democracies by executive form and authoritarian systems by ruling-elite structure.",
-      temporal: { observationReferenceYear: 2022, upstreamDatasetRelease: "Bjørnskov-Rode regime data v6.1 via QoG Standard Jan26", retrievedAt: "2026-04-22 04:01:13.289", civicaPublicationVersion: "2026_v1" },
+      temporal: {
+        observationReferenceYear: 2022,
+        upstreamDatasetRelease:
+          "Bjørnskov-Rode regime data v6.1 via QoG Standard Jan26",
+        retrievedAt: "2026-04-22 04:01:13.289",
+        civicaPublicationVersion: "2026_v1",
+      },
       values: [
         {
           value: "presidential_democracy",
@@ -712,7 +758,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       sourceName: "CIA World Factbook",
       description:
         "Monarchy status (6-value enum: none / constitutional / absolute / ceremonial / elective / theocratic). Descriptive constitutional-form metadata, NOT an analytical peer lens. Provided here for filterability ('show me ceremonial monarchies').",
-      temporal: { observationReferenceYear: null, upstreamDatasetRelease: null, retrievedAt: null, civicaPublicationVersion: null },
+      temporal: {
+        observationReferenceYear: null,
+        upstreamDatasetRelease: null,
+        retrievedAt: null,
+        civicaPublicationVersion: null,
+      },
       values: [
         {
           value: "constitutional",
@@ -800,7 +851,10 @@ function pulseVersionIdentityExample(
       },
       prompt:
         stage === "classify"
-          ? { state: "versioned" as const, id: "pulse-classifier-prompt/example" }
+          ? {
+              state: "versioned" as const,
+              id: "pulse-classifier-prompt/example",
+            }
           : {
               state: "not_applicable" as const,
               reason: `${stage} does not use a language-model decision prompt.`,
@@ -984,7 +1038,57 @@ const pulseEventsExampleResponse = zPulseEventsResponse.strict().parse({
             sourceId: "gdelt",
             sourceType: "news",
             sourceName: "GDELT",
-            sourceUrl: null,
+            sourceUrl: "https://example.test/story",
+            evidenceIdentity: {
+              identityKey:
+                "pulse-evidence/sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              contentHash:
+                "2222222222222222222222222222222222222222222222222222222222222222",
+              retrievedAt: "2026-07-01T12:00:00.000Z",
+              language: "en",
+              publisher: {
+                schemaVersion: "pulse-raw-evidence/v1",
+                sourceId: "gdelt",
+                sourceFamilyId: "gdelt",
+                sourcePublisher: "GDELT Project",
+                sourceCanonicalUrl:
+                  "https://api.gdeltproject.org/api/v2/doc/doc",
+                itemPublisherHost: "example.test",
+                sourceType: "news",
+              },
+              attribution: {
+                schemaVersion: "pulse-raw-evidence/v1",
+                methodVersion: "country-resolver/connector-v1",
+                status: "resolved",
+                rawCountryName: "Brazil",
+                jurisdictionId: "jur-bra",
+                evidence: [{ kind: "source_country_label", value: "Brazil" }],
+              },
+              rights: {
+                schemaVersion: "pulse-raw-evidence/v1",
+                sourceId: "gdelt",
+                licenseId: "PUBLISHER-TERMS-PENDING:open-with-attribution",
+                termsUrl: "https://api.gdeltproject.org/api/v2/doc/doc",
+                reviewStatus: "pending",
+                reviewedAt: null,
+                publicExport: "pending-review",
+                redistributionPosture: "open-with-attribution",
+                restrictions: [
+                  "Bulk export remains blocked until the terms record is verified",
+                ],
+              },
+              retention: {
+                schemaVersion: "pulse-raw-evidence/v1",
+                captureMode: "full_internal_snapshot",
+                storedFields: ["title", "body", "raw"],
+                storageRelation: "raw_events",
+                publicPayloadDistribution: "blocked",
+                hashAlgorithm: "canonical-json/sha256-v1",
+                linkRotProtection: "stored_payload_plus_content_hash",
+                policyReason:
+                  "Private research evidence; public payload redistribution is blocked.",
+              },
+            },
           },
         ],
       },
@@ -1039,7 +1143,56 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
           sourceId: "gdelt",
           sourceName: "GDELT",
           sourceType: "news",
-          sourceUrl: null,
+          sourceUrl: "https://example.test/story",
+          evidenceIdentity: {
+            identityKey:
+              "pulse-evidence/sha256:1111111111111111111111111111111111111111111111111111111111111111",
+            contentHash:
+              "2222222222222222222222222222222222222222222222222222222222222222",
+            retrievedAt: "2026-07-01T12:00:00.000Z",
+            language: "en",
+            publisher: {
+              schemaVersion: "pulse-raw-evidence/v1",
+              sourceId: "gdelt",
+              sourceFamilyId: "gdelt",
+              sourcePublisher: "GDELT Project",
+              sourceCanonicalUrl: "https://api.gdeltproject.org/api/v2/doc/doc",
+              itemPublisherHost: "example.test",
+              sourceType: "news",
+            },
+            attribution: {
+              schemaVersion: "pulse-raw-evidence/v1",
+              methodVersion: "country-resolver/connector-v1",
+              status: "resolved",
+              rawCountryName: "Brazil",
+              jurisdictionId: "jur-bra",
+              evidence: [{ kind: "source_country_label", value: "Brazil" }],
+            },
+            rights: {
+              schemaVersion: "pulse-raw-evidence/v1",
+              sourceId: "gdelt",
+              licenseId: "PUBLISHER-TERMS-PENDING:open-with-attribution",
+              termsUrl: "https://api.gdeltproject.org/api/v2/doc/doc",
+              reviewStatus: "pending",
+              reviewedAt: null,
+              publicExport: "pending-review",
+              redistributionPosture: "open-with-attribution",
+              restrictions: [
+                "Bulk export remains blocked until the terms record is verified",
+              ],
+            },
+            retention: {
+              schemaVersion: "pulse-raw-evidence/v1",
+              captureMode: "full_internal_snapshot",
+              storedFields: ["title", "body", "raw"],
+              storageRelation: "raw_events",
+              publicPayloadDistribution: "blocked",
+              hashAlgorithm: "canonical-json/sha256-v1",
+              linkRotProtection: "stored_payload_plus_content_hash",
+              policyReason:
+                "Private research evidence; public payload redistribution is blocked.",
+            },
+          },
         },
       ],
       versionIdentity: {
@@ -1065,23 +1218,88 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
 const countryExportJsonExample = zCountryExportJson.parse({
   schemaVersion: "country-research-export/v1",
   generatedAt: "2026-07-11T00:00:00.000Z",
-  selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null },
-  jurisdiction: { id: "example-france-id", slug: "france", name: "France", iso2: "FR", iso3: "FRA", status: "sovereign_state" },
-  facts: [{
-    factKey: "population_total",
-    canonical: {
-      recordClass: "canonical", rowId: "example-population-row", factKey: "population_total", factGroup: "B", category: "People",
-      value: { text: "68,170,000", numeric: 68170000, structured: null, unit: "people", status: "observed", statusReason: null, type: "measured" },
-      source: { id: "world_bank", name: "World Bank", url: "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=FR", license: "CC-BY-4.0", termsUrl: "https://datacatalog.worldbank.org/public-licenses", lastSyncedAt: "2026-07-01T00:00:00.000Z" },
-      freshness: { asOf: "2024-01-01", observationYear: 2024, dataVintageYear: 2024, retrievedAt: "2026-04-01T00:00:00.000Z", upstreamVintage: "WDI 2026.04" },
-      lifecycle: { status: "active", reason: null },
-      method: { rowMethodologyVersion: "v0.2-beta", reconciliationVersion: "source-precedence/v1", growthMethodology: null },
-      decision: { reason: "fresher_winner", trace: [{ code: "canonical_selection", outcome: "selected", detail: "The resolver selected this row.", sourceIds: ["world_bank"] }] },
-      dispute: { openOrInReview: false },
+  selection: {
+    mode: "live",
+    asOf: "live",
+    vintage: null,
+    cutoffAt: null,
+    retrievedThrough: "2026-07-11T00:00:00.000Z",
+    methodologyVersions: ["v0.2-beta"],
+    candidateSetStatus: "live",
+    candidateSetChecksum: null,
+    winnerSetChecksum: null,
+    resolverVersionHash: null,
+  },
+  jurisdiction: {
+    id: "example-france-id",
+    slug: "france",
+    name: "France",
+    iso2: "FR",
+    iso3: "FRA",
+    status: "sovereign_state",
+  },
+  facts: [
+    {
+      factKey: "population_total",
+      canonical: {
+        recordClass: "canonical",
+        rowId: "example-population-row",
+        factKey: "population_total",
+        factGroup: "B",
+        category: "People",
+        value: {
+          text: "68,170,000",
+          numeric: 68170000,
+          structured: null,
+          unit: "people",
+          status: "observed",
+          statusReason: null,
+          type: "measured",
+        },
+        source: {
+          id: "world_bank",
+          name: "World Bank",
+          url: "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=FR",
+          license: "CC-BY-4.0",
+          termsUrl: "https://datacatalog.worldbank.org/public-licenses",
+          lastSyncedAt: "2026-07-01T00:00:00.000Z",
+        },
+        freshness: {
+          asOf: "2024-01-01",
+          observationYear: 2024,
+          dataVintageYear: 2024,
+          retrievedAt: "2026-04-01T00:00:00.000Z",
+          upstreamVintage: "WDI 2026.04",
+        },
+        lifecycle: { status: "active", reason: null },
+        method: {
+          rowMethodologyVersion: "v0.2-beta",
+          reconciliationVersion: "source-precedence/v1",
+          growthMethodology: null,
+        },
+        decision: {
+          reason: "fresher_winner",
+          trace: [
+            {
+              code: "canonical_selection",
+              outcome: "selected",
+              detail: "The resolver selected this row.",
+              sourceIds: ["world_bank"],
+            },
+          ],
+        },
+        dispute: { openOrInReview: false },
+      },
+      alternates: [],
+      projections: [],
+      rejected: [],
     },
-    alternates: [], projections: [], rejected: [],
-  }],
-  withheld: { factKeys: [], observationCount: 0, reason: "Rows whose source terms do not permit public export are omitted." },
+  ],
+  withheld: {
+    factKeys: [],
+    observationCount: 0,
+    reason: "Rows whose source terms do not permit public export are omitted.",
+  },
   rights: { manifest: "/api/rights-manifest", policy: "source-row-filtered" },
 });
 

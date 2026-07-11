@@ -91,4 +91,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "a508699b24d9a0730234af5d27e4df90bb25f9c750a0ea5ba3caa55ebee7fe63",
     baseline: false,
   },
+  {
+    id: "0015_steep_cyclops",
+    path: "drizzle/authoritative/0015_steep_cyclops.sql",
+    sha256: "5f6f350e9d99fbe531438e468b4f4f983d802856b4138c00658a2f8e389a9e7c",
+    baseline: false,
+  },
 ] as const;

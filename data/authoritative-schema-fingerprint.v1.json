@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T15:06:29.836Z",
-  "sha256": "d38f8953d5cfb721fe66770a280c986df8be9630cd65fd68f51d9bf2910f95e1",
+  "generatedAt": "2026-07-11T15:30:08.179Z",
+  "sha256": "0eb41c2fc66843e9e4e9beeeee0c2105ee151009e1617d06e1272564f1c8b88e",
   "schema": {
     "columns": [
       {
@@ -6121,7 +6121,7 @@
         "type": "uuid",
         "table": "pulse_sources",
         "default": null,
-        "nullable": "YES",
+        "nullable": "NO",
         "position": 7
       },
       {
@@ -6193,7 +6193,7 @@
         "type": "text",
         "table": "raw_events",
         "default": null,
-        "nullable": "YES",
+        "nullable": "NO",
         "position": 4
       },
       {
@@ -6366,6 +6366,69 @@
         "default": null,
         "nullable": "YES",
         "position": 23
+      },
+      {
+        "udt": "text",
+        "name": "evidence_identity_key",
+        "type": "text",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 24
+      },
+      {
+        "udt": "text",
+        "name": "evidence_content_hash",
+        "type": "text",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 25
+      },
+      {
+        "udt": "text",
+        "name": "evidence_language",
+        "type": "text",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 26
+      },
+      {
+        "udt": "jsonb",
+        "name": "evidence_publisher",
+        "type": "jsonb",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 27
+      },
+      {
+        "udt": "jsonb",
+        "name": "evidence_attribution",
+        "type": "jsonb",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 28
+      },
+      {
+        "udt": "jsonb",
+        "name": "evidence_rights",
+        "type": "jsonb",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 29
+      },
+      {
+        "udt": "jsonb",
+        "name": "evidence_retention",
+        "type": "jsonb",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 30
       },
       {
         "udt": "text",
@@ -7512,6 +7575,11 @@
         "definition": "CREATE INDEX idx_raw_events_cluster_run ON public.raw_events USING btree (cluster_run_id)"
       },
       {
+        "name": "idx_raw_events_evidence_identity",
+        "table": "raw_events",
+        "definition": "CREATE UNIQUE INDEX idx_raw_events_evidence_identity ON public.raw_events USING btree (evidence_identity_key)"
+      },
+      {
         "name": "idx_raw_events_external",
         "table": "raw_events",
         "definition": "CREATE UNIQUE INDEX idx_raw_events_external ON public.raw_events USING btree (source_id, external_id) WHERE (external_id IS NOT NULL)"
@@ -7607,6 +7675,11 @@
         "name": "civica_guard_candidate_snapshot_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_protect_pulse_raw_evidence",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_pulse_raw_evidence()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'raw Pulse evidence is append-only';\n  END IF;\n  IF NEW.source_id IS DISTINCT FROM OLD.source_id\n     OR NEW.external_id IS DISTINCT FROM OLD.external_id\n     OR NEW.source_url IS DISTINCT FROM OLD.source_url\n     OR NEW.source_type IS DISTINCT FROM OLD.source_type\n     OR NEW.jurisdiction_id IS DISTINCT FROM OLD.jurisdiction_id\n     OR NEW.raw_country_name IS DISTINCT FROM OLD.raw_country_name\n     OR NEW.event_date IS DISTINCT FROM OLD.event_date\n     OR NEW.retrieved_at IS DISTINCT FROM OLD.retrieved_at\n     OR NEW.title IS DISTINCT FROM OLD.title\n     OR NEW.body IS DISTINCT FROM OLD.body\n     OR NEW.raw IS DISTINCT FROM OLD.raw\n     OR NEW.evidence_identity_key IS DISTINCT FROM OLD.evidence_identity_key\n     OR NEW.evidence_content_hash IS DISTINCT FROM OLD.evidence_content_hash\n     OR NEW.evidence_language IS DISTINCT FROM OLD.evidence_language\n     OR NEW.evidence_publisher IS DISTINCT FROM OLD.evidence_publisher\n     OR NEW.evidence_attribution IS DISTINCT FROM OLD.evidence_attribution\n     OR NEW.evidence_rights IS DISTINCT FROM OLD.evidence_rights\n     OR NEW.evidence_retention IS DISTINCT FROM OLD.evidence_retention THEN\n    RAISE EXCEPTION 'raw Pulse evidence identity is immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "civica_reject_frozen_vintage_mutation",
@@ -8019,6 +8092,11 @@
         "name": "pul_004_raw_lineage_write_once",
         "table": "raw_events",
         "definition": "CREATE TRIGGER pul_004_raw_lineage_write_once BEFORE UPDATE ON raw_events FOR EACH ROW EXECUTE FUNCTION pul_004_guard_raw_lineage()"
+      },
+      {
+        "name": "pulse_raw_evidence_immutable",
+        "table": "raw_events",
+        "definition": "CREATE TRIGGER pulse_raw_evidence_immutable BEFORE DELETE OR UPDATE ON raw_events FOR EACH ROW EXECUTE FUNCTION civica_protect_pulse_raw_evidence()"
       },
       {
         "name": "research_evidence_history_append_only",
@@ -9268,7 +9346,7 @@
         "name": "pulse_sources_raw_event_id_raw_events_id_fk",
         "type": "f",
         "table": "pulse_sources",
-        "definition": "FOREIGN KEY (raw_event_id) REFERENCES raw_events(id)"
+        "definition": "FOREIGN KEY (raw_event_id) REFERENCES raw_events(id) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_sources_source_id_sources_id_fk",
@@ -9299,6 +9377,12 @@
         "type": "f",
         "table": "raw_events",
         "definition": "FOREIGN KEY (cluster_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "raw_events_evidence_identity_check",
+        "type": "c",
+        "table": "raw_events",
+        "definition": "CHECK (evidence_identity_key ~ '^pulse-evidence/sha256:[a-f0-9]{64}$'::text AND evidence_content_hash ~ '^[a-f0-9]{64}$'::text AND evidence_language <> ''::text AND (evidence_publisher ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_attribution ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_rights ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_retention ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_retention ->> 'publicPayloadDistribution'::text) = 'blocked'::text)"
       },
       {
         "name": "raw_events_ingest_run_id_pulse_pipeline_runs_id_fk",

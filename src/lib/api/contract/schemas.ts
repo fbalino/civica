@@ -293,8 +293,12 @@ export const zCiMethodologyMeta = z
         ranked_quantity: z.literal("published_integer_composite"),
         tie_method: z.literal("competition"),
         tie_breaker: z.literal("none_for_published_rank"),
-        display_order_within_tie: z.literal("jurisdiction_id_ascending_nonordinal"),
-        rank_uncertainty: z.literal("not_estimable_without_valid_score_uncertainty"),
+        display_order_within_tie: z.literal(
+          "jurisdiction_id_ascending_nonordinal",
+        ),
+        rank_uncertainty: z.literal(
+          "not_estimable_without_valid_score_uncertainty",
+        ),
       })
       .strict(),
     presentation: z
@@ -367,7 +371,11 @@ export const zFactbookReconciliationMeta = z
     cutoffAt: z.string().nullable(),
     retrievedThrough: z.string().nullable(),
     methodologyVersions: z.array(z.string()),
-    candidateSetStatus: z.enum(["live", "complete_candidates", "canonical_only_legacy"]),
+    candidateSetStatus: z.enum([
+      "live",
+      "complete_candidates",
+      "canonical_only_legacy",
+    ]),
     candidateSetChecksum: z.string().nullable(),
     winnerSetChecksum: z.string().nullable(),
     resolverVersionHash: z.string().nullable(),
@@ -410,7 +418,24 @@ export const zCountryListItem = z
 export const zCountriesListMeta = zPaginationMeta
   .extend({
     taxonomy: z.string(),
-    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()), candidateSetStatus: z.enum(["live", "complete_candidates", "canonical_only_legacy"]), candidateSetChecksum: z.string().nullable(), winnerSetChecksum: z.string().nullable(), resolverVersionHash: z.string().nullable() }).strict(),
+    selection: z
+      .object({
+        mode: z.enum(["live", "vintage"]),
+        asOf: z.string(),
+        vintage: z.string().nullable(),
+        cutoffAt: z.string().nullable(),
+        retrievedThrough: z.string().nullable(),
+        methodologyVersions: z.array(z.string()),
+        candidateSetStatus: z.enum([
+          "live",
+          "complete_candidates",
+          "canonical_only_legacy",
+        ]),
+        candidateSetChecksum: z.string().nullable(),
+        winnerSetChecksum: z.string().nullable(),
+        resolverVersionHash: z.string().nullable(),
+      })
+      .strict(),
   })
   .extend(zDeprecationMeta.shape)
   .strict();
@@ -619,7 +644,9 @@ export const zIndexHistoryItem = z
 export const zIndexHistoryResponse = z
   .object({
     data: z.array(zIndexHistoryItem),
-    meta: z.object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance }).strict(),
+    meta: z
+      .object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance })
+      .strict(),
   })
   .strict();
 
@@ -718,7 +745,12 @@ export const zIndexMethodologyData = z
 export const zIndexMethodologyResponse = z
   .object({
     data: zIndexMethodologyData,
-    meta: z.object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance.nullable() }).strict(),
+    meta: z
+      .object({
+        methodology: zCiMethodologyMeta,
+        series: zCiSeriesProvenance.nullable(),
+      })
+      .strict(),
   })
   .strict();
 
@@ -804,12 +836,14 @@ export const zPeerLensBlock = z
     source: z.string(),
     sourceName: z.string(),
     description: z.string(),
-    temporal: z.object({
-      observationReferenceYear: z.number().int().nullable(),
-      upstreamDatasetRelease: z.string().nullable(),
-      retrievedAt: z.string().nullable(),
-      civicaPublicationVersion: z.string().nullable(),
-    }).strict(),
+    temporal: z
+      .object({
+        observationReferenceYear: z.number().int().nullable(),
+        upstreamDatasetRelease: z.string().nullable(),
+        retrievedAt: z.string().nullable(),
+        civicaPublicationVersion: z.string().nullable(),
+      })
+      .strict(),
     values: z.array(zPeerLensValue),
   })
   .strict();
@@ -851,7 +885,9 @@ export const zPeerGroupingsResponse = z
 const zPulseVersionRef = z.discriminatedUnion("state", [
   z.object({ state: z.literal("versioned"), id: z.string() }).strict(),
   z.object({ state: z.literal("not_applicable"), reason: z.string() }).strict(),
-  z.object({ state: z.literal("legacy_unversioned"), reason: z.string() }).strict(),
+  z
+    .object({ state: z.literal("legacy_unversioned"), reason: z.string() })
+    .strict(),
 ]);
 
 const zPulseStageVersionEnvelope = z
@@ -981,12 +1017,88 @@ export const zPulseDimensionsResponse = z
  * /api/v1/pulse/[country_slug]/events
  * ──────────────────────────────────────────────────────────────── */
 
+const zPulseEvidencePublisher = z
+  .object({
+    schemaVersion: z.literal("pulse-raw-evidence/v1"),
+    sourceId: z.string(),
+    sourceFamilyId: z.string(),
+    sourcePublisher: z.string(),
+    sourceCanonicalUrl: z.string().url(),
+    itemPublisherHost: z.string().nullable(),
+    sourceType: z.enum(["specialist", "news"]),
+  })
+  .strict();
+
+const zPulseEvidenceAttribution = z
+  .object({
+    schemaVersion: z.literal("pulse-raw-evidence/v1"),
+    methodVersion: z.enum([
+      "country-resolver/connector-v1",
+      "legacy_unversioned",
+    ]),
+    status: z.enum(["resolved", "unresolved"]),
+    rawCountryName: z.string().nullable(),
+    jurisdictionId: z.string().nullable(),
+    evidence: z.array(
+      z
+        .object({ kind: z.literal("source_country_label"), value: z.string() })
+        .strict(),
+    ),
+  })
+  .strict();
+
+const zPulseEvidenceRights = z
+  .object({
+    schemaVersion: z.literal("pulse-raw-evidence/v1"),
+    sourceId: z.string(),
+    licenseId: z.string(),
+    termsUrl: z.string().url(),
+    reviewStatus: z.enum(["verified", "pending"]),
+    reviewedAt: z.string().nullable(),
+    publicExport: z.string(),
+    redistributionPosture: z.string(),
+    restrictions: z.array(z.string()),
+  })
+  .strict();
+
+const zPulseEvidenceRetention = z
+  .object({
+    schemaVersion: z.literal("pulse-raw-evidence/v1"),
+    captureMode: z.literal("full_internal_snapshot"),
+    storedFields: z.tuple([
+      z.literal("title"),
+      z.literal("body"),
+      z.literal("raw"),
+    ]),
+    storageRelation: z.literal("raw_events"),
+    publicPayloadDistribution: z.literal("blocked"),
+    hashAlgorithm: z.enum([
+      "canonical-json/sha256-v1",
+      "postgres-jsonb-text/sha256-legacy-v1",
+    ]),
+    linkRotProtection: z.literal("stored_payload_plus_content_hash"),
+    policyReason: z.string(),
+  })
+  .strict();
+
 export const zPulseEventSourceDetail = z
   .object({
     sourceId: z.string(),
     sourceType: z.string(),
     sourceName: z.string(),
-    sourceUrl: z.string().nullable(),
+    sourceUrl: z.string().url(),
+    evidenceIdentity: z
+      .object({
+        identityKey: z.string().regex(/^pulse-evidence\/sha256:[a-f0-9]{64}$/),
+        contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+        retrievedAt: z.string().datetime(),
+        language: z.string().min(2),
+        publisher: zPulseEvidencePublisher,
+        attribution: zPulseEvidenceAttribution,
+        rights: zPulseEvidenceRights,
+        retention: zPulseEvidenceRetention,
+      })
+      .strict(),
   })
   .strict();
 
@@ -1146,6 +1258,7 @@ export const zPulseMethodologySnapshot = z
     status: z.literal("experimental"),
     mixed_legacy_unversioned: z.literal(false),
     ledgerHistory: z.unknown(),
+    evidenceIdentity: z.unknown(),
     providers: z.unknown(),
     feeds: z.unknown(),
     cadence: z.unknown(),
@@ -1164,23 +1277,72 @@ export const zPulseMethodologyResponse = z
   .strict();
 
 /* /api/countries/[slug]/export — rights-filtered research export. */
-const zDecisionTraceStep = z.object({
-  code: z.enum(["row_eligibility", "measurement_partition", "source_lineage", "precedence_rule", "guard_result", "canonical_selection"]),
-  outcome: z.string(),
-  detail: z.string(),
-  sourceIds: z.array(z.string()),
-}).strict();
+const zDecisionTraceStep = z
+  .object({
+    code: z.enum([
+      "row_eligibility",
+      "measurement_partition",
+      "source_lineage",
+      "precedence_rule",
+      "guard_result",
+      "canonical_selection",
+    ]),
+    outcome: z.string(),
+    detail: z.string(),
+    sourceIds: z.array(z.string()),
+  })
+  .strict();
 
 const zCountryExportObservation = z
   .object({
     recordClass: z.enum(["canonical", "alternate", "projection", "rejected"]),
-    rowId: z.string(), factKey: z.string(), factGroup: z.string(), category: z.string(),
-    value: z.object({ text: z.string().nullable(), numeric: z.number().nullable(), structured: z.unknown().nullable(), unit: z.string().nullable(), status: z.string(), statusReason: z.string().nullable(), type: z.string() }).strict(),
-    source: z.object({ id: z.string(), name: z.string(), url: z.string().url(), license: z.string(), termsUrl: z.string().url(), lastSyncedAt: z.string().datetime().nullable() }).strict(),
-    freshness: z.object({ asOf: z.string().nullable(), observationYear: z.number().int().nullable(), dataVintageYear: z.number().int().nullable(), retrievedAt: z.string().datetime(), upstreamVintage: z.string().nullable() }).strict(),
-    lifecycle: z.object({ status: z.string(), reason: z.string().nullable() }).strict(),
-    method: z.object({ rowMethodologyVersion: z.string(), reconciliationVersion: z.literal("source-precedence/v1"), growthMethodology: z.string().nullable() }).strict(),
-    decision: z.object({ reason: z.string(), trace: z.array(zDecisionTraceStep) }).strict(),
+    rowId: z.string(),
+    factKey: z.string(),
+    factGroup: z.string(),
+    category: z.string(),
+    value: z
+      .object({
+        text: z.string().nullable(),
+        numeric: z.number().nullable(),
+        structured: z.unknown().nullable(),
+        unit: z.string().nullable(),
+        status: z.string(),
+        statusReason: z.string().nullable(),
+        type: z.string(),
+      })
+      .strict(),
+    source: z
+      .object({
+        id: z.string(),
+        name: z.string(),
+        url: z.string().url(),
+        license: z.string(),
+        termsUrl: z.string().url(),
+        lastSyncedAt: z.string().datetime().nullable(),
+      })
+      .strict(),
+    freshness: z
+      .object({
+        asOf: z.string().nullable(),
+        observationYear: z.number().int().nullable(),
+        dataVintageYear: z.number().int().nullable(),
+        retrievedAt: z.string().datetime(),
+        upstreamVintage: z.string().nullable(),
+      })
+      .strict(),
+    lifecycle: z
+      .object({ status: z.string(), reason: z.string().nullable() })
+      .strict(),
+    method: z
+      .object({
+        rowMethodologyVersion: z.string(),
+        reconciliationVersion: z.literal("source-precedence/v1"),
+        growthMethodology: z.string().nullable(),
+      })
+      .strict(),
+    decision: z
+      .object({ reason: z.string(), trace: z.array(zDecisionTraceStep) })
+      .strict(),
     dispute: z.object({ openOrInReview: z.boolean() }).strict(),
   })
   .strict();
@@ -1191,16 +1353,71 @@ export const zCountryExportJson = z
   .object({
     schemaVersion: z.literal("country-research-export/v1"),
     generatedAt: z.string().datetime(),
-    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()), candidateSetStatus: z.enum(["live", "complete_candidates", "canonical_only_legacy"]), candidateSetChecksum: z.string().nullable(), winnerSetChecksum: z.string().nullable(), resolverVersionHash: z.string().nullable() }).strict(),
-    jurisdiction: z.object({ id: z.string(), slug: z.string(), name: z.string(), iso2: z.string().nullable(), iso3: z.string().nullable(), status: z.string() }).strict(),
-    facts: z.array(z.object({
-      factKey: z.string(),
-      canonical: zCountryExportObservation.refine((row) => row.recordClass === "canonical"),
-      alternates: z.array(zCountryExportObservation.refine((row) => row.recordClass === "alternate")),
-      projections: z.array(zCountryExportObservation.refine((row) => row.recordClass === "projection")),
-      rejected: z.array(zCountryExportObservation.refine((row) => row.recordClass === "rejected")),
-    }).strict()),
-    withheld: z.object({ factKeys: z.array(z.string()), observationCount: z.number().int().nonnegative(), reason: z.string() }).strict(),
-    rights: z.object({ manifest: z.literal("/api/rights-manifest"), policy: z.literal("source-row-filtered") }).strict(),
+    selection: z
+      .object({
+        mode: z.enum(["live", "vintage"]),
+        asOf: z.string(),
+        vintage: z.string().nullable(),
+        cutoffAt: z.string().nullable(),
+        retrievedThrough: z.string().nullable(),
+        methodologyVersions: z.array(z.string()),
+        candidateSetStatus: z.enum([
+          "live",
+          "complete_candidates",
+          "canonical_only_legacy",
+        ]),
+        candidateSetChecksum: z.string().nullable(),
+        winnerSetChecksum: z.string().nullable(),
+        resolverVersionHash: z.string().nullable(),
+      })
+      .strict(),
+    jurisdiction: z
+      .object({
+        id: z.string(),
+        slug: z.string(),
+        name: z.string(),
+        iso2: z.string().nullable(),
+        iso3: z.string().nullable(),
+        status: z.string(),
+      })
+      .strict(),
+    facts: z.array(
+      z
+        .object({
+          factKey: z.string(),
+          canonical: zCountryExportObservation.refine(
+            (row) => row.recordClass === "canonical",
+          ),
+          alternates: z.array(
+            zCountryExportObservation.refine(
+              (row) => row.recordClass === "alternate",
+            ),
+          ),
+          projections: z.array(
+            zCountryExportObservation.refine(
+              (row) => row.recordClass === "projection",
+            ),
+          ),
+          rejected: z.array(
+            zCountryExportObservation.refine(
+              (row) => row.recordClass === "rejected",
+            ),
+          ),
+        })
+        .strict(),
+    ),
+    withheld: z
+      .object({
+        factKeys: z.array(z.string()),
+        observationCount: z.number().int().nonnegative(),
+        reason: z.string(),
+      })
+      .strict(),
+    rights: z
+      .object({
+        manifest: z.literal("/api/rights-manifest"),
+        policy: z.literal("source-row-filtered"),
+      })
+      .strict(),
   })
   .strict();

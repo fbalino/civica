@@ -13,6 +13,7 @@ import {
   pulseDimensionalDeltas,
   pulseEventsV2,
   pulsePipelineRuns,
+  rawEvents,
   pulseSources,
 } from "@/lib/db/schema";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
@@ -30,11 +31,26 @@ import {
   type PulseStageVersionEnvelope,
   type PulseVersionSetSummary,
 } from "@/lib/pulse/v2/pipeline-version";
+import type {
+  PulseEvidenceAttributionSnapshot,
+  PulseEvidencePublisherSnapshot,
+  PulseEvidenceRetentionSnapshot,
+  PulseEvidenceRightsSnapshot,
+} from "@/lib/pulse/v2/evidence-identity";
 
 export interface PulseRunIdentity {
   runId: string;
   versionKey: string;
   versions: PulseStageVersionEnvelope;
+}
+
+function pulseTimestampIso(value: unknown): string {
+  if (value instanceof Date) return value.toISOString();
+  const text = String(value ?? "");
+  const parsed = new Date(
+    /[zZ]|[+-]\d\d(?::?\d\d)?$/.test(text) ? text : `${text}Z`,
+  );
+  return Number.isNaN(parsed.getTime()) ? text : parsed.toISOString();
 }
 
 async function loadPulseRunMap(runIds: readonly string[]) {
@@ -367,7 +383,8 @@ export async function getPulseV2EventsForCountry(slug: string) {
       sourceId: string;
       sourceType: string;
       sourceName: string;
-      sourceUrl: string | null;
+      sourceUrl: string;
+      evidenceIdentity: PulseEvidenceIdentityDetail;
     }>
   >();
   if (eventIds.length) {
@@ -377,9 +394,18 @@ export async function getPulseV2EventsForCountry(slug: string) {
         sourceId: pulseSources.sourceId,
         sourceType: pulseSources.sourceType,
         sourceName: pulseSources.sourceName,
-        sourceUrl: pulseSources.sourceUrl,
+        sourceUrl: rawEvents.sourceUrl,
+        evidenceIdentityKey: rawEvents.evidenceIdentityKey,
+        evidenceContentHash: rawEvents.evidenceContentHash,
+        evidenceLanguage: rawEvents.evidenceLanguage,
+        retrievedAt: rawEvents.retrievedAt,
+        evidencePublisher: rawEvents.evidencePublisher,
+        evidenceAttribution: rawEvents.evidenceAttribution,
+        evidenceRights: rawEvents.evidenceRights,
+        evidenceRetention: rawEvents.evidenceRetention,
       })
       .from(pulseSources)
+      .innerJoin(rawEvents, eq(pulseSources.rawEventId, rawEvents.id))
       .where(sql`${pulseSources.eventId} IN ${eventIds}`);
     for (const row of sourceRows) {
       const arr = sourceMap.get(row.eventId) ?? [];
@@ -388,6 +414,16 @@ export async function getPulseV2EventsForCountry(slug: string) {
         sourceType: row.sourceType,
         sourceName: row.sourceName,
         sourceUrl: row.sourceUrl,
+        evidenceIdentity: {
+          identityKey: row.evidenceIdentityKey,
+          contentHash: row.evidenceContentHash,
+          retrievedAt: row.retrievedAt.toISOString(),
+          language: row.evidenceLanguage,
+          publisher: row.evidencePublisher,
+          attribution: row.evidenceAttribution,
+          rights: row.evidenceRights,
+          retention: row.evidenceRetention,
+        },
       });
       sourceMap.set(row.eventId, arr);
     }
@@ -465,7 +501,19 @@ export interface PulseV2SourceDetail {
   sourceId: string;
   sourceName: string;
   sourceType: string;
-  sourceUrl: string | null;
+  sourceUrl: string;
+  evidenceIdentity: PulseEvidenceIdentityDetail;
+}
+
+export interface PulseEvidenceIdentityDetail {
+  identityKey: string;
+  contentHash: string;
+  retrievedAt: string;
+  language: string;
+  publisher: PulseEvidencePublisherSnapshot;
+  attribution: PulseEvidenceAttributionSnapshot;
+  rights: PulseEvidenceRightsSnapshot;
+  retention: PulseEvidenceRetentionSnapshot;
 }
 
 export interface PulseV2ChangelogRow {
@@ -580,9 +628,19 @@ export async function getPulseV2Changelog(
             'sourceId', ps.source_id,
             'sourceName', ps.source_name,
             'sourceType', ps.source_type,
-            'sourceUrl', ps.source_url
+            'sourceUrl', re.source_url,
+            'evidenceIdentity', json_build_object(
+              'identityKey', re.evidence_identity_key,
+              'contentHash', re.evidence_content_hash,
+              'retrievedAt', re.retrieved_at,
+              'language', re.evidence_language,
+              'publisher', re.evidence_publisher,
+              'attribution', re.evidence_attribution,
+              'rights', re.evidence_rights,
+              'retention', re.evidence_retention
+            )
           ) ORDER BY ps.source_type, ps.source_name
-        ) FROM pulse_sources ps WHERE ps.event_id = p.id),
+        ) FROM pulse_sources ps JOIN raw_events re ON re.id = ps.raw_event_id WHERE ps.event_id = p.id),
         '[]'::json
       ) AS source_detail
     FROM pulse_events_v2 p
@@ -630,16 +688,28 @@ export async function getPulseV2Changelog(
 
     const rawDetail = r.source_detail;
     const sourceDetail: PulseV2SourceDetail[] = Array.isArray(rawDetail)
-      ? (rawDetail as Array<Record<string, unknown>>).map((s) => ({
-          sourceId: String(s.sourceId ?? s.source_id ?? ""),
-          sourceName: String(s.sourceName ?? s.source_name ?? ""),
-          sourceType: String(s.sourceType ?? s.source_type ?? ""),
-          sourceUrl: s.sourceUrl
-            ? String(s.sourceUrl)
-            : s.source_url
-              ? String(s.source_url)
-              : null,
-        }))
+      ? (rawDetail as Array<Record<string, unknown>>).map((s) => {
+          const evidence = (s.evidenceIdentity ??
+            s.evidence_identity ??
+            {}) as Record<string, unknown>;
+          return {
+            sourceId: String(s.sourceId ?? s.source_id ?? ""),
+            sourceName: String(s.sourceName ?? s.source_name ?? ""),
+            sourceType: String(s.sourceType ?? s.source_type ?? ""),
+            sourceUrl: String(s.sourceUrl ?? s.source_url ?? ""),
+            evidenceIdentity: {
+              identityKey: String(evidence.identityKey ?? ""),
+              contentHash: String(evidence.contentHash ?? ""),
+              retrievedAt: pulseTimestampIso(evidence.retrievedAt),
+              language: String(evidence.language ?? "und"),
+              publisher: evidence.publisher as PulseEvidencePublisherSnapshot,
+              attribution:
+                evidence.attribution as PulseEvidenceAttributionSnapshot,
+              rights: evidence.rights as PulseEvidenceRightsSnapshot,
+              retention: evidence.retention as PulseEvidenceRetentionSnapshot,
+            },
+          };
+        })
       : [];
 
     const rsfRaw = r.press_freedom_score_at_classification;

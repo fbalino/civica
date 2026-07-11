@@ -9,7 +9,7 @@ import {
 test("documents every current Drizzle table and column", () => {
   const dictionary = buildSchemaDataDictionary();
   assert.equal(dictionary.summary.tables, 56);
-  assert.equal(dictionary.summary.columns, 740);
+  assert.equal(dictionary.summary.columns, 747);
   assert.deepEqual(dictionaryValidationErrors(dictionary), []);
 });
 
@@ -41,23 +41,53 @@ test("does not misstate a member of a composite unique index as individually uni
     .find((table) => table.name === "country_facts")
     ?.columns.find((column) => column.name === "source_id");
   assert.equal(sourceId?.key.unique, false);
-  assert.deepEqual(sourceId?.key.uniqueGroups, ["idx_country_facts_jurisdiction_factkey_source"]);
+  assert.deepEqual(sourceId?.key.uniqueGroups, [
+    "idx_country_facts_jurisdiction_factkey_source",
+  ]);
 });
 
 test("marks legacy Pulse tables and jurisdiction cache columns explicitly", () => {
   const dictionary = buildSchemaDataDictionary();
-  assert.equal(dictionary.tables.find((table) => table.name === "pulse_events")?.deprecation.status, "legacy");
-  const jurisdictions = dictionary.tables.find((table) => table.name === "jurisdictions");
-  assert.equal(jurisdictions?.columns.find((column) => column.name === "population")?.deprecation.status, "legacy");
-  assert.equal(jurisdictions?.columns.find((column) => column.name === "name")?.deprecation.status, "active");
+  assert.equal(
+    dictionary.tables.find((table) => table.name === "pulse_events")
+      ?.deprecation.status,
+    "legacy",
+  );
+  const jurisdictions = dictionary.tables.find(
+    (table) => table.name === "jurisdictions",
+  );
+  assert.equal(
+    jurisdictions?.columns.find((column) => column.name === "population")
+      ?.deprecation.status,
+    "legacy",
+  );
+  assert.equal(
+    jurisdictions?.columns.find((column) => column.name === "name")?.deprecation
+      .status,
+    "active",
+  );
 });
 
 test("distinguishes source time, observation time, and method version in field metadata", () => {
   const dictionary = buildSchemaDataDictionary();
-  const facts = dictionary.tables.find((table) => table.name === "country_facts");
-  assert.match(facts?.columns.find((column) => column.name === "retrieved_at")?.vintageSemantics ?? "", /retrieval\/processing time/i);
-  assert.match(facts?.columns.find((column) => column.name === "data_vintage_year")?.vintageSemantics ?? "", /measurement/i);
-  assert.match(facts?.columns.find((column) => column.name === "methodology_version")?.vintageSemantics ?? "", /Interpretation\/version/i);
+  const facts = dictionary.tables.find(
+    (table) => table.name === "country_facts",
+  );
+  assert.match(
+    facts?.columns.find((column) => column.name === "retrieved_at")
+      ?.vintageSemantics ?? "",
+    /retrieval\/processing time/i,
+  );
+  assert.match(
+    facts?.columns.find((column) => column.name === "data_vintage_year")
+      ?.vintageSemantics ?? "",
+    /measurement/i,
+  );
+  assert.match(
+    facts?.columns.find((column) => column.name === "methodology_version")
+      ?.vintageSemantics ?? "",
+    /Interpretation\/version/i,
+  );
 });
 
 test("detects a seeded checked-artifact drift", () => {

@@ -41,6 +41,13 @@ runs; no historical method, prompt, model, ontology, or source basket is
 inferred. `0014_boring_tana_nile` adds the database check that binds each run's
 stored stage and schema to its content-addressed version key.
 
+`0015_steep_cyclops` seals each Pulse raw item as an immutable private
+evidence snapshot with exact URL and retrieval time, content and identity
+hashes, explicit language state, publisher/source-family identity,
+ingest-time jurisdiction attribution, and a captured source-rights posture.
+Every event-source row must retain its raw-evidence link; public payload
+redistribution remains blocked independently of site access.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

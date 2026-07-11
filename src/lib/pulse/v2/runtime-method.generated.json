@@ -55,12 +55,31 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "5549ebfdad9257b6ce4e572390512c6c13fd17fe3200853f366e7f70d3007b78",
+  "contractHash": "cf2281f9b7aa58cbf520e96c73e7573f6c70f8f8ea2e8d779288f4295171f553",
   "evaluation": {
     "backtestMatchesCurrentProduction": false,
     "currentProductionValidatedByExistingBacktest": false,
     "externalValidation": "not_completed",
     "statusReason": "Numeric Pulse deltas are public experiments, not validated measurements; the current ensemble still requires a method-matched replay, calibration, and external review."
+  },
+  "evidenceIdentity": {
+    "eventTrace": "pulse_sources_to_raw_events",
+    "legacyRule": "Retained rows preserve their exact stored payload and ingest-time metadata under an explicit legacy hash/attribution method rather than receiving invented current provenance.",
+    "publicPayloadDistribution": "blocked",
+    "rawItemSnapshot": "immutable_private_payload_plus_hash",
+    "requiredMetadata": [
+      "exact_item_url",
+      "source_family",
+      "publisher",
+      "retrieval_time",
+      "content_hash",
+      "language_or_und",
+      "jurisdiction_attribution_evidence",
+      "captured_rights_posture"
+    ],
+    "rightsRule": "Free access, indexing, or citation never grants public redistribution of the retained publisher payload; a separate verified rights decision is required.",
+    "schemaVersion": "pulse-raw-evidence/v1",
+    "unknownLanguage": "und"
   },
   "feeds": {
     "activeDefinition": "A production-active feed is a source ID observed in raw_events by the stated evidence cut. A connector, configured source, or sync in another Civica pipeline does not qualify by itself.",

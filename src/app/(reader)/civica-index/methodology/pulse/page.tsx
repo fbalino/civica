@@ -23,8 +23,7 @@ export const metadata: Metadata = {
     canonical: "https://civicaatlas.org/civica-index/methodology/pulse",
   },
   other: {
-    "civica:pulse-numeric-policy":
-      CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.id,
+    "civica:pulse-numeric-policy": CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.id,
     "civica:methodology-version":
       CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.methodVersion,
     "civica:numeric-standing":
@@ -39,6 +38,7 @@ const SECTIONS = [
   { id: "sources", label: "Sources" },
   { id: "daily-pipeline", label: "Scheduled pipeline" },
   { id: "version-identity", label: "Version identity" },
+  { id: "evidence-identity", label: "Evidence identity" },
   { id: "event-categories", label: "Event ontology" },
   { id: "disambiguation", label: "Disambiguation" },
   { id: "cascade-model", label: "Cascade model" },
@@ -151,10 +151,10 @@ export default function PulseMethodologyPage() {
         <div className="editorial-warning">
           <strong>This is an experimental system.</strong> Pulse classifications
           and numeric effects have not completed independent review and should
-          not be treated as established measurements. The
-          current production ensemble has not completed representative
-          evaluation or independent review. The published historical smoke
-          test predates the current classifier and is not a graduation result.
+          not be treated as established measurements. The current production
+          ensemble has not completed representative evaluation or independent
+          review. The published historical smoke test predates the current
+          classifier and is not a graduation result.
         </div>
 
         {/* Markdown body — content/methodology-pulse.md is the prose
@@ -171,21 +171,31 @@ export default function PulseMethodologyPage() {
           />
         </Reveal>
 
-        <Reveal as="section" className="editorial-section" id="cite" amount={0.15}>
+        <Reveal
+          as="section"
+          className="editorial-section"
+          id="cite"
+          amount={0.15}
+        >
           <h2>Cite this page</h2>
           <CiteAccordion
             subject="Civica Atlas Methodology — Pulse methodology (Beta)"
             pageTitle="Pulse methodology"
             url="https://civicaatlas.org/civica-index/methodology/pulse"
-            dataVintage={
-              method.feeds.activeProduction.observedThrough
-            }
+            dataVintage={method.feeds.activeProduction.observedThrough}
           />
         </Reveal>
 
-        <nav className="editorial-footer-nav" aria-label="Methodology navigation">
-          <Link href="/civica-index/methodology">← Civica Index methodology</Link>
-          <Link href="/civica-index/methodology/pulse/backtest">Backtest report →</Link>
+        <nav
+          className="editorial-footer-nav"
+          aria-label="Methodology navigation"
+        >
+          <Link href="/civica-index/methodology">
+            ← Civica Index methodology
+          </Link>
+          <Link href="/civica-index/methodology/pulse/backtest">
+            Backtest report →
+          </Link>
           <Link href="/civica-index/pulse-changelog">Pulse changelog</Link>
           <Link href="/civica-index/corrections">Corrections form</Link>
         </nav>

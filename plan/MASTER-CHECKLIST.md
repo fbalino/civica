@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 95
-- **Remaining:** 197
-- **Progress:** 32.5%
+- **Completed:** 96
+- **Remaining:** 196
+- **Progress:** 32.9%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -126,7 +126,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [x] **PUL-002** (P0) Adopt a Pulse ledger research charter with a bounded construct. _Done when: a citable resolution defines the unit as documented governance-relevant events, target users, inclusion/exclusion rules, non-claims, source universe, geographic/temporal scope, observability limitations, and success/retirement criteria._
 - [x] **PUL-003** (P0) Replace the single-label-only codebook with a versioned multi-label event ontology. _Done when: ontology version, categories, dimensions, severity descriptors, mutually compatible labels, ambiguous/legitimate-event guidance, examples/counterexamples, and change policy are published; fixtures cover known multi-dimensional and normatively ambiguous cases._
 - [x] **PUL-004** (P0) Add immutable methodology, ontology, prompt, model/provider, source-basket, and pipeline versions to Pulse rows. _Done when: every raw item, cluster, classification run, review, published event, and computed output identifies all applicable versions; mixed-version queries cannot masquerade as one continuous series._
-- [ ] **PUL-005** (P0) Preserve legally compliant source snapshots and evidence identity for every ledger item. _Done when: each event traces to URL/source family/publisher/retrieval time/content hash or permitted snapshot, language, jurisdiction attribution evidence, and licensing posture; link rot cannot erase the audit trail._
+- [x] **PUL-005** (P0) Preserve legally compliant source snapshots and evidence identity for every ledger item. _Done when: each event traces to URL/source family/publisher/retrieval time/content hash or permitted snapshot, language, jurisdiction attribution evidence, and licensing posture; link rot cannot erase the audit trail._
 - [ ] **PUL-006** (P0) Rebuild clustering so source-independent reports can meet after subject-country attribution. _Done when: clustering operates on normalized event identity rather than a premature jurisdiction bucket, fixtures merge same-event reports across source families/languages while keeping distinct events separate, and a released coverage report shows cluster-size/source-diversity distributions._
 - [ ] **PUL-007** (P0) Define source-family independence and republication detection. _Done when: wire copies, syndication, mirrored NGO releases, and references to one underlying report do not count as independent corroboration; a reviewed fixture set reaches predeclared pairwise precision/recall thresholds._
 - [ ] **PUL-008** (P0) Make active source coverage truthful and observable. _Done when: runtime dashboards and public methodology list only operating feeds, successful/failed retrievals, last data time, language/geographic scope, row yield, source rights, and known blind spots; inactive/stub feeds cannot appear active._

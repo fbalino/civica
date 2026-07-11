@@ -1,0 +1,13 @@
+{
+  "id": "pulse-evidence-shared-api-contract",
+  "toVersion": "civica-index-api-contract-pulse-evidence-v1",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/pulse/v2/evidence-identity.ts"],
+    "release_note": ["plan/research/pulse-evidence-index-contract-release-note.md"],
+    "migration_plan": ["plan/research/pulse-evidence-index-contract-migration.md"],
+    "golden_test": ["src/lib/pulse/v2/evidence-identity.test.ts"],
+    "contract_test": ["src/lib/api/contract/examples.ts"]
+  }
+}

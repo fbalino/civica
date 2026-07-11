@@ -1,6 +1,12 @@
 import { sql as dsql } from "drizzle-orm";
 import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
 import type { PulseStageVersionEnvelope } from "@/lib/pulse/v2/pipeline-version";
+import type {
+  PulseEvidenceAttributionSnapshot,
+  PulseEvidencePublisherSnapshot,
+  PulseEvidenceRetentionSnapshot,
+  PulseEvidenceRightsSnapshot,
+} from "@/lib/pulse/v2/evidence-identity";
 import {
   pgTable,
   uuid,
@@ -362,9 +368,9 @@ export const countryFactbookSections = pgTable(
   (table) => [
     uniqueIndex("idx_factbook_sections_unique").on(
       table.jurisdictionId,
-      table.sectionName
+      table.sectionName,
     ),
-  ]
+  ],
 );
 
 /**
@@ -563,7 +569,7 @@ export const countryFacts = pgTable(
     uniqueIndex("idx_country_facts_jurisdiction_factkey_source").on(
       table.jurisdictionId,
       table.factKey,
-      table.sourceId
+      table.sourceId,
     ),
     index("idx_country_facts_key").on(table.factKey),
     index("idx_country_facts_category").on(table.category),
@@ -572,15 +578,15 @@ export const countryFacts = pgTable(
     index("idx_country_facts_jurisdiction").on(table.jurisdictionId),
     index("idx_country_facts_numeric").on(
       table.factKey,
-      table.factValueNumeric
+      table.factValueNumeric,
     ),
     /** Bug-1 — supports the resolver's "any measured row exists?"
      *  partition probe and the replication CSV's value-type filter. */
     index("idx_country_facts_factkey_valuetype").on(
       table.factKey,
-      table.valueType
+      table.valueType,
     ),
-  ]
+  ],
 );
 
 /**
@@ -719,15 +725,15 @@ export const countryFactVintages = pgTable(
     uniqueIndex("idx_fact_vintage_unique").on(
       table.jurisdictionId,
       table.factKey,
-      table.vintageLabel
+      table.vintageLabel,
     ),
     index("idx_fact_vintage_label").on(table.vintageLabel),
     index("idx_fact_vintage_derivation_version").on(table.derivationVersionKey),
     index("idx_fact_vintage_jurisdiction").on(
       table.jurisdictionId,
-      table.vintageLabel
+      table.vintageLabel,
     ),
-  ]
+  ],
 );
 
 /** One release-level closure record for a reconciliation cut. */
@@ -747,7 +753,9 @@ export const countryFactVintageReleases = pgTable(
     inputManifest: jsonb("input_manifest").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [index("idx_fact_vintage_release_status").on(table.completenessStatus)],
+  (table) => [
+    index("idx_fact_vintage_release_status").on(table.completenessStatus),
+  ],
 );
 
 /** Complete immutable resolver input for one candidate at one release cut. */
@@ -763,7 +771,9 @@ export const countryFactVintageCandidates = pgTable(
       .references(() => jurisdictions.id)
       .notNull(),
     factKey: text("fact_key").notNull(),
-    sourceId: text("source_id").references(() => sources.id).notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
     sourceRowId: uuid("source_row_id").notNull(),
     sourceHash: text("source_hash"),
     sourceSnapshotId: uuid("source_snapshot_id"),
@@ -772,17 +782,34 @@ export const countryFactVintageCandidates = pgTable(
     adapterVersionHash: text("adapter_version_hash").notNull(),
     candidateContentHash: text("candidate_content_hash").notNull(),
     candidateStatus: text("candidate_status").notNull(),
-    candidatePayload: jsonb("candidate_payload").$type<import("../factbook/reconcile/types").FactRow>().notNull(),
+    candidatePayload: jsonb("candidate_payload")
+      .$type<import("../factbook/reconcile/types").FactRow>()
+      .notNull(),
     isCanonicalAtCut: boolean("is_canonical_at_cut").notNull().default(false),
     decisionReason: text("decision_reason"),
     decisionTrace: jsonb("decision_trace"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_fact_vintage_candidate_identity").on(table.vintageLabel, table.jurisdictionId, table.factKey, table.sourceId),
-    uniqueIndex("idx_fact_vintage_candidate_id_label").on(table.id, table.vintageLabel),
-    index("idx_fact_vintage_candidate_pair").on(table.vintageLabel, table.jurisdictionId, table.factKey),
-    index("idx_fact_vintage_candidate_source").on(table.vintageLabel, table.sourceId),
+    uniqueIndex("idx_fact_vintage_candidate_identity").on(
+      table.vintageLabel,
+      table.jurisdictionId,
+      table.factKey,
+      table.sourceId,
+    ),
+    uniqueIndex("idx_fact_vintage_candidate_id_label").on(
+      table.id,
+      table.vintageLabel,
+    ),
+    index("idx_fact_vintage_candidate_pair").on(
+      table.vintageLabel,
+      table.jurisdictionId,
+      table.factKey,
+    ),
+    index("idx_fact_vintage_candidate_source").on(
+      table.vintageLabel,
+      table.sourceId,
+    ),
   ],
 );
 
@@ -828,13 +855,10 @@ export const dataDisputes = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("idx_disputes_status_kind").on(
-      table.status,
-      table.disputeKind
-    ),
+    index("idx_disputes_status_kind").on(table.status, table.disputeKind),
     index("idx_disputes_jurisdiction").on(table.jurisdictionId),
     index("idx_disputes_factkey").on(table.factKey),
-  ]
+  ],
 );
 
 /**
@@ -864,13 +888,10 @@ export const factSnapshots = pgTable(
   (table) => [
     uniqueIndex("idx_fact_snapshots_unique").on(
       table.sourceId,
-      table.payloadHash
+      table.payloadHash,
     ),
-    index("idx_fact_snapshots_ref").on(
-      table.upstreamRef,
-      table.fetchedAt
-    ),
-  ]
+    index("idx_fact_snapshots_ref").on(table.upstreamRef, table.fetchedAt),
+  ],
 );
 
 /**
@@ -886,9 +907,7 @@ export const dataFactsAuditLog = pgTable(
   "data_facts_audit_log",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    jurisdictionId: uuid("jurisdiction_id").references(
-      () => jurisdictions.id
-    ),
+    jurisdictionId: uuid("jurisdiction_id").references(() => jurisdictions.id),
     factKey: text("fact_key"),
     disputeId: uuid("dispute_id").references(() => dataDisputes.id),
     /** 'reviewer_decision' | 'resolver_recompute' |
@@ -905,13 +924,10 @@ export const dataFactsAuditLog = pgTable(
     index("idx_facts_audit_dispute").on(table.disputeId),
     index("idx_facts_audit_jurisdiction_factkey").on(
       table.jurisdictionId,
-      table.factKey
+      table.factKey,
     ),
-    index("idx_facts_audit_actor_date").on(
-      table.actorId,
-      table.createdAt
-    ),
-  ]
+    index("idx_facts_audit_actor_date").on(table.actorId, table.createdAt),
+  ],
 );
 
 /**
@@ -1023,7 +1039,7 @@ export const governmentTaxonomies = pgTable(
   (table) => [
     uniqueIndex("idx_government_taxonomies_unique").on(
       table.jurisdictionId,
-      table.taxonomyVersion
+      table.taxonomyVersion,
     ),
     index("idx_government_taxonomies_version").on(table.taxonomyVersion),
     index("idx_government_taxonomies_derivation_version").on(
@@ -1031,13 +1047,13 @@ export const governmentTaxonomies = pgTable(
     ),
     index("idx_government_taxonomies_regime").on(
       table.taxonomyVersion,
-      table.regimeTypeCgv
+      table.regimeTypeCgv,
     ),
     index("idx_government_taxonomies_structural").on(
       table.taxonomyVersion,
-      table.structuralFamily
+      table.structuralFamily,
     ),
-  ]
+  ],
 );
 
 export const contactSubmissions = pgTable("contact_submissions", {
@@ -1069,7 +1085,7 @@ export const billSummaryCache = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (t) => [uniqueIndex("bill_summary_cache_key_idx").on(t.cacheKey)]
+  (t) => [uniqueIndex("bill_summary_cache_key_idx").on(t.cacheKey)],
 );
 
 // Phase H — persisted bills, populated by per-jurisdiction sync scripts.
@@ -1123,11 +1139,11 @@ export const bills = pgTable(
     // Drives the 10-most-recent-bills query.
     index("bills_jurisdiction_last_action_idx").on(
       t.jurisdictionId,
-      t.lastActionDate
+      t.lastActionDate,
     ),
     // Idempotent upserts.
     uniqueIndex("bills_source_external_idx").on(t.sourceId, t.externalId),
-  ]
+  ],
 );
 
 export const metricDefinitions = pgTable("metric_definitions", {
@@ -1171,11 +1187,11 @@ export const countryMetrics = pgTable(
     uniqueIndex("idx_country_metrics_unique").on(
       table.jurisdictionId,
       table.metricId,
-      table.year
+      table.year,
     ),
     index("idx_country_metrics_type_year").on(table.metricId, table.year),
     index("idx_country_metrics_jurisdiction").on(table.jurisdictionId),
-  ]
+  ],
 );
 
 // --- Civica Index & Pulse tables ---
@@ -1209,14 +1225,23 @@ export const ciIngestionRuns = pgTable(
     completedAt: timestamp("completed_at"),
   },
   (table) => [
-    index("idx_ci_ingestion_runs_status_started").on(table.status, table.startedAt),
+    index("idx_ci_ingestion_runs_status_started").on(
+      table.status,
+      table.startedAt,
+    ),
     uniqueIndex("idx_ci_ingestion_runs_release_label").on(table.releaseLabel),
-    check("ci_ingestion_runs_status_closed", dsql`${table.status} IN ('staging', 'failed', 'completed')`),
-    check("ci_ingestion_runs_terminal_shape", dsql`
+    check(
+      "ci_ingestion_runs_status_closed",
+      dsql`${table.status} IN ('staging', 'failed', 'completed')`,
+    ),
+    check(
+      "ci_ingestion_runs_terminal_shape",
+      dsql`
       (${table.status} = 'staging' AND ${table.completedAt} IS NULL)
       OR (${table.status} = 'failed' AND ${table.completedAt} IS NOT NULL AND ${table.errorMessage} IS NOT NULL)
       OR (${table.status} = 'completed' AND ${table.completedAt} IS NOT NULL AND ${table.stagedChecksum} IS NOT NULL AND ${table.errorMessage} IS NULL)
-    `),
+    `,
+    ),
   ],
 );
 
@@ -1255,8 +1280,11 @@ export const ciSourceIngestions = pgTable(
       table.datasetYear,
       table.indicatorId,
     ),
-    check("ci_source_ingestions_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
-  ]
+    check(
+      "ci_source_ingestions_lineage_check",
+      dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+  ],
 );
 
 export const ciDimensionScores = pgTable(
@@ -1316,8 +1344,11 @@ export const ciDimensionScores = pgTable(
       columns: [table.methodologyVersion],
       foreignColumns: [ciMethodologyVersions.id],
     }),
-    check("ci_dimension_scores_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
-  ]
+    check(
+      "ci_dimension_scores_lineage_check",
+      dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+  ],
 );
 
 /**
@@ -1390,11 +1421,14 @@ export const indicatorHistory = pgTable(
     // Hot path: "give me every year of every indicator for this country".
     index("idx_indicator_history_jur_dim").on(
       table.jurisdictionId,
-      table.dimension
+      table.dimension,
     ),
     index("idx_indicator_history_indicator").on(table.indicator),
-    check("indicator_history_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
-  ]
+    check(
+      "indicator_history_lineage_check",
+      dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+  ],
 );
 
 /**
@@ -1426,10 +1460,22 @@ export const ciResearchPanelReleases = pgTable(
     completedAt: timestamp("completed_at"),
   },
   (table) => [
-    check("ci_research_panel_release_status", dsql`${table.status} IN ('staging','complete')`),
-    check("ci_research_panel_release_period", dsql`${table.periodStart} <= ${table.periodEnd}`),
-    check("ci_research_panel_release_counts", dsql`${table.expectedRows} = ${table.observedRows} + ${table.missingRows} AND ${table.expectedRows} = ${table.jurisdictionCount} * ${table.indicatorCount} * (${table.periodEnd} - ${table.periodStart} + 1)`),
-    check("ci_research_panel_release_hashes", dsql`${table.rowSha256} ~ '^[a-f0-9]{64}$' AND ${table.coverageSha256} ~ '^[a-f0-9]{64}$' AND ${table.temporalBreaksSha256} ~ '^[a-f0-9]{64}$'`),
+    check(
+      "ci_research_panel_release_status",
+      dsql`${table.status} IN ('staging','complete')`,
+    ),
+    check(
+      "ci_research_panel_release_period",
+      dsql`${table.periodStart} <= ${table.periodEnd}`,
+    ),
+    check(
+      "ci_research_panel_release_counts",
+      dsql`${table.expectedRows} = ${table.observedRows} + ${table.missingRows} AND ${table.expectedRows} = ${table.jurisdictionCount} * ${table.indicatorCount} * (${table.periodEnd} - ${table.periodStart} + 1)`,
+    ),
+    check(
+      "ci_research_panel_release_hashes",
+      dsql`${table.rowSha256} ~ '^[a-f0-9]{64}$' AND ${table.coverageSha256} ~ '^[a-f0-9]{64}$' AND ${table.temporalBreaksSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
   ],
 );
 
@@ -1445,7 +1491,9 @@ export const ciResearchPanelRows = pgTable(
     periodYear: integer("period_year").notNull(),
     dimension: text("dimension").notNull(),
     indicatorId: text("indicator_id").notNull(),
-    sourceId: text("source_id").references(() => sources.id).notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
     sourceOwner: text("source_owner").notNull(),
     retrievalPath: text("retrieval_path").notNull(),
     value: real("value"),
@@ -1467,12 +1515,35 @@ export const ciResearchPanelRows = pgTable(
     contentHash: text("content_hash").notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.releaseId, table.jurisdictionId, table.indicatorId, table.sourceId, table.periodYear] }),
-    index("idx_ci_research_panel_release_year").on(table.releaseId, table.periodYear),
-    index("idx_ci_research_panel_release_indicator").on(table.releaseId, table.indicatorId),
-    check("ci_research_panel_value_state", dsql`(${table.availabilityStatus} = 'observed' AND ${table.value} IS NOT NULL AND ${table.missingReason} IS NULL) OR (${table.availabilityStatus} = 'missing' AND ${table.value} IS NULL AND ${table.missingReason} IS NOT NULL)`),
-    check("ci_research_panel_uncertainty_shape", dsql`(${table.uncertaintyLower} IS NULL AND ${table.uncertaintyUpper} IS NULL) OR (${table.uncertaintyLower} IS NOT NULL AND ${table.uncertaintyUpper} IS NOT NULL AND ${table.uncertaintyLower} <= ${table.uncertaintyUpper})`),
-    check("ci_research_panel_content_hash", dsql`${table.contentHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactHash} ~ '^[a-f0-9]{64}$'`),
+    primaryKey({
+      columns: [
+        table.releaseId,
+        table.jurisdictionId,
+        table.indicatorId,
+        table.sourceId,
+        table.periodYear,
+      ],
+    }),
+    index("idx_ci_research_panel_release_year").on(
+      table.releaseId,
+      table.periodYear,
+    ),
+    index("idx_ci_research_panel_release_indicator").on(
+      table.releaseId,
+      table.indicatorId,
+    ),
+    check(
+      "ci_research_panel_value_state",
+      dsql`(${table.availabilityStatus} = 'observed' AND ${table.value} IS NOT NULL AND ${table.missingReason} IS NULL) OR (${table.availabilityStatus} = 'missing' AND ${table.value} IS NULL AND ${table.missingReason} IS NOT NULL)`,
+    ),
+    check(
+      "ci_research_panel_uncertainty_shape",
+      dsql`(${table.uncertaintyLower} IS NULL AND ${table.uncertaintyUpper} IS NULL) OR (${table.uncertaintyLower} IS NOT NULL AND ${table.uncertaintyUpper} IS NOT NULL AND ${table.uncertaintyLower} <= ${table.uncertaintyUpper})`,
+    ),
+    check(
+      "ci_research_panel_content_hash",
+      dsql`${table.contentHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactHash} ~ '^[a-f0-9]{64}$'`,
+    ),
   ],
 );
 
@@ -1536,19 +1607,17 @@ export const ciCompositeScores = pgTable(
     uniqueIndex("idx_ci_composite_unique").on(
       table.jurisdictionId,
       table.quarter,
-      table.methodologyVersion
+      table.methodologyVersion,
     ),
     index("idx_ci_composite_quarter_rank").on(table.quarter, table.rank),
     index("idx_ci_composite_jurisdiction").on(table.jurisdictionId),
-    index("idx_ci_composite_derivation_version").on(
-      table.derivationVersionKey,
-    ),
+    index("idx_ci_composite_derivation_version").on(table.derivationVersionKey),
     foreignKey({
       name: "ci_composite_scores_methodology_version_ci_methodology_versions",
       columns: [table.methodologyVersion],
       foreignColumns: [ciMethodologyVersions.id],
     }),
-  ]
+  ],
 );
 
 export const pulseEvents = pgTable(
@@ -1576,15 +1645,15 @@ export const pulseEvents = pgTable(
   (table) => [
     index("idx_pulse_events_jurisdiction_date").on(
       table.jurisdictionId,
-      table.eventDate
+      table.eventDate,
     ),
     index("idx_pulse_events_active").on(
       table.jurisdictionId,
       table.isActive,
-      table.eventDate
+      table.eventDate,
     ),
     index("idx_pulse_events_category").on(table.category),
-  ]
+  ],
 );
 
 export const pulseDailyScores = pgTable(
@@ -1609,7 +1678,7 @@ export const pulseDailyScores = pgTable(
   (table) => [
     uniqueIndex("idx_pulse_daily_unique").on(
       table.jurisdictionId,
-      table.scoreDate
+      table.scoreDate,
     ),
     index("idx_pulse_daily_date").on(table.scoreDate),
     index("idx_pulse_daily_jurisdiction").on(table.jurisdictionId),
@@ -1618,7 +1687,7 @@ export const pulseDailyScores = pgTable(
       columns: [table.methodologyVersion],
       foreignColumns: [ciMethodologyVersions.id],
     }),
-  ]
+  ],
 );
 
 export const pulseChangelog = pgTable(
@@ -1639,10 +1708,10 @@ export const pulseChangelog = pgTable(
   (table) => [
     index("idx_pulse_changelog_jurisdiction_date").on(
       table.jurisdictionId,
-      table.scoreDate
+      table.scoreDate,
     ),
     index("idx_pulse_changelog_event").on(table.eventId),
-  ]
+  ],
 );
 
 // --- International organizations (CIV-163) ---
@@ -1679,11 +1748,11 @@ export const organizationMemberships = pgTable(
   (table) => [
     uniqueIndex("idx_org_memberships_unique").on(
       table.orgId,
-      table.jurisdictionId
+      table.jurisdictionId,
     ),
     index("idx_org_memberships_jurisdiction").on(table.jurisdictionId),
     index("idx_org_memberships_org").on(table.orgId),
-  ]
+  ],
 );
 
 // --- Phase 5.2 — Civica Conditions companion layer ---
@@ -1739,8 +1808,11 @@ export const civicaConditionsScores = pgTable(
     ),
     index("idx_conditions_quarter").on(table.quarter),
     index("idx_conditions_jurisdiction").on(table.jurisdictionId),
-    check("civica_conditions_scores_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
-  ]
+    check(
+      "civica_conditions_scores_lineage_check",
+      dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+  ],
 );
 
 // --- Phase 5.1 — CI v2 credibility infrastructure ---
@@ -1909,7 +1981,7 @@ export const rawEvents = pgTable(
       .notNull(),
     /** Source-native id where available, for upsert idempotency */
     externalId: text("external_id"),
-    sourceUrl: text("source_url"),
+    sourceUrl: text("source_url").notNull(),
     /** 'specialist' | 'news' */
     sourceType: text("source_type").notNull(),
     /** Nullable — country resolution can fail */
@@ -1922,6 +1994,24 @@ export const rawEvents = pgTable(
     body: text("body"),
     /** Full source payload for re-extraction without re-fetching */
     raw: jsonb("raw").notNull(),
+    /** PUL-005 immutable evidence identity over source payload, extracted
+     * evidence, retrieval time, attribution, publisher, and rights state. */
+    evidenceIdentityKey: text("evidence_identity_key").notNull(),
+    evidenceContentHash: text("evidence_content_hash").notNull(),
+    /** BCP 47 language code or `und` when the source did not declare one. */
+    evidenceLanguage: text("evidence_language").notNull(),
+    evidencePublisher: jsonb("evidence_publisher")
+      .$type<PulseEvidencePublisherSnapshot>()
+      .notNull(),
+    evidenceAttribution: jsonb("evidence_attribution")
+      .$type<PulseEvidenceAttributionSnapshot>()
+      .notNull(),
+    evidenceRights: jsonb("evidence_rights")
+      .$type<PulseEvidenceRightsSnapshot>()
+      .notNull(),
+    evidenceRetention: jsonb("evidence_retention")
+      .$type<PulseEvidenceRetentionSnapshot>()
+      .notNull(),
     /** 384-dim sentence-transformer embedding for clustering */
     embedding: real("embedding").array(),
     /** Set when row joins a cluster; null until then */
@@ -1952,17 +2042,24 @@ export const rawEvents = pgTable(
   (table) => [
     index("idx_raw_events_jurisdiction_date").on(
       table.jurisdictionId,
-      table.eventDate
+      table.eventDate,
     ),
     index("idx_raw_events_unclustered").on(table.clusteredAt),
     index("idx_raw_events_cluster").on(table.clusterId),
     index("idx_raw_events_ingest_run").on(table.ingestRunId),
     index("idx_raw_events_cluster_run").on(table.clusterRunId),
     index("idx_raw_events_classification_run").on(table.classificationRunId),
+    uniqueIndex("idx_raw_events_evidence_identity").on(
+      table.evidenceIdentityKey,
+    ),
     uniqueIndex("idx_raw_events_external")
       .on(table.sourceId, table.externalId)
       .where(dsql`${table.externalId} IS NOT NULL`),
-  ]
+    check(
+      "raw_events_evidence_identity_check",
+      dsql`${table.evidenceIdentityKey} ~ '^pulse-evidence/sha256:[a-f0-9]{64}$' AND ${table.evidenceContentHash} ~ '^[a-f0-9]{64}$' AND ${table.evidenceLanguage} <> '' AND ${table.evidencePublisher}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceAttribution}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRights}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRetention}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRetention}->>'publicPayloadDistribution' = 'blocked'`,
+    ),
+  ],
 );
 
 /**
@@ -2048,7 +2145,7 @@ export const pulseEventsV2 = pgTable(
      *  corroboration pass. Scheduled recomputation may overwrite it; this is
      *  not an immutable at-classification snapshot. */
     pressFreedomScoreAtClassification: real(
-      "press_freedom_score_at_classification"
+      "press_freedom_score_at_classification",
     ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -2056,7 +2153,7 @@ export const pulseEventsV2 = pgTable(
   (table) => [
     index("idx_pulse_v2_jurisdiction_date").on(
       table.jurisdictionId,
-      table.eventDate
+      table.eventDate,
     ),
     index("idx_pulse_v2_published").on(table.published, table.reviewStatus),
     index("idx_pulse_v2_dimension").on(table.dimension, table.eventDate),
@@ -2065,7 +2162,7 @@ export const pulseEventsV2 = pgTable(
     index("idx_pulse_v2_publication_run").on(table.publicationRunId),
     index("idx_pulse_v2_corroboration_run").on(table.corroborationRunId),
     uniqueIndex("idx_pulse_v2_cluster_unique").on(table.clusterId),
-  ]
+  ],
 );
 
 /**
@@ -2088,7 +2185,9 @@ export const pulseSources = pgTable(
     sourceName: text("source_name").notNull(),
     sourceUrl: text("source_url"),
     /** Breadcrumb back to the staging row that contributed */
-    rawEventId: uuid("raw_event_id").references(() => rawEvents.id),
+    rawEventId: uuid("raw_event_id")
+      .references(() => rawEvents.id, { onDelete: "restrict" })
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -2097,7 +2196,7 @@ export const pulseSources = pgTable(
     uniqueIndex("idx_pulse_sources_raw_event_unique")
       .on(table.rawEventId)
       .where(dsql`${table.rawEventId} IS NOT NULL`),
-  ]
+  ],
 );
 
 /**
@@ -2134,12 +2233,12 @@ export const pulseDimensionalDeltas = pgTable(
   (table) => [
     uniqueIndex("idx_pulse_dim_unique").on(
       table.jurisdictionId,
-      table.dimension
+      table.dimension,
     ),
     index("idx_pulse_dim_jurisdiction").on(table.jurisdictionId),
     index("idx_pulse_dim_derivation_version").on(table.derivationVersionKey),
     index("idx_pulse_dim_computation_run").on(table.computationRunId),
-  ]
+  ],
 );
 
 /**
@@ -2177,10 +2276,10 @@ export const pulseReviewAuditLog = pgTable(
     index("idx_pulse_review_audit_event").on(table.eventId),
     index("idx_pulse_review_audit_reviewer").on(
       table.reviewerId,
-      table.createdAt
+      table.createdAt,
     ),
     index("idx_pulse_review_audit_run").on(table.runId),
-  ]
+  ],
 );
 
 /**
@@ -2226,7 +2325,7 @@ export const backtestEvents = pgTable(
     hintSeverityTier: text("hint_severity_tier"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [index("idx_backtest_events_case").on(table.caseId)]
+  (table) => [index("idx_backtest_events_case").on(table.caseId)],
 );
 
 /**
@@ -2253,7 +2352,7 @@ export const backtestRuns = pgTable(
   },
   (table) => [
     index("idx_backtest_runs_case_ran").on(table.caseId, table.ranAt),
-  ]
+  ],
 );
 
 /**
@@ -2317,5 +2416,5 @@ export const rateLimits = pgTable(
      *  used by the lazy reaper; never consulted on the hot path. */
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
-  (table) => [index("idx_rate_limits_expires_at").on(table.expiresAt)]
+  (table) => [index("idx_rate_limits_expires_at").on(table.expiresAt)],
 );

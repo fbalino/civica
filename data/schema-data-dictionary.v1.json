@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "2d373e7de492df38d0362d931d8ab899fb0cf1ddad72f4b901eb549b519f0cf0",
+  "schemaFingerprint": "47b4c331b94e92235c233ac555261770dd1c050084126e27b5cb6533267cd78a",
   "summary": {
     "tables": 56,
-    "columns": 740,
+    "columns": 747,
     "publicAtlasTables": 18,
     "researchBetaTables": 15,
     "supportTables": 11,
@@ -18064,8 +18064,8 @@
           "propertyName": "rawEventId",
           "definition": "Raw event id; relational link to raw_events.id.",
           "sqlType": "uuid",
-          "nullable": true,
-          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -18291,10 +18291,10 @@
       "definition": "Deduplicated raw Pulse v2 inputs plus retained terminal classification dispositions.",
       "rowGrain": "One fetched publisher item or deduplicated article candidate.",
       "releaseScope": "research_beta",
-      "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+      "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
       "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
       "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-      "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+      "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
       "deprecation": {
         "status": "active"
       },
@@ -18316,10 +18316,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18341,10 +18341,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18366,10 +18366,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18391,10 +18391,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18421,7 +18421,7 @@
           "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18443,10 +18443,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "Classified at follows this table contract. event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18470,10 +18470,10 @@
             ],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18500,7 +18500,7 @@
           "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18524,10 +18524,10 @@
             ],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "Clustered at follows this table contract. event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18549,10 +18549,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18574,10 +18574,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18601,10 +18601,189 @@
             ],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "Event date follows this table contract. event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_attribution",
+          "propertyName": "evidenceAttribution",
+          "definition": "Ingest-time jurisdiction resolution status, raw country label, resolved jurisdiction, evidence, and resolver version.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_content_hash",
+          "propertyName": "evidenceContentHash",
+          "definition": "SHA-256 identity of the exact source payload and extracted evidence retained for the Pulse raw item.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_identity_key",
+          "propertyName": "evidenceIdentityKey",
+          "definition": "Content-addressed identity binding the Pulse source snapshot, retrieval time, language, publisher, attribution evidence, and captured rights posture.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_raw_events_evidence_identity"
+            ],
+            "uniqueGroups": [
+              "idx_raw_events_evidence_identity"
+            ]
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_language",
+          "propertyName": "evidenceLanguage",
+          "definition": "BCP 47 language code declared by the source, or und when unavailable.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_publisher",
+          "propertyName": "evidencePublisher",
+          "definition": "Ingest-time publisher, source-family, canonical-source, item-host, and source-type snapshot.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_retention",
+          "propertyName": "evidenceRetention",
+          "definition": "Private snapshot storage, hashing, link-rot protection, and public-payload distribution policy.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_rights",
+          "propertyName": "evidenceRights",
+          "definition": "Ingest-time source terms, review status, redistribution posture, and public-export restriction snapshot.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18630,10 +18809,10 @@
               "idx_raw_events_external"
             ]
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18658,7 +18837,7 @@
           "sourceOrDerivation": "Civica-generated database identifier.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18685,7 +18864,7 @@
           "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18712,7 +18891,7 @@
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18734,10 +18913,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18759,10 +18938,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18784,10 +18963,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "Civica retrieval/processing time; distinct from source observation and release vintage.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18816,7 +18995,7 @@
           "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18838,10 +19017,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Captured source-lineage metadata. Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Captured source-lineage metadata. Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18851,8 +19030,8 @@
           "propertyName": "sourceUrl",
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
-          "nullable": true,
-          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -18863,10 +19042,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Captured source-lineage metadata. Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Captured source-lineage metadata. Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
@@ -18888,10 +19067,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "sourceOrDerivation": "Pulse source connector payload sealed with exact URL, content and identity hashes, language state, publisher/source family, jurisdiction-attribution evidence, and captured rights metadata.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
-          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
           "deprecation": {
             "status": "active"
           }
