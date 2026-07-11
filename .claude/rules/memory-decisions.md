@@ -792,3 +792,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   2026 retrieval timestamp, and `2026_v1` describe different things.
 - Leave unavailable at-cut metadata null instead of borrowing post-cut state.
   Durable record: APR-D058.
+
+## 2026-07-11 — One authoritative migration history governs deploys
+
+- `drizzle/authoritative/` is the only deployable history; the incomplete older
+  journal remains a historical archive and is never replayed.
+- Empty databases execute the checked baseline. Existing databases adopt only
+  on an exact full-catalog fingerprint; later hash-pinned migrations run once.
+- Deployment migrates before build and fails on unknown IDs, changed hashes, or
+  schema drift. Durable record: APR-D059 in `plan/DECISIONS.md`.

@@ -174,6 +174,7 @@ Canonical npm scripts (in `package.json`):
 - `npm run pulse:v2:{ingest,cluster,classify,score}` — run one Pulse v2 stage
 - `npm run snapshot:pulse-runtime` / `npm run validate:pulse-runtime:live` — regenerate or validate the public runtime-method contract
 - `npm run db:generate` — generate a checked Drizzle forward artifact
+- `npm run db:migrate` — apply or exactly adopt the hash-pinned authoritative history, then verify the full public-schema fingerprint
 - `npm run db:plan -- --id=<migration-id> --live` — zero-write migration plan and pre-change row counts
 - `npm run db:push` — intentionally refuses; `db:push` is not production history
 - `CIVICA_ALLOW_DB_PUSH=local-only npm run db:push:local` — disposable non-production databases only

@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-026_authoritative_migration_path"
+    "current_task": "DAT-027_canonical_plus_alternates_exports"
   },
   "budget": {
     "mode": "subscription_only",
@@ -632,6 +632,10 @@
     "plan/evidence/DAT-024/live-boundary-audit.json",
     "plan/evidence/DAT-025/README.md",
     "plan/evidence/DAT-025/live-temporal-audit.json",
+    "plan/evidence/DAT-026/README.md",
+    "plan/evidence/DAT-026/fresh-and-upgrade-result.json",
+    "drizzle/authoritative/0000_authoritative_baseline.sql",
+    "data/authoritative-schema-fingerprint.v1.json",
     "drizzle/migrations/0026_temporal_metadata.sql",
     "drizzle/migrations/0025_immutable_frozen_vintages.sql",
     "src/app/downloads/civica-atlas-2026-07-11.manifest.json/route.ts",
@@ -655,11 +659,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "Every migration, temporal, data, release, claims/documentation, TypeScript, and production-build gate passed for DAT-025.",
-    "tests": "631/631 tests passed. Live audit found 0 temporal mismatches and the seeded 2025 BR cross-section label fails. Master plan is 44/288 complete (15.3%).",
-    "public_claims": "BR/CGV now accurately publishes reference year 2022 and separately labels original v6.1, QoG Jan26, retrieval, and Civica publication versions.",
-    "browser": "The live peer-grouping API returned the four-field temporal object; the BR/CGV reader rendered reference year 2022 at desktop light and 390px dark with no request or console errors.",
-    "visual_review": "The corrected temporal note composes the existing editorial typography without a new component or token."
+    "build": "Every authoritative-migration, data, release, rights, claims/documentation, TypeScript, and production-build gate passed for DAT-026.",
+    "tests": "633/633 tests passed. Fresh PostgreSQL 17 and production-shaped adoption match the checked full-catalog fingerprint; rerun has 0 pending and 0 planned writes. Master plan is 45/288 complete (15.6%).",
+    "public_claims": "The deployable schema history is now a checked 50-table baseline plus ordered hash-pinned migrations; the incomplete legacy journal is explicitly archival.",
+    "browser": "Not applicable: DAT-026 changes database deployment machinery and internal documentation, with no reader-facing UI change.",
+    "visual_review": "Not applicable: no UI or design-system surface changed."
   },
-  "updated_at": "2026-07-11T07:35:00Z"
+  "updated_at": "2026-07-11T05:08:36Z"
 }

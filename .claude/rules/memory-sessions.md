@@ -462,3 +462,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   separate. Honest historical nulls remain where only post-cut state exists.
 - 631/631 tests, live audit, release rebuild, all gates, build, API, and
   desktop/mobile browser checks pass. DAT-026 is next.
+
+## 2026-07-11 — DAT-026 authoritative migration path completed
+
+- Replaced the incomplete deploy history with a 50-table authoritative baseline,
+  hash-pinned manifest, full-catalog fingerprint, and fail-closed migrator.
+- Fresh PostgreSQL 17 creation and exact production adoption produce the same
+  fingerprint; the production adoption replayed no public DDL or data writes.
+- 633/633 tests, live validation, all gates, and the production build pass.
+  DAT-027 is next.

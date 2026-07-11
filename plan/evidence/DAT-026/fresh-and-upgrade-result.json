@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "authoritative-migration-evidence/v1",
+  "completedAt": "2026-07-11T05:08:36Z",
+  "baseline": {
+    "id": "0000_authoritative_baseline",
+    "sha256": "3ba983b97fc6eeaad67c38c069ec72edf0371e62c2f7037380d86343dc13a418",
+    "statements": 1171,
+    "publicTables": 50
+  },
+  "expectedPublicSchemaFingerprint": "92914965fc631e39e059fde8c7d9d4daaeb7cb24b8c025f19a28db60af9b6bee",
+  "freshDatabase": {
+    "engine": "PostgreSQL 17",
+    "baselineExecuted": true,
+    "publicTables": 50,
+    "fingerprintMatches": true,
+    "temporaryClusterDeleted": true
+  },
+  "productionShapedUpgrade": {
+    "publicTablesBefore": 50,
+    "fingerprintMatchedBeforeAdoption": true,
+    "baselineMode": "adopted",
+    "publicDdlReplayed": false,
+    "publicDataRowsChanged": 0,
+    "ledgerEntries": 1,
+    "fingerprintMatchesAfter": true
+  },
+  "rerun": {
+    "applied": 1,
+    "pending": 0,
+    "planWrites": 0
+  },
+  "tests": {
+    "passed": 633,
+    "failed": 0
+  }
+}

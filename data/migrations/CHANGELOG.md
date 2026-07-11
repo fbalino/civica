@@ -1,8 +1,9 @@
 # Migration and production-data change log
 
 This is the internal release-note index for migration artifacts. It records
-historical reality without pretending the incomplete Drizzle journal is an
-authoritative production history. DAT-026 owns the replacement baseline.
+historical reality without pretending the incomplete legacy Drizzle journal is
+authoritative. The deployable replacement is `drizzle/authoritative/`; this
+file remains the archive index only.
 
 Every ID below resolves to the checked forward artifact and policy metadata in
 `src/lib/db/migration-registry.ts`.
