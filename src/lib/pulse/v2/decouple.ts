@@ -27,6 +27,7 @@ import {
   ciDimensionScores,
   pulseEventsV2,
 } from "@/lib/db/schema";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import type * as schema from "@/lib/db/schema";
 
 type Db = NeonHttpDatabase<typeof schema>;
@@ -79,7 +80,7 @@ export async function decoupleAbsorbedEvents(
     dryRun?: boolean;
   } = {}
 ): Promise<DecoupleSummary> {
-  const methodologyVersion = opts.methodologyVersion ?? "beta";
+  const methodologyVersion = opts.methodologyVersion ?? CURRENT_CI_METHODOLOGY_VERSION;
   const threshold = opts.threshold ?? DEFAULT_DECOUPLE_THRESHOLD;
   const dryRun = opts.dryRun ?? false;
 

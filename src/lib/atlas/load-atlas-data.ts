@@ -17,6 +17,7 @@ import {
   ciCompositeScores,
 } from "@/lib/db/schema";
 import { getLatestAvailableQuarter } from "@/lib/db/queries";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { formatGovernmentDisplay } from "@/lib/text/clean";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
@@ -799,8 +800,8 @@ async function _loadAtlasData(): Promise<{
  *   - regime / income come from the canonical fact layer (`status='active'`
  *     rows of `vdem_row` / `world_bank_income_group`), preserving the
  *     human-readable upstream strings ("Liberal Democracy", "High income").
- *   - the Civica Index composite is PINNED to `methodology_version='beta'` at
- *     the latest available beta quarter (AGENTS.md CI read invariant), so the
+ *   - the Civica Index composite is pinned to the current release constant at
+ *     its latest available quarter (AGENTS.md CI read invariant), so the
  *     tier coloring reconciles with the rest of the site.
  */
 export interface AtlasLayerValues {
@@ -857,7 +858,7 @@ async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> 
       entry.incomeGroup = row.factValue;
   }
 
-  const quarter = await getLatestAvailableQuarter("beta");
+  const quarter = await getLatestAvailableQuarter(CURRENT_CI_METHODOLOGY_VERSION);
   const scoreRows = await db
     .select({
       jurisdictionId: ciCompositeScores.jurisdictionId,
@@ -867,7 +868,7 @@ async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> 
     .where(
       and(
         eq(ciCompositeScores.quarter, quarter),
-        eq(ciCompositeScores.methodologyVersion, "beta")
+        eq(ciCompositeScores.methodologyVersion, CURRENT_CI_METHODOLOGY_VERSION)
       )
     );
 

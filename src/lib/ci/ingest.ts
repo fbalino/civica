@@ -14,6 +14,7 @@ import type { IngestionResult } from "./types";
 import { CI_INGEST_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 import type { StagedCiAdapter, StagedCiRow } from "./atomic-ingestion";
 import { buildIndicatorLineage, frozenCiPublisherHash } from "@/lib/indicators/lineage";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
 
 export function createDb() {
   const sqlClient = neon(process.env.DATABASE_URL!);
@@ -38,11 +39,11 @@ export async function getLatestMethodologyVersion(db: Db): Promise<string> {
   const rows = await db
     .select({ id: ciMethodologyVersions.id })
     .from(ciMethodologyVersions)
-    .orderBy(dsql`${ciMethodologyVersions.publishedAt} DESC`)
+    .where(dsql`${ciMethodologyVersions.id} = ${CURRENT_CI_METHODOLOGY_VERSION}`)
     .limit(1);
   if (rows.length === 0) {
     throw new Error(
-      "No methodology version found. Run seed-ci-methodology first.",
+      `No ${CURRENT_CI_METHODOLOGY_VERSION} methodology version found. Run seed-ci-methodology:beta first.`,
     );
   }
   return rows[0].id;
@@ -64,6 +65,9 @@ export async function runIngestion(
     markSynced?: typeof markSourcesSynced;
   },
 ): Promise<{ ingested: number; skipped: number }> {
+  if (result.records.length === 0) {
+    throw new Error(`${result.sourceId}/${result.dimension}: upstream produced zero records`);
+  }
   const iso3Map = await buildIso3Map(db);
   const methodologyVersion = await getLatestMethodologyVersion(db);
   const quarter = yearToQuarter(result.datasetYear);
@@ -81,10 +85,6 @@ export async function runIngestion(
     publisherArtifactHash: frozenCiPublisherHash(result.sourceId, result.datasetYear),
     substitutionReason,
   });
-
-  if (result.records.length === 0) {
-    throw new Error(`${result.sourceId}/${result.dimension}: upstream produced zero records`);
-  }
 
   if (opts?.dryRun) {
     let ingested = 0;

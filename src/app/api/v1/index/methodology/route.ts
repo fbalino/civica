@@ -8,7 +8,7 @@ function publicMethodologyRecord<T extends { id: string; notes: string | null }>
   return {
     ...row,
     notes:
-      row.id === "beta"
+      row.id.startsWith("beta")
         ? "Research-beta composite under active validation. Numeric estimates are secondary experimental outputs and are not categorical country grades."
         : "Archived methodology version retained for reproducibility; consult the current methodology for public interpretation guidance.",
   };

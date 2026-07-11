@@ -23,6 +23,7 @@ import { calculateCompositeV2, latestQuarter } from "../src/lib/ci/calculate-v2"
 import { decoupleAbsorbedEvents } from "../src/lib/pulse/v2/decouple";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "../src/lib/db/schema";
+import { CURRENT_CI_METHODOLOGY_VERSION, SUPERSEDED_CI_VINTAGE_LABEL } from "../src/lib/ci/current-release";
 
 async function main() {
   const db = createDb();
@@ -34,8 +35,8 @@ async function main() {
   const positional = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   let quarter = positional[0];
   const sims = positional[1] ? parseInt(positional[1], 10) : undefined;
-  const methodologyVersion = process.argv.find((arg) => arg.startsWith("--methodology-version="))?.split("=").slice(1).join("=") ?? "beta";
-  const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=");
+  const methodologyVersion = process.argv.find((arg) => arg.startsWith("--methodology-version="))?.split("=").slice(1).join("=") ?? CURRENT_CI_METHODOLOGY_VERSION;
+  const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=") ?? SUPERSEDED_CI_VINTAGE_LABEL;
 
   if (!quarter) {
     quarter = (await latestQuarter(db)) ?? "";
@@ -49,7 +50,7 @@ async function main() {
   // Vintage label is the public citation handle. Convention:
   // "Civica Index 2023 Q4 (Beta)".
   const [year, q] = quarter.split("-Q");
-  const publishedVersion = methodologyVersion === "beta" ? "Beta" : methodologyVersion;
+  const publishedVersion = methodologyVersion === "beta" ? "Beta" : methodologyVersion.replace(/^beta-r/i, "Beta-R");
   const vintageLabel = `Civica Index ${year} Q${q} (${publishedVersion})`;
 
   console.log(`\n=== Civica Index — Beta calculation ===`);
@@ -79,7 +80,7 @@ async function main() {
     db as unknown as NeonHttpDatabase<typeof schema>,
     quarter,
     {
-      methodologyVersion: "beta",
+      methodologyVersion,
       dryRun: decoupleDryRun,
     }
   );

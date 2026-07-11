@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/deprecation";
 import { and, eq, sql, desc } from "drizzle-orm";
 import { shapeIndexCountryData } from "@/lib/api/contract/shapes";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 
 /**
  * This endpoint serves the current Beta methodology by default. Pass
@@ -30,7 +31,7 @@ export async function GET(
     const { country_slug } = await params;
     const slug = country_slug.toLowerCase();
     const url = new URL(request.url);
-    const methodologyVersion = url.searchParams.get("methodology") ?? "beta";
+    const methodologyVersion = url.searchParams.get("methodology") ?? CURRENT_CI_METHODOLOGY_VERSION;
 
     const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) {

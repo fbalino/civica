@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "ci-clean-room-reproduction/v1",
+  "releaseId": "ci-beta-r3-2024-Q4",
+  "quarter": "2024-Q4",
+  "methodologyVersion": "beta-r3",
+  "vintageLabel": "Civica Index 2024 Q4 (Beta-R3)",
+  "inputManifest": "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
+  "inputSha256": {
+    "vdem": "bd6430d6b78785c7422acee7d75bef1b852f2ce1baa5f673ae40ffca64ffe51b",
+    "worldbank_wgi": "25a2f9eabb90b0092973392c0b31571aa58b691cc5786292e504b52f693e1eb8",
+    "freedom_house": "d6ac861af6e7dcea7e870e39ddbcd2925730a653c1466f8992a7d0005f53be88",
+    "transparency_intl": "34d1c16eb3c5b04cad2cf116c852dfc4ab8144b1c66cb37c74011848639f5736"
+  },
+  "jurisdictionSpine": {
+    "path": "data/releases/ci-beta-r3-2024-Q4/jurisdiction-spine.v1.json",
+    "rowCount": 197,
+    "sha256": "06d713ae407736525a7d01ea40299756ae7cde007f023329176f7b12137c73e8"
+  },
+  "algorithm": {
+    "simulations": 10000,
+    "randomization": "deterministic per-jurisdiction Mulberry32 seed over release, period, identity, ordered dimensions, sources, and raw values"
+  },
+  "dimensions": {
+    "rows": 745,
+    "sha256": "d16100ada72a2037a5c311b098eb8bb283ef0d01f1a346efdf74126b1fb65327"
+  },
+  "composites": {
+    "rows": 190,
+    "sha256": "dfc3b2d53587fa3901a368b32580f648ee54d68ecbaaae7163515972083b2fa3"
+  },
+  "tolerance": {
+    "identities": "exact",
+    "rawAndNormalizedDimensions": "absolute difference <= 0.00001 for PostgreSQL real storage",
+    "compositeFields": "exact"
+  }
+}

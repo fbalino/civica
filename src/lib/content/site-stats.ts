@@ -30,6 +30,7 @@
  */
 
 import { cache } from "react";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 
@@ -224,12 +225,12 @@ async function queryCurrentScoredJurisdictions(): Promise<number> {
   return queryScalar(
     sql`SELECT COUNT(DISTINCT jurisdiction_id)::int AS n
         FROM ci_composite_scores
-        WHERE methodology_version = 'beta'
+        WHERE methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
           AND score IS NOT NULL
           AND quarter = (
             SELECT MAX(quarter)
             FROM ci_composite_scores
-            WHERE methodology_version = 'beta'
+            WHERE methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
               AND score IS NOT NULL
           )`,
   );

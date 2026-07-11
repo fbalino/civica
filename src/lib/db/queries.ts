@@ -1,6 +1,7 @@
 import { eq, and, desc, asc, sql } from "drizzle-orm";
 import { db } from "./index";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { parseDataValueStatus } from "@/lib/data/value-state";
 import {
   buildGovernmentClassificationMap,
@@ -257,7 +258,7 @@ const RANKING_CI_DIMENSIONS: Record<string, string> = {
 export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
   const factKeys = Object.values(RANKING_FACT_KEYS);
   const dimensions = Object.values(RANKING_CI_DIMENSIONS);
-  const quarter = await getLatestAvailableQuarter("beta");
+  const quarter = await getLatestAvailableQuarter(CURRENT_CI_METHODOLOGY_VERSION);
 
   const byId = new Map<string, RankingCountryRow & { id: string }>();
   const ensure = (
@@ -346,7 +347,7 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
     JOIN jurisdictions j
       ON j.id = cs.jurisdiction_id
       AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
-    WHERE cs.quarter = ${quarter} AND cs.methodology_version = 'beta'
+    WHERE cs.quarter = ${quarter} AND cs.methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
   `);
   const compositeRows = (
     Array.isArray(compositeResult)
@@ -393,7 +394,7 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
       ON j.id = ds.jurisdiction_id
       AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
     WHERE ds.quarter = ${quarter}
-      AND ds.methodology_version = 'beta'
+      AND ds.methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
       AND ds.dimension IN ${dimensions}
   `);
   const dimensionRows = (
@@ -1118,7 +1119,7 @@ export async function getCIRankings(
     methodologyVersion?: string;
   }
 ) {
-  const methodologyVersion = filters?.methodologyVersion ?? "beta";
+  const methodologyVersion = filters?.methodologyVersion ?? CURRENT_CI_METHODOLOGY_VERSION;
   const q = quarter ?? (await getLatestAvailableQuarter(methodologyVersion));
   const continentFilter = filters?.continent
     ? sql`AND j.continent = ${filters.continent}`
@@ -1228,7 +1229,7 @@ export async function getCIRankings(
 export async function getCICountryDetail(
   slug: string,
   quarter?: string,
-  methodologyVersion: string = "beta",
+  methodologyVersion: string = CURRENT_CI_METHODOLOGY_VERSION,
 ) {
   const q = quarter ?? (await getLatestAvailableQuarter(methodologyVersion));
 
@@ -1300,7 +1301,7 @@ export async function getCICountryDetail(
 
 export async function getCICountryHistory(
   slug: string,
-  methodologyVersion: string = "beta",
+  methodologyVersion: string = CURRENT_CI_METHODOLOGY_VERSION,
 ) {
   const jurisdiction = await db
     .select({ id: jurisdictions.id })
@@ -1466,14 +1467,14 @@ export async function compareCICountries(slugs: string[], quarter?: string) {
     })
     .from(ciCompositeScores)
     .where(
-      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${"beta"}`
+      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${CURRENT_CI_METHODOLOGY_VERSION}`
     );
 
   const dimensions = await db
     .select()
     .from(ciDimensionScores)
     .where(
-      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${"beta"}`
+      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${CURRENT_CI_METHODOLOGY_VERSION}`
     );
 
   const classificationMap = await buildGovernmentClassificationMap(countries);
@@ -1503,7 +1504,7 @@ export async function getCIByGovernmentTypeDots(quarter?: string) {
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE cs.quarter = ${q}
-      AND cs.methodology_version = ${"beta"}
+      AND cs.methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
       AND j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
     ORDER BY j.government_type, cs.score DESC
@@ -1549,7 +1550,7 @@ export async function getGovTypeTrajectory() {
       cs.score
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
-    WHERE cs.methodology_version = ${"beta"}
+    WHERE cs.methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
       AND j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
     ORDER BY cs.quarter ASC, j.government_type ASC, cs.score DESC
@@ -1647,7 +1648,7 @@ export async function getInternationalMembershipsBySlugs(
 // removal workstream) and any other consumer that needs the latest
 // CI-vintage quarter as a peg.
 export async function getLatestAvailableQuarter(
-  methodologyVersion: string = "beta",
+  methodologyVersion: string = CURRENT_CI_METHODOLOGY_VERSION,
 ): Promise<string> {
   const [row] = await db
     .select({ quarter: ciCompositeScores.quarter })

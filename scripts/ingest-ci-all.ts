@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import { neon } from "@neondatabase/serverless";
 import { canonicalStageChecksum, REQUIRED_CI_ADAPTERS, validateStagedCiRelease, type StagedCiAdapter } from "../src/lib/ci/atomic-ingestion";
 import { sourceFreshnessTransactionQuery } from "../src/lib/db/source-freshness";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "../src/lib/ci/current-release";
 
 const ADAPTERS = [
   { key: "vdem:democratic_quality", name: "V-Dem (democratic_quality)", script: "ingest-ci-vdem.ts" },
@@ -37,7 +38,7 @@ async function main() {
 
   try {
     if (!DRY_RUN) {
-      const [method] = await sql`SELECT id FROM ci_methodology_versions ORDER BY published_at DESC LIMIT 1`;
+      const [method] = await sql`SELECT id FROM ci_methodology_versions WHERE id=${CURRENT_CI_METHODOLOGY_VERSION} LIMIT 1`;
       if (!method?.id) throw new Error("No methodology version found");
       const datasetYear = Number(process.env.CI_DATASET_YEAR ?? 2024);
       const quarter = `${datasetYear}-Q4`;

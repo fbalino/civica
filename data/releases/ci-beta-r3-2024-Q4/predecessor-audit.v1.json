@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "ci-predecessor-reproducibility-audit/v1",
+  "currentReleaseId": "ci-beta-r3-2024-Q4",
+  "auditedAt": "2026-07-11",
+  "predecessors": [
+    {
+      "methodologyVersion": "beta",
+      "status": "not_exactly_reproducible",
+      "finding": "The released calculation used an unseeded random generator, so identical inputs do not guarantee identical scores, intervals, or ranks."
+    },
+    {
+      "methodologyVersion": "beta-r1",
+      "status": "not_exactly_reproducible",
+      "finding": "The seeded calculation still allowed database row order to affect the simulation input order."
+    },
+    {
+      "methodologyVersion": "beta-r2",
+      "status": "superseded_during_audit",
+      "finding": "The audit found that a clean-room implementation must reproduce PostgreSQL real storage and text-protocol round trips before constructing release seeds. Beta-R3 is the first release certified against that complete boundary."
+    }
+  ],
+  "currentResult": {
+    "methodologyVersion": "beta-r3",
+    "dimensionRows": 745,
+    "compositeRows": 190,
+    "dimensionErrors": 0,
+    "compositeErrors": 0,
+    "unexplainedRows": 0,
+    "exactCompositeFields": true
+  }
+}

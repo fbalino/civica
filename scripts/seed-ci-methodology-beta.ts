@@ -16,22 +16,24 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { ciMethodologyVersions } from "../src/lib/db/schema";
 import { V2_WEIGHTS } from "../src/lib/ci/dimensions-v2";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "../src/lib/ci/current-release";
 
 const sqlClient = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sqlClient });
 
 async function main() {
-  console.log("Seeding Beta methodology row...");
+  console.log(`Seeding ${CURRENT_CI_METHODOLOGY_VERSION} methodology row...`);
 
   await db
     .insert(ciMethodologyVersions)
     .values({
-      id: "beta",
-      publishedAt: new Date(),
+      id: CURRENT_CI_METHODOLOGY_VERSION,
+      publishedAt: new Date("2026-07-11T12:02:00.000Z"),
       weights: V2_WEIGHTS,
       notes:
-        "Beta — 4 governance dimensions, fixed-bound normalization, " +
+        "Research beta revision 1 — 4 governance dimensions, fixed-bound normalization, " +
         "Monte Carlo input-variation ranges (10k simulations), neutral numeric presentation, " +
+        "deterministic per-jurisdiction PRNG seeds, " +
         "mandatory-dimension missing-data rules. Weights provisional " +
         "until PCA / factor analysis (Phase 5.3) confirms structure. " +
         "HDI and Stability moved out to Civica Conditions companion layer.",
@@ -41,8 +43,9 @@ async function main() {
       set: {
         weights: V2_WEIGHTS,
         notes:
-          "Beta — 4 governance dimensions, fixed-bound normalization, " +
+          "Research beta revision 1 — 4 governance dimensions, fixed-bound normalization, " +
           "Monte Carlo input-variation ranges (10k simulations), neutral numeric presentation, " +
+          "deterministic per-jurisdiction PRNG seeds, " +
           "mandatory-dimension missing-data rules. Weights provisional " +
           "until PCA / factor analysis (Phase 5.3) confirms structure. " +
           "HDI and Stability moved out to Civica Conditions companion layer.",

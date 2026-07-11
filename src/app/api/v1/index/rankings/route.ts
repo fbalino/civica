@@ -5,6 +5,7 @@ import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
 import { eq, sql, desc, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import {
   shapeIndexRankingsItem,
   shapeIndexRankingsMeta,
@@ -84,7 +85,7 @@ export async function GET(request: Request) {
 
     const limit = Math.min(Math.max(parseInt(limitParam ?? "50", 10) || 50, 1), 250);
     const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
-    const methodologyVersion = url.searchParams.get("methodology") ?? "beta";
+    const methodologyVersion = url.searchParams.get("methodology") ?? CURRENT_CI_METHODOLOGY_VERSION;
 
     // Resolve the target quarter: explicit param or latest available for
     // the requested methodology version.

@@ -1,11 +1,10 @@
 /**
  * Civica Index — Beta calculation orchestrator.
  *
- * Reads raw indicator values from `ci_dimension_scores` (any methodology
+ * Reads raw indicator values from `ci_dimension_scores` for one explicit
  * version), applies the v2 fixed-bound normalization, runs Monte Carlo
  * to derive the central input-variation range, applies the v2 missing-data
- * rules, and writes the result to `ci_composite_scores` under
- * `methodology_version='beta'`.
+ * rules, and writes the result under the pinned current methodology version.
  *
  * The v1 calculation path (scripts/calculate-ci-composite.ts) is preserved for
  * reproducibility. Current Beta scores live alongside those archived rows in
@@ -28,8 +27,9 @@ import { normalizeV2, defaultUncertaintyV2 } from "./normalize-v2";
 import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
 import { CI_BETA_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 import { assertSupersession, frozenContentHash, indexContentHash, parseIndexVintageLabel, stableStringify } from "../data/frozen-vintage";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
 
-export const BETA_VERSION = "beta";
+export const BETA_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
 
 /**
  * Spec §2.7: a partial estimate (mandatory dimensions present, one
@@ -123,13 +123,13 @@ export function adjustedWeights(
  * both call this same function, so the published worked examples can
  * never drift from the scoring code that runs in production.
  *
- * `rng` defaults to `Math.random` (production behavior, unchanged).
- * Tests inject a seeded generator for deterministic assertions.
+ * Callers must provide a seeded generator. An implicit random generator would
+ * make a named release impossible to reproduce.
  */
 export function computeOne(
   rows: DimensionRow[],
   sims: number,
-  rng: () => number = Math.random,
+  rng: () => number,
 ): CompositeResult | null {
   // Reduce to v2 dimensions only — drop human_development and
   // stability_security (those go to Civica Conditions).
@@ -190,9 +190,9 @@ interface RunSummary {
 }
 
 /**
- * Read all dimension rows for a quarter (any methodology version),
- * compute v2 composites, and write to `ci_composite_scores` under
- * methodology_version='beta'. Sets vintage_label for display.
+ * Read one explicit methodology's dimension rows for a quarter, compute v2
+ * composites, and write them under that same version. Sets vintage_label for
+ * display.
  */
 export async function calculateCompositeV2(
   db: Db,
@@ -218,7 +218,7 @@ export async function calculateCompositeV2(
       sourceId: ciDimensionScores.sourceId,
     })
     .from(ciDimensionScores)
-    .where(eq(ciDimensionScores.quarter, quarter));
+    .where(and(eq(ciDimensionScores.quarter, quarter), eq(ciDimensionScores.methodologyVersion, methodologyVersion)));
 
   // Group rows by jurisdiction. The dimension table can have multiple
   // rows for the same (jurisdiction, dimension) under different
@@ -237,10 +237,13 @@ export async function calculateCompositeV2(
   const results: CompositeResult[] = [];
   let insufficient = 0;
   for (const [, dims] of byJurisdiction) {
+    const orderedDims = [...dims.values()].sort((a, b) =>
+      `${a.dimension}:${a.sourceId}`.localeCompare(`${b.dimension}:${b.sourceId}`),
+    );
     const result = computeOne(
-      [...dims.values()],
+      orderedDims,
       sims,
-      seededRng(`${vintageLabel ?? "live"}|${quarter}|${[...dims.values()][0]?.jurisdictionId}|${[...dims.keys()].sort().join("|")}|${[...dims.values()].map((row) => `${row.sourceId}:${row.rawValue}`).sort().join("|")}`),
+      seededRng(`${vintageLabel ?? "live"}|${quarter}|${orderedDims[0]?.jurisdictionId}|${orderedDims.map((row) => row.dimension).join("|")}|${orderedDims.map((row) => `${row.sourceId}:${row.rawValue}`).sort().join("|")}`),
     );
     if (!result) {
       insufficient++;
@@ -279,8 +282,12 @@ export async function calculateCompositeV2(
       derivationVersions: ciCompositeScores.derivationVersions,
     })
     .from(ciCompositeScores)
+    .where(and(eq(ciCompositeScores.quarter, quarter), eq(ciCompositeScores.methodologyVersion, methodologyVersion))) : [];
+  const priorReleaseRows = vintageLabel ? await db
+    .select({ vintageLabel: ciCompositeScores.vintageLabel })
+    .from(ciCompositeScores)
     .where(eq(ciCompositeScores.quarter, quarter)) : [];
-  const priorLabels = existingRows
+  const priorLabels = priorReleaseRows
     .map((row) => row.vintageLabel)
     .filter((label): label is string => Boolean(label && label !== vintageLabel));
   if (vintageLabel) {
@@ -330,7 +337,10 @@ export async function calculateCompositeV2(
         Object.keys(comparable).map((key) => [key, existing[key as keyof typeof existing] ?? null]),
       );
       if (stableStringify(stored) !== stableStringify(comparable)) {
-        throw new Error(`Frozen Civica Index conflict for ${vintageLabel}; publish a new superseding version instead.`);
+        const differingFields = Object.keys(comparable).filter(
+          (key) => stableStringify(stored[key]) !== stableStringify(comparable[key as keyof typeof comparable]),
+        );
+        throw new Error(`Frozen Civica Index conflict for ${vintageLabel}/${r.jurisdictionId} in ${differingFields.join(", ")}; publish a new superseding version instead.`);
       }
       unchanged += 1;
       continue;

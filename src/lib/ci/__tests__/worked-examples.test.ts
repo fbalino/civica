@@ -35,6 +35,7 @@ import {
   BETA_VERSION,
   type DimensionRow,
 } from "../calculate-v2";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "../current-release";
 import { simulateComposite } from "../monte-carlo";
 import { civicaIndex } from "@/lib/content/site-state";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
@@ -145,7 +146,7 @@ test("§4 weights: V2_WEIGHTS sums to 1.00 and matches published site-state dime
 });
 
 test("§14 beta/release presentation: methodology-version constant and beta status are coherent", () => {
-  assert.equal(BETA_VERSION, "beta");
+  assert.equal(BETA_VERSION, CURRENT_CI_METHODOLOGY_VERSION);
   assert.equal(civicaIndex.status, "beta");
   assert.equal(CI_METHODOLOGY_META.status, civicaIndex.status);
   assert.equal(CI_METHODOLOGY_META.presentation.format, "numeric_position");

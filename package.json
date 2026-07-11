@@ -33,6 +33,8 @@
     "reparse:constitutions": "tsx scripts/reparse-constitutions.ts",
     "ingest:ci": "tsx scripts/ingest-ci-all.ts",
     "audit:ci-production-adapters": "tsx scripts/audit-ci-production-adapters.ts",
+    "reproduce:ci-current": "tsx scripts/reproduce-current-index.ts",
+    "validate:ci-current-release": "tsx scripts/validate-ci-current-release.ts",
     "generate:source-input-manifest": "tsx scripts/generate-source-input-manifest.ts",
     "generate:fact-coverage": "tsx scripts/generate-fact-coverage-report.ts",
     "generate:source-coverage": "tsx scripts/generate-domain-coverage.ts",

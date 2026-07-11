@@ -366,7 +366,7 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta",
+    methodologyVersion: "beta-r3",
     dimensions: [
       {
         dimension: "democratic_quality",
@@ -501,7 +501,7 @@ const indexCompareResultA = shapeIndexCompareResult({
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta",
+    methodologyVersion: "beta-r3",
   },
   dimensions: [
     {
@@ -552,7 +552,7 @@ const indexCompareResultB = shapeIndexCompareResult({
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta",
+    methodologyVersion: "beta-r3",
   },
   dimensions: [
     {
@@ -658,7 +658,7 @@ const indexRankingsExampleResponse = zIndexRankingsResponse.strict().parse({
       isPartial: false,
       missingDimensions: [],
       dimensionsAvailable: 4,
-      methodologyVersion: "beta",
+      methodologyVersion: "beta-r3",
       slug: "norway",
       name: "Norway",
       iso2: "NO",

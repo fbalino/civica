@@ -26,6 +26,7 @@ import {
   countryMetrics,
   jurisdictions,
 } from "@/lib/db/schema";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 
 export interface ScoreRow {
   /** Stable id used as React key + automation hook. */
@@ -96,7 +97,7 @@ function trendBucket(delta: number | null): "up" | "down" | "flat" | null {
 
 // ---- Civica Index ----------------------------------------------------------
 
-const CI_METHODOLOGY_VERSION = "beta";
+const CI_METHODOLOGY_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
 
 async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
   // Pin the methodology version (beta) — 47 jurisdictions carry both v1.0

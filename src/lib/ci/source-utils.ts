@@ -226,6 +226,13 @@ export async function buildIso3ByCountryName(db: Db): Promise<Map<string, string
     .from(jurisdictions)
     .where(dsql`${jurisdictions.iso3} IS NOT NULL`);
 
+  return buildIso3ByCountryNameRows(rows);
+}
+
+export function buildIso3ByCountryNameRows(
+  rows: readonly { name: string; iso3: string | null }[],
+): Map<string, string> {
+
   const map = new Map<string, string>();
   for (const row of rows) {
     if (row.iso3) map.set(normalizeCountryName(row.name), row.iso3);

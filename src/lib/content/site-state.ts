@@ -63,6 +63,7 @@ export const currentVintage =
 // ─────────────────────────────────────────────────────────────────────
 
 import { getPcaAnalysisSummary as PCA_ANALYSIS_SUMMARY_FN } from "@/lib/ci/pca-analysis";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 /** Computed once at module load — pure, DB-free, no clock. See
  *  `civicaIndex.pca` below. */
 const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
@@ -74,9 +75,10 @@ const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
  *  dimensions with PCA-derived weights 27/26/23/24. Verified
  *  2026-05-05 against `src/lib/ci/dimensions-v2.ts`,
  *  `src/app/(reader)/civica-index/[slug]/page.tsx`, and
- *  `getCIRankings()` defaulting to `methodologyVersion: "beta"`. */
+ *  `getCIRankings()` defaulting to the pinned current release version. */
 export const civicaIndex = {
   status: "beta" as const,
+  methodologyVersion: CURRENT_CI_METHODOLOGY_VERSION,
   scaleMin: 0,
   scaleMax: 100,
 
