@@ -13,4 +13,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "113c545226364b362f78480f3a9a83cee52605e39b37eeb3e27ae651d520e4d0",
     baseline: false,
   },
+  {
+    id: "0002_quarantine_numeric_outliers",
+    path: "drizzle/authoritative/0002_quarantine_numeric_outliers.sql",
+    sha256: "76cca42a16ab01d41889922b72b15b7cd84e966145871b4a17a6070dd3b4c776",
+    baseline: false,
+  },
 ] as const;

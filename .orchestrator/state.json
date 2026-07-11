@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-029_numeric_validation_quarantine"
+    "current_task": "DAT-030_atomic_ingestion_orchestration"
   },
   "budget": {
     "mode": "subscription_only",
@@ -638,6 +638,8 @@
     "plan/evidence/DAT-027/live-france-export-audit.json",
     "plan/evidence/DAT-028/README.md",
     "plan/evidence/DAT-028/live-statement-audit.json",
+    "plan/evidence/DAT-029/README.md",
+    "plan/evidence/DAT-029/live-numeric-audit.json",
     "drizzle/authoritative/0000_authoritative_baseline.sql",
     "data/authoritative-schema-fingerprint.v1.json",
     "drizzle/migrations/0026_temporal_metadata.sql",
@@ -663,11 +665,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "Every provenance, migration, data, claims/documentation, TypeScript, and production-build gate passed for DAT-028.",
-    "tests": "636/636 tests passed. All 6,768 live statement subjects resolve, duplicate identity groups are zero, and fresh-database orphan/duplicate probes fail closed. Master plan is 47/288 complete (16.3%).",
-    "public_claims": "Statement-level provenance now uses a closed typed subject registry and source-specific identities across all seven producers.",
-    "browser": "No reader-facing UI changed in DAT-028; API and browser behavior from DAT-027 remains unchanged.",
-    "visual_review": "No UI, design-system CSS, or component styling changed in DAT-028."
+    "build": "Every numeric, quality, migration, data, claims/documentation, TypeScript, and production-build gate passed for DAT-029.",
+    "tests": "641/641 tests passed. All five globally small edge fixtures remain active, North Korea's corrupt numeric candidate is retained as rejected evidence, and all nine release-quality families pass. Master plan is 48/288 complete (16.7%).",
+    "public_claims": "The live release-quality report now passes every invariant family with zero active numeric-envelope violations.",
+    "browser": "No reader-facing UI changed in DAT-029; canonical resolution now excludes the rejected North Korea numeric candidate.",
+    "visual_review": "No UI, design-system CSS, or component styling changed in DAT-029."
   },
-  "updated_at": "2026-07-11T07:00:00Z"
+  "updated_at": "2026-07-11T08:00:00Z"
 }

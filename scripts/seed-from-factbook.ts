@@ -14,6 +14,7 @@ import { classifyJurisdictionStatus } from "../src/lib/jurisdictions/status-taxo
 import countryGalleries from "../src/lib/data/country-galleries.generated.json";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
 import { writeAtlasCountry, type AtlasSectionInput } from "../src/lib/factbook/atlas-seed-writer";
+import { parseFactbookNumeric } from "../src/lib/factbook/numeric-validation";
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sql });
@@ -94,47 +95,6 @@ function normalizeKey(key: string): string {
     .toLowerCase()
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_]/g, "");
-}
-
-function parseNumeric(text: string | null | undefined): { value: number | null; unit: string; year: number | null; note: string } {
-  if (!text) return { value: null, unit: "", year: null, note: "" };
-
-  let note = "";
-  const yearMatch = text.match(/\((\d{4})\s*(?:est\.?|census)?\)/);
-  const year = yearMatch ? parseInt(yearMatch[1]) : null;
-  if (yearMatch) note = yearMatch[0];
-
-  let cleaned = text.replace(/\(.*?\)/g, "").trim();
-  let unit = "";
-
-  if (cleaned.startsWith("$")) {
-    unit = "$";
-    cleaned = cleaned.slice(1).trim();
-  }
-
-  if (cleaned.endsWith("%")) {
-    unit = "%";
-    cleaned = cleaned.replace(/%$/, "").trim();
-  }
-
-  cleaned = cleaned.replace(/,/g, "");
-
-  let multiplier = 1;
-  if (/trillion/i.test(cleaned)) {
-    multiplier = 1e12;
-    cleaned = cleaned.replace(/\s*trillion/i, "");
-  } else if (/billion/i.test(cleaned)) {
-    multiplier = 1e9;
-    cleaned = cleaned.replace(/\s*billion/i, "");
-  } else if (/million/i.test(cleaned)) {
-    multiplier = 1e6;
-    cleaned = cleaned.replace(/\s*million/i, "");
-  }
-
-  const numMatch = cleaned.match(/-?[\d.]+/);
-  const value = numMatch ? parseFloat(numMatch[0]) * multiplier : null;
-
-  return { value, unit, year, note };
 }
 
 function decodeHtmlEntities(str: string): string {
@@ -244,7 +204,7 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
   ) {
     const text = extractText(raw);
     if (!text) return;
-    const parsed = parseNumeric(text);
+    const parsed = parseFactbookNumeric(text, overrideUnit);
     // CIA's "(YYYY est.)" stamp on the five demographic keys is a
     // projection year one ahead of the underlying measurement vintage.
     // Record the real measurement year so the resolver's freshness
@@ -446,10 +406,10 @@ function extractProfileFields(data: Record<string, unknown>) {
   const capital = extractText(getNestedValue(gov ?? {}, "Capital", "name"));
 
   const popText = extractText(getNestedValue(people ?? {}, "Population", "total"));
-  const popParsed = parseNumeric(popText);
+  const popParsed = parseFactbookNumeric(popText, "people");
 
   const areaText = extractText(getNestedValue(geo ?? {}, "Area", "total"));
-  const areaParsed = parseNumeric(areaText);
+  const areaParsed = parseFactbookNumeric(areaText, "sq km");
 
   const gdpText = (() => {
     const gdpPPP = getNestedValue(econ ?? {}, "Real GDP (purchasing power parity)");
@@ -459,7 +419,7 @@ function extractProfileFields(data: Record<string, unknown>) {
     }
     return null;
   })();
-  const gdpParsed = parseNumeric(gdpText);
+  const gdpParsed = parseFactbookNumeric(gdpText, "$ ");
   const gdpBillions = gdpParsed.value ? gdpParsed.value / 1e9 : null;
 
   // Same wrapped-then-flat shape-awareness as extractFacts() above.

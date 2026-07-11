@@ -492,3 +492,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - The repair remains auditable through 5,365 update and 1,123 delete history
   rows. 636/636 tests, fresh/live migration proof, and the build pass.
   DAT-029 is next.
+
+## 2026-07-11 — DAT-029 numeric quarantine completed
+
+- Replaced the CIA prose parser that combined the year 2010 with a later
+  “billion” scale; ambiguous ranges and multi-value percentages fail closed.
+- The writer now persists invalid numeric candidates as rejected evidence.
+  Migration `0002` quarantined the North Korea row and retained its source,
+  prose, and pre-change audit state without inventing an alternate value.
+- Five microstate/territory edge fixtures stay active; the live quality report
+  is green across all nine families. 641/641 tests and build pass. DAT-030 next.

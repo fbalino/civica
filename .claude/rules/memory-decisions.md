@@ -819,3 +819,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   composition statements attach to their government body.
 - Statement uniqueness includes source ID, and both application producers and
   database enforcement use the same identity. Durable record: APR-D061.
+
+## 2026-07-11 — Numeric rejection retains evidence
+
+- Fact-key-specific envelopes must preserve valid microstate and territory
+  values; never repair a parser bug by raising a universal minimum.
+- Ambiguous or out-of-envelope numeric candidates persist as rejected rows
+  with reasons and source evidence, but cannot enter canonical resolution.
+- Scale words can modify only their attached quantity; ranged or multi-value
+  percentage prose fails closed. Durable record: APR-D062.

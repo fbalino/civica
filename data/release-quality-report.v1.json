@@ -1,7 +1,7 @@
 {
   "schemaVersion": "release-data-quality/v1",
-  "generatedAt": "2026-07-11T05:32:22.591Z",
-  "status": "fail",
+  "generatedAt": "2026-07-11T05:49:51.795Z",
+  "status": "pass",
   "policy": {
     "sourceMaxAgeDays": 180,
     "minimumVintageYear": 1500,
@@ -31,8 +31,8 @@
     },
     {
       "category": "impossible_range",
-      "status": "fail",
-      "issueCount": 1
+      "status": "pass",
+      "issueCount": 0
     },
     {
       "category": "unit_vintage_consistency",
@@ -65,16 +65,5 @@
       "issueCount": 0
     }
   ],
-  "issues": [
-    {
-      "checkId": "fact.plausibility_envelope",
-      "category": "impossible_range",
-      "severity": "error",
-      "entity": "f853cbae-795b-4426-b2e2-fa2c002ccc3d",
-      "detail": "military_expenditure_pct_gdp value 2010000000000 is outside its registered plausibility envelope.",
-      "observed": 2010000000000,
-      "expected": "0..100",
-      "remediation": "Reject or correct country_facts row f853cbae-795b-4426-b2e2-fa2c002ccc3d; do not widen the envelope without methodology review."
-    }
-  ]
+  "issues": []
 }

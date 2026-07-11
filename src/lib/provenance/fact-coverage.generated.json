@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fact-provenance-coverage/v1",
-  "generatedAt": "2026-07-11T05:31:41.563Z",
+  "generatedAt": "2026-07-11T05:49:54.987Z",
   "staleness": {
     "liveRowThresholdDays": 180,
     "frozenSourcesExcluded": true,
@@ -16,10 +16,10 @@
     "limitation": "The checked lineage registry covers every active source/fact relationship. New or unmapped relationships remain visible but cannot add an independent family until reviewed."
   },
   "facts": {
-    "activeRows": 25824,
-    "total": 17516,
-    "sourceLinked": 17516,
-    "oneSource": 13201,
+    "activeRows": 25823,
+    "total": 17515,
+    "sourceLinked": 17515,
+    "oneSource": 13200,
     "twoPlusIndependentSources": 458,
     "unresolvedDisputes": 0,
     "staleRows": 0,
@@ -1693,9 +1693,9 @@
     {
       "id": "north-korea",
       "label": "North Korea",
-      "facts": 62,
-      "sourceLinkedFacts": 62,
-      "oneSourceFacts": 51,
+      "facts": 61,
+      "sourceLinkedFacts": 61,
+      "oneSourceFacts": 50,
       "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
@@ -3225,9 +3225,9 @@
     {
       "id": "military_expenditure_pct_gdp",
       "label": "military_expenditure_pct_gdp",
-      "facts": 172,
-      "sourceLinkedFacts": 172,
-      "oneSourceFacts": 19,
+      "facts": 171,
+      "sourceLinkedFacts": 171,
+      "oneSourceFacts": 18,
       "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0

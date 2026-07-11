@@ -15,6 +15,13 @@
       "when": 1783747696005,
       "tag": "0001_aspiring_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783750800000,
+      "tag": "0002_quarantine_numeric_outliers",
+      "breakpoints": true
     }
   ]
 }

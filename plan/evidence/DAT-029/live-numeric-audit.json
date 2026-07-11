@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "numeric-quarantine-audit/v1",
+  "task": "DAT-029",
+  "auditedAt": "2026-07-11",
+  "activeEnvelopeViolations": 0,
+  "northKorea": {
+    "factKey": "military_expenditure_pct_gdp",
+    "rejectedRows": 1,
+    "originalNumericValue": 2010000000000,
+    "sourceEvidenceRetained": true,
+    "priorStateRetainedInHistory": true,
+    "activeFallbackRows": 0
+  },
+  "smallValueFixtures": {
+    "pitcairnPopulation": 50,
+    "cocosPopulation": 593,
+    "vaticanAreaKm2": 0.44,
+    "niuePopulation": 1815,
+    "tokelauGdpUsdBillions": 0.007711583,
+    "activeCount": 5
+  },
+  "releaseQuality": { "status": "pass", "familiesPassed": 9, "familiesTotal": 9 },
+  "activeFactGroups": 17515,
+  "sourceLinkedFactGroups": 17515,
+  "migration": {
+    "id": "0002_quarantine_numeric_outliers",
+    "sha256": "76cca42a16ab01d41889922b72b15b7cd84e966145871b4a17a6070dd3b4c776",
+    "ledgerApplied": 3,
+    "ledgerExpected": 3,
+    "pendingAfterRerun": 0,
+    "schemaFingerprint": "647e8ed0a2d95e59e46ea7a53b5c8ac56acc6b078b1053fa19ac69dbde945e54"
+  },
+  "testsPassed": 641,
+  "buildPassed": true
+}
