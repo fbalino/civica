@@ -98,7 +98,9 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/app/api/v1/index/compare/route.ts", category: "presentation" },
   { path: "src/app/api/v1/index/methodology/route.ts", category: "presentation" },
   { path: "src/app/api/v1/index/rankings/route.ts", category: "presentation" },
+  { path: "src/lib/pulse/v2/runtime-contract.ts", category: "presentation" },
   { path: "content/methodology-civica-index.md", category: "presentation" },
+  { path: "content/methodology-pulse.md", category: "presentation" },
   { path: "content/methodology-pca-appendix.md", category: "presentation" },
   { path: "content/data-approach.md", category: "presentation" },
 ] as const;

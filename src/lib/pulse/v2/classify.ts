@@ -72,7 +72,11 @@ import {
   parseClassify,
   parseVerify,
 } from "./classifier-prompt";
-import { resolveSubjectJurisdiction } from "./country-attribution";
+import {
+  resolveSubjectJurisdiction,
+  SUBJECT_ATTRIBUTION_MODEL,
+  SUBJECT_ATTRIBUTION_PROVIDER,
+} from "./country-attribution";
 // Provider abstraction — the engine (Anthropic / DeepSeek / GLM / OpenAI) is
 // env-driven. The published two-pass classify→verify methodology is
 // unchanged; only which model(s) run the classify pass moves here.
@@ -100,6 +104,14 @@ import {
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
+import { PULSE_RUNTIME_METHOD_VERSION } from "./runtime-contract";
+import {
+  reviewsFromVerifier,
+  type PulseDecisionActor,
+  type PulseDecisionInput,
+  type PulseDecisionPayloads,
+} from "./decision-ledger";
+import { persistPulseDecisions } from "./decision-ledger-store";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -271,6 +283,9 @@ export async function classifyClusters(
     try {
       const result = await classify(cluster);
       if (!result) {
+        if (!opts.dryRun) {
+          await persistClassificationFailureDecision(db, cluster, run.id);
+        }
         summary.failed++;
         continue;
       }
@@ -287,6 +302,7 @@ export async function classifyClusters(
             },
             run.id,
           );
+          await persistNonEventDecision(db, cluster, run.id);
         }
         continue;
       }
@@ -302,6 +318,7 @@ export async function classifyClusters(
         ok.classified.headline,
         ok.classified.description,
       );
+      ok.subjectAttribution = subject;
       if (subject) ok.classified.jurisdictionId = subject.jurisdictionId;
       summary.planned.push({
         clusterId: cluster.clusterId,
@@ -351,6 +368,8 @@ export async function classifyClusters(
 export interface ClassifyOneResult {
   classified: ClassifiedEvent;
   autoPublished: boolean;
+  verification: VerifyResultLite | null;
+  subjectAttribution?: Awaited<ReturnType<typeof resolveSubjectJurisdiction>>;
 }
 
 async function classifyOne(
@@ -461,6 +480,7 @@ async function classifyOneSingle(
   return {
     classified,
     autoPublished: !requiresReview,
+    verification: verify,
   };
 }
 
@@ -677,7 +697,11 @@ function buildEnsembleResult(
     verifySkipped: opts.verifySkipped,
   });
 
-  return { classified, autoPublished: !requiresReview };
+  return {
+    classified,
+    autoPublished: !requiresReview,
+    verification: verify,
+  };
 }
 
 /** The subset of EnsembleConsensus that buildEnsembleResult consumes (after
@@ -896,6 +920,297 @@ export function selectProvisionalJurisdiction(
   return selected;
 }
 
+function classifierActorFromRuns(
+  runs: readonly ClassifierRun[],
+): PulseDecisionActor {
+  const classifiers = runs.filter((run) => {
+    try {
+      return (JSON.parse(run.raw) as { pass?: string }).pass === "classify";
+    } catch {
+      return run.run !== VERIFY_RUN_ORDINAL;
+    }
+  });
+  const providers = [
+    ...new Set(classifiers.map((run) => run.provider).filter(Boolean)),
+  ];
+  const models = [
+    ...new Set(classifiers.map((run) => run.model).filter(Boolean)),
+  ];
+  return {
+    type: "classifier",
+    provider: providers.length === 1 ? String(providers[0]) : "multi_provider",
+    model: models.length ? models.join(",") : null,
+    reviewerId: null,
+  };
+}
+
+function payloadForDecisionKind(
+  kind:
+    "event_existence" | "subject_attribution" | "category_labels" | "severity",
+  result: ClassifyOneResult,
+): PulseDecisionPayloads[typeof kind] {
+  if (kind === "event_existence") return { disposition: "event" };
+  if (kind === "subject_attribution") {
+    const subject = result.subjectAttribution;
+    return subject
+      ? {
+          status: "single",
+          primaryJurisdictionId: subject.jurisdictionId,
+          affectedJurisdictionIds: [subject.jurisdictionId],
+        }
+      : {
+          status: "unresolved",
+          primaryJurisdictionId: null,
+          affectedJurisdictionIds: [],
+        };
+  }
+  if (kind === "category_labels") {
+    return {
+      categoryIds: [result.classified.category],
+      dimensionIds: [result.classified.dimension],
+    };
+  }
+  return {
+    tier: result.classified.severityTier,
+    value: result.classified.severityValue,
+    direction:
+      result.classified.severityValue > 0
+        ? "positive"
+        : result.classified.severityValue < 0
+          ? "negative"
+          : "neutral",
+  };
+}
+
+export function classificationDecisionInputs(input: {
+  cluster: ClusterToClassify;
+  eventId: string;
+  result: ClassifyOneResult;
+  runId: string;
+  decidedAt: string;
+}): PulseDecisionInput[] {
+  const { cluster, eventId, result, runId, decidedAt } = input;
+  const evidenceRefs = cluster.rawEventIds.map((id) => `raw-event:${id}`);
+  const classifierActor = classifierActorFromRuns(
+    result.classified.classifierRuns,
+  );
+  const classifierBase = {
+    clusterId: cluster.clusterId,
+    eventId,
+    actor: classifierActor,
+    stageRunId: runId,
+    methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+    evidenceRefs,
+    decidedAt,
+  };
+  const decisions: PulseDecisionInput[] = [
+    {
+      ...classifierBase,
+      kind: "event_existence",
+      verdict: "affirmed",
+      payload: payloadForDecisionKind("event_existence", result),
+      rationale:
+        "Classifier panel admitted the cluster as a discrete governance event.",
+    },
+    {
+      ...classifierBase,
+      kind: "category_labels",
+      verdict: "affirmed",
+      payload: payloadForDecisionKind("category_labels", result),
+      rationale: `Classifier panel selected ${result.classified.category} in ${result.classified.dimension}.`,
+    },
+    {
+      ...classifierBase,
+      kind: "severity",
+      verdict: "affirmed",
+      payload: payloadForDecisionKind("severity", result),
+      rationale: `Classifier panel selected ${result.classified.severityTier} at ${result.classified.severityValue}.`,
+    },
+    {
+      clusterId: cluster.clusterId,
+      eventId,
+      kind: "calibration",
+      verdict: "unresolved",
+      payload: {
+        standing: "not_calibrated",
+        signals: [
+          "classifier_self_confidence",
+          "classifier_agreement",
+          ...(result.verification ? ["verifier_confidence"] : []),
+          ...(result.subjectAttribution
+            ? ["subject_attributor_confidence"]
+            : []),
+        ],
+        targetDecisionKinds: [
+          "event_existence",
+          "subject_attribution",
+          "category_labels",
+          "severity",
+          "publication",
+        ],
+        validationReleaseId: null,
+      },
+      actor: {
+        type: "calibration_assessor",
+        provider: null,
+        model: null,
+        reviewerId: null,
+      },
+      stageRunId: runId,
+      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+      rationale:
+        "Available model confidence and agreement signals have not been calibrated against a representative labeled release.",
+      evidenceRefs,
+      decidedAt,
+    },
+    {
+      clusterId: cluster.clusterId,
+      eventId,
+      kind: "subject_attribution",
+      verdict: result.subjectAttribution ? "affirmed" : "unresolved",
+      payload: payloadForDecisionKind("subject_attribution", result),
+      actor: {
+        type: "subject_attributor",
+        provider: SUBJECT_ATTRIBUTION_PROVIDER,
+        model: SUBJECT_ATTRIBUTION_MODEL,
+        reviewerId: null,
+      },
+      stageRunId: runId,
+      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+      rationale:
+        result.subjectAttribution?.verdict.reasoning ??
+        "Subject-country pass did not resolve a supported single jurisdiction; the provisional projection was retained.",
+      evidenceRefs,
+      decidedAt,
+    },
+    {
+      clusterId: cluster.clusterId,
+      eventId,
+      kind: "publication",
+      verdict: "affirmed",
+      payload: {
+        eligible: result.autoPublished,
+        origin: result.autoPublished ? "auto" : "queued",
+        gateReasons: [
+          result.autoPublished
+            ? "automatic_gate_passed"
+            : "human_review_required",
+        ],
+      },
+      actor: {
+        type: "publication_gate",
+        provider: null,
+        model: null,
+        reviewerId: null,
+      },
+      stageRunId: runId,
+      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+      rationale: result.autoPublished
+        ? "The versioned publication gate admitted the event automatically."
+        : "The versioned publication gate routed the event to human review.",
+      evidenceRefs,
+      decidedAt,
+    },
+  ];
+
+  if (result.verification) {
+    const verifierActor: PulseDecisionActor = {
+      type: "verifier",
+      provider: VERIFY_CONFIG.provider,
+      model: VERIFY_CONFIG.model,
+      reviewerId: null,
+    };
+    for (const review of reviewsFromVerifier(result.verification)) {
+      decisions.push({
+        clusterId: cluster.clusterId,
+        eventId,
+        kind: review.kind,
+        verdict: review.verdict,
+        payload: payloadForDecisionKind(review.kind, result),
+        actor: verifierActor,
+        stageRunId: runId,
+        methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+        rationale: review.rationale,
+        evidenceRefs,
+        decidedAt,
+      });
+    }
+  }
+  return decisions;
+}
+
+export async function persistNonEventDecision(
+  db: Db,
+  cluster: ClusterToClassify,
+  runId: string,
+  override: {
+    actor?: PulseDecisionActor;
+    rationale?: string;
+    decidedAt?: string;
+  } = {},
+): Promise<void> {
+  await persistPulseDecisions(db, [
+    {
+      clusterId: cluster.clusterId,
+      eventId: null,
+      kind: "event_existence",
+      verdict: "refuted",
+      payload: { disposition: "non_event" },
+      actor:
+        override.actor ??
+        ({
+          type: "classifier",
+          provider: IS_ENSEMBLE ? "multi_provider" : CLASSIFY_CONFIG.provider,
+          model: CLASSIFY_ENSEMBLE.map(({ model }) => model).join(","),
+          reviewerId: null,
+        } satisfies PulseDecisionActor),
+      stageRunId: runId,
+      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+      rationale:
+        override.rationale ??
+        "Classifier panel found no qualifying governance event.",
+      evidenceRefs: cluster.rawEventIds.map((id) => `raw-event:${id}`),
+      decidedAt: override.decidedAt ?? new Date().toISOString(),
+    },
+  ]);
+}
+
+export async function persistClassificationFailureDecision(
+  db: Db,
+  cluster: ClusterToClassify,
+  runId: string,
+  override: {
+    actor?: PulseDecisionActor;
+    rationale?: string;
+    decidedAt?: string;
+  } = {},
+): Promise<void> {
+  await persistPulseDecisions(db, [
+    {
+      clusterId: cluster.clusterId,
+      eventId: null,
+      kind: "event_existence",
+      verdict: "unresolved",
+      payload: { disposition: "insufficient_evidence" },
+      actor:
+        override.actor ??
+        ({
+          type: "classifier",
+          provider: IS_ENSEMBLE ? "multi_provider" : CLASSIFY_CONFIG.provider,
+          model: CLASSIFY_ENSEMBLE.map(({ model }) => model).join(","),
+          reviewerId: null,
+        } satisfies PulseDecisionActor),
+      stageRunId: runId,
+      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+      rationale:
+        override.rationale ??
+        "No usable classifier result was produced; event existence remains unresolved.",
+      evidenceRefs: cluster.rawEventIds.map((id) => `raw-event:${id}`),
+      decidedAt: override.decidedAt ?? new Date().toISOString(),
+    },
+  ]);
+}
+
 export async function writeEvent(
   db: Db,
   cluster: ClusterToClassify,
@@ -948,6 +1263,17 @@ export async function writeEvent(
     eventId = existing[0]?.id;
   }
   if (!eventId) return;
+
+  await persistPulseDecisions(
+    db,
+    classificationDecisionInputs({
+      cluster,
+      eventId,
+      result,
+      runId: classificationRunId,
+      decidedAt: new Date().toISOString(),
+    }),
+  );
 
   // Insert pulse_sources rows for every contributing raw_event
   for (const attr of cluster.attributions) {

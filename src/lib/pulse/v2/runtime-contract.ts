@@ -61,9 +61,14 @@ import {
   PULSE_INFORMATION_ENVIRONMENT_VERSION,
   RSF_2026_CANDIDATE_RELEASE,
 } from "./press-freedom";
+import {
+  PULSE_DECISION_KINDS,
+  PULSE_DECISION_LEDGER_VERSION,
+  type PulseDecisionKind,
+} from "./decision-ledger";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.5.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.6-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.6.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.7-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -155,6 +160,22 @@ export interface PulseRuntimeMethodContract {
     eventTrace: "pulse_sources_to_raw_events";
     publicPayloadDistribution: "blocked";
     rightsRule: string;
+    legacyRule: string;
+  };
+  decisionLedger: {
+    schemaVersion: typeof PULSE_DECISION_LEDGER_VERSION;
+    storage: "append_only";
+    decisionKinds: PulseDecisionKind[];
+    currentEventRowRole: "current_state_projection_not_decision_history";
+    verifierAxes: [
+      "event_existence",
+      "subject_attribution",
+      "category_labels",
+      "severity",
+    ];
+    genericConfidenceField: "prohibited";
+    corroborationStanding: "heuristic_weight_not_probability";
+    supersessionRule: "same_axis_only_other_axes_unchanged";
     legacyRule: string;
   };
   providers: {
@@ -482,6 +503,23 @@ export function buildPulseRuntimeMethod(
         "Free access, indexing, or citation never grants public redistribution of the retained publisher payload; a separate verified rights decision is required.",
       legacyRule:
         "Retained rows preserve their exact stored payload and ingest-time metadata under an explicit legacy hash/attribution method rather than receiving invented current provenance.",
+    },
+    decisionLedger: {
+      schemaVersion: PULSE_DECISION_LEDGER_VERSION,
+      storage: "append_only",
+      decisionKinds: [...PULSE_DECISION_KINDS],
+      currentEventRowRole: "current_state_projection_not_decision_history",
+      verifierAxes: [
+        "event_existence",
+        "subject_attribution",
+        "category_labels",
+        "severity",
+      ],
+      genericConfidenceField: "prohibited",
+      corroborationStanding: "heuristic_weight_not_probability",
+      supersessionRule: "same_axis_only_other_axes_unchanged",
+      legacyRule:
+        "Retained event fields are captured as legacy_projection decisions; an unresolved verdict marks any axis whose original independent judgment cannot be reconstructed.",
     },
     providers: {
       classify: {

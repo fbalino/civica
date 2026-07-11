@@ -48,6 +48,8 @@ import {
   PULSE_SOURCE_INDEPENDENCE_VERSION,
   type SourceEvidenceReport,
 } from "./source-independence";
+import { persistPulseDecisions } from "./decision-ledger-store";
+import { PULSE_RUNTIME_METHOD_VERSION } from "./runtime-contract";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -63,6 +65,7 @@ export interface CorroborateSummary {
 
 export interface EventRow {
   id: string;
+  clusterId: string;
   jurisdictionId: string;
   iso3: string | null;
   severityTier: SeverityTier;
@@ -81,6 +84,7 @@ export interface SourceCounts {
 
 export interface CorroborationPlan {
   eventId: string;
+  clusterId: string;
   confidence: number;
   informationEnvironmentContext: PulseInformationEnvironmentContext;
   corroborationRunId: string;
@@ -173,6 +177,7 @@ export async function corroborateEvents(
     totalConfidence += confidence;
     const plan = {
       eventId: event.id,
+      clusterId: event.clusterId,
       confidence,
       informationEnvironmentContext: informationContext,
       corroborationRunId: run.id,
@@ -250,6 +255,38 @@ async function writeCorroboration(
       corroborationRunId: plan.corroborationRunId,
     })
     .where(eq(pulseEventsV2.id, plan.eventId));
+  await persistPulseDecisions(db, [
+    {
+      clusterId: plan.clusterId,
+      eventId: plan.eventId,
+      kind: "corroboration",
+      verdict: "affirmed",
+      payload: {
+        independentEvidenceGroups: plan.independentEvidenceGroups,
+        contributingReports: plan.contributingReports,
+        confidenceWeight: plan.confidence,
+        calibrationStanding: "heuristic_not_probability",
+      },
+      actor: {
+        type: "corroborator",
+        provider: null,
+        model: null,
+        reviewerId: null,
+      },
+      stageRunId: plan.corroborationRunId,
+      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+      rationale:
+        "Versioned source-independence rules produced a heuristic corroboration weight; it is not a calibrated probability.",
+      evidenceRefs: [
+        `event:${plan.eventId}`,
+        `source-independence:${plan.sourceIndependenceVersion}`,
+        ...(plan.informationEnvironmentContext.sourceUrl
+          ? [plan.informationEnvironmentContext.sourceUrl]
+          : []),
+      ],
+      decidedAt: now.toISOString(),
+    },
+  ]);
 }
 
 function baselineConfidence(
@@ -281,6 +318,7 @@ async function loadEvents(
   const result = await db.execute(sql`
     SELECT
       p.id,
+      p.cluster_id,
       p.jurisdiction_id,
       j.iso3,
       p.severity_tier,
@@ -295,6 +333,7 @@ async function loadEvents(
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>).map((r) => ({
     id: String(r.id),
+    clusterId: String(r.cluster_id),
     jurisdictionId: String(r.jurisdiction_id),
     iso3: r.iso3 ? String(r.iso3) : null,
     severityTier: r.severity_tier as SeverityTier,

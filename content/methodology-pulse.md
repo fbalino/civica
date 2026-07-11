@@ -73,7 +73,7 @@ The machine-readable [source-coverage endpoint](/api/v1/pulse/source-coverage) p
 
 The active basket is dominated by GDELT, and a single-evidence event can currently affect an experimental delta at reduced heuristic weight. The current method collapses likely copies and reports sharing one publisher or declared origin before it counts evidence groups, but it does not impose a two-group publication minimum. Readers should not interpret “corroboration weight” as proof that an event was independently corroborated.
 
-An event seen only in news, without specialist corroboration, is scored at reduced confidence. Information-environment context does not currently alter production weights; see the context policy below.
+An event seen only in news, without specialist corroboration, receives a reduced heuristic weight. Information-environment context does not currently alter production weights; see the context policy below.
 
 ## Scheduled pipeline {#daily-pipeline}
 
@@ -82,8 +82,8 @@ The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score 
 1. **Ingest.** Attempt every scheduled connector, retain per-connector success/failure and yield telemetry, and write returned records to the staging table. The source-coverage contract decides which feeds are operating after the run.
 2. **Cluster.** Normalize each report under `{{ctx.clusterIdentityVersion}}`, embed it with `{{ctx.clusterEmbeddingModel}}`, and compare it with other candidates inside a ±{{ctx.clusterWindowHours}}-hour window. The ingest-time country guess is diagnostic and does not partition the candidates. A pair must meet the semantic cosine threshold of {{ctx.clusterSemanticThreshold}} or the canonical-token Jaccard threshold of {{ctx.clusterLexicalThreshold}}, with a shared event-identity anchor guarding against generic same-day matches. When the embedding runtime is unavailable, production uses the canonical-token path alone. That fallback has not been shown to perform equivalently.
 3. **Classify.** The configured cross-vendor voters — {{ctx.classifyVotersProse}} — assign a taxonomy category and severity. A strict majority wins; a category deadlock or no quorum goes to review. Different vendors diversify error sources but do not make their errors statistically independent.
-4. **Verify and attribute.** {{ctx.verifierProse}} makes a separate adversarial call against the majority verdict. The same model also participates as one voter, so this is a separate call rather than an independent model family. Subject-country attribution is another pass, currently {{ctx.subjectAttributorProse}}, run after classification; if it fails, the ingest-time attribution remains. That attribution verdict is not yet persisted as a separately versioned audit row.
-5. **Weight.** Collapse likely republications and evidence from one publisher or underlying report, then count the remaining specialist and news evidence groups. Combine that count with the stored agreement label and apply asymmetric and provisional press-context multipliers. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
+4. **Verify and attribute.** {{ctx.verifierProse}} makes a separate adversarial call against the majority verdict. The same model also participates as one voter, so this is a separate call rather than an independent model family. Subject-country attribution is another pass, currently {{ctx.subjectAttributorProse}}, run after classification; if it fails, the ingest-time attribution remains as the event projection and the attribution decision is recorded as unresolved.
+5. **Weight.** Collapse likely republications and evidence from one publisher or underlying report, then count the remaining specialist and news evidence groups. Combine that count with the stored agreement label and the positive-event asymmetry rule. Information-environment context has no production multiplier. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
 6. **Review or publish.** {{ctx.reviewTiersProse}}, deadlocks/no quorum, and weak or degraded majorities paired with a verifier objection route to review. An objection includes low confidence, a revised or rejected verdict, a negative category/severity/subject/event check, or failed/unavailable verification. Other events may be auto-published. Queued and rejected events do not affect public deltas.
 7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write API-only experimental deltas.
 
@@ -103,9 +103,19 @@ The checked regression fixture was labelled before detector evaluation and must 
 
 Each attempted pipeline stage has an immutable run record. It names the stage, methodology, production ontology, pipeline and algorithm versions, prompt version or a reason no prompt applies, configured provider/model set, source basket, individual source IDs, and upstream run IDs. The run closes as completed, partial, or failed with outcome counts and retained component failures. Its version payload and content-derived key cannot be edited or deleted after insertion.
 
-Raw items point to the ingest run that created them. Cluster and classification links are write-once. Events identify their classification, latest corroboration, and current publication decision runs; a human review has its own append-only audit row. Stored dimensional outputs identify the score run that computed them. A later recomputation may replace a current-state pointer, but the referenced run record remains immutable. Append-only output history is a separate later requirement.
+Raw items point to the ingest run that created them. Cluster and classification links are write-once. Events identify their classification, latest corroboration, and current publication decision runs; a human review has its own append-only audit row. Stored dimensional outputs identify the score run that computed them. A later recomputation may replace a current-state pointer, but the referenced run record remains immutable. The decision ledger described below is append-only. Dimensional score history remains a separate output-history requirement.
 
 Rows created before this contract point to fixed legacy stage records. Every unknown axis remains `legacy_unversioned`; the migration does not infer a modern method, ontology, prompt, provider, model, source basket, algorithm, or pipeline version. Event and delta APIs return exact row identities plus a version-set summary. A mixed or legacy result has `comparableAsSingleSeries: false` and cannot present as one continuous current-method series.
+
+## Independent decision ledger {#independent-decisions}
+
+Pulse records event existence, subject attribution, category labels, severity, confidence/calibration, corroboration, and publication as separate decisions under `pulse-decision-ledger/v1`. Each row identifies its actor, stage run, method version, rationale, evidence references, payload, and decision time. The verifier writes four distinct judgments: whether the item is an event, whether its subject attribution is supported, whether its category is supported, and whether its severity is supported. A negative judgment on one axis does not silently rewrite another.
+
+The event row is the current projection used by the site and scorer. It is not the decision history. Decision rows cannot be updated or deleted. A later reviewer records a new row that supersedes the earlier decision on the same axis; category correction, for example, does not imply a severity correction. The database rejects cross-axis supersession.
+
+There is no general confidence field on a decision. Classifier self-confidence and agreement remain model diagnostics. The corroboration payload has a named `confidenceWeight` for compatibility with the scoring formula, together with the required standing `heuristic_not_probability`. This weight is not a calibrated probability of event truth, attribution accuracy, label accuracy, severity accuracy, or publication fitness.
+
+Retained event fields whose original independent judgments cannot be reconstructed appear as `legacy_projection` decisions with an unresolved verdict on the affected axis. This makes the current stored state queryable without claiming that a modern verifier or decision process produced it.
 
 ## Evidence identity {#evidence-identity}
 
@@ -245,13 +255,13 @@ The Pulse models a coup as the **stability rupture**. The democratic damage that
 
 This mirrors how political scientists model regime breakdown: the coup is the rupture event, the consolidation is what kills democratic institutions over the following weeks and months. Each cascade event is independently classifiable; their dimensional impacts accumulate naturally on the right rows. A reader looking at the country page sees Stability plummet on day one and Democratic Quality, Rule of Law, and Rights & Freedoms degrade over the following months as the new regime consolidates power.
 
-## Classification confidence — cross-model consensus, then verify {#classification-confidence}
+## Classification signals — cross-model consensus, then verify {#classification-confidence}
 
 LLM self-reported confidence is not calibrated, so the Pulse does not treat a model saying it is sure as a probability of correctness. It also does not treat repeated sampling of one prompt as independent evidence. The current decision process combines **cross-vendor voting, an adversarial verification call, and a heuristic source-diversity weight**. None of those substitutes for representative validation.
 
 **The classify pass is a cross-vendor ensemble.** Each cluster is classified in parallel by the configured voters — {{ctx.classifyVotersProse}}. Using different vendors is intended to diversify error sources; it does not establish that errors are independent. Each voter assigns a category, a severity tier and value, and names the runner-up category it considered. The candidate classification is the **majority verdict**:
 
-- **All three agree** → highest-confidence classification.
+- **All three agree** → the strongest agreement label.
 - **Two of three agree** → the majority category is taken, but the disagreement is recorded and the event faces the verification pass below before it can publish.
 - **No majority** (three different answers, or too few models returned a usable answer) → the event is treated as unresolved and routed to human review; it does not publish automatically.
 
@@ -265,13 +275,13 @@ What this drives:
 - **Most raw news is dropped.** The classifier is deliberately strict about what qualifies as an event: opinion columns, partisan commentary, market and business stories, and un-enacted announcements are not governance events and are discarded rather than scored. Multiple configured models flagging the same item as a non-event is itself a strong drop signal.
 - **Corroboration is the primary weight on the events that do score** — see the next two sections. Diversity across independent evidence groups determines how heavily a published event moves the dimensional deltas. Information-environment context is disabled in production.
 
-Current provider-tagged events store each successful voter result and rationale plus the verification result. The public ledger also contains older classifier generations whose compatibility labels cannot be interpreted literally as three-voter counts. Those rows now carry explicit legacy stage-run identities rather than guessed versions. Event and delta APIs return the exact run identity for each row and a version-set verdict; mixed or legacy results state that they are not comparable as one method series. Every row remains challengeable through the [corrections process](#corrections).
+Current provider-tagged events store each successful voter result and rationale plus the verification result. Their event, subject, category, severity, calibration, corroboration, and publication judgments also enter the independent decision ledger. The public ledger contains classifier generations whose compatibility labels cannot be interpreted literally as three-voter counts; their stage and decision records remain explicitly legacy where the method cannot be reconstructed. Event and delta APIs return the exact run identity for each row and a version-set verdict; mixed or legacy results state that they are not comparable as one method series. Every row remains challengeable through the [corrections process](#corrections).
 
 ## Asymmetric scoring — anti-gaming {#asymmetric-scoring}
 
 The experimental weighting applies stronger discounts to positive events to reduce sensitivity to symbolic or state-promoted claims. These are hand-set **heuristic multipliers**, not empirically calibrated probabilities or publication gates:
 
-- A positive event with **no independent specialist evidence group** has its corroboration confidence reduced (currently ×0.6), so a state-announced "reform" with no specialist record barely moves the score.
+- A positive event with **no independent specialist evidence group** has its corroboration weight reduced (currently ×0.6), so a state-announced "reform" with no specialist record barely moves the score.
 - No country-level information-environment multiplier is active in production. The grouping method detects several common republication relationships but does not establish state ownership or full editorial independence.
 
 (The classifier is instructed to drop un-enacted announcements and symbolic claims, but this behavior has not completed representative evaluation.)
@@ -307,7 +317,7 @@ Pulse Beta assigns event-type-specific half-lives instead of a single uniform de
 | Peace agreement (implemented)       |              365 |
 | Armed conflict (active)             |              180 |
 
-Decay is exponential: `impact = severity × confidence × exp(−ln2 × days / half_life)`.
+Decay is exponential: `impact = severity × corroboration_weight × exp(−ln2 × days / half_life)`.
 
 ## Bounds, scoring window, and structural overlap {#bounds}
 

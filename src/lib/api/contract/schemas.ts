@@ -1436,6 +1436,7 @@ export const zPulseMethodologySnapshot = z
     mixed_legacy_unversioned: z.literal(false),
     ledgerHistory: z.unknown(),
     evidenceIdentity: z.unknown(),
+    decisionLedger: z.unknown(),
     providers: z.unknown(),
     feeds: z.unknown(),
     observability: z.unknown(),

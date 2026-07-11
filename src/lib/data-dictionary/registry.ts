@@ -696,6 +696,21 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
     deprecation: active,
   },
+  pulse_event_decisions: {
+    definition:
+      "Append-only, axis-specific Pulse decisions and refutations underlying the current event projection.",
+    rowGrain:
+      "One event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+    cadence: "Append-only at classification, corroboration, and review time.",
+    vintageSemantics:
+      "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+    rights:
+      "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+    deprecation: active,
+  },
   pulse_sources: {
     definition:
       "Evidence-source links between Pulse v2 events and raw publisher items.",

@@ -19,6 +19,7 @@ type Db = NeonHttpDatabase<typeof schema>;
 
 const event: EventRow = {
   id: "event-1",
+  clusterId: "11111111-1111-4111-8111-111111111111",
   jurisdictionId: "jurisdiction-1",
   iso3: null,
   severityTier: "moderate_neg",

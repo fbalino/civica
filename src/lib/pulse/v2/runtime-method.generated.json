@@ -61,7 +61,7 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "7f953f2bb74626f125d910a8beba4071d89eeab838fde780d8725fb6630bcd14",
+  "contractHash": "5fa79a043353506f07dd578e575727e9309ccee0dcb65ee8a54ac234d640db82",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -107,6 +107,30 @@
       "version": "pulse-source-independence/evidence-family-v1"
     },
     "standing": "heuristic_not_probability"
+  },
+  "decisionLedger": {
+    "corroborationStanding": "heuristic_weight_not_probability",
+    "currentEventRowRole": "current_state_projection_not_decision_history",
+    "decisionKinds": [
+      "event_existence",
+      "subject_attribution",
+      "category_labels",
+      "severity",
+      "calibration",
+      "corroboration",
+      "publication"
+    ],
+    "genericConfidenceField": "prohibited",
+    "legacyRule": "Retained event fields are captured as legacy_projection decisions; an unresolved verdict marks any axis whose original independent judgment cannot be reconstructed.",
+    "schemaVersion": "pulse-decision-ledger/v1",
+    "storage": "append_only",
+    "supersessionRule": "same_axis_only_other_axes_unchanged",
+    "verifierAxes": [
+      "event_existence",
+      "subject_attribution",
+      "category_labels",
+      "severity"
+    ]
   },
   "evaluation": {
     "backtestMatchesCurrentProduction": false,
@@ -506,7 +530,7 @@
       }
     }
   },
-  "schemaVersion": "1.5.0",
+  "schemaVersion": "1.6.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -519,5 +543,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.6-beta"
+  "version": "pulse-v2.7-beta"
 }

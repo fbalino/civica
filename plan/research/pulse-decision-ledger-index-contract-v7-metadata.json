@@ -1,0 +1,27 @@
+{
+  "id": "pulse-independent-decision-ledger-contract",
+  "toVersion": "civica-index-api-contract-pulse-decision-ledger-v7",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-decision-ledger-index-contract-v7-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-decision-ledger-index-contract-v7-migration.md"
+    ],
+    "golden_test": ["src/lib/pulse/v2/decision-ledger.test.ts"],
+    "contract_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "src/lib/api/contract/__tests__/contract.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:pulse-decision-ledger"
+  ]
+}

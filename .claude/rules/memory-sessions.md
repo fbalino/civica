@@ -637,3 +637,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   rights and validation; legacy multipliers are sensitivity-only.
 - Public APIs hide old raw scalars, 794 tests and the production build pass,
   and reader markdown no longer exposes internal HTML claim comments. PUL-011 next.
+
+## 2026-07-11 — PUL-011 independent decision ledger completed
+
+- Runtime method `pulse-v2.7-beta` writes seven independent append-only
+  judgments and prohibits a generic confidence payload.
+- The live ledger holds 2,688 explicit legacy projections across 384 retained
+  events; migration replay, upgrade fixtures, 799 tests, claims, and build pass.
+- Public methodology and light/dark browser checks match the runtime contract.
+  PUL-012 is next.

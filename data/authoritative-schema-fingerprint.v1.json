@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T15:30:08.179Z",
-  "sha256": "0eb41c2fc66843e9e4e9beeeee0c2105ee151009e1617d06e1272564f1c8b88e",
+  "generatedAt": "2026-07-11T18:08:34.556Z",
+  "sha256": "915ed87da97d2e85c245aaf4d3ec72ca28af6d83ad9e047d1ab93ed138e17b5f",
   "schema": {
     "columns": [
       {
@@ -5516,6 +5516,150 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "pulse_event_decisions",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "decision_key",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "cluster_id",
+        "type": "uuid",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "event_id",
+        "type": "uuid",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "kind",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "verdict",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "jsonb",
+        "name": "payload",
+        "type": "jsonb",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "jsonb",
+        "name": "actor",
+        "type": "jsonb",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "uuid",
+        "name": "stage_run_id",
+        "type": "uuid",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "rationale",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "_text",
+        "name": "evidence_refs",
+        "type": "ARRAY",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "supersedes_decision_key",
+        "type": "text",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "timestamp",
+        "name": "decided_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_decisions",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_decisions",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_events",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -7430,6 +7574,31 @@
         "definition": "CREATE UNIQUE INDEX pulse_dimensional_deltas_pkey ON public.pulse_dimensional_deltas USING btree (id)"
       },
       {
+        "name": "idx_pulse_event_decisions_cluster_kind_time",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE INDEX idx_pulse_event_decisions_cluster_kind_time ON public.pulse_event_decisions USING btree (cluster_id, kind, decided_at)"
+      },
+      {
+        "name": "idx_pulse_event_decisions_event_kind_time",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE INDEX idx_pulse_event_decisions_event_kind_time ON public.pulse_event_decisions USING btree (event_id, kind, decided_at)"
+      },
+      {
+        "name": "idx_pulse_event_decisions_key",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_event_decisions_key ON public.pulse_event_decisions USING btree (decision_key)"
+      },
+      {
+        "name": "idx_pulse_event_decisions_run",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE INDEX idx_pulse_event_decisions_run ON public.pulse_event_decisions USING btree (stage_run_id)"
+      },
+      {
+        "name": "pulse_event_decisions_pkey",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE UNIQUE INDEX pulse_event_decisions_pkey ON public.pulse_event_decisions USING btree (id)"
+      },
+      {
         "name": "idx_pulse_events_active",
         "table": "pulse_events",
         "definition": "CREATE INDEX idx_pulse_events_active ON public.pulse_events USING btree (jurisdiction_id, is_active, event_date)"
@@ -7677,6 +7846,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
+        "name": "civica_protect_pulse_event_decisions",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_pulse_event_decisions()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse decisions are append-only; record a superseding decision instead';\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_protect_pulse_raw_evidence",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_pulse_raw_evidence()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'raw Pulse evidence is append-only';\n  END IF;\n  IF NEW.source_id IS DISTINCT FROM OLD.source_id\n     OR NEW.external_id IS DISTINCT FROM OLD.external_id\n     OR NEW.source_url IS DISTINCT FROM OLD.source_url\n     OR NEW.source_type IS DISTINCT FROM OLD.source_type\n     OR NEW.jurisdiction_id IS DISTINCT FROM OLD.jurisdiction_id\n     OR NEW.raw_country_name IS DISTINCT FROM OLD.raw_country_name\n     OR NEW.event_date IS DISTINCT FROM OLD.event_date\n     OR NEW.retrieved_at IS DISTINCT FROM OLD.retrieved_at\n     OR NEW.title IS DISTINCT FROM OLD.title\n     OR NEW.body IS DISTINCT FROM OLD.body\n     OR NEW.raw IS DISTINCT FROM OLD.raw\n     OR NEW.evidence_identity_key IS DISTINCT FROM OLD.evidence_identity_key\n     OR NEW.evidence_content_hash IS DISTINCT FROM OLD.evidence_content_hash\n     OR NEW.evidence_language IS DISTINCT FROM OLD.evidence_language\n     OR NEW.evidence_publisher IS DISTINCT FROM OLD.evidence_publisher\n     OR NEW.evidence_attribution IS DISTINCT FROM OLD.evidence_attribution\n     OR NEW.evidence_rights IS DISTINCT FROM OLD.evidence_rights\n     OR NEW.evidence_retention IS DISTINCT FROM OLD.evidence_retention THEN\n    RAISE EXCEPTION 'raw Pulse evidence identity is immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -7700,6 +7874,11 @@
         "name": "civica_validate_frozen_vintage_insert",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_frozen_vintage_insert()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  parsed text[];\n  published_period text;\n  prior_label text;\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' THEN\n    parsed := regexp_match(NEW.vintage_label, '^Civica Atlas Reconciled (v[^[:space:]]+) — vintage ([0-9]{4}-Q[1-4])$');\n    IF parsed IS NULL OR NEW.methodology_version <> parsed[1] THEN\n      RAISE EXCEPTION 'Atlas vintage label and methodology_version disagree';\n    END IF;\n    published_period := parsed[2];\n    SELECT vintage_label INTO prior_label FROM country_fact_vintages\n      WHERE vintage_label <> NEW.vintage_label\n        AND vintage_label LIKE '%vintage ' || published_period LIMIT 1;\n    IF prior_label IS NOT NULL AND NEW.supersedes_vintage_label IS NULL THEN\n      RAISE EXCEPTION 'corrected Atlas vintage must name supersedes_vintage_label';\n    END IF;\n  ELSE\n    IF NEW.vintage_label IS NULL THEN RETURN NEW; END IF;\n    parsed := regexp_match(NEW.vintage_label, '^Civica Index ([0-9]{4}) Q([1-4]) \\(([^)]+)\\)$');\n    IF parsed IS NULL OR NEW.quarter <> parsed[1] || '-Q' || parsed[2]\n       OR lower(NEW.methodology_version) <> lower(parsed[3]) THEN\n      RAISE EXCEPTION 'Civica Index vintage label, quarter, and methodology_version disagree';\n    END IF;\n    SELECT vintage_label INTO prior_label FROM ci_composite_scores\n      WHERE quarter = NEW.quarter AND vintage_label IS NOT NULL\n        AND vintage_label <> NEW.vintage_label LIMIT 1;\n    IF prior_label IS NOT NULL AND NEW.supersedes_vintage_label IS NULL THEN\n      RAISE EXCEPTION 'corrected Civica Index vintage must name supersedes_vintage_label';\n    END IF;\n  END IF;\n\n  IF NEW.supersedes_vintage_label IS NOT NULL AND NOT EXISTS (\n    SELECT 1 FROM (\n      SELECT vintage_label FROM country_fact_vintages WHERE TG_TABLE_NAME = 'country_fact_vintages'\n      UNION ALL\n      SELECT vintage_label FROM ci_composite_scores WHERE TG_TABLE_NAME = 'ci_composite_scores'\n    ) prior WHERE prior.vintage_label = NEW.supersedes_vintage_label\n  ) THEN\n    RAISE EXCEPTION 'supersedes_vintage_label does not identify an existing frozen vintage';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_pulse_decision_supersession",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_decision_supersession()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  parent_kind text;\n  parent_cluster_id uuid;\n  parent_event_id uuid;\nBEGIN\n  IF NEW.supersedes_decision_key IS NULL THEN\n    RETURN NEW;\n  END IF;\n  SELECT kind, cluster_id, event_id\n  INTO parent_kind, parent_cluster_id, parent_event_id\n  FROM pulse_event_decisions\n  WHERE decision_key = NEW.supersedes_decision_key;\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'superseded Pulse decision does not exist';\n  END IF;\n  IF NEW.kind IS DISTINCT FROM parent_kind\n     OR NEW.cluster_id IS DISTINCT FROM parent_cluster_id\n     OR NEW.event_id IS DISTINCT FROM parent_event_id THEN\n    RAISE EXCEPTION 'Pulse decision supersession must stay on the same axis, cluster, and event';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "civica_validate_statement_subject",
@@ -8059,6 +8238,16 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_dimensional_deltas FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "pulse_event_decisions_append_only",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE TRIGGER pulse_event_decisions_append_only BEFORE DELETE OR UPDATE ON pulse_event_decisions FOR EACH ROW EXECUTE FUNCTION civica_protect_pulse_event_decisions()"
+      },
+      {
+        "name": "pulse_event_decisions_validate_supersession",
+        "table": "pulse_event_decisions",
+        "definition": "CREATE TRIGGER pulse_event_decisions_validate_supersession BEFORE INSERT ON pulse_event_decisions FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_decision_supersession()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "pulse_events_v2",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -8349,6 +8538,11 @@
         "kind": "v",
         "name": "pulse_evaluation_evidence",
         "definition": " SELECT 'classifier_disposition'::text AS evidence_kind,\n    re.id::text AS evidence_id,\n        CASE\n            WHEN re.classification_disposition = 'non_governance'::text THEN 'false_negative_candidate'::text\n            WHEN re.classification_disposition = 'invalid'::text THEN 'invalid_classification_candidate'::text\n            ELSE re.classification_disposition\n        END AS outcome,\n    jsonb_build_object('raw_event', to_jsonb(re.*), 'decision', re.classification_decision, 'reason', re.classification_reason) AS payload,\n    COALESCE(re.classified_at, re.created_at) AS recorded_at\n   FROM raw_events re\n  WHERE re.classification_disposition <> 'pending'::text\nUNION ALL\n SELECT 'human_review'::text AS evidence_kind,\n    pe.id::text AS evidence_id,\n        CASE\n            WHEN pe.review_status = 'rejected'::text THEN 'false_positive_candidate'::text\n            ELSE 'reviewed_event'::text\n        END AS outcome,\n    to_jsonb(pe.*) AS payload,\n    pe.updated_at AS recorded_at\n   FROM pulse_events_v2 pe\n  WHERE pe.human_reviewed = true OR pe.review_status = 'rejected'::text;"
+      },
+      {
+        "kind": "r",
+        "name": "pulse_event_decisions",
+        "definition": null
       },
       {
         "kind": "r",
@@ -9239,6 +9433,36 @@
         "type": "p",
         "table": "pulse_dimensional_deltas",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_event_decisions_contract_check",
+        "type": "c",
+        "table": "pulse_event_decisions",
+        "definition": "CHECK (schema_version = 'pulse-decision-ledger/v1'::text AND decision_key ~ '^pulse-decision/sha256:[a-f0-9]{64}$'::text AND (kind = ANY (ARRAY['event_existence'::text, 'subject_attribution'::text, 'category_labels'::text, 'severity'::text, 'calibration'::text, 'corroboration'::text, 'publication'::text])) AND (verdict = ANY (ARRAY['affirmed'::text, 'refuted'::text, 'abstained'::text, 'unresolved'::text])) AND rationale <> ''::text AND jsonb_typeof(payload) = 'object'::text AND NOT payload ? 'confidence'::text AND (kind = 'event_existence'::text AND payload ? 'disposition'::text OR kind = 'subject_attribution'::text AND payload ?& ARRAY['status'::text, 'primaryJurisdictionId'::text, 'affectedJurisdictionIds'::text] OR kind = 'category_labels'::text AND payload ?& ARRAY['categoryIds'::text, 'dimensionIds'::text] OR kind = 'severity'::text AND payload ?& ARRAY['tier'::text, 'value'::text, 'direction'::text] OR kind = 'calibration'::text AND payload ?& ARRAY['standing'::text, 'signals'::text, 'targetDecisionKinds'::text, 'validationReleaseId'::text] AND (payload ->> 'standing'::text) = 'not_calibrated'::text OR kind = 'corroboration'::text AND payload ?& ARRAY['independentEvidenceGroups'::text, 'contributingReports'::text, 'confidenceWeight'::text, 'calibrationStanding'::text] AND (payload ->> 'calibrationStanding'::text) = 'heuristic_not_probability'::text OR kind = 'publication'::text AND payload ?& ARRAY['eligible'::text, 'origin'::text, 'gateReasons'::text]) AND jsonb_typeof(actor) = 'object'::text AND ((actor ->> 'type'::text) = ANY (ARRAY['classifier'::text, 'verifier'::text, 'subject_attributor'::text, 'calibration_assessor'::text, 'corroborator'::text, 'publication_gate'::text, 'human_reviewer'::text, 'legacy_projection'::text])))"
+      },
+      {
+        "name": "pulse_event_decisions_event_id_pulse_events_v2_id_fk",
+        "type": "f",
+        "table": "pulse_event_decisions",
+        "definition": "FOREIGN KEY (event_id) REFERENCES pulse_events_v2(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_decisions_pkey",
+        "type": "p",
+        "table": "pulse_event_decisions",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_event_decisions_stage_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_event_decisions",
+        "definition": "FOREIGN KEY (stage_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_decisions_supersedes_decision_key_fk",
+        "type": "f",
+        "table": "pulse_event_decisions",
+        "definition": "FOREIGN KEY (supersedes_decision_key) REFERENCES pulse_event_decisions(decision_key) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_events_jurisdiction_id_jurisdictions_id_fk",

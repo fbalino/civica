@@ -4,6 +4,7 @@ import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "@/lib/db/schema";
 import {
   classifyClusters,
+  classificationDecisionInputs,
   selectProvisionalJurisdiction,
   type ClassifyOneResult,
   type ClusterToClassify,
@@ -47,6 +48,8 @@ const result: ClassifyOneResult = {
     description: "Fixture classification",
   },
   autoPublished: true,
+  verification: null,
+  subjectAttribution: null,
 };
 
 const classify = async () => structuredClone(result);
@@ -144,5 +147,67 @@ test("provisional jurisdiction selection is deterministic and majority-based", (
   assert.throws(
     () => selectProvisionalJurisdiction([]),
     /no provisional jurisdiction/,
+  );
+});
+
+test("classification persists each judgment and verifier axis separately", () => {
+  const verified: ClassifyOneResult = {
+    ...structuredClone(result),
+    verification: {
+      verdict: "revised",
+      confidence: "low",
+      categoryOk: false,
+      severityOk: true,
+      subjectOk: false,
+      isEvent: true,
+      rationale: "category and subject need review",
+    },
+    subjectAttribution: {
+      jurisdictionId: "jurisdiction-1",
+      verdict: {
+        iso3: "JPN",
+        country: "Japan",
+        scope: "single",
+        confidence: "high",
+        reasoning: "The event concerns Japan's domestic institutions.",
+      },
+    },
+  };
+  const decisions = classificationDecisionInputs({
+    cluster,
+    eventId: "44444444-4444-4444-8444-444444444444",
+    result: verified,
+    runId: runRef.id,
+    decidedAt: "2026-07-11T20:00:00.000Z",
+  });
+  assert.deepEqual(
+    decisions
+      .filter(({ actor }) => actor.type !== "verifier")
+      .map(({ kind }) => kind),
+    [
+      "event_existence",
+      "category_labels",
+      "severity",
+      "calibration",
+      "subject_attribution",
+      "publication",
+    ],
+  );
+  assert.deepEqual(
+    Object.fromEntries(
+      decisions
+        .filter(({ actor }) => actor.type === "verifier")
+        .map(({ kind, verdict }) => [kind, verdict]),
+    ),
+    {
+      event_existence: "affirmed",
+      subject_attribution: "refuted",
+      category_labels: "refuted",
+      severity: "affirmed",
+    },
+  );
+  assert.equal(
+    decisions.some((decision) => "confidence" in decision.payload),
+    false,
   );
 });

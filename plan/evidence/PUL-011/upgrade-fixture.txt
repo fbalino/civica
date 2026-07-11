@@ -1,0 +1,10 @@
+PUL-011 production-shaped upgrade fixture
+
+decision rows: 8
+event decision rows: 7
+non-event decision rows: 1
+generic confidence payloads: 0
+event kinds: calibration, category_labels, corroboration, event_existence,
+  publication, severity, subject_attribution
+append-only update: rejected
+cross-axis supersession: rejected

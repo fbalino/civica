@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "47b4c331b94e92235c233ac555261770dd1c050084126e27b5cb6533267cd78a",
+  "schemaFingerprint": "785bcae709593b89727436018a64befb9a92facaac6be825fd240a2f48604292",
   "summary": {
-    "tables": 56,
-    "columns": 747,
+    "tables": 57,
+    "columns": 763,
     "publicAtlasTables": 18,
-    "researchBetaTables": 15,
+    "researchBetaTables": 16,
     "supportTables": 11,
     "internalTables": 10,
     "privateTables": 2,
@@ -16292,6 +16292,438 @@
           "cadence": "Daily after classification/corroboration and on rescore.",
           "vintageSemantics": "Last computed at follows this table contract. created_at is scoring time; method_version fixes the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_event_decisions",
+      "exportName": "pulseEventDecisions",
+      "definition": "Append-only, axis-specific Pulse decisions and refutations underlying the current event projection.",
+      "rowGrain": "One event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+      "cadence": "Append-only at classification, corroboration, and review time.",
+      "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+      "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "actor",
+          "propertyName": "actor",
+          "definition": "Actor recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cluster_id",
+          "propertyName": "clusterId",
+          "definition": "Cluster id recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_decisions_cluster_kind_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decided_at",
+          "propertyName": "decidedAt",
+          "definition": "Decided at recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_decisions_event_kind_time",
+              "idx_pulse_event_decisions_cluster_kind_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "Decided at follows this table contract. decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decision_key",
+          "propertyName": "decisionKey",
+          "definition": "Decision key recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_decisions_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_event_decisions_key"
+            ]
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_id",
+          "propertyName": "eventId",
+          "definition": "Event id; relational link to pulse_events_v2.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_events_v2.id",
+            "indexGroups": [
+              "idx_pulse_event_decisions_event_kind_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_events_v2.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_refs",
+          "propertyName": "evidenceRefs",
+          "definition": "Evidence refs recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "kind",
+          "propertyName": "kind",
+          "definition": "Kind recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_decisions_event_kind_time",
+              "idx_pulse_event_decisions_cluster_kind_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "payload",
+          "propertyName": "payload",
+          "definition": "Payload recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rationale",
+          "propertyName": "rationale",
+          "definition": "Rationale recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "stage_run_id",
+          "propertyName": "stageRunId",
+          "definition": "Stage run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_event_decisions_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersedes_decision_key",
+          "propertyName": "supersedesDecisionKey",
+          "definition": "Supersedes decision key; relational link to pulse_event_decisions.decision_key.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_event_decisions.decision_key",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_event_decisions.decision_key; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "verdict",
+          "propertyName": "verdict",
+          "definition": "Verdict recorded for the event-existence, subject-attribution, category, severity, corroboration, or publication judgment by one actor at one stage run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned classifier, verifier, subject-attribution, corroboration, publication-gate, or human-review output over retained Pulse evidence; legacy projections are explicitly marked unresolved where independent history cannot be reconstructed.",
+          "cadence": "Append-only at classification, corroboration, and review time.",
+          "vintageSemantics": "decided_at is the judgment time; created_at is storage time; supersedes_decision_key replaces only the same decision axis.",
+          "rights": "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
           "deprecation": {
             "status": "active"
           }

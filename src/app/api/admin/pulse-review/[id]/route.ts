@@ -24,10 +24,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import {
-  pulseEventsV2,
-  pulseReviewAuditLog,
-} from "@/lib/db/schema";
+import { pulseEventsV2, pulseReviewAuditLog } from "@/lib/db/schema";
 import { getAdminSession } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 import { validatePulseClassification } from "@/lib/pulse/v2/review-validation";
@@ -36,6 +33,15 @@ import {
   finishPulsePipelineRun,
   startPulsePipelineRun,
 } from "@/lib/pulse/v2/pipeline-version";
+import {
+  latestPulseDecisionKeys,
+  persistPulseDecisions,
+} from "@/lib/pulse/v2/decision-ledger-store";
+import type {
+  PulseDecisionInput,
+  PulseDecisionKind,
+} from "@/lib/pulse/v2/decision-ledger";
+import type { PulseDimension, SeverityTier } from "@/lib/pulse/v2/types";
 
 type Action = "approve" | "edit" | "reject";
 
@@ -52,7 +58,7 @@ interface ReviewBody {
 }
 
 async function readBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<{ body: ReviewBody; isForm: boolean }> {
   const contentType = request.headers.get("content-type") ?? "";
   if (contentType.includes("application/x-www-form-urlencoded")) {
@@ -86,7 +92,7 @@ async function readBody(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const auth = await getAdminSession();
   if (!auth) {
@@ -97,10 +103,7 @@ export async function POST(
   const { body, isForm } = await readBody(request);
 
   if (!VALID_ACTIONS.has(body.action)) {
-    return NextResponse.json(
-      { error: "invalid action" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "invalid action" }, { status: 400 });
   }
 
   const existingRows = await db
@@ -176,6 +179,19 @@ export async function POST(
     upstreamRunIds: [existing.classificationRunId],
   });
   await startPulsePipelineRun(db, reviewRun);
+  const decisionKinds: PulseDecisionKind[] = ["publication"];
+  if (body.action === "reject") decisionKinds.push("event_existence");
+  if (category !== existing.category || dimension !== existing.dimension) {
+    decisionKinds.push("category_labels");
+  }
+  if (
+    severityTier !== existing.severityTier ||
+    severityValue !== existing.severityValue
+  ) {
+    decisionKinds.push("severity");
+  }
+  const superseded = await latestPulseDecisionKeys(db, id, decisionKinds);
+  const decidedAt = new Date();
 
   await db
     .update(pulseEventsV2)
@@ -189,7 +205,7 @@ export async function POST(
       humanReviewed: true,
       reviewerId: auth.reviewerId,
       reviewNotes: body.notes ?? existing.reviewNotes,
-      updatedAt: new Date(),
+      updatedAt: decidedAt,
       publicationRunId: published ? reviewRun.id : null,
     })
     .where(eq(pulseEventsV2.id, id));
@@ -204,10 +220,94 @@ export async function POST(
     runId: reviewRun.id,
   });
 
+  const decisionBase = {
+    clusterId: existing.clusterId,
+    eventId: id,
+    actor: {
+      type: "human_reviewer" as const,
+      provider: null,
+      model: null,
+      reviewerId: auth.reviewerId,
+    },
+    stageRunId: reviewRun.id,
+    methodVersion: "pulse-review/decision-ledger-v1",
+    evidenceRefs: [`event:${id}`],
+    decidedAt: decidedAt.toISOString(),
+  };
+  const reviewDecisions: PulseDecisionInput[] = [
+    {
+      ...decisionBase,
+      kind: "publication",
+      verdict: "affirmed",
+      payload: {
+        eligible: published,
+        origin:
+          body.action === "reject"
+            ? "human_rejected"
+            : body.action === "edit"
+              ? "human_edited"
+              : "human_approved",
+        gateReasons: [`human_${body.action}`],
+      },
+      rationale:
+        body.notes?.trim() || `Human reviewer recorded ${body.action}.`,
+      supersedesDecisionKey: superseded.publication ?? null,
+    },
+  ];
+  if (body.action === "reject") {
+    reviewDecisions.push({
+      ...decisionBase,
+      kind: "event_existence",
+      verdict: "refuted",
+      payload: { disposition: "non_event" },
+      rationale:
+        body.notes?.trim() || "Human reviewer rejected the event candidate.",
+      supersedesDecisionKey: superseded.event_existence ?? null,
+    });
+  }
+  if (category !== existing.category || dimension !== existing.dimension) {
+    reviewDecisions.push({
+      ...decisionBase,
+      kind: "category_labels",
+      verdict: "affirmed",
+      payload: {
+        categoryIds: [category],
+        dimensionIds: [dimension as PulseDimension],
+      },
+      rationale:
+        body.notes?.trim() || "Human reviewer corrected the category label.",
+      supersedesDecisionKey: superseded.category_labels ?? null,
+    });
+  }
+  if (
+    severityTier !== existing.severityTier ||
+    severityValue !== existing.severityValue
+  ) {
+    reviewDecisions.push({
+      ...decisionBase,
+      kind: "severity",
+      verdict: "affirmed",
+      payload: {
+        tier: severityTier as SeverityTier,
+        value: severityValue,
+        direction:
+          severityValue > 0
+            ? "positive"
+            : severityValue < 0
+              ? "negative"
+              : "neutral",
+      },
+      rationale:
+        body.notes?.trim() || "Human reviewer corrected the severity judgment.",
+      supersedesDecisionKey: superseded.severity ?? null,
+    });
+  }
+  await persistPulseDecisions(db, reviewDecisions);
+
   await finishPulsePipelineRun(db, reviewRun.id, {
     status: "completed",
     counts: {
-      decisions: 1,
+      decisions: reviewDecisions.length,
       published: published ? 1 : 0,
       rejected: body.action === "reject" ? 1 : 0,
       edited: body.action === "edit" ? 1 : 0,

@@ -97,4 +97,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "5f6f350e9d99fbe531438e468b4f4f983d802856b4138c00658a2f8e389a9e7c",
     baseline: false,
   },
+  {
+    id: "0016_loving_maggott",
+    path: "drizzle/authoritative/0016_loving_maggott.sql",
+    sha256: "a7a512a6b2a7a50f149d319641293e8feb77ebd1c8f42a444fd8cdfc851bab73",
+    baseline: false,
+  },
+  {
+    id: "0017_validate_decision_supersession",
+    path: "drizzle/authoritative/0017_validate_decision_supersession.sql",
+    sha256: "5a8d4cf62a6fbc29d5360cba7098a83239c267965e90c82771231401eb80fa36",
+    baseline: false,
+  },
 ] as const;

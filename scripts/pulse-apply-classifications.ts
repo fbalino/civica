@@ -26,6 +26,8 @@ import { sql, eq } from "drizzle-orm";
 import { rawEvents } from "../src/lib/db/schema";
 import { createDb } from "../src/lib/pulse/v2/ingest";
 import {
+  persistClassificationFailureDecision,
+  persistNonEventDecision,
   writeEvent,
   type ClusterToClassify,
   type ClassifyOneResult,
@@ -37,7 +39,11 @@ import {
 } from "../src/lib/pulse/v2/taxonomy";
 import { corroborateEvents } from "../src/lib/pulse/v2/corroborate";
 import { calculateDimensionalDeltas } from "../src/lib/pulse/v2/score";
-import type { ClassifierRun, ClassifiedEvent, SeverityTier } from "../src/lib/pulse/v2/types";
+import type {
+  ClassifierRun,
+  ClassifiedEvent,
+  SeverityTier,
+} from "../src/lib/pulse/v2/types";
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
@@ -58,17 +64,25 @@ interface Decision {
   confidence?: "high" | "medium" | "low";
 }
 
-const arg = (k: string) => process.argv.find((a) => a.startsWith(k))?.slice(k.length);
+const arg = (k: string) =>
+  process.argv.find((a) => a.startsWith(k))?.slice(k.length);
 const rows = (r: unknown) =>
-  (Array.isArray(r) ? r : ((r as { rows?: unknown[] }).rows ?? [])) as Record<string, unknown>[];
+  (Array.isArray(r) ? r : ((r as { rows?: unknown[] }).rows ?? [])) as Record<
+    string,
+    unknown
+  >[];
 
 async function main() {
   const db = createDb();
   const clustersPath = arg("--clusters=") ?? "/tmp/pulse-clusters.json";
   const decisionsPath = arg("--decisions=") ?? "/tmp/pulse-decisions.json";
 
-  const clusters: ClusterToClassify[] = JSON.parse(await readFile(clustersPath, "utf8"));
-  const decisions: Decision[] = JSON.parse(await readFile(decisionsPath, "utf8"));
+  const clusters: ClusterToClassify[] = JSON.parse(
+    await readFile(clustersPath, "utf8"),
+  );
+  const decisions: Decision[] = JSON.parse(
+    await readFile(decisionsPath, "utf8"),
+  );
   const byId = new Map(clusters.map((c) => [c.clusterId, c]));
   const classificationRun = createPulsePipelineRunRef("classify", {
     sourceIds: clusters.flatMap((cluster) => cluster.sourceIds),
@@ -87,13 +101,21 @@ async function main() {
 
   const iso3Map = new Map<string, string>();
   for (const j of rows(
-    await db.execute(sql`SELECT id, iso3 FROM jurisdictions WHERE iso3 IS NOT NULL`)
+    await db.execute(
+      sql`SELECT id, iso3 FROM jurisdictions WHERE iso3 IS NOT NULL`,
+    ),
   ))
     iso3Map.set(String(j.iso3).toUpperCase(), String(j.id));
 
   let written = 0,
     skipped = 0,
     invalid = 0;
+  const subscriptionActor = {
+    type: "classifier" as const,
+    provider: "subscription_agent",
+    model: "claude-code-agent",
+    reviewerId: null,
+  };
 
   async function retainDisposition(
     decision: Decision,
@@ -124,24 +146,44 @@ async function main() {
         "non_governance",
         "classifier determined that the cluster was not a governance event",
       );
+      await persistNonEventDecision(db, cluster, classificationRun.id, {
+        actor: subscriptionActor,
+        rationale:
+          "Subscription-agent classifier found no qualifying governance event.",
+      });
       skipped++;
       continue;
     }
     const cat = EVENT_CATEGORY_INDEX[d.category];
     if (!cat || !cat.allowedTiers.includes(d.severityTier)) {
-      console.warn(`  ! invalid category/tier for cluster ${d.clusterId}: ${d.category}/${d.severityTier}`);
+      console.warn(
+        `  ! invalid category/tier for cluster ${d.clusterId}: ${d.category}/${d.severityTier}`,
+      );
       await retainDisposition(
         d,
         "invalid",
         `invalid category/tier: ${d.category}/${d.severityTier}`,
       );
+      await persistClassificationFailureDecision(
+        db,
+        cluster,
+        classificationRun.id,
+        {
+          actor: subscriptionActor,
+          rationale: `Subscription-agent output had an invalid category/tier: ${d.category}/${d.severityTier}.`,
+        },
+      );
       invalid++;
       continue;
     }
     const range = SEVERITY_TIER_RANGES[d.severityTier];
-    const severityValue = Math.max(range.min, Math.min(range.max, Math.round(d.severityValue)));
+    const severityValue = Math.max(
+      range.min,
+      Math.min(range.max, Math.round(d.severityValue)),
+    );
     const jurisdictionId =
-      (d.subjectIso3 && iso3Map.get(d.subjectIso3.toUpperCase())) || cluster.jurisdictionId;
+      (d.subjectIso3 && iso3Map.get(d.subjectIso3.toUpperCase())) ||
+      cluster.jurisdictionId;
 
     const run: ClassifierRun = {
       run: 1,
@@ -172,15 +214,21 @@ async function main() {
     // when the classifying prompt dropped the confidence field). Anything
     // that isn't a recognized value is treated as "low" — i.e. it queues for
     // human review rather than silently auto-publishing.
-    if (d.confidence !== "high" && d.confidence !== "medium" && d.confidence !== "low") {
+    if (
+      d.confidence !== "high" &&
+      d.confidence !== "medium" &&
+      d.confidence !== "low"
+    ) {
       console.warn(
         `  ! missing/invalid confidence for cluster ${d.clusterId} (got ${JSON.stringify(
-          d.confidence
-        )}) — treating as "low" (routes to human review).`
+          d.confidence,
+        )}) — treating as "low" (routes to human review).`,
       );
     }
     const conf: "high" | "medium" | "low" =
-      d.confidence === "high" || d.confidence === "medium" || d.confidence === "low"
+      d.confidence === "high" ||
+      d.confidence === "medium" ||
+      d.confidence === "low"
         ? d.confidence
         : "low";
     const ok: ClassifyOneResult = {
@@ -189,12 +237,18 @@ async function main() {
       // classify→verify confidence is not low. Low-confidence events go to
       // the human review queue (published=false) instead of scoring silently.
       autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier) && conf !== "low",
+      // This legacy subscription-agent import did not preserve the verifier's
+      // four independent judgments or a subject-attribution verdict.
+      verification: null,
+      subjectAttribution: null,
     };
     await writeEvent(db, cluster, ok, classificationRun.id);
     written++;
   }
 
-  console.log(`\nWrote ${written} event(s) · skipped ${skipped} (non-governance) · ${invalid} invalid.`);
+  console.log(
+    `\nWrote ${written} event(s) · skipped ${skipped} (non-governance) · ${invalid} invalid.`,
+  );
   await finishPulsePipelineRun(db, classificationRun.id, {
     status: invalid > 0 ? "partial" : "completed",
     counts: { decisions: decisions.length, written, skipped, invalid },
@@ -211,15 +265,19 @@ async function main() {
   console.log("Re-running corroboration + scoring...");
   const corro = await corroborateEvents(db);
   const score = await calculateDimensionalDeltas(db);
-  console.log(`  corroboration: ${corro.examined} events, avg conf ${corro.averageConfidence.toFixed(3)}`);
   console.log(
-    `  scoring: ${score.eventsConsidered} events × ${score.countriesScored} countries → ${score.significantDeltas} significant deltas`
+    `  corroboration: ${corro.examined} events, avg conf ${corro.averageConfidence.toFixed(3)}`,
+  );
+  console.log(
+    `  scoring: ${score.eventsConsidered} events × ${score.countriesScored} countries → ${score.significantDeltas} significant deltas`,
   );
 
   // DAT-016: examined non-events stay in raw_events with their decision and
   // reason. They are excluded from the unclassified queue by disposition and
   // remain available for prospective false-negative studies.
-  console.log(`  retained ${skipped + invalid} rejected/invalid cluster decision(s) for evaluation.`);
+  console.log(
+    `  retained ${skipped + invalid} rejected/invalid cluster decision(s) for evaluation.`,
+  );
   console.log("DONE.");
   process.exit(0);
 }

@@ -2,6 +2,12 @@ import { sql as dsql } from "drizzle-orm";
 import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
 import type { PulseStageVersionEnvelope } from "@/lib/pulse/v2/pipeline-version";
 import type {
+  PulseDecisionActor,
+  PulseDecisionKind,
+  PulseDecisionPayloads,
+  PulseDecisionVerdict,
+} from "@/lib/pulse/v2/decision-ledger";
+import type {
   PulseEvidenceAttributionSnapshot,
   PulseEvidencePublisherSnapshot,
   PulseEvidenceRetentionSnapshot,
@@ -2162,6 +2168,64 @@ export const pulseEventsV2 = pgTable(
     index("idx_pulse_v2_publication_run").on(table.publicationRunId),
     index("idx_pulse_v2_corroboration_run").on(table.corroborationRunId),
     uniqueIndex("idx_pulse_v2_cluster_unique").on(table.clusterId),
+  ],
+);
+
+/**
+ * Append-only, stage-specific Pulse decisions. `pulse_events_v2` remains the
+ * current-state projection used by readers and scoring; this table preserves
+ * the independent judgments that produced or later challenged that state.
+ * Non-event clusters have no event row, so `event_id` is intentionally
+ * nullable while `cluster_id` is always present.
+ */
+export const pulseEventDecisions = pgTable(
+  "pulse_event_decisions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    decisionKey: text("decision_key").notNull(),
+    clusterId: uuid("cluster_id").notNull(),
+    eventId: uuid("event_id").references(() => pulseEventsV2.id, {
+      onDelete: "restrict",
+    }),
+    kind: text("kind").$type<PulseDecisionKind>().notNull(),
+    verdict: text("verdict").$type<PulseDecisionVerdict>().notNull(),
+    payload: jsonb("payload")
+      .$type<PulseDecisionPayloads[PulseDecisionKind]>()
+      .notNull(),
+    actor: jsonb("actor").$type<PulseDecisionActor>().notNull(),
+    stageRunId: uuid("stage_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    methodVersion: text("method_version").notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    supersedesDecisionKey: text("supersedes_decision_key"),
+    decidedAt: timestamp("decided_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_event_decisions_key").on(table.decisionKey),
+    index("idx_pulse_event_decisions_event_kind_time").on(
+      table.eventId,
+      table.kind,
+      table.decidedAt,
+    ),
+    index("idx_pulse_event_decisions_cluster_kind_time").on(
+      table.clusterId,
+      table.kind,
+      table.decidedAt,
+    ),
+    index("idx_pulse_event_decisions_run").on(table.stageRunId),
+    foreignKey({
+      name: "pulse_event_decisions_supersedes_decision_key_fk",
+      columns: [table.supersedesDecisionKey],
+      foreignColumns: [table.decisionKey],
+    }).onDelete("restrict"),
+    check(
+      "pulse_event_decisions_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-decision-ledger/v1' AND ${table.decisionKey} ~ '^pulse-decision/sha256:[a-f0-9]{64}$' AND ${table.kind} IN ('event_existence','subject_attribution','category_labels','severity','calibration','corroboration','publication') AND ${table.verdict} IN ('affirmed','refuted','abstained','unresolved') AND ${table.rationale} <> '' AND jsonb_typeof(${table.payload}) = 'object' AND NOT (${table.payload} ? 'confidence') AND ((${table.kind} = 'event_existence' AND ${table.payload} ? 'disposition') OR (${table.kind} = 'subject_attribution' AND ${table.payload} ?& ARRAY['status','primaryJurisdictionId','affectedJurisdictionIds']) OR (${table.kind} = 'category_labels' AND ${table.payload} ?& ARRAY['categoryIds','dimensionIds']) OR (${table.kind} = 'severity' AND ${table.payload} ?& ARRAY['tier','value','direction']) OR (${table.kind} = 'calibration' AND ${table.payload} ?& ARRAY['standing','signals','targetDecisionKinds','validationReleaseId'] AND ${table.payload}->>'standing' = 'not_calibrated') OR (${table.kind} = 'corroboration' AND ${table.payload} ?& ARRAY['independentEvidenceGroups','contributingReports','confidenceWeight','calibrationStanding'] AND ${table.payload}->>'calibrationStanding' = 'heuristic_not_probability') OR (${table.kind} = 'publication' AND ${table.payload} ?& ARRAY['eligible','origin','gateReasons'])) AND jsonb_typeof(${table.actor}) = 'object' AND ${table.actor}->>'type' IN ('classifier','verifier','subject_attributor','calibration_assessor','corroborator','publication_gate','human_reviewer','legacy_projection')`,
+    ),
   ],
 );
 

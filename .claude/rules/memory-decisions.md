@@ -881,3 +881,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   rights, and use metadata. The RSF candidate remains disabled.
 - Threshold multipliers are sensitivity scenarios, not calibrated corrections.
   Durable record: APR-D118 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Pulse decisions remain independent and append-only
+
+- `pulse-decision-ledger/v1` separates existence, attribution, category,
+  severity, calibration, corroboration, and publication judgments.
+- Supersession is same-axis and append-only; the event row is only a current
+  projection. Generic confidence payloads are prohibited.
+- Calibration remains not calibrated and corroboration remains a heuristic.
+  Durable record: APR-D119 in `plan/DECISIONS.md`.
