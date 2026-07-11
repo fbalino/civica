@@ -121,6 +121,8 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
   "content/methodology-overview.md": [],
   "content/methodology-pulse.md": [
     "methodologyVersion",
+    "ontologyVersion",
+    "ontologyCategoryCount",
     "observedThrough",
     "activeFeedsProse",
     "classifyVotersProse",

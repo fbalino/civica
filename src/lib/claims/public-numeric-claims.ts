@@ -790,8 +790,8 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "pulse-methodology.taxonomy-total",
     "content/methodology-pulse.md",
     "reader:methodology-pulse",
-    "{{state.pulse.taxonomy.categoryCount}} categories",
-    "registered site-state Pulse taxonomy",
+    "{{ctx.ontologyCategoryCount}} event categories",
+    "registered pulse-event-ontology/v3.0 codebook",
   ),
   runtimeClaim(
     "pulse-methodology.democratic-quality-categories",

@@ -90,9 +90,27 @@ The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score 
 6. **Review or publish.** {{ctx.reviewTiersProse}}, deadlocks/no quorum, and weak or degraded majorities paired with a verifier objection route to review. An objection includes low confidence, a revised or rejected verdict, a negative category/severity/subject/event check, or failed/unavailable verification. Other events may be auto-published. Queued and rejected events do not affect public deltas.
 7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write API-only experimental deltas.
 
-## Event categories — the {{state.pulse.taxonomy.version}} taxonomy {#event-categories}
+## Event ontology — {{ctx.ontologyVersion}} {#event-categories}
 
-The Pulse classifies every event into exactly one category drawn from a fixed taxonomy. {{state.pulse.taxonomy.version}} ships **{{state.pulse.taxonomy.categoryCount}} categories** across the five dimensions, derived from a top-down completeness review against five established political-science frameworks (V-Dem, ACLED, the Comparative Constitutions Project, the Polity Project, and Freedom House). Full derivation lives in [the gap-analysis document](https://github.com/fbalino/civica/blob/main/docs/taxonomy-v2-gap-analysis.md).
+The adopted research codebook is **{{ctx.ontologyVersion}}**. It carries forward all **{{ctx.ontologyCategoryCount}} event categories** from the production {{state.pulse.taxonomy.version}} taxonomy and permits several labels on one real-world event when the source record supports distinct facets. Each assigned label retains its own evidence references and rationale. Its dimension is derived from the category rather than chosen separately by a model.
+
+The scheduled classifier still writes one {{state.pulse.taxonomy.version}} category per event. That runtime remains in place until the row schema, prompts, review tools, API contract, migration, and evaluation release all name the new ontology version. Existing rows keep the version under which they were classified; adopting the codebook does not silently relabel them.
+
+The five dimensions remain Democratic Quality, Rule of Law, Rights & Freedoms, Corruption Control, and Stability. The v2 derivation record is preserved in [the gap-analysis document](https://github.com/fbalino/civica/blob/main/docs/taxonomy-v2-gap-analysis.md).
+
+### Severity descriptors
+
+Severity describes the documented reach and reversibility of a particular event facet. It is recorded separately from effect direction and from any experimental numeric delta.
+
+| Descriptor | Meaning |
+| --- | --- |
+| `not_assessed` | The occurrence is supported, but its institutional scope or intensity has not been assessed. |
+| `limited` | Localized, short-duration, narrowly targeted, or readily reversible. |
+| `material` | Substantial within an institution, jurisdiction, or affected population, without threatening the institutional order as a whole. |
+| `major` | National, prolonged, difficult to reverse, or consequential for a core institution. |
+| `critical` | Disrupts the constitutional or institutional order, affects a very large population, or has severe and difficult-to-reverse consequences. |
+
+Effect direction is one of `expansive`, `restrictive`, `mixed`, `unclear`, or `not_assessed`. It refers only to the named construct. It is not an overall verdict on a policy, government, event, or country.
 
 ### Democratic Quality ({{state.pulse.taxonomy.categoriesPerDimension.democratic_quality}} categories)
 
@@ -166,22 +184,26 @@ The Pulse classifies every event into exactly one category drawn from a fixed ta
 - `peace_agreement_signed` / `peace_agreement_implemented` — formal peace agreements (positive).
 - `negotiated_transition_stability` — stabilising side of pacted regime transitions (positive).
 
-Each category in the taxonomy ships with: an inline theoretical citation, an allowed-severity-tier list, a decay half-life, and a direction (positive / negative / mixed). The classifier picks exactly one category per event; multiple related events on different dimensions form what the methodology calls a *cascade* — see below.
+The carried-forward production categories retain their theoretical references, decay settings, and prior production directions for historical interpretation. The new annotation contract separates occurrence, direction, and severity so those older settings do not predetermine a research annotation.
 
 ## Disambiguation — when an event could fit multiple categories {#disambiguation}
 
-Several fine-grained categories overlap — an event could plausibly fit more than one. The classifier applies a single rule:
+One event may receive labels from several dimensions, but each label must describe a separately evidenced facet. Two rules prevent double coding. The same category cannot be assigned twice to one facet, and a generic label cannot sit beside its more specific counterpart on that same facet. Mutually exclusive outcomes, such as `fair_election` and `election_cancellation`, remain unassigned candidates when the evidence does not resolve them.
 
-**The more dimension-specific category wins over the more generic procedural one.**
+A lawful institutional act can qualify as an event without being coded as beneficial or harmful overall. A disaster emergency with no documented governance effect is outside the ontology. When the evidence establishes an occurrence but cannot distinguish, for example, an independent corruption conviction from selective prosecution of an opponent, the record keeps both candidate labels and an ambiguity reason; neither becomes an assigned label.
 
-Concrete precedence:
+Additional consequences are never inferred from the first event. Evidence of a coup alone does not establish media closure, martial law, electoral annulment, or detention. Each consequence needs its own source support.
 
-- `emergency_declaration` loses to `term_extension`, `mass_disenfranchisement`, `election_cancellation`, `constitutional_override_electoral`, `judicial_purge`, and `martial_law` when the event has a named institutional target.
-- `systematic_crackdown` loses to any category with a named institutional target (e.g. `ngo_restriction`, `media_shutdown`, `academic_freedom_change`).
-- `mass_detention` loses to `opposition_prosecution` when the detained are named figures with formal charges.
-- `coup` wins over `government_collapse` and `constitutional_crisis` when there is an unconstitutional seizure of power.
+| Case | Treatment |
+| --- | --- |
+| A seizure of power, a separately documented dissolution of the elected legislature, and a separately documented media order | Assign `coup`, `constitutional_override_electoral`, and `media_shutdown` to three evidenced facets. |
+| A certified fair result accompanied by separately documented partisan violence | Assign `fair_election` and `electoral_violence`; the labels describe different facets. |
+| An opposition leader is convicted, but available evidence cannot establish prosecutorial independence | Keep `corruption_conviction` and `opposition_prosecution` as candidates; assign neither pending adjudication. |
+| A lawful disaster emergency has no documented institutional or rights effect | Mark non-qualifying; do not force an `emergency_declaration` label. |
+| One decree both declares an emergency and extends a mandate | Use the specific `term_extension` label for that facet, not both labels. |
+| A coup report contains no evidence of military jurisdiction over civilians | Assign `coup`; do not infer `martial_law`. |
 
-These precedence rules are part of the classifier's instructions, so they are applied consistently to every event.
+Changes are versioned. A new category needs a definition, dimension, source-framework rationale, example, counterexample, and compatibility review. Changes to category identity, dimension, compatibility, severity, or annotation states require a new major version and a migration map. Old annotations keep their recorded version.
 
 ## How coups are classified — the cascade model {#cascade-model}
 

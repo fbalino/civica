@@ -10,6 +10,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { pulse, disputeSla } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
+import { PULSE_EVENT_ONTOLOGY } from "@/lib/pulse/v2/event-ontology";
 
 export const revalidate = 3600;
 
@@ -37,7 +38,7 @@ const SECTIONS = [
   { id: "what-pulse-is-not", label: "What the Pulse is not" },
   { id: "sources", label: "Sources" },
   { id: "daily-pipeline", label: "Scheduled pipeline" },
-  { id: "event-categories", label: "Event categories" },
+  { id: "event-categories", label: "Event ontology" },
   { id: "disambiguation", label: "Disambiguation" },
   { id: "cascade-model", label: "Cascade model" },
   { id: "classification-confidence", label: "Classification confidence" },
@@ -93,6 +94,8 @@ export default function PulseMethodologyPage() {
   // scripts/validate-content-templates.ts.
   const ctx = {
     methodologyVersion: method.version,
+    ontologyVersion: PULSE_EVENT_ONTOLOGY.id,
+    ontologyCategoryCount: PULSE_EVENT_ONTOLOGY.categories.length,
     observedThrough: method.feeds.activeProduction.observedThrough,
     activeFeedsProse: proseList(
       method.feeds.activeProduction.sourceIds.map(
