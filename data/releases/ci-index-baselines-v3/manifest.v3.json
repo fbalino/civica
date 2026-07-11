@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "civica-index-baseline-manifest/v3",
+  "releaseId": "ci-index-baselines-v3",
+  "methodVersion": "civica-index-baselines/v3",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "inputIdentities": [
+    "vdem:v2x_libdem",
+    "worldbank_wgi:va.est",
+    "worldbank_wgi:rl.est",
+    "freedom_house:pr_cl_total",
+    "transparency_intl:score"
+  ],
+  "inputCells": 24250,
+  "observedInputRows": 19471,
+  "indicatorContractHash": "38eaf15fc0d730ae737a44022342a75ba15570c446574c209ee1c5830879023b",
+  "baselines": {
+    "B0": {
+      "rows": 4850,
+      "coverage": {
+        "development": 2193,
+        "validation": 1356,
+        "final_holdout": 1301
+      },
+      "outputSha256": "38314d92dcf33fa999e2983b22bff10ea2485dc9c9dd2f36837ab78bcc2c85f0",
+      "scale": [
+        "no_score_native_observations"
+      ]
+    },
+    "B1": {
+      "rows": 4298,
+      "coverage": {
+        "development": 1868,
+        "validation": 1238,
+        "final_holdout": 1192
+      },
+      "outputSha256": "d3bb46e209084cc37742cf27e544cc2a2ecdd475403b41cdaa95e807e86c5818",
+      "scale": [
+        "vdem_native_0_1"
+      ]
+    },
+    "B2": {
+      "rows": 2270,
+      "coverage": {
+        "development": 551,
+        "validation": 793,
+        "final_holdout": 926
+      },
+      "outputSha256": "ad5e0dbbb436668781490399e66da6390fc353e2147f9ad5723384ef13118435",
+      "scale": [
+        "common_scale_0_100"
+      ]
+    },
+    "B3": {
+      "rows": 2270,
+      "coverage": {
+        "development": 551,
+        "validation": 793,
+        "final_holdout": 926
+      },
+      "outputSha256": "2c7186dd4488e7020744aa17607ddd6a9394005b8e7e723f3ef23f45369a4a4e",
+      "scale": [
+        "development_fitted_first_factor_z"
+      ]
+    }
+  },
+  "factorModel": {
+    "sourceOrder": [
+      "democratic_quality",
+      "rule_of_law",
+      "freedom_rights",
+      "corruption_control"
+    ],
+    "fitRows": 551,
+    "iterations": 12,
+    "tolerance": 1e-12,
+    "modelSha256": "a01497d5c961b1a31a0dfd167b6b25daffae80b2170b249c2b59c61ec851cca7"
+  },
+  "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+  "publicValuesIncluded": false,
+  "rightsPosture": "private_internal_research_only_pending_source_terms"
+}

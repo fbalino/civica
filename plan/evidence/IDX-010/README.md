@@ -1,17 +1,17 @@
 # IDX-010 evidence — locked tournament preregistration
 
-Current protocol v2 was registered before outcome inspection. V1 remains preserved; v2 changes only the frozen panel and candidate identity needed to use Freedom House `pr_cl_total` rather than `fh_total_score`. Splits, gates, thresholds, and decision rules are unchanged.
+Current protocol v3 was registered before outcome inspection. Prior versions remain preserved; v3 pins the exact PR+CL and WGI VA fallback identities and precedence. Splits, gates, thresholds, and decision rules are unchanged.
 
 ## Registration
 
-- Protocol: `civica-index-tournament-preregistration/v2`
-- Registered: `2026-07-11T09:31:50Z`
-- Registration-base commit: `60012a66d1d5713c02c3e7355b4320113e221416`
-- Frozen panel commit: `dcce033e56db7927d55743e05625aa539ded1544`
+- Protocol: `civica-index-tournament-preregistration/v3`
+- Registered: `2026-07-11T09:40:42Z`
+- Registration-base commit: `8f18b696250d18d00a30e62f31e31c4fea41f4ac`
+- Frozen panel commit: `4aaca7c26ae0a0b26e4ffe05e04ea568282f5cb7`
 - Frozen charter commit: `28edebdfea368c9f5938b8483b4fd1645a448ce9`
-- Frozen candidate-set commit: `60012a66d1d5713c02c3e7355b4320113e221416`
+- Frozen candidate-set commit: `8f18b696250d18d00a30e62f31e31c4fea41f4ac`
 
-The readable amendment is `plan/research/index-tournament-preregistration-v2.md`; the complete executable source is `src/lib/ci/tournament-preregistration.ts`.
+The readable amendment is `plan/research/index-tournament-preregistration-v3.md`; the complete executable source is `src/lib/ci/tournament-preregistration.ts`.
 
 ## Frozen data and splits
 

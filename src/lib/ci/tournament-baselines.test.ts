@@ -4,7 +4,7 @@ import { dashboardBaseline, equalWeightBaseline, firstFactorBaseline, fitFirstFa
 
 const sources = [
   ["vdem", "v2x_libdem", 0, 1], ["worldbank_wgi", "rl.est", -2.5, 2.5],
-  ["freedom_house", "fh_total_score", 0, 100], ["transparency_intl", "score", 0, 100],
+  ["freedom_house", "pr_cl_total", 2, 14], ["transparency_intl", "score", 0, 100],
 ] as const;
 const rows: BaselinePanelObservation[] = [];
 for (const [countryIndex, iso3] of ["URY", "JPN", "FRA", "USA", "ZAF"].entries()) {

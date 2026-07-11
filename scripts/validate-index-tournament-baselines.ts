@@ -5,9 +5,9 @@ import { buildBaselineManifest } from "./generate-index-tournament-baselines";
 config({ path: ".env.local" });
 async function main() {
   const live = process.argv.includes("--live");
-  const checked = JSON.parse(readFileSync("data/releases/ci-index-baselines-v2/manifest.v2.json", "utf8"));
+  const checked = JSON.parse(readFileSync("data/releases/ci-index-baselines-v3/manifest.v3.json", "utf8"));
   const errors: string[] = [];
-  if (checked.schemaVersion !== "civica-index-baseline-manifest/v2") errors.push("wrong manifest schema");
+  if (checked.schemaVersion !== "civica-index-baseline-manifest/v3") errors.push("wrong manifest schema");
   if (checked.publicValuesIncluded !== false) errors.push("restricted baseline values are public");
   if (JSON.stringify(Object.keys(checked.baselines).sort()) !== JSON.stringify(["B0", "B1", "B2", "B3"])) errors.push("baseline set is incomplete");
   for (const [id, row] of Object.entries(checked.baselines) as Array<[string, { outputSha256: string; rows: number }]>) {

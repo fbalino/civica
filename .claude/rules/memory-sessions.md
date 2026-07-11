@@ -583,3 +583,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   ratings input. Immutable v2 uses the exact hash-pinned publisher workbook.
 - Candidate set, preregistration, and baselines advanced to v2 before outcome
   inspection; all v1 artifacts remain preserved. IDX-012 resumes next.
+
+## 2026-07-11 — IDX-038 reopened and closed with WGI fallback
+
+- A second audit found the missing WGI Voice fallback. Panel v3 now retains it
+  separately from WGI Rule of Law and applies V-Dem-first precedence.
+- Candidate set, preregistration, and baselines advanced to v3 before outcome
+  inspection; all earlier releases remain immutable. IDX-012 resumes.
