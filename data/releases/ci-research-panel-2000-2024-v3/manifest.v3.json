@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "ci-research-panel/v3",
+  "releaseId": "ci-research-panel-2000-2024-v3",
+  "supersedes": "ci-research-panel-2000-2024-v2",
+  "correction": "adds the exact WGI Voice and Accountability fallback required by K1 without replacing V-Dem",
+  "period": {
+    "start": 2000,
+    "end": 2024
+  },
+  "scope": {
+    "jurisdictionStatus": "sovereign_state",
+    "jurisdictions": 194,
+    "indicators": 6,
+    "expectedRows": 29100,
+    "observedRows": 23911,
+    "missingRows": 5189
+  },
+  "selectionPrecedence": {
+    "democratic_quality": [
+      "vdem:v2x_libdem",
+      "worldbank_wgi:va.est"
+    ],
+    "rule": "use V-Dem when observed; otherwise use WGI VA; never average primary and fallback"
+  },
+  "rowSha256": "7da2d4cfd58b671957c0c88cd043467563edd2cda8e8fbd6442aae6201d4bb72",
+  "coverageSha256": "fbca1142e428702ee868514ae7ade422dc2b58af5496fa38f3f0a0b2539c1195",
+  "temporalBreaksSha256": "db2ae9eef23196e294807261738840b40c88caf4cd436ac1c4a49aed66d6a4b7",
+  "generatorVersion": "ci-tournament-panel-generator/v3",
+  "captures": {
+    "freedomHouse": {
+      "accessUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx",
+      "contentSha256": "d6ac861af6e7dcea7e870e39ddbcd2925730a653c1466f8992a7d0005f53be88",
+      "retrievedAt": "2026-07-10T20:56:16.125Z",
+      "upstreamVersion": "Freedom in the World workbook through 2024",
+      "redistributionPosture": "restricted-no-redistribution",
+      "unmatchedPublisherNames": [
+        "Kosovo",
+        "Serbia and Montenegro",
+        "Taiwan"
+      ]
+    },
+    "wgi": {
+      "accessUrl": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx",
+      "contentSha256": "25a2f9eabb90b0092973392c0b31571aa58b691cc5786292e504b52f693e1eb8",
+      "retrievedAt": "2026-07-10T20:56:16.125Z",
+      "upstreamVersion": "WGI 2025 methodology revision",
+      "redistributionPosture": "open-with-attribution"
+    }
+  },
+  "seriesType": "current_harmonized_backcast_not_as_published",
+  "valuesLocation": "private_neon_ci_research_panel_rows",
+  "rightsPosture": "private_internal_research_only_pending_source_terms",
+  "publicBulkValuesIncluded": false
+}
