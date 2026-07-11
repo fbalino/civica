@@ -49,7 +49,7 @@ export function NavLinks() {
       : pathname === href || pathname.startsWith(href + "/");
 
   const indexActive =
-    pathname === "/civica-index" || pathname.startsWith("/civica-index/");
+    pathname === "/governance-evidence" || pathname === "/civica-index" || pathname.startsWith("/civica-index/");
 
   const methodologyActive =
     pathname === "/methodology" ||

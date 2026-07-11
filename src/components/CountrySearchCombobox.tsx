@@ -26,6 +26,8 @@ interface CountrySearchComboboxProps {
   placeholder?: string;
   ariaLabel?: string;
   countryPathPrefix?: string;
+  /** Navigate to `countryPathPrefix?{countryQueryParam}=slug` instead of a path segment. */
+  countryQueryParam?: string;
   hrefForCountry?: (country: CountrySearchOption) => string;
   onSelect?: (country: CountrySearchOption) => void;
   autoFocus?: boolean;
@@ -42,6 +44,7 @@ export function CountrySearchCombobox({
   placeholder = "Search countries...",
   ariaLabel = "Search countries",
   countryPathPrefix = "/country",
+  countryQueryParam,
   hrefForCountry,
   onSelect,
   autoFocus = false,
@@ -117,13 +120,13 @@ export function CountrySearchCombobox({
         onSelect(country);
         return;
       }
-      router.push(
-        hrefForCountry
-          ? hrefForCountry(country)
-          : `${countryPathPrefix.replace(/\/$/, "")}/${country.slug}`
-      );
+      router.push(hrefForCountry
+        ? hrefForCountry(country)
+        : countryQueryParam
+          ? `${countryPathPrefix}?${new URLSearchParams({ [countryQueryParam]: country.slug })}`
+          : `${countryPathPrefix.replace(/\/$/, "")}/${country.slug}`);
     },
-    [countryPathPrefix, hrefForCountry, onSelect, router]
+    [countryPathPrefix, countryQueryParam, hrefForCountry, onSelect, router]
   );
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {

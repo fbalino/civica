@@ -18,6 +18,7 @@ export type IndexNavItem = {
  * for non-methodology Index sub-pages only.
  */
 export const INDEX_NAV_ITEMS: IndexNavItem[] = [
+  { href: "/governance-evidence", label: "Evidence Dashboard", descriptor: "Source-native observations" },
   { href: "/civica-index", label: "Overview", descriptor: "Research-beta home" },
   {
     href: "/civica-index/government-types",
