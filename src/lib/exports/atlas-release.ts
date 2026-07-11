@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { SOURCE_RIGHTS } from "@/lib/rights/manifest";
 import { parseAtlasVintageLabel } from "@/lib/data/frozen-vintage";
 
-export const ATLAS_EXPORT_SCHEMA_VERSION = "civica-atlas-export/v2" as const;
+export const ATLAS_EXPORT_SCHEMA_VERSION = "civica-atlas-export/v3" as const;
 export const ATLAS_EXPORT_RELEASE_ID = "atlas-2026-07-11" as const;
 export const ATLAS_EXPORT_RELEASE_DATE = "2026-07-11" as const;
 export const ATLAS_EXPORT_VINTAGE_LABEL = "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1" as const;

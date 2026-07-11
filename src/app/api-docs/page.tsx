@@ -527,7 +527,7 @@ for country in resp.json()["data"]:
         </p>
 
         <p className="api-info-card__body">
-          Schema <code>civica-atlas-export/v2</code> · release date{" "}
+          Schema <code>civica-atlas-export/v3</code> · release date{" "}
           <code>2026-07-11</code> · SHA-256{" "}
           <code>8be96e97fef153736f98ce56c8ab59a697f6396c3f61d3b07b12ba7823904ba9</code>.
           The package contains its codebook, join keys, deterministic ordering,

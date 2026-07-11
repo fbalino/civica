@@ -934,7 +934,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-atlas-export.ts",
     ],
     implementationOwner: "Atlas exports and data governance",
-    methodologyVersion: "civica-atlas-export/v2",
+    methodologyVersion: "civica-atlas-export/v3",
     gate: "G2",
     source: {
       path: "src/app/api-docs/page.tsx",

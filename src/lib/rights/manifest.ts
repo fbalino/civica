@@ -316,7 +316,7 @@ export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
     governingTerms:
       "Each fact row retains its source ID and joins to the embedded source-specific terms record. Download access does not replace those terms or grant a blanket license.",
     derivationVersions: buildDerivationVersionEnvelope({
-      methodology: versioned("civica-atlas-export/v2"),
+      methodology: versioned("civica-atlas-export/v3"),
       algorithm: versioned("atlas-export-generator/v1"),
       prompt: notApplicable("The export is generated deterministically without a model prompt."),
       taxonomy: versioned("jurisdiction-status/v1"),

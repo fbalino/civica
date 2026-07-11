@@ -50,7 +50,7 @@ export builder, and compares exact bytes to the checked expectation.
 - fixture SHA-256:
   `78d1bf5d5fa335aa98f8424f9387cb45b1d5bbc1158dff9d8686a3bd4a6f8113`
 - normalized export SHA-256:
-  `8ff633f5447f59b6771c7ae10b63b407df9af99aab632889967a073c6386e639`
+  `6ffab7346a96ab3fe44727709d79f9fda659e701f2fe0a2a7a4f45a4457adeeb`
 - rows: 3 jurisdictions, 3 facts, 3 source-rights records
 - tolerance: exact canonical JSON bytes
 - credentials used: none
