@@ -75,7 +75,7 @@ A governance monitor built on general news alone hits the **media-asymmetry prob
 
 **Current production coverage (runtime snapshot {{ctx.observedThrough}}).** The only feeds with observed Pulse staging rows are {{ctx.activeFeedsProse}}. ACLED is access-gated; RSF and Reuters/AP lack configured production feeds; the IPU connector is sparse and has produced no observed Pulse staging rows in the snapshot; the V-Dem connector is a placeholder. “Present in the orchestrator” does not mean “active.”
 
-The active basket is dominated by GDELT, and a single-source event can currently affect an experimental delta at reduced heuristic weight. Source diversity is recorded when it exists, but the present method does not impose a two-source publication minimum. Readers should not interpret “corroboration weight” as proof that an event was independently corroborated.
+The active basket is dominated by GDELT, and a single-evidence event can currently affect an experimental delta at reduced heuristic weight. The current method collapses likely copies and reports sharing one publisher or declared origin before it counts evidence groups, but it does not impose a two-group publication minimum. Readers should not interpret “corroboration weight” as proof that an event was independently corroborated.
 
 An event seen only in news, without specialist corroboration, is scored at reduced confidence; in low-press-freedom countries that discount is severe — see the press-freedom rule below.
 
@@ -87,13 +87,21 @@ The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score 
 2. **Cluster.** Normalize each report under `{{ctx.clusterIdentityVersion}}`, embed it with `{{ctx.clusterEmbeddingModel}}`, and compare it with other candidates inside a ±{{ctx.clusterWindowHours}}-hour window. The ingest-time country guess is diagnostic and does not partition the candidates. A pair must meet the semantic cosine threshold of {{ctx.clusterSemanticThreshold}} or the canonical-token Jaccard threshold of {{ctx.clusterLexicalThreshold}}, with a shared event-identity anchor guarding against generic same-day matches. When the embedding runtime is unavailable, production uses the canonical-token path alone. That fallback has not been shown to perform equivalently.
 3. **Classify.** The configured cross-vendor voters — {{ctx.classifyVotersProse}} — assign a taxonomy category and severity. A strict majority wins; a category deadlock or no quorum goes to review. Different vendors diversify error sources but do not make their errors statistically independent.
 4. **Verify and attribute.** {{ctx.verifierProse}} makes a separate adversarial call against the majority verdict. The same model also participates as one voter, so this is a separate call rather than an independent model family. Subject-country attribution is another pass, currently {{ctx.subjectAttributorProse}}, run after classification; if it fails, the ingest-time attribution remains. That attribution verdict is not yet persisted as a separately versioned audit row.
-5. **Weight.** Count distinct specialist and news source IDs, combine that diversity with the stored agreement label, and apply asymmetric and provisional press-context multipliers. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
+5. **Weight.** Collapse likely republications and evidence from one publisher or underlying report, then count the remaining specialist and news evidence groups. Combine that count with the stored agreement label and apply asymmetric and provisional press-context multipliers. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
 6. **Review or publish.** {{ctx.reviewTiersProse}}, deadlocks/no quorum, and weak or degraded majorities paired with a verifier objection route to review. An objection includes low confidence, a revised or rejected verdict, a negative category/severity/subject/event check, or failed/unavailable verification. Other events may be auto-published. Queued and rejected events do not affect public deltas.
 7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write API-only experimental deltas.
 
 ## Clustering coverage {#clustering-coverage}
 
 The frozen [cluster coverage report](/api/v1/pulse/cluster-coverage) publishes cluster-size, recorded source-ID, source-family, language, provisional-country, and method-version distributions for retained reports. It is a descriptive release rather than an accuracy result. Source-family diversity does not establish editorial independence, and the stored historical clusters should not be read as if the current method had produced all of them. Held-out overmerge and undermerge evaluation remains pending.
+
+## Source independence {#source-independence}
+
+The corroboration stage uses `{{ctx.sourceIndependenceVersion}}` to compare the retained reports attached to one event. Reports are treated as dependent when they share the same evidence snapshot, canonical URL, publisher family, declared underlying origin, or near-verbatim account. Dependencies are joined transitively into evidence groups. A specialist report and a news copy of it form one specialist group rather than two corroborating sources.
+
+Publisher identity is taken from the recorded publisher host for aggregated news and from the connector&rsquo;s known organization for direct specialist or wire feeds. When an aggregated-news publisher cannot be resolved, the method collapses those unresolved reports within the event. This conservative rule can undercount genuinely separate reporting, but it avoids awarding corroboration merely because publisher metadata is missing.
+
+The checked regression fixture was labelled before detector evaluation and must reach pairwise precision of at least {{ctx.sourceIndependencePrecisionPct}}% and recall of at least {{ctx.sourceIndependenceRecallPct}}%. It passes those gates. This small, internally reviewed fixture protects known cases such as wire copies, mirrored NGO releases, and references to one underlying report. It is not representative external validation. Distinct publishers can still rely on the same undisclosed reporting, and paraphrased republication can evade a lexical detector. The later held-out event evaluation must measure those errors on a broader sample.
 
 ## Version identity {#version-identity}
 
@@ -267,12 +275,12 @@ Current provider-tagged events store each successful voter result and rationale 
 
 The experimental weighting applies stronger discounts to positive events to reduce sensitivity to symbolic or state-promoted claims. These are hand-set **heuristic multipliers**, not empirically calibrated probabilities or publication gates:
 
-- A positive event with **no specialist source ID** has its corroboration confidence reduced (currently ×0.6), so a state-announced "reform" with no specialist record barely moves the score.
-- In **low-press-freedom** countries, a positive event with fewer than two distinct recorded source IDs is discounted further (currently ×0.5). The current data model does not detect state ownership or source-family relationships, so this count must not be read as evidence that the sources are independent or non-state.
+- A positive event with **no independent specialist evidence group** has its corroboration confidence reduced (currently ×0.6), so a state-announced "reform" with no specialist record barely moves the score.
+- In **low-press-freedom** countries, a positive event with fewer than two independent evidence groups is discounted further (currently ×0.5). The grouping method detects several common republication relationships but does not establish state ownership or full editorial independence.
 
 (The classifier is instructed to drop un-enacted announcements and symbolic claims, but this behavior has not completed representative evaluation.)
 
-Negative events do not receive the positive-event multipliers. There is currently no minimum such as “one specialist plus one news source” or “two distinct news source IDs”: a single-source event can affect an API-only experimental delta at reduced weight. Source-family independence and republication detection are not yet implemented.
+Negative events do not receive the positive-event multipliers. There is currently no minimum such as “one specialist plus one news group” or “two independent news groups”: a one-group event can affect an API-only experimental delta at reduced weight. The source-independence detector changes the heuristic count; it does not create a publication requirement.
 
 ## Press-freedom rule {#press-freedom-rule}
 
@@ -324,7 +332,7 @@ Country pages flagged by the provisional press-context lookup surface this cavea
 ## Known limitations {#known-limitations}
 
 - Coverage is uneven and currently leans heavily on GDELT plus three specialist feeds. Inactive and placeholder connectors do not contribute evidence. Sparse-coverage countries can have missed events; absence is not stability.
-- A single-source event can currently affect an experimental delta, and GDELT is counted as one source ID regardless of the underlying publisher. Source-family independence and republication detection are not implemented.
+- A one-group event can currently affect an experimental delta. The source-independence detector collapses common same-publisher, wire-copy, mirror, and named-origin relationships, but it has only an internal regression fixture. It can miss paraphrased or undisclosed republication and can conservatively merge separate reports when publisher metadata is unresolved.
 - Current clustering compares normalized event identities without a country partition, but most retained historical clusters predate that method. The lexical-only fallback has not been evaluated as equivalent to the multilingual semantic path, and held-out overmerge and undermerge performance remains unknown.
 - The classifier is deliberately strict — the large majority of ingested news is commentary, business, or un-enacted announcements rather than discrete governance events, and is dropped. This keeps noise out of the scores, but a genuine event can occasionally be discarded; missing-event disputes are welcomed.
 - LLM classification is imperfect. Current provider-tagged runs preserve successful voter and verification outputs, while older classifier generations remain explicitly legacy-versioned. The API prevents the full ledger from presenting as a homogeneous current-method sample.

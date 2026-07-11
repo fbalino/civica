@@ -4,6 +4,7 @@ import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "@/lib/db/schema";
 import {
   corroborateEvents,
+  sourceCountsFromEvidence,
   type CorroborationPlan,
   type EventRow,
   type SourceCounts,
@@ -23,10 +24,12 @@ const event: EventRow = {
   classificationRunId: "33333333-3333-4333-8333-333333333333",
 };
 
-const sourceCounts = new Map<string, SourceCounts>([[
-  event.id,
-  { specialist: new Set(["specialist-1"]), news: new Set(["news-1"]) },
-]]);
+const sourceCounts = new Map<string, SourceCounts>([
+  [
+    event.id,
+    { specialist: new Set(["specialist-1"]), news: new Set(["news-1"]) },
+  ],
+]);
 const runRef = createPulsePipelineRunRef("corroborate", {
   id: "55555555-5555-4555-8555-555555555555",
   sourceIds: ["specialist-1", "news-1"],
@@ -39,7 +42,9 @@ test("corroboration dry-run is stable and performs zero writes", async () => {
     events: [event],
     sourceCounts,
     dryRun: true,
-    write: async () => { writes++; },
+    write: async () => {
+      writes++;
+    },
     runRef,
   };
   const first = await corroborateEvents({} as Db, options);
@@ -69,7 +74,9 @@ test("malformed corroboration fixtures fail before writes", async () => {
     corroborateEvents({} as Db, {
       events: [event, event],
       sourceCounts,
-      write: async () => { writes++; },
+      write: async () => {
+        writes++;
+      },
       runRef,
     }),
     /duplicate corroboration event id/,
@@ -86,4 +93,32 @@ test("empty corroboration input is an explicit no-op", async () => {
   });
   assert.equal(result.examined, 0);
   assert.deepEqual(result.planned, []);
+});
+
+test("corroboration counts independent evidence groups instead of connector rows", () => {
+  const counts = sourceCountsFromEvidence([
+    {
+      rawEventId: "raw-reuters",
+      sourceId: "gdelt",
+      sourceType: "news",
+      sourceUrl: "https://reuters.com/story",
+      sourceFamilyId: "gdelt",
+      itemPublisherHost: "reuters.com",
+      title: "Minister resigns",
+      body: "Reuters reported the resignation",
+    },
+    {
+      rawEventId: "raw-copy",
+      sourceId: "gdelt",
+      sourceType: "news",
+      sourceUrl: "https://daily.test/reuters-copy",
+      sourceFamilyId: "gdelt",
+      itemPublisherHost: "daily.test",
+      title: "Minister resigns",
+      body: "Reporting by Reuters on the resignation",
+    },
+  ]);
+  assert.equal(counts.reportCount, 2);
+  assert.equal(counts.news.size, 1);
+  assert.deepEqual([...counts.sourceIds!], ["gdelt"]);
 });

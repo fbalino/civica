@@ -1263,6 +1263,7 @@ export const zPulseMethodologySnapshot = z
     feeds: z.unknown(),
     cadence: z.unknown(),
     clustering: z.unknown(),
+    corroboration: z.unknown(),
     publicationPolicy: z.unknown(),
     numericDeltas: z.unknown(),
     evaluation: z.unknown(),

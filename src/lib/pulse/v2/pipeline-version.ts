@@ -96,7 +96,7 @@ function stageAlgorithm(stage: PulsePipelineStage): VersionRef {
   if (stage === "classify")
     return versioned(PULSE_CLASSIFICATION_ALGORITHM_VERSION);
   if (stage === "corroborate")
-    return versioned("pulse-corroboration/heuristic-v2.1");
+    return versioned("pulse-corroboration/evidence-family-v3");
   if (stage === "review") return versioned("pulse-review/human-decision-v1");
   return versioned(PULSE_DELTA_ALGORITHM_VERSION);
 }

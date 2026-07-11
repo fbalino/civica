@@ -45,9 +45,14 @@ import {
 } from "./summarize";
 import { PULSE_EMBEDDING_MODEL } from "./embed";
 import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
+import {
+  PULSE_SOURCE_INDEPENDENCE_VERSION,
+  SOURCE_INDEPENDENCE_MIN_PRECISION,
+  SOURCE_INDEPENDENCE_MIN_RECALL,
+} from "./source-independence";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.1.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.2-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.2.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.3-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -231,6 +236,26 @@ export interface PulseRuntimeMethodContract {
       condition: "embedding_model_unavailable";
       metric: "jaccard_token_similarity";
       threshold: number;
+    };
+  };
+  corroboration: {
+    standing: "heuristic_not_probability";
+    countingUnit: "independent_evidence_group";
+    sourceIndependence: {
+      version: string;
+      dependentSignals: [
+        "same_snapshot",
+        "same_canonical_url",
+        "same_publisher_family",
+        "same_declared_origin",
+        "near_verbatim_republication",
+      ];
+      unresolvedPublisherPolicy: "collapse_within_event";
+      reviewedPairThresholds: {
+        precision: number;
+        recall: number;
+      };
+      validationStanding: "reviewed_regression_fixture_not_external_validation";
     };
   };
   publicationPolicy: {
@@ -484,6 +509,27 @@ export function buildPulseRuntimeMethod(
         condition: "embedding_model_unavailable",
         metric: "jaccard_token_similarity",
         threshold: facts.clustering.lexicalThreshold,
+      },
+    },
+    corroboration: {
+      standing: "heuristic_not_probability",
+      countingUnit: "independent_evidence_group",
+      sourceIndependence: {
+        version: PULSE_SOURCE_INDEPENDENCE_VERSION,
+        dependentSignals: [
+          "same_snapshot",
+          "same_canonical_url",
+          "same_publisher_family",
+          "same_declared_origin",
+          "near_verbatim_republication",
+        ],
+        unresolvedPublisherPolicy: "collapse_within_event",
+        reviewedPairThresholds: {
+          precision: SOURCE_INDEPENDENCE_MIN_PRECISION,
+          recall: SOURCE_INDEPENDENCE_MIN_RECALL,
+        },
+        validationStanding:
+          "reviewed_regression_fixture_not_external_validation",
       },
     },
     publicationPolicy: {

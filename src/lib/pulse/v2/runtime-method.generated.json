@@ -61,7 +61,27 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "e197ac2b107d7058c0cdc7af99f9980d4bf3429553914f1a7feba5ee05253a97",
+  "contractHash": "2e9b328a834553d4180ef36d2d358789f5e100aeb19539fb40c2e2b9921ebaed",
+  "corroboration": {
+    "countingUnit": "independent_evidence_group",
+    "sourceIndependence": {
+      "dependentSignals": [
+        "same_snapshot",
+        "same_canonical_url",
+        "same_publisher_family",
+        "same_declared_origin",
+        "near_verbatim_republication"
+      ],
+      "reviewedPairThresholds": {
+        "precision": 0.95,
+        "recall": 0.9
+      },
+      "unresolvedPublisherPolicy": "collapse_within_event",
+      "validationStanding": "reviewed_regression_fixture_not_external_validation",
+      "version": "pulse-source-independence/evidence-family-v1"
+    },
+    "standing": "heuristic_not_probability"
+  },
   "evaluation": {
     "backtestMatchesCurrentProduction": false,
     "currentProductionValidatedByExistingBacktest": false,
@@ -407,7 +427,7 @@
       }
     }
   },
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -420,5 +440,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.2-beta"
+  "version": "pulse-v2.3-beta"
 }

@@ -183,7 +183,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.2-beta",
+    methodologyVersion: "pulse-v2.3-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
@@ -638,7 +638,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-pulse-runtime-method.ts",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.2-beta",
+    methodologyVersion: "pulse-v2.3-beta",
     gate: "G3",
     source: {
       // CLM-012: api-docs/page.tsx renders this route's description from
@@ -731,7 +731,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.2-beta",
+    methodologyVersion: "pulse-v2.3-beta",
     gate: "G3",
     source: {
       path: "README.template.md",
@@ -816,7 +816,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.2-beta",
+    methodologyVersion: "pulse-v2.3-beta",
     gate: "G3",
     source: {
       path: "CITATION.cff",
@@ -913,7 +913,7 @@ export const PUBLIC_CLAIMS = [
       "src/lib/pulse/v2/runtime-contract.ts",
     ],
     implementationOwner: "SEO and Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.2-beta",
+    methodologyVersion: "pulse-v2.3-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/methodology/pulse/page.tsx",

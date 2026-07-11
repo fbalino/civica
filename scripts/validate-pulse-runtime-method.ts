@@ -839,9 +839,12 @@ function validatePublicSurfaces(
     methodContent.includes("failed/unavailable verification") &&
       methodContent.includes("not comparable as one method series") &&
       methodContent.includes("failed provider") &&
-      methodContent.includes("distinct recorded source IDs") &&
-      methodContent.includes("does not detect state ownership or source-family relationships"),
-    "Pulse methodology must disclose failed verification, explicit mixed/legacy version boundaries, persistence limits, and source-ID semantics",
+      methodContent.includes("independent evidence groups") &&
+      methodContent.includes(
+        "does not establish state ownership or full editorial independence",
+      ) &&
+      methodContent.includes("{{ctx.sourceIndependenceVersion}}"),
+    "Pulse methodology must disclose failed verification, explicit mixed/legacy version boundaries, persistence limits, and evidence-group semantics",
   );
 }
 

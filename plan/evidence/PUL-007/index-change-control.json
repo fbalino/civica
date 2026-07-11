@@ -1,0 +1,16 @@
+{
+  "id": "pulse-source-independence-shared-api-contract",
+  "toVersion": "civica-index-api-contract-pulse-independence-v1",
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-source-independence-index-contract-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-source-independence-index-contract-migration.md"
+    ],
+    "golden_test": ["src/lib/pulse/v2/source-independence.test.ts"],
+    "contract_test": ["src/lib/pulse/v2/runtime-method.test.ts"]
+  }
+}

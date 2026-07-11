@@ -38,6 +38,7 @@ const SECTIONS = [
   { id: "sources", label: "Sources" },
   { id: "daily-pipeline", label: "Scheduled pipeline" },
   { id: "clustering-coverage", label: "Clustering coverage" },
+  { id: "source-independence", label: "Source independence" },
   { id: "version-identity", label: "Version identity" },
   { id: "evidence-identity", label: "Evidence identity" },
   { id: "event-categories", label: "Event ontology" },
@@ -128,6 +129,14 @@ export default function PulseMethodologyPage() {
     clusterWindowHours: method.clustering.dateWindowHours,
     clusterSemanticThreshold: method.clustering.semantic.threshold,
     clusterLexicalThreshold: method.clustering.lexicalFallback.threshold,
+    sourceIndependenceVersion:
+      method.corroboration.sourceIndependence.version,
+    sourceIndependencePrecisionPct:
+      method.corroboration.sourceIndependence.reviewedPairThresholds.precision *
+      100,
+    sourceIndependenceRecallPct:
+      method.corroboration.sourceIndependence.reviewedPairThresholds.recall *
+      100,
     scoreWindowDays: method.numericDeltas.trailingWindowDays,
     deltaLowerBound: method.numericDeltas.boundsPerDimension.lower,
     deltaUpperBound: `+${method.numericDeltas.boundsPerDimension.upper}`,
