@@ -12,7 +12,10 @@
 import Link from "next/link";
 import { Pill } from "@/components/editorial/Pill";
 import { Tooltip } from "@/components/editorial/Tooltip";
-import type { PulseV2ForCountry, DimensionRow } from "@/lib/db/queries-pulse-v2";
+import type {
+  PulseV2ForCountry,
+  DimensionRow,
+} from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
 import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
@@ -82,7 +85,8 @@ function ProvenanceDot() {
           height: 8,
           borderRadius: "999px",
           background: "var(--color-source-live)",
-          boxShadow: "0 0 0 1px color-mix(in oklab, var(--color-success) 22%, transparent)",
+          boxShadow:
+            "0 0 0 1px color-mix(in oklab, var(--color-success) 22%, transparent)",
         }}
       />
     </span>
@@ -143,7 +147,10 @@ function DimensionRowView({
             className="pulse-dimension-limited-tooltip"
           >
             <span className="pulse-dimension-limited-tag">
-              <span className="pulse-dimension-limited-dot" aria-hidden="true" />
+              <span
+                className="pulse-dimension-limited-dot"
+                aria-hidden="true"
+              />
               Limited signal · {row.limitedReason}
             </span>
           </Tooltip>
@@ -216,8 +223,7 @@ function DimensionRowView({
                     minWidth: 0,
                     color: "var(--color-text-55)",
                     textDecoration: "none",
-                    borderBottom:
-                      "1px dotted var(--color-card-border)",
+                    borderBottom: "1px dotted var(--color-card-border)",
                     overflowWrap: "anywhere",
                   }}
                 >
@@ -254,7 +260,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
     (r) =>
       r.evidence.nEvents > 0 &&
       r.delta !== null &&
-      Math.abs(r.delta) >= SIGNIFICANCE_THRESHOLD
+      Math.abs(r.delta) >= SIGNIFICANCE_THRESHOLD,
   ).length;
 
   return (
@@ -347,30 +353,6 @@ export function PulseDimensionalDeltas({ data }: Props) {
         .
       </p>
 
-      {data.pressFreedomContext.directLookup &&
-      data.pressFreedomContext.score < 30 ? (
-        <div
-          className="editorial-warning"
-          style={{ margin: "8px 0 16px" }}
-        >
-          <strong>Coverage caveat.</strong> Civica&apos;s provisional,
-          incomplete 2024 press-freedom context lookup flags a severely
-          restricted information environment for {jurisdiction.name}. The
-          Pulse depends on observable
-          events; in restricted-press environments it systematically
-          under-detects events, and the lookup itself is not a complete or
-          current RSF dataset. Consult the underlying country evidence and
-          named sources. See the{" "}
-          <Link
-            href="/civica-index/methodology/pulse#coverage-limitations"
-            style={{ color: "var(--color-accent)" }}
-          >
-            Pulse coverage limitations
-          </Link>{" "}
-          for details.
-        </div>
-      ) : null}
-
       {totalEvents === 0 ? (
         <p
           style={{
@@ -381,10 +363,10 @@ export function PulseDimensionalDeltas({ data }: Props) {
             lineHeight: 1.5,
           }}
         >
-          No published Pulse events were detected for {jurisdiction.name} in
-          the current evidence window. This is not evidence that governance
-          was stable. Events queued for human review do not contribute to the
-          public experimental deltas. See the{" "}
+          No published Pulse events were detected for {jurisdiction.name} in the
+          current evidence window. This is not evidence that governance was
+          stable. Events queued for human review do not contribute to the public
+          experimental deltas. See the{" "}
           <Link
             href="/civica-index/pulse-changelog"
             style={{ color: "var(--color-accent)" }}
@@ -434,7 +416,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
             ? "No experimental delta available"
             : significantCount === 0
               ? `${totalEvents} published event${totalEvents === 1 ? "" : "s"} · effects below ±0.5`
-            : `${significantCount} dimension${significantCount === 1 ? "" : "s"} moving · ${totalEvents} event${totalEvents === 1 ? "" : "s"} in window`}
+              : `${significantCount} dimension${significantCount === 1 ? "" : "s"} moving · ${totalEvents} event${totalEvents === 1 ? "" : "s"} in window`}
         </span>
         <span>Last computed {formatLastComputed(lastComputedAt)}</span>
       </footer>

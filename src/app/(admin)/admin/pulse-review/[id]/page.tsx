@@ -94,7 +94,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
 
   const paragraphs = cleanDescriptionParagraphs(
     event.description,
-    event.headline
+    event.headline,
   );
   const unresolved = event.category === "none";
 
@@ -102,8 +102,8 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
     event.severityValue < 0
       ? "danger"
       : event.severityValue > 0
-      ? "success"
-      : "warn";
+        ? "success"
+        : "warn";
 
   return (
     <>
@@ -149,7 +149,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
             Confidence {(event.corroborationConfidence ?? 0).toFixed(2)}
           </Chip>
           {event.pressFreedomScoreAtClassification != null ? (
-            <Chip>RSF {event.pressFreedomScoreAtClassification.toFixed(0)}</Chip>
+            <Chip variant="warn">Legacy unversioned context retained</Chip>
           ) : null}
         </div>
       </header>
@@ -189,7 +189,11 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
             <li key={i} className="admin-source-item">
               <SourceDot source={src.sourceId} retrievedAt={null} />
               <strong>{src.sourceName}</strong>
-              <Chip variant={src.sourceType === "specialist" ? "success" : "neutral"}>
+              <Chip
+                variant={
+                  src.sourceType === "specialist" ? "success" : "neutral"
+                }
+              >
                 {src.sourceType}
               </Chip>
               {src.sourceUrl ? (
@@ -231,8 +235,8 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                     run.severityValue < 0
                       ? "danger"
                       : run.severityValue > 0
-                      ? "success"
-                      : "warn"
+                        ? "success"
+                        : "warn"
                   }
                 >
                   {severityTierLabel(run.severityTier)} ·{" "}

@@ -29,8 +29,7 @@ const SOURCES = [
   {
     id: "cia_world_leaders",
     name: "CIA World Leaders",
-    baseUrl:
-      "https://www.cia.gov/resources/world-leaders/foreign-governments/",
+    baseUrl: "https://www.cia.gov/resources/world-leaders/foreign-governments/",
     license: "public_domain",
     isCommercialUseAllowed: true,
     lastSyncAt: null,
@@ -193,7 +192,8 @@ const SOURCES = [
   {
     id: "bjornskov_rode",
     name: "Bjornskov-Rode / CGV Regime Data",
-    baseUrl: "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
+    baseUrl:
+      "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
     license: "academic_noncommercial",
     isCommercialUseAllowed: false,
     lastSyncAt: null,
@@ -221,9 +221,9 @@ const SOURCES = [
   {
     id: "rsf_press_freedom",
     name: "Reporters Without Borders Press Freedom Index",
-    baseUrl: "https://rsf.org/en/index",
-    license: "open_data",
-    isCommercialUseAllowed: true,
+    baseUrl: "https://rsf.org/sites/default/files/import_classement/2026.csv",
+    license: "restricted-no-redistribution",
+    isCommercialUseAllowed: false,
     lastSyncAt: null,
   },
   {
@@ -524,7 +524,8 @@ const METRIC_DEFINITIONS = [
   {
     id: "hdi",
     name: "Human Development Index",
-    description: "Composite index of life expectancy, education, and per capita income",
+    description:
+      "Composite index of life expectancy, education, and per capita income",
     category: "society",
     unit: "index (0–1)",
     higherIsBetter: true,
@@ -535,7 +536,8 @@ const METRIC_DEFINITIONS = [
   {
     id: "cpi",
     name: "Corruption Perceptions Index",
-    description: "Perceived levels of public sector corruption on a scale of 0 (highly corrupt) to 100 (very clean)",
+    description:
+      "Perceived levels of public sector corruption on a scale of 0 (highly corrupt) to 100 (very clean)",
     category: "governance",
     unit: "score (0–100)",
     higherIsBetter: true,
@@ -546,7 +548,8 @@ const METRIC_DEFINITIONS = [
   {
     id: "happiness_score",
     name: "World Happiness Score",
-    description: "Life evaluation score based on the Cantril ladder question (0 worst to 10 best)",
+    description:
+      "Life evaluation score based on the Cantril ladder question (0 worst to 10 best)",
     category: "society",
     unit: "score (0–10)",
     higherIsBetter: true,
@@ -557,10 +560,11 @@ const METRIC_DEFINITIONS = [
   {
     id: "press_freedom",
     name: "Press Freedom Index",
-    description: "Score measuring the level of press freedom, lower is better",
+    description:
+      "RSF score measuring the level of press freedom, higher is better",
     category: "governance",
     unit: "score (0–100)",
-    higherIsBetter: false,
+    higherIsBetter: true,
     valueMin: 0,
     valueMax: 100,
     defaultSourceId: "rsf_press_freedom",
@@ -590,7 +594,8 @@ const METRIC_DEFINITIONS = [
   {
     id: "unemployment_rate",
     name: "Unemployment Rate",
-    description: "Share of the labor force that is without work but available and seeking employment",
+    description:
+      "Share of the labor force that is without work but available and seeking employment",
     category: "economy",
     unit: "percent",
     higherIsBetter: false,
@@ -612,7 +617,8 @@ const METRIC_DEFINITIONS = [
   {
     id: "gini_index",
     name: "Gini Index",
-    description: "Measure of income inequality, 0 is perfect equality, 100 is perfect inequality",
+    description:
+      "Measure of income inequality, 0 is perfect equality, 100 is perfect inequality",
     category: "economy",
     unit: "index (0–100)",
     higherIsBetter: false,
@@ -623,7 +629,8 @@ const METRIC_DEFINITIONS = [
   {
     id: "school_enrollment_tertiary",
     name: "School Enrollment, Tertiary",
-    description: "Gross enrollment ratio in tertiary education regardless of age",
+    description:
+      "Gross enrollment ratio in tertiary education regardless of age",
     category: "education",
     unit: "percent",
     higherIsBetter: true,

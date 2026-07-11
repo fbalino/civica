@@ -73,7 +73,7 @@ The machine-readable [source-coverage endpoint](/api/v1/pulse/source-coverage) p
 
 The active basket is dominated by GDELT, and a single-evidence event can currently affect an experimental delta at reduced heuristic weight. The current method collapses likely copies and reports sharing one publisher or declared origin before it counts evidence groups, but it does not impose a two-group publication minimum. Readers should not interpret “corroboration weight” as proof that an event was independently corroborated.
 
-An event seen only in news, without specialist corroboration, is scored at reduced confidence; in low-press-freedom countries that discount is severe — see the press-freedom rule below.
+An event seen only in news, without specialist corroboration, is scored at reduced confidence. Information-environment context does not currently alter production weights; see the context policy below.
 
 ## Scheduled pipeline {#daily-pipeline}
 
@@ -263,7 +263,7 @@ What this drives:
 
 - **Some candidates require human review.** Deadlocks/no quorum, {{ctx.reviewTiersProse}}, and weak/degraded majorities paired with any verifier objection described above route to the queue and do not affect public deltas until a valid classification is approved. Other candidates can auto-publish; a published row is not necessarily human-reviewed. A reviewer cannot publish an unresolved `category="none"` row as-is.
 - **Most raw news is dropped.** The classifier is deliberately strict about what qualifies as an event: opinion columns, partisan commentary, market and business stories, and un-enacted announcements are not governance events and are discarded rather than scored. Multiple configured models flagging the same item as a non-event is itself a strong drop signal.
-- **Corroboration is the primary weight on the events that do score** — see the next two sections. Source diversity and press-freedom context determine how heavily a published event moves the dimensional deltas.
+- **Corroboration is the primary weight on the events that do score** — see the next two sections. Diversity across independent evidence groups determines how heavily a published event moves the dimensional deltas. Information-environment context is disabled in production.
 
 Current provider-tagged events store each successful voter result and rationale plus the verification result. The public ledger also contains older classifier generations whose compatibility labels cannot be interpreted literally as three-voter counts. Those rows now carry explicit legacy stage-run identities rather than guessed versions. Event and delta APIs return the exact run identity for each row and a version-set verdict; mixed or legacy results state that they are not comparable as one method series. Every row remains challengeable through the [corrections process](#corrections).
 
@@ -272,21 +272,19 @@ Current provider-tagged events store each successful voter result and rationale 
 The experimental weighting applies stronger discounts to positive events to reduce sensitivity to symbolic or state-promoted claims. These are hand-set **heuristic multipliers**, not empirically calibrated probabilities or publication gates:
 
 - A positive event with **no independent specialist evidence group** has its corroboration confidence reduced (currently ×0.6), so a state-announced "reform" with no specialist record barely moves the score.
-- In **low-press-freedom** countries, a positive event with fewer than two independent evidence groups is discounted further (currently ×0.5). The grouping method detects several common republication relationships but does not establish state ownership or full editorial independence.
+- No country-level information-environment multiplier is active in production. The grouping method detects several common republication relationships but does not establish state ownership or full editorial independence.
 
 (The classifier is instructed to drop un-enacted announcements and symbolic claims, but this behavior has not completed representative evaluation.)
 
 Negative events do not receive the positive-event multipliers. There is currently no minimum such as “one specialist plus one news group” or “two independent news groups”: a one-group event can affect an API-only experimental delta at reduced weight. The source-independence detector changes the heuristic count; it does not create a publication requirement.
 
-## Press-freedom rule {#press-freedom-rule}
+## Information-environment context {#press-freedom-rule}
 
-The current code uses an incomplete static lookup of approximate 2024 RSF scores, with an unobserved country defaulting to 50. This is a provisional context heuristic, not a complete, versioned RSF dataset. It applies the following multipliers to the corroboration weight:
+Pulse does not use an approximate country lookup or substitute a value when context is missing. The country API returns a versioned context object. A missing observation contains no score, tier, source, vintage, or coverage estimate and has no effect on the corroboration weight.
 
-- **Score ≥ 70 (free press).** News-only signals carry full weight.
-- **Score 50–69 (partially free).** All events are discounted (currently ×0.8), including specialist-backed events.
-- **Score < 50 (restricted press).** News-only signals are heavily discounted (currently ×0.3) — on their own they barely move the score, so a published event in a closed-press country effectively needs a specialist source to register.
+Civica has registered the official [RSF World Press Freedom Index release](https://rsf.org/en/index) as a candidate input with its exact download URL, retrieval timestamp, content hash, publisher coverage, observation vintage, and terms posture. RSF's terms do not provide permission for Civica to republish the country data, so the candidate remains disabled pending a rights decision and method validation.
 
-This rule is an unvalidated attempt to reduce media-asymmetry effects. It does not solve non-observation in closed regimes and must not turn “no detected event” into evidence of stability.
+The declared thresholds and multipliers are available only as a sensitivity scenario. They can show how much that design choice would change an event weight, but they are not production settings, calibrated probabilities, or a validated correction for reporting bias. The runtime-method contract records the exact scenario and candidate-release metadata.
 
 ## Decay — different events fade at different rates {#decay}
 
@@ -323,7 +321,7 @@ The Pulse depends on observable, reportable events. Where press freedom or inter
 
 This is a known limitation of any event-monitoring system that depends on documented evidence. For these countries, the structural [Civica Index](/civica-index) draws on expert assessments aggregated annually (V-Dem, Freedom House, etc.) and therefore does not depend on observable event reports. The Index remains a separate research beta, not a substitute for missing Pulse evidence.
 
-Country pages flagged by the provisional press-context lookup surface this caveat directly on the Pulse panel. Because that lookup is incomplete and approximate, it is itself a limitation pending replacement with a complete, versioned source.
+Country pages do not infer restricted-information status from an approximate or default country score. A future flag requires a rights-cleared, versioned observation with complete source and coverage metadata.
 
 ## Country-period observability {#observability}
 
@@ -336,7 +334,7 @@ The operational threshold for `sufficient_observation` currently requires retain
 
 `no_qualifying_event_observed` is available only when the observation state is sufficient. Low coverage, an outage, or a restricted information environment produces `not_assessable` when no event was found. In every state, an absent event has no numeric effect and cannot become a stability, good-governance, or country-quality judgment.
 
-The incomplete static press-freedom lookup used by the experimental event-weighting code is not eligible to create `restricted_information_environment`. That state requires a sourced, versioned context record with its observation year and retrieval time. Until PUL-010 supplies that record, the API leaves the context empty rather than guessing.
+The registered RSF candidate is not eligible to create `restricted_information_environment` while rights and validation remain unresolved. That state requires a usable, sourced, versioned context record with complete vintage and coverage. The API therefore leaves production context missing rather than guessing.
 
 ## Known limitations {#known-limitations}
 
@@ -346,7 +344,7 @@ The incomplete static press-freedom lookup used by the experimental event-weight
 - The classifier is deliberately strict — the large majority of ingested news is commentary, business, or un-enacted announcements rather than discrete governance events, and is dropped. This keeps noise out of the scores, but a genuine event can occasionally be discarded; missing-event disputes are welcomed.
 - LLM classification is imperfect. Current provider-tagged runs preserve successful voter and verification outputs, while older classifier generations remain explicitly legacy-versioned. The API prevents the full ledger from presenting as a homogeneous current-method sample.
 - Positive events receive stronger heuristic discounts than negative events. This is an anti-gaming design choice under evaluation, not a requirement that they be independently verified before publication.
-- “Corroboration weight” is a heuristic, not a calibrated probability. The provisional press-context lookup is incomplete, applies a default to uncovered countries, and has not been validated as a bias correction.
+- “Corroboration weight” is a heuristic, not a calibrated probability. Information-environment weighting is disabled in production; the retained multiplier scenario is sensitivity analysis, not a validated bias correction.
 - Dimensional deltas are bounded and limited to a trailing {{ctx.scoreWindowDays}}-day window. Longer configured half-lives are truncated, and structural-overlap handling is not durable.
 - The published historical smoke test uses an earlier classifier architecture and does not validate the current production ensemble. Representative evaluation and independent review are incomplete.
 - Pulse classifications and numeric effects have not completed independent review and should not be treated as established measurements.

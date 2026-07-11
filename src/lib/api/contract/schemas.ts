@@ -1069,6 +1069,76 @@ export const zPulseCountryPeriodObservability = z
     }
   });
 
+export const zPulseInformationEnvironmentContext = z
+  .object({
+    schemaVersion: z.literal("pulse-information-environment-context/v1"),
+    valueStatus: z.enum(["observed", "missing"]),
+    score: z.number().min(0).max(100).nullable(),
+    tier: z.enum(["free", "partial", "restricted"]).nullable(),
+    sourceId: z.string().nullable(),
+    sourceUrl: z.string().url().nullable(),
+    upstreamRelease: z.string().nullable(),
+    observationYear: z.number().int().nullable(),
+    retrievedAt: z.string().nullable(),
+    contentSha256: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .nullable(),
+    sourceCoverage: z
+      .object({
+        publisherRows: z.number().int().nonnegative().nullable(),
+        matchedJurisdictions: z.number().int().nonnegative().nullable(),
+        supportedJurisdictions: z.number().int().nonnegative().nullable(),
+      })
+      .strict(),
+    rightsStatus: z.enum(["verified", "pending", "not_registered"]),
+    useStatus: z.enum([
+      "active_unvalidated_heuristic",
+      "disabled_pending_rights_and_validation",
+      "not_available",
+    ]),
+    missingReason: z.string().nullable(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    const observedFields = [
+      value.score,
+      value.tier,
+      value.sourceId,
+      value.sourceUrl,
+      value.upstreamRelease,
+      value.observationYear,
+      value.retrievedAt,
+      value.contentSha256,
+      value.sourceCoverage.publisherRows,
+      value.sourceCoverage.matchedJurisdictions,
+      value.sourceCoverage.supportedJurisdictions,
+    ];
+    const observed = value.valueStatus === "observed";
+    if (observed !== observedFields.every((field) => field !== null)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["valueStatus"],
+        message:
+          "observed context requires complete source, vintage, and coverage",
+      });
+    }
+    if (!observed && observedFields.some((field) => field !== null)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["valueStatus"],
+        message: "missing context cannot contain a substituted observation",
+      });
+    }
+    if (observed === (value.missingReason !== null)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["missingReason"],
+        message: "only missing context requires a reason",
+      });
+    }
+  });
+
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/pulse/[country_slug]/dimensions
  * ──────────────────────────────────────────────────────────────── */
@@ -1087,14 +1157,7 @@ export const zPulseDimensionsData = z
     lastComputedAt: z.string().nullable(),
     totalEvents: z.number(),
     observability: zPulseCountryPeriodObservability,
-    pressFreedomContext: z
-      .object({
-        score: z.number(),
-        source: z.literal("approximate_static_2024_subset"),
-        directLookup: z.boolean(),
-        defaultApplied: z.boolean(),
-      })
-      .strict(),
+    informationEnvironmentContext: zPulseInformationEnvironmentContext,
     versionSet: zPulseVersionSetSummary,
   })
   .strict()
@@ -1305,7 +1368,7 @@ export const zPulseChangelogRow = z
     classifierAgreement: z.string(),
     classifierRuns: z.array(zPulseClassifierRun),
     corroborationConfidence: z.number(),
-    pressFreedomScoreAtClassification: z.number().nullable(),
+    legacyInformationContextPresent: z.boolean(),
     humanReviewed: z.boolean(),
     publicationOrigin: zPulsePublicationOrigin,
     published: z.boolean(),

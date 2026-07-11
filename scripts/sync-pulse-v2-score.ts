@@ -1,9 +1,8 @@
 /**
  * Phase 5.5 — Pulse v2 corroborate + score runner.
  *
- * Two-pass: first refresh corroboration_confidence and pin
- * press-freedom score on every pulse_events_v2 row, then aggregate
- * decayed impacts into pulse_dimensional_deltas.
+ * Two-pass: first refresh corroboration confidence without substituting a
+ * press-freedom score, then aggregate decayed impacts into dimensional deltas.
  *
  * Usage: npm run pulse:v2:score
  */
@@ -24,21 +23,27 @@ async function main() {
 
   const start = Date.now();
 
-  console.log("Pass 1 — corroboration confidence + press-freedom pin…");
+  console.log("Pass 1 — corroboration confidence (context disabled)…");
   const corro = await corroborateEvents(db, { dryRun });
   console.log(`  examined: ${corro.examined}`);
-  console.log(`  ${dryRun ? "would update" : "updated"}:  ${dryRun ? corro.planned.length : corro.updated}`);
+  console.log(
+    `  ${dryRun ? "would update" : "updated"}:  ${dryRun ? corro.planned.length : corro.updated}`,
+  );
   console.log(`  avg confidence: ${corro.averageConfidence.toFixed(3)}`);
 
   console.log("\nPass 2 — dimensional deltas…");
   const score = await calculateDimensionalDeltas(db, { dryRun });
   console.log(`  events considered:   ${score.eventsConsidered}`);
   console.log(`  countries scored:    ${score.countriesScored}`);
-  console.log(`  dim rows ${dryRun ? "planned" : "written"}:    ${dryRun ? score.planned.length : score.dimensionRowsWritten}`);
+  console.log(
+    `  dim rows ${dryRun ? "planned" : "written"}:    ${dryRun ? score.planned.length : score.dimensionRowsWritten}`,
+  );
   console.log(`  significant deltas:  ${score.significantDeltas}`);
 
   // Show top deltas
-  const result = dryRun ? [] : await db.execute(sql`
+  const result = dryRun
+    ? []
+    : await db.execute(sql`
     SELECT j.name AS country, pdd.dimension, pdd.delta_value
     FROM pulse_dimensional_deltas pdd
     JOIN jurisdictions j ON j.id = pdd.jurisdiction_id
@@ -53,7 +58,7 @@ async function main() {
       const v = Number(row.delta_value);
       const sign = v >= 0 ? "+" : "";
       console.log(
-        `  ${row.country?.toString().padEnd(20)}  ${String(row.dimension).padEnd(20)}  ${sign}${v.toFixed(2)}`
+        `  ${row.country?.toString().padEnd(20)}  ${String(row.dimension).padEnd(20)}  ${sign}${v.toFixed(2)}`,
       );
     }
   }

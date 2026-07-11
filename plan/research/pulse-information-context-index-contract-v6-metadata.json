@@ -1,0 +1,19 @@
+{
+  "id": "pulse-information-environment-context-contract",
+  "toVersion": "civica-index-api-contract-pulse-information-context-v6",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-information-context-index-contract-v6-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-information-context-index-contract-v6-migration.md"
+    ],
+    "golden_test": ["src/lib/pulse/v2/press-freedom.test.ts"],
+    "contract_test": [
+      "src/lib/api/contract/pulse-observability-contract.test.ts"
+    ]
+  }
+}

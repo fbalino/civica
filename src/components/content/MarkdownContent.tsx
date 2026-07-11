@@ -45,8 +45,12 @@ import { cache } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { substitute, type SubstitutionContext } from "@/lib/content/markdown/substitute";
+import {
+  substitute,
+  type SubstitutionContext,
+} from "@/lib/content/markdown/substitute";
 import { remarkCivicaAnchors } from "@/lib/content/markdown/remark-civica-anchors";
+import { stripHtmlComments } from "@/lib/content/markdown/strip-html-comments";
 
 export interface MarkdownContentProps {
   /** Path to the markdown file, relative to the project root.
@@ -155,17 +159,6 @@ const readContentFile = cache(async (file: string): Promise<string> => {
   return fs.readFile(abs, "utf8");
 });
 
-/**
- * Strip the leading authoring banner (a single HTML comment block
- * at the very top of the file). Authors put orientation notes there
- * for future maintainers; the rendered surface should not show them.
- *
- * Mirrors the same convention used by `scripts/regenerate-readme.ts`.
- */
-function stripAuthoringBanner(text: string): string {
-  return text.replace(/^<!--[\s\S]*?-->\n+/, "");
-}
-
 export async function MarkdownContent({
   file,
   state = {},
@@ -175,7 +168,10 @@ export async function MarkdownContent({
   warnOnUnresolved = true,
 }: MarkdownContentProps) {
   const raw = await readContentFile(file);
-  let body = stripAuthoringBanner(raw);
+  // ReactMarkdown does not execute raw HTML, but it can expose comment text
+  // as visible prose. Claim markers and authoring notes stay in source for
+  // validators and are removed only from the rendered copy.
+  let body = stripHtmlComments(raw);
 
   if (slice) {
     body = sliceMarkdownByAnchor(body, slice, file, warnOnUnresolved);

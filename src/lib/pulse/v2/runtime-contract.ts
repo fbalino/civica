@@ -56,9 +56,14 @@ import {
   PULSE_OBSERVABILITY_VERSION,
   PULSE_OBSERVATION_STATES,
 } from "./observability";
+import {
+  PULSE_INFORMATION_ENVIRONMENT_POLICY,
+  PULSE_INFORMATION_ENVIRONMENT_VERSION,
+  RSF_2026_CANDIDATE_RELEASE,
+} from "./press-freedom";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.4.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.5-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.5.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.6-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -280,6 +285,32 @@ export interface PulseRuntimeMethodContract {
         recall: number;
       };
       validationStanding: "reviewed_regression_fixture_not_external_validation";
+    };
+    informationEnvironment: {
+      schemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_VERSION;
+      policyVersion: string;
+      productionUse: "disabled_pending_rights_and_validation";
+      missingValuePolicy: "no_multiplier";
+      validationStanding: "not_calibrated_bias_correction";
+      candidateRelease: {
+        sourceId: string;
+        sourceUrl: string;
+        methodologyUrl: string;
+        termsUrl: string;
+        upstreamRelease: string;
+        observationYear: number;
+        retrievedAt: string;
+        contentSha256: string;
+        publisherRows: number;
+        redistributionPosture: "restricted-no-redistribution";
+        rightsStatus: "pending";
+      };
+      sensitivityOnly: {
+        status: "legacy_multiplier_scenario_only";
+        partialAllEvents: number;
+        restrictedNewsOnly: number;
+        restrictedPositiveThinEvidence: number;
+      };
     };
   };
   publicationPolicy: {
@@ -571,6 +602,31 @@ export function buildPulseRuntimeMethod(
         },
         validationStanding:
           "reviewed_regression_fixture_not_external_validation",
+      },
+      informationEnvironment: {
+        schemaVersion: PULSE_INFORMATION_ENVIRONMENT_VERSION,
+        policyVersion: PULSE_INFORMATION_ENVIRONMENT_POLICY.version,
+        productionUse: "disabled_pending_rights_and_validation",
+        missingValuePolicy: "no_multiplier",
+        validationStanding: "not_calibrated_bias_correction",
+        candidateRelease: {
+          sourceId: RSF_2026_CANDIDATE_RELEASE.sourceId,
+          sourceUrl: RSF_2026_CANDIDATE_RELEASE.sourceUrl,
+          methodologyUrl: RSF_2026_CANDIDATE_RELEASE.methodologyUrl,
+          termsUrl: RSF_2026_CANDIDATE_RELEASE.termsUrl,
+          upstreamRelease: RSF_2026_CANDIDATE_RELEASE.upstreamRelease,
+          observationYear: RSF_2026_CANDIDATE_RELEASE.observationYear,
+          retrievedAt: RSF_2026_CANDIDATE_RELEASE.retrievedAt,
+          contentSha256: RSF_2026_CANDIDATE_RELEASE.contentSha256,
+          publisherRows: RSF_2026_CANDIDATE_RELEASE.publisherRows,
+          redistributionPosture:
+            RSF_2026_CANDIDATE_RELEASE.redistributionPosture,
+          rightsStatus: RSF_2026_CANDIDATE_RELEASE.rightsStatus,
+        },
+        sensitivityOnly: {
+          status: PULSE_INFORMATION_ENVIRONMENT_POLICY.sensitivityMode,
+          ...PULSE_INFORMATION_ENVIRONMENT_POLICY.multipliers,
+        },
       },
     },
     publicationPolicy: {

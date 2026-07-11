@@ -628,3 +628,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   coexist with low broader coverage.
 - The append-only API contract, 786 tests, full build, and responsive light/dark
   methodology checks pass. PUL-010 is next.
+
+## 2026-07-11 — PUL-010 information-environment context completed
+
+- Runtime method `pulse-v2.6-beta` replaces approximate/default country scores
+  with a strict versioned context whose missing state stays null.
+- The exact RSF 2026 candidate is recorded but production use is disabled for
+  rights and validation; legacy multipliers are sensitivity-only.
+- Public APIs hide old raw scalars, 794 tests and the production build pass,
+  and reader markdown no longer exposes internal HTML claim comments. PUL-011 next.

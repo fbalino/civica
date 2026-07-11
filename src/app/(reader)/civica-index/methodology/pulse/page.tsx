@@ -51,7 +51,7 @@ const SECTIONS = [
   { id: "cascade-model", label: "Cascade model" },
   { id: "classification-confidence", label: "Classification confidence" },
   { id: "asymmetric-scoring", label: "Asymmetric scoring" },
-  { id: "press-freedom-rule", label: "Press-freedom rule" },
+  { id: "press-freedom-rule", label: "Information context" },
   { id: "decay", label: "Decay" },
   { id: "bounds", label: "Bounds" },
   { id: "coverage-limitations", label: "Coverage limitations" },

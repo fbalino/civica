@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.5-beta");
+  assert.equal(method.version, "pulse-v2.6-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -66,6 +66,22 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.deepEqual(
     method.corroboration.sourceIndependence.reviewedPairThresholds,
     { precision: 0.95, recall: 0.9 },
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.productionUse,
+    "disabled_pending_rights_and_validation",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.missingValuePolicy,
+    "no_multiplier",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.validationStanding,
+    "not_calibrated_bias_correction",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.candidateRelease.publisherRows,
+    180,
   );
 });
 
@@ -262,7 +278,7 @@ test("contract hash omits its own field and changes when contract content change
 
   const changed: PulseRuntimeMethodContract = {
     ...CURRENT_PULSE_RUNTIME_METHOD,
-    version: "pulse-v2.5-beta-test-change",
+    version: "pulse-v2.6-beta-test-change",
   };
   assert.notEqual(pulseContractHash(changed), snapshot.contractHash);
 });

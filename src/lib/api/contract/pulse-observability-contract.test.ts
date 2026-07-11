@@ -57,11 +57,25 @@ function fixture() {
       countryQualityInference: "prohibited",
       limitations: ["fixture"],
     },
-    pressFreedomContext: {
-      score: 50,
-      source: "approximate_static_2024_subset",
-      directLookup: false,
-      defaultApplied: true,
+    informationEnvironmentContext: {
+      schemaVersion: "pulse-information-environment-context/v1",
+      valueStatus: "missing",
+      score: null,
+      tier: null,
+      sourceId: null,
+      sourceUrl: null,
+      upstreamRelease: null,
+      observationYear: null,
+      retrievedAt: null,
+      contentSha256: null,
+      sourceCoverage: {
+        publisherRows: null,
+        matchedJurisdictions: null,
+        supportedJurisdictions: null,
+      },
+      rightsStatus: "not_registered",
+      useStatus: "not_available",
+      missingReason: "fixture",
     },
     versionSet: {
       state: "empty",
@@ -74,6 +88,14 @@ function fixture() {
 
 test("a sufficiently observed no-event period remains nonnumeric", () => {
   assert.equal(zPulseDimensionsData.safeParse(fixture()).success, true);
+});
+
+test("missing information context cannot contain a substituted score", () => {
+  const input = structuredClone(fixture());
+  (input.informationEnvironmentContext as { score: number | null }).score = 50;
+  const result = zPulseDimensionsData.safeParse(input);
+  assert.equal(result.success, false);
+  assert.match(JSON.stringify(result.error?.issues), /substituted observation/);
 });
 
 test("an absent event cannot leak a zero delta", () => {

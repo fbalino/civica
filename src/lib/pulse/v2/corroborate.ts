@@ -14,10 +14,9 @@
  *   4. Applies the asymmetric rule for positive-direction events using
  *      the independent evidence-group count. State ownership is not yet
  *      represented by the current data model.
- *   5. Applies the press-freedom rule using the country's iso3 ↔
- *      RSF score lookup.
- *   6. Stores the latest provisional press-freedom context applied by this
- *      recomputation. Scheduled runs may overwrite the prior value.
+ *   5. Applies no information-environment multiplier in production while the
+ *      candidate source is rights-blocked and the heuristic is unvalidated.
+ *      A versioned context can be supplied only for sensitivity fixtures.
  *
  * Updates only — no inserts. Run after classify.ts.
  */
@@ -32,7 +31,11 @@ import {
 } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { isPositiveTier } from "./taxonomy";
-import { pressFreedomScore, pressFreedomTier } from "./press-freedom";
+import {
+  informationEnvironmentMultiplier,
+  missingInformationEnvironmentContext,
+  type PulseInformationEnvironmentContext,
+} from "./press-freedom";
 import type { ClassifierAgreement, SeverityTier } from "./types";
 import {
   createPulsePipelineRunRef,
@@ -79,7 +82,7 @@ export interface SourceCounts {
 export interface CorroborationPlan {
   eventId: string;
   confidence: number;
-  pressFreedomScore: number | null;
+  informationEnvironmentContext: PulseInformationEnvironmentContext;
   corroborationRunId: string;
   sourceIndependenceVersion: typeof PULSE_SOURCE_INDEPENDENCE_VERSION;
   independentEvidenceGroups: number;
@@ -91,6 +94,8 @@ export interface CorroborateOptions {
   dryRun?: boolean;
   events?: EventRow[];
   sourceCounts?: ReadonlyMap<string, SourceCounts>;
+  informationContexts?: ReadonlyMap<string, PulseInformationEnvironmentContext>;
+  informationContextMode?: "production" | "sensitivity";
   write?: (db: Db, plan: CorroborationPlan) => Promise<void>;
   now?: Date;
   runRef?: PulsePipelineRunRef;
@@ -134,8 +139,19 @@ export async function corroborateEvents(
 
   for (const event of events) {
     const counts = resolvedCounts.get(event.id)!;
-    const press = pressFreedomScore(event.iso3);
-    const tier = pressFreedomTier(press);
+    const informationContext =
+      opts.informationContexts?.get(event.jurisdictionId) ??
+      missingInformationEnvironmentContext(
+        "No rights-cleared, versioned production context is registered.",
+      );
+    if (
+      opts.informationContexts &&
+      !opts.informationContexts.has(event.jurisdictionId)
+    ) {
+      throw new Error(
+        `missing information-context fixture for jurisdiction: ${event.jurisdictionId}`,
+      );
+    }
 
     let confidence = baselineConfidence(counts, event.classifierAgreement);
 
@@ -143,28 +159,22 @@ export async function corroborateEvents(
     if (isPositiveTier(event.severityTier)) {
       // Positive events without specialist corroboration get penalised
       if (counts.specialist.size === 0) confidence *= 0.6;
-      // In low-press-freedom environments, require at least two evidence
-      // groups after publisher-family and republication collapse.
-      if (tier === "restricted") {
-        const distinctRecordedSources =
-          counts.specialist.size + counts.news.size;
-        if (distinctRecordedSources < 2) confidence *= 0.5;
-      }
     }
 
-    // Press-freedom rule (spec §3.5)
-    if (tier === "partial") confidence *= 0.8;
-    if (tier === "restricted" && counts.specialist.size === 0) {
-      // News-only in restricted press → don't drive scoring at all
-      confidence *= 0.3;
-    }
+    confidence *= informationEnvironmentMultiplier({
+      context: informationContext,
+      isPositive: isPositiveTier(event.severityTier),
+      specialistGroups: counts.specialist.size,
+      newsGroups: counts.news.size,
+      mode: opts.informationContextMode ?? "production",
+    });
 
     confidence = Math.max(0, Math.min(1, confidence));
     totalConfidence += confidence;
     const plan = {
       eventId: event.id,
       confidence,
-      pressFreedomScore: press,
+      informationEnvironmentContext: informationContext,
       corroborationRunId: run.id,
       sourceIndependenceVersion: PULSE_SOURCE_INDEPENDENCE_VERSION,
       independentEvidenceGroups: counts.specialist.size + counts.news.size,
@@ -236,7 +246,6 @@ async function writeCorroboration(
     .update(pulseEventsV2)
     .set({
       corroborationConfidence: plan.confidence,
-      pressFreedomScoreAtClassification: plan.pressFreedomScore,
       updatedAt: now,
       corroborationRunId: plan.corroborationRunId,
     })

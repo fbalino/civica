@@ -61,9 +61,35 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "184c4fbddc1d28242fc7a8b4c5d454bf6cdce98505c7c4fbe09f3fb2a22701a4",
+  "contractHash": "7f953f2bb74626f125d910a8beba4071d89eeab838fde780d8725fb6630bcd14",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
+    "informationEnvironment": {
+      "candidateRelease": {
+        "contentSha256": "65ec7bd9b9740e0f51e9b4eea585030b2226c1a96938ec06a4cbbdbd2639aae2",
+        "methodologyUrl": "https://rsf.org/en/methodology-used-compiling-world-press-freedom-index-2026",
+        "observationYear": 2025,
+        "publisherRows": 180,
+        "redistributionPosture": "restricted-no-redistribution",
+        "retrievedAt": "2026-07-11T17:17:00.000Z",
+        "rightsStatus": "pending",
+        "sourceId": "rsf_press_freedom",
+        "sourceUrl": "https://rsf.org/sites/default/files/import_classement/2026.csv",
+        "termsUrl": "https://rsf.org/en/cgu",
+        "upstreamRelease": "RSF World Press Freedom Index 2026"
+      },
+      "missingValuePolicy": "no_multiplier",
+      "policyVersion": "pulse-information-environment-uncertainty/v1",
+      "productionUse": "disabled_pending_rights_and_validation",
+      "schemaVersion": "pulse-information-environment-context/v1",
+      "sensitivityOnly": {
+        "partialAllEvents": 0.8,
+        "restrictedNewsOnly": 0.3,
+        "restrictedPositiveThinEvidence": 0.5,
+        "status": "legacy_multiplier_scenario_only"
+      },
+      "validationStanding": "not_calibrated_bias_correction"
+    },
     "sourceIndependence": {
       "dependentSignals": [
         "same_snapshot",
@@ -480,7 +506,7 @@
       }
     }
   },
-  "schemaVersion": "1.4.0",
+  "schemaVersion": "1.5.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -493,5 +519,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.5-beta"
+  "version": "pulse-v2.6-beta"
 }

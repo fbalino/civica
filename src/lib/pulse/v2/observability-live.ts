@@ -57,8 +57,8 @@ export async function loadPulseCountryPeriodObservability(input: {
     feeds: coverage.feeds,
     sourceCounts,
     qualifyingEvents: input.qualifyingEvents,
-    // PUL-010 must supply a complete, versioned source. The approximate
-    // static press-freedom lookup is intentionally not eligible here.
+    // Production context stays absent until a complete, versioned source is
+    // both rights-cleared and validated for this use.
     informationEnvironment: null,
   });
 }

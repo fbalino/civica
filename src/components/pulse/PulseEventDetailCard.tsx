@@ -30,9 +30,7 @@ function formatEventDate(d: string): string {
   });
 }
 
-function severityVariant(
-  v: number
-): "danger" | "success" | "warn" {
+function severityVariant(v: number): "danger" | "success" | "warn" {
   if (v < 0) return "danger";
   if (v > 0) return "success";
   return "warn";
@@ -40,10 +38,7 @@ function severityVariant(
 
 /** Strip the "- HEADLINE (Click to expand Image" lead, drop standalone
  *  © / Getty Images credit lines, render paragraphs separately. */
-function cleanDescriptionParagraphs(
-  raw: string,
-  headline: string
-): string[] {
+function cleanDescriptionParagraphs(raw: string, headline: string): string[] {
   if (!raw) return [];
   let text = raw;
   const lead = `- ${headline}`;
@@ -69,7 +64,7 @@ export function PulseEventDetailCard({
 }) {
   const paragraphs = cleanDescriptionParagraphs(
     event.description,
-    event.headline
+    event.headline,
   );
   const providerTaggedClassifyRuns = event.classifierRuns.filter(
     (run) => run.provider && run.model && !run.confidence,
@@ -91,10 +86,7 @@ export function PulseEventDetailCard({
   const unresolved = event.category === "none";
 
   return (
-    <article
-      id={`evt-${event.id}`}
-      className="editorial-card pulse-event-card"
-    >
+    <article id={`evt-${event.id}`} className="editorial-card pulse-event-card">
       <details className="pulse-event-accordion">
         <summary className="pulse-event-summary">
           <span className="pulse-event-summary-main">
@@ -228,13 +220,17 @@ export function PulseEventDetailCard({
           <footer className="editorial-card-foot">
             <span>
               Corroboration weight{" "}
-              {(event.corroborationConfidence ?? 0).toFixed(2)} · heuristic,
-              not a probability
-              {event.pressFreedomScoreAtClassification != null
-                ? " · provisional press-context adjustment recorded"
+              {(event.corroborationConfidence ?? 0).toFixed(2)} · heuristic, not
+              a probability
+              {event.legacyInformationContextPresent
+                ? " · legacy unversioned context retained for audit"
                 : ""}
             </span>
-            <span>{unresolved ? "Unresolved candidate" : categoryLabel(event.category)}</span>
+            <span>
+              {unresolved
+                ? "Unresolved candidate"
+                : categoryLabel(event.category)}
+            </span>
           </footer>
         </div>
       </details>

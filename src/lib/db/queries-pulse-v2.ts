@@ -19,8 +19,8 @@ import {
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
 import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import {
-  pressFreedomScore,
-  RSF_SCORES_2024,
+  missingInformationEnvironmentContext,
+  type PulseInformationEnvironmentContext,
 } from "@/lib/pulse/v2/press-freedom";
 import {
   publicationOriginFor,
@@ -130,14 +130,9 @@ export interface PulseV2ForCountry {
   /** Country-period observation and event-absence states. This never creates
    * a stability or country-quality judgment. */
   observability: PulseCountryPeriodObservability;
-  /** Provisional context heuristic used by the current weighting code.
-   * This is not a complete or live RSF dataset. */
-  pressFreedomContext: {
-    score: number;
-    source: "approximate_static_2024_subset";
-    directLookup: boolean;
-    defaultApplied: boolean;
-  };
+  /** Versioned information-environment context. Missing observations remain
+   * missing and have no production weighting effect. */
+  informationEnvironmentContext: PulseInformationEnvironmentContext;
   versionSet: PulseVersionSetSummary;
 }
 
@@ -165,12 +160,6 @@ export async function getPulseV2ForCountry(
 
   const jurisdiction = jurisdictionRows[0];
   if (!jurisdiction) return null;
-  const press = pressFreedomScore(jurisdiction.iso3);
-  const directPressLookup = Boolean(
-    jurisdiction.iso3 &&
-    RSF_SCORES_2024[jurisdiction.iso3.toUpperCase()] != null,
-  );
-
   // Pull all stored dimension rows. Missing or not-yet-computed dimensions
   // remain unobserved (`delta: null`) below.
   const deltaRows = await db
@@ -323,12 +312,7 @@ export async function getPulseV2ForCountry(
       jurisdictionId: jurisdiction.id,
       qualifyingEvents: eventRows.length,
     }),
-    pressFreedomContext: {
-      score: press,
-      source: "approximate_static_2024_subset",
-      directLookup: directPressLookup,
-      defaultApplied: !directPressLookup,
-    },
+    informationEnvironmentContext: missingInformationEnvironmentContext(),
     versionSet: summarizePulseVersionSet(
       [...computationRuns.values()].map(({ versionKey, versions }) => ({
         versionKey,
@@ -536,7 +520,9 @@ export interface PulseV2ChangelogRow {
   classifierAgreement: string;
   classifierRuns: PulseV2ClassifierRun[];
   corroborationConfidence: number;
-  pressFreedomScoreAtClassification: number | null;
+  /** True when a historical row retains the old unversioned scalar. The
+   * value is deliberately not exposed as current context. */
+  legacyInformationContextPresent: boolean;
   humanReviewed: boolean;
   publicationOrigin: PulsePublicationOrigin;
   published: boolean;
@@ -722,8 +708,8 @@ export async function getPulseV2Changelog(
       : [];
 
     const rsfRaw = r.press_freedom_score_at_classification;
-    const pressFreedomScoreAtClassification =
-      rsfRaw === null || rsfRaw === undefined ? null : Number(rsfRaw);
+    const legacyInformationContextPresent =
+      rsfRaw !== null && rsfRaw !== undefined;
 
     const category = String(r.category);
     const published = Boolean(r.published);
@@ -742,7 +728,7 @@ export async function getPulseV2Changelog(
       classifierAgreement: String(r.classifier_agreement),
       classifierRuns: runs,
       corroborationConfidence: Number(r.corroboration_confidence),
-      pressFreedomScoreAtClassification,
+      legacyInformationContextPresent,
       humanReviewed,
       publicationOrigin: publicationOriginFor({
         published,

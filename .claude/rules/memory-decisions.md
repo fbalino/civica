@@ -872,3 +872,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   current outage, and sourced restricted-information states remain not assessable.
 - The approximate press-freedom fallback cannot create a restricted state.
   Durable record: APR-D117 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Pulse information context stays missing until usable
+
+- Production has no country-level information-environment multiplier and never
+  substitutes a score for missing context.
+- Any future observation requires complete source, vintage, hash, coverage,
+  rights, and use metadata. The RSF candidate remains disabled.
+- Threshold multipliers are sensitivity scenarios, not calibrated corrections.
+  Durable record: APR-D118 in `plan/DECISIONS.md`.

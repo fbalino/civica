@@ -19,11 +19,7 @@
 
 import { eq, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import {
-  backtestCases,
-  backtestEvents,
-  backtestRuns,
-} from "@/lib/db/schema";
+import { backtestCases, backtestEvents, backtestRuns } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import {
   EVENT_CATEGORY_INDEX,
@@ -33,11 +29,12 @@ import {
   DELTA_UPPER_BOUND,
 } from "./taxonomy";
 import { decayedImpact } from "./decay";
-import { PULSE_DIMENSIONS, type PulseDimension, type SeverityTier, type ClassifierAgreement } from "./types";
 import {
-  pressFreedomScore,
-  pressFreedomTier,
-} from "./press-freedom";
+  PULSE_DIMENSIONS,
+  type PulseDimension,
+  type SeverityTier,
+  type ClassifierAgreement,
+} from "./types";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -91,7 +88,7 @@ interface ClassifiedBacktestEvent {
   classifierAgreement: ClassifierAgreement;
   /** Final corroboration confidence in [0, 1] */
   corroborationConfidence: number;
-  pressFreedomScore: number;
+  informationEnvironmentContext: "missing";
   /** The two reasoning passes preserved in the run snapshot */
   runs: Array<{
     run: number;
@@ -107,10 +104,8 @@ async function classifyEvent(
   title: string,
   body: string | null,
   countryName: string,
-  iso3: string | null
 ): Promise<ClassifiedBacktestEvent | null> {
   const userContent = `Country: ${countryName}\n\nHeadline: ${title}\n\nBody:\n${body ?? ""}`;
-  const press = pressFreedomScore(iso3);
 
   // Pass 1 — classify.
   let classifyResp;
@@ -134,7 +129,7 @@ async function classifyEvent(
   const range = SEVERITY_TIER_RANGES[first.severityTier];
   const severityValue = Math.max(
     range.min,
-    Math.min(range.max, Math.round(first.severityValue))
+    Math.min(range.max, Math.round(first.severityValue)),
   );
 
   // Pass 2 — verify (refute).
@@ -169,11 +164,9 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
   // sources. The agreement→base mapping mirrors baselineConfidence there.
   const baseConf =
     agreement === "all" ? 0.85 : agreement === "two_of_three" ? 0.65 : 0.4;
-  const tier = pressFreedomTier(press);
-  let conf = baseConf;
-  if (tier === "partial") conf *= 0.85;
-  if (tier === "restricted") conf *= 0.7; // single specialist source assumed
-  conf = Math.max(0, Math.min(1, conf));
+  // The diagnostic has no rights-cleared, versioned country context. Missing
+  // values stay missing and do not alter confidence.
+  const conf = Math.max(0, Math.min(1, baseConf));
 
   // The diagnostic keeps candidates that would route to human review and
   // effectively assumes approval, but verifier objections retain the low
@@ -187,7 +180,7 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
     severityValue,
     classifierAgreement: agreement,
     corroborationConfidence: conf,
-    pressFreedomScore: press,
+    informationEnvironmentContext: "missing",
     runs: [
       {
         run: 1,
@@ -239,7 +232,7 @@ const MAGNITUDE_THRESHOLDS: Record<string, number> = {
 
 function buildTrajectory(
   caseDate: Date,
-  classified: Array<ClassifiedBacktestEvent & { eventDate: string }>
+  classified: Array<ClassifiedBacktestEvent & { eventDate: string }>,
 ): TrajectorySample[] {
   const samples: TrajectorySample[] = [];
   // Sample every 30 days from -180 to +360.
@@ -251,20 +244,17 @@ function buildTrajectory(
         if (ev.dimension !== dim) continue;
         const evDate = new Date(ev.eventDate).getTime();
         if (evDate > sampleDate.getTime()) continue; // future event, no contribution
-        const days = Math.max(
-          0,
-          (sampleDate.getTime() - evDate) / 86400000
-        );
+        const days = Math.max(0, (sampleDate.getTime() - evDate) / 86400000);
         total += decayedImpact(
           ev.severityValue,
           ev.corroborationConfidence,
           days,
-          ev.category
+          ev.category,
         );
       }
       const clamped = Math.max(
         DELTA_LOWER_BOUND,
-        Math.min(DELTA_UPPER_BOUND, total)
+        Math.min(DELTA_UPPER_BOUND, total),
       );
       samples.push({ dayOffset: off, dimension: dim, delta: clamped });
     }
@@ -274,7 +264,7 @@ function buildTrajectory(
 
 function judge(
   expected: ExpectedRow[],
-  trajectory: TrajectorySample[]
+  trajectory: TrajectorySample[],
 ): {
   verdict: "pass" | "partial" | "fail";
   details: VerdictDetail[];
@@ -284,7 +274,7 @@ function judge(
       (s) =>
         s.dimension === exp.dimension &&
         s.dayOffset >= -30 &&
-        s.dayOffset <= 90
+        s.dayOffset <= 90,
     );
     let peakDelta = 0;
     let peakDay = 0;
@@ -331,7 +321,7 @@ export interface BacktestRunResult {
 
 export async function runBacktest(
   db: Db,
-  caseId: string
+  caseId: string,
 ): Promise<BacktestRunResult | null> {
   const caseRows = await db
     .select()
@@ -349,19 +339,14 @@ export async function runBacktest(
   const classified: Array<ClassifiedBacktestEvent & { eventDate: string }> = [];
   for (const ev of events) {
     process.stdout.write(`    classifying ${ev.eventDate.slice(0, 10)} … `);
-    const c = await classifyEvent(
-      ev.title,
-      ev.body,
-      cs.countryName,
-      cs.countryIso3
-    );
+    const c = await classifyEvent(ev.title, ev.body, cs.countryName);
     if (!c) {
       console.log("(skipped)");
       continue;
     }
     classified.push({ ...c, eventDate: ev.eventDate });
     console.log(
-      `→ ${c.category} ${c.severityTier} (${c.severityValue}) [${c.classifierAgreement}]`
+      `→ ${c.category} ${c.severityTier} (${c.severityValue}) [${c.classifierAgreement}]`,
     );
   }
 
@@ -377,7 +362,7 @@ export async function runBacktest(
       ["coup", "judicial_purge", "journalist_arrest"].map((k) => [
         k,
         halfLifeFor(k),
-      ])
+      ]),
     ),
     deltaBounds: [DELTA_LOWER_BOUND, DELTA_UPPER_BOUND],
     // Verify-confidence → corroboration base (mirrors corroborate.ts):
@@ -386,6 +371,10 @@ export async function runBacktest(
       high: 0.85,
       medium: 0.65,
       low: 0.4,
+    },
+    informationEnvironmentContext: {
+      valueStatus: "missing",
+      numericEffect: "none",
     },
   };
 
@@ -407,9 +396,7 @@ export async function runBacktest(
 }
 
 /** Wrapper to run every case in DB, used by `npm run backtest:run`. */
-export async function runAllBacktests(
-  db: Db
-): Promise<BacktestRunResult[]> {
+export async function runAllBacktests(db: Db): Promise<BacktestRunResult[]> {
   const cases = await db
     .select({ id: backtestCases.id })
     .from(backtestCases)

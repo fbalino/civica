@@ -10,6 +10,10 @@ import {
   type SourceCounts,
 } from "./corroborate";
 import { createPulsePipelineRunRef } from "./pipeline-version";
+import {
+  RSF_2026_CANDIDATE_RELEASE,
+  observedInformationEnvironmentContext,
+} from "./press-freedom";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -121,4 +125,43 @@ test("corroboration counts independent evidence groups instead of connector rows
   assert.equal(counts.reportCount, 2);
   assert.equal(counts.news.size, 1);
   assert.deepEqual([...counts.sourceIds!], ["gdelt"]);
+});
+
+test("information context changes only the declared sensitivity scenario", async () => {
+  const positive = { ...event, severityTier: "moderate_pos" as const };
+  const newsOnly = new Map<string, SourceCounts>([
+    [positive.id, { specialist: new Set(), news: new Set(["news-1"]) }],
+  ]);
+  const context = observedInformationEnvironmentContext({
+    score: 30,
+    sourceId: RSF_2026_CANDIDATE_RELEASE.sourceId,
+    sourceUrl: RSF_2026_CANDIDATE_RELEASE.sourceUrl,
+    upstreamRelease: RSF_2026_CANDIDATE_RELEASE.upstreamRelease,
+    observationYear: RSF_2026_CANDIDATE_RELEASE.observationYear,
+    retrievedAt: RSF_2026_CANDIDATE_RELEASE.retrievedAt,
+    contentSha256: RSF_2026_CANDIDATE_RELEASE.contentSha256,
+    publisherRows: 180,
+    matchedJurisdictions: 175,
+    supportedJurisdictions: 195,
+    rightsStatus: "pending",
+    useStatus: "disabled_pending_rights_and_validation",
+  });
+  const informationContexts = new Map([[positive.jurisdictionId, context]]);
+  const common = {
+    events: [positive],
+    sourceCounts: newsOnly,
+    informationContexts,
+    dryRun: true,
+    runRef,
+  };
+  const production = await corroborateEvents({} as Db, common);
+  const sensitivity = await corroborateEvents({} as Db, {
+    ...common,
+    informationContextMode: "sensitivity",
+  });
+  assert.ok(Math.abs((production.planned[0]?.confidence ?? 0) - 0.384) < 1e-12);
+  assert.ok(
+    Math.abs((sensitivity.planned[0]?.confidence ?? 0) - 0.0576) < 1e-12,
+  );
+  assert.equal(production.planned[0]?.informationEnvironmentContext.score, 30);
 });

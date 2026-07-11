@@ -338,9 +338,8 @@ export default async function PulseReviewQueuePage({
                           ? `+${event.severityValue}`
                           : event.severityValue}
                       </Chip>
-                      {event.pressFreedomScoreAtClassification != null &&
-                      event.pressFreedomScoreAtClassification < 50 ? (
-                        <Chip variant="warn">Restricted press</Chip>
+                      {event.pressFreedomScoreAtClassification != null ? (
+                        <Chip variant="warn">Legacy unversioned context</Chip>
                       ) : null}
                     </span>
                   </td>

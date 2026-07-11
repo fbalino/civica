@@ -9,7 +9,7 @@
  * Important per spec §2.3: GDELT is a *secondary* / corroboration
  * source in the v2 architecture, not a primary trigger. Events
  * appearing only in GDELT (no specialist-feed corroboration) are
- * weighted lower and held to stricter rules in low-press-freedom
+ * weighted lower under the source-diversity and positive-event rules
  * countries — that logic lives in `corroborate.ts`, not here.
  *
  * BODY ENRICHMENT: GDELT returns only headline + URL, never article

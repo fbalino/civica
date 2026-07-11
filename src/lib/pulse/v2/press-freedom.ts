@@ -1,136 +1,224 @@
 /**
- * Phase 5.5 — country press-freedom scores for the corroboration rule.
+ * PUL-010 — versioned information-environment context.
  *
- * Per spec §3.5, news-only signals carry different weight depending
- * on the country's RSF Press Freedom Index score:
- *   - score ≥ 70 (free press)        : full confidence
- *   - score 50–69 (partially free)   : −20% confidence; specialist
- *                                      corroboration preferred
- *   - score < 50 (restricted press)  : news-only weights are multiplied
- *                                      by 0.3; this is not a review gate
- *
- * The full RSF country index is loaded into Civica via
- * `rsf_press_freedom` source ingestion in the CI pipeline. For the
- * Pulse currently uses an incomplete static fallback table of approximate
- * 2024 values. If a country is absent, code defaults to 50. This is a known,
- * unvalidated heuristic limitation and public responses expose whether the
- * default was applied; it must not be presented as a complete live RSF feed.
- *
- * To refresh: pull the latest RSF index, copy the country → score
- * pairs into the map below, bump LAST_UPDATED.
+ * The former module embedded an incomplete set of approximate 2024 RSF
+ * scores and substituted 50 whenever a jurisdiction was missing. That made an
+ * unsourced default behave like a country observation. The replacement keeps
+ * missingness explicit and treats the old multipliers as a sensitivity
+ * scenario only. Production applies no context multiplier until both rights
+ * and validation gates pass.
  */
 
-/** Approximate RSF 2024 World Press Freedom Index scores by country
- *  ISO3 code. Higher = freer press. Range 0-100. */
-export const RSF_SCORES_2024: Record<string, number> = {
-  // Free press (≥ 70)
-  NOR: 91,
-  DNK: 89,
-  SWE: 88,
-  NLD: 88,
-  FIN: 87,
-  EST: 86,
-  PRT: 85,
-  IRL: 85,
-  CHE: 85,
-  DEU: 83,
-  CZE: 80,
-  ISL: 80,
-  CAN: 80,
-  LTU: 80,
-  AUT: 79,
-  LUX: 79,
-  BEL: 79,
-  TWN: 78,
-  GBR: 75,
-  AUS: 75,
-  ESP: 74,
-  FRA: 73,
-  NZL: 73,
-  CHL: 73,
-  JPN: 72,
-  KOR: 72,
-  POL: 71,
-  USA: 70,
-  ARG: 70,
+export const PULSE_INFORMATION_ENVIRONMENT_VERSION =
+  "pulse-information-environment-context/v1" as const;
 
-  // Partially free (50–69)
-  ITA: 67,
-  ZAF: 66,
-  ZMB: 66,
-  CRI: 65,
-  HUN: 65,
-  ROU: 65,
-  BGR: 65,
-  GRC: 65,
-  HRV: 65,
-  ALB: 64,
-  ISR: 60,
-  BWA: 60,
-  MEX: 58,
-  BRA: 58,
-  GHA: 58,
-  IND: 56,
-  IDN: 56,
-  PHL: 56,
-  KEN: 56,
-  COL: 55,
-  PER: 55,
-  TUN: 55,
-  UKR: 55,
-  TZA: 55,
-  PAK: 53,
-  LKA: 53,
-  ARM: 52,
-  ECU: 50,
-  HTI: 50,
-  ETH: 50,
+export const RSF_2026_CANDIDATE_RELEASE = Object.freeze({
+  sourceId: "rsf_press_freedom",
+  sourceUrl: "https://rsf.org/sites/default/files/import_classement/2026.csv",
+  methodologyUrl:
+    "https://rsf.org/en/methodology-used-compiling-world-press-freedom-index-2026",
+  termsUrl: "https://rsf.org/en/cgu",
+  upstreamRelease: "RSF World Press Freedom Index 2026",
+  observationYear: 2025,
+  retrievedAt: "2026-07-11T17:17:00.000Z",
+  contentSha256:
+    "65ec7bd9b9740e0f51e9b4eea585030b2226c1a96938ec06a4cbbdbd2639aae2",
+  publisherRows: 180,
+  redistributionPosture: "restricted-no-redistribution",
+  rightsStatus: "pending",
+  productionUse: "disabled_pending_rights_and_validation",
+});
 
-  // Restricted press (< 50)
-  NGA: 47,
-  BGD: 45,
-  HND: 45,
-  THA: 44,
-  TUR: 42,
-  HKG: 42,
-  RWA: 42,
-  SGP: 41,
-  EGY: 38,
-  AGO: 37,
-  BLR: 36,
-  CMR: 36,
-  COD: 35,
-  RUS: 33,
-  AFG: 32,
-  MMR: 28,
-  IRN: 28,
-  CHN: 23,
-  SYR: 22,
-  YEM: 22,
-  CUB: 22,
-  VNM: 22,
-  TKM: 22,
-  PRK: 21,
-  ERI: 18,
-  SAU: 18,
-};
+export type PulseInformationEnvironmentValueStatus = "observed" | "missing";
+export type PulseInformationEnvironmentTier = "free" | "partial" | "restricted";
 
-/** Heuristic midpoint for unknown countries; not a sourced observation. */
-const DEFAULT_SCORE = 50;
-
-/** Given a jurisdiction (by iso3 or by lookup), return the press
- *  freedom score 0-100. */
-export function pressFreedomScore(
-  iso3OrCode: string | null | undefined
-): number {
-  if (!iso3OrCode) return DEFAULT_SCORE;
-  return RSF_SCORES_2024[iso3OrCode.toUpperCase()] ?? DEFAULT_SCORE;
+export interface PulseInformationEnvironmentContext {
+  schemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_VERSION;
+  valueStatus: PulseInformationEnvironmentValueStatus;
+  score: number | null;
+  tier: PulseInformationEnvironmentTier | null;
+  sourceId: string | null;
+  sourceUrl: string | null;
+  upstreamRelease: string | null;
+  observationYear: number | null;
+  retrievedAt: string | null;
+  contentSha256: string | null;
+  sourceCoverage: {
+    publisherRows: number | null;
+    matchedJurisdictions: number | null;
+    supportedJurisdictions: number | null;
+  };
+  rightsStatus: "verified" | "pending" | "not_registered";
+  useStatus:
+    | "active_unvalidated_heuristic"
+    | "disabled_pending_rights_and_validation"
+    | "not_available";
+  missingReason: string | null;
 }
 
-export function pressFreedomTier(
-  score: number
-): "free" | "partial" | "restricted" {
-  if (score >= 70) return "free";
-  if (score >= 50) return "partial";
+export const PULSE_INFORMATION_ENVIRONMENT_POLICY = Object.freeze({
+  version: "pulse-information-environment-uncertainty/v1",
+  productionMode: "disabled_pending_rights_and_validation" as const,
+  missingValuePolicy: "no_multiplier" as const,
+  validationStanding: "not_calibrated_bias_correction" as const,
+  sensitivityMode: "legacy_multiplier_scenario_only" as const,
+  tierThresholds: Object.freeze({ freeAtLeast: 70, partialAtLeast: 50 }),
+  multipliers: Object.freeze({
+    partialAllEvents: 0.8,
+    restrictedNewsOnly: 0.3,
+    restrictedPositiveThinEvidence: 0.5,
+  }),
+});
+
+export function informationEnvironmentTier(
+  score: number,
+): PulseInformationEnvironmentTier {
+  if (!Number.isFinite(score) || score < 0 || score > 100) {
+    throw new Error("information-environment score must be within 0–100");
+  }
+  if (score >= PULSE_INFORMATION_ENVIRONMENT_POLICY.tierThresholds.freeAtLeast)
+    return "free";
+  if (
+    score >= PULSE_INFORMATION_ENVIRONMENT_POLICY.tierThresholds.partialAtLeast
+  )
+    return "partial";
   return "restricted";
+}
+
+export function missingInformationEnvironmentContext(
+  reason = "No rights-cleared, versioned context observation is available.",
+): PulseInformationEnvironmentContext {
+  return {
+    schemaVersion: PULSE_INFORMATION_ENVIRONMENT_VERSION,
+    valueStatus: "missing",
+    score: null,
+    tier: null,
+    sourceId: null,
+    sourceUrl: null,
+    upstreamRelease: null,
+    observationYear: null,
+    retrievedAt: null,
+    contentSha256: null,
+    sourceCoverage: {
+      publisherRows: null,
+      matchedJurisdictions: null,
+      supportedJurisdictions: null,
+    },
+    rightsStatus: "not_registered",
+    useStatus: "not_available",
+    missingReason: reason,
+  };
+}
+
+export function observedInformationEnvironmentContext(input: {
+  score: number;
+  sourceId: string;
+  sourceUrl: string;
+  upstreamRelease: string;
+  observationYear: number;
+  retrievedAt: string;
+  contentSha256: string;
+  publisherRows: number;
+  matchedJurisdictions: number;
+  supportedJurisdictions: number;
+  rightsStatus: "verified" | "pending";
+  useStatus:
+    "active_unvalidated_heuristic" | "disabled_pending_rights_and_validation";
+}): PulseInformationEnvironmentContext {
+  if (!input.sourceId.trim() || !input.sourceUrl.startsWith("https://")) {
+    throw new Error("observed context requires a source id and HTTPS URL");
+  }
+  if (
+    !input.upstreamRelease.trim() ||
+    !Number.isInteger(input.observationYear)
+  ) {
+    throw new Error(
+      "observed context requires an upstream release and vintage",
+    );
+  }
+  if (
+    !/^\d{4}-\d{2}-\d{2}T/.test(input.retrievedAt) ||
+    Number.isNaN(Date.parse(input.retrievedAt))
+  ) {
+    throw new Error("observed context requires a retrieval timestamp");
+  }
+  if (!/^[a-f0-9]{64}$/.test(input.contentSha256)) {
+    throw new Error("observed context requires a SHA-256 input hash");
+  }
+  for (const [field, value] of Object.entries({
+    publisherRows: input.publisherRows,
+    matchedJurisdictions: input.matchedJurisdictions,
+    supportedJurisdictions: input.supportedJurisdictions,
+  })) {
+    if (!Number.isInteger(value) || value < 0) {
+      throw new Error(`${field} must be a non-negative integer`);
+    }
+  }
+  if (input.publisherRows === 0 || input.supportedJurisdictions === 0) {
+    throw new Error(
+      "observed context requires non-zero publisher and scope coverage",
+    );
+  }
+  if (input.matchedJurisdictions > input.supportedJurisdictions) {
+    throw new Error("matched jurisdiction coverage exceeds supported scope");
+  }
+  if (input.matchedJurisdictions > input.publisherRows) {
+    throw new Error("matched jurisdiction coverage exceeds publisher rows");
+  }
+  return {
+    schemaVersion: PULSE_INFORMATION_ENVIRONMENT_VERSION,
+    valueStatus: "observed",
+    score: input.score,
+    tier: informationEnvironmentTier(input.score),
+    sourceId: input.sourceId,
+    sourceUrl: input.sourceUrl,
+    upstreamRelease: input.upstreamRelease,
+    observationYear: input.observationYear,
+    retrievedAt: input.retrievedAt,
+    contentSha256: input.contentSha256,
+    sourceCoverage: {
+      publisherRows: input.publisherRows,
+      matchedJurisdictions: input.matchedJurisdictions,
+      supportedJurisdictions: input.supportedJurisdictions,
+    },
+    rightsStatus: input.rightsStatus,
+    useStatus: input.useStatus,
+    missingReason: null,
+  };
+}
+
+export function informationEnvironmentMultiplier(input: {
+  context: PulseInformationEnvironmentContext;
+  isPositive: boolean;
+  specialistGroups: number;
+  newsGroups: number;
+  mode?: "production" | "sensitivity";
+}): number {
+  if (
+    input.mode !== "sensitivity" ||
+    input.context.valueStatus !== "observed" ||
+    input.context.score === null
+  ) {
+    return 1;
+  }
+  const tier = informationEnvironmentTier(input.context.score);
+  let multiplier = 1;
+  if (tier === "partial") {
+    multiplier *=
+      PULSE_INFORMATION_ENVIRONMENT_POLICY.multipliers.partialAllEvents;
+  }
+  if (tier === "restricted" && input.specialistGroups === 0) {
+    multiplier *=
+      PULSE_INFORMATION_ENVIRONMENT_POLICY.multipliers.restrictedNewsOnly;
+  }
+  if (
+    tier === "restricted" &&
+    input.isPositive &&
+    input.specialistGroups + input.newsGroups < 2
+  ) {
+    multiplier *=
+      PULSE_INFORMATION_ENVIRONMENT_POLICY.multipliers
+        .restrictedPositiveThinEvidence;
+  }
+  return multiplier;
 }
