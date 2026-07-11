@@ -846,3 +846,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   Frozen reads use only snapshot rows and leave absent facts null.
 - Response metadata is derived from the chosen rows. Durable record: APR-D064
   in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Reconciliation releases freeze all resolver candidates
+
+- From v0.3-beta, a release freezes each exact resolver input with source or
+  normalized-observation hash, candidate status, adapter hash, and code hash.
+- Staged chunks stay publicly invisible until database counts, checksums, winner
+  flags, and immutable candidate pointers close; completion is one transition.
+- Q1 remains `canonical_only_legacy`; do not infer its missing alternates from
+  current rows. Durable record: APR-D065 in `plan/DECISIONS.md`.

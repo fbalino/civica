@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 50
-- **Remaining:** 238
-- **Progress:** 17.4%
+- **Completed:** 51
+- **Remaining:** 237
+- **Progress:** 17.7%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -69,7 +69,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-029** (P0) Rebuild numeric validation and quarantine for microstates and catastrophic parser errors. _Done when: globally valid small values for Pitcairn/Cocos/Vatican/Niue/Tokelau pass, the North Korea military-expenditure corruption is fixed/quarantined, ingestion persists rejection status rather than only filtering in memory, DB/CI report zero active envelope violation, and provenance survives fallback._
 - [x] **DAT-030** (P0) Make multi-source research ingestion orchestration fail closed and publish atomically. _Done when: adapter exceptions exit nonzero, orchestration cannot report success after a child failure, staged dimensions pass coverage/required-source/checksum/version validation before one named vintage becomes visible, partial runs leave the prior release intact, and the run manifest records every result._
 - [x] **DAT-031** (P0) Separate live resolver data from named frozen vintages in every API/export. _Done when: callers explicitly select `as_of=live` or a valid immutable `vintage`, response metadata is derived from the selected rows, unsupported labels fail, and no current post-cut value can carry static Q1/frozen metadata._
-- [ ] **DAT-032** (P0) Freeze the complete candidate observation set, not only winners, for each reconciliation release. _Done when: every candidate row/source/hash/status used at the cut is version-associated, adapters archive or hash exact inputs, winner pointers cannot drift to changed mutable rows, and offline replay reproduces the release checksum without network access._
+- [x] **DAT-032** (P0) Freeze the complete candidate observation set, not only winners, for each reconciliation release. _Done when: every candidate row/source/hash/status used at the cut is version-associated, adapters archive or hash exact inputs, winner pointers cannot drift to changed mutable rows, and offline replay reproduces the release checksum without network access._
 - [ ] **DAT-033** (P0) Make indicator/source lineage a first-class key rather than dimension-only metadata. _Done when: CI/Conditions/history observations and ingestions identify indicator ID, source, upstream release, artifact hash, temporal coverage, license URL, transformation, substitution reason, and method; uniqueness prevents one source/indicator silently overwriting another._
 
 ## Area 04 — Civica Index Research Program and Design Tournament

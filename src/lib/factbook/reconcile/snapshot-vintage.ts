@@ -55,7 +55,7 @@ type Db = typeof defaultDb;
 /**
  * The published release methodology version used at vintage time.
  */
-export const VINTAGE_METHODOLOGY_VERSION = "v0.2-beta";
+export const VINTAGE_METHODOLOGY_VERSION = "v0.3-beta";
 
 /**
  * The label format for v1.0+ vintage cuts (resolution v1.0 § 2a).
@@ -281,7 +281,7 @@ export interface SnapshotSummary {
  * Internal helpers
  * ──────────────────────────────────────────────────────────────── */
 
-interface FactRowDb {
+export interface FactRowDb {
   id: string;
   jurisdictionId: string;
   factKey: string;
@@ -314,7 +314,7 @@ interface FactRowDb {
   growthMethodology?: string | null;
 }
 
-function dbRowToFactRow(row: FactRowDb): FactRow {
+export function dbRowToFactRow(row: FactRowDb): FactRow {
   return {
     id: row.id,
     jurisdictionId: row.jurisdictionId,

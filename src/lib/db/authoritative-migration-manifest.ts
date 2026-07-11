@@ -31,4 +31,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "521113620700811c93b9acaf91c5766e0be302d9e8ecb6e9049e3fd8f11d235e",
     baseline: false,
   },
+  {
+    id: "0005_freeze_reconciliation_candidates",
+    path: "drizzle/authoritative/0005_freeze_reconciliation_candidates.sql",
+    sha256: "d2fd01385d030d8e670eea144eb1ad3ed61a02cb15f8e4c79ecf6abefb518420",
+    baseline: false,
+  },
+  {
+    id: "0006_staged_candidate_publication",
+    path: "drizzle/authoritative/0006_staged_candidate_publication.sql",
+    sha256: "85f2603f1e13235b07b5cb20228e5b1eb02bdc542220d45dde615f03a87a4088",
+    baseline: false,
+  },
 ] as const;

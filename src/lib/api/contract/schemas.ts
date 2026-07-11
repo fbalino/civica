@@ -308,6 +308,10 @@ export const zFactbookReconciliationMeta = z
     cutoffAt: z.string().nullable(),
     retrievedThrough: z.string().nullable(),
     methodologyVersions: z.array(z.string()),
+    candidateSetStatus: z.enum(["live", "complete_candidates", "canonical_only_legacy"]),
+    candidateSetChecksum: z.string().nullable(),
+    winnerSetChecksum: z.string().nullable(),
+    resolverVersionHash: z.string().nullable(),
   })
   .strict();
 
@@ -347,7 +351,7 @@ export const zCountryListItem = z
 export const zCountriesListMeta = zPaginationMeta
   .extend({
     taxonomy: z.string(),
-    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()) }).strict(),
+    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()), candidateSetStatus: z.enum(["live", "complete_candidates", "canonical_only_legacy"]), candidateSetChecksum: z.string().nullable(), winnerSetChecksum: z.string().nullable(), resolverVersionHash: z.string().nullable() }).strict(),
   })
   .extend(zDeprecationMeta.shape)
   .strict();
@@ -1055,7 +1059,7 @@ export const zCountryExportJson = z
   .object({
     schemaVersion: z.literal("country-research-export/v1"),
     generatedAt: z.string().datetime(),
-    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()) }).strict(),
+    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()), candidateSetStatus: z.enum(["live", "complete_candidates", "canonical_only_legacy"]), candidateSetChecksum: z.string().nullable(), winnerSetChecksum: z.string().nullable(), resolverVersionHash: z.string().nullable() }).strict(),
     jurisdiction: z.object({ id: z.string(), slug: z.string(), name: z.string(), iso2: z.string().nullable(), iso3: z.string().nullable(), status: z.string() }).strict(),
     facts: z.array(z.object({
       factKey: z.string(),

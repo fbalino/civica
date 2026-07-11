@@ -152,7 +152,7 @@ export async function GET(
       : null;
     if (frozen && !frozen.exists) return withStructuralFamilyDeprecation(apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400));
     const facts = frozen?.resolutions ?? await getCanonicalFactsForJurisdiction(country.id, factKeys);
-    const selectionMetadata = metadataFromResolutions(selection, facts, frozen ? { cutoffAt: frozen.cutoffAt, retrievedThrough: frozen.retrievedThrough, methodologyVersions: frozen.methodologyVersions } : undefined);
+    const selectionMetadata = metadataFromResolutions(selection, facts, frozen ?? undefined);
     const liveFallback = selection.mode === "live";
 
     /**

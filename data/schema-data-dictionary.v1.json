@@ -2,13 +2,13 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "2da21f8643b3443150dcdc85000830ad9757fec43efdbce7c7e431574ae13612",
+  "schemaFingerprint": "d7612068d2880bbdc4fdc1ed16cf2a185e6c5264847049d6d073d8b8392197cd",
   "summary": {
-    "tables": 51,
-    "columns": 613,
+    "tables": 53,
+    "columns": 645,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
-    "supportTables": 9,
+    "supportTables": 11,
     "internalTables": 8,
     "privateTables": 2,
     "legacyTables": 3
@@ -5015,6 +5015,842 @@
       ]
     },
     {
+      "name": "country_fact_vintage_candidates",
+      "exportName": "countryFactVintageCandidates",
+      "definition": "Immutable complete resolver inputs and source/input evidence for a named reconciliation release.",
+      "rowGrain": "One jurisdiction, fact key, source candidate, and named release cut.",
+      "releaseScope": "public_support",
+      "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+      "cadence": "Frozen once with each complete reconciliation release.",
+      "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+      "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "adapter_version_hash",
+          "propertyName": "adapterVersionHash",
+          "definition": "Adapter version hash recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_content_hash",
+          "propertyName": "candidateContentHash",
+          "definition": "Candidate content hash recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "Candidate content hash follows this table contract. The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_payload",
+          "propertyName": "candidatePayload",
+          "definition": "Candidate payload recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "Candidate payload follows this table contract. The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_status",
+          "propertyName": "candidateStatus",
+          "definition": "Candidate status recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "Candidate status follows this table contract. The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cut_at_timestamp",
+          "propertyName": "cutAtTimestamp",
+          "definition": "Cut at timestamp recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decision_reason",
+          "propertyName": "decisionReason",
+          "definition": "Decision reason recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decision_trace",
+          "propertyName": "decisionTrace",
+          "definition": "Decision trace recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "jsonb",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "fact_key",
+          "propertyName": "factKey",
+          "definition": "Stable Civica identifier for the asserted fact concept.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_fact_vintage_candidate_identity",
+              "idx_fact_vintage_candidate_pair"
+            ],
+            "uniqueGroups": [
+              "idx_fact_vintage_candidate_identity"
+            ]
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_fact_vintage_candidate_id_label"
+            ],
+            "uniqueGroups": [
+              "idx_fact_vintage_candidate_id_label"
+            ]
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "input_evidence_hash",
+          "propertyName": "inputEvidenceHash",
+          "definition": "Input evidence hash recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "input_evidence_kind",
+          "propertyName": "inputEvidenceKind",
+          "definition": "Input evidence kind recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "is_canonical_at_cut",
+          "propertyName": "isCanonicalAtCut",
+          "definition": "Is canonical at cut recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "boolean",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [
+              "idx_fact_vintage_candidate_identity",
+              "idx_fact_vintage_candidate_pair"
+            ],
+            "uniqueGroups": [
+              "idx_fact_vintage_candidate_identity"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_hash",
+          "propertyName": "sourceHash",
+          "definition": "Stable hash of the captured upstream payload/value used for change detection and replay.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "sources.id",
+            "indexGroups": [
+              "idx_fact_vintage_candidate_identity",
+              "idx_fact_vintage_candidate_source"
+            ],
+            "uniqueGroups": [
+              "idx_fact_vintage_candidate_identity"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_row_id",
+          "propertyName": "sourceRowId",
+          "definition": "Source row id recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_snapshot_id",
+          "propertyName": "sourceSnapshotId",
+          "definition": "Source snapshot id recorded for the jurisdiction, fact key, source candidate, and named release cut.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Exact normalized country_facts resolver input with source payload or observation hash and producing adapter hash.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "vintage_label",
+          "propertyName": "vintageLabel",
+          "definition": "Vintage label; relational link to country_fact_vintage_releases.vintage_label.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "country_fact_vintage_releases.vintage_label",
+            "indexGroups": [
+              "idx_fact_vintage_candidate_identity",
+              "idx_fact_vintage_candidate_id_label",
+              "idx_fact_vintage_candidate_pair",
+              "idx_fact_vintage_candidate_source"
+            ],
+            "uniqueGroups": [
+              "idx_fact_vintage_candidate_identity",
+              "idx_fact_vintage_candidate_id_label"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing country_fact_vintage_releases.vintage_label; substantive provenance follows this table's source contract.",
+          "cadence": "Frozen once with each complete reconciliation release.",
+          "vintageSemantics": "Vintage label follows this table contract. The candidate payload retains observation, upstream release, retrieval, and method times; cut_at_timestamp binds release membership.",
+          "rights": "Payloads inherit source rights and are not automatically eligible for public bulk redistribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "country_fact_vintage_releases",
+      "exportName": "countryFactVintageReleases",
+      "definition": "Release-level closure manifest for one named reconciliation cut.",
+      "rowGrain": "One immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+      "releaseScope": "public_support",
+      "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+      "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+      "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+      "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "candidate_count",
+          "propertyName": "candidateCount",
+          "definition": "Candidate count recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "Candidate count follows this table contract. cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_set_checksum",
+          "propertyName": "candidateSetChecksum",
+          "definition": "Candidate set checksum recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "Candidate set checksum follows this table contract. cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "completeness_status",
+          "propertyName": "completenessStatus",
+          "definition": "Completeness status recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_fact_vintage_release_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cut_at_timestamp",
+          "propertyName": "cutAtTimestamp",
+          "definition": "Cut at timestamp recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "input_manifest",
+          "propertyName": "inputManifest",
+          "definition": "Input manifest recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_version",
+          "propertyName": "methodologyVersion",
+          "definition": "Version of the Civica method that produced or interprets this row.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "resolver_version_hash",
+          "propertyName": "resolverVersionHash",
+          "definition": "Resolver version hash recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "vintage_label",
+          "propertyName": "vintageLabel",
+          "definition": "Vintage label recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "Vintage label follows this table contract. cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "winner_count",
+          "propertyName": "winnerCount",
+          "definition": "Winner count recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "winner_set_checksum",
+          "propertyName": "winnerSetChecksum",
+          "definition": "Winner set checksum recorded for the immutable named reconciliation release or explicitly disclosed canonical-only legacy cut.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the complete frozen resolver candidate set, resolver code hash, adapter hashes, and winner replay.",
+          "cadence": "One append-only row per quarterly or explicitly corrected reconciliation release.",
+          "vintageSemantics": "cut_at_timestamp is the actual selection boundary; the vintage label is the Civica publication handle.",
+          "rights": "Civica-authored manifest metadata; candidate payload rights remain source-specific.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
       "name": "country_fact_vintages",
       "exportName": "countryFactVintages",
       "definition": "Named frozen canonical country-fact selections.",
@@ -5048,6 +5884,31 @@
           "sourceOrDerivation": "Snapshot of a country_facts selection plus resolver decision metadata.",
           "cadence": "Immutable per named release cut.",
           "vintageSemantics": "As of follows this table contract. vintage names the Civica release cut; data year and as-of fields retain upstream observation time.",
+          "rights": "Inherits the selected source row's rights and release-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "canonical_candidate_id",
+          "propertyName": "canonicalCandidateId",
+          "definition": "Canonical candidate id recorded for the canonical jurisdiction/fact selection in one named vintage.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Snapshot of a country_facts selection plus resolver decision metadata.",
+          "cadence": "Immutable per named release cut.",
+          "vintageSemantics": "Canonical candidate id follows this table contract. vintage names the Civica release cut; data year and as-of fields retain upstream observation time.",
           "rights": "Inherits the selected source row's rights and release-manifest restrictions.",
           "deprecation": {
             "status": "active"

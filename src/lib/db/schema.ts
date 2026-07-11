@@ -676,6 +676,9 @@ export const countryFactVintages = pgTable(
     canonicalFactId: uuid("canonical_fact_id")
       .references(() => countryFacts.id)
       .notNull(),
+    /** Immutable candidate-snapshot row that won. Required for complete
+     * candidate releases; null only on disclosed canonical-only legacy cuts. */
+    canonicalCandidateId: uuid("canonical_candidate_id"),
     /** Frozen-at-vintage copy of the value fields, queryable
      *  without joining country_facts. */
     valueText: text("value_text"),
@@ -723,6 +726,62 @@ export const countryFactVintages = pgTable(
       table.vintageLabel
     ),
   ]
+);
+
+/** One release-level closure record for a reconciliation cut. */
+export const countryFactVintageReleases = pgTable(
+  "country_fact_vintage_releases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    vintageLabel: text("vintage_label").notNull().unique(),
+    cutAtTimestamp: timestamp("cut_at_timestamp").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    resolverVersionHash: text("resolver_version_hash").notNull(),
+    completenessStatus: text("completeness_status").notNull(),
+    candidateCount: integer("candidate_count"),
+    winnerCount: integer("winner_count").notNull(),
+    candidateSetChecksum: text("candidate_set_checksum"),
+    winnerSetChecksum: text("winner_set_checksum").notNull(),
+    inputManifest: jsonb("input_manifest").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_fact_vintage_release_status").on(table.completenessStatus)],
+);
+
+/** Complete immutable resolver input for one candidate at one release cut. */
+export const countryFactVintageCandidates = pgTable(
+  "country_fact_vintage_candidates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    vintageLabel: text("vintage_label")
+      .references(() => countryFactVintageReleases.vintageLabel)
+      .notNull(),
+    cutAtTimestamp: timestamp("cut_at_timestamp").notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    factKey: text("fact_key").notNull(),
+    sourceId: text("source_id").references(() => sources.id).notNull(),
+    sourceRowId: uuid("source_row_id").notNull(),
+    sourceHash: text("source_hash"),
+    sourceSnapshotId: uuid("source_snapshot_id"),
+    inputEvidenceKind: text("input_evidence_kind").notNull(),
+    inputEvidenceHash: text("input_evidence_hash").notNull(),
+    adapterVersionHash: text("adapter_version_hash").notNull(),
+    candidateContentHash: text("candidate_content_hash").notNull(),
+    candidateStatus: text("candidate_status").notNull(),
+    candidatePayload: jsonb("candidate_payload").$type<import("../factbook/reconcile/types").FactRow>().notNull(),
+    isCanonicalAtCut: boolean("is_canonical_at_cut").notNull().default(false),
+    decisionReason: text("decision_reason"),
+    decisionTrace: jsonb("decision_trace"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_fact_vintage_candidate_identity").on(table.vintageLabel, table.jurisdictionId, table.factKey, table.sourceId),
+    uniqueIndex("idx_fact_vintage_candidate_id_label").on(table.id, table.vintageLabel),
+    index("idx_fact_vintage_candidate_pair").on(table.vintageLabel, table.jurisdictionId, table.factKey),
+    index("idx_fact_vintage_candidate_source").on(table.vintageLabel, table.sourceId),
+  ],
 );
 
 /**

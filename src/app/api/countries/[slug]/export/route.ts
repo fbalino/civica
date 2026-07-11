@@ -61,7 +61,7 @@ export async function GET(
   const resolutions = frozen?.resolutions ?? await getCanonicalFactsForJurisdiction(jurisdiction.id, factKeys);
   const document = buildCountryResearchExport({
     generatedAt: new Date().toISOString(),
-    selection: metadataFromResolutions(selection, resolutions, frozen ? { cutoffAt: frozen.cutoffAt, retrievedThrough: frozen.retrievedThrough, methodologyVersions: frozen.methodologyVersions } : undefined),
+    selection: metadataFromResolutions(selection, resolutions, frozen ?? undefined),
     jurisdiction: {
       id: jurisdiction.id,
       slug: jurisdiction.slug,

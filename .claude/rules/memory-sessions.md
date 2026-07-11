@@ -520,3 +520,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   only snapshot rows with no current cache fallback; metadata is row-derived.
 - A live post-cut differential, 647/647 tests, claims/docs, API contracts, and
   the production build pass. DAT-032 is next.
+
+## 2026-07-11 — DAT-032 complete candidate vintages completed
+
+- Applied authoritative migrations 0005/0006 and published the v0.3-beta Q2
+  release with 25,827 frozen candidates and 17,515 linked winners.
+- Exact rerun is a no-op; database mutation probes fail; API metadata exposes
+  Q1 legacy versus Q2 complete-candidate status and checksums.
+- A 4.9 MB local package replayed both release checksums with zero network
+  requests. 651/651 tests, browser/API checks, and build pass. DAT-033 next.

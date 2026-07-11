@@ -1,6 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { countryFactVintages } from "@/lib/db/schema";
+import { countryFactVintages, countryFactVintageReleases } from "@/lib/db/schema";
 import { getFactKey } from "@/lib/factbook/reconcile/fact-keys";
 import type { FactRow, ResolverOutput } from "@/lib/factbook/reconcile/types";
 
@@ -27,18 +27,30 @@ export interface AtlasSelectionMetadata {
   cutoffAt: string | null;
   retrievedThrough: string | null;
   methodologyVersions: string[];
+  candidateSetStatus: "live" | "complete_candidates" | "canonical_only_legacy";
+  candidateSetChecksum: string | null;
+  winnerSetChecksum: string | null;
+  resolverVersionHash: string | null;
 }
 
 export async function immutableVintageExists(vintageLabel: string): Promise<boolean> {
-  const rows = await db.select({ id: countryFactVintages.id }).from(countryFactVintages).where(eq(countryFactVintages.vintageLabel, vintageLabel)).limit(1);
+  const rows = await db.select({ id: countryFactVintageReleases.id }).from(countryFactVintageReleases).where(and(
+    eq(countryFactVintageReleases.vintageLabel, vintageLabel),
+    inArray(countryFactVintageReleases.completenessStatus, ["complete_candidates", "canonical_only_legacy"]),
+  )).limit(1);
   return rows.length > 0;
 }
 
-export async function getImmutableVintageMetadata(vintageLabel: string): Promise<{ cutoffAt: string | null; retrievedThrough: string | null; methodologyVersions: string[] }> {
-  const rows = await db.select({ cutoffAt: countryFactVintages.cutAtTimestamp, sourceRetrievedAt: countryFactVintages.sourceRetrievedAt, methodologyVersion: countryFactVintages.methodologyVersion }).from(countryFactVintages).where(eq(countryFactVintages.vintageLabel, vintageLabel));
+export async function getImmutableVintageMetadata(vintageLabel: string): Promise<{ cutoffAt: string | null; retrievedThrough: string | null; methodologyVersions: string[]; candidateSetStatus: "complete_candidates" | "canonical_only_legacy"; candidateSetChecksum: string | null; winnerSetChecksum: string | null; resolverVersionHash: string | null }> {
+  const [rows, releaseRows] = await Promise.all([
+    db.select({ cutoffAt: countryFactVintages.cutAtTimestamp, sourceRetrievedAt: countryFactVintages.sourceRetrievedAt, methodologyVersion: countryFactVintages.methodologyVersion }).from(countryFactVintages).where(eq(countryFactVintages.vintageLabel, vintageLabel)),
+    db.select().from(countryFactVintageReleases).where(eq(countryFactVintageReleases.vintageLabel, vintageLabel)).limit(1),
+  ]);
   const cutoffs = [...new Set(rows.map((row) => row.cutoffAt?.toISOString()).filter((value): value is string => Boolean(value)))];
   const retrieved = rows.map((row) => row.sourceRetrievedAt?.toISOString()).filter((value): value is string => Boolean(value)).sort();
-  return { cutoffAt: cutoffs.length === 1 ? cutoffs[0] : null, retrievedThrough: retrieved.at(-1) ?? null, methodologyVersions: [...new Set(rows.map((row) => row.methodologyVersion))].sort() };
+  const release = releaseRows[0];
+  if (!release || (release.completenessStatus !== "complete_candidates" && release.completenessStatus !== "canonical_only_legacy")) throw new Error(`Unsupported immutable vintage: ${vintageLabel}`);
+  return { cutoffAt: cutoffs.length === 1 ? cutoffs[0] : null, retrievedThrough: retrieved.at(-1) ?? null, methodologyVersions: [...new Set(rows.map((row) => row.methodologyVersion))].sort(), candidateSetStatus: release.completenessStatus, candidateSetChecksum: release.candidateSetChecksum, winnerSetChecksum: release.winnerSetChecksum, resolverVersionHash: release.resolverVersionHash };
 }
 
 export async function getFrozenDisplayFactsForJurisdictions(
@@ -69,7 +81,7 @@ export async function getFrozenDisplayFactsForJurisdictions(
 export function metadataFromResolutions(
   selection: AtlasReadSelection,
   resolutions: Record<string, ResolverOutput>,
-  frozen?: { cutoffAt: string | null; retrievedThrough?: string | null; methodologyVersions: string[] },
+  frozen?: { cutoffAt: string | null; retrievedThrough?: string | null; methodologyVersions: string[]; candidateSetStatus?: "complete_candidates" | "canonical_only_legacy"; candidateSetChecksum?: string | null; winnerSetChecksum?: string | null; resolverVersionHash?: string | null },
 ): AtlasSelectionMetadata {
   if (selection.mode === "vintage") {
     return {
@@ -79,6 +91,10 @@ export function metadataFromResolutions(
       cutoffAt: frozen?.cutoffAt ?? null,
       retrievedThrough: frozen?.retrievedThrough ?? null,
       methodologyVersions: [...new Set(frozen?.methodologyVersions ?? [])].sort(),
+      candidateSetStatus: frozen?.candidateSetStatus ?? "canonical_only_legacy",
+      candidateSetChecksum: frozen?.candidateSetChecksum ?? null,
+      winnerSetChecksum: frozen?.winnerSetChecksum ?? null,
+      resolverVersionHash: frozen?.resolverVersionHash ?? null,
     };
   }
   const rows = Object.values(resolutions).flatMap((resolution) => resolution.all);
@@ -90,6 +106,10 @@ export function metadataFromResolutions(
     cutoffAt: null,
     retrievedThrough: retrieved.at(-1) ?? null,
     methodologyVersions: [...new Set(rows.map((row) => row.methodologyVersion))].sort(),
+    candidateSetStatus: "live",
+    candidateSetChecksum: null,
+    winnerSetChecksum: null,
+    resolverVersionHash: null,
   };
 }
 
@@ -103,9 +123,16 @@ export async function getFrozenFactsForJurisdiction(
   cutoffAt: string | null;
   retrievedThrough: string | null;
   methodologyVersions: string[];
+  candidateSetStatus: "complete_candidates" | "canonical_only_legacy";
+  candidateSetChecksum: string | null;
+  winnerSetChecksum: string | null;
+  resolverVersionHash: string | null;
 }> {
   const [labelRows, rows] = await Promise.all([
-    db.select({ id: countryFactVintages.id }).from(countryFactVintages).where(eq(countryFactVintages.vintageLabel, vintageLabel)).limit(1),
+    db.select().from(countryFactVintageReleases).where(and(
+      eq(countryFactVintageReleases.vintageLabel, vintageLabel),
+      inArray(countryFactVintageReleases.completenessStatus, ["complete_candidates", "canonical_only_legacy"]),
+    )).limit(1),
     db.select().from(countryFactVintages).where(and(
           eq(countryFactVintages.jurisdictionId, jurisdictionId),
           eq(countryFactVintages.vintageLabel, vintageLabel),
@@ -162,11 +189,16 @@ export async function getFrozenFactsForJurisdiction(
   }
   const cutoffs = [...new Set(rows.map((row) => row.cutAtTimestamp?.toISOString()).filter((value): value is string => Boolean(value)))];
   const retrieved = rows.map((row) => row.sourceRetrievedAt?.toISOString()).filter((value): value is string => Boolean(value)).sort();
+  const release = labelRows[0];
   return {
     exists: labelRows.length > 0,
     resolutions,
     cutoffAt: cutoffs.length === 1 ? cutoffs[0] : null,
     retrievedThrough: retrieved.at(-1) ?? null,
     methodologyVersions: [...new Set(rows.map((row) => row.methodologyVersion))].sort(),
+    candidateSetStatus: release?.completenessStatus === "complete_candidates" ? "complete_candidates" : "canonical_only_legacy",
+    candidateSetChecksum: release?.candidateSetChecksum ?? null,
+    winnerSetChecksum: release?.winnerSetChecksum ?? null,
+    resolverVersionHash: release?.resolverVersionHash ?? null,
   };
 }

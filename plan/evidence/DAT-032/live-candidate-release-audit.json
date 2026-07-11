@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "reconciliation-candidate-live-audit/v1",
+  "task": "DAT-032",
+  "auditedAt": "2026-07-11",
+  "legacy": { "label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1", "status": "canonical_only_legacy", "candidateSetChecksum": null, "changedCurrentWinnerContents": 171 },
+  "complete": {
+    "label": "Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2",
+    "cutAt": "2026-07-11T06:41:29.000Z",
+    "status": "complete_candidates",
+    "candidateCount": 25827,
+    "winnerCount": 17515,
+    "candidateSetChecksum": "6dfd021d56393bf72d3e8a515d2958c4e1b0723de605bbef1480fcea5fe31f2b",
+    "winnerSetChecksum": "3d380dde76aa37f8db41a27a5c7da0a0febc06d97917cdc01d9fbde996f039a3",
+    "resolverVersionHash": "248ce8b7ff6b5c491269c19ed6b259bbbb346c775e6fbc45d96b34bd2a258e29",
+    "missingRequiredEvidence": 0,
+    "missingWinnerPointers": 0,
+    "badWinnerPointers": 0,
+    "exactRerunUnchanged": true,
+    "mutationRejected": true
+  },
+  "offlineReplay": { "compressedBytes": 5165870, "networkRequests": 0, "candidateChecksumMatched": true, "winnerChecksumMatched": true },
+  "authoritativeMigrations": { "applied": 7, "expected": 7, "schemaFingerprint": "22ea9db0d3ca41998e305b04ae364465c09b2ab596f39d08a55954431ed1e03c" },
+  "testsPassed": 651,
+  "buildPassed": true
+}

@@ -99,7 +99,7 @@ function fixture() {
   const sourceIds = ["world_bank", "wikidata", "cia_factbook", "ipu_parline"];
   return buildCountryResearchExport({
     generatedAt: "2026-07-11T00:00:00.000Z",
-    selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"] },
+    selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null },
     jurisdiction: {
       id: "france-id",
       slug: "france",

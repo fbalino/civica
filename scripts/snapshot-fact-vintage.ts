@@ -1,10 +1,9 @@
 /**
  * Phase F.1 / R.22 — quarterly fact-vintage snapshot CLI.
  *
- * Thin wrapper around `snapshotCurrentVintage()` from
- * `src/lib/factbook/reconcile/snapshot-vintage.ts`. The library
- * does all the work; this script handles arg parsing + log
- * output. The cron route at
+ * Thin wrapper around `snapshotCompleteCandidateRelease()`. The library
+ * freezes every resolver input, source/input and adapter hash, offline replay
+ * checksum, and immutable winner pointer. This script handles arguments; the cron route at
  * `src/app/api/cron/factbook/snapshot-vintage/route.ts` is the
  * production caller; this script is for diagnostic / manual cuts.
  *
@@ -16,10 +15,7 @@
  *
  *   # Override the label (diagnostic / smoke-test cut):
  *   npx tsx scripts/snapshot-fact-vintage.ts \
- *     --vintage="Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1"
- *
- *   # Restrict to one jurisdiction:
- *   npx tsx scripts/snapshot-fact-vintage.ts --jurisdiction=argentina
+ *     --vintage="Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2"
  *
  *   # Dry run (no DB writes):
  *   npx tsx scripts/snapshot-fact-vintage.ts --dry-run
@@ -27,64 +23,46 @@
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
-import { snapshotCurrentVintage } from "../src/lib/factbook/reconcile/snapshot-vintage";
+import { deriveVintageLabel } from "../src/lib/factbook/reconcile/snapshot-vintage";
+import { snapshotCompleteCandidateRelease } from "../src/lib/factbook/reconcile/snapshot-candidate-release";
 
 interface CliArgs {
   vintage?: string;
   dryRun: boolean;
-  jurisdictionSlug?: string;
-  supersedesVintageLabel?: string;
 }
 
 function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
   let vintage: string | undefined;
   let dryRun = false;
-  let jurisdictionSlug: string | undefined;
-  let supersedesVintageLabel: string | undefined;
 
   for (const a of args) {
     if (a.startsWith("--vintage=")) vintage = a.slice("--vintage=".length);
     else if (a === "--dry-run") dryRun = true;
-    else if (a.startsWith("--jurisdiction=")) {
-      jurisdictionSlug = a.slice("--jurisdiction=".length);
-    }
-    else if (a.startsWith("--supersedes=")) {
-      supersedesVintageLabel = a.slice("--supersedes=".length);
-    }
+    else if (a.startsWith("--jurisdiction=") || a.startsWith("--supersedes=")) throw new Error("Complete candidate releases cannot be partial or overwrite a prior release");
   }
 
-  return { vintage, dryRun, jurisdictionSlug, supersedesVintageLabel };
+  return { vintage, dryRun };
 }
 
 async function main() {
-  const { vintage, dryRun, jurisdictionSlug, supersedesVintageLabel } = parseArgs();
+  const { vintage, dryRun } = parseArgs();
+  const cutDate = new Date();
 
-  const summary = await snapshotCurrentVintage({
-    vintageLabel: vintage,
-    jurisdictionSlug,
-    supersedesVintageLabel,
+  const summary = await snapshotCompleteCandidateRelease({
+    vintageLabel: vintage ?? deriveVintageLabel(cutDate, "v0.3-beta"),
+    cutDate,
     dryRun,
-    onProgress: (line) => {
-      if (line.startsWith("!")) console.error(line);
-      else console.log(line);
-    },
   });
 
   console.log("\n=== summary ===");
   console.log(`  vintage:           ${summary.vintageLabel}`);
   console.log(`  cut_at:            ${summary.cutAt}`);
-  console.log(`  scanned:           ${summary.scanned}`);
-  console.log(`  snapshotted:       ${summary.snapshotted}`);
+  console.log(`  candidates:        ${summary.candidateCount}`);
+  console.log(`  winners:           ${summary.winnerCount}`);
   console.log(`  unchanged:         ${summary.unchanged}`);
-  console.log(`  skipped (no key):  ${summary.skippedNoFactKey}`);
-  console.log(`  skipped (no can.): ${summary.skippedNoCanonical}`);
-  console.log(`  errors:            ${summary.errors.length}`);
-  if (summary.errors.length > 0) {
-    for (const e of summary.errors) {
-      console.error(`  ! ${e.jurisdictionSlug}/${e.factKey}: ${e.error}`);
-    }
-  }
+  console.log(`  candidate checksum:${summary.candidateSetChecksum}`);
+  console.log(`  winner checksum:   ${summary.winnerSetChecksum}`);
 }
 
 main().catch((err) => {

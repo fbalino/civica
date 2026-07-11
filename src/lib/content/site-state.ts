@@ -56,7 +56,7 @@ export const externalReviewStatus: "not-yet" | "in-review" | "complete" =
  *  flipped this from the legacy "Civica Atlas 2026Q3" placeholder
  *  to the live R.22 cut on 2026-05-06. */
 export const currentVintage =
-  "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1" as const;
+  "Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2" as const;
 
 // ─────────────────────────────────────────────────────────────────────
 // Civica Index (CI) — composite governance score
@@ -187,18 +187,23 @@ export const reconciliation = {
    *  R.23 rewrite (2026-05-05) bumped from v0.1 to v0.2-beta and
    *  re-framed graduation as a perpetual-beta posture: version
    *  bumps signal refinements, not graduation events. */
-  version: "v0.2-beta" as const,
+  version: "v0.3-beta" as const,
   status: "beta" as const,
   /** Original publication date of the methodology page; the R.23
    *  rewrite is dated separately as `lastUpdated`. */
   publishedAt: "2026-05-02" as const,
   /** Date of the most recent methodology-page rewrite. The
    *  reconciliation methodology meta line cites both dates. */
-  lastUpdated: "2026-05-05" as const,
+  lastUpdated: "2026-07-11" as const,
+  /** Method version attached to the first canonical-only cut. */
+  firstVintageVersion: "v0.2-beta" as const,
   /** First v1 quarterly vintage cut. */
   firstVintage: "2026-Q1" as const,
   /** Date the first v1 vintage was cut. */
   firstVintageCutDate: "2026-05-05" as const,
+  /** First complete-candidate release and its actual manual cut date. */
+  firstCompleteCandidateVintage: "2026-Q2" as const,
+  firstCompleteCandidateCutDate: "2026-07-11" as const,
 
   /** Forward-looking v1.0 graduation criteria. Currently NOT
    *  rendered on the public page — the R.23 rewrite (2026-05-05)

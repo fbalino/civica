@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T05:58:48.123Z",
-  "sha256": "552dd17c582ebef7a30b001a37a2d46fc84a2bcc07b88824be9aaaded4538b86",
+  "generatedAt": "2026-07-11T06:44:04.420Z",
+  "sha256": "22ea9db0d3ca41998e305b04ae364465c09b2ab596f39d08a55954431ed1e03c",
   "schema": {
     "columns": [
       {
@@ -1673,6 +1673,285 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "country_fact_vintage_candidates",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "vintage_label",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "timestamp",
+        "name": "cut_at_timestamp",
+        "type": "timestamp without time zone",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "fact_key",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "uuid",
+        "name": "source_row_id",
+        "type": "uuid",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "source_hash",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "source_snapshot_id",
+        "type": "uuid",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "input_evidence_kind",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "input_evidence_hash",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "adapter_version_hash",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "candidate_content_hash",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "candidate_status",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "jsonb",
+        "name": "candidate_payload",
+        "type": "jsonb",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "bool",
+        "name": "is_canonical_at_cut",
+        "type": "boolean",
+        "table": "country_fact_vintage_candidates",
+        "default": "false",
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "decision_reason",
+        "type": "text",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "jsonb",
+        "name": "decision_trace",
+        "type": "jsonb",
+        "table": "country_fact_vintage_candidates",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "country_fact_vintage_candidates",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "country_fact_vintage_releases",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "vintage_label",
+        "type": "text",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "timestamp",
+        "name": "cut_at_timestamp",
+        "type": "timestamp without time zone",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "methodology_version",
+        "type": "text",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "resolver_version_hash",
+        "type": "text",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "completeness_status",
+        "type": "text",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "int4",
+        "name": "candidate_count",
+        "type": "integer",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "int4",
+        "name": "winner_count",
+        "type": "integer",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "candidate_set_checksum",
+        "type": "text",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "winner_set_checksum",
+        "type": "text",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "jsonb",
+        "name": "input_manifest",
+        "type": "jsonb",
+        "table": "country_fact_vintage_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "country_fact_vintage_releases",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "country_fact_vintages",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -1875,6 +2154,15 @@
         "default": null,
         "nullable": "YES",
         "position": 23
+      },
+      {
+        "udt": "uuid",
+        "name": "canonical_candidate_id",
+        "type": "uuid",
+        "table": "country_fact_vintages",
+        "default": null,
+        "nullable": "YES",
+        "position": 24
       },
       {
         "udt": "uuid",
@@ -5804,6 +6092,46 @@
         "definition": "CREATE UNIQUE INDEX correction_log_pkey ON public.correction_log USING btree (id)"
       },
       {
+        "name": "country_fact_vintage_candidates_pkey",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CREATE UNIQUE INDEX country_fact_vintage_candidates_pkey ON public.country_fact_vintage_candidates USING btree (id)"
+      },
+      {
+        "name": "idx_fact_vintage_candidate_id_label",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CREATE UNIQUE INDEX idx_fact_vintage_candidate_id_label ON public.country_fact_vintage_candidates USING btree (id, vintage_label)"
+      },
+      {
+        "name": "idx_fact_vintage_candidate_identity",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CREATE UNIQUE INDEX idx_fact_vintage_candidate_identity ON public.country_fact_vintage_candidates USING btree (vintage_label, jurisdiction_id, fact_key, source_id)"
+      },
+      {
+        "name": "idx_fact_vintage_candidate_pair",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CREATE INDEX idx_fact_vintage_candidate_pair ON public.country_fact_vintage_candidates USING btree (vintage_label, jurisdiction_id, fact_key)"
+      },
+      {
+        "name": "idx_fact_vintage_candidate_source",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CREATE INDEX idx_fact_vintage_candidate_source ON public.country_fact_vintage_candidates USING btree (vintage_label, source_id)"
+      },
+      {
+        "name": "country_fact_vintage_releases_pkey",
+        "table": "country_fact_vintage_releases",
+        "definition": "CREATE UNIQUE INDEX country_fact_vintage_releases_pkey ON public.country_fact_vintage_releases USING btree (id)"
+      },
+      {
+        "name": "country_fact_vintage_releases_vintage_label_unique",
+        "table": "country_fact_vintage_releases",
+        "definition": "CREATE UNIQUE INDEX country_fact_vintage_releases_vintage_label_unique ON public.country_fact_vintage_releases USING btree (vintage_label)"
+      },
+      {
+        "name": "idx_fact_vintage_release_status",
+        "table": "country_fact_vintage_releases",
+        "definition": "CREATE INDEX idx_fact_vintage_release_status ON public.country_fact_vintage_releases USING btree (completeness_status)"
+      },
+      {
         "name": "country_fact_vintages_pkey",
         "table": "country_fact_vintages",
         "definition": "CREATE UNIQUE INDEX country_fact_vintages_pkey ON public.country_fact_vintages USING btree (id)"
@@ -6331,6 +6659,16 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_research_evidence_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text;\n  evidence_actor text;\n  evidence_reason text;\nBEGIN\n  evidence_id := COALESCE(after_row->>'id', before_row->>'id', md5(before_row::text));\n  evidence_actor := COALESCE(\n    NULLIF(after_row->>'reviewer_id', ''),\n    NULLIF(after_row->>'actor_id', ''),\n    NULLIF(before_row->>'reviewer_id', ''),\n    current_user\n  );\n  evidence_reason := COALESCE(\n    NULLIF(after_row->>'status_reason', ''),\n    NULLIF(after_row->>'review_notes', ''),\n    NULLIF(after_row->>'disposition', ''),\n    NULLIF(after_row->>'classification_reason', ''),\n    NULLIF(before_row->>'status_reason', ''),\n    lower(TG_OP) || '_retained_by_dat_016'\n  );\n\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    evidence_reason, evidence_actor\n  );\n\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_guard_candidate_release_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_release_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE actual_candidates integer; actual_winners integer; linked_winners integer;\nBEGIN\n  IF TG_OP <> 'UPDATE' OR OLD.completeness_status <> 'staging' OR NEW.completeness_status <> 'complete_candidates'\n     OR (to_jsonb(OLD) - 'completeness_status') IS DISTINCT FROM (to_jsonb(NEW) - 'completeness_status') THEN\n    RAISE EXCEPTION 'candidate release % is immutable except staging finalization', OLD.vintage_label;\n  END IF;\n  SELECT count(*)::int, count(*) FILTER (WHERE is_canonical_at_cut)::int INTO actual_candidates, actual_winners\n    FROM country_fact_vintage_candidates WHERE vintage_label=NEW.vintage_label;\n  SELECT count(*)::int INTO linked_winners FROM country_fact_vintages v\n    JOIN country_fact_vintage_candidates c ON c.id=v.canonical_candidate_id AND c.vintage_label=v.vintage_label AND c.is_canonical_at_cut\n    WHERE v.vintage_label=NEW.vintage_label;\n  IF actual_candidates <> NEW.candidate_count OR actual_winners <> NEW.winner_count OR linked_winners <> NEW.winner_count THEN\n    RAISE EXCEPTION 'candidate release % is incomplete: candidates %/%, winners %/%, linked %/%', NEW.vintage_label,\n      actual_candidates, NEW.candidate_count, actual_winners, NEW.winner_count, linked_winners, NEW.winner_count;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_candidate_snapshot_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
         "name": "civica_reject_frozen_vintage_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_frozen_vintage_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' OR OLD.vintage_label IS NOT NULL THEN\n    RAISE EXCEPTION 'frozen vintage % is immutable; publish a new superseding version', OLD.vintage_label;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -6339,6 +6677,11 @@
         "name": "civica_reject_research_evidence_history_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_research_evidence_history_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'research_evidence_history is append-only';\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_complete_candidate_winner",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_complete_candidate_winner()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text; candidate_winner boolean;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases WHERE vintage_label=NEW.vintage_label;\n  IF release_status = 'complete_candidates' THEN\n    IF NEW.canonical_candidate_id IS NULL THEN RAISE EXCEPTION 'complete candidate release requires canonical_candidate_id'; END IF;\n    SELECT is_canonical_at_cut INTO candidate_winner FROM country_fact_vintage_candidates\n      WHERE id=NEW.canonical_candidate_id AND vintage_label=NEW.vintage_label;\n    IF candidate_winner IS DISTINCT FROM true THEN RAISE EXCEPTION 'canonical candidate pointer is not the frozen winner'; END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
         "name": "civica_validate_frozen_vintage_insert",
@@ -6583,6 +6926,16 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON correction_log FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "dat_032_immutable_candidates",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CREATE TRIGGER dat_032_immutable_candidates BEFORE DELETE OR UPDATE ON country_fact_vintage_candidates FOR EACH ROW EXECUTE FUNCTION civica_guard_candidate_snapshot_mutation()"
+      },
+      {
+        "name": "dat_032_immutable_candidate_releases",
+        "table": "country_fact_vintage_releases",
+        "definition": "CREATE TRIGGER dat_032_immutable_candidate_releases BEFORE DELETE OR UPDATE ON country_fact_vintage_releases FOR EACH ROW EXECUTE FUNCTION civica_guard_candidate_release_mutation()"
+      },
+      {
         "name": "dat_023_immutable_vintage",
         "table": "country_fact_vintages",
         "definition": "CREATE TRIGGER dat_023_immutable_vintage BEFORE DELETE OR UPDATE ON country_fact_vintages FOR EACH ROW EXECUTE FUNCTION civica_reject_frozen_vintage_mutation()"
@@ -6591,6 +6944,11 @@
         "name": "dat_023_validate_vintage",
         "table": "country_fact_vintages",
         "definition": "CREATE TRIGGER dat_023_validate_vintage BEFORE INSERT ON country_fact_vintages FOR EACH ROW EXECUTE FUNCTION civica_validate_frozen_vintage_insert()"
+      },
+      {
+        "name": "dat_032_validate_complete_candidate_winner",
+        "table": "country_fact_vintages",
+        "definition": "CREATE TRIGGER dat_032_validate_complete_candidate_winner BEFORE INSERT ON country_fact_vintages FOR EACH ROW EXECUTE FUNCTION civica_validate_complete_candidate_winner()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -6787,6 +7145,16 @@
       {
         "kind": "r",
         "name": "correction_log",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "country_fact_vintage_candidates",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "country_fact_vintage_releases",
         "definition": null
       },
       {
@@ -7192,6 +7560,72 @@
         "type": "p",
         "table": "correction_log",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "country_fact_vintage_candidates_jurisdiction_id_jurisdictions_i",
+        "type": "f",
+        "table": "country_fact_vintage_candidates",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "country_fact_vintage_candidates_pkey",
+        "type": "p",
+        "table": "country_fact_vintage_candidates",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "country_fact_vintage_candidates_source_id_sources_id_fk",
+        "type": "f",
+        "table": "country_fact_vintage_candidates",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "country_fact_vintage_candidates_vintage_label_country_fact_vint",
+        "type": "f",
+        "table": "country_fact_vintage_candidates",
+        "definition": "FOREIGN KEY (vintage_label) REFERENCES country_fact_vintage_releases(vintage_label)"
+      },
+      {
+        "name": "fact_vintage_candidate_evidence_closed",
+        "type": "c",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CHECK ((input_evidence_kind = ANY (ARRAY['source_payload_hash'::text, 'normalized_observation_hash'::text])) AND input_evidence_hash ~ '^[0-9a-f]{64}$'::text AND adapter_version_hash ~ '^[0-9a-f]{64}$'::text AND candidate_content_hash ~ '^[0-9a-f]{64}$'::text)"
+      },
+      {
+        "name": "fact_vintage_candidate_status_closed",
+        "type": "c",
+        "table": "country_fact_vintage_candidates",
+        "definition": "CHECK (candidate_status = ANY (ARRAY['active'::text, 'rejected'::text, 'superseded'::text, 'demoted'::text]))"
+      },
+      {
+        "name": "country_fact_vintage_releases_pkey",
+        "type": "p",
+        "table": "country_fact_vintage_releases",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "country_fact_vintage_releases_vintage_label_unique",
+        "type": "u",
+        "table": "country_fact_vintage_releases",
+        "definition": "UNIQUE (vintage_label)"
+      },
+      {
+        "name": "fact_vintage_release_completeness_closed",
+        "type": "c",
+        "table": "country_fact_vintage_releases",
+        "definition": "CHECK ((completeness_status = ANY (ARRAY['staging'::text, 'complete_candidates'::text])) AND candidate_count IS NOT NULL AND candidate_count > 0 AND candidate_set_checksum ~ '^[0-9a-f]{64}$'::text OR completeness_status = 'canonical_only_legacy'::text AND candidate_count IS NULL AND candidate_set_checksum IS NULL)"
+      },
+      {
+        "name": "fact_vintage_release_hashes_valid",
+        "type": "c",
+        "table": "country_fact_vintage_releases",
+        "definition": "CHECK (winner_count > 0 AND winner_set_checksum ~ '^[0-9a-f]{64}$'::text AND (resolver_version_hash = 'legacy-unrecorded'::text OR resolver_version_hash ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "country_fact_vintages_candidate_same_release_fk",
+        "type": "f",
+        "table": "country_fact_vintages",
+        "definition": "FOREIGN KEY (canonical_candidate_id, vintage_label) REFERENCES country_fact_vintage_candidates(id, vintage_label) DEFERRABLE INITIALLY DEFERRED"
       },
       {
         "name": "country_fact_vintages_canonical_fact_id_country_facts_id_fk",

@@ -9,16 +9,15 @@
  * Eurostat ESA quarterly) with the smallest reader-visible delay.
  *
  * Authenticated via `requireCronAuth` against `CRON_SECRET`.
- * Idempotent — re-runs of the same vintage label upsert the same
- * rows (the unique index on
- * `(jurisdiction_id, fact_key, vintage_label)` collapses
- * duplicates).
+ * Idempotent and resumable — candidates and winners stage under an invisible
+ * release record, then one database-verified state transition publishes the
+ * complete cut. Same-label drift fails instead of mutating the release.
  *
  * The cron's job is to freeze the live resolver's output as a
  * citable artefact. It does NOT re-cut prior vintages, does
  * NOT modify `country_facts`, and does NOT change canonical
- * picks for the live API. It only writes
- * `country_fact_vintages`.
+ * picks for the live API. It writes the release manifest, immutable complete
+ * candidate set, and winner rows with candidate pointers.
  *
  * Runtime-vs-snapshot split:
  *   - Reader-facing factbook pages and the public API call the
@@ -33,14 +32,15 @@
  *   - `?vintageLabel=<custom>` — overrides the auto-derived
  *     label. Useful for backfill cuts (e.g., re-cutting a
  *     historical vintage manually).
- *   - `?jurisdiction=<slug>` — restricts the cut to one
- *     jurisdiction (smoke test).
+ * Partial jurisdiction cuts are forbidden because they cannot constitute a
+ * complete reconciliation release.
  *
  * Methodology: ~/civica/plan/vintage-cadence-resolution-v1.md
  */
 import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
-import { snapshotCurrentVintage } from "@/lib/factbook/reconcile/snapshot-vintage";
+import { deriveVintageLabel } from "@/lib/factbook/reconcile/snapshot-vintage";
+import { snapshotCompleteCandidateRelease } from "@/lib/factbook/reconcile/snapshot-candidate-release";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,23 +56,14 @@ async function handler(request: Request) {
   const startedAt = new Date().toISOString();
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
-  const vintageLabel = url.searchParams.get("vintageLabel") ?? undefined;
-  const jurisdictionSlug =
-    url.searchParams.get("jurisdiction") ?? undefined;
+  const cutDate = new Date();
+  const vintageLabel = url.searchParams.get("vintageLabel") ?? deriveVintageLabel(cutDate, "v0.3-beta");
 
   try {
-    const summary = await snapshotCurrentVintage({
-      dryRun,
-      vintageLabel,
-      jurisdictionSlug,
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-        else console.log(line);
-      },
-    });
+    const summary = await snapshotCompleteCandidateRelease({ dryRun, vintageLabel, cutDate });
 
-    if (summary.errors.length > 0 || summary.snapshotted === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.snapshot-vintage", dryRun, errors: summary.errors.length ? summary.errors : [{ error: "No canonical facts snapshotted" }] }, { status: 500 });
+    if (summary.winnerCount === 0 || summary.candidateCount === 0) {
+      return NextResponse.json({ ok: false, step: "factbook.snapshot-vintage", dryRun, errors: [{ error: "No complete candidate release produced" }] }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -83,11 +74,11 @@ async function handler(request: Request) {
       dryRun,
       vintageLabel: summary.vintageLabel,
       cutAt: summary.cutAt,
-      scanned: summary.scanned,
-      snapshotted: summary.snapshotted,
-      skippedNoFactKey: summary.skippedNoFactKey,
-      skippedNoCanonical: summary.skippedNoCanonical,
-      errors: summary.errors,
+      candidateCount: summary.candidateCount,
+      winnerCount: summary.winnerCount,
+      candidateSetChecksum: summary.candidateSetChecksum,
+      winnerSetChecksum: summary.winnerSetChecksum,
+      unchanged: summary.unchanged,
     });
   } catch (err) {
     console.error("[cron factbook.snapshot-vintage] failed:", err);

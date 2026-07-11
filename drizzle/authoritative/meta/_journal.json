@@ -36,6 +36,20 @@
       "when": 1783749303318,
       "tag": "0004_naive_dust",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783751733974,
+      "tag": "0005_freeze_reconciliation_candidates",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783752200000,
+      "tag": "0006_staged_candidate_publication",
+      "breakpoints": true
     }
   ]
 }

@@ -216,7 +216,7 @@ const countriesExampleResponse = zCountriesListResponse.strict().parse({
     offset: 0,
     hasMore: true,
     taxonomy: "raw",
-    selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"] },
+    selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null },
   }),
 });
 
@@ -321,7 +321,7 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
       governmentFormDescription: { status: "observed", reason: null },
     },
   }),
-  meta: shapeCountryDetailMeta({ mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"] }),
+  meta: shapeCountryDetailMeta({ mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null }),
 });
 
 /* ────────────────────────────────────────────────────────────────
@@ -1029,7 +1029,7 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
 const countryExportJsonExample = zCountryExportJson.parse({
   schemaVersion: "country-research-export/v1",
   generatedAt: "2026-07-11T00:00:00.000Z",
-  selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"] },
+  selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null },
   jurisdiction: { id: "example-france-id", slug: "france", name: "France", iso2: "FR", iso3: "FRA", status: "sovereign_state" },
   facts: [{
     factKey: "population_total",

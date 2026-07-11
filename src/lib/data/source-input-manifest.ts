@@ -522,7 +522,7 @@ const DERIVED_INPUTS: Readonly<Record<string, string>> = {
   "factbook.auto-resolve":
     "current unresolved data disputes and admitted country facts",
   "factbook.snapshot-vintage":
-    "current canonical facts selected at the named vintage cut",
+    "complete country-fact candidate observations, source/input hashes, adapter versions, and resolver code selected at the named cut",
   "factbook.verify-reconciliation":
     "current country facts, snapshots, disputes, and reconciliation policy",
   "pulse.v2.cluster": "admitted Pulse v2 article rows from pulse.v2.ingest",

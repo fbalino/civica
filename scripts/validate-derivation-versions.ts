@@ -16,6 +16,7 @@ const REQUIRED_TABLES = [
 
 const WRITERS = [
   "src/lib/factbook/reconcile/snapshot-vintage.ts",
+  "src/lib/factbook/reconcile/snapshot-candidate-release.ts",
   "scripts/derive-government-taxonomy.ts",
   "scripts/ingest-government-taxonomy-br.ts",
   "src/lib/government-taxonomy/writer.ts",

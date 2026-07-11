@@ -236,13 +236,13 @@ The shape mirrors what reference institutions like Our World in Data already do:
 
 ## Vintaging
 
-Each `country_facts` row carries the upstream measurement date (`as_of`), our retrieval date, and the upstream dataset version where known (e.g. `World Bank WDI 2026Q3`, `CIA Factbook 2026-01-frozen`, `IMF WEO 2026 April`, `ONS UK 2026Q2`, `IBGE SIDRA 2026Q2`, `Stats SA 2026Q2`). On top of those per-row upstream vintages, Civica freezes a quarterly **reconciled-fact vintage** — a snapshot of the resolver's output for every country and fact at the cut moment. The cadence is **15 days after each calendar quarter end**: 15 January, 15 April, 15 July, 15 October at 04:00 UTC. The T+15 day buffer gives publishers with quarter-end releases time to finish their normal cadence before the cut.
+Each `country_facts` row carries the upstream measurement date (`as_of`), our retrieval date, and the upstream dataset version where known (e.g. `World Bank WDI 2026Q3`, `CIA Factbook 2026-01-frozen`, `IMF WEO 2026 April`, `ONS UK 2026Q2`, `IBGE SIDRA 2026Q2`, `Stats SA 2026Q2`). On top of those per-row upstream vintages, Civica freezes a quarterly **reconciled-fact vintage**. From methodology v0.3-beta onward, the cut contains every normalized candidate the resolver received, the source or observation hash, the producing adapter hash, the resolver-code hash, and an immutable pointer from each winner back to its candidate row. The cadence is **15 days after each calendar quarter end**: 15 January, 15 April, 15 July, 15 October at 04:00 UTC. The T+15 day buffer gives publishers with quarter-end releases time to finish their normal cadence before the cut.
 
 The vintage label format is:
 
 `Civica Atlas Reconciled v<methodology_version> — vintage <YYYY-Qn>`
 
-The first frozen v1 vintage is **`Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1`**, cut on 5 May 2026. It records the resolver state at that cut. The methodology version is embedded in the label so any cited vintage value carries the rules that produced it. When methodology revises to `v0.3-beta`, the next vintage label embeds that version, and the v0.2-beta vintages remain stable as historical citations.
+The first frozen v1 vintage is **`Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1`**, cut on 5 May 2026. It preserves canonical values, but predates complete candidate-set retention and is marked `canonical_only_legacy` in API and export metadata. It cannot support a full historical resolver replay. The first complete-candidate cut is `Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2`. The methodology version is embedded in the label so any cited vintage value carries the rules that produced it.
 
 Pinning a citation to a specific vintage gives the reader a value that does not move. If the upstream World Bank revises a 2024 GDP figure six months later, that revision lands in a new vintage; the prior snapshot is unchanged. Civica stores vintages uniformly, while displays can filter quarters where nothing materially changed so readers do not need to scroll past silent vintages.
 
@@ -316,7 +316,7 @@ Resolution targets — these are targets, not gates; the fact continues to rende
 
 ## Replication
 
-The resolver is a pure function. Given a fixed snapshot of the inputs, it produces the same output every time. A third party should be able to reproduce any vintage's values from public artefacts.
+The resolver is a pure function. Given a fixed snapshot of the inputs, it produces the same output every time. A third party can reproduce a complete-candidate vintage from its exported offline package without contacting a publisher or Civica's database.
 
 The deterministic inputs are:
 
@@ -325,11 +325,11 @@ The deterministic inputs are:
 - The sync scripts that populate the source rows — for the CIA file, for Wikidata via the SPARQL query interface, for each multilateral agency adapter, and for each NSO adapter.
 - The resolver itself, at the same git tag — `src/lib/factbook/reconcile/resolver.ts`.
 - The vintage snapshot script and cron route that write the quarterly vintage rows.
-- The upstream payload archive — every Wikidata, World Bank, IMF, NSO, and other adapter response is hashed and stored alongside the country-facts rows. Snapshot artefacts make a vintage replayable even if upstream values later change.
+- The candidate snapshot. Each normalized resolver input carries an exact content hash and adapter version. Where the adapter retained an upstream payload hash, the candidate points to it; older rows without one use a clearly typed normalized-observation hash rather than claiming a raw payload archive exists.
 
 Crucially, the resolver does not call a language model. Fact reconciliation is rule-based — that is the entire point of the design. A language model can summarise a dispute for an operator, and a deterministic LLM call is used at sync time for the Stats SA PDF-extraction case (Worked Example 5 above), but the canonical resolver output is deterministic boolean and numeric logic only.
 
-A full replication recipe — including SQL snapshots and a worked walk-through that re-derives a vintage's values from the artefacts — is on the v1.1 roadmap as a future page at `/country/methodology/reconciliation/replication` (not yet shipped). For the present, the inputs above are load-bearing in their git-tagged form, and an external reviewer with access to the repository can replay the v0.2-beta vintage 2026-Q1 cut by running the sync scripts against the archived payloads and the snapshot script against the resulting rows.
+The repository command `npm run replay:reconciliation-release` exports a complete-candidate cut and replays its winners from the compressed local package with network access disabled. The Q1 canonical-only cut remains stable for value citation, but its missing historical alternates cannot be reconstructed honestly and are not presented as replayable.
 
 ---
 

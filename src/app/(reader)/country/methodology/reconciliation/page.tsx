@@ -177,7 +177,7 @@ export default async function ReconciliationMethodologyPage() {
         embeds the methodology version that produced it, so a
         citation pinned to{" "}
         <code>
-          Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+          Civica Atlas Reconciled {reconciliation.firstVintageVersion} — vintage{" "}
           {reconciliation.firstVintage}
         </code>{" "}
         is stable: the underlying rules are tied to the label. See
@@ -581,7 +581,7 @@ export default async function ReconciliationMethodologyPage() {
         </p>
         <p>
           <strong>
-            Frozen worked examples — methodology {reconciliation.version},
+            Frozen worked examples — methodology {reconciliation.firstVintageVersion},
             vintage {reconciliation.firstVintage}.
           </strong>{" "}
           The eight examples that follow record the rows and resolver
@@ -1177,9 +1177,11 @@ export default async function ReconciliationMethodologyPage() {
           <code>IBGE SIDRA 2026Q2</code>,{" "}
           <code>Stats SA 2026Q2</code>). On top of those per-row
           upstream vintages, Civica freezes a quarterly{" "}
-          <strong>reconciled-fact vintage</strong> — a snapshot of
-          the resolver&rsquo;s output for every country and fact at
-          the cut moment. The cadence is{" "}
+          <strong>reconciled-fact vintage</strong>. From methodology
+          v0.3-beta onward, the cut contains every normalized candidate the
+          resolver received, the source or observation hash, the producing
+          adapter hash, the resolver-code hash, and an immutable pointer from
+          each winner back to its candidate row. The cadence is{" "}
           <strong>15 days after each calendar quarter end</strong>:
           15 January, 15 April, 15 July, 15 October at 04:00 UTC. The
           T+15 day buffer gives publishers with quarter-end releases
@@ -1195,7 +1197,7 @@ export default async function ReconciliationMethodologyPage() {
           The first frozen v1 vintage is{" "}
           <strong>
             <code>
-              Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+              Civica Atlas Reconciled {reconciliation.firstVintageVersion} — vintage{" "}
               {reconciliation.firstVintage}
             </code>
           </strong>
@@ -1203,8 +1205,12 @@ export default async function ReconciliationMethodologyPage() {
           {new Date(reconciliation.firstVintageCutDate).toLocaleDateString(
             "en-GB",
             { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" },
-          )}. It records the resolver state at that cut. The methodology
-          version is embedded in the
+          )}. It preserves canonical values, but predates complete candidate-set
+          retention and is marked <code>canonical_only_legacy</code> in API and
+          export metadata. It cannot support a full historical resolver replay.
+          The first complete-candidate cut is{" "}
+          <code>Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2</code>.
+          The methodology version is embedded in the
           label so any cited vintage value carries the rules that
           produced it. When methodology revises to the next version,
           the next vintage label embeds it, and the{" "}
@@ -1523,8 +1529,8 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           The resolver is a pure function. Given a fixed snapshot of
           the inputs, it produces the same output every time. A third
-          party should be able to reproduce any vintage&rsquo;s
-          values from public artefacts.
+          party can reproduce a complete-candidate vintage from its exported
+          offline package without contacting a publisher or Civica&rsquo;s database.
         </p>
         <p>The deterministic inputs are:</p>
         <ul>
@@ -1553,11 +1559,11 @@ export default async function ReconciliationMethodologyPage() {
             quarterly vintage rows.
           </li>
           <li>
-            The upstream payload archive — every Wikidata, World
-            Bank, IMF, NSO, and other adapter response is hashed and
-            stored alongside the country-facts rows. Snapshot
-            artefacts make a vintage replayable even if upstream
-            values later change.
+            The candidate snapshot. Each normalized resolver input carries an
+            exact content hash and adapter version. Where the adapter retained
+            an upstream payload hash, the candidate points to it; older rows
+            without one use a clearly typed normalized-observation hash rather
+            than claiming a raw payload archive exists.
           </li>
         </ul>
         <p>
@@ -1570,17 +1576,12 @@ export default async function ReconciliationMethodologyPage() {
           is deterministic boolean and numeric logic only.
         </p>
         <p>
-          A full replication recipe — including SQL snapshots and a
-          worked walk-through that re-derives a vintage&rsquo;s
-          values from the artefacts — is on the v1.1 roadmap as a
-          future page at{" "}
-          <code>/country/methodology/reconciliation/replication</code>{" "}
-          (not yet shipped). For the present, the inputs above are
-          load-bearing in their git-tagged form, and an external
-          reviewer with access to the repository can replay the{" "}
-          {reconciliation.version} vintage {reconciliation.firstVintage}{" "}
-          cut by running the sync scripts against the archived payloads
-          and the snapshot script against the resulting rows.
+          The repository command <code>npm run replay:reconciliation-release</code>{" "}
+          exports a complete-candidate cut and replays its winners from the
+          compressed local package with network access disabled. The Q1
+          canonical-only cut remains stable for value citation, but its missing
+          historical alternates cannot be reconstructed honestly and are not
+          presented as replayable.
         </p>
       </section>
 
@@ -1609,13 +1610,13 @@ export default async function ReconciliationMethodologyPage() {
           unstable. The vintage label embeds the methodology version,
           so a reader citing{" "}
           <code>
-            Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+            Civica Atlas Reconciled {reconciliation.firstVintageVersion} — vintage{" "}
             {reconciliation.firstVintage}
           </code>{" "}
           gets a value that does not move and is unambiguously tied
-          to the {reconciliation.version} rules. When methodology
+          to the {reconciliation.firstVintageVersion} rules. When methodology
           revises to a successor version, the new vintage label
-          carries that version; the {reconciliation.version} vintages
+          carries that version; the {reconciliation.firstVintageVersion} vintages
           remain as stable historical citations.
         </p>
         <p>
@@ -1664,9 +1665,9 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           <em>
             Civica Atlas (2026). [Country] [fact], vintage Civica
-            Atlas Reconciled {reconciliation.version} — vintage{" "}
+            Atlas Reconciled {reconciliation.firstVintageVersion} — vintage{" "}
             {reconciliation.firstVintage}. Sourced from [primary
-            publisher]. Methodology {reconciliation.version}.
+            publisher]. Methodology {reconciliation.firstVintageVersion}.
           </em>
         </p>
         <p>
@@ -1676,23 +1677,23 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           <em>
             Civica Atlas (2026). Argentina inflation rate, vintage
-            Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+            Civica Atlas Reconciled {reconciliation.firstVintageVersion} — vintage{" "}
             {reconciliation.firstVintage}. Sourced from World Bank
             World Development Indicators 2026Q3 (2024 reading:
-            219.88%). Methodology {reconciliation.version}.
+            219.88%). Methodology {reconciliation.firstVintageVersion}.
           </em>
         </p>
 
         <h3>Citing a frozen vintage of the entire reconciled atlas</h3>
         <p>
           <em>
-            Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+            Civica Atlas Reconciled {reconciliation.firstVintageVersion} — vintage{" "}
             {reconciliation.firstVintage}. Civica Atlas, 2026.{" "}
             <Link href="https://civicaatlas.org/country/methodology/reconciliation">
               https://civicaatlas.org/country/methodology/reconciliation
             </Link>
             . Cut date: 5 May 2026. Methodology version{" "}
-            {reconciliation.version}.
+            {reconciliation.firstVintageVersion}.
           </em>
         </p>
 
@@ -1704,7 +1705,7 @@ export default async function ReconciliationMethodologyPage() {
         </p>
 
         <CiteAccordion
-          subject={`Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`}
+          subject={`Civica Atlas Reconciled ${reconciliation.firstVintageVersion} — vintage ${reconciliation.firstVintage}`}
           pageTitle="Factbook Reconciliation Methodology"
           url="https://civicaatlas.org/country/methodology/reconciliation"
           dataVintage={reconciliation.firstVintageCutDate}

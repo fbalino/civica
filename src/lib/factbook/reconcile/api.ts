@@ -26,7 +26,7 @@ import { eq, sql, and, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { countryFacts, jurisdictions, dataDisputes } from "@/lib/db/schema";
-import { reconciliation } from "@/lib/content/site-state";
+import { currentVintage, reconciliation } from "@/lib/content/site-state";
 import { resolveFromRows } from "./resolver";
 import { getFactKey } from "./fact-keys";
 import type {
@@ -75,7 +75,7 @@ export const FACTBOOK_RECONCILIATION_META = Object.freeze({
   version: reconciliation.version,
   reference:
     "https://civicaatlas.org/country/methodology/reconciliation",
-  vintage: `Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`,
+  vintage: currentVintage,
 });
 
 /**
