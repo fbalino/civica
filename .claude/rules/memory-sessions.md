@@ -569,3 +569,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   holdouts, thresholds, subgroups, sensitivities, missingness, and exclusions.
 - Confirmatory gates cannot compensate for each other; exploratory results cannot
   pick a winner, and no winner remains valid. 681/681 tests pass. IDX-011 next.
+
+## 2026-07-11 — IDX-011 simple baselines completed
+
+- Implemented B0 dashboard/no-score, B1 native V-Dem, B2 equal weight, and B3
+  development-fitted first-factor methods behind one split/output contract.
+- The live private panel exactly reproduces checked counts and hashes without
+  publishing restricted values. TypeScript and 684/684 tests pass. IDX-012 next.
