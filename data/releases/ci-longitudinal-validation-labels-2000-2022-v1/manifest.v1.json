@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "ci-longitudinal-validation-inputs/v1",
+  "releaseId": "ci-longitudinal-validation-labels-2000-2022-v1",
+  "period": {
+    "start": 2000,
+    "end": 2022
+  },
+  "indicator": {
+    "sourceId": "bjornskov_rode",
+    "indicatorId": "br_dem",
+    "definition": "Bjørnskov-Rode/CGV dichotomous democracy coding carried in the QoG Standard time-series release",
+    "nativeUnit": "binary 0/1",
+    "nativeMin": 0,
+    "nativeMax": 1,
+    "uncertainty": "no per-country probability distribution published"
+  },
+  "captures": {
+    "qogJan26": {
+      "url": "https://www.qogdata.pol.gu.se/data/qog_std_ts_jan26.csv",
+      "sha256": "f8e140b706106e211460db54cf094de0d36eae0003e81c0f01c9427d0f756de0",
+      "retrievedAt": "2026-07-11T10:39:32Z",
+      "role": "frozen known-change labels"
+    },
+    "qogJan25": {
+      "url": "https://www.qogdata.pol.gu.se/data/qog_std_ts_jan25.csv",
+      "sha256": "42dd8b26ad4ff3f640979b1d6ad814f6b2b8009bbab656beee0160fe0e9e71bf",
+      "retrievedAt": "2026-07-11T10:39:32Z",
+      "role": "label revision sensitivity"
+    },
+    "qogJan24": {
+      "url": "https://www.qogdata.pol.gu.se/data/qog_std_ts_jan24.csv",
+      "sha256": "9ee069f36440636620e66556c1dfedcdae43ea4209ff0bbe9ff875d6ffc3656b",
+      "retrievedAt": "2026-07-11T10:39:32Z",
+      "role": "label revision sensitivity"
+    },
+    "vdemV15": {
+      "url": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip",
+      "sha256": "bd6430d6b78785c7422acee7d75bef1b852f2ce1baa5f673ae40ffca64ffe51b",
+      "role": "current K1 democratic-quality input"
+    },
+    "vdemV14": {
+      "url": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v14_csv.zip",
+      "sha256": "6bf73aa29897618af9a70fa790726bc2a009a8e9f908147a5a9fc5a00dc0f299",
+      "role": "source revision sensitivity"
+    }
+  },
+  "rights": {
+    "posture": "private_internal_research_only_academic_noncommercial",
+    "publicBulkValues": false
+  },
+  "missingness": {
+    "imputation": "none"
+  },
+  "seriesType": "current_harmonized_backcast_not_as_published",
+  "scope": {
+    "jurisdictions": 194,
+    "years": 23,
+    "indicators": 1,
+    "expected": 4462,
+    "observed": 0,
+    "missing": 4462
+  },
+  "rowSha256": "528994d8c711bb240f2792fdbb5c3e96b7dcf5b9cccb255b15ac2cc17a758c1f",
+  "coverageSha256": "f851e9b329a3d49a2d76146850ea84ad951082364f648e6be877fd5a7a9eb301",
+  "temporalBreaksSha256": "aff86854928f57ec6ca7144dc4bd443b6375f80d93e605a5cf5d3d6ef43f88ba",
+  "breaks": [
+    {
+      "period": "Jan24–Jan26 releases",
+      "treatment": "retain exact editions for revision comparison; never rewrite older capture"
+    },
+    {
+      "period": "country-year series through 2022",
+      "treatment": "2023–2024 K1 rows have no BR label and are excluded from event tests"
+    }
+  ],
+  "valuesLocation": "private_neon_ci_research_panel_rows"
+}

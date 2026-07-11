@@ -61,6 +61,8 @@
     "validate:index-incremental-preregistration": "tsx scripts/validate-index-incremental-preregistration.ts",
     "generate:index-incremental-information": "tsx scripts/generate-index-incremental-information.ts",
     "validate:index-incremental-information": "tsx scripts/validate-index-incremental-information.ts",
+    "generate:longitudinal-validation-inputs": "tsx scripts/generate-longitudinal-validation-inputs.ts",
+    "validate:longitudinal-validation-inputs": "tsx scripts/validate-longitudinal-validation-inputs.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",

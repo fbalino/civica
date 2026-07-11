@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 290
-- **Completed:** 72
+- **Total tasks:** 291
+- **Completed:** 73
 - **Remaining:** 218
-- **Progress:** 24.8%
-- **Priority mix:** P0 181 · P1 104 · P2 5
+- **Progress:** 25.1%
+- **Priority mix:** P0 182 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -115,6 +115,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [ ] **IDX-037** (P0) Replace the n=46 freshest-cross-section PCA artifact or narrow every claim to it. _Done when: a frozen full temporal panel and declared method produce reproducible PCA/factor/rotation/sensitivity outputs with source/method/year controls and fifth-dimension decision, or public prose/weights state the actual cross-sectional limitation without claiming unrun analysis._
 - [x] **IDX-038** (P0) Correct the tournament panel's exact K1 input identities before outcome analysis. _Done when: a superseding immutable panel uses the hash-pinned `pr_cl_total` publisher series rather than `fh_total_score`, includes the exact WGI Voice & Accountability fallback alongside V-Dem, structural gaps and selection precedence remain explicit, the preregistration and baselines advance to corrected hashes, prior releases remain preserved, and exact live reproduction passes._
 - [x] **IDX-039** (P0) Freeze practice-specific external indicators required for constitution-to-practice testing. _Done when: a small codebook-justified set of publisher indicators is ingested with exact source/indicator identity, definition, vintage, retrieval hash, native unit, published uncertainty, rights, missingness, and temporal breaks; broad LDI/FH/WGI composites cannot substitute for a specific practice construct; K4 can read the frozen release without inspecting validation labels._
+- [x] **IDX-040** (P0) Freeze independent longitudinal change labels and revision vintages for IDX-017. _Done when: exact official BR/CGV time-series editions identify dated democracy-state changes, at least one prior K1 input vintage supports source-revision sensitivity, every capture has URL/version/hash/rights/missingness, and no label is used to tune K1._
 
 ## Area 05 — Pulse Event Ledger and Validation
 
