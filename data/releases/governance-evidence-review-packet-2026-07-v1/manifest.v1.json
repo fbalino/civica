@@ -36,7 +36,11 @@
       "scripts/validate-governance-evidence-dashboard.ts"
     ],
     "environmentSource": "data/releases/index-tournament-results-package-v1/manifest.v1.json",
-    "packageLock": "package-lock.json"
+    "packageLock": "package-lock.json",
+    "commandMap": {
+      "reproduce:governance-evidence-review-packet": "tsx scripts/generate-governance-evidence-review-packet.ts",
+      "validate:governance-evidence-review-packet": "tsx scripts/validate-governance-evidence-review-packet.ts"
+    }
   },
   "transformations": {
     "empiricalValues": "none; publisher values remain on native scales",
@@ -223,6 +227,13 @@
       "path": "data/releases/governance-evidence-review-packet-2026-07-v1/codebook.v1.csv"
     },
     {
+      "artifactId": "frozen-command-map",
+      "role": "packet-document",
+      "bytes": 222,
+      "sha256": "e69eadcd2933c36bea966297db86ddab1c65c48c8fb94d530fa959290b028252",
+      "path": "data/releases/governance-evidence-review-packet-2026-07-v1/command-map.v1.json"
+    },
+    {
       "artifactId": "packet-readme",
       "role": "packet-document",
       "bytes": 990,
@@ -398,13 +409,6 @@
       "path": "package-lock.json"
     },
     {
-      "artifactId": "package-json",
-      "role": "environment",
-      "bytes": 22856,
-      "sha256": "0b368e1f833f3b315ed53feac38bb924049a09c14c9e3f904a59d3cf956f34a8",
-      "path": "package.json"
-    },
-    {
       "artifactId": "public-surface-migration",
       "role": "disposition",
       "bytes": 3243,
@@ -442,8 +446,8 @@
     {
       "artifactId": "review-packet-validator",
       "role": "selected-product-code",
-      "bytes": 2434,
-      "sha256": "3629fe4a6185bdaf447c22807c7e51da8047d35204da37a371f9717126dbbada",
+      "bytes": 2723,
+      "sha256": "b5421a7945b01efb0ca3e64c68b1b940257f479793410a0304dc9403a7408982",
       "path": "scripts/validate-governance-evidence-review-packet.ts"
     },
     {
@@ -470,15 +474,15 @@
     {
       "artifactId": "review-packet-builder",
       "role": "selected-product-code",
-      "bytes": 10097,
-      "sha256": "e35587f696e6b1d2c497f51e650ccfff6c5165b2aa70115368c88ce17338ad1f",
+      "bytes": 10319,
+      "sha256": "29567f004e9dcac428969c3acbfaea5d06aa21373f176a0c552fb77e0d16b945",
       "path": "src/lib/ci/governance-evidence-review-package.ts"
     },
     {
       "artifactId": "review-packet-contract",
       "role": "selected-product-code",
-      "bytes": 8882,
-      "sha256": "fd8b049cec2c6f002a6f7906e836a289df94a1a25eca8ed677e7da828f41d585",
+      "bytes": 9134,
+      "sha256": "9a2f2080d28e630f82ba4275934011963777066ffd7018f9441fde049393d1c8",
       "path": "src/lib/ci/governance-evidence-review-packet.ts"
     },
     {
@@ -503,5 +507,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "067310d6227ecea53d6b4b1d60faf6ba7f7d177582c01579b360d62ea7310317"
+  "bundleSemanticSha256": "6becae1710d78ae7e3e79ca614b2a48d670961979fa7914a35f453e3c36ceec1"
 }

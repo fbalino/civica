@@ -1,0 +1,4 @@
+{
+  "reproduce:governance-evidence-review-packet": "tsx scripts/generate-governance-evidence-review-packet.ts",
+  "validate:governance-evidence-review-packet": "tsx scripts/validate-governance-evidence-review-packet.ts"
+}

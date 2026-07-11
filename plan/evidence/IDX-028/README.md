@@ -2,12 +2,12 @@
 
 ## Outcome
 
-`data/releases/governance-evidence-review-packet-2026-07-v1/` is the versioned replication and external-review packet for the selected Governance Evidence product. Its semantic SHA-256 is `067310d6227ecea53d6b4b1d60faf6ba7f7d177582c01579b360d62ea7310317`.
+`data/releases/governance-evidence-review-packet-2026-07-v1/` is the versioned replication and external-review packet for the selected Governance Evidence product. Its semantic SHA-256 is `6becae1710d78ae7e3e79ca614b2a48d670961979fa7914a35f453e3c36ceec1`.
 
 The 46-artifact inventory binds:
 
 - the source-native construct, 2024 five-indicator input grid, and exact 970-cell fidelity result;
-- implementation code, package command map, dependency lock, and runtime environment;
+- implementation code, frozen packet command map, dependency lock, and runtime environment;
 - five-row codebook, no-aggregation transformations, explicit missingness, and rights-filtered export rule;
 - publisher-supplied uncertainty or explicit absence, with no invented Civica interval;
 - sensitivity choices, subgroup limits, seven known limitations, citation metadata, and exact commands;

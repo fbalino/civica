@@ -36,6 +36,10 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
     ],
     environmentSource: "data/releases/index-tournament-results-package-v1/manifest.v1.json",
     packageLock: "package-lock.json",
+    commandMap: {
+      "reproduce:governance-evidence-review-packet": "tsx scripts/generate-governance-evidence-review-packet.ts",
+      "validate:governance-evidence-review-packet": "tsx scripts/validate-governance-evidence-review-packet.ts",
+    },
   },
   transformations: {
     empiricalValues: "none; publisher values remain on native scales",

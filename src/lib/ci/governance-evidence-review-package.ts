@@ -39,7 +39,6 @@ const CORE_EXTERNAL_ARTIFACTS: ReadonlyArray<{
   { artifactId: "adopted-disposition", role: "disposition", path: "data/releases/index-disposition-2026-07-v1/resolution.v1.json" },
   { artifactId: "public-surface-migration", role: "disposition", path: "plan/evidence/IDX-027/README.md" },
   { artifactId: "rights-manifest-code", role: "rights", path: "src/lib/rights/manifest.ts" },
-  { artifactId: "package-json", role: "environment", path: "package.json" },
   { artifactId: "package-lock", role: "environment", path: "package-lock.json" },
   { artifactId: "review-packet-contract", role: "selected-product-code", path: "src/lib/ci/governance-evidence-review-packet.ts" },
   { artifactId: "review-packet-builder", role: "selected-product-code", path: "src/lib/ci/governance-evidence-review-package.ts" },
@@ -147,6 +146,10 @@ abstract: "A replication and bounded external-review packet for a source-native 
 `;
 }
 
+export function renderCommandMapJson(): string {
+  return `${JSON.stringify(GOVERNANCE_EVIDENCE_REVIEW_PACKET.implementation.commandMap, null, 2)}\n`;
+}
+
 function generatedDocuments(): Array<{ artifactId: string; path: string; content: string }> {
   return [
     { artifactId: "packet-readme", path: `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/README.md`, content: renderReviewPacketReadme() },
@@ -154,6 +157,7 @@ function generatedDocuments(): Array<{ artifactId: string; path: string; content
     { artifactId: "reproduction-guide", path: `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/reproduction.md`, content: renderReproductionGuide() },
     { artifactId: "selected-product-codebook", path: `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/codebook.v1.csv`, content: renderCodebookCsv() },
     { artifactId: "packet-citation", path: `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/CITATION.cff`, content: renderCitationCff() },
+    { artifactId: "frozen-command-map", path: `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/command-map.v1.json`, content: renderCommandMapJson() },
   ];
 }
 

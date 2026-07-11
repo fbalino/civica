@@ -60,6 +60,14 @@ assert.ok(
   manifest.inventory.some((row) => row.path.endsWith("index-misuse-audit-v1/result.v1.json")),
   "GOV-014 misuse analysis is not bound",
 );
+assert.ok(
+  manifest.inventory.some((row) => row.path.endsWith("command-map.v1.json")),
+  "frozen reproduction command map is not bound",
+);
+assert.ok(
+  !manifest.inventory.some((row) => row.path === "package.json"),
+  "mutable root package.json must not invalidate a frozen packet",
+);
 
 console.log(
   `PASS — ${GOVERNANCE_EVIDENCE_REVIEW_PACKET.releaseId}: ${manifest.inventory.length} artifacts and ${manifest.reviewQuestions.length} review questions reproduce exactly.`,
