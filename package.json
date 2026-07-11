@@ -46,6 +46,7 @@
     "validate:ci-research-panel:live": "tsx scripts/validate-ci-research-panel.ts --live",
     "validate:index-research-charter": "tsx scripts/validate-index-research-charter.ts",
     "validate:index-candidate-specifications": "tsx scripts/validate-index-candidate-specifications.ts",
+    "validate:index-tournament-preregistration": "tsx scripts/validate-index-tournament-preregistration.ts",
     "generate:source-input-manifest": "tsx scripts/generate-source-input-manifest.ts",
     "generate:fact-coverage": "tsx scripts/generate-fact-coverage-report.ts",
     "generate:source-coverage": "tsx scripts/generate-domain-coverage.ts",

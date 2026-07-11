@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 61
-- **Remaining:** 227
-- **Progress:** 21.2%
+- **Completed:** 62
+- **Remaining:** 226
+- **Progress:** 21.5%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -85,7 +85,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-007** (P0) Adopt a research charter defining what an original Civica measurement must contribute. _Done when: the charter specifies target users/decisions, unit/cadence, construct/nonclaims, expected causal or descriptive role, novelty criterion versus V-Dem/WGI/Freedom House/native dashboard, misuse risks, and falsification/retirement conditions._
 - [x] **IDX-008** (P0) Convert Fable's design-space report and Codex audit into at least four materially distinct candidate specifications. _Done when: candidates include distinct constructs—not cosmetic weighting variants—and for each define inputs, transforms, missingness, uncertainty, versioning, normative choices, expected added value, public presentation, validation, and retirement rule; dashboard/no-score is included._
 - [x] **IDX-009** (P0) Include provenance-native and institutional-structure alternatives, not only governance-quality composites. _Done when: at least one candidate uses Civica's source disagreement/coverage/reconciliation strength, at least one uses defensible institutional structure/constraint evidence, and each proves it is not a hidden country-quality grade or abandons the candidate._
-- [ ] **IDX-010** (P0) Preregister the candidate tournament before winner-selecting analyses. _Done when: protocol freezes panel split, candidates, simple baselines, metrics, subgroup/sensitivity tests, decision thresholds, multiplicity/exploration handling, missingness, exclusions, code commit, input hashes, and “no candidate wins” rule in a timestamped artifact._
+- [x] **IDX-010** (P0) Preregister the candidate tournament before winner-selecting analyses. _Done when: protocol freezes panel split, candidates, simple baselines, metrics, subgroup/sensitivity tests, decision thresholds, multiplicity/exploration handling, missingness, exclusions, code commit, input hashes, and “no candidate wins” rule in a timestamped artifact._
 - [ ] **IDX-011** (P0) Define and implement simple baselines. _Done when: best single established indicator, transparent equal-weight aggregate where coherent, first common factor/latent baseline where coherent, and source-native dashboard/no-score baseline are reproducible and receive the same evaluation as Civica candidates._
 - [ ] **IDX-012** (P1) Reimplement the current four-dimension composite as a fully specified tournament candidate. _Done when: canonical inputs, fixed transforms, dependency-aware uncertainty, missingness, rank/tie rules, version, and exact reproduction tests exist; no special threshold or favorable dataset is reserved for it._
 - [ ] **IDX-013** (P1) Implement each approved alternative candidate in isolated research code with a shared evaluation interface. _Done when: candidate code reads the same frozen panel/manifests, emits standardized predictions/summaries/uncertainty/coverage, has unit/golden tests, and cannot inspect held-out labels during fitting/tuning._

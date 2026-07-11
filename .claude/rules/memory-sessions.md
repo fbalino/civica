@@ -562,3 +562,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   plus a separate sourced institutional-structure alternative.
 - Every qualifying candidate must explicitly reject hidden aggregation, ranking,
   scoring, or country-quality inference. IDX-010 is next.
+
+## 2026-07-11 — IDX-010 tournament preregistration completed
+
+- Locked candidates, baselines, panel and code hashes, temporal/geographic
+  holdouts, thresholds, subgroups, sensitivities, missingness, and exclusions.
+- Confirmatory gates cannot compensate for each other; exploratory results cannot
+  pick a winner, and no winner remains valid. 681/681 tests pass. IDX-011 next.

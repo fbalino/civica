@@ -29,7 +29,7 @@ export interface IndexCandidateSpecification {
 
 const common = {
   hiddenCountryQualityGrade: false as const,
-  charterVersion: INDEX_RESEARCH_CHARTER_VERSION,
+  charterVersion: INDEX_RESEARCH_CHARTER_VERSION as typeof INDEX_RESEARCH_CHARTER_VERSION,
 };
 
 export const INDEX_CANDIDATE_SPECIFICATIONS: readonly IndexCandidateSpecification[] = [
