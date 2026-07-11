@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "ci-research-panel-coverage/v2",
+  "releaseId": "ci-research-panel-2000-2024-v2",
+  "coverage": [
+    {
+      "identity": "freedom_house:pr_cl_total",
+      "observed": 3659,
+      "missing": 1191
+    },
+    {
+      "identity": "transparency_intl:score",
+      "observed": 2270,
+      "missing": 2580
+    },
+    {
+      "identity": "undp_hdi:hdi",
+      "observed": 4440,
+      "missing": 410
+    },
+    {
+      "identity": "vdem:v2x_libdem",
+      "observed": 4298,
+      "missing": 552
+    },
+    {
+      "identity": "worldbank_wgi:rl.est",
+      "observed": 4622,
+      "missing": 228
+    }
+  ]
+}

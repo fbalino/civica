@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "ci-research-panel-temporal-breaks/v2",
+  "releaseId": "ci-research-panel-2000-2024-v2",
+  "breaks": [
+    {
+      "sourceId": "freedom_house",
+      "indicatorId": "pr_cl_total",
+      "period": "2006",
+      "treatment": "2000–2005 are outside the captured comparable ratings series; no conversion from 0–100 totals"
+    },
+    {
+      "sourceId": "freedom_house",
+      "indicatorId": "pr_cl_total",
+      "period": "2006–2024",
+      "treatment": "exact 2024 publisher workbook back-series; no total-score substitution"
+    }
+  ]
+}

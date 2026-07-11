@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "ci-research-panel/v2",
+  "releaseId": "ci-research-panel-2000-2024-v2",
+  "supersedes": "ci-research-panel-2000-2024-v1",
+  "correction": "replaces Freedom House fh_total_score with the canonical K1 pr_cl_total input",
+  "period": {
+    "start": 2000,
+    "end": 2024
+  },
+  "scope": {
+    "jurisdictionStatus": "sovereign_state",
+    "jurisdictions": 194,
+    "indicators": 5,
+    "expectedRows": 24250,
+    "observedRows": 19289,
+    "missingRows": 4961
+  },
+  "rowSha256": "0d232534be46fd3c4c18d7c9d278b41e258ec72c2f42b1d7fdc2796286aa7a37",
+  "coverageSha256": "2e89d1bdcd1fed59031a64576917c506c31562e5c36a5591301f056841e99f40",
+  "temporalBreaksSha256": "227b9c7ef58b6fba615378ceb7a755ee7a3b2892e27563dd366d78a85b59b237",
+  "generatorVersion": "ci-tournament-panel-generator/v2",
+  "freedomHouseCapture": {
+    "accessUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx",
+    "contentSha256": "d6ac861af6e7dcea7e870e39ddbcd2925730a653c1466f8992a7d0005f53be88",
+    "retrievedAt": "2026-07-10T20:56:16.125Z",
+    "upstreamVersion": "Freedom in the World workbook through 2024",
+    "redistributionPosture": "restricted-no-redistribution",
+    "unmatchedPublisherNames": [
+      "Kosovo",
+      "Serbia and Montenegro",
+      "Taiwan"
+    ]
+  },
+  "seriesType": "current_harmonized_backcast_not_as_published",
+  "valuesLocation": "private_neon_ci_research_panel_rows",
+  "rightsPosture": "private_internal_research_only_pending_source_terms",
+  "publicBulkValuesIncluded": false
+}
