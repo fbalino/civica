@@ -19,13 +19,14 @@ import { shapePulseDimensionsData } from "@/lib/api/contract/shapes";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ country_slug: string }> }
+  { params }: { params: Promise<{ country_slug: string }> },
 ) {
   const rateLimited = withRateLimit(request);
   if (rateLimited) return rateLimited;
 
   try {
     const { country_slug } = await params;
+    // PUBLIC_CLAIM: pulse.country-period-observability
     const data = await getPulseV2ForCountry(country_slug);
 
     if (!data) return apiError("Country not found", 404);

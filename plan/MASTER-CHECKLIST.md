@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 99
-- **Remaining:** 193
-- **Progress:** 33.9%
+- **Completed:** 100
+- **Remaining:** 192
+- **Progress:** 34.2%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -130,7 +130,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [x] **PUL-006** (P0) Rebuild clustering so source-independent reports can meet after subject-country attribution. _Done when: clustering operates on normalized event identity rather than a premature jurisdiction bucket, fixtures merge same-event reports across source families/languages while keeping distinct events separate, and a released coverage report shows cluster-size/source-diversity distributions._
 - [x] **PUL-007** (P0) Define source-family independence and republication detection. _Done when: wire copies, syndication, mirrored NGO releases, and references to one underlying report do not count as independent corroboration; a reviewed fixture set reaches predeclared pairwise precision/recall thresholds._
 - [x] **PUL-008** (P0) Make active source coverage truthful and observable. _Done when: runtime dashboards and public methodology list only operating feeds, successful/failed retrievals, last data time, language/geographic scope, row yield, source rights, and known blind spots; inactive/stub feeds cannot appear active._
-- [ ] **PUL-009** (P0) Model observability separately from event direction or country quality. _Done when: country-period outputs distinguish sufficient observation, low coverage, source outage, restricted information environment, and no qualifying event observed; low observability cannot automatically create stability or a governance score._
+- [x] **PUL-009** (P0) Model observability separately from event direction or country quality. _Done when: country-period outputs distinguish sufficient observation, low coverage, source outage, restricted information environment, and no qualifying event observed; low observability cannot automatically create stability or a governance score._
 - [ ] **PUL-010** (P1) Replace static approximate press-freedom mappings with a versioned sourced context variable and uncertainty policy. _Done when: every value has source/vintage/coverage, missing values remain missing, sensitivity tests show the effect of any use, and press freedom is not presented as a calibrated correction without validation._
 - [ ] **PUL-011** (P0) Separate event existence, country attribution, category labels, severity, confidence/calibration, corroboration, and publication decisions. _Done when: schema/services/tests store and evaluate each decision independently, a verifier can refute any stage, and no single opaque confidence field substitutes for all of them._
 - [ ] **PUL-012** (P0) Rework jurisdiction/subject attribution with explicit evidence and multi-country support. _Done when: events can name primary and affected jurisdictions with rationales, aliases/entities are versioned, the classifier receives human-readable country/entity context rather than only UUIDs, and cross-border fixtures pass._

@@ -545,7 +545,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/pulse/[country_slug]/dimensions/route.ts",
     versioned: true,
     summary:
-      "Public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, and driving published events. No scalar Pulse score.",
+      "Public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, driving events, and a separate country-period observability verdict. No scalar Pulse score; absent events never become stability evidence.",
     params: [
       {
         name: ":country_slug",

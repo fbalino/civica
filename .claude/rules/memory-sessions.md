@@ -5,6 +5,7 @@ non-git-recoverable gotchas and constraints. Per-feature "what shipped" history
 lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelogs.
 
 ## Current architecture state
+
 - **Replication status (CLM-010).** `replicationPackage` in
   `src/lib/content/site-state.ts` is the canonical nine-component inventory
   for `/civica-index/replication`. `npm run validate:replication-surface`
@@ -40,6 +41,7 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   are apex.
 
 ## CSS / UI gotchas (would silently re-break)
+
 - `.factbook-hero` (country masthead — max-width:1280px, display:grid) and
   `.factbook-landing-hero` (full-bleed) are DISTINCT classes. Do NOT merge — the landing
   once reused `.factbook-hero` and inherited the 1280px cap (white gap on wide screens).
@@ -81,6 +83,7 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   theme-independent white + dark halo (--map-label-fg/-halo tokens).
 
 ## Blog / images
+
 - Cover resolution = `resolvePostCover()` in `src/lib/blog.ts`: dedicated
   `public/blog/<slug>/cover.{webp,png}` → first inline-placeholder engraving → frontmatter
   `coverImage` → generated HemicycleCover. Used by BOTH the `/blog` index AND the article hero
@@ -92,6 +95,7 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   `public/engravings/countries/*.png` → `.webp`, then deploy.
 
 ## Data / CI correctness invariants
+
 - CI read queries MUST pin `methodology_version='beta'` (else a v1.0/beta mix → zig-zag
   history + double-counted gov-type averages).
 - CI per-dimension scores go through `displayDimensionScore` (v2 fixed-bound normalize) so the
@@ -119,6 +123,7 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   unknown values rather than crashing.
 
 ## Admin auth / env / infra gotchas
+
 - **Next.js `.env` does dotenv-EXPANSION on `$`.** Any value in `.env.local` with an
   unescaped `$name` is treated as a variable reference and silently mangled at load
   (a `$` segment starting with a letter → expanded to empty). This bit `ADMIN_PASSWORD_HASH`
@@ -146,6 +151,7 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   session, not in the worktrees.
 
 ## Pulse (daily cron active; academically experimental)
+
 - The production daily cron was re-enabled on 2026-07-05. Do not describe Pulse
   as paused or cost-free from memory; inspect the current cron/runtime/provider
   configuration before making cadence or spend claims.
@@ -163,6 +169,7 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   populates env vars).
 
 ## Deferred / calendar-gated (do NOT "fix" unasked)
+
 - **`--shadow-hard*` token naming** — owner-gated (see memory-decisions 2026-06-20). The palette
   fork is reconciled: code, DESIGN.md, and the embed all use Parchment + terracotta + soft
   shadows. Only the token NAMES still read "hard" while their values are soft. Don't rename
@@ -611,3 +618,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   executive rows; 51 remain contested and 26 jurisdictions lack eligible data.
 - Historical transfer and term-limit claims remain uncomputed. Validation is
   preregistered, claims/design gates and browser checks pass. IDX-034 next.
+
+## 2026-07-11 — PUL-009 country-period observability completed
+
+- Pulse runtime method advanced to `pulse-v2.5-beta`; the country-dimensions
+  API now carries strict observation and event-observation states.
+- Live smoke checks covered Japan, Uruguay, Eritrea, China, and Brazil; absent
+  events remain null, low coverage is not assessable, and observed events can
+  coexist with low broader coverage.
+- The append-only API contract, 786 tests, full build, and responsive light/dark
+  methodology checks pass. PUL-010 is next.

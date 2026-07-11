@@ -200,6 +200,7 @@ plan at `~/civica/plan/structural-family-removal-implementation-plan.md`
 sync wait, hard cut at T+2 vintages).
 
 User-locked decisions (2026-05-02):
+
 - Q1: `/government-types` and `/government-types/[type]` archive with 308
   redirects to `/civica-index/methodology#peer-grouping`. Repurposing as
   educational reference would recreate the controlled-vocabulary problem
@@ -217,6 +218,7 @@ User-locked decisions (2026-05-02):
   externally-attested classifications, not asserting a novel composite.
 
 How to apply:
+
 - Do NOT introduce new code paths that read `structural_family` or
   derive a Civica-asserted government-type taxonomy.
 - For peer-grouping logic, use `src/lib/peer-grouping/` helpers
@@ -338,6 +340,7 @@ hedging while the rework is in flight.
 ## 2026-04-24
 
 ### Chat context scoping rule (Ask Civica)
+
 The `contextChips` shown in the right-pane chat AND the `apiContext` sent to `/api/chat`
 must only include state variables that are semantically relevant to the active tab.
 
@@ -354,6 +357,7 @@ strips house) → then to bills, the chip still said "Lower" and felt like leake
 rather than an intentional scope.
 
 How to apply:
+
 ```ts
 const tabNeedsHouse = tab === "chamber" || tab === "bills";
 const contextChips = [
@@ -413,6 +417,7 @@ with a short, neutral provenance note, on the Geography sections of the United
 States, Mexico, and Canada (the only countries whose CIA prose references it).
 
 ### The editorial decision
+
 - Primary displayed name: **"Gulf of Mexico."**
 - A transparent provenance note appears ONLY on sections where the rename
   actually occurred:
@@ -424,6 +429,7 @@ States, Mexico, and Canada (the only countries whose CIA prose references it).
   per-page styling, fully tokenized).
 
 ### Rationale
+
 For an international, academically-citable reference work, "Gulf of Mexico" is
 the defensible primary name — it is used by the International Hydrographic
 Organization, the United Nations, Wikipedia, Britannica, AP, Reuters, and the
@@ -434,6 +440,7 @@ Factbook is itself a U.S. federal publication and adopted the executive order's
 wording, which is why our public-domain import surfaced "Gulf of America."
 
 ### How it's implemented — render-time only, stored source kept verbatim
+
 - The CIA JSONB in `country_factbook_sections.section_data` is **left
   untouched**. We store the source as-is and display our house naming
   convention with a note — the cleanest provenance posture. No DB mutation,
@@ -452,6 +459,7 @@ wording, which is why our public-domain import surfaced "Gulf of America."
   absent; "Persian Gulf" untouched across 17 sections).
 
 ### Scope discipline for future renames
+
 This is intentionally a single, targeted rename. Future U.S.-federal
 geographic renames (e.g. Denali/Mt. McKinley) must be evaluated case-by-case
 against the same international-reference standard (IHO / UN / major
@@ -855,3 +863,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   flags, and immutable candidate pointers close; completion is one transition.
 - Q1 remains `canonical_only_legacy`; do not infer its missing alternates from
   current rows. Durable record: APR-D065 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Pulse separates observation from event absence
+
+- `pulse-observability/country-period-v1` uses independent observation-state
+  and event-observation axes; an empty period is not a zero or stability result.
+- No-event language requires the declared operational threshold. Low coverage,
+  current outage, and sourced restricted-information states remain not assessable.
+- The approximate press-freedom fallback cannot create a restricted state.
+  Durable record: APR-D117 in `plan/DECISIONS.md`.

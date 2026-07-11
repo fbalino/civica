@@ -977,6 +977,98 @@ export const zPulseDimensionRow = z
   })
   .strict();
 
+export const zPulseCountryPeriodObservability = z
+  .object({
+    schemaVersion: z.literal("pulse-observability/country-period-v1"),
+    period: z
+      .object({
+        start: z.string(),
+        end: z.string(),
+        basis: z.literal("retrieval_time"),
+      })
+      .strict(),
+    observationState: z.enum([
+      "sufficient_observation",
+      "low_coverage",
+      "source_outage",
+      "restricted_information_environment",
+    ]),
+    eventObservation: z.enum([
+      "qualifying_event_observed",
+      "no_qualifying_event_observed",
+      "not_assessable",
+    ]),
+    stateReason: z.string(),
+    evidence: z
+      .object({
+        operatingFeeds: z.number().int().nonnegative(),
+        degradedFeeds: z.number().int().nonnegative(),
+        observedFeedFamilies: z.array(z.string()),
+        retainedDocuments: z.number().int().nonnegative(),
+        qualifyingEvents: z.number().int().nonnegative(),
+        informationEnvironment: z
+          .object({
+            state: z.literal("restricted"),
+            sourceId: z.string(),
+            sourceUrl: z.string(),
+            upstreamVersion: z.string(),
+            observationYear: z.number().int(),
+            retrievedAt: z.string(),
+          })
+          .strict()
+          .nullable(),
+      })
+      .strict(),
+    thresholds: z
+      .object({
+        minimumObservedFeedFamilies: z.number().int().positive(),
+        minimumRetainedDocuments: z.number().int().positive(),
+      })
+      .strict(),
+    numericEffect: z.enum(["event_evidence_only", "withheld"]),
+    countryQualityInference: z.literal("prohibited"),
+    limitations: z.array(z.string()),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      value.eventObservation === "no_qualifying_event_observed" &&
+      value.observationState !== "sufficient_observation"
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["eventObservation"],
+        message: "no qualifying event observed requires sufficient observation",
+      });
+    }
+    if (
+      value.eventObservation === "not_assessable" &&
+      value.observationState === "sufficient_observation"
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["eventObservation"],
+        message:
+          "sufficient observation with no event must use the explicit no-event state",
+      });
+    }
+    const hasEvent = value.evidence.qualifyingEvents > 0;
+    if ((value.eventObservation === "qualifying_event_observed") !== hasEvent) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["evidence", "qualifyingEvents"],
+        message: "event observation and qualifying-event count disagree",
+      });
+    }
+    if ((value.numericEffect === "event_evidence_only") !== hasEvent) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["numericEffect"],
+        message: "numeric effects require observed event evidence",
+      });
+    }
+  });
+
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/pulse/[country_slug]/dimensions
  * ──────────────────────────────────────────────────────────────── */
@@ -994,6 +1086,7 @@ export const zPulseDimensionsData = z
     dimensions: z.record(z.string(), zPulseDimensionRow),
     lastComputedAt: z.string().nullable(),
     totalEvents: z.number(),
+    observability: zPulseCountryPeriodObservability,
     pressFreedomContext: z
       .object({
         score: z.number(),
@@ -1004,7 +1097,28 @@ export const zPulseDimensionsData = z
       .strict(),
     versionSet: zPulseVersionSetSummary,
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.totalEvents !== value.observability.evidence.qualifyingEvents) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["totalEvents"],
+        message: "total events and observability event count disagree",
+      });
+    }
+    if (value.observability.evidence.qualifyingEvents === 0) {
+      for (const [dimension, row] of Object.entries(value.dimensions)) {
+        if (row.delta !== null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["dimensions", dimension, "delta"],
+            message:
+              "a country-period without qualifying events cannot emit a numeric delta",
+          });
+        }
+      }
+    }
+  });
 
 export const zPulseDimensionsResponse = z
   .object({
@@ -1261,6 +1375,7 @@ export const zPulseMethodologySnapshot = z
     evidenceIdentity: z.unknown(),
     providers: z.unknown(),
     feeds: z.unknown(),
+    observability: z.unknown(),
     cadence: z.unknown(),
     clustering: z.unknown(),
     corroboration: z.unknown(),

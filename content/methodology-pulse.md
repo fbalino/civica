@@ -325,6 +325,19 @@ This is a known limitation of any event-monitoring system that depends on docume
 
 Country pages flagged by the provisional press-context lookup surface this caveat directly on the Pulse panel. Because that lookup is incomplete and approximate, it is itself a limitation pending replacement with a complete, versioned source.
 
+## Country-period observability {#observability}
+
+Pulse reports observation separately from event direction and country quality. The country-dimensions API returns two axes for the same trailing window:
+
+- **Observation state:** `sufficient_observation`, `low_coverage`, `source_outage`, or `restricted_information_environment`.
+- **Event observation:** `qualifying_event_observed`, `no_qualifying_event_observed`, or `not_assessable`.
+
+The operational threshold for `sufficient_observation` currently requires retained documents from at least {{ctx.observabilityMinFeeds}} operating feed families and at least {{ctx.observabilityMinDocuments}} retained country-period documents. This threshold controls disclosure language only. It is not a validated retrieval-recall estimate.
+
+`no_qualifying_event_observed` is available only when the observation state is sufficient. Low coverage, an outage, or a restricted information environment produces `not_assessable` when no event was found. In every state, an absent event has no numeric effect and cannot become a stability, good-governance, or country-quality judgment.
+
+The incomplete static press-freedom lookup used by the experimental event-weighting code is not eligible to create `restricted_information_environment`. That state requires a sourced, versioned context record with its observation year and retrieval time. Until PUL-010 supplies that record, the API leaves the context empty rather than guessing.
+
 ## Known limitations {#known-limitations}
 
 - Coverage is uneven and currently leans heavily on GDELT plus three specialist feeds. Inactive and placeholder connectors do not contribute evidence. Sparse-coverage countries can have missed events; absence is not stability.

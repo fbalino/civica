@@ -1,0 +1,18 @@
+{
+  "id": "pulse-country-period-observability-contract",
+  "toVersion": "civica-index-api-contract-pulse-observability-v5",
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-observability-index-contract-v5-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-observability-index-contract-v5-migration.md"
+    ],
+    "golden_test": ["src/lib/pulse/v2/observability.test.ts"],
+    "contract_test": [
+      "src/lib/api/contract/pulse-observability-contract.test.ts"
+    ]
+  }
+}

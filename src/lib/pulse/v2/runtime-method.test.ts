@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.4-beta");
+  assert.equal(method.version, "pulse-v2.5-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -36,6 +36,13 @@ test("current contract states the non-negotiable publication boundaries", () => 
     lower: -15,
     upper: 10,
   });
+  assert.equal(
+    method.observability.noEventRule,
+    "only_when_observation_is_sufficient",
+  );
+  assert.equal(method.observability.approximatePressFreedomEligible, false);
+  assert.equal(method.observability.absentNumericEffect, "withheld");
+  assert.equal(method.observability.countryQualityInference, "prohibited");
   assert.equal(method.numericDeltas.trailingWindowDays, 365);
   assert.equal(method.evaluation.backtestMatchesCurrentProduction, false);
   assert.equal(
@@ -255,7 +262,7 @@ test("contract hash omits its own field and changes when contract content change
 
   const changed: PulseRuntimeMethodContract = {
     ...CURRENT_PULSE_RUNTIME_METHOD,
-    version: "pulse-v2.4-beta-test-change",
+    version: "pulse-v2.5-beta-test-change",
   };
   assert.notEqual(pulseContractHash(changed), snapshot.contractHash);
 });

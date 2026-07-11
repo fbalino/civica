@@ -50,9 +50,15 @@ import {
   SOURCE_INDEPENDENCE_MIN_PRECISION,
   SOURCE_INDEPENDENCE_MIN_RECALL,
 } from "./source-independence";
+import {
+  PULSE_EVENT_OBSERVATION_STATES,
+  PULSE_OBSERVABILITY_THRESHOLDS,
+  PULSE_OBSERVABILITY_VERSION,
+  PULSE_OBSERVATION_STATES,
+} from "./observability";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.3.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.4-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.4.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.5-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -208,6 +214,22 @@ export interface PulseRuntimeMethodContract {
       activation: string;
       blindSpots: string[];
     }>;
+  };
+  observability: {
+    schemaVersion: typeof PULSE_OBSERVABILITY_VERSION;
+    periodBasis: "retrieval_time";
+    observationStates: Array<(typeof PULSE_OBSERVATION_STATES)[number]>;
+    eventObservationStates: Array<
+      (typeof PULSE_EVENT_OBSERVATION_STATES)[number]
+    >;
+    minimumObservedFeedFamilies: number;
+    minimumRetainedDocuments: number;
+    noEventRule: "only_when_observation_is_sufficient";
+    restrictedEnvironmentRule: "requires_sourced_versioned_context";
+    approximatePressFreedomEligible: false;
+    absentNumericEffect: "withheld";
+    countryQualityInference: "prohibited";
+    validationStanding: "operational_threshold_not_retrieval_validation";
   };
   cadence: {
     frequency: "daily";
@@ -487,6 +509,22 @@ export function buildPulseRuntimeMethod(
         sourceIds: observedEvidenceSourceIds,
       },
       connectors,
+    },
+    observability: {
+      schemaVersion: PULSE_OBSERVABILITY_VERSION,
+      periodBasis: "retrieval_time",
+      observationStates: [...PULSE_OBSERVATION_STATES],
+      eventObservationStates: [...PULSE_EVENT_OBSERVATION_STATES],
+      minimumObservedFeedFamilies:
+        PULSE_OBSERVABILITY_THRESHOLDS.minimumObservedFeedFamilies,
+      minimumRetainedDocuments:
+        PULSE_OBSERVABILITY_THRESHOLDS.minimumRetainedDocuments,
+      noEventRule: "only_when_observation_is_sufficient",
+      restrictedEnvironmentRule: "requires_sourced_versioned_context",
+      approximatePressFreedomEligible: false,
+      absentNumericEffect: "withheld",
+      countryQualityInference: "prohibited",
+      validationStanding: "operational_threshold_not_retrieval_validation",
     },
     cadence: {
       frequency: "daily",

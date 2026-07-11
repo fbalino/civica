@@ -55,6 +55,7 @@ const SECTIONS = [
   { id: "decay", label: "Decay" },
   { id: "bounds", label: "Bounds" },
   { id: "coverage-limitations", label: "Coverage limitations" },
+  { id: "observability", label: "Observability states" },
   { id: "known-limitations", label: "Known limitations" },
   { id: "corrections", label: "Corrections" },
   { id: "cite", label: "Cite this page" },
@@ -207,6 +208,8 @@ export default async function PulseMethodologyPage() {
     sourceIndependenceRecallPct:
       method.corroboration.sourceIndependence.reviewedPairThresholds.recall *
       100,
+    observabilityMinFeeds: method.observability.minimumObservedFeedFamilies,
+    observabilityMinDocuments: method.observability.minimumRetainedDocuments,
     scoreWindowDays: method.numericDeltas.trailingWindowDays,
     deltaLowerBound: method.numericDeltas.boundsPerDimension.lower,
     deltaUpperBound: `+${method.numericDeltas.boundsPerDimension.upper}`,

@@ -1058,6 +1058,37 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
     },
     lastComputedAt: "2026-07-09T09:00:29.000Z",
     totalEvents: 1,
+    observability: {
+      schemaVersion: "pulse-observability/country-period-v1",
+      period: {
+        start: "2025-07-11",
+        end: "2026-07-11",
+        basis: "retrieval_time",
+      },
+      observationState: "low_coverage",
+      eventObservation: "qualifying_event_observed",
+      stateReason:
+        "Retained country-period evidence does not meet the operational feed-family and document thresholds for a no-event statement.",
+      evidence: {
+        operatingFeeds: 4,
+        degradedFeeds: 0,
+        observedFeedFamilies: ["gdelt"],
+        retainedDocuments: 3,
+        qualifyingEvents: 1,
+        informationEnvironment: null,
+      },
+      thresholds: {
+        minimumObservedFeedFamilies: 2,
+        minimumRetainedDocuments: 5,
+      },
+      numericEffect: "event_evidence_only",
+      countryQualityInference: "prohibited",
+      limitations: [
+        "The threshold is an operational disclosure rule, not a validated estimate of retrieval recall.",
+        "No qualifying event observed is not evidence of stability, good governance, or country quality.",
+        "Restricted-information status requires a sourced context record; an approximate or default score cannot create it.",
+      ],
+    },
     pressFreedomContext: {
       score: 58,
       source: "approximate_static_2024_subset",

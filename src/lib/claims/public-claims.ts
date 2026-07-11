@@ -183,7 +183,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.4-beta",
+    methodologyVersion: "pulse-v2.5-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
@@ -231,6 +231,27 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/api/v1/pulse/source-coverage/route.ts",
       fragment: "PUBLIC_CLAIM: pulse.source-coverage-runtime",
+    },
+  },
+  {
+    id: "pulse.country-period-observability",
+    surface: "pulse",
+    routeOrArtifact: "/api/v1/pulse/:country_slug/dimensions",
+    exactClaim:
+      "Pulse country-period output separates observation sufficiency, low coverage, source outage, restricted information environments, qualifying-event observation, and no-event observation; absence has no numeric effect and cannot imply stability or country quality.",
+    tier: "derived-descriptive-metric",
+    evidenceSources: [
+      "src/lib/pulse/v2/observability.ts",
+      "src/lib/pulse/v2/observability.test.ts",
+      "src/lib/api/contract/pulse-observability-contract.test.ts",
+      "content/methodology-pulse.md",
+    ],
+    implementationOwner: "Pulse event-ledger research lane",
+    methodologyVersion: "pulse-observability/country-period-v1",
+    gate: "G3",
+    source: {
+      path: "src/app/api/v1/pulse/[country_slug]/dimensions/route.ts",
+      fragment: "PUBLIC_CLAIM: pulse.country-period-observability",
     },
   },
   {
@@ -659,7 +680,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-pulse-runtime-method.ts",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.4-beta",
+    methodologyVersion: "pulse-v2.5-beta",
     gate: "G3",
     source: {
       // CLM-012: api-docs/page.tsx renders this route's description from
@@ -752,7 +773,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.4-beta",
+    methodologyVersion: "pulse-v2.5-beta",
     gate: "G3",
     source: {
       path: "README.template.md",
@@ -837,7 +858,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.4-beta",
+    methodologyVersion: "pulse-v2.5-beta",
     gate: "G3",
     source: {
       path: "CITATION.cff",
@@ -934,7 +955,7 @@ export const PUBLIC_CLAIMS = [
       "src/lib/pulse/v2/runtime-contract.ts",
     ],
     implementationOwner: "SEO and Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.4-beta",
+    methodologyVersion: "pulse-v2.5-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/methodology/pulse/page.tsx",

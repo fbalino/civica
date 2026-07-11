@@ -37,6 +37,8 @@ import type {
   PulseEvidenceRetentionSnapshot,
   PulseEvidenceRightsSnapshot,
 } from "@/lib/pulse/v2/evidence-identity";
+import { loadPulseCountryPeriodObservability } from "@/lib/pulse/v2/observability-live";
+import type { PulseCountryPeriodObservability } from "@/lib/pulse/v2/observability";
 
 export interface PulseRunIdentity {
   runId: string;
@@ -125,6 +127,9 @@ export interface PulseV2ForCountry {
   lastComputedAt: string | null;
   /** Total published events feeding the deltas. */
   totalEvents: number;
+  /** Country-period observation and event-absence states. This never creates
+   * a stability or country-quality judgment. */
+  observability: PulseCountryPeriodObservability;
   /** Provisional context heuristic used by the current weighting code.
    * This is not a complete or live RSF dataset. */
   pressFreedomContext: {
@@ -314,6 +319,10 @@ export async function getPulseV2ForCountry(
     dimensions,
     lastComputedAt,
     totalEvents: eventRows.length,
+    observability: await loadPulseCountryPeriodObservability({
+      jurisdictionId: jurisdiction.id,
+      qualifyingEvents: eventRows.length,
+    }),
     pressFreedomContext: {
       score: press,
       source: "approximate_static_2024_subset",

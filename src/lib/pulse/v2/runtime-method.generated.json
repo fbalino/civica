@@ -61,7 +61,7 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "67ad630593b33223910fe2fb5fd23049ca759106f2f53a0eb72b79ded538a1fe",
+  "contractHash": "184c4fbddc1d28242fc7a8b4c5d454bf6cdce98505c7c4fbe09f3fb2a22701a4",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "sourceIndependence": {
@@ -305,6 +305,29 @@
     "shape": "per_dimension",
     "trailingWindowDays": 365
   },
+  "observability": {
+    "absentNumericEffect": "withheld",
+    "approximatePressFreedomEligible": false,
+    "countryQualityInference": "prohibited",
+    "eventObservationStates": [
+      "qualifying_event_observed",
+      "no_qualifying_event_observed",
+      "not_assessable"
+    ],
+    "minimumObservedFeedFamilies": 2,
+    "minimumRetainedDocuments": 5,
+    "noEventRule": "only_when_observation_is_sufficient",
+    "observationStates": [
+      "sufficient_observation",
+      "low_coverage",
+      "source_outage",
+      "restricted_information_environment"
+    ],
+    "periodBasis": "retrieval_time",
+    "restrictedEnvironmentRule": "requires_sourced_versioned_context",
+    "schemaVersion": "pulse-observability/country-period-v1",
+    "validationStanding": "operational_threshold_not_retrieval_validation"
+  },
   "providers": {
     "backtest": {
       "differences": [
@@ -457,7 +480,7 @@
       }
     }
   },
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "1.4.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -470,5 +493,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.4-beta"
+  "version": "pulse-v2.5-beta"
 }

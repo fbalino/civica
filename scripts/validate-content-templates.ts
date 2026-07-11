@@ -144,6 +144,8 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "sourceIndependenceVersion",
     "sourceIndependencePrecisionPct",
     "sourceIndependenceRecallPct",
+    "observabilityMinFeeds",
+    "observabilityMinDocuments",
     "scoreWindowDays",
     "deltaLowerBound",
     "deltaUpperBound",

@@ -105,6 +105,7 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - Bjornskov-Rode / CGV regime taxonomy (QoG Standard Jan 2026) — underpins government classification
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
 - Pulse operating/degraded/inactive feed states come from `/api/v1/pulse/source-coverage`; the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json` are historical evidence coverage, not an operating verdict
+- Pulse country-period observability is `pulse-observability/country-period-v1` under runtime method `pulse-v2.5-beta`. The country-dimensions API separates observation state from event observation; absent events never create a zero, stability label, or country-quality inference. The approximate press-freedom fallback cannot create a restricted-information state.
 
 ## Source-input manifests
 
