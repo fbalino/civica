@@ -136,14 +136,14 @@ const GROUP_A: FactKeyInput[] = [
     category: "society",
     label: "Official languages",
   },
-  // Areas: km² envelope spans Vatican (0.49) up to Russia (~17.1M).
+  // Areas: CIA rounds Vatican City to 0 km²; the upper bound covers Russia.
   {
     key: "area_total_km2",
     group: "A",
     category: "geography",
     label: "Total area",
     unit: "km2",
-    envelope: { min: 0.4, max: 18_000_000 },
+    envelope: { min: 0, max: 18_000_000 },
   },
   {
     key: "area_land_km2",
@@ -151,7 +151,7 @@ const GROUP_A: FactKeyInput[] = [
     category: "geography",
     label: "Land area",
     unit: "km2",
-    envelope: { min: 0.4, max: 18_000_000 },
+    envelope: { min: 0, max: 18_000_000 },
   },
   {
     key: "area_water_km2",
@@ -233,7 +233,8 @@ const GROUP_B: FactKeyInput[] = [
     category: "demographics",
     label: "Population",
     unit: "people",
-    envelope: { min: 1_000, max: 2_000_000_000 },
+    // The Atlas includes small territories such as Pitcairn, not only states.
+    envelope: { min: 1, max: 2_000_000_000 },
     materialErrorPctThreshold: 0.5,
   },
   // Legacy-CIA alias key seeded as `population` (no _total).
@@ -243,7 +244,7 @@ const GROUP_B: FactKeyInput[] = [
     category: "demographics",
     label: "Population",
     unit: "people",
-    envelope: { min: 1_000, max: 2_000_000_000 },
+    envelope: { min: 1, max: 2_000_000_000 },
     materialErrorPctThreshold: 0.5,
   },
   {
@@ -378,7 +379,7 @@ const GROUP_B: FactKeyInput[] = [
     // nominal given international-dollar rebasing; 80_000 ($80T) provides
     // margin for the largest PPP economy through the ~2031 horizon.
     // See ~/civica/plan/imf-weo-resolution-v1.md §3b.
-    envelope: { min: 0.05, max: 80_000 },
+    envelope: { min: 0.000001, max: 80_000 },
     higherIsBetter: true,
     materialErrorPctThreshold: 0.8,
   },
@@ -389,7 +390,7 @@ const GROUP_B: FactKeyInput[] = [
     category: "economy",
     label: "GDP (PPP)",
     unit: "USD",
-    envelope: { min: 50_000_000, max: 40_000_000_000_000 },
+    envelope: { min: 1, max: 40_000_000_000_000 },
     higherIsBetter: true,
     materialErrorPctThreshold: 0.8,
   },

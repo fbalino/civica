@@ -342,3 +342,16 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   notes, a guarded disposable-local push path, and a refusing `db:push` command.
 - Eight focused fixtures, 588/588 tests, TypeScript, ESLint, documentation,
   claims, and the full build pass. DAT-013 is complete; DAT-014 is next.
+
+## 2026-07-10 — DAT-014 release-quality gate completed
+
+- Added one strict live gate for identifier uniqueness, jurisdiction coverage,
+  plausibility ranges, unit/vintage consistency, provenance orphans, duplicate
+  canonicals, required fields, row deltas, and source age.
+- The checked live report passes seven families and blocks release on one
+  North Korea numeric parser corruption plus orphan statement subjects in
+  jurisdictions, legislature parties, and terms. DAT-029 and DAT-028 own the
+  repairs; the report must stay red until they land.
+- Corrected legacy plausibility minima so real microstate and territory values
+  are valid. Twelve focused fixtures, 600/600 tests, TypeScript, ESLint,
+  documentation, claims, and the production build pass. DAT-015 is next.

@@ -42,7 +42,8 @@ test("getFactKey('population_total') is Group B", () => {
   assert.equal(def!.group, "B");
   assert.equal(def!.category, "demographics");
   assert.ok(def!.envelope, "population_total should have an envelope");
-  assert.equal(def!.envelope!.min, 1_000);
+  // The Atlas includes micro-territories such as Pitcairn (about 50 people).
+  assert.equal(def!.envelope!.min, 1);
   assert.equal(def!.envelope!.max, 2_000_000_000);
 });
 

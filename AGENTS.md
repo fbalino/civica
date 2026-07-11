@@ -61,6 +61,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - Government taxonomy helper layer: `src/lib/db/government-taxonomy.ts` + `src/lib/government-taxonomy/*`
 - Entity status is separate from government form: `src/lib/jurisdictions/status-taxonomy.ts` owns the closed `jurisdiction-status/v1` contract. Only `sovereign_state` enters sovereign-state totals; unknown rows fail closed. Run `npm run validate:jurisdiction-status` after code/schema changes and `npm run audit:jurisdiction-status:live` after applying the targeted migration.
 - Dataset provenance coverage is generated from the live DB with `npm run generate:fact-coverage`, checked into `src/lib/provenance/fact-coverage.generated.json`, and published at `/methodology/provenance-coverage` plus `/api/provenance-coverage`. Run `npm run validate:fact-coverage` after fact/source/dispute/report changes. Keep it distinct from the compact-renderer audit in `src/lib/claims/provenance-coverage.ts`.
+- `npm run validate:release-quality` is the strict live release gate. It writes `data/release-quality-report.v1.json` and fails on identifier, coverage, range, unit/vintage, provenance-orphan, canonical-duplicate, required-field, row-delta, or source-age anomalies. `npm run validate:release-quality-report` is the DB-free checked-report integrity gate used by builds.
 
 ## Design System (authoritative)
 **See `https://www.civicaatlas.org/design-system` for the live reference.** Code lives in `src/app/globals.css`, `src/app/atlas.css`, and `src/app/design-system/page.tsx`.

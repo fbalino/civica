@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-014_release_data_quality_invariants_and_anomaly_reports"
+    "current_task": "DAT-015_explicit_absence_states_across_db_api_ui_export"
   },
   "budget": {
     "mode": "subscription_only",
@@ -616,6 +616,8 @@
     "plan/evidence/DAT-012/README.md",
     "plan/evidence/DAT-013/README.md",
     "plan/evidence/DAT-013/preflight.json",
+    "plan/evidence/DAT-014/README.md",
+    "data/release-quality-report.v1.json",
     "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
     "data/schema-data-dictionary.v1.json",
     "data/SCHEMA-DATA-DICTIONARY.md",
@@ -635,11 +637,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-013: migration/preflight, source/freshness, release/version, claims/documentation, compilation, TypeScript, static generation, and route-generation gates succeeded with 588 tests.",
-    "tests": "588/588 tests passed. Eight focused migration fixtures cover registry closure, missing metadata/linkage, unregistered artifacts, journal lies, unsafe db:push, comment traps, deterministic hashes, destructive detection, and data-script relation discovery. Master plan validates at 32/288 complete (11.1%).",
-    "public_claims": "No reader-facing claim changed. Migration history gaps remain internal and honestly disclosed; DAT-026 owns the authoritative replacement baseline.",
-    "browser": "Not applicable for DAT-013 because no rendered UI or design-system behavior changed.",
+    "build": "npm run build passed for DAT-014: checked quality-report integrity, migration/preflight, source/freshness, release/version, claims/documentation, compilation, TypeScript, static generation, and route-generation gates succeeded with 600 tests.",
+    "tests": "600/600 tests passed. Twelve focused quality fixtures cover a clean release, every required seeded anomaly family, source-age exemptions, and missing-category rejection. The strict live report correctly remains failed on one numeric parser corruption and three grouped statement-subject orphan classes. Master plan validates at 33/288 complete (11.5%).",
+    "public_claims": "No reader-facing claim changed. The checked internal report is honestly red; DAT-028 and DAT-029 own its remaining live blockers.",
+    "browser": "Not applicable for DAT-014 because no rendered UI or design-system behavior changed.",
     "visual_review": "No rendered UI or design-system behavior changed."
   },
-  "updated_at": "2026-07-11T01:15:00Z"
+  "updated_at": "2026-07-11T02:18:00Z"
 }

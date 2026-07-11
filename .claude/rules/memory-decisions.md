@@ -683,3 +683,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Do not create retrospective capture records for Atlas G2 or Pulse until they
   have a real frozen release cut. Durable record: APR-D045 in
   `plan/DECISIONS.md`.
+
+## 2026-07-10 — The checked quality report may honestly fail
+
+- `npm run validate:release-quality` is the strict live release command and
+  must exit nonzero on any active anomaly.
+- The production build checks report integrity without changing a live failure
+  into a pass. A red checked report is evidence and remains a release blocker.
+- Normalize only semantically equivalent unit labels. Explicit fact-key bounds
+  outrank generic percent fallbacks. DAT-028 owns statement-subject orphans;
+  DAT-029 owns active numeric-envelope corruption. Durable record: APR-D047 in
+  `plan/DECISIONS.md`.
