@@ -71,6 +71,27 @@
       "when": 1783754384313,
       "tag": "0009_ambiguous_maverick",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783759991026,
+      "tag": "0010_early_hawkeye",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783760500000,
+      "tag": "0011_freeze_ci_research_panel",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783761000000,
+      "tag": "0012_fix_panel_release_staging_delete",
+      "breakpoints": true
     }
   ]
 }

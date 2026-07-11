@@ -529,3 +529,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   Q1 legacy versus Q2 complete-candidate status and checksums.
 - A 4.9 MB local package replayed both release checksums with zero network
   requests. 651/651 tests, browser/API checks, and build pass. DAT-033 next.
+
+## 2026-07-11 — IDX-006 longitudinal research panel completed
+
+- Froze a private 2000–2024, five-indicator research grid with 24,250 cells,
+  including 4,384 typed gaps and full source-native metadata.
+- Completed rows and release metadata are immutable; checked aggregate artifacts
+  retain deterministic row, coverage, and temporal-break hashes without exposing
+  mixed-rights source values.
+- Static/live validators, mutation probes, 672/672 tests, methodology browser
+  verification, and the production build pass. IDX-007 is next.

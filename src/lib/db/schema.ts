@@ -14,6 +14,7 @@ import {
   index,
   foreignKey,
   check,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const jurisdictions = pgTable("jurisdictions", {
@@ -1393,6 +1394,85 @@ export const indicatorHistory = pgTable(
     index("idx_indicator_history_indicator").on(table.indicator),
     check("indicator_history_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
   ]
+);
+
+/**
+ * Private, immutable research-panel releases. These rows are not a public
+ * download surface: several upstream series have redistribution limits. The
+ * checked repository manifest exposes hashes and coverage only; exact values
+ * stay in the database for reproducible internal research runs.
+ */
+export const ciResearchPanelReleases = pgTable(
+  "ci_research_panel_releases",
+  {
+    id: text("id").primaryKey(),
+    schemaVersion: text("schema_version").notNull(),
+    status: text("status").notNull().default("staging"),
+    periodStart: integer("period_start").notNull(),
+    periodEnd: integer("period_end").notNull(),
+    jurisdictionCount: integer("jurisdiction_count").notNull(),
+    indicatorCount: integer("indicator_count").notNull(),
+    expectedRows: integer("expected_rows").notNull(),
+    observedRows: integer("observed_rows").notNull(),
+    missingRows: integer("missing_rows").notNull(),
+    rowSha256: text("row_sha256").notNull(),
+    coverageSha256: text("coverage_sha256").notNull(),
+    temporalBreaksSha256: text("temporal_breaks_sha256").notNull(),
+    generatorVersion: text("generator_version").notNull(),
+    sourceSnapshot: jsonb("source_snapshot").notNull(),
+    rightsPosture: text("rights_posture").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => [
+    check("ci_research_panel_release_status", dsql`${table.status} IN ('staging','complete')`),
+    check("ci_research_panel_release_period", dsql`${table.periodStart} <= ${table.periodEnd}`),
+    check("ci_research_panel_release_counts", dsql`${table.expectedRows} = ${table.observedRows} + ${table.missingRows} AND ${table.expectedRows} = ${table.jurisdictionCount} * ${table.indicatorCount} * (${table.periodEnd} - ${table.periodStart} + 1)`),
+    check("ci_research_panel_release_hashes", dsql`${table.rowSha256} ~ '^[a-f0-9]{64}$' AND ${table.coverageSha256} ~ '^[a-f0-9]{64}$' AND ${table.temporalBreaksSha256} ~ '^[a-f0-9]{64}$'`),
+  ],
+);
+
+export const ciResearchPanelRows = pgTable(
+  "ci_research_panel_rows",
+  {
+    releaseId: text("release_id")
+      .references(() => ciResearchPanelReleases.id)
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    periodYear: integer("period_year").notNull(),
+    dimension: text("dimension").notNull(),
+    indicatorId: text("indicator_id").notNull(),
+    sourceId: text("source_id").references(() => sources.id).notNull(),
+    sourceOwner: text("source_owner").notNull(),
+    retrievalPath: text("retrieval_path").notNull(),
+    value: real("value"),
+    availabilityStatus: text("value_status").notNull(),
+    missingReason: text("missing_reason"),
+    nativeUnit: text("native_unit").notNull(),
+    nativeMin: real("native_min").notNull(),
+    nativeMax: real("native_max").notNull(),
+    isInverted: boolean("is_inverted").notNull(),
+    transformId: text("transform_id").notNull(),
+    sourceVintage: text("source_vintage").notNull(),
+    sourceVintageStatus: text("source_vintage_status").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    uncertaintyStatus: text("uncertainty_status").notNull(),
+    uncertaintyLower: real("uncertainty_lower"),
+    uncertaintyUpper: real("uncertainty_upper"),
+    revisionStatus: text("revision_status").notNull(),
+    seriesType: text("series_type").notNull(),
+    contentHash: text("content_hash").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.releaseId, table.jurisdictionId, table.indicatorId, table.sourceId, table.periodYear] }),
+    index("idx_ci_research_panel_release_year").on(table.releaseId, table.periodYear),
+    index("idx_ci_research_panel_release_indicator").on(table.releaseId, table.indicatorId),
+    check("ci_research_panel_value_state", dsql`(${table.availabilityStatus} = 'observed' AND ${table.value} IS NOT NULL AND ${table.missingReason} IS NULL) OR (${table.availabilityStatus} = 'missing' AND ${table.value} IS NULL AND ${table.missingReason} IS NOT NULL)`),
+    check("ci_research_panel_uncertainty_shape", dsql`(${table.uncertaintyLower} IS NULL AND ${table.uncertaintyUpper} IS NULL) OR (${table.uncertaintyLower} IS NOT NULL AND ${table.uncertaintyUpper} IS NOT NULL AND ${table.uncertaintyLower} <= ${table.uncertaintyUpper})`),
+    check("ci_research_panel_content_hash", dsql`${table.contentHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactHash} ~ '^[a-f0-9]{64}$'`),
+  ],
 );
 
 export const ciCompositeScores = pgTable(

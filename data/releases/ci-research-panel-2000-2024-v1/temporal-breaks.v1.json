@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "ci-research-panel-temporal-breaks/v1",
+  "releaseId": "ci-research-panel-2000-2024-v1",
+  "breaks": [
+    {
+      "sourceId": "vdem",
+      "kind": "release_revision",
+      "period": "every release",
+      "treatment": "current harmonized release only; never labeled as-published",
+      "reference": "https://www.v-dem.net/about/v-dem-project/methodology/"
+    },
+    {
+      "sourceId": "worldbank_wgi",
+      "kind": "cadence_break",
+      "period": "1996–2000 biennial; 2002 onward annual",
+      "treatment": "2001 is structural nonpublication, not imputed",
+      "reference": "https://www.worldbank.org/content/dam/sites/govindicators/doc/The%20Worldwide%20Governance%20Indicators%202025%20Methodology%20Revision.pdf"
+    },
+    {
+      "sourceId": "worldbank_wgi",
+      "kind": "methodology_revision",
+      "period": "2025 revision recalculated history to 1996",
+      "treatment": "current harmonized series only; prior editions are not reconstructed",
+      "reference": "https://www.worldbank.org/content/dam/sites/govindicators/doc/The%20Worldwide%20Governance%20Indicators%202025%20Methodology%20Revision.pdf"
+    },
+    {
+      "sourceId": "freedom_house",
+      "kind": "methodology_change",
+      "period": "2018 edition",
+      "treatment": "flagged; no mechanical adjustment or imputation",
+      "reference": "https://freedomhouse.org/reports/freedom-world/freedom-world-research-methodology"
+    },
+    {
+      "sourceId": "transparency_intl",
+      "kind": "comparability_boundary",
+      "period": "2012",
+      "treatment": "pre-2012 periods are outside the comparable series",
+      "reference": "https://www.transparency.org/en/news/how-cpi-scores-are-calculated"
+    },
+    {
+      "sourceId": "undp_hdi",
+      "kind": "cross_edition_revision",
+      "period": "every report edition",
+      "treatment": "current internally consistent backcast only; not comparable to values printed in earlier editions",
+      "reference": "https://hdr.undp.org/reports-and-publications/2020-human-development-report/data-readers-guide"
+    }
+  ]
+}

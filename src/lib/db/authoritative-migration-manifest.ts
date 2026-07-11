@@ -61,4 +61,22 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "bdeca05751fd26c59251bf26661ab6f70bebc01bf1752b664aebcdff6b24db36",
     baseline: false,
   },
+  {
+    id: "0010_early_hawkeye",
+    path: "drizzle/authoritative/0010_early_hawkeye.sql",
+    sha256: "c3f3c2291139ef216d27352450d21fbc4430791384c4fc044128a444ec707b8e",
+    baseline: false,
+  },
+  {
+    id: "0011_freeze_ci_research_panel",
+    path: "drizzle/authoritative/0011_freeze_ci_research_panel.sql",
+    sha256: "7150550d7f12aa552dfb8ee79e0bef44b5faae9aeb1ccde67b303b31b1d22d45",
+    baseline: false,
+  },
+  {
+    id: "0012_fix_panel_release_staging_delete",
+    path: "drizzle/authoritative/0012_fix_panel_release_staging_delete.sql",
+    sha256: "c7794c1ecfa66857310be13d66b545aaa3eaf12161902ec0c690b206c22f9c82",
+    baseline: false,
+  },
 ] as const;

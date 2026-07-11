@@ -1,0 +1,1051 @@
+{
+  "schemaVersion": "ci-research-panel-coverage/v1",
+  "releaseId": "ci-research-panel-2000-2024-v1",
+  "coverage": [
+    {
+      "sourceId": "vdem",
+      "indicatorId": "v2x_libdem",
+      "dimension": "democratic_quality",
+      "observed": 4298,
+      "missing": 552,
+      "byYear": [
+        {
+          "year": 2000,
+          "observed": 171,
+          "missing": 23,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 23
+          }
+        },
+        {
+          "year": 2001,
+          "observed": 171,
+          "missing": 23,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 23
+          }
+        },
+        {
+          "year": 2002,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2003,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2004,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2005,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2006,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2007,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2008,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2009,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2010,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2011,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2012,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2013,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2014,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2015,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2016,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2017,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2018,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2019,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2020,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2021,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2022,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2023,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2024,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "worldbank_wgi",
+      "indicatorId": "rl.est",
+      "dimension": "rule_of_law",
+      "observed": 4622,
+      "missing": 228,
+      "byYear": [
+        {
+          "year": 2000,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2001,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "source_not_published_for_period": 194
+          }
+        },
+        {
+          "year": 2002,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2003,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2004,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2005,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2006,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2007,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2008,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2009,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2010,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2011,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2012,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2013,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2014,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2015,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2016,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2017,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2018,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2019,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2020,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2021,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2022,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2023,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2024,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "freedom_house",
+      "indicatorId": "fh_total_score",
+      "dimension": "freedom_rights",
+      "observed": 4236,
+      "missing": 614,
+      "byYear": [
+        {
+          "year": 2000,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2001,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2002,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2003,
+          "observed": 191,
+          "missing": 3,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 3
+          }
+        },
+        {
+          "year": 2004,
+          "observed": 191,
+          "missing": 3,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 3
+          }
+        },
+        {
+          "year": 2005,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2006,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2007,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2008,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2009,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2010,
+          "observed": 192,
+          "missing": 2,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 2
+          }
+        },
+        {
+          "year": 2011,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2012,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2013,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2014,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2015,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2016,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2017,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2018,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2019,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2020,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2021,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2022,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2023,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        },
+        {
+          "year": 2024,
+          "observed": 193,
+          "missing": 1,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 1
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "transparency_intl",
+      "indicatorId": "score",
+      "dimension": "corruption_control",
+      "observed": 2270,
+      "missing": 2580,
+      "byYear": [
+        {
+          "year": 2000,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2001,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2002,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2003,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2004,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2005,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2006,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2007,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2008,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2009,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2010,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2011,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_comparable_series": 194
+          }
+        },
+        {
+          "year": 2012,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2013,
+          "observed": 173,
+          "missing": 21,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 21
+          }
+        },
+        {
+          "year": 2014,
+          "observed": 171,
+          "missing": 23,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 23
+          }
+        },
+        {
+          "year": 2015,
+          "observed": 165,
+          "missing": 29,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 29
+          }
+        },
+        {
+          "year": 2016,
+          "observed": 173,
+          "missing": 21,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 21
+          }
+        },
+        {
+          "year": 2017,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2018,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2019,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2020,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2021,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2022,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2023,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        },
+        {
+          "year": 2024,
+          "observed": 177,
+          "missing": 17,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 17
+          }
+        }
+      ]
+    },
+    {
+      "sourceId": "undp_hdi",
+      "indicatorId": "hdi",
+      "dimension": "human_development",
+      "observed": 4440,
+      "missing": 410,
+      "byYear": [
+        {
+          "year": 2000,
+          "observed": 170,
+          "missing": 24,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 24
+          }
+        },
+        {
+          "year": 2001,
+          "observed": 170,
+          "missing": 24,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 24
+          }
+        },
+        {
+          "year": 2002,
+          "observed": 171,
+          "missing": 23,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 23
+          }
+        },
+        {
+          "year": 2003,
+          "observed": 172,
+          "missing": 22,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 22
+          }
+        },
+        {
+          "year": 2004,
+          "observed": 173,
+          "missing": 21,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 21
+          }
+        },
+        {
+          "year": 2005,
+          "observed": 184,
+          "missing": 10,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 10
+          }
+        },
+        {
+          "year": 2006,
+          "observed": 184,
+          "missing": 10,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 10
+          }
+        },
+        {
+          "year": 2007,
+          "observed": 185,
+          "missing": 9,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 9
+          }
+        },
+        {
+          "year": 2008,
+          "observed": 186,
+          "missing": 8,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 8
+          }
+        },
+        {
+          "year": 2009,
+          "observed": 185,
+          "missing": 9,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 9
+          }
+        },
+        {
+          "year": 2010,
+          "observed": 189,
+          "missing": 5,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 5
+          }
+        },
+        {
+          "year": 2011,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2012,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2013,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2014,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2015,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2016,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2017,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2018,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2019,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2020,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2021,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2022,
+          "observed": 190,
+          "missing": 4,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 4
+          }
+        },
+        {
+          "year": 2023,
+          "observed": 191,
+          "missing": 3,
+          "missingReasons": {
+            "source_no_observation_for_jurisdiction_period": 3
+          }
+        },
+        {
+          "year": 2024,
+          "observed": 0,
+          "missing": 194,
+          "missingReasons": {
+            "outside_captured_release": 194
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -61,10 +61,11 @@ The frozen 2024-Q4 Beta release uses **World Bank WGI Voice & Accountability as 
 
 ## Section 4 · Weight determination {#weights}
 
-The current beta weights are PCA-informed estimates, not externally reviewed parameters. The completed analysis uses a single-year, {{state.civicaIndex.pca.panelSize}}-country panel; the planned historical and substitution tests below have not yet been completed:
+The current beta weights are PCA-informed estimates, not externally reviewed parameters. The completed analysis uses a single-year, {{state.civicaIndex.pca.panelSize}}-country panel. Civica has since frozen a private 2000–2024 native-scale research panel with explicit missing cells, but has not yet run the preregistered historical factor and substitution analyses:
 
 - **Completed:** principal component analysis (PCA) on the currently ingested complete-case panel. The appendix reports its sample, data vintage, and limitations.
-- **Planned:** a longitudinal country-year panel and factor analysis with varimax rotation to test whether Administrative Capacity is distinct from Rule of Law.
+- **Completed data foundation:** the 2000–2024 country-year panel is frozen with source, vintage-status, unit, identity transform, uncertainty status, missingness reason, revision status, temporal-break registry, and semantic hashes. Exact values remain private because source rights are mixed.
+- **Planned analysis:** factor analysis with justified rotation and source/method controls to test whether Administrative Capacity is distinct from Rule of Law.
 - **Planned:** source-substitution sensitivity testing that swaps primary and secondary indicators and measures how much results move.
 
 The full PCA results — eigenvalues, scree plot, factor loadings, and decision rationale — are published as a separate appendix at [/civica-index/methodology/pca-appendix](/civica-index/methodology/pca-appendix). Headline finding: the {{state.civicaIndex.dimensionCount}} governance dimensions are highly correlated (r = {{ctx.corrLow}} to {{ctx.corrHigh}}), one dominant latent factor explains {{ctx.pc1VariancePct}}% of the variance, and weights proportional to the squared first-component loadings come out near-equal — close enough to the provisional values that rankings barely move under the revision.
@@ -137,7 +138,7 @@ Both series are accessible via the API. See §13 for citation format.
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](/civica-conditions).
 
-**PCA panel underpowered.** The PCA in §4 was run on n = {{state.civicaIndex.pca.panelSize}} countries from a single year ({{state.civicaIndex.pca.dataVintage}}). The weights must be recomputed and compared when the historical panel is ingested. The current result does not establish that the same structure will hold across years or broader country coverage.
+**PCA panel underpowered.** The PCA in §4 was run on n = {{state.civicaIndex.pca.panelSize}} countries from a single year ({{state.civicaIndex.pca.dataVintage}}). A historical panel is now frozen, but the preregistered longitudinal analysis has not been run. The current result does not establish that the same structure will hold across years or broader country coverage.
 
 ## Section 13 · Citation {#citation}
 

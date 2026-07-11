@@ -23,6 +23,17 @@ Every ID below resolves to the checked forward artifact and policy metadata in
 0024_research_evidence_retention · 0025_immutable_frozen_vintages ·
 0026_temporal_metadata
 
+Authoritative follow-up: `0010_early_hawkeye` adds private immutable Civica
+Index research-panel release and row tables for IDX-006. Exact source values
+remain outside public repository artifacts; checked manifests expose hashes,
+coverage, exclusions, and temporal-break metadata only.
+
+`0011_freeze_ci_research_panel` adds database triggers that reject writes to
+completed research-panel releases and their rows.
+
+`0012_fix_panel_release_staging_delete` preserves deletion of an incomplete
+staging release while keeping completed releases immutable.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

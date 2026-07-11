@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "4daef2fe319a3cd474a9691ba1ff53ce82d28ee2e6b543675f15f16fd805e596",
+  "schemaFingerprint": "c834223e5b8ba375671ff774ae7151e5c69c888170caa8a0e960b32036a419a8",
   "summary": {
-    "tables": 53,
-    "columns": 680,
+    "tables": 55,
+    "columns": 723,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
     "supportTables": 11,
-    "internalTables": 8,
+    "internalTables": 10,
     "privateTables": 2,
     "legacyTables": 3
   },
@@ -3586,6 +3586,1120 @@
           "cadence": "On adopted methodology change.",
           "vintageSemantics": "effective_from/to bound the interpretation period; version is not a source-data vintage.",
           "rights": "Civica-authored metadata; input-source rights remain separate.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ci_research_panel_releases",
+      "exportName": "ciResearchPanelReleases",
+      "definition": "Immutable private release ledger for frozen Civica Index research panels.",
+      "rowGrain": "One frozen research-panel release.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+      "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+      "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+      "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "completed_at",
+          "propertyName": "completedAt",
+          "definition": "Timestamp when the operation completed.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "Completed at follows this table contract. The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "coverage_sha256",
+          "propertyName": "coverageSha256",
+          "definition": "Coverage sha256 recorded for the frozen research-panel release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "expected_rows",
+          "propertyName": "expectedRows",
+          "definition": "Expected rows recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "generator_version",
+          "propertyName": "generatorVersion",
+          "definition": "Generator version recorded for the frozen research-panel release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "indicator_count",
+          "propertyName": "indicatorCount",
+          "definition": "Indicator count recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_count",
+          "propertyName": "jurisdictionCount",
+          "definition": "Jurisdiction count recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "missing_rows",
+          "propertyName": "missingRows",
+          "definition": "Missing rows recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observed_rows",
+          "propertyName": "observedRows",
+          "definition": "Observed rows recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "period_end",
+          "propertyName": "periodEnd",
+          "definition": "Period end recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "period_start",
+          "propertyName": "periodStart",
+          "definition": "Period start recorded for the frozen research-panel release.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rights_posture",
+          "propertyName": "rightsPosture",
+          "definition": "Rights posture recorded for the frozen research-panel release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "row_sha256",
+          "propertyName": "rowSha256",
+          "definition": "Row sha256 recorded for the frozen research-panel release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the frozen research-panel release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_snapshot",
+          "propertyName": "sourceSnapshot",
+          "definition": "Source snapshot recorded for the frozen research-panel release.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "temporal_breaks_sha256",
+          "propertyName": "temporalBreaksSha256",
+          "definition": "Temporal breaks sha256 recorded for the frozen research-panel release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the closed indicator-history source registry and explicit country-period grid.",
+          "cadence": "Once per preregistered research-panel release; completed rows are immutable.",
+          "vintageSemantics": "The period bounds describe observations; source_snapshot records retained source-vintage labels and artifact hashes; completion time is Civica publication time.",
+          "rights": "Private internal research only while any included source terms remain pending or restrictive; public artifacts expose metadata and hashes, not values.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ci_research_panel_rows",
+      "exportName": "ciResearchPanelRows",
+      "definition": "Complete country-year-indicator grid for one frozen private research-panel release.",
+      "rowGrain": "One release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+      "cadence": "Written during staging and immutable after release completion.",
+      "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+      "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "artifact_hash",
+          "propertyName": "artifactHash",
+          "definition": "Artifact hash recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "content_hash",
+          "propertyName": "contentHash",
+          "definition": "Hash of the captured content used for deduplication and replay identity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension",
+          "propertyName": "dimension",
+          "definition": "Dimension recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "indicator_id",
+          "propertyName": "indicatorId",
+          "definition": "Indicator id recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_research_panel_release_indicator"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "is_inverted",
+          "propertyName": "isInverted",
+          "definition": "Is inverted recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "boolean",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "missing_reason",
+          "propertyName": "missingReason",
+          "definition": "Missing reason recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "native_max",
+          "propertyName": "nativeMax",
+          "definition": "Native max recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "native_min",
+          "propertyName": "nativeMin",
+          "definition": "Native min recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "native_unit",
+          "propertyName": "nativeUnit",
+          "definition": "Native unit recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "period_year",
+          "propertyName": "periodYear",
+          "definition": "Period year recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "Gregorian calendar year",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_research_panel_release_year"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "Period year follows this table contract. period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to ci_research_panel_releases.id.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "ci_research_panel_releases.id",
+            "indexGroups": [
+              "idx_ci_research_panel_release_year",
+              "idx_ci_research_panel_release_indicator"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing ci_research_panel_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "retrieval_path",
+          "propertyName": "retrievalPath",
+          "definition": "Retrieval path recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "revision_status",
+          "propertyName": "revisionStatus",
+          "definition": "Revision status recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "series_type",
+          "propertyName": "seriesType",
+          "definition": "Series type recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "sources.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_owner",
+          "propertyName": "sourceOwner",
+          "definition": "Source owner recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_vintage",
+          "propertyName": "sourceVintage",
+          "definition": "Source vintage recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "Source vintage follows this table contract. period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_vintage_status",
+          "propertyName": "sourceVintageStatus",
+          "definition": "Source vintage status recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "Source vintage status follows this table contract. period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transform_id",
+          "propertyName": "transformId",
+          "definition": "Transform id recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "uncertainty_lower",
+          "propertyName": "uncertaintyLower",
+          "definition": "Uncertainty lower recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "uncertainty_status",
+          "propertyName": "uncertaintyStatus",
+          "definition": "Uncertainty status recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "uncertainty_upper",
+          "propertyName": "uncertaintyUpper",
+          "definition": "Uncertainty upper recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value",
+          "propertyName": "value",
+          "definition": "Value recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "availabilityStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-native-scale observations from indicator_history plus explicit structural and coverage missingness rows.",
+          "cadence": "Written during staging and immutable after release completion.",
+          "vintageSemantics": "period_year is observation time; source_vintage and its status disclose the retained capture label; series_type distinguishes current harmonized backcasts from as-published vintages.",
+          "rights": "Exact values remain private and inherit source-specific restrictions; no public bulk panel is implied.",
           "deprecation": {
             "status": "active"
           }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T07:20:38.629Z",
-  "sha256": "a985b2a0b2036a8186a7d013f00d0127366248fa48f64656fb009cbe75c81cb4",
+  "generatedAt": "2026-07-11T09:01:28.433Z",
+  "sha256": "3f1f49b235aee99b1861c589fe6cc2a760b1776f7544c53c079abf81eb1d8125",
   "schema": {
     "columns": [
       {
@@ -1200,6 +1200,393 @@
         "default": "now()",
         "nullable": "YES",
         "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "id",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": "'staging'::text",
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "int4",
+        "name": "period_start",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "int4",
+        "name": "period_end",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "int4",
+        "name": "jurisdiction_count",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "int4",
+        "name": "indicator_count",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "int4",
+        "name": "expected_rows",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "int4",
+        "name": "observed_rows",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "int4",
+        "name": "missing_rows",
+        "type": "integer",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "row_sha256",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "coverage_sha256",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "temporal_breaks_sha256",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "generator_version",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "jsonb",
+        "name": "source_snapshot",
+        "type": "jsonb",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "rights_posture",
+        "type": "text",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "ci_research_panel_releases",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "timestamp",
+        "name": "completed_at",
+        "type": "timestamp without time zone",
+        "table": "ci_research_panel_releases",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "int4",
+        "name": "period_year",
+        "type": "integer",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "dimension",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "indicator_id",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "source_owner",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "retrieval_path",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "float4",
+        "name": "value",
+        "type": "real",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "value_status",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "missing_reason",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "native_unit",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "float4",
+        "name": "native_min",
+        "type": "real",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "float4",
+        "name": "native_max",
+        "type": "real",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "bool",
+        "name": "is_inverted",
+        "type": "boolean",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "transform_id",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "source_vintage",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "source_vintage_status",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "artifact_hash",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "uncertainty_status",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "float4",
+        "name": "uncertainty_lower",
+        "type": "real",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "YES",
+        "position": 21
+      },
+      {
+        "udt": "float4",
+        "name": "uncertainty_upper",
+        "type": "real",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "YES",
+        "position": 22
+      },
+      {
+        "udt": "text",
+        "name": "revision_status",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 23
+      },
+      {
+        "udt": "text",
+        "name": "series_type",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 24
+      },
+      {
+        "udt": "text",
+        "name": "content_hash",
+        "type": "text",
+        "table": "ci_research_panel_rows",
+        "default": null,
+        "nullable": "NO",
+        "position": 25
       },
       {
         "udt": "uuid",
@@ -6347,6 +6734,26 @@
         "definition": "CREATE UNIQUE INDEX ci_methodology_versions_pkey ON public.ci_methodology_versions USING btree (id)"
       },
       {
+        "name": "ci_research_panel_releases_pkey",
+        "table": "ci_research_panel_releases",
+        "definition": "CREATE UNIQUE INDEX ci_research_panel_releases_pkey ON public.ci_research_panel_releases USING btree (id)"
+      },
+      {
+        "name": "ci_research_panel_rows_release_id_jurisdiction_id_indicator_id_",
+        "table": "ci_research_panel_rows",
+        "definition": "CREATE UNIQUE INDEX ci_research_panel_rows_release_id_jurisdiction_id_indicator_id_ ON public.ci_research_panel_rows USING btree (release_id, jurisdiction_id, indicator_id, source_id, period_year)"
+      },
+      {
+        "name": "idx_ci_research_panel_release_indicator",
+        "table": "ci_research_panel_rows",
+        "definition": "CREATE INDEX idx_ci_research_panel_release_indicator ON public.ci_research_panel_rows USING btree (release_id, indicator_id)"
+      },
+      {
+        "name": "idx_ci_research_panel_release_year",
+        "table": "ci_research_panel_rows",
+        "definition": "CREATE INDEX idx_ci_research_panel_release_year ON public.ci_research_panel_rows USING btree (release_id, period_year)"
+      },
+      {
         "name": "ci_source_ingestions_pkey",
         "table": "ci_source_ingestions",
         "definition": "CREATE UNIQUE INDEX ci_source_ingestions_pkey ON public.ci_source_ingestions USING btree (id)"
@@ -6969,6 +7376,16 @@
         "definition": "CREATE OR REPLACE FUNCTION public.armor(bytea, text[], text[])\n RETURNS text\n LANGUAGE c\n IMMUTABLE PARALLEL SAFE STRICT\nAS '$libdir/pgcrypto', $function$pg_armor$function$\n"
       },
       {
+        "name": "ci_research_panel_release_immutable",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.ci_research_panel_release_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status = 'complete' THEN\n    RAISE EXCEPTION 'completed Civica Index research panel releases are immutable';\n  END IF;\n  RETURN COALESCE(NEW, OLD);\nEND;\n$function$\n"
+      },
+      {
+        "name": "ci_research_panel_rows_immutable",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.ci_research_panel_rows_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF EXISTS (\n    SELECT 1 FROM public.ci_research_panel_releases\n    WHERE id = COALESCE(OLD.release_id, NEW.release_id) AND status = 'complete'\n  ) THEN\n    RAISE EXCEPTION 'completed Civica Index research panel rows are immutable';\n  END IF;\n  RETURN COALESCE(NEW, OLD);\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_capture_research_evidence_history",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_research_evidence_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text;\n  evidence_actor text;\n  evidence_reason text;\nBEGIN\n  evidence_id := COALESCE(after_row->>'id', before_row->>'id', md5(before_row::text));\n  evidence_actor := COALESCE(\n    NULLIF(after_row->>'reviewer_id', ''),\n    NULLIF(after_row->>'actor_id', ''),\n    NULLIF(before_row->>'reviewer_id', ''),\n    current_user\n  );\n  evidence_reason := COALESCE(\n    NULLIF(after_row->>'status_reason', ''),\n    NULLIF(after_row->>'review_notes', ''),\n    NULLIF(after_row->>'disposition', ''),\n    NULLIF(after_row->>'classification_reason', ''),\n    NULLIF(before_row->>'status_reason', ''),\n    lower(TG_OP) || '_retained_by_dat_016'\n  );\n\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    evidence_reason, evidence_actor\n  );\n\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -7221,6 +7638,16 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON ci_ingestion_runs FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "ci_research_panel_release_immutable",
+        "table": "ci_research_panel_releases",
+        "definition": "CREATE TRIGGER ci_research_panel_release_immutable BEFORE DELETE OR UPDATE ON ci_research_panel_releases FOR EACH ROW EXECUTE FUNCTION ci_research_panel_release_immutable()"
+      },
+      {
+        "name": "ci_research_panel_rows_immutable",
+        "table": "ci_research_panel_rows",
+        "definition": "CREATE TRIGGER ci_research_panel_rows_immutable BEFORE INSERT OR DELETE OR UPDATE ON ci_research_panel_rows FOR EACH ROW EXECUTE FUNCTION ci_research_panel_rows_immutable()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "civica_conditions_scores",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON civica_conditions_scores FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -7430,6 +7857,16 @@
       {
         "kind": "r",
         "name": "ci_methodology_versions",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "ci_research_panel_releases",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "ci_research_panel_rows",
         "definition": null
       },
       {
@@ -7803,6 +8240,78 @@
         "type": "p",
         "table": "ci_methodology_versions",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ci_research_panel_release_counts",
+        "type": "c",
+        "table": "ci_research_panel_releases",
+        "definition": "CHECK (expected_rows = (observed_rows + missing_rows) AND expected_rows = (jurisdiction_count * indicator_count * (period_end - period_start + 1)))"
+      },
+      {
+        "name": "ci_research_panel_release_hashes",
+        "type": "c",
+        "table": "ci_research_panel_releases",
+        "definition": "CHECK (row_sha256 ~ '^[a-f0-9]{64}$'::text AND coverage_sha256 ~ '^[a-f0-9]{64}$'::text AND temporal_breaks_sha256 ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "ci_research_panel_release_period",
+        "type": "c",
+        "table": "ci_research_panel_releases",
+        "definition": "CHECK (period_start <= period_end)"
+      },
+      {
+        "name": "ci_research_panel_release_status",
+        "type": "c",
+        "table": "ci_research_panel_releases",
+        "definition": "CHECK (status = ANY (ARRAY['staging'::text, 'complete'::text]))"
+      },
+      {
+        "name": "ci_research_panel_releases_pkey",
+        "type": "p",
+        "table": "ci_research_panel_releases",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ci_research_panel_content_hash",
+        "type": "c",
+        "table": "ci_research_panel_rows",
+        "definition": "CHECK (content_hash ~ '^[a-f0-9]{64}$'::text AND artifact_hash ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "ci_research_panel_rows_jurisdiction_id_jurisdictions_id_fk",
+        "type": "f",
+        "table": "ci_research_panel_rows",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "ci_research_panel_rows_release_id_ci_research_panel_releases_id",
+        "type": "f",
+        "table": "ci_research_panel_rows",
+        "definition": "FOREIGN KEY (release_id) REFERENCES ci_research_panel_releases(id)"
+      },
+      {
+        "name": "ci_research_panel_rows_release_id_jurisdiction_id_indicator_id_",
+        "type": "p",
+        "table": "ci_research_panel_rows",
+        "definition": "PRIMARY KEY (release_id, jurisdiction_id, indicator_id, source_id, period_year)"
+      },
+      {
+        "name": "ci_research_panel_rows_source_id_sources_id_fk",
+        "type": "f",
+        "table": "ci_research_panel_rows",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "ci_research_panel_uncertainty_shape",
+        "type": "c",
+        "table": "ci_research_panel_rows",
+        "definition": "CHECK (uncertainty_lower IS NULL AND uncertainty_upper IS NULL OR uncertainty_lower IS NOT NULL AND uncertainty_upper IS NOT NULL AND uncertainty_lower <= uncertainty_upper)"
+      },
+      {
+        "name": "ci_research_panel_value_state",
+        "type": "c",
+        "table": "ci_research_panel_rows",
+        "definition": "CHECK (value_status = 'observed'::text AND value IS NOT NULL AND missing_reason IS NULL OR value_status = 'missing'::text AND value IS NULL AND missing_reason IS NOT NULL)"
       },
       {
         "name": "ci_source_ingestions_lineage_check",
