@@ -5,6 +5,7 @@ import type {
   ResolverOutput,
 } from "@/lib/factbook/reconcile/types";
 import { SOURCE_PRECEDENCE_VERSION } from "@/lib/factbook/reconcile/resolver";
+import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
 
 export const COUNTRY_RESEARCH_EXPORT_VERSION =
   "country-research-export/v1" as const;
@@ -90,6 +91,7 @@ export interface CountryExportFact {
 export interface CountryResearchExport {
   schemaVersion: typeof COUNTRY_RESEARCH_EXPORT_VERSION;
   generatedAt: string;
+  selection: AtlasSelectionMetadata;
   jurisdiction: CountryExportJurisdiction;
   facts: CountryExportFact[];
   withheld: {
@@ -165,6 +167,7 @@ const stableRows = (rows: FactRow[]) => [...rows].sort(
 
 export function buildCountryResearchExport(input: {
   generatedAt: string;
+  selection: AtlasSelectionMetadata;
   jurisdiction: CountryExportJurisdiction;
   resolutions: Record<string, ResolverOutput>;
   sources: Map<string, ExportSourceRecord>;
@@ -220,6 +223,7 @@ export function buildCountryResearchExport(input: {
   return {
     schemaVersion: COUNTRY_RESEARCH_EXPORT_VERSION,
     generatedAt: input.generatedAt,
+    selection: input.selection,
     jurisdiction: input.jurisdiction,
     facts,
     withheld: {
@@ -236,7 +240,7 @@ export function buildCountryResearchExport(input: {
 }
 
 export const COUNTRY_RESEARCH_EXPORT_CSV_COLUMNS = [
-  "schema_version", "generated_at", "rights_manifest", "rights_policy",
+  "schema_version", "generated_at", "selection_mode", "selection_as_of", "selection_vintage", "selection_cutoff_at", "selection_retrieved_through", "selection_methodology_versions_json", "rights_manifest", "rights_policy",
   "withheld_fact_keys_json", "withheld_observation_count", "withheld_reason",
   "jurisdiction_id", "jurisdiction_slug", "jurisdiction_name",
   "iso2", "iso3", "jurisdiction_status", "fact_key", "record_class", "row_id",
@@ -264,7 +268,9 @@ export function countryResearchExportCsv(document: CountryResearchExport): strin
     ];
     for (const row of observations) {
       rows.push([
-        document.schemaVersion, document.generatedAt, document.rights.manifest, document.rights.policy,
+        document.schemaVersion, document.generatedAt, document.selection.mode, document.selection.asOf,
+        document.selection.vintage ?? "", document.selection.cutoffAt ?? "", document.selection.retrievedThrough ?? "",
+        JSON.stringify(document.selection.methodologyVersions), document.rights.manifest, document.rights.policy,
         JSON.stringify(document.withheld.factKeys), String(document.withheld.observationCount), document.withheld.reason,
         document.jurisdiction.id, document.jurisdiction.slug,
         document.jurisdiction.name, document.jurisdiction.iso2 ?? "", document.jurisdiction.iso3 ?? "",

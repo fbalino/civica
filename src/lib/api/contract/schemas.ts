@@ -302,7 +302,12 @@ export const zFactbookReconciliationMeta = z
     reference: z.literal(
       "https://civicaatlas.org/country/methodology/reconciliation",
     ),
-    vintage: z.string(),
+    mode: z.enum(["live", "vintage"]),
+    asOf: z.string(),
+    vintage: z.string().nullable(),
+    cutoffAt: z.string().nullable(),
+    retrievedThrough: z.string().nullable(),
+    methodologyVersions: z.array(z.string()),
   })
   .strict();
 
@@ -342,6 +347,7 @@ export const zCountryListItem = z
 export const zCountriesListMeta = zPaginationMeta
   .extend({
     taxonomy: z.string(),
+    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()) }).strict(),
   })
   .extend(zDeprecationMeta.shape)
   .strict();
@@ -1049,6 +1055,7 @@ export const zCountryExportJson = z
   .object({
     schemaVersion: z.literal("country-research-export/v1"),
     generatedAt: z.string().datetime(),
+    selection: z.object({ mode: z.enum(["live", "vintage"]), asOf: z.string(), vintage: z.string().nullable(), cutoffAt: z.string().nullable(), retrievedThrough: z.string().nullable(), methodologyVersions: z.array(z.string()) }).strict(),
     jurisdiction: z.object({ id: z.string(), slug: z.string(), name: z.string(), iso2: z.string().nullable(), iso3: z.string().nullable(), status: z.string() }).strict(),
     facts: z.array(z.object({
       factKey: z.string(),

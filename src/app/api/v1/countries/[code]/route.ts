@@ -24,6 +24,7 @@ import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { shapeCountryDetail, shapeCountryDetailMeta } from "@/lib/api/contract/shapes";
 import type { zCountryDetail } from "@/lib/api/contract/schemas";
 import type { z } from "zod";
+import { getFrozenFactsForJurisdiction, metadataFromResolutions, parseAtlasReadSelection } from "@/lib/factbook/read-selection";
 
 type CountryDetailGovernment = z.infer<typeof zCountryDetail>["government"];
 type CountryDetailBody = CountryDetailGovernment[string][number];
@@ -66,6 +67,9 @@ export async function GET(
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
+    const parsedSelection = parseAtlasReadSelection(new URL(request.url).searchParams.get("as_of"));
+    if (!parsedSelection.selection) return withStructuralFamilyDeprecation(apiError(parsedSelection.error, 400));
+    const selection = parsedSelection.selection;
     const { code } = await params;
     const lookup = code.toLowerCase();
 
@@ -142,10 +146,14 @@ export async function GET(
 
     // Phase F.4 — resolver-direct fetch for every reconciled fact.
     // One batch query covers all 11 in-scope fact-keys.
-    const facts = await getCanonicalFactsForJurisdiction(
-      country.id,
-      Object.values(FACT_FIELDS)
-    );
+    const factKeys = Object.values(FACT_FIELDS);
+    const frozen = selection.mode === "vintage"
+      ? await getFrozenFactsForJurisdiction(country.id, factKeys, selection.asOf)
+      : null;
+    if (frozen && !frozen.exists) return withStructuralFamilyDeprecation(apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400));
+    const facts = frozen?.resolutions ?? await getCanonicalFactsForJurisdiction(country.id, factKeys);
+    const selectionMetadata = metadataFromResolutions(selection, facts, frozen ? { cutoffAt: frozen.cutoffAt, retrievedThrough: frozen.retrievedThrough, methodologyVersions: frozen.methodologyVersions } : undefined);
+    const liveFallback = selection.mode === "live";
 
     /**
      * For each flat field, prefer the resolver's canonical value
@@ -179,18 +187,18 @@ export async function GET(
     const govFormResolver = resolverValueFor("governmentFormDescription");
 
     const flatValues: Record<FlatFieldName, string | number | null> = {
-      capital: capitalResolver.text ?? country.capital,
+      capital: capitalResolver.text ?? (liveFallback ? country.capital : null),
       population:
         popResolver.numeric != null
           ? Math.round(popResolver.numeric)
-          : country.population,
-      gdpBillions: gdpResolver.numeric ?? country.gdpBillions,
+          : (liveFallback ? country.population : null),
+      gdpBillions: gdpResolver.numeric ?? (liveFallback ? country.gdpBillions : null),
       areaSqKm:
         areaResolver.numeric != null
           ? Math.round(areaResolver.numeric)
-          : country.areaSqKm,
-      languages: languagesResolver.text ?? country.languages,
-      currency: currencyResolver.text ?? country.currency,
+          : (liveFallback ? country.areaSqKm : null),
+      languages: languagesResolver.text ?? (liveFallback ? country.languages : null),
+      currency: currencyResolver.text ?? (liveFallback ? country.currency : null),
       worldBankRegion: wbRegionResolver.text,
       worldBankIncomeGroup: wbIncomeResolver.text,
       vdemRow: vdemRowResolver.text,
@@ -332,7 +340,7 @@ export async function GET(
         provenance,
         valueStatus,
       }),
-      meta: shapeCountryDetailMeta(),
+      meta: shapeCountryDetailMeta(selectionMetadata),
     }));
   } catch (e) {
     console.error("API /v1/countries/[code] error:", e);

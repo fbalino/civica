@@ -511,3 +511,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   and left the prior 1,142-row score hash unchanged with zero score mutations.
 - A real run atomically published 745 rows and source timestamps under one
   completed manifest/checksum. 644/644 tests and build pass. DAT-031 is next.
+
+## 2026-07-11 — DAT-031 explicit fact read selection completed
+
+- Country list, detail, and research export now require `as_of=live` or a full
+  immutable vintage label; missing, shorthand, and unsupported values fail.
+- Live metadata excludes frozen identity. Vintage values and peer filters read
+  only snapshot rows with no current cache fallback; metadata is row-derived.
+- A live post-cut differential, 647/647 tests, claims/docs, API contracts, and
+  the production build pass. DAT-032 is next.

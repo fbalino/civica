@@ -44,6 +44,7 @@ import {
 } from "@/lib/api/deprecation";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
+import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries
@@ -73,6 +74,7 @@ export function shapeCountriesListMeta(input: {
   offset: number;
   hasMore: boolean;
   taxonomy: string;
+  selection: AtlasSelectionMetadata;
 }): z.infer<typeof zCountriesListMeta> {
   return zCountriesListMeta.parse({
     ...input,
@@ -90,9 +92,14 @@ export function shapeCountryDetail(
   return zCountryDetail.parse(input);
 }
 
-export function shapeCountryDetailMeta(): z.infer<typeof zCountryDetailMeta> {
+export function shapeCountryDetailMeta(selection: AtlasSelectionMetadata): z.infer<typeof zCountryDetailMeta> {
   return zCountryDetailMeta.parse({
-    reconciliation: FACTBOOK_RECONCILIATION_META,
+    reconciliation: {
+      status: FACTBOOK_RECONCILIATION_META.status,
+      version: FACTBOOK_RECONCILIATION_META.version,
+      reference: FACTBOOK_RECONCILIATION_META.reference,
+      ...selection,
+    },
     methodology: CI_METHODOLOGY_META,
     ...STRUCTURAL_FAMILY_DEPRECATION_META,
   });

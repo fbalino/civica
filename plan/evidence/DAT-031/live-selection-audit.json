@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "fact-read-selection-audit/v1",
+  "task": "DAT-031",
+  "auditedAt": "2026-07-11",
+  "surfaces": ["country-list", "country-detail", "country-research-export-json-csv"],
+  "http": { "missingSelection": 400, "live": 200, "frozen": 200, "unsupportedCompleteLabel": 400 },
+  "frozenVintage": { "label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1", "rows": 17506, "distinctCutoffs": 1, "cutoffAt": "2026-05-05T19:54:22.775Z", "retrievedThrough": "2026-05-05T18:58:11.407Z", "methodologyVersions": ["v0.2-beta"] },
+  "postCutIsolation": { "jurisdiction": "albania", "factKey": "inflation_rate", "liveNumeric": 2.1461854, "frozenNumeric": 2.2158737 },
+  "invariants": { "liveVintageIsNull": true, "liveCutoffIsNull": true, "frozenReadsSnapshotOnly": true, "frozenMissingFactsRemainNull": true, "metadataDerivedFromSelectedRows": true },
+  "testsPassed": 647,
+  "buildPassed": true
+}

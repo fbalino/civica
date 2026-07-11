@@ -110,6 +110,12 @@ export const API_ROUTES: RouteContract[] = [
       "Paginated list of sovereign states with basic metadata. Filter by continent or by a typed peer lens: region, income, V-Dem regime, CGV regime, or monarchy status.",
     params: [
       {
+        name: "as_of",
+        in: "query",
+        type: "string",
+        description: 'Required: "live" or a complete immutable Civica Atlas vintage label.',
+      },
+      {
         name: "continent",
         in: "query",
         type: "string",
@@ -145,7 +151,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [400, 429, 500],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countries",
   },
@@ -166,11 +172,17 @@ export const API_ROUTES: RouteContract[] = [
         description:
           'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states").',
       },
+      {
+        name: "as_of",
+        in: "query",
+        type: "string",
+        description: 'Required: "live" or a complete immutable Civica Atlas vintage label.',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [400, 404, 429, 500],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countryDetail",
   },
@@ -574,6 +586,12 @@ export const API_ROUTES: RouteContract[] = [
         in: "query",
         type: "string",
         description: '"json" (default) or "csv".',
+      },
+      {
+        name: "as_of",
+        in: "query",
+        type: "string",
+        description: 'Required: "live" or a complete immutable Civica Atlas vintage label.',
       },
     ],
     cors: false,

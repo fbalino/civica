@@ -837,3 +837,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   the completed run manifest. Failed children leave visible scores untouched.
 - Dry runs create neither run rows nor freshness changes. Durable record:
   APR-D063 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Country fact reads require an explicit temporal selection
+
+- Country list, detail, and research export callers choose `as_of=live` or one
+  complete, existing immutable vintage label; shorthand and absence fail.
+- Live rows can use live cache fallback but never carry a vintage/cutoff.
+  Frozen reads use only snapshot rows and leave absent facts null.
+- Response metadata is derived from the chosen rows. Durable record: APR-D064
+  in `plan/DECISIONS.md`.

@@ -30,6 +30,7 @@ import {
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeCountryListItem, shapeCountriesListMeta } from "@/lib/api/contract/shapes";
+import { getFrozenDisplayFactsForJurisdictions, getImmutableVintageMetadata, immutableVintageExists, metadataFromResolutions, parseAtlasReadSelection, type AtlasReadSelection } from "@/lib/factbook/read-selection";
 
 /**
  * Resolver-canonical display facts the list serves. Mirrors the
@@ -59,19 +60,39 @@ interface ListDisplayRow {
  */
 async function resolveListDisplayFacts(
   rows: ListDisplayRow[],
-): Promise<Map<string, {
+  selection: AtlasReadSelection,
+): Promise<{ values: Map<string, {
   capital: string | null;
   population: number | null;
   gdpBillions: number | null;
   areaSqKm: number | null;
-}>> {
+}>; metadata: ReturnType<typeof metadataFromResolutions> }> {
   const out = new Map<string, {
     capital: string | null;
     population: number | null;
     gdpBillions: number | null;
     areaSqKm: number | null;
   }>();
-  if (rows.length === 0) return out;
+  if (rows.length === 0) return { values: out, metadata: metadataFromResolutions(selection, {}) };
+
+  if (selection.mode === "vintage") {
+    const [facts, frozenMetadata] = await Promise.all([
+      getFrozenDisplayFactsForJurisdictions(rows.map((row) => row.id), Object.values(LIST_FACT_FIELDS), selection.asOf),
+      getImmutableVintageMetadata(selection.asOf),
+    ]);
+    for (const row of rows) {
+      const f = facts.get(row.id);
+      const pop = f?.get(LIST_FACT_FIELDS.population)?.numeric ?? null;
+      const area = f?.get(LIST_FACT_FIELDS.areaSqKm)?.numeric ?? null;
+      out.set(row.id, {
+        capital: f?.get(LIST_FACT_FIELDS.capital)?.text ?? null,
+        population: pop == null ? null : Math.round(pop),
+        gdpBillions: f?.get(LIST_FACT_FIELDS.gdpBillions)?.numeric ?? null,
+        areaSqKm: area == null ? null : Math.round(area),
+      });
+    }
+    return { values: out, metadata: metadataFromResolutions(selection, {}, frozenMetadata) };
+  }
 
   let facts: Awaited<ReturnType<typeof getCanonicalFactsForJurisdictions>> = {};
   try {
@@ -99,7 +120,8 @@ async function resolveListDisplayFacts(
       areaSqKm: areaNum != null ? Math.round(areaNum) : row.areaSqKm,
     });
   }
-  return out;
+  const flatResolutions = Object.fromEntries(Object.entries(facts).flatMap(([jurisdictionId, byFact]) => Object.entries(byFact).map(([factKey, resolution]) => [`${jurisdictionId}:${factKey}`, resolution])));
+  return { values: out, metadata: metadataFromResolutions(selection, flatResolutions) };
 }
 
 type ExtendedTaxonomy =
@@ -120,6 +142,7 @@ const PEER_LENS_FACT_KEY: Partial<Record<ExtendedTaxonomy, string>> = {
 function buildPeerLensCondition(
   taxonomy: ExtendedTaxonomy,
   value: string,
+  selection: AtlasReadSelection,
 ) {
   if (taxonomy === "cgv") {
     return sql`EXISTS (
@@ -130,6 +153,13 @@ function buildPeerLensCondition(
   }
   const factKey = PEER_LENS_FACT_KEY[taxonomy];
   if (!factKey) return null;
+  if (selection.mode === "vintage") return sql`EXISTS (
+    SELECT 1 FROM country_fact_vintages v
+    WHERE v.jurisdiction_id = ${jurisdictions.id}
+      AND v.fact_key = ${factKey}
+      AND v.vintage_label = ${selection.asOf}
+      AND v.value_text = ${value}
+  )`;
   return sql`EXISTS (
     SELECT 1 FROM country_facts cf
     WHERE cf.jurisdiction_id = ${jurisdictions.id}
@@ -145,6 +175,10 @@ export async function GET(request: Request) {
 
   try {
     const url = new URL(request.url);
+    const parsedSelection = parseAtlasReadSelection(url.searchParams.get("as_of"));
+    if (!parsedSelection.selection) return withStructuralFamilyDeprecation(apiError(parsedSelection.error, 400));
+    const selection = parsedSelection.selection;
+    if (selection.mode === "vintage" && !(await immutableVintageExists(selection.asOf))) return withStructuralFamilyDeprecation(apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400));
     const continent = url.searchParams.get("continent");
     const governmentType = url.searchParams.get("government_type");
     const taxonomyParam = url.searchParams.get("taxonomy");
@@ -195,7 +229,7 @@ export async function GET(request: Request) {
         taxonomy === "cgv" ||
         taxonomy === "monarchy");
     if (isPeerLensFilter && governmentType) {
-      const cond = buildPeerLensCondition(taxonomy, governmentType);
+      const cond = buildPeerLensCondition(taxonomy, governmentType, selection);
       if (cond) conditions.push(cond);
     }
 
@@ -245,7 +279,8 @@ export async function GET(request: Request) {
         });
 
       const paged = filtered.slice(offset, offset + limit);
-      const displayFacts = await resolveListDisplayFacts(paged);
+      const display = await resolveListDisplayFacts(paged, selection);
+      const displayFacts = display.values;
       const pagedResolved = paged.map(({ id, ...country }) => {
         const d = displayFacts.get(id);
         return shapeCountryListItem({
@@ -265,6 +300,7 @@ export async function GET(request: Request) {
             offset,
             hasMore: offset + limit < filtered.length,
             taxonomy,
+            selection: display.metadata,
           }),
         }),
       );
@@ -298,7 +334,8 @@ export async function GET(request: Request) {
         .where(where),
     ]);
     const classificationMap = await buildGovernmentClassificationMap(countries);
-    const displayFacts = await resolveListDisplayFacts(countries);
+    const display = await resolveListDisplayFacts(countries, selection);
+    const displayFacts = display.values;
 
     const total = countResult[0]?.count ?? 0;
 
@@ -323,6 +360,7 @@ export async function GET(request: Request) {
           offset,
           hasMore: offset + limit < total,
           taxonomy,
+          selection: display.metadata,
         }),
       }),
     );
