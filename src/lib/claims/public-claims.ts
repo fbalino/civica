@@ -183,7 +183,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.3-beta",
+    methodologyVersion: "pulse-v2.4-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
@@ -210,6 +210,27 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/api/v1/pulse/cluster-coverage/route.ts",
       fragment: "PUBLIC_CLAIM: pulse.cluster-coverage-release",
+    },
+  },
+  {
+    id: "pulse.source-coverage-runtime",
+    surface: "pulse",
+    routeOrArtifact: "/api/v1/pulse/source-coverage",
+    exactClaim:
+      "Live Pulse source coverage reports operating, degraded, and inactive connector states from retained retrieval telemetry, evidence scope, and rights without claiming retrieval validation.",
+    tier: "derived-descriptive-metric",
+    evidenceSources: [
+      "src/lib/pulse/v2/source-coverage.ts",
+      "src/lib/pulse/v2/source-coverage.test.ts",
+      "scripts/validate-pulse-source-coverage.ts",
+      "content/methodology-pulse.md",
+    ],
+    implementationOwner: "Pulse event-ledger research lane",
+    methodologyVersion: "pulse-source-coverage/v1",
+    gate: "G3",
+    source: {
+      path: "src/app/api/v1/pulse/source-coverage/route.ts",
+      fragment: "PUBLIC_CLAIM: pulse.source-coverage-runtime",
     },
   },
   {
@@ -638,7 +659,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-pulse-runtime-method.ts",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.3-beta",
+    methodologyVersion: "pulse-v2.4-beta",
     gate: "G3",
     source: {
       // CLM-012: api-docs/page.tsx renders this route's description from
@@ -731,7 +752,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.3-beta",
+    methodologyVersion: "pulse-v2.4-beta",
     gate: "G3",
     source: {
       path: "README.template.md",
@@ -816,7 +837,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.3-beta",
+    methodologyVersion: "pulse-v2.4-beta",
     gate: "G3",
     source: {
       path: "CITATION.cff",
@@ -913,7 +934,7 @@ export const PUBLIC_CLAIMS = [
       "src/lib/pulse/v2/runtime-contract.ts",
     ],
     implementationOwner: "SEO and Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.3-beta",
+    methodologyVersion: "pulse-v2.4-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/methodology/pulse/page.tsx",

@@ -59,21 +59,17 @@ Changing the unit, admission boundary, source classes, scope, success gates, or 
 
 A governance monitor built on general news alone hits the **media-asymmetry problem**: closed regimes produce few detectable stories because journalists are restricted, while free-press democracies produce many. Naive aggregation would end up rewarding censorship. To counter this, the Pulse is designed to stack **specialist structured feeds as the primary signal**, with general news as corroboration rather than the driver.
 
-### Designed specialist connectors
+### Operating feeds
 
-- **CIVICUS Monitor** — civic-space alerts: restrictions on assembly, expression, association.
-- **Human Rights Watch & Amnesty International** — human-rights violations, mass detentions, crackdowns.
-- **ACLED** — structured records of conflict, protest, and political violence.
-- **RSF** — Reporters Without Borders press-freedom alerts: journalist arrests, media shutdowns.
-- **IPU Parline** — legislative actions, constitutional events, cabinet changes.
-- **V-Dem early warning** — democratic-backsliding signals.
+These records are generated from the latest retained connector telemetry and the raw-evidence ledger at {{ctx.sourceCoverageGeneratedAt}}. A feed appears here only when its latest observed retrieval succeeded, retained evidence exists, and its source-input and rights contracts are registered. “Present in the orchestrator” does not qualify.
 
-### Designed news connectors
+{{ctx.operatingSourceCoverageRecords}}
 
-- **GDELT** — global structured event records drawn from news.
-- **Reuters and AP wire** — major international wire reporting.
+**Degraded feeds.** {{ctx.degradedFeedsProse}}
 
-**Current production coverage (runtime snapshot {{ctx.observedThrough}}).** The only feeds with observed Pulse staging rows are {{ctx.activeFeedsProse}}. ACLED is access-gated; RSF and Reuters/AP lack configured production feeds; the IPU connector is sparse and has produced no observed Pulse staging rows in the snapshot; the V-Dem connector is a placeholder. “Present in the orchestrator” does not mean “active.”
+**Inactive connectors.** {{ctx.inactiveFeedsProse}}
+
+The machine-readable [source-coverage endpoint](/api/v1/pulse/source-coverage) publishes every operating, degraded, and inactive state, successful and failed observed runs, latest yield, retained-row time, observed language and jurisdiction scope, rights posture, and known blind spots. These are operational observations, not a retrieval-recall validation result.
 
 The active basket is dominated by GDELT, and a single-evidence event can currently affect an experimental delta at reduced heuristic weight. The current method collapses likely copies and reports sharing one publisher or declared origin before it counts evidence groups, but it does not impose a two-group publication minimum. Readers should not interpret “corroboration weight” as proof that an event was independently corroborated.
 
@@ -83,7 +79,7 @@ An event seen only in news, without specialist corroboration, is scored at reduc
 
 The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score stage first recomputes heuristic corroboration weights and then writes dimensional deltas. These are separate cron jobs without a durable parent run ledger, so a schedule is not proof that every stage completed in sequence. Per-country panels expose the latest stored delta-computation time when available. The [Pulse changelog](/civica-index/pulse-changelog) shows the most recent event date in its current result set, not the last successful pipeline-run time.
 
-1. **Ingest.** Pull the trailing window of records from every active feed and write them to a staging table.
+1. **Ingest.** Attempt every scheduled connector, retain per-connector success/failure and yield telemetry, and write returned records to the staging table. The source-coverage contract decides which feeds are operating after the run.
 2. **Cluster.** Normalize each report under `{{ctx.clusterIdentityVersion}}`, embed it with `{{ctx.clusterEmbeddingModel}}`, and compare it with other candidates inside a ±{{ctx.clusterWindowHours}}-hour window. The ingest-time country guess is diagnostic and does not partition the candidates. A pair must meet the semantic cosine threshold of {{ctx.clusterSemanticThreshold}} or the canonical-token Jaccard threshold of {{ctx.clusterLexicalThreshold}}, with a shared event-identity anchor guarding against generic same-day matches. When the embedding runtime is unavailable, production uses the canonical-token path alone. That fallback has not been shown to perform equivalently.
 3. **Classify.** The configured cross-vendor voters — {{ctx.classifyVotersProse}} — assign a taxonomy category and severity. A strict majority wins; a category deadlock or no quorum goes to review. Different vendors diversify error sources but do not make their errors statistically independent.
 4. **Verify and attribute.** {{ctx.verifierProse}} makes a separate adversarial call against the majority verdict. The same model also participates as one voter, so this is a separate call rather than an independent model family. Subject-country attribution is another pass, currently {{ctx.subjectAttributorProse}}, run after classification; if it fails, the ingest-time attribution remains. That attribution verdict is not yet persisted as a separately versioned audit row.

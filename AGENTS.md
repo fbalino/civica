@@ -1,11 +1,13 @@
 # Civica — Agent Instructions
 
 ## Project Overview
+
 Civica Atlas is a provenance-first comparative reference to how every country is governed. Country profiles, institutional data, constitutions, elections, source trails, reconciliation, exports, and citation are the primary product. The Civica Index and Civica Pulse are secondary research experiments and must remain visibly beta until the master plan's validation and external-review gates are satisfied.
 
 Domain: `civicaatlas.org`.
 
 ## Design system is non-negotiable
+
 - Read [DESIGN.md](DESIGN.md) before any UI work.
 - **OWNER MANDATE (2026-07-05, after repeated drift): EVERYTHING follows the
   design system — never hard-code values, EVER.** When the system genuinely
@@ -24,12 +26,14 @@ Domain: `civicaatlas.org`.
 - The `/design-system` page is the only source of canonical visuals. If your page does not look like a piece of `/design-system`, it is wrong.
 
 ## North stars
+
 - **Design system is canonical.** Before creating any new page or component, consult [`/design-system`](https://www.civicaatlas.org/design-system). Any styling that drifts from those tokens is a bug.
 - **The atlas is the primary product.** Country profiles, institutional evidence, source provenance, reconciliation, exports, and citation lead. Index and Pulse remain secondary research experiments until they earn stronger standing through the active master plan.
 - **Provenance is load-bearing.** Every data point traces to a source row with a license and `last_sync_at`. Sync scripts MUST stamp `sources.last_sync_at = NOW()` on success.
 - **Academic legitimacy matters.** The Bjornskov-Rode / CGV regime taxonomy and BR/CGV attribution is already integrated — keep it prominent.
 
 ## Active plan
+
 The active source of execution truth is `plan/MASTER-CHECKLIST.md`, governed by
 `plan/00-mission-and-operating-rules.md`; the plain-language owner view is
 `plan/MASTER-PLAN-OVERVIEW.md`. The 2026-06-30 feature roadmap and other dated
@@ -37,6 +41,7 @@ plans are historical inputs: preserve them, but do not execute an unchecked item
 unless it has been imported into the master checklist with a stable task ID.
 
 ## Tech Stack
+
 - **Next.js 16.2** (App Router, Turbopack, React 19.2)
 - **Neon** (serverless Postgres via `@neondatabase/serverless`)
 - **Drizzle ORM** (type-safe, schema in `src/lib/db/schema.ts`)
@@ -45,15 +50,20 @@ unless it has been imported into the master checklist with a stable task ID.
 - **Anthropic SDK 0.90** — Claude powers `/api/chat`, Pulse verification/subject attribution, and selected review tools
 
 <!-- BEGIN:nextjs-agent-rules -->
+
 ## Next.js 16 Rules
+
 This version has breaking changes. Read `node_modules/next/dist/docs/` before writing code.
+
 - `params` and `searchParams` MUST be awaited (async)
 - `middleware.ts` is deprecated — use `proxy.ts`
 - Turbopack is default — config goes at top level of nextConfig
 - When cacheComponents is enabled, use `use cache` directive instead of `export const dynamic`
+
 <!-- END:nextjs-agent-rules -->
 
 ## Database
+
 - Schema: `src/lib/db/schema.ts` — **56 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
@@ -68,6 +78,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - `src/lib/data/value-state.ts` owns the closed data-availability contract. Country facts, indicator history, and country metrics store `value_status` plus `value_status_reason`; observed/disputed rows carry values and every absence state carries no value plus a reason. Run `npm run validate:data-value-states` after DB/API/UI/export changes and `npm run validate:data-value-states:live` after applying its migration.
 
 ## Design System (authoritative)
+
 **See `https://www.civicaatlas.org/design-system` for the live reference.** Code lives in `src/app/globals.css`, `src/app/atlas.css`, and `src/app/design-system/page.tsx`.
 
 - **Typography**: Source Serif 4 (serif, display + country cards) via `--font-heading`, Inter (sans — body/interface/labels/eyebrows/numeric) via `--font-body`. **Monospace (`--font-code`) is reserved for literal code/API snippets only** — never for labels, IDs, meta rows, eyebrows, tabs, or readable facts. (The legacy `--font-mono` token is repointed to Inter so stragglers can't render monospace.) Small-caps labels = Inter + uppercase + letter-spacing; aligned numeric columns = Inter + `font-variant-numeric: tabular-nums`. Do NOT substitute Fraunces, IBM Plex, or other fonts.
@@ -84,14 +95,16 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - **SourceDot**: every data point carries a provenance dot (green=live, amber=frozen). Use `src/components/SourceDot.tsx` — do not hand-roll.
 
 ## Data Sources
+
 All sources tracked in `sources` table. Every fact ideally has statement-level provenance.
+
 - CIA Factbook (frozen Jan 2026, public domain)
 - Wikidata (CC0, primary identity spine)
 - IPU Parline (CC-BY-NC-SA-4.0, non-commercial only)
 - Constitute Project (non-commercial only)
 - Bjornskov-Rode / CGV regime taxonomy (QoG Standard Jan 2026) — underpins government classification
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
-- Pulse production-active feeds are the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json`; connector presence alone does not make a feed active
+- Pulse operating/degraded/inactive feed states come from `/api/v1/pulse/source-coverage`; the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json` are historical evidence coverage, not an operating verdict
 
 ## Source-input manifests
 
@@ -150,9 +163,11 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   credential-free and must remain part of the production build.
 
 ## Core environment variables
+
 The complete, authoritative contract (every var, required/optional, and why) is
 `.env.example` — read it rather than trusting a partial list here. Headline
 variables:
+
 - `DATABASE_URL` — Neon Postgres connection (required)
 - `ANTHROPIC_API_KEY_CHAT` — required for `/api/chat`
 - `DEEPSEEK_API_KEY`, `GLM_API_KEY`, `ANTHROPIC_API_KEY_PULSE_CLASSIFIER` — default Pulse voters, verification, and subject attribution
@@ -161,7 +176,9 @@ variables:
 - `CONGRESS_API_KEY` — optional, legacy US-legislative sync
 
 ## Scripts
+
 Canonical npm scripts (in `package.json`):
+
 - `npm run seed:sources` — seed the sources table
 - `npm run seed:factbook` — import CIA World Factbook (clones repo, imports 250+ countries)
 - `npm run sync:wikidata` — sync heads of state/government from Wikidata SPARQL
@@ -180,11 +197,13 @@ Canonical npm scripts (in `package.json`):
 - `CIVICA_ALLOW_DB_PUSH=local-only npm run db:push:local` — disposable non-production databases only
 
 ## Civica Index pipeline (manual today; cron target in the plan)
+
 1. `tsx scripts/ingest-ci-all.ts` — runs the four current Beta dimensions: V-Dem primary democratic quality, the disclosed WGI Voice & Accountability coverage fallback, WGI Rule of Law, Freedom House, and Transparency CPI. HDI/GPI are Conditions inputs, not Index dimensions.
 2. `tsx scripts/calculate-ci-composite.ts` — computes composite scores and ranks
 3. For Pulse v2: `npm run pulse:v2:ingest` → `npm run pulse:v2:cluster` → `npm run pulse:v2:classify` → `npm run pulse:v2:score` (the score step corroborates first, then writes experimental per-dimension deltas)
 
 ## Reader-page prose lives in `content/*.md`, not TSX
+
 Seven `content/*.md` files are now the rendered prose source of truth for their paired pages (`/about`, `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse`, `/civica-index/methodology/pca-appendix`). The TSX shells wrap the markdown via `<MarkdownContent>` from `src/components/content/`. Edit prose in the markdown file, NOT the TSX. The TSX shell only owns layout, rich components (weights bar, neutral score-position example, version strip, source-card grids, eigenvalue chart), DB-driven blocks (revision history, source list), CiteAccordion invocations, and footer nav.
 
 - **Any methodology number cited in `content/*.md` is a `{{state.*}}` or `{{stats.*}}` interpolation, not a hardcode.** Drift between the rendered page and the live DB is caught by `npm run validate:content-templates`. New hardcoded numbers in markdown are a bug.
@@ -195,10 +214,13 @@ Seven `content/*.md` files are now the rendered prose source of truth for their 
 - **Mutable public counts are registered claims.** A current coverage/count claim in public prose or UI must resolve from runtime state with a nonnumeric soft fallback, or be visibly tied to a dated frozen release. Register it in `PUBLIC_NUMERIC_CLAIMS` (`src/lib/claims/public-numeric-claims.ts`) and run `npm run validate:numeric-claims`; do not restore convenient literals such as `195 countries` or `250+ countries`.
 
 ## Footer invariants
+
 These links MUST survive any header/footer refactor:
+
 - Blog · API Docs · Design System · **Status Page** (https://statuspage.incident.io/civica-atlas) · Licensing · Contact · GitHub
 
 ## Committing
+
 - Civica currently tolerates a pre-existing repo-wide lint failure unrelated to normal work (old React effect/hook warnings). Do not fix unrelated lint just to make a commit green; focus on what you touched.
 - Do NOT ship `npm run sync:*` changes that drop `last_sync_at` updates. If you add a new sync script, stamp the source.
 - `sources.last_sync_at` must be stamped ONLY via `markSourcesSynced()` from `src/lib/db/source-freshness.ts` — the single sanctioned path. It stamps exclusively when a run actually wrote rows (`!dryRun && rowsWritten > 0`), so a failed or empty sync never fakes freshness. Never write `last_sync_at` directly (no inline `.set({ lastSyncAt })`, `onConflictDoUpdate` set blocks, or raw `SET last_sync_at` UPDATEs). Enforced by `npm run validate:sync-freshness`.

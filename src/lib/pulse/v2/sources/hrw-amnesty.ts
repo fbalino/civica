@@ -30,18 +30,9 @@ export interface HrwAmnestyFetchResult {
 async function fetchOne(
   url: string,
   sourceId: string,
-  map: JurisdictionMap
+  map: JurisdictionMap,
 ): Promise<{ rows: RawEventInput[]; unmatched: number; fetched: number }> {
-  let items;
-  try {
-    items = await fetchRss(url);
-  } catch (err) {
-    console.warn(
-      `[${sourceId}] feed fetch failed (${url}); returning 0 rows. ` +
-        `Error: ${(err as Error).message}`
-    );
-    return { rows: [], unmatched: 0, fetched: 0 };
-  }
+  const items = await fetchRss(url);
 
   const rows: RawEventInput[] = [];
   let unmatched = 0;
@@ -70,8 +61,26 @@ async function fetchOne(
   return { rows, unmatched, fetched: items.length };
 }
 
+export async function fetchHrw(map: JurisdictionMap) {
+  const result = await fetchOne(HRW_URL, "hrw", map);
+  return {
+    rows: result.rows,
+    unmatchedCountry: result.unmatched,
+    fetched: result.fetched,
+  };
+}
+
+export async function fetchAmnesty(map: JurisdictionMap) {
+  const result = await fetchOne(AMNESTY_URL, "amnesty", map);
+  return {
+    rows: result.rows,
+    unmatchedCountry: result.unmatched,
+    fetched: result.fetched,
+  };
+}
+
 export async function fetchHrwAmnesty(
-  map: JurisdictionMap
+  map: JurisdictionMap,
 ): Promise<HrwAmnestyFetchResult> {
   // Fan out both separately identified feeds in parallel.
   const [hrw, amnesty] = await Promise.all([

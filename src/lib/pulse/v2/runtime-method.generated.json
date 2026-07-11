@@ -61,7 +61,7 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "2e9b328a834553d4180ef36d2d358789f5e100aeb19539fb40c2e2b9921ebaed",
+  "contractHash": "67ad630593b33223910fe2fb5fd23049ca759106f2f53a0eb72b79ded538a1fe",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "sourceIndependence": {
@@ -108,19 +108,12 @@
     "unknownLanguage": "und"
   },
   "feeds": {
-    "activeDefinition": "A production-active feed is a source ID observed in raw_events by the stated evidence cut. A connector, configured source, or sync in another Civica pipeline does not qualify by itself.",
-    "activeProduction": {
-      "observedThrough": "2026-07-11",
-      "sourceIds": [
-        "amnesty",
-        "civicus_monitor",
-        "gdelt",
-        "hrw"
-      ]
-    },
     "connectors": [
       {
         "activation": "Requires licensed academic API access and a registered account email.",
+        "blindSpots": [
+          "Not operating; no Pulse retrieval coverage is available."
+        ],
         "connectorId": "acled",
         "defaultEnabled": false,
         "feedId": "acled",
@@ -133,7 +126,10 @@
       },
       {
         "activation": "Default Amnesty International RSS feed.",
-        "connectorId": "hrw_amnesty",
+        "blindSpots": [
+          "RSS selection and publisher cadence do not provide a complete Amnesty corpus."
+        ],
+        "connectorId": "amnesty",
         "defaultEnabled": true,
         "feedId": "amnesty",
         "observedInProduction": true,
@@ -145,6 +141,9 @@
       },
       {
         "activation": "No working default feed; requires an explicitly configured feed URL.",
+        "blindSpots": [
+          "Not operating; no AP Pulse retrieval coverage is available."
+        ],
         "connectorId": "reuters_ap",
         "defaultEnabled": false,
         "feedId": "ap",
@@ -157,6 +156,9 @@
       },
       {
         "activation": "Default CIVICUS Monitor RSS feed.",
+        "blindSpots": [
+          "RSS selection and publisher geography do not provide a country-complete sampling frame."
+        ],
         "connectorId": "civicus",
         "defaultEnabled": true,
         "feedId": "civicus",
@@ -169,6 +171,9 @@
       },
       {
         "activation": "Default GDELT document API query with best-effort article enrichment.",
+        "blindSpots": [
+          "Query terms, GDELT indexing, publisher access, paywalls, language, and enrichment failures constrain recall."
+        ],
         "connectorId": "gdelt",
         "defaultEnabled": true,
         "feedId": "gdelt",
@@ -181,7 +186,10 @@
       },
       {
         "activation": "Default Human Rights Watch RSS feed.",
-        "connectorId": "hrw_amnesty",
+        "blindSpots": [
+          "RSS selection and publisher cadence do not provide a complete Human Rights Watch corpus."
+        ],
+        "connectorId": "hrw",
         "defaultEnabled": true,
         "feedId": "hrw",
         "observedInProduction": true,
@@ -193,6 +201,9 @@
       },
       {
         "activation": "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
+        "blindSpots": [
+          "Not operating as a daily parliamentary-actions feed."
+        ],
         "connectorId": "ipu",
         "defaultEnabled": true,
         "feedId": "ipu",
@@ -205,6 +216,9 @@
       },
       {
         "activation": "No working default feed; requires an explicitly configured feed URL.",
+        "blindSpots": [
+          "Not operating; no Reuters Pulse retrieval coverage is available."
+        ],
         "connectorId": "reuters_ap",
         "defaultEnabled": false,
         "feedId": "reuters",
@@ -217,6 +231,9 @@
       },
       {
         "activation": "No public feed is configured; requires an approved ingestion surface.",
+        "blindSpots": [
+          "Not operating; no RSF Pulse retrieval coverage is available."
+        ],
         "connectorId": "rsf",
         "defaultEnabled": false,
         "feedId": "rsf",
@@ -229,6 +246,9 @@
       },
       {
         "activation": "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
+        "blindSpots": [
+          "Placeholder only; it supplies no event retrieval coverage."
+        ],
         "connectorId": "vdem_pulse",
         "defaultEnabled": true,
         "feedId": "vdem",
@@ -237,7 +257,17 @@
         "sourceIds": [],
         "status": "placeholder"
       }
-    ]
+    ],
+    "observedEvidence": {
+      "observedThrough": "2026-07-11",
+      "sourceIds": [
+        "amnesty",
+        "civicus_monitor",
+        "gdelt",
+        "hrw"
+      ]
+    },
+    "observedEvidenceDefinition": "This is the source-ID set retained in raw_events by the stated evidence cut, not a current operating-feed verdict. The live source-coverage contract decides operating, degraded, and inactive states from retrieval telemetry, evidence, and rights."
   },
   "ledgerHistory": {
     "comparisonWarning": "API version-set metadata marks legacy or mixed results as not comparable as one method series.",
@@ -427,7 +457,7 @@
       }
     }
   },
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -440,5 +470,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.3-beta"
+  "version": "pulse-v2.4-beta"
 }

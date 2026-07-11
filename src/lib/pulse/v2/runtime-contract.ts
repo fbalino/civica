@@ -51,8 +51,8 @@ import {
   SOURCE_INDEPENDENCE_MIN_RECALL,
 } from "./source-independence";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.2.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.3-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.3.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.4-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -79,6 +79,7 @@ export interface PulseConnectorFact {
   defaultEnabled: boolean;
   observedInProduction: boolean;
   activation: string;
+  blindSpots: readonly string[];
 }
 
 export interface PulseCadenceFact {
@@ -191,8 +192,8 @@ export interface PulseRuntimeMethodContract {
     };
   };
   feeds: {
-    activeDefinition: string;
-    activeProduction: {
+    observedEvidenceDefinition: string;
+    observedEvidence: {
       observedThrough: string;
       sourceIds: string[];
     };
@@ -205,6 +206,7 @@ export interface PulseRuntimeMethodContract {
       defaultEnabled: boolean;
       observedInProduction: boolean;
       activation: string;
+      blindSpots: string[];
     }>;
   };
   cadence: {
@@ -369,10 +371,11 @@ export function buildPulseRuntimeMethod(
     .map((connector) => ({
       ...connector,
       sourceIds: uniqueSorted(connector.sourceIds),
+      blindSpots: [...connector.blindSpots],
     }))
     .sort((a, b) => a.feedId.localeCompare(b.feedId));
 
-  const activeProductionSourceIds = uniqueSorted(
+  const observedEvidenceSourceIds = uniqueSorted(
     connectors
       .filter((connector) => connector.observedInProduction)
       .flatMap((connector) => connector.sourceIds),
@@ -477,11 +480,11 @@ export function buildPulseRuntimeMethod(
       },
     },
     feeds: {
-      activeDefinition:
-        "A production-active feed is a source ID observed in raw_events by the stated evidence cut. A connector, configured source, or sync in another Civica pipeline does not qualify by itself.",
-      activeProduction: {
+      observedEvidenceDefinition:
+        "This is the source-ID set retained in raw_events by the stated evidence cut, not a current operating-feed verdict. The live source-coverage contract decides operating, degraded, and inactive states from retrieval telemetry, evidence, and rights.",
+      observedEvidence: {
         observedThrough: facts.activeFeedsObservedThrough,
-        sourceIds: activeProductionSourceIds,
+        sourceIds: observedEvidenceSourceIds,
       },
       connectors,
     },
@@ -648,16 +651,20 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: false,
       activation:
         "Requires licensed academic API access and a registered account email.",
+      blindSpots: ["Not operating; no Pulse retrieval coverage is available."],
     },
     {
       feedId: "amnesty",
-      connectorId: "hrw_amnesty",
+      connectorId: "amnesty",
       sourceIds: ["amnesty"],
       role: "specialist",
       status: "active_observed",
       defaultEnabled: true,
       observedInProduction: true,
       activation: "Default Amnesty International RSS feed.",
+      blindSpots: [
+        "RSS selection and publisher cadence do not provide a complete Amnesty corpus.",
+      ],
     },
     {
       feedId: "ap",
@@ -669,6 +676,9 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: false,
       activation:
         "No working default feed; requires an explicitly configured feed URL.",
+      blindSpots: [
+        "Not operating; no AP Pulse retrieval coverage is available.",
+      ],
     },
     {
       feedId: "civicus",
@@ -679,6 +689,9 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       defaultEnabled: true,
       observedInProduction: true,
       activation: "Default CIVICUS Monitor RSS feed.",
+      blindSpots: [
+        "RSS selection and publisher geography do not provide a country-complete sampling frame.",
+      ],
     },
     {
       feedId: "gdelt",
@@ -690,16 +703,22 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: true,
       activation:
         "Default GDELT document API query with best-effort article enrichment.",
+      blindSpots: [
+        "Query terms, GDELT indexing, publisher access, paywalls, language, and enrichment failures constrain recall.",
+      ],
     },
     {
       feedId: "hrw",
-      connectorId: "hrw_amnesty",
+      connectorId: "hrw",
       sourceIds: ["hrw"],
       role: "specialist",
       status: "active_observed",
       defaultEnabled: true,
       observedInProduction: true,
       activation: "Default Human Rights Watch RSS feed.",
+      blindSpots: [
+        "RSS selection and publisher cadence do not provide a complete Human Rights Watch corpus.",
+      ],
     },
     {
       feedId: "ipu",
@@ -711,6 +730,7 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: false,
       activation:
         "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
+      blindSpots: ["Not operating as a daily parliamentary-actions feed."],
     },
     {
       feedId: "reuters",
@@ -722,6 +742,9 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: false,
       activation:
         "No working default feed; requires an explicitly configured feed URL.",
+      blindSpots: [
+        "Not operating; no Reuters Pulse retrieval coverage is available.",
+      ],
     },
     {
       feedId: "rsf",
@@ -733,6 +756,9 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: false,
       activation:
         "No public feed is configured; requires an approved ingestion surface.",
+      blindSpots: [
+        "Not operating; no RSF Pulse retrieval coverage is available.",
+      ],
     },
     {
       feedId: "vdem",
@@ -744,6 +770,9 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       observedInProduction: false,
       activation:
         "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
+      blindSpots: [
+        "Placeholder only; it supplies no event retrieval coverage.",
+      ],
     },
   ],
   cadence: [

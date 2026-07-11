@@ -10,7 +10,7 @@
  *   - reject credential-like fields or values
  *
  * Optional live mode (`--live`) additionally compares the source IDs present
- * in Neon `raw_events` with the contract's production-active feed set. No
+ * in Neon `raw_events` with the contract's observed-evidence source set. No
  * connection string, credential, event text, count, or URL is printed.
  */
 
@@ -75,7 +75,9 @@ function parseArgs(argv: readonly string[]): { live: boolean } {
   }
   const unknown = args.filter((arg) => arg !== "--live");
   if (unknown.length > 0) {
-    throw new Error(`Unknown argument${unknown.length > 1 ? "s" : ""}: ${unknown.join(", ")}`);
+    throw new Error(
+      `Unknown argument${unknown.length > 1 ? "s" : ""}: ${unknown.join(", ")}`,
+    );
   }
   return { live: args.includes("--live") };
 }
@@ -125,7 +127,9 @@ function validateNoSecrets(
     for (const [key, child] of Object.entries(value)) {
       check(
         state,
-        !/(?:api[_-]?key|secret|password|access[_-]?token|credential)$/i.test(key),
+        !/(?:api[_-]?key|secret|password|access[_-]?token|credential)$/i.test(
+          key,
+        ),
         `${location}.${key} looks like a credential-bearing field`,
       );
       validateNoSecrets(state, child, `${location}.${key}`);
@@ -289,13 +293,11 @@ function validateClassifierAndReview(
   const publicationGate = relative("src/lib/pulse/v2/publication-gate.ts");
   const subject = relative("src/lib/pulse/v2/country-attribution.ts");
   const schema = relative("src/lib/db/schema.ts");
-  const reviewRoute = relative(
-    "src/app/api/admin/pulse-review/[id]/route.ts",
-  );
+  const reviewRoute = relative("src/app/api/admin/pulse-review/[id]/route.ts");
 
   for (const [fragment, message] of [
     [
-      'HUMAN_REVIEW_TIERS.has(consensus.severityTier)',
+      "HUMAN_REVIEW_TIERS.has(consensus.severityTier)",
       "Ensemble review must retain the absolute severity-tier gate",
     ],
     [
@@ -339,8 +341,7 @@ function validateClassifierAndReview(
     classify.includes("normalizeInvalidConsensusForReview(consensus)") &&
       publicationGate.includes('category: "none"') &&
       snapshot.publicationPolicy.reviewGates
-        .invalidConsensusCategoryPersistence ===
-        "normalize_to_none_unresolved",
+        .invalidConsensusCategoryPersistence === "normalize_to_none_unresolved",
     "Invalid consensus categories must persist as unresolved rather than leak through a fallback dimension",
   );
   check(
@@ -366,7 +367,7 @@ function validateClassifierAndReview(
   check(
     state,
     subject.includes("export function parseSubjectVerdict") &&
-      subject.includes('/^[A-Z]{3}$/') &&
+      subject.includes("/^[A-Z]{3}$/") &&
       snapshot.providers.subject.responseValidation ===
         "strict_scope_confidence_and_iso3_shape",
     "Subject attribution must validate the declared scope, confidence, and ISO3 wire contract",
@@ -399,8 +400,9 @@ function validateClassifierAndReview(
   );
   check(
     state,
-    schema.includes('humanReviewed: boolean("human_reviewed").notNull().default(false)') &&
-      !/humanReviewed\s*:\s*true/.test(classify),
+    schema.includes(
+      'humanReviewed: boolean("human_reviewed").notNull().default(false)',
+    ) && !/humanReviewed\s*:\s*true/.test(classify),
     "Auto-published classifier rows must not be represented as human-reviewed",
   );
   check(
@@ -419,8 +421,7 @@ function validateClassifierAndReview(
   check(
     state,
     snapshot.publicationPolicy.reviewGates.verifierObjectionWithWeakConsensus
-      .selfConfidenceAggregation ===
-      "maximum_among_winning_category_voters",
+      .selfConfidenceAggregation === "maximum_among_winning_category_voters",
     "Contract must name the actual winning-voter confidence aggregation",
   );
   check(
@@ -452,12 +453,12 @@ function validateProviderRoles(
 
   check(
     state,
-    (subject.includes(
+    subject.includes(
       `export const SUBJECT_ATTRIBUTION_MODEL = "${snapshot.providers.subject.engine.model}"`,
     ) ||
       subject.includes(
         `const MODEL = "${snapshot.providers.subject.engine.model}"`,
-      )),
+      ),
     "Subject-attribution model must match the runtime contract",
   );
   check(
@@ -487,7 +488,8 @@ function validateProviderRoles(
     state,
     snapshot.providers.backtest.matchesCurrentProduction === false &&
       snapshot.evaluation.backtestMatchesCurrentProduction === false &&
-      snapshot.evaluation.currentProductionValidatedByExistingBacktest === false,
+      snapshot.evaluation.currentProductionValidatedByExistingBacktest ===
+        false,
     "The snapshot must not misrepresent the old single-engine backtest as current-production validation",
   );
 }
@@ -497,9 +499,11 @@ function validateConnectors(
   snapshot: PulseRuntimeMethodSnapshot,
 ): void {
   const ingest = relative("src/lib/pulse/v2/ingest.ts");
-  const scheduledConnectorIds = sorted([
-    ...ingest.matchAll(/\{\s*source:\s*"([a-z_]+)",\s*fetcher:/g),
-  ].map((match) => match[1]));
+  const scheduledConnectorIds = sorted(
+    [...ingest.matchAll(/\{\s*source:\s*"([a-z_]+)",\s*fetcher:/g)].map(
+      (match) => match[1],
+    ),
+  );
   const contractConnectorIds = sorted(
     snapshot.feeds.connectors.map((connector) => connector.connectorId),
   );
@@ -537,7 +541,7 @@ function validateConnectors(
 
   checkEqual(
     state,
-    snapshot.feeds.activeProduction.sourceIds,
+    snapshot.feeds.observedEvidence.sourceIds,
     ["amnesty", "civicus_monitor", "gdelt", "hrw"],
     "Only production-observed raw-event feeds may be listed as active",
   );
@@ -590,7 +594,9 @@ function validateClusteringAndScoring(
     cluster.includes("? (opts.embeddingResult ?? null)") &&
       cluster.includes(": await tryEmbedBatch(texts)") &&
       cluster.includes("const useEmbeddings = embeddings !== null") &&
-      cluster.includes("compareEventIdentities(identities[ia], identities[ib])") &&
+      cluster.includes(
+        "compareEventIdentities(identities[ia], identities[ib])",
+      ) &&
       cluster.includes("semanticSimilarity >= CLUSTER_SIM_THRESHOLD") &&
       cluster.includes("identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD") &&
       snapshot.clustering.countryPartitioned === false,
@@ -677,8 +683,10 @@ function validatePublicSurfaces(
   const methodContent = relative("content/methodology-pulse.md");
   for (const marker of [
     "{{ctx.methodologyVersion}}",
-    "{{ctx.observedThrough}}",
-    "{{ctx.activeFeedsProse}}",
+    "{{ctx.sourceCoverageGeneratedAt}}",
+    "{{ctx.operatingSourceCoverageRecords}}",
+    "{{ctx.degradedFeedsProse}}",
+    "{{ctx.inactiveFeedsProse}}",
     "{{ctx.classifyVotersProse}}",
     "{{ctx.verifierProse}}",
     "{{ctx.subjectAttributorProse}}",
@@ -697,9 +705,10 @@ function validatePublicSurfaces(
   check(
     state,
     methodPage.includes("CURRENT_PULSE_RUNTIME_METHOD") &&
-      methodPage.includes("activeFeedsProse") &&
+      methodPage.includes("loadPulseSourceCoverageReport") &&
+      methodPage.includes("operatingSourceCoverageRecords") &&
       methodPage.includes("scheduleProse"),
-    "The Pulse methodology page must materialize generated runtime-contract values",
+    "The Pulse methodology page must materialize runtime-contract and live source-coverage values",
   );
 
   // CLM-012: api-docs/page.tsx no longer hand-imports
@@ -714,7 +723,7 @@ function validatePublicSurfaces(
   const contractRegistry = relative("src/lib/api/contract/registry.ts");
   check(
     state,
-    contractRegistry.includes('/api/v1/pulse/methodology') &&
+    contractRegistry.includes("/api/v1/pulse/methodology") &&
       contractExamples.includes("createPulseRuntimeMethodSnapshot") &&
       apiDocs.includes('"pulseMethodology"') &&
       !apiDocs.includes("sort=cp") &&
@@ -738,7 +747,9 @@ function validatePublicSurfaces(
   const changelogPage = relative(
     "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
   );
-  const normalizedChangelogPage = changelogPage.toLowerCase().replace(/\s+/g, " ");
+  const normalizedChangelogPage = changelogPage
+    .toLowerCase()
+    .replace(/\s+/g, " ");
   check(
     state,
     changelogPage.includes("high-positive") &&
@@ -753,9 +764,7 @@ function validatePublicSurfaces(
     "The changelog must state every review gate and distinguish auto, queued, and rejected outcomes",
   );
 
-  const changelogApi = relative(
-    "src/app/api/v1/pulse/changelog/v2/route.ts",
-  );
+  const changelogApi = relative("src/app/api/v1/pulse/changelog/v2/route.ts");
   const pulseQueries = relative("src/lib/db/queries-pulse-v2.ts");
   check(
     state,
@@ -765,7 +774,9 @@ function validatePublicSurfaces(
       changelogApi.includes("severityValue: null") &&
       pulseQueries.includes('e.category === "none" ? null : e.dimension') &&
       pulseQueries.includes('e.category === "none" ? null : e.severityTier') &&
-      pulseQueries.includes('category === "none" ? null : String(r.severity_tier)') &&
+      pulseQueries.includes(
+        'category === "none" ? null : String(r.severity_tier)',
+      ) &&
       pulseQueries.includes("publicationOriginFor") &&
       pulseQueries.includes("p.category <> 'none'") &&
       pulseQueries.includes("p.event_date <= CURRENT_DATE") &&
@@ -805,7 +816,9 @@ function validatePublicSurfaces(
   check(
     state,
     readmeTemplate.includes("named per-dimension deltas") &&
-      readmeTemplate.includes("does not publish a merged Pulse score or Pulse ranking") &&
+      readmeTemplate.includes(
+        "does not publish a merged Pulse score or Pulse ranking",
+      ) &&
       readmeTemplate.includes("DeepSeek, GLM, and Anthropic voters"),
     "README template must match the public experimental dimensional contract and provider roles",
   );
@@ -828,10 +841,10 @@ function validatePublicSurfaces(
   const agentDocs = relative("AGENTS.md");
   check(
     state,
-    indexMethod.includes("source basket is generated from observed staging rows") &&
-      agentDocs.includes("runtime-method.generated.json") &&
-      agentDocs.includes("connector presence alone does not make a feed active"),
-    "Secondary docs must defer dynamic active-feed truth to the generated contract",
+    indexMethod.includes("/api/v1/pulse/source-coverage") &&
+      agentDocs.includes("/api/v1/pulse/source-coverage") &&
+      agentDocs.includes("not an operating verdict"),
+    "Secondary docs must defer operating-feed truth to the live source-coverage contract",
   );
 
   check(
@@ -852,10 +865,16 @@ async function validateLiveFeeds(
   state: ValidationState,
   snapshot: PulseRuntimeMethodSnapshot,
 ): Promise<"checked" | "skipped"> {
-  dotenvConfig({ path: path.join(ROOT, ".env.local"), override: true, quiet: true });
+  dotenvConfig({
+    path: path.join(ROOT, ".env.local"),
+    override: true,
+    quiet: true,
+  });
   const databaseUrl = process.env.DATABASE_URL?.trim();
   if (!databaseUrl) {
-    console.warn("Live Pulse feed check skipped: DATABASE_URL is not configured.");
+    console.warn(
+      "Live Pulse feed check skipped: DATABASE_URL is not configured.",
+    );
     return "skipped";
   }
 
@@ -871,23 +890,21 @@ async function validateLiveFeeds(
   checkEqual(
     state,
     actual,
-    snapshot.feeds.activeProduction.sourceIds,
-    "Live raw_events source IDs must match the production-active feed set",
+    snapshot.feeds.observedEvidence.sourceIds,
+    "Live raw_events source IDs must match the observed-evidence source set",
   );
   const latestRows = await sql`
     SELECT MAX(created_at)::date::text AS observed_through
     FROM raw_events
   `;
   const observedThrough = latestRows[0]
-    ? String(
-        (latestRows[0] as Record<string, unknown>).observed_through ?? "",
-      )
+    ? String((latestRows[0] as Record<string, unknown>).observed_through ?? "")
     : "";
   checkEqual(
     state,
     observedThrough,
-    snapshot.feeds.activeProduction.observedThrough,
-    "Live raw_events evidence cut must match activeProduction.observedThrough",
+    snapshot.feeds.observedEvidence.observedThrough,
+    "Live raw_events evidence cut must match observedEvidence.observedThrough",
   );
   return "checked";
 }

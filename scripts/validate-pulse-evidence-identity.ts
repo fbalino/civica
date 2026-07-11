@@ -64,7 +64,7 @@ for (const [path, fragments] of Object.entries(requiredFragments)) {
   }
 }
 
-for (const sourceId of CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction
+for (const sourceId of CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence
   .sourceIds) {
   if (!SOURCE_INPUT_SPECS.some((source) => source.sourceId === sourceId)) {
     fail(`active source ${sourceId} lacks a source-input contract`);

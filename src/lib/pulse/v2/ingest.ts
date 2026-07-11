@@ -17,7 +17,7 @@ import { buildJurisdictionMap } from "./country-resolver";
 import { upsertRawEvents, type UpsertResult } from "./upsert";
 import { fetchCivicus } from "./sources/civicus";
 import { fetchRsf } from "./sources/rsf";
-import { fetchHrwAmnesty } from "./sources/hrw-amnesty";
+import { fetchAmnesty, fetchHrw } from "./sources/hrw-amnesty";
 import { fetchIpuActions } from "./sources/ipu-actions";
 import { fetchAcled } from "./sources/acled";
 import { fetchVdemPulse } from "./sources/vdem-pulse";
@@ -93,11 +93,56 @@ export interface PulseIngestOptions {
   requireNonEmpty?: boolean;
 }
 
+export const PULSE_CONNECTOR_METRICS = [
+  "fetched",
+  "wouldWrite",
+  "inserted",
+  "skippedDuplicate",
+  "unmatchedCountry",
+  "failed",
+] as const;
+
+export type PulseConnectorMetric = (typeof PULSE_CONNECTOR_METRICS)[number];
+
+export function pulseConnectorMetricKey(
+  connectorId: string,
+  metric: PulseConnectorMetric,
+): string {
+  if (!/^[a-z0-9_-]+$/.test(connectorId)) {
+    throw new Error(
+      `Invalid Pulse connector id for run metrics: ${connectorId}`,
+    );
+  }
+  return `connector.${connectorId}.${metric}`;
+}
+
+export function connectorReportsToRunCounts(
+  reports: readonly ConnectorReport[],
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const report of reports) {
+    counts[pulseConnectorMetricKey(report.source, "fetched")] = report.fetched;
+    counts[pulseConnectorMetricKey(report.source, "wouldWrite")] =
+      report.wouldWrite;
+    counts[pulseConnectorMetricKey(report.source, "inserted")] =
+      report.inserted;
+    counts[pulseConnectorMetricKey(report.source, "skippedDuplicate")] =
+      report.skippedDuplicate;
+    counts[pulseConnectorMetricKey(report.source, "unmatchedCountry")] =
+      report.unmatchedCountry;
+    counts[pulseConnectorMetricKey(report.source, "failed")] = report.error
+      ? 1
+      : 0;
+  }
+  return counts;
+}
+
 function liveConnectorJobs(map: JurisdictionMap): PulseConnectorJob[] {
   return [
     { source: "civicus", fetcher: () => fetchCivicus(map) },
     { source: "rsf", fetcher: () => fetchRsf(map) },
-    { source: "hrw_amnesty", fetcher: () => fetchHrwAmnesty(map) },
+    { source: "amnesty", fetcher: () => fetchAmnesty(map) },
+    { source: "hrw", fetcher: () => fetchHrw(map) },
     { source: "ipu", fetcher: () => fetchIpuActions(map) },
     {
       source: "acled",
@@ -132,7 +177,7 @@ export async function ingestPulseV2(
   const run =
     options.runRef ??
     createPulsePipelineRunRef("ingest", {
-      sourceIds: CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.sourceIds,
+      sourceIds: CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.sourceIds,
     });
   const persistRun = !options.dryRun && !options.jobs && !options.runRef;
   if (persistRun) await startPulsePipelineRun(db, run);
@@ -182,13 +227,24 @@ export async function ingestPulseV2(
   const totalInserted = reports.reduce((a, r) => a + r.inserted, 0);
   const totalSkipped = reports.reduce((a, r) => a + r.skippedDuplicate, 0);
   const totalUnmatched = reports.reduce((a, r) => a + r.unmatchedCountry, 0);
-  const totalWouldWrite = reports.reduce((a, report) => a + report.wouldWrite, 0);
+  const totalWouldWrite = reports.reduce(
+    (a, report) => a + report.wouldWrite,
+    0,
+  );
+  const runCounts = {
+    fetched: totalFetched,
+    inserted: totalInserted,
+    skipped: totalSkipped,
+    unmatched: totalUnmatched,
+    wouldWrite: totalWouldWrite,
+    ...connectorReportsToRunCounts(reports),
+  };
 
   if ((options.requireNonEmpty ?? true) && totalFetched === 0) {
     if (persistRun) {
       await finishPulsePipelineRun(db, run.id, {
         status: "failed",
-        counts: { fetched: 0, inserted: 0 },
+        counts: runCounts,
         failures: reports
           .filter(({ error }) => error)
           .map(({ source, error }) => ({ component: source, message: error! })),
@@ -203,12 +259,7 @@ export async function ingestPulseV2(
       .map(({ source, error }) => ({ component: source, message: error! }));
     await finishPulsePipelineRun(db, run.id, {
       status: failures.length ? "partial" : "completed",
-      counts: {
-        fetched: totalFetched,
-        inserted: totalInserted,
-        skipped: totalSkipped,
-        unmatched: totalUnmatched,
-      },
+      counts: runCounts,
       failures,
     });
   }

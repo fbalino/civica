@@ -95,11 +95,11 @@ Human development, security, and economic stability are **not part of the Civica
 
 Civica publishes these as the **Civica Conditions** companion layer at [/civica-conditions](/civica-conditions). Each Conditions dimension is shown separately on country pages — never merged into a single number, and never combined with the CI.
 
-| Conditions dimension | Source |
-|---|---|
-| Human Development | UNDP Human Development Index |
-| Peace & Security | Institute for Economics and Peace, Global Peace Index |
-| Economic Stability | World Bank composite (inflation, unemployment, GDP growth) |
+| Conditions dimension | Source                                                     |
+| -------------------- | ---------------------------------------------------------- |
+| Human Development    | UNDP Human Development Index                               |
+| Peace & Security     | Institute for Economics and Peace, Global Peace Index      |
+| Economic Stability   | World Bank composite (inflation, unemployment, GDP growth) |
 
 The contrast between CI and Conditions is itself informative. A country can have a higher numeric governance estimate alongside lower material-condition estimates, or the inverse. Reading the source dimensions together tells a fuller story than any single composite can.
 
@@ -113,9 +113,9 @@ How Civica chooses peer sets for ranking comparisons — different lenses for ma
 
 ## Section 10 · Civica Pulse (Beta) {#pulse}
 
-The Civica Pulse is a separate experimental event ledger. It publishes **public experimental dimensional deltas** — never a merged Pulse score or ranking. The current production source basket is generated from observed staging rows and enumerated on the [Pulse methodology page](/civica-index/methodology/pulse#sources); a connector's presence in the code does not make it active. A single-source event can currently affect a delta at reduced heuristic weight, so “corroboration” must not be read as proof of independent confirmation.
+The Civica Pulse is a separate experimental event ledger. It publishes **public experimental dimensional deltas** — never a merged Pulse score or ranking. The live [source-coverage contract](/api/v1/pulse/source-coverage) decides whether a connector is operating, degraded, or inactive from retained retrieval telemetry, evidence, jurisdiction scope, and rights; a connector's presence in code does not make it active. A one-group event can currently affect a delta at reduced heuristic weight, so “corroboration” must not be read as proof of independent confirmation.
 
-The Pulse is currently a clearly labelled *Beta* experiment. Its classifications and numeric effects have not completed representative validation or independent review. Its methodology is documented in detail at [/civica-index/methodology/pulse](/civica-index/methodology/pulse), and the event ledger is at [/civica-index/pulse-changelog](/civica-index/pulse-changelog).
+The Pulse is currently a clearly labelled _Beta_ experiment. Its classifications and numeric effects have not completed representative validation or independent review. Its methodology is documented in detail at [/civica-index/methodology/pulse](/civica-index/methodology/pulse), and the event ledger is at [/civica-index/pulse-changelog](/civica-index/pulse-changelog).
 
 ## Section 11 · Update frequency & vintages {#vintages}
 

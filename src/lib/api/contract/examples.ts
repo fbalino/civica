@@ -34,6 +34,7 @@ import {
   zPeerGroupingsResponse,
   zPulseMethodologyResponse,
   zPulseClusterCoverageResponse,
+  zPulseSourceCoverageResponse,
   zPulseDimensionsResponse,
   zPulseEventsResponse,
   zPulseChangelogResponse,
@@ -804,6 +805,66 @@ const pulseClusterCoverageExampleResponse = zPulseClusterCoverageResponse
   .strict()
   .parse({ data: pulseClusterCoverage });
 
+const pulseSourceCoverageExampleResponse = zPulseSourceCoverageResponse
+  .strict()
+  .parse({
+    data: {
+      schemaVersion: "pulse-source-coverage/v1",
+      generatedAt: "2026-07-11T16:45:00.000Z",
+      standing: "operational_observability_not_retrieval_validation",
+      feeds: [
+        {
+          feedId: "gdelt",
+          connectorId: "gdelt",
+          sourceIds: ["gdelt"],
+          role: "news",
+          state: "operating",
+          stateReason:
+            "The latest connector attempt succeeded and retained evidence exists.",
+          retrieval: {
+            observedRuns: 1,
+            successfulRuns: 1,
+            failedRuns: 0,
+            latestAttemptAt: "2026-07-11T16:42:00.000Z",
+            latestOutcome: "successful",
+            latestFetched: 250,
+            latestYield: 250,
+            latestInserted: 128,
+            latestSkippedDuplicate: 122,
+            latestUnmatchedCountry: 1,
+          },
+          evidence: {
+            retainedRows: 1306,
+            lastDataAt: "2026-07-11T16:45:00.000Z",
+            languages: ["en", "es", "und"],
+            observedJurisdictions: 90,
+            jurisdictionIso3s: ["BRA", "JPN", "URY"],
+            unresolvedJurisdictionRows: 24,
+          },
+          rights: [
+            {
+              sourceId: "gdelt",
+              licenseId: "pending-review",
+              termsUrl: "https://www.gdeltproject.org/about.html",
+              reviewStatus: "pending",
+              publicExport: "pending-review",
+              redistributionPosture: "open-with-attribution",
+              restrictions: [
+                "Public payload redistribution remains blocked pending review.",
+              ],
+            },
+          ],
+          activation:
+            "Default GDELT document API query with best-effort article enrichment.",
+          blindSpots: [
+            "Query design, indexing, publisher access, language, and enrichment constrain recall.",
+          ],
+        },
+      ],
+      summary: { operating: 1, degraded: 0, inactive: 0 },
+    },
+  });
+
 /** Every other Pulse endpoint's `meta.methodology` block, shared once
  *  here instead of copy-pasted per example. */
 function pulseMethodologyMetaExample() {
@@ -1326,6 +1387,7 @@ export const EXAMPLES = {
   peerGroupings: peerGroupingsExampleResponse,
   pulseMethodology: pulseMethodologyExampleResponse,
   pulseClusterCoverage: pulseClusterCoverageExampleResponse,
+  pulseSourceCoverage: pulseSourceCoverageExampleResponse,
   pulseDimensions: pulseDimensionsExampleResponse,
   pulseEvents: pulseEventsExampleResponse,
   pulseChangelog: pulseChangelogExampleResponse,

@@ -29,10 +29,7 @@ import {
   extractSourceName,
 } from "../../gdelt";
 import { extractArticleText } from "../article-extract";
-import {
-  resolveCountry,
-  type JurisdictionMap,
-} from "../country-resolver";
+import { resolveCountry, type JurisdictionMap } from "../country-resolver";
 import type { RawEventInput } from "../types";
 
 const SOURCE_ID = "gdelt";
@@ -42,13 +39,17 @@ const DEFAULT_CONCURRENCY = 5;
 /** PULSE_ARTICLE_FETCH — "off" disables body enrichment (headline-only,
  *  the pre-enrichment behaviour). Anything else (incl. unset) = on. */
 function articleFetchEnabled(): boolean {
-  return (process.env.PULSE_ARTICLE_FETCH ?? "on").trim().toLowerCase() !== "off";
+  return (
+    (process.env.PULSE_ARTICLE_FETCH ?? "on").trim().toLowerCase() !== "off"
+  );
 }
 
 /** PULSE_ARTICLE_FETCH_CONCURRENCY — parallel article fetches (default 5). */
 function articleFetchConcurrency(): number {
   const raw = Number(process.env.PULSE_ARTICLE_FETCH_CONCURRENCY);
-  return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : DEFAULT_CONCURRENCY;
+  return Number.isFinite(raw) && raw >= 1
+    ? Math.floor(raw)
+    : DEFAULT_CONCURRENCY;
 }
 
 /** Tiny bounded-concurrency worker pool — runs `fn` over `items`, at most
@@ -56,7 +57,7 @@ function articleFetchConcurrency(): number {
 async function pool<T, R>(
   items: T[],
   n: number,
-  fn: (item: T, index: number) => Promise<R>
+  fn: (item: T, index: number) => Promise<R>,
 ): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let cursor = 0;
@@ -66,9 +67,7 @@ async function pool<T, R>(
       out[i] = await fn(items[i], i);
     }
   }
-  await Promise.all(
-    Array.from({ length: Math.min(n, items.length) }, worker)
-  );
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, worker));
   return out;
 }
 
@@ -107,7 +106,7 @@ async function enrichBodies(rows: RawEventInput[]): Promise<void> {
   });
 
   console.log(
-    `[gdelt] article enrichment: ${enriched} enriched / ${fellBack} fell back to domain name (of ${rows.length}) @ concurrency ${concurrency}`
+    `[gdelt] article enrichment: ${enriched} enriched / ${fellBack} fell back to domain name (of ${rows.length}) @ concurrency ${concurrency}`,
   );
 }
 
@@ -119,7 +118,7 @@ export interface GdeltFetchResult {
 
 export async function fetchGdelt(
   map: JurisdictionMap,
-  opts: { hoursBack?: number } = {}
+  opts: { hoursBack?: number } = {},
 ): Promise<GdeltFetchResult> {
   const hoursBack = opts.hoursBack ?? 24;
 
@@ -138,8 +137,7 @@ export async function fetchGdelt(
         : e.cause
           ? String(e.cause)
           : "(no cause)";
-    console.warn(`[gdelt] fetch failed: ${e.message} | cause: ${cause}`);
-    return { rows: [], unmatchedCountry: 0, fetched: 0 };
+    throw new Error(`GDELT retrieval failed: ${e.message}; cause: ${cause}`);
   }
 
   const rows: RawEventInput[] = [];
@@ -178,7 +176,7 @@ export async function fetchGdelt(
       await enrichBodies(rows);
     } catch (err) {
       console.warn(
-        `[gdelt] article enrichment errored (kept domain fallbacks): ${(err as Error).message}`
+        `[gdelt] article enrichment errored (kept domain fallbacks): ${(err as Error).message}`,
       );
     }
   }

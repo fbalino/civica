@@ -11,6 +11,11 @@ import { pulse, disputeSla } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
 import { PULSE_EVENT_ONTOLOGY } from "@/lib/pulse/v2/event-ontology";
+import {
+  loadPulseSourceCoverageReport,
+  type PulseFeedCoverage,
+  type PulseSourceCoverageReport,
+} from "@/lib/pulse/v2/source-coverage";
 
 export const revalidate = 3600;
 
@@ -62,6 +67,56 @@ const SOURCE_LABELS: Record<string, string> = {
   hrw: "Human Rights Watch",
 };
 
+function utcMinute(value: string | null): string {
+  if (!value) return "not observed";
+  return value.replace("T", " ").replace(/:\d\d\.\d\d\dZ$/, " UTC");
+}
+
+function feedLabel(feed: PulseFeedCoverage): string {
+  return SOURCE_LABELS[feed.sourceIds[0]] ?? feed.feedId;
+}
+
+function rightsProse(feed: PulseFeedCoverage): string {
+  if (feed.rights.length === 0) return "no source contract";
+  return feed.rights
+    .map((right) => {
+      const license = right.licenseId.startsWith("PUBLISHER-TERMS-PENDING")
+        ? "publisher terms review pending"
+        : right.licenseId;
+      const label = `${license}; export ${right.publicExport}`;
+      return right.termsUrl ? `[${label}](${right.termsUrl})` : label;
+    })
+    .join("; ");
+}
+
+function coverageRecords(feeds: PulseFeedCoverage[]): string {
+  if (feeds.length === 0) {
+    return "_No feed currently satisfies the operating-feed contract._";
+  }
+  return feeds
+    .map((feed) => {
+      const retrieval = `${feed.retrieval.successfulRuns} successful / ${feed.retrieval.failedRuns} failed retained runs; latest ${utcMinute(feed.retrieval.latestAttemptAt)}; fetched ${feed.retrieval.latestFetched ?? "unknown"}, yielded ${feed.retrieval.latestYield ?? "unknown"}, inserted ${feed.retrieval.latestInserted ?? "unknown"}`;
+      const evidence = `${feed.evidence.retainedRows} rows; latest ${utcMinute(feed.evidence.lastDataAt)}`;
+      const languages = feed.evidence.languages.length
+        ? feed.evidence.languages
+            .map((language) =>
+              language === "und" ? "und (not declared)" : language,
+            )
+            .join(", ")
+        : "none observed";
+      const scope = `${languages}; ${feed.evidence.observedJurisdictions} resolved jurisdictions; ${feed.evidence.unresolvedJurisdictionRows} unresolved rows`;
+      return `#### ${feedLabel(feed)}\n\n- **Role:** ${feed.role}\n- **Retrieval and yield:** ${retrieval}\n- **Retained evidence:** ${evidence}\n- **Observed scope:** ${scope}\n- **Rights:** ${rightsProse(feed)}\n- **Known blind spot:** ${feed.blindSpots.join("; ")}`;
+    })
+    .join("\n\n");
+}
+
+function stateList(feeds: PulseFeedCoverage[], unavailable: string): string {
+  if (feeds.length === 0) return unavailable;
+  return feeds
+    .map((feed) => `**${feedLabel(feed)}** — ${feed.stateReason}`)
+    .join("; ");
+}
+
 const PROVIDER_LABELS: Record<string, string> = {
   anthropic: "Anthropic",
   deepseek: "DeepSeek",
@@ -90,8 +145,20 @@ function cronTime(cron: string): string {
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
-export default function PulseMethodologyPage() {
+export default async function PulseMethodologyPage() {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
+  let sourceCoverage: PulseSourceCoverageReport | null = null;
+  try {
+    sourceCoverage = await loadPulseSourceCoverageReport();
+  } catch (error) {
+    console.error("Pulse methodology source coverage unavailable", error);
+  }
+  const operatingFeeds =
+    sourceCoverage?.feeds.filter(({ state }) => state === "operating") ?? [];
+  const degradedFeeds =
+    sourceCoverage?.feeds.filter(({ state }) => state === "degraded") ?? [];
+  const inactiveFeeds =
+    sourceCoverage?.feeds.filter(({ state }) => state === "inactive") ?? [];
   // Pre-computed helpers materialised at the call site (Phase 5
   // §3.2). Keys must match the validator's per-file allowlist in
   // scripts/validate-content-templates.ts.
@@ -99,12 +166,16 @@ export default function PulseMethodologyPage() {
     methodologyVersion: method.version,
     ontologyVersion: PULSE_EVENT_ONTOLOGY.id,
     ontologyCategoryCount: PULSE_EVENT_ONTOLOGY.categories.length,
-    observedThrough: method.feeds.activeProduction.observedThrough,
-    activeFeedsProse: proseList(
-      method.feeds.activeProduction.sourceIds.map(
-        (id) => SOURCE_LABELS[id] ?? id,
-      ),
-    ),
+    sourceCoverageGeneratedAt: sourceCoverage
+      ? utcMinute(sourceCoverage.generatedAt)
+      : "an unavailable runtime check",
+    operatingSourceCoverageRecords: coverageRecords(operatingFeeds),
+    degradedFeedsProse: sourceCoverage
+      ? stateList(degradedFeeds, "None in the current check.")
+      : "Runtime coverage is unavailable; no feed should be inferred to be operating.",
+    inactiveFeedsProse: sourceCoverage
+      ? stateList(inactiveFeeds, "None in the current check.")
+      : "Runtime coverage is unavailable.",
     classifyVotersProse: proseList(
       method.providers.classify.engines.map(engineProse),
     ),
@@ -129,8 +200,7 @@ export default function PulseMethodologyPage() {
     clusterWindowHours: method.clustering.dateWindowHours,
     clusterSemanticThreshold: method.clustering.semantic.threshold,
     clusterLexicalThreshold: method.clustering.lexicalFallback.threshold,
-    sourceIndependenceVersion:
-      method.corroboration.sourceIndependence.version,
+    sourceIndependenceVersion: method.corroboration.sourceIndependence.version,
     sourceIndependencePrecisionPct:
       method.corroboration.sourceIndependence.reviewedPairThresholds.precision *
       100,
@@ -197,7 +267,7 @@ export default function PulseMethodologyPage() {
             subject="Civica Atlas Methodology — Pulse methodology (Beta)"
             pageTitle="Pulse methodology"
             url="https://civicaatlas.org/civica-index/methodology/pulse"
-            dataVintage={method.feeds.activeProduction.observedThrough}
+            dataVintage={method.feeds.observedEvidence.observedThrough}
           />
         </Reveal>
 

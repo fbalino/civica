@@ -49,6 +49,7 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "index-methodology", label: "Index methodology version" },
   { id: "pulse-methodology", label: "Pulse runtime method" },
   { id: "pulse-cluster-coverage", label: "Pulse cluster coverage" },
+  { id: "pulse-source-coverage", label: "Pulse source coverage" },
   { id: "pulse-dimensions", label: "Pulse dimensions" },
   { id: "pulse-events", label: "Pulse country events" },
   { id: "pulse-changelog-v2", label: "Pulse changelog" },
@@ -238,6 +239,7 @@ export default function ApiDocsPage() {
   const indexMethodologyRoute = getRouteContract("index-methodology");
   const pulseMethodologyRoute = getRouteContract("pulse-methodology");
   const pulseClusterCoverageRoute = getRouteContract("pulse-cluster-coverage");
+  const pulseSourceCoverageRoute = getRouteContract("pulse-source-coverage");
   const pulseDimensionsRoute = getRouteContract("pulse-dimensions");
   const pulseEventsRoute = getRouteContract("pulse-events");
   const pulseChangelogRoute = getRouteContract("pulse-changelog-v2");
@@ -457,6 +459,16 @@ export default function ApiDocsPage() {
           description={pulseClusterCoverageRoute.summary}
           parameters={toDocParams(pulseClusterCoverageRoute.params)}
           exampleResponse={docExample("pulseClusterCoverage")}
+        />
+
+        <EndpointSection
+          id="pulse-source-coverage"
+          routeId="pulse-source-coverage"
+          method="GET"
+          path={pulseSourceCoverageRoute.pathTemplate}
+          description={pulseSourceCoverageRoute.summary}
+          parameters={toDocParams(pulseSourceCoverageRoute.params)}
+          exampleResponse={docExample("pulseSourceCoverage")}
         />
 
         <EndpointSection

@@ -1,0 +1,16 @@
+{
+  "id": "pulse-source-coverage-responsive-contract",
+  "toVersion": "civica-index-api-contract-pulse-source-coverage-v2",
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-source-coverage-index-contract-v2-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-source-coverage-index-contract-v2-migration.md"
+    ],
+    "golden_test": ["src/lib/pulse/v2/source-coverage.test.ts"],
+    "contract_test": ["src/lib/api/contract/source-coverage-contract.test.ts"]
+  }
+}

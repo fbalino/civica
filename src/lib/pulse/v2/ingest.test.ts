@@ -2,12 +2,43 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { RawEventInput } from "./types";
 import {
+  connectorReportsToRunCounts,
   ingestPulseV2,
+  pulseConnectorMetricKey,
   type Db,
   type PulseConnectorJob,
 } from "./ingest";
 import type { UpsertResult } from "./upsert";
 import { createPulsePipelineRunRef } from "./pipeline-version";
+
+test("connector run metrics distinguish success, empty yield, and failure", () => {
+  const counts = connectorReportsToRunCounts([
+    {
+      source: "gdelt",
+      fetched: 12,
+      wouldWrite: 10,
+      inserted: 4,
+      skippedDuplicate: 6,
+      unmatchedCountry: 2,
+    },
+    {
+      source: "rsf",
+      fetched: 0,
+      wouldWrite: 0,
+      inserted: 0,
+      skippedDuplicate: 0,
+      unmatchedCountry: 0,
+      error: "upstream unavailable",
+    },
+  ]);
+  assert.equal(counts[pulseConnectorMetricKey("gdelt", "failed")], 0);
+  assert.equal(counts[pulseConnectorMetricKey("gdelt", "wouldWrite")], 10);
+  assert.equal(counts[pulseConnectorMetricKey("rsf", "failed")], 1);
+  assert.throws(
+    () => pulseConnectorMetricKey("not/a/connector", "fetched"),
+    /Invalid Pulse connector id/,
+  );
+});
 
 const runRef = createPulsePipelineRunRef("ingest", {
   id: "11111111-1111-4111-8111-111111111111",
@@ -61,7 +92,10 @@ test("dry-run returns a stable diff and performs zero writes", async () => {
 
 test("two fixture applications preserve identical canonical state without duplicates", async () => {
   const state = new Map<string, RawEventInput>();
-  const writeRows = async (_db: Db, rows: RawEventInput[]): Promise<UpsertResult> => {
+  const writeRows = async (
+    _db: Db,
+    rows: RawEventInput[],
+  ): Promise<UpsertResult> => {
     let inserted = 0;
     let skippedDuplicate = 0;
     for (const candidate of rows) {
@@ -72,7 +106,11 @@ test("two fixture applications preserve identical canonical state without duplic
         inserted++;
       }
     }
-    return { inserted, skippedDuplicate, sourcesStamped: inserted ? ["gdelt"] : [] };
+    return {
+      inserted,
+      skippedDuplicate,
+      sourcesStamped: inserted ? ["gdelt"] : [],
+    };
   };
   const options = {
     jobs: jobs(),
@@ -92,7 +130,14 @@ test("two fixture applications preserve identical canonical state without duplic
 test("strict fixture mode fails loudly on malformed connector output", async () => {
   await assert.rejects(
     ingestPulseV2({} as Db, {
-      jobs: [{ source: "broken", fetcher: async () => { throw new Error("malformed fixture"); } }],
+      jobs: [
+        {
+          source: "broken",
+          fetcher: async () => {
+            throw new Error("malformed fixture");
+          },
+        },
+      ],
       jurisdictionMap: new Map<string, string>(),
       failOnConnectorError: true,
     }),
@@ -103,7 +148,12 @@ test("strict fixture mode fails loudly on malformed connector output", async () 
 test("strict fixture mode rejects a completely empty upstream result", async () => {
   await assert.rejects(
     ingestPulseV2({} as Db, {
-      jobs: [{ source: "empty", fetcher: async () => ({ rows: [], fetched: 0, unmatchedCountry: 0 }) }],
+      jobs: [
+        {
+          source: "empty",
+          fetcher: async () => ({ rows: [], fetched: 0, unmatchedCountry: 0 }),
+        },
+      ],
       jurisdictionMap: new Map<string, string>(),
       requireNonEmpty: true,
     }),

@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.3-beta");
+  assert.equal(method.version, "pulse-v2.4-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -62,13 +62,13 @@ test("current contract states the non-negotiable publication boundaries", () => 
   );
 });
 
-test("only production-observed raw-event feeds are active", () => {
+test("the runtime snapshot distinguishes observed evidence from operating state", () => {
   assert.equal(
-    CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.observedThrough,
+    CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.observedThrough,
     "2026-07-11",
   );
   assert.deepEqual(
-    CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.sourceIds,
+    CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.sourceIds,
     ["amnesty", "civicus_monitor", "gdelt", "hrw"],
   );
 
@@ -236,7 +236,7 @@ test("pure builder normalizes set-like fields without mutating its input", () =>
     built.cadence.stages.map((stage) => stage.stage),
     ["ingest", "cluster", "classify", "score"],
   );
-  assert.deepEqual(built.feeds.activeProduction.sourceIds, [
+  assert.deepEqual(built.feeds.observedEvidence.sourceIds, [
     "amnesty",
     "civicus_monitor",
     "gdelt",
@@ -255,7 +255,7 @@ test("contract hash omits its own field and changes when contract content change
 
   const changed: PulseRuntimeMethodContract = {
     ...CURRENT_PULSE_RUNTIME_METHOD,
-    version: "pulse-v2.3-beta-test-change",
+    version: "pulse-v2.4-beta-test-change",
   };
   assert.notEqual(pulseContractHash(changed), snapshot.contractHash);
 });

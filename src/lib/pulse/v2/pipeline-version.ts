@@ -84,7 +84,7 @@ export interface PulsePipelineRunRef {
 }
 
 const activeSourceIds = () =>
-  [...CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.sourceIds].sort();
+  [...CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.sourceIds].sort();
 
 function stageAlgorithm(stage: PulsePipelineStage): VersionRef {
   if (stage === "ingest") return versioned("pulse-ingest/connectors-v2.1");

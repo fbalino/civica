@@ -521,6 +521,23 @@ export const API_ROUTES: RouteContract[] = [
     exampleId: "pulseClusterCoverage",
   },
   {
+    id: "pulse-source-coverage",
+    docSectionId: "pulse-source-coverage",
+    method: "GET",
+    pathTemplate: "/api/v1/pulse/source-coverage",
+    filePath: "src/app/api/v1/pulse/source-coverage/route.ts",
+    versioned: true,
+    summary:
+      "Returns live Pulse connector outcomes, row yield, retained evidence times, observed language and jurisdiction scope, source rights, and blind spots. Stub and gated feeds remain inactive.",
+    params: [],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [429, 500],
+    deprecation: null,
+    exampleId: "pulseSourceCoverage",
+  },
+  {
     id: "pulse-dimensions",
     docSectionId: "pulse-dimensions",
     method: "GET",

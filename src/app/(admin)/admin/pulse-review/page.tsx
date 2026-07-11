@@ -6,6 +6,7 @@ import { DataTable } from "@/components/editorial/DataTable";
 import { AdminRow } from "@/app/(admin)/AdminRow";
 import { getPulseReviewQueue } from "@/lib/db/queries-pulse-review";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
+import { loadPulseSourceCoverageReport } from "@/lib/pulse/v2/source-coverage";
 
 export const metadata: Metadata = {
   title: "Pulse review queue — Civica admin",
@@ -53,7 +54,7 @@ interface PageProps {
 
 function buildHref(
   base: Record<string, string | undefined>,
-  override: Record<string, string | undefined>
+  override: Record<string, string | undefined>,
 ): string {
   const params = new URLSearchParams();
   const merged = { ...base, ...override };
@@ -95,10 +96,23 @@ function formatDate(d: string): string {
   });
 }
 
-export default async function PulseReviewQueuePage({ searchParams }: PageProps) {
+function formatTimestamp(value: string | null): string {
+  if (!value) return "Not observed";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleString("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  });
+}
+
+export default async function PulseReviewQueuePage({
+  searchParams,
+}: PageProps) {
   const params = await searchParams;
   const dimension = (PULSE_DIMENSIONS as string[]).includes(
-    params.dimension ?? ""
+    params.dimension ?? "",
   )
     ? (params.dimension as PulseDimension)
     : undefined;
@@ -107,12 +121,10 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
   const limit = 50;
   const offset = (page - 1) * limit;
 
-  const { rows, totalPending } = await getPulseReviewQueue({
-    dimension,
-    severity,
-    limit,
-    offset,
-  });
+  const [{ rows, totalPending }, sourceCoverage] = await Promise.all([
+    getPulseReviewQueue({ dimension, severity, limit, offset }),
+    loadPulseSourceCoverageReport(),
+  ]);
 
   const baseParams = { dimension, severity };
 
@@ -122,10 +134,9 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
         <h1 className="admin-title">Pulse review</h1>
         <p className="admin-subtitle">
           Pending Pulse events awaiting a reviewer decision. High-positive,
-          severe-negative, and catastrophic-negative classifications;
-          deadlocks or no quorum; and weak/degraded majorities paired with
-          low-confidence, refuted, or failed verification land here
-          automatically.
+          severe-negative, and catastrophic-negative classifications; deadlocks
+          or no quorum; and weak/degraded majorities paired with low-confidence,
+          refuted, or failed verification land here automatically.
         </p>
         <p className="admin-meta">
           <span className="admin-meta-num">{totalPending}</span>
@@ -136,6 +147,84 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
           </span>
         </p>
       </header>
+
+      <section
+        className="admin-section"
+        aria-labelledby="source-coverage-title"
+      >
+        <h2 id="source-coverage-title" className="admin-section-title">
+          Source operations
+        </h2>
+        <p className="admin-section-intro">
+          Live connector outcomes and retained evidence scope. A configured or
+          stub connector cannot appear operating without a successful latest
+          retrieval, retained evidence, and registered rights.
+        </p>
+        <div className="admin-table-scroll">
+          <DataTable className="admin-table">
+            <thead>
+              <tr>
+                <th>Feed / state</th>
+                <th>Latest retrieval</th>
+                <th>Yield</th>
+                <th>Retained evidence</th>
+                <th>Observed scope / rights</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sourceCoverage.feeds.map((feed) => (
+                <tr key={feed.feedId}>
+                  <td>
+                    <span className="admin-row-primary">{feed.feedId}</span>
+                    <Chip
+                      variant={
+                        feed.state === "operating"
+                          ? "success"
+                          : feed.state === "degraded"
+                            ? "warn"
+                            : "neutral"
+                      }
+                    >
+                      {feed.state}
+                    </Chip>
+                  </td>
+                  <td>
+                    {formatTimestamp(feed.retrieval.latestAttemptAt)}
+                    <span className="admin-row-secondary">
+                      {feed.retrieval.successfulRuns} successful ·{" "}
+                      {feed.retrieval.failedRuns} failed
+                    </span>
+                  </td>
+                  <td>
+                    {feed.retrieval.latestFetched ?? "—"} fetched ·{" "}
+                    {feed.retrieval.latestYield ?? "—"} yielded ·{" "}
+                    {feed.retrieval.latestInserted ?? "—"} inserted
+                  </td>
+                  <td>
+                    {feed.evidence.retainedRows} rows
+                    <span className="admin-row-secondary">
+                      Latest {formatTimestamp(feed.evidence.lastDataAt)}
+                    </span>
+                  </td>
+                  <td>
+                    {feed.evidence.languages.join(", ") ||
+                      "No language observed"}
+                    {" · "}
+                    {feed.evidence.observedJurisdictions} jurisdictions
+                    <span className="admin-row-secondary">
+                      Rights{" "}
+                      {feed.rights
+                        .map(({ reviewStatus }) => reviewStatus)
+                        .join(", ") || "not registered"}
+                      . {feed.blindSpots.join(" ")}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
+        </div>
+      </section>
 
       <div className="admin-filters">
         <div className="admin-filter-row">
@@ -238,7 +327,9 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
                   <td>
                     <span className="admin-cell-chips">
                       <Chip
-                        variant={SEVERITY_VARIANT[event.severityTier] ?? "neutral"}
+                        variant={
+                          SEVERITY_VARIANT[event.severityTier] ?? "neutral"
+                        }
                       >
                         {SEVERITY_LABELS[event.severityTier] ??
                           event.severityTier}{" "}

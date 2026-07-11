@@ -28,18 +28,9 @@ export interface CivicusFetchResult {
 }
 
 export async function fetchCivicus(
-  map: JurisdictionMap
+  map: JurisdictionMap,
 ): Promise<CivicusFetchResult> {
-  let items;
-  try {
-    items = await fetchRss(FEED_URL);
-  } catch (err) {
-    console.warn(
-      `[civicus] feed fetch failed (${FEED_URL}); returning 0 rows. ` +
-        `Error: ${(err as Error).message}`
-    );
-    return { rows: [], unmatchedCountry: 0, fetched: 0 };
-  }
+  const items = await fetchRss(FEED_URL);
 
   const rows: RawEventInput[] = [];
   let unmatchedCountry = 0;

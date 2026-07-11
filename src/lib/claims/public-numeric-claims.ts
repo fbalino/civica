@@ -62,8 +62,7 @@ export interface PublicNumericTextFragment {
   line: number;
 }
 
-export interface PublicNumericClaimCandidate
-  extends PublicNumericTextFragment {
+export interface PublicNumericClaimCandidate extends PublicNumericTextFragment {
   hasRuntimeValue: boolean;
   hasLiteralCount: boolean;
   hasCurrentLiteralCount: boolean;
@@ -117,8 +116,7 @@ const COUNT_NOUN =
 // ISO3, v2, and EU-27 out of the count grammar.
 const LITERAL_COUNT =
   "(?<![A-Za-z0-9_.-])(?:~\\s*)?\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?\\+?";
-const DYNAMIC_COUNT =
-  `(?:\\{\\{\\s*(?:stats|state|ctx)\\.[^{}]+\\}\\}|\\$\\{[^{}]*${JS_COUNT_NAME}[^{}]*\\}|\\{[^{}]*${JS_COUNT_NAME}[^{}]*\\})`;
+const DYNAMIC_COUNT = `(?:\\{\\{\\s*(?:stats|state|ctx)\\.[^{}]+\\}\\}|\\$\\{[^{}]*${JS_COUNT_NAME}[^{}]*\\}|\\{[^{}]*${JS_COUNT_NAME}[^{}]*\\})`;
 const ANY_COUNT = `(?:${LITERAL_COUNT}|${DYNAMIC_COUNT})`;
 const COUNT_BEFORE_NOUN = new RegExp(
   `${ANY_COUNT}\\s+(?:[A-Za-z][\\w-]*\\s+){0,2}${COUNT_NOUN}\\b`,
@@ -217,7 +215,9 @@ function stripMarkdownNonRenderedText(source: string): string {
   return source.replace(/<!--[\s\S]*?-->/g, blankPreservingNewlines);
 }
 
-function markdownFragments(document: PublicNumericDocument): PublicNumericTextFragment[] {
+function markdownFragments(
+  document: PublicNumericDocument,
+): PublicNumericTextFragment[] {
   const rendered = stripMarkdownNonRenderedText(document.source);
   const fragments: PublicNumericTextFragment[] = [];
   let offset = 0;
@@ -301,7 +301,11 @@ function typescriptFragments(
 
   const isInsideJsxAttribute = (node: ts.Node, name: string): boolean => {
     let current: ts.Node | undefined = node.parent;
-    for (let depth = 0; current && depth < 3; depth++, current = current.parent) {
+    for (
+      let depth = 0;
+      current && depth < 3;
+      depth++, current = current.parent
+    ) {
       if (
         ts.isJsxAttribute(current) &&
         current.name.getText(sourceFile) === name
@@ -319,7 +323,9 @@ function typescriptFragments(
       file: document.file,
       surface: document.surface,
       fragment: normalized,
-      line: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1,
+      line:
+        sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile))
+          .line + 1,
     });
   };
 
@@ -329,10 +335,7 @@ function typescriptFragments(
       if (
         !ts.isImportDeclaration(node.parent) &&
         !ts.isExportDeclaration(node.parent) &&
-        !(
-          ts.isPropertyAssignment(node.parent) &&
-          node.parent.name === node
-        )
+        !(ts.isPropertyAssignment(node.parent) && node.parent.name === node)
       ) {
         add(
           isInsideJsxAttribute(node, "exampleResponse")
@@ -652,362 +655,377 @@ function exemptClaim(
   return { id, file, surface, fragment, disposition: "exempt", source };
 }
 
-export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = [
-  runtimeClaim(
-    "readme.reconciliation-summary",
-    "README.template.md",
-    "README",
-    '{{stats.activeSources | "multiple"}} active source orchestrators',
-    "getSiteStats plus regenerate-readme state/ctx helpers, with generic fallbacks",
-  ),
-  runtimeClaim(
-    "readme.status-active-sources",
-    "README.template.md",
-    "README",
-    '{{stats.activeSources | "Multiple"}} (',
-    "getSiteStats().activeSources with a generic fallback",
-  ),
-  runtimeClaim(
-    "readme.status-fact-rows",
-    "README.template.md",
-    "README",
-    '{{ctx.totalFactsRoundedThousands | "Many"}} across',
-    "regenerate-readme ctx derived from getSiteStats().totalFacts",
-  ),
-  runtimeClaim(
-    "readme.status-multisourced-keys",
-    "README.template.md",
-    "README",
-    '{{stats.multiSourcedFactKeys | "Multiple"}}',
-    "getSiteStats().multiSourcedFactKeys with a generic fallback",
-  ),
-  runtimeClaim(
-    "readme.status-five-source-keys",
-    "README.template.md",
-    "README",
-    '{{stats.fiveSourceFactKeys | "Several"}}',
-    "getSiteStats().fiveSourceFactKeys with a generic fallback",
-  ),
-  runtimeClaim(
-    "data-approach.active-sources",
-    "content/data-approach.md",
-    "reader:data-approach",
-    '{{stats.activeSources | "multiple"}} source orchestrators',
-    "getSiteStats().activeSources with a generic fallback",
-  ),
-  runtimeClaim(
-    "data-approach.single-source-coverage",
-    "content/data-approach.md",
-    "reader:data-approach",
-    '{{stats.singleSourcedFactKeys | "Many"}} of {{stats.distinctFactKeys | "many"}}',
-    "getSiteStats single-sourced and distinct fact-key counts with generic fallbacks",
-  ),
-  runtimeClaim(
-    "provenance-report.scope",
-    "src/app/(reader)/methodology/provenance-coverage/page.tsx",
-    "/methodology/provenance-coverage",
-    "It covers {number.format(report.facts.distinctJurisdictions)} country or area records",
-    "checked fact-coverage.generated.json produced from the live database",
-  ),
-  runtimeClaim(
-    "provenance-report.statement-coverage",
-    "src/app/(reader)/methodology/provenance-coverage/page.tsx",
-    "/methodology/provenance-coverage",
-    "Total: {number.format(report.statements.sourceLinked)} of {number.format(report.statements.total)} statement rows",
-    "checked fact-coverage.generated.json produced from the live database",
-  ),
-  runtimeClaim(
-    "domain-source-coverage.rows",
-    "src/app/(reader)/methodology/source-coverage/page.tsx",
-    "/methodology/source-coverage",
-    "{number.format(domain.recordCount)} {domain.recordLabel}",
-    "checked domain-coverage.generated.json produced from the live database",
-  ),
-  runtimeClaim(
-    "index-methodology.pca-headline",
-    "content/methodology-civica-index.md",
-    "reader:methodology-civica-index",
-    "{{state.civicaIndex.dimensionCount}} dimensions are highly correlated",
-    "registered site-state Civica Index PCA configuration",
-  ),
-  runtimeClaim(
-    "index-methodology.complete-estimate",
-    "content/methodology-civica-index.md",
-    "reader:methodology-civica-index",
-    "All {{state.civicaIndex.dimensionCount}} dimensions present",
-    "site-state.civicaIndex.dimensionCount",
-  ),
-  runtimeClaim(
-    "index-methodology.publication-threshold",
-    "content/methodology-civica-index.md",
-    "reader:methodology-civica-index",
-    "at least {{state.civicaIndex.missingness.minimumDimensionsForPublication}} of the {{state.civicaIndex.dimensionCount}} dimensions",
-    "versioned site-state Civica Index missingness policy",
-  ),
-  runtimeClaim(
-    "index-methodology.uncertainty-coverage",
-    "content/methodology-civica-index.md",
-    "reader:methodology-civica-index",
-    "usable uncertainty coverage is {{state.civicaIndex.uncertainty.usableReleasedUncertaintyRows}} of {{state.civicaIndex.uncertainty.releasedDimensionRows}} rows",
-    "checked current-release uncertainty audit exposed through site-state.civicaIndex.uncertainty",
-  ),
-  runtimeClaim(
-    "pca-appendix.panel-summary",
-    "content/methodology-pca-appendix.md",
-    "reader:methodology-pca-appendix",
-    "{{state.civicaIndex.pca.panelSize}} countries** with all",
-    "registered site-state Civica Index PCA panel, dimensions, and data vintage",
-  ),
-  runtimeClaim(
-    "pca-appendix.dimension-limitation",
-    "content/methodology-pca-appendix.md",
-    "reader:methodology-pca-appendix",
-    "describe these {{state.civicaIndex.pca.panelSize}} observations only",
-    "site-state.civicaIndex PCA panel size",
-  ),
-  runtimeClaim(
-    "pca-appendix.sample-size",
-    "content/methodology-pca-appendix.md",
-    "reader:methodology-pca-appendix",
-    "contains {{state.civicaIndex.pca.panelSize}} countries from one 2023 cross-section",
-    "registered site-state Civica Index PCA panel and data vintage",
-  ),
-  runtimeClaim(
-    "pca-appendix.source-coverage",
-    "content/methodology-pca-appendix.md",
-    "reader:methodology-pca-appendix",
-    "{{state.civicaIndex.pca.panelSize}} countries with all",
-    "registered site-state Civica Index PCA panel and dimension count",
-  ),
-  runtimeClaim(
-    "peer-grouping.vdem-dependency",
-    "content/methodology-peer-grouping.md",
-    "reader:methodology-peer-grouping",
-    "two of its {{state.civicaIndex.dimensionCount}} dimensions",
-    "site-state.civicaIndex.dimensionCount and declared V-Dem input mapping",
-  ),
-  runtimeClaim(
-    "pulse-methodology.taxonomy-total",
-    "content/methodology-pulse.md",
-    "reader:methodology-pulse",
-    "{{ctx.ontologyCategoryCount}} event categories",
-    "registered pulse-event-ontology/v3.0 codebook",
-  ),
-  runtimeClaim(
-    "pulse-methodology.democratic-quality-categories",
-    "content/methodology-pulse.md",
-    "reader:methodology-pulse",
-    "{{state.pulse.taxonomy.categoriesPerDimension.democratic_quality}} categories",
-    "registered site-state Pulse taxonomy",
-  ),
-  runtimeClaim(
-    "pulse-methodology.rule-of-law-categories",
-    "content/methodology-pulse.md",
-    "reader:methodology-pulse",
-    "{{state.pulse.taxonomy.categoriesPerDimension.rule_of_law}} categories",
-    "registered site-state Pulse taxonomy",
-  ),
-  runtimeClaim(
-    "pulse-methodology.freedom-rights-categories",
-    "content/methodology-pulse.md",
-    "reader:methodology-pulse",
-    "{{state.pulse.taxonomy.categoriesPerDimension.freedom_rights}} categories",
-    "registered site-state Pulse taxonomy",
-  ),
-  runtimeClaim(
-    "pulse-methodology.corruption-control-categories",
-    "content/methodology-pulse.md",
-    "reader:methodology-pulse",
-    "{{state.pulse.taxonomy.categoriesPerDimension.corruption_control}} categories",
-    "registered site-state Pulse taxonomy",
-  ),
-  runtimeClaim(
-    "pulse-methodology.stability-categories",
-    "content/methodology-pulse.md",
-    "reader:methodology-pulse",
-    "{{state.pulse.taxonomy.categoriesPerDimension.stability}} categories",
-    "registered site-state Pulse taxonomy",
-  ),
-  runtimeClaim(
-    "index-methodology.visible-dimensions",
-    "src/app/(reader)/civica-index/methodology/page.tsx",
-    "/civica-index/methodology",
-    "{civicaIndex.dimensionCount} governance dimensions",
-    "site-state.civicaIndex.dimensionCount",
-  ),
-  runtimeClaim(
-    "pca-page.figure-dimensions",
-    "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
-    "/civica-index/methodology/pca-appendix",
-    "{civicaIndex.dimensionCount}",
-    "site-state.civicaIndex dimension and PCA configuration",
-  ),
-  runtimeClaim(
-    "pca-page.panel-size",
-    "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
-    "/civica-index/methodology/pca-appendix",
-    "{pca.panelSize} countries",
-    "site-state.civicaIndex.pca.panelSize and lastRunDate",
-  ),
-  runtimeClaim(
-    "reconciliation.metadata-source-roster",
-    "src/app/(reader)/country/methodology/reconciliation/page.tsx",
-    "/country/methodology/reconciliation",
-    "${tier1Shipped.length} multilateral publishers",
-    "site-state tier1Publishers and nsoWave1 rosters",
-  ),
-  runtimeClaim(
-    "reconciliation.active-publisher-commitment",
-    "src/app/(reader)/country/methodology/reconciliation/page.tsx",
-    "/country/methodology/reconciliation",
-    "{tier1Shipped.length} active publishers",
-    "site-state shipped Tier-1 publisher roster",
-  ),
-  runtimeClaim(
-    "reconciliation.live-layer-totals",
-    "src/app/(reader)/country/methodology/reconciliation/page.tsx",
-    "/country/methodology/reconciliation",
-    "${stats.totalFacts.toLocaleString()} rows across ${stats.distinctFactKeys} fact-keys and ${stats.activeSources} active sources",
-    "getSiteStats live database counters with count-free outage fallback",
-  ),
-  runtimeClaim(
-    "about.source-roster-count",
-    "src/app/about/page.tsx",
-    "/about",
-    "${sourcesForDisplay.length} source records",
-    "getAllSources result with generic DB-outage copy",
-  ),
-  exemptClaim(
-    "api-docs.country-list-example",
-    "src/lib/api/contract/examples.ts",
-    "/api-docs",
-    'Illustrative Example Response: {"data":[{"slug":"united-states"',
-    "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  exemptClaim(
-    "api-docs.government-types-example",
-    "src/lib/api/contract/examples.ts",
-    "/api-docs",
-    'Illustrative Example Response: {"data":[{"governmentType":"Presidential republic"',
-    "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  exemptClaim(
-    "api-docs.by-government-type-example",
-    "src/lib/api/contract/examples.ts",
-    "/api-docs",
-    'Illustrative Example Response: {"data":[{"key":"parliamentary_democracy"',
-    "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  exemptClaim(
-    "api-docs.compare-example",
-    "src/lib/api/contract/examples.ts",
-    "/api-docs",
-    'Illustrative Example Response: {"data":[{"jurisdiction":{"slug":"france"',
-    "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  exemptClaim(
-    "api-docs.ranking-example",
-    "src/lib/api/contract/examples.ts",
-    "/api-docs",
-    'Illustrative Example Response: {"data":[{"rank":1,"score":91.4',
-    "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  exemptClaim(
-    "api-docs.peer-groupings-example",
-    "src/lib/api/contract/examples.ts",
-    "/api-docs",
-    'Illustrative Example Response: {"data":{"world_bank_region"',
-    "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  runtimeClaim(
-    "rankings.live-row-count",
-    "src/app/rankings/page.tsx",
-    "/rankings",
-    "${rows.length} jurisdictions",
-    "getRankingsMatrix returned row count with generic empty fallback",
-  ),
-  runtimeClaim(
-    "rankings.table-row-count",
-    "src/app/rankings/RankingsMatrix.tsx",
-    "/rankings/RankingsMatrix.tsx",
-    "${rows.length} jurisdictions · click a column header to re-sort",
-    "RankingsMatrix receives the current getRankingsMatrix result rows",
-  ),
-  runtimeClaim(
-    "elections.filtered-upcoming-count",
-    "src/app/elections/ElectionsClient.tsx",
-    "/elections/ElectionsClient.tsx",
-    "{filteredUpcoming.length} elections",
-    "client-side filtered live election result rows; omitted when none",
-  ),
-  runtimeClaim(
-    "elections.filtered-recent-count",
-    "src/app/elections/ElectionsClient.tsx",
-    "/elections/ElectionsClient.tsx",
-    "${filteredRecent.length} elections",
-    "client-side filtered result rows with generic load-failure copy",
-  ),
-  runtimeClaim(
-    "elections.source-coverage",
-    "src/app/elections/ElectionsClient.tsx",
-    "/elections/ElectionsClient.tsx",
-    "{coverage.legislativeJurisdictions} national parliaments",
-    "live election-source coverage object with generic DB-outage copy",
-  ),
-  runtimeClaim(
-    "compare-index.dimension-count",
-    "src/components/compare/CompareCivicaIndex.tsx",
-    "component:compare/CompareCivicaIndex",
-    "{V2_DIMENSIONS.length} dimensions",
-    "canonical Civica Index dimension constant",
-  ),
-  runtimeClaim(
-    "constitution.indexed-count",
-    "src/components/constitution/ConstitutionLanding.tsx",
-    "component:constitution/ConstitutionLanding",
-    "{countries.length} national constitutions",
-    "live indexed constitution rows with explicit catalog-outage state",
-  ),
-  runtimeClaim(
-    "country-index.rendered-dimensions",
-    "src/components/country/CivicaIndexPanel.tsx",
-    "component:country/CivicaIndexPanel",
-    "{renderedDimensionCount} governance dimensions",
-    "current rendered country dimension rows",
-  ),
-  runtimeClaim(
-    "conditions.metric-coverage",
-    "src/components/outcomes/MetricStripPlot.tsx",
-    "component:outcomes/MetricStripPlot",
-    "Coverage: {coverage.withData} of {coverage.total} countries",
-    "metric result coverage, rendered only when a coverage object exists",
-  ),
-  runtimeClaim(
-    "country-index.dimension-count",
-    "src/components/ci/CIPulseScoreDisplay.tsx",
-    "component:ci/CIPulseScoreDisplay",
-    "Composite of ${dimCount} governance dimensions",
-    "current country composite dimension rows",
-  ),
-  runtimeClaim(
-    "government-explorer.country-count",
-    "src/components/ci/GovernmentTypesAccordionExplorer.tsx",
-    "component:ci/GovernmentTypesAccordionExplorer",
-    "{row.countryCount} countries",
-    "runtime grouped-country result count",
-  ),
-  runtimeClaim(
-    "almanac.catalog-count",
-    "src/components/factbook/FactbookAlmanac.tsx",
-    "component:factbook/FactbookAlmanac",
-    "${countries.length} countries and territories",
-    "runtime almanac catalog length",
-  ),
-  runtimeClaim(
-    "home.catalog-count",
-    "src/components/home/HomeGrid.tsx",
-    "component:home/HomeGrid",
-    '{catalogCount ?? "—"} Countries &amp; territories',
-    "runtime getAllJurisdictions catalog length with nonnumeric fallback",
-  ),
-];
+export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
+  [
+    runtimeClaim(
+      "readme.reconciliation-summary",
+      "README.template.md",
+      "README",
+      '{{stats.activeSources | "multiple"}} active source orchestrators',
+      "getSiteStats plus regenerate-readme state/ctx helpers, with generic fallbacks",
+    ),
+    runtimeClaim(
+      "readme.status-active-sources",
+      "README.template.md",
+      "README",
+      '{{stats.activeSources | "Multiple"}} (',
+      "getSiteStats().activeSources with a generic fallback",
+    ),
+    runtimeClaim(
+      "readme.status-fact-rows",
+      "README.template.md",
+      "README",
+      '{{ctx.totalFactsRoundedThousands | "Many"}} across',
+      "regenerate-readme ctx derived from getSiteStats().totalFacts",
+    ),
+    runtimeClaim(
+      "readme.status-multisourced-keys",
+      "README.template.md",
+      "README",
+      '{{stats.multiSourcedFactKeys | "Multiple"}}',
+      "getSiteStats().multiSourcedFactKeys with a generic fallback",
+    ),
+    runtimeClaim(
+      "readme.status-five-source-keys",
+      "README.template.md",
+      "README",
+      '{{stats.fiveSourceFactKeys | "Several"}}',
+      "getSiteStats().fiveSourceFactKeys with a generic fallback",
+    ),
+    runtimeClaim(
+      "data-approach.active-sources",
+      "content/data-approach.md",
+      "reader:data-approach",
+      '{{stats.activeSources | "multiple"}} source orchestrators',
+      "getSiteStats().activeSources with a generic fallback",
+    ),
+    runtimeClaim(
+      "data-approach.single-source-coverage",
+      "content/data-approach.md",
+      "reader:data-approach",
+      '{{stats.singleSourcedFactKeys | "Many"}} of {{stats.distinctFactKeys | "many"}}',
+      "getSiteStats single-sourced and distinct fact-key counts with generic fallbacks",
+    ),
+    runtimeClaim(
+      "provenance-report.scope",
+      "src/app/(reader)/methodology/provenance-coverage/page.tsx",
+      "/methodology/provenance-coverage",
+      "It covers {number.format(report.facts.distinctJurisdictions)} country or area records",
+      "checked fact-coverage.generated.json produced from the live database",
+    ),
+    runtimeClaim(
+      "provenance-report.statement-coverage",
+      "src/app/(reader)/methodology/provenance-coverage/page.tsx",
+      "/methodology/provenance-coverage",
+      "Total: {number.format(report.statements.sourceLinked)} of {number.format(report.statements.total)} statement rows",
+      "checked fact-coverage.generated.json produced from the live database",
+    ),
+    runtimeClaim(
+      "domain-source-coverage.rows",
+      "src/app/(reader)/methodology/source-coverage/page.tsx",
+      "/methodology/source-coverage",
+      "{number.format(domain.recordCount)} {domain.recordLabel}",
+      "checked domain-coverage.generated.json produced from the live database",
+    ),
+    runtimeClaim(
+      "index-methodology.pca-headline",
+      "content/methodology-civica-index.md",
+      "reader:methodology-civica-index",
+      "{{state.civicaIndex.dimensionCount}} dimensions are highly correlated",
+      "registered site-state Civica Index PCA configuration",
+    ),
+    runtimeClaim(
+      "index-methodology.complete-estimate",
+      "content/methodology-civica-index.md",
+      "reader:methodology-civica-index",
+      "All {{state.civicaIndex.dimensionCount}} dimensions present",
+      "site-state.civicaIndex.dimensionCount",
+    ),
+    runtimeClaim(
+      "index-methodology.publication-threshold",
+      "content/methodology-civica-index.md",
+      "reader:methodology-civica-index",
+      "at least {{state.civicaIndex.missingness.minimumDimensionsForPublication}} of the {{state.civicaIndex.dimensionCount}} dimensions",
+      "versioned site-state Civica Index missingness policy",
+    ),
+    runtimeClaim(
+      "index-methodology.uncertainty-coverage",
+      "content/methodology-civica-index.md",
+      "reader:methodology-civica-index",
+      "usable uncertainty coverage is {{state.civicaIndex.uncertainty.usableReleasedUncertaintyRows}} of {{state.civicaIndex.uncertainty.releasedDimensionRows}} rows",
+      "checked current-release uncertainty audit exposed through site-state.civicaIndex.uncertainty",
+    ),
+    runtimeClaim(
+      "pca-appendix.panel-summary",
+      "content/methodology-pca-appendix.md",
+      "reader:methodology-pca-appendix",
+      "{{state.civicaIndex.pca.panelSize}} countries** with all",
+      "registered site-state Civica Index PCA panel, dimensions, and data vintage",
+    ),
+    runtimeClaim(
+      "pca-appendix.dimension-limitation",
+      "content/methodology-pca-appendix.md",
+      "reader:methodology-pca-appendix",
+      "describe these {{state.civicaIndex.pca.panelSize}} observations only",
+      "site-state.civicaIndex PCA panel size",
+    ),
+    runtimeClaim(
+      "pca-appendix.sample-size",
+      "content/methodology-pca-appendix.md",
+      "reader:methodology-pca-appendix",
+      "contains {{state.civicaIndex.pca.panelSize}} countries from one 2023 cross-section",
+      "registered site-state Civica Index PCA panel and data vintage",
+    ),
+    runtimeClaim(
+      "pca-appendix.source-coverage",
+      "content/methodology-pca-appendix.md",
+      "reader:methodology-pca-appendix",
+      "{{state.civicaIndex.pca.panelSize}} countries with all",
+      "registered site-state Civica Index PCA panel and dimension count",
+    ),
+    runtimeClaim(
+      "peer-grouping.vdem-dependency",
+      "content/methodology-peer-grouping.md",
+      "reader:methodology-peer-grouping",
+      "two of its {{state.civicaIndex.dimensionCount}} dimensions",
+      "site-state.civicaIndex.dimensionCount and declared V-Dem input mapping",
+    ),
+    runtimeClaim(
+      "pulse-methodology.taxonomy-total",
+      "content/methodology-pulse.md",
+      "reader:methodology-pulse",
+      "{{ctx.ontologyCategoryCount}} event categories",
+      "registered pulse-event-ontology/v3.0 codebook",
+    ),
+    runtimeClaim(
+      "pulse-methodology.democratic-quality-categories",
+      "content/methodology-pulse.md",
+      "reader:methodology-pulse",
+      "{{state.pulse.taxonomy.categoriesPerDimension.democratic_quality}} categories",
+      "registered site-state Pulse taxonomy",
+    ),
+    runtimeClaim(
+      "pulse-methodology.rule-of-law-categories",
+      "content/methodology-pulse.md",
+      "reader:methodology-pulse",
+      "{{state.pulse.taxonomy.categoriesPerDimension.rule_of_law}} categories",
+      "registered site-state Pulse taxonomy",
+    ),
+    runtimeClaim(
+      "pulse-methodology.freedom-rights-categories",
+      "content/methodology-pulse.md",
+      "reader:methodology-pulse",
+      "{{state.pulse.taxonomy.categoriesPerDimension.freedom_rights}} categories",
+      "registered site-state Pulse taxonomy",
+    ),
+    runtimeClaim(
+      "pulse-methodology.corruption-control-categories",
+      "content/methodology-pulse.md",
+      "reader:methodology-pulse",
+      "{{state.pulse.taxonomy.categoriesPerDimension.corruption_control}} categories",
+      "registered site-state Pulse taxonomy",
+    ),
+    runtimeClaim(
+      "pulse-methodology.stability-categories",
+      "content/methodology-pulse.md",
+      "reader:methodology-pulse",
+      "{{state.pulse.taxonomy.categoriesPerDimension.stability}} categories",
+      "registered site-state Pulse taxonomy",
+    ),
+    runtimeClaim(
+      "pulse-methodology.source-retained-rows",
+      "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
+      "/civica-index/methodology/pulse",
+      "${feed.evidence.retainedRows} rows; latest ${utcMinute(feed.evidence.lastDataAt)}",
+      "live pulse-source-coverage/v1 retained-row and latest-data aggregates",
+    ),
+    runtimeClaim(
+      "pulse-methodology.source-jurisdiction-scope",
+      "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
+      "/civica-index/methodology/pulse",
+      "${languages}; ${feed.evidence.observedJurisdictions} resolved jurisdictions; ${feed.evidence.unresolvedJurisdictionRows} unresolved rows",
+      "live pulse-source-coverage/v1 resolved and unresolved jurisdiction aggregates",
+    ),
+    runtimeClaim(
+      "index-methodology.visible-dimensions",
+      "src/app/(reader)/civica-index/methodology/page.tsx",
+      "/civica-index/methodology",
+      "{civicaIndex.dimensionCount} governance dimensions",
+      "site-state.civicaIndex.dimensionCount",
+    ),
+    runtimeClaim(
+      "pca-page.figure-dimensions",
+      "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
+      "/civica-index/methodology/pca-appendix",
+      "{civicaIndex.dimensionCount}",
+      "site-state.civicaIndex dimension and PCA configuration",
+    ),
+    runtimeClaim(
+      "pca-page.panel-size",
+      "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
+      "/civica-index/methodology/pca-appendix",
+      "{pca.panelSize} countries",
+      "site-state.civicaIndex.pca.panelSize and lastRunDate",
+    ),
+    runtimeClaim(
+      "reconciliation.metadata-source-roster",
+      "src/app/(reader)/country/methodology/reconciliation/page.tsx",
+      "/country/methodology/reconciliation",
+      "${tier1Shipped.length} multilateral publishers",
+      "site-state tier1Publishers and nsoWave1 rosters",
+    ),
+    runtimeClaim(
+      "reconciliation.active-publisher-commitment",
+      "src/app/(reader)/country/methodology/reconciliation/page.tsx",
+      "/country/methodology/reconciliation",
+      "{tier1Shipped.length} active publishers",
+      "site-state shipped Tier-1 publisher roster",
+    ),
+    runtimeClaim(
+      "reconciliation.live-layer-totals",
+      "src/app/(reader)/country/methodology/reconciliation/page.tsx",
+      "/country/methodology/reconciliation",
+      "${stats.totalFacts.toLocaleString()} rows across ${stats.distinctFactKeys} fact-keys and ${stats.activeSources} active sources",
+      "getSiteStats live database counters with count-free outage fallback",
+    ),
+    runtimeClaim(
+      "about.source-roster-count",
+      "src/app/about/page.tsx",
+      "/about",
+      "${sourcesForDisplay.length} source records",
+      "getAllSources result with generic DB-outage copy",
+    ),
+    exemptClaim(
+      "api-docs.country-list-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"data":[{"slug":"united-states"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    exemptClaim(
+      "api-docs.government-types-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"data":[{"governmentType":"Presidential republic"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    exemptClaim(
+      "api-docs.by-government-type-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"data":[{"key":"parliamentary_democracy"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    exemptClaim(
+      "api-docs.compare-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"data":[{"jurisdiction":{"slug":"france"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    exemptClaim(
+      "api-docs.ranking-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"data":[{"rank":1,"score":91.4',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    exemptClaim(
+      "api-docs.peer-groupings-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"data":{"world_bank_region"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    runtimeClaim(
+      "rankings.live-row-count",
+      "src/app/rankings/page.tsx",
+      "/rankings",
+      "${rows.length} jurisdictions",
+      "getRankingsMatrix returned row count with generic empty fallback",
+    ),
+    runtimeClaim(
+      "rankings.table-row-count",
+      "src/app/rankings/RankingsMatrix.tsx",
+      "/rankings/RankingsMatrix.tsx",
+      "${rows.length} jurisdictions · click a column header to re-sort",
+      "RankingsMatrix receives the current getRankingsMatrix result rows",
+    ),
+    runtimeClaim(
+      "elections.filtered-upcoming-count",
+      "src/app/elections/ElectionsClient.tsx",
+      "/elections/ElectionsClient.tsx",
+      "{filteredUpcoming.length} elections",
+      "client-side filtered live election result rows; omitted when none",
+    ),
+    runtimeClaim(
+      "elections.filtered-recent-count",
+      "src/app/elections/ElectionsClient.tsx",
+      "/elections/ElectionsClient.tsx",
+      "${filteredRecent.length} elections",
+      "client-side filtered result rows with generic load-failure copy",
+    ),
+    runtimeClaim(
+      "elections.source-coverage",
+      "src/app/elections/ElectionsClient.tsx",
+      "/elections/ElectionsClient.tsx",
+      "{coverage.legislativeJurisdictions} national parliaments",
+      "live election-source coverage object with generic DB-outage copy",
+    ),
+    runtimeClaim(
+      "compare-index.dimension-count",
+      "src/components/compare/CompareCivicaIndex.tsx",
+      "component:compare/CompareCivicaIndex",
+      "{V2_DIMENSIONS.length} dimensions",
+      "canonical Civica Index dimension constant",
+    ),
+    runtimeClaim(
+      "constitution.indexed-count",
+      "src/components/constitution/ConstitutionLanding.tsx",
+      "component:constitution/ConstitutionLanding",
+      "{countries.length} national constitutions",
+      "live indexed constitution rows with explicit catalog-outage state",
+    ),
+    runtimeClaim(
+      "country-index.rendered-dimensions",
+      "src/components/country/CivicaIndexPanel.tsx",
+      "component:country/CivicaIndexPanel",
+      "{renderedDimensionCount} governance dimensions",
+      "current rendered country dimension rows",
+    ),
+    runtimeClaim(
+      "conditions.metric-coverage",
+      "src/components/outcomes/MetricStripPlot.tsx",
+      "component:outcomes/MetricStripPlot",
+      "Coverage: {coverage.withData} of {coverage.total} countries",
+      "metric result coverage, rendered only when a coverage object exists",
+    ),
+    runtimeClaim(
+      "country-index.dimension-count",
+      "src/components/ci/CIPulseScoreDisplay.tsx",
+      "component:ci/CIPulseScoreDisplay",
+      "Composite of ${dimCount} governance dimensions",
+      "current country composite dimension rows",
+    ),
+    runtimeClaim(
+      "government-explorer.country-count",
+      "src/components/ci/GovernmentTypesAccordionExplorer.tsx",
+      "component:ci/GovernmentTypesAccordionExplorer",
+      "{row.countryCount} countries",
+      "runtime grouped-country result count",
+    ),
+    runtimeClaim(
+      "almanac.catalog-count",
+      "src/components/factbook/FactbookAlmanac.tsx",
+      "component:factbook/FactbookAlmanac",
+      "${countries.length} countries and territories",
+      "runtime almanac catalog length",
+    ),
+    runtimeClaim(
+      "home.catalog-count",
+      "src/components/home/HomeGrid.tsx",
+      "component:home/HomeGrid",
+      '{catalogCount ?? "—"} Countries &amp; territories',
+      "runtime getAllJurisdictions catalog length with nonnumeric fallback",
+    ),
+  ];

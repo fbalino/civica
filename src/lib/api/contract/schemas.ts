@@ -1335,6 +1335,76 @@ export const zPulseClusterCoverageResponse = z
   .object({ data: zPulseClusterCoverageReport })
   .strict();
 
+const zPulseFeedRights = z
+  .object({
+    sourceId: z.string(),
+    licenseId: z.string(),
+    termsUrl: z.string().nullable(),
+    reviewStatus: z.enum(["verified", "pending", "missing"]),
+    publicExport: z.string(),
+    redistributionPosture: z.string(),
+    restrictions: z.array(z.string()),
+  })
+  .strict();
+
+const zPulseFeedCoverage = z
+  .object({
+    feedId: z.string(),
+    connectorId: z.string(),
+    sourceIds: z.array(z.string()),
+    role: z.enum(["specialist", "news"]),
+    state: z.enum(["operating", "degraded", "inactive"]),
+    stateReason: z.string(),
+    retrieval: z
+      .object({
+        observedRuns: z.number().int().nonnegative(),
+        successfulRuns: z.number().int().nonnegative(),
+        failedRuns: z.number().int().nonnegative(),
+        latestAttemptAt: z.string().datetime().nullable(),
+        latestOutcome: z.enum(["successful", "failed", "not_observed"]),
+        latestFetched: z.number().int().nonnegative().nullable(),
+        latestYield: z.number().int().nonnegative().nullable(),
+        latestInserted: z.number().int().nonnegative().nullable(),
+        latestSkippedDuplicate: z.number().int().nonnegative().nullable(),
+        latestUnmatchedCountry: z.number().int().nonnegative().nullable(),
+      })
+      .strict(),
+    evidence: z
+      .object({
+        retainedRows: z.number().int().nonnegative(),
+        lastDataAt: z.string().datetime().nullable(),
+        languages: z.array(z.string()),
+        observedJurisdictions: z.number().int().nonnegative(),
+        jurisdictionIso3s: z.array(z.string()),
+        unresolvedJurisdictionRows: z.number().int().nonnegative(),
+      })
+      .strict(),
+    rights: z.array(zPulseFeedRights),
+    activation: z.string(),
+    blindSpots: z.array(z.string()),
+  })
+  .strict();
+
+export const zPulseSourceCoverageReport = z
+  .object({
+    schemaVersion: z.literal("pulse-source-coverage/v1"),
+    generatedAt: z.string().datetime(),
+    standing: z.literal("operational_observability_not_retrieval_validation"),
+    feeds: z.array(zPulseFeedCoverage),
+    summary: z
+      .object({
+        operating: z.number().int().nonnegative(),
+        degraded: z.number().int().nonnegative(),
+        inactive: z.number().int().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const zPulseSourceCoverageResponse = z
+  .object({ data: zPulseSourceCoverageReport })
+  .strict();
+
 /* /api/countries/[slug]/export — rights-filtered research export. */
 const zDecisionTraceStep = z
   .object({
