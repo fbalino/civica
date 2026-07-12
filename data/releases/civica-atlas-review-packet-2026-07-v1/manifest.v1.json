@@ -8,8 +8,8 @@
       "id": "frozen_release",
       "path": "data/releases/atlas-2026-07-11-g2-rc1.zip",
       "role": "Frozen G2 release candidate archive",
-      "bytes": 1869727,
-      "sha256": "727d517ed9d9a57c97fd652e735b51352aea26519bf78c328aec1bbdefa6ba19"
+      "bytes": 1869724,
+      "sha256": "978476a32355767eac6e73e792cd31580f850d9b498d576b4926fa4e10c9e53d"
     },
     {
       "id": "bundle_manifest",
@@ -23,7 +23,7 @@
       "path": "data/releases/atlas-2026-07-11/g2-rc1/SHA256SUMS",
       "role": "Release checksums",
       "bytes": 1302,
-      "sha256": "a498dd991d8ba8be65c780eefa1b80a59978c59a0b46caf4b0b150ec11b7165c"
+      "sha256": "4dcaf61c5e5149ef5990bef40cefcadc767639a1feff91ea2807eff7d0e1e1e6"
     },
     {
       "id": "codebook",
@@ -122,5 +122,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "a325ea2a69497f8f311b3253698a1504e6f4eab87c71210af726651de4f8866b"
+  "semanticSha256": "69c57c1e9452b446b1770b72e562693758b3786fff159acf564f8ac2b8b572b4"
 }

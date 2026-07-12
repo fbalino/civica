@@ -95,7 +95,7 @@ suppressed), which is the plan's "update every registered surface" discipline:
   Constitute rights addition required a reproducible repackage
   (`package:g2-atlas`). Only `rights-manifest.v1.json` and `SHA256SUMS` changed
   inside the bundle; the frozen vintage data is untouched. The archive is now
-  1,869,727 bytes, SHA-256 `727d517ed9d9a57c97fd652e735b51352aea26519bf78c328aec1bbdefa6ba19`
+  1,869,727 bytes, SHA-256 `978476a32355767eac6e73e792cd31580f850d9b498d576b4926fa4e10c9e53d`
   (the prior documented `bb845c3d…`/1,869,053 references were already stale from
   an earlier rights-manifest change; DAT-022/024 and PROGRESS now carry the
   accurate value). `validate:g2-atlas` and credential-free `reproduce:g2-atlas`
