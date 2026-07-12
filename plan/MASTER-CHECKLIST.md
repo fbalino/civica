@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 171
-- **Remaining:** 132
-- **Progress:** 56.4%
+- **Completed:** 172
+- **Remaining:** 131
+- **Progress:** 56.8%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -207,7 +207,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 Source: `plan/07-design-system-assets-and-reader-experience.md`
 
 - [ ] **EXP-001** (P0) Create a route-by-route rendered-module ledger for all reader, utility, error, admin-review, API-doc, embed, and navigation surfaces. _Done when: every source-rendered module is listed and assigned clean/finding/not-observed for desktop/mobile and light/dark; screenshots locate each module; a module absent from evidence is itself an open finding._
-- [ ] **EXP-002** (P0) Map every live UI pattern to a canonical design-system token, primitive, composition, or approved exception. _Done when: the map covers typography, spacing, colors, elevation, forms, tabs, tables, charts, maps, disclosures, data states, navigation, overlays, and editorial layouts; unmatched patterns become explicit design-system tasks._
+- [x] **EXP-002** (P0) Map every live UI pattern to a canonical design-system token, primitive, composition, or approved exception. _Done when: the map covers typography, spacing, colors, elevation, forms, tabs, tables, charts, maps, disclosures, data states, navigation, overlays, and editorial layouts; unmatched patterns become explicit design-system tasks._
 - [ ] **EXP-003** (P1) Ratchet the 412 baselined legacy design-token violations down by live-surface priority. _Done when: dead-code violations are removed, touched live areas have zero baselined violations, the baseline never increases, each reduction updates the baseline intentionally, and `npm run validate:design-tokens` passes._
 - [ ] **EXP-004** (P1) Eliminate page-local reader styling where canonical editorial compositions already exist. _Done when: live reader-style pages use shared primitives/editorial classes, no new per-page style block duplicates layout/typography/filter/card patterns, and visual-regression evidence shows no unintended drift._
 - [x] **EXP-005** (P0) Define a measurable canonical engraving color and rendering contract using approved reference art. _Done when: the contract specifies light/dark tone curves, cool-shadow/gold-highlight targets, saturation/chroma/warmth ranges, contrast, line preservation, dimensions, format/quality, landmark fidelity, and representative pass/fail examples._
