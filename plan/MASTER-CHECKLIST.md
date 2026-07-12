@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 157
-- **Remaining:** 146
-- **Progress:** 51.8%
+- **Completed:** 158
+- **Remaining:** 145
+- **Progress:** 52.1%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -260,7 +260,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [ ] **PLT-004** (P0) Audit Next.js 16.2, React 19.2, Drizzle, Neon, Tailwind v4, and runtime usage against installed official documentation. _Done when: a dated compatibility report covers async params/searchParams, cache components/directives, proxy/middleware, Turbopack config, server/client boundaries, route handlers, DB driver behavior, and deprecated APIs; every confirmed mismatch has a task/test._
 - [ ] **PLT-005** (P1) Establish dependency update, vulnerability, provenance, and lockfile policy. _Done when: production/dev dependency inventory, licenses, supported versions, vulnerability scan, update cadence, lockfile integrity, and emergency process are documented; critical findings block CI and Renovate/Dependabot or equivalent is configured intentionally._
 - [ ] **PLT-006** (P0) Validate environment configuration by execution context. _Done when: build, dev, tests, scripts, cron, admin, chat, and production startup fail early with clear messages for required missing/invalid variables; optional variables degrade explicitly; secrets are never echoed._
-- [ ] **PLT-007** (P0) Add secret and sensitive-artifact scanning. _Done when: CI and pre-release scans cover repository history/current tree, logs/evidence, `.orchestrator`, plan artifacts, source snapshots, env files, and build output; seeded keys/dumps fail and documented false positives are narrowly allowlisted._
+- [x] **PLT-007** (P0) Add secret and sensitive-artifact scanning. _Done when: CI and pre-release scans cover repository history/current tree, logs/evidence, `.orchestrator`, plan artifacts, source snapshots, env files, and build output; seeded keys/dumps fail and documented false positives are narrowly allowlisted._
 - [ ] **PLT-008** (P0) Inventory every route handler by exposure, mutation, data sensitivity, auth, rate limit, cache, input schema, and version. _Done when: all public/admin/cron/internal/embed/export/chat routes are registered; an unregistered route fails CI; the inventory flags mutable or sensitive endpoints without explicit controls._
 - [ ] **PLT-009** (P0) Consolidate and test admin authentication/authorization and audit identity. _Done when: all admin mutations use one reviewed timing-safe auth/session layer, CSRF/cookie/bearer behavior is documented, reviewer identity is sanitized/capped, brute-force/session expiry/logout tests pass, and audit rows identify actor/action/target/time/result._
 - [ ] **PLT-010** (P0) Make cron endpoints authenticated, idempotent, concurrency-safe, and success-honest. _Done when: missing/wrong secrets fail closed consistently, duplicate/concurrent deliveries cannot duplicate effects, partial failures do not claim success/freshness, retries are safe, and integration fixtures cover each scheduled route._

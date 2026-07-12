@@ -20,4 +20,6 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run validate:index-change-control:run
+      - run: npm run validate:secrets
+      - run: npm run validate:lint
       - run: npm run validate:claims-docs

@@ -327,9 +327,9 @@
     "validate:provenance-claims": "tsx scripts/validate-provenance-claims.ts",
     "crawl:metadata": "tsx scripts/crawl-public-metadata.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
-    "test": "node --import tsx --test \"src/**/*.test.ts\"",
-    "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\"",
-    "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\"",
+    "test": "node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
+    "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
+    "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "validate:design-tokens": "tsx scripts/validate-design-tokens.ts",
     "measure:gdelt-noise": "tsx scripts/measure-gdelt-noise.ts",
@@ -375,7 +375,9 @@
     "generate:atlas-review-packet": "tsx scripts/generate-atlas-review-packet.ts --write",
     "validate:atlas-review-packet": "node --import tsx --test src/lib/research/atlas-review-packet.test.ts && tsx scripts/generate-atlas-review-packet.ts && tsx scripts/validate-atlas-review-packet.ts",
     "validate:index-review-packet": "npm run validate:governance-evidence-review-packet && tsx scripts/validate-index-review-packet.ts",
-    "validate:lint": "tsx scripts/validate-lint.ts"
+    "validate:lint": "tsx scripts/validate-lint.ts",
+    "validate:secrets": "tsx scripts/scan-secrets.ts",
+    "validate:secrets:history": "tsx scripts/scan-secrets.ts --history"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
