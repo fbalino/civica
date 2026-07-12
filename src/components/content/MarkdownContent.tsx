@@ -150,13 +150,42 @@ function sliceMarkdownByAnchor(
 }
 
 /**
+ * The single directory reader-page prose is allowed to come from. Keeping the
+ * disk read statically scoped to `content/**` (rather than
+ * `path.resolve(process.cwd(), file)` over an arbitrary path) is what stops
+ * Turbopack from tracing the whole project into every page that renders
+ * markdown (PLT-003). It also fences the read against `../` traversal.
+ */
+const CONTENT_ROOT = "content";
+
+/**
+ * Normalize a caller-supplied content path to its segment within `content/`,
+ * rejecting anything that escapes the directory. Exported for regression tests.
+ */
+export function contentRelative(file: string): string {
+  const rel = file.startsWith(`${CONTENT_ROOT}/`)
+    ? file.slice(CONTENT_ROOT.length + 1)
+    : file;
+  if (
+    rel.length === 0 ||
+    rel.startsWith("/") ||
+    rel.split(/[\\/]/).some((segment) => segment === "..")
+  ) {
+    throw new Error(`content path escapes ${CONTENT_ROOT}/: ${file}`);
+  }
+  return rel;
+}
+
+/**
  * Read a content file with a per-render cache so multiple
  * `<MarkdownContent>` invocations on the same page (rare but possible)
  * issue exactly one disk read.
  */
 const readContentFile = cache(async (file: string): Promise<string> => {
-  const abs = path.resolve(process.cwd(), file);
-  return fs.readFile(abs, "utf8");
+  const rel = contentRelative(file);
+  // Inline `process.cwd(), "content", …` keeps Turbopack's file-trace scoped to
+  // content/** — do not hoist the literal into a variable (PLT-003).
+  return fs.readFile(path.join(process.cwd(), "content", rel), "utf8");
 });
 
 export async function MarkdownContent({
