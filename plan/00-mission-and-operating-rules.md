@@ -125,6 +125,15 @@ Public methodology, UI labels, API docs, examples, README, citation metadata, st
 - Keep automatic review loops to one independent review and one focused repair pass unless a concrete failure remains.
 - Store orchestration state and worker artifacts in this repository; do not place project history in global skill or memory files.
 
+## Parallel lanes and calendar-critical work
+
+Gate order sequences claims and releases, not all execution. Subject to the one-driver-per-mutable-file-area rule and an explicit merge order:
+
+- Areas 06–09 and the contact-free research portions of Areas 10–11 may run in parallel with the remaining Area 05 evaluation work. They must not serialize behind the Pulse disposition, which is calendar-bound by the prospective shadow window and independent human coding.
+- Calendar-critical clocks start at their earliest valid date rather than in checklist order: the prospective shadow window (PUL-040), independent-coder recruitment preparation (PUL-039), and reviewer criteria/longlist/shortlist preparation (GOV-008 through GOV-011, research only).
+- Parallel workers keep disjoint file ownership; the controller merges. Checklist, evidence, and `PROGRESS.md` updates remain single-writer at task completion time.
+- Nothing in this section relaxes the contact boundary: external solicitation still begins only after G4 via GOV-016/GOV-017.
+
 ## Plan self-extension
 
 Executors may and should add tasks when implementation exposes a bug, missing state, invalid assumption, new source-rights issue, or untested edge. New tasks receive the next stable ID in the correct area, an objective `Done when`, dependencies, and a matching line in `plan/MASTER-CHECKLIST.md`. Discovered work is never buried in prose or silently folded into an unrelated task.

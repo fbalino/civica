@@ -21,6 +21,7 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - Approve the final public disposition of each experimental measurement after its resolution and external review are complete.
+- **PUL-039 · Owner:** approve the independent-coder recruitment plan — candidate pool, compensation posture and budget ceiling, blinding/independence terms, and start timing — before any candidate is contacted.
 
 ## External systems
 

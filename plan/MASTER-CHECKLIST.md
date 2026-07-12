@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 292
+- **Total tasks:** 297
 - **Completed:** 107
-- **Remaining:** 185
-- **Progress:** 36.6%
-- **Priority mix:** P0 183 · P1 104 · P2 5
+- **Remaining:** 190
+- **Progress:** 36%
+- **Priority mix:** P0 183 · P1 109 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -71,6 +71,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-031** (P0) Separate live resolver data from named frozen vintages in every API/export. _Done when: callers explicitly select `as_of=live` or a valid immutable `vintage`, response metadata is derived from the selected rows, unsupported labels fail, and no current post-cut value can carry static Q1/frozen metadata._
 - [x] **DAT-032** (P0) Freeze the complete candidate observation set, not only winners, for each reconciliation release. _Done when: every candidate row/source/hash/status used at the cut is version-associated, adapters archive or hash exact inputs, winner pointers cannot drift to changed mutable rows, and offline replay reproduces the release checksum without network access._
 - [x] **DAT-033** (P0) Make indicator/source lineage a first-class key rather than dimension-only metadata. _Done when: CI/Conditions/history observations and ingestions identify indicator ID, source, upstream release, artifact hash, temporal coverage, license URL, transformation, substitution reason, and method; uniqueness prevents one source/indicator silently overwriting another._
+- [ ] **DAT-034** (P1) Run a preregistered random-sample value-fidelity audit of published atlas facts against upstream publisher evidence. _Done when: a seeded, stratified sample of at least 300 published canonical facts spans source families and fact domains; each sampled value is independently re-verified against retained publisher bytes or the current official publisher surface; discrepancies are classified by cause and severity; the protocol, per-fact ledger, and a sampled error rate with an uncertainty interval are published on a methodology surface; and every confirmed defect becomes a tracked repair task._
 
 ## Area 04 — Civica Index Research Program and Design Tournament
 
@@ -160,6 +161,8 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [ ] **PUL-036** (P0) Derive ensemble agreement and publication eligibility only from stored independent runs. _Done when: no script/admin/subscription path can write a literal unsupported `two_of_three`/`all`, agreement is recomputed from provider/model/prompt-versioned runs, product-specific Pulse metadata replaces CI metadata in all APIs, and one-run auto-publication fixtures fail._
 - [ ] **PUL-037** (P0) Redesign decoupling/absorption as versioned evidence rather than destructive confidence mutation. _Done when: only comparable fixed-scale CI releases and an explicit linked event can support absorption, absorption is stored separately with method/as-of/reason, later corroboration cannot erase it, and reruns are stable with historical auditability._
 - [ ] **PUL-038** (P0) Make press/information-environment context immutable, complete, and noninvented. _Done when: a verified official dataset/version covers supported jurisdictions, each event pins the exact value/source/vintage at classification, unknown remains unknown rather than default 50, reruns cannot overwrite the pin, and sensitivity/observability use is documented._
+- [ ] **PUL-039** (P1) Prepare the independent-coder recruitment package before any human contact. _Done when: a role specification records required qualifications, blinding/independence and conflict rules, estimated packet workload and hours derived from the frozen evaluation sets, training and qualification steps, and compensation options with realistic cost ranges; candidate sourcing pools and draft outreach copy exist; the owner approval ask with a lead-time estimate is queued in `plan/MANUAL-CHECKS.md`; and no candidate has been contacted._
+- [ ] **PUL-040** (P1) Start the prospective shadow-period clock at the earliest protocol-valid date. _Done when: the preregistered protocol's start prerequisites are enumerated with current status, the earliest compliant start date is computed and recorded, pipeline and method versions for the window are frozen, window output retention is verified running before human labels exist, and the start decision is logged in evidence and `plan/PROGRESS.md`._
 
 ## Area 06 — Atlas Content and Research Features
 
@@ -239,6 +242,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [ ] **EXP-035** (P1) Make provenance controls precise and accessible. _Done when: `SourceDot` and related disclosures expose source, exact as-of/last-sync timestamp when available, upstream vintage, rights, live/frozen/experimental state and accessible name; month-only display cannot hide a materially stale value; fixtures cover missing/unknown times._
 - [ ] **EXP-036** (P1) Align Record/article metadata and image rendering with visible content. _Done when: Open Graph/social images use the same resolved cover as the page, article/index contain one main landmark, inline images declare stable dimensions/responsive sizes/alt semantics and meet byte budgets, and layout-shift/social-card tests pass._
 - [ ] **EXP-037** (P0) Remove nested interactive elements from country map/media tiles. _Done when: map activation and OpenStreetMap/Protomaps attribution are sibling controls with independent names/focus behavior, no link/button/control is nested inside another interactive element, HTML/accessibility tests pass, and tile click/keyboard behavior remains correct._
+- [ ] **EXP-038** (P1) Run an English-first editorial copy-quality pass on key reader surfaces. _Done when: home, about, methodology landing, country-page module intros, Governance Evidence explainers, licensing, and contact/advisory copy are reviewed for clarity, plain language, and audience fit; drafts are written and owner-approved in English before any other language; approved copy preserves registered claims and passes the claims/docs gate; and browser checks confirm the rendered pages._
 
 ## Area 08 — Platform, Security, Performance, and Operations
 
@@ -272,6 +276,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [ ] **PLT-026** (P0) Distinguish true route not-found from infrastructure failure and add product error boundaries. _Done when: only absent entities return the branded 404; DB/query/service failures produce logged noindex 503/retry responses through tokenized light/dark/mobile `error.tsx`/`global-error.tsx` boundaries; route tests simulate both and prevent caching/indexing a false 404._
 - [ ] **PLT-027** (P0) Close admin redirect, login, session-expiry, and audit-identity gaps. _Done when: a central same-origin redirect validator rejects scheme-relative/backslash/encoded-authority cases; login has durable throttling; signed session state includes identity/issued/expiry/session ID verified server-side; audit actor cannot be changed by an unsigned cookie; regression tests pass._
 - [ ] **PLT-028** (P1) Move large research-feed filtering and pagination to server/query boundaries. _Done when: Pulse ledger/changelog and comparable feeds fetch at most the requested page plus bounded metadata, filters are URL-addressable, query counts/response bytes meet budgets, and a 5,000-row fixture does not serialize into the initial page._
+- [ ] **PLT-029** (P1) Report cumulative program cost and effort telemetry at every gate. _Done when: a documented ledger linked from `plan/PROGRESS.md` records, at each G-gate and at least weekly while work is active, the subscription plans in use, any paid API spend against the caps in `.orchestrator/state.json`, committed external human spend, and notable cost events; zero unexplained paid-API spend exists; and the reporting format is documented so future workers keep it current._
 
 ## Area 09 — Testing, QA, and Release Verification
 
