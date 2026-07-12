@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "civica-atlas-review-packet/2026-07-v1",
+  "releaseId": "atlas-2026-07-11-g2-rc1",
+  "status": "ready_for_independent_review_not_endorsed",
+  "reviewerTerms": "Independent criticism is requested. A favorable conclusion is not required. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica products.",
+  "artifacts": [
+    {
+      "id": "frozen_release",
+      "path": "data/releases/atlas-2026-07-11-g2-rc1.zip",
+      "role": "Frozen G2 release candidate archive",
+      "bytes": 1869046,
+      "sha256": "65c8245c31a3eae7211b3b9f5421d59c759b77ac47b58804fd89c867d60dc656"
+    },
+    {
+      "id": "bundle_manifest",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+      "role": "Release identity and inventory",
+      "bytes": 1513,
+      "sha256": "dd4c19324ac97c7fddb895fb8baf87e213c7c90df370edc9c751ab8ac51a117c"
+    },
+    {
+      "id": "checksums",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/SHA256SUMS",
+      "role": "Release checksums",
+      "bytes": 1302,
+      "sha256": "76a4e6da0b8b43a53f7f8cc9067d36045659bd6e15a4694f4092551efb69e4fb"
+    },
+    {
+      "id": "codebook",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/codebook.v1.json",
+      "role": "Released field codebook",
+      "bytes": 4309,
+      "sha256": "5409a10e17c360160467ad000d52748a9645db6866f955fa205f246904309a9e"
+    },
+    {
+      "id": "data_dictionary",
+      "path": "data/schema-data-dictionary.v1.json",
+      "role": "Complete schema data dictionary",
+      "bytes": 1128962,
+      "sha256": "7dd11d58e74b53141be03d9c4470b68fc2e55103f8a442fbe0b14f9e895631c3"
+    },
+    {
+      "id": "rights_manifest",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+      "role": "Source, field, product, and release rights",
+      "bytes": 32353,
+      "sha256": "16eeb3345e7ed77414673c950cb6e8edd2d5c0d028be95448efaf47823016b54"
+    },
+    {
+      "id": "source_input_manifest",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/source-input-manifest.v1.json",
+      "role": "Source and release-input state",
+      "bytes": 3450,
+      "sha256": "0fa2c4ad4fc03d572b913318534a93bd2bf0ddf4c863f6427f305e9e9fa24959"
+    },
+    {
+      "id": "release_bom",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/release-bom.v1.json",
+      "role": "Release bill of materials",
+      "bytes": 2124,
+      "sha256": "93e4b3fdfd2d5f2b2b7861eb271131a5a8abffd0e3d1218a304b69683cb16638"
+    },
+    {
+      "id": "clean_room",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/clean-room-evidence.v1.json",
+      "role": "Credential-free clean-room result",
+      "bytes": 617,
+      "sha256": "521bada197b450d36a4aeb3b4d7e75a63fd7cf7a3149182a7a5146403bad32cb"
+    },
+    {
+      "id": "reproduction",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+      "role": "Reproduction instructions",
+      "bytes": 467,
+      "sha256": "b1b3fcb48f43b3904f7a23288baa69c51d1a8c0f530e17063f0768d44270c2ef"
+    },
+    {
+      "id": "coverage",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/coverage-report.v1.json",
+      "role": "Release coverage report",
+      "bytes": 573,
+      "sha256": "f675b4112c3db13615363cc39ab344595cda726f386743e1cc45495756386a71"
+    },
+    {
+      "id": "quality",
+      "path": "data/release-quality-report.v1.json",
+      "role": "Release-quality and anomaly report",
+      "bytes": 1404,
+      "sha256": "c08437c954cdeb94ee7b8086ea8dd4ceeb377b58c1bd5ef57f4cc3b3e7411ce7"
+    },
+    {
+      "id": "limitations",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md",
+      "role": "Known limitations",
+      "bytes": 907,
+      "sha256": "a98879c023d030bfd4fe7748bc3bd407dc2e6ed5198588a129f7c619b7361bf1"
+    },
+    {
+      "id": "citation",
+      "path": "data/releases/atlas-2026-07-11/g2-rc1/CITATION.cff",
+      "role": "Citation metadata",
+      "bytes": 1765,
+      "sha256": "5c6f343ca4e9c3ace5333751eb19bd0e8d5a174d2d8524bf3328b367a79f5fe4"
+    },
+    {
+      "id": "correction_policy",
+      "path": "content/policies.md",
+      "role": "Correction, retraction, supersession, and preservation policy",
+      "bytes": 12488,
+      "sha256": "b420af4d7c0dd4caa5b43cdcd9036938a1483c9c18c2833388cbfeccc0ea2744"
+    }
+  ],
+  "questions": [
+    "Can the frozen release be reproduced from the supplied environment, manifest, codebook, and commands, and do the resulting checksums match?",
+    "Does the codebook define every released field, unit, null/value state, vintage, derivation, and source meaning needed for independent use?",
+    "Do the source-input and rights manifests distinguish access, citation, reuse permission, non-commercial restrictions, and excluded payloads accurately?",
+    "Does the release preserve a sufficiently inspectable provenance chain from each exported fact to source identity and vintage?",
+    "Are coverage and quality reports scoped honestly, with missing, unknown, unsupported, disputed, stale, and withheld states kept distinct?",
+    "Are reconciliation, source independence, and precedence rules appropriate for the selected facts and supported by reproducible evidence?",
+    "Do the known limitations identify the material gaps a researcher or teacher would need before reuse?",
+    "Are citation metadata, version identity, checksums, and supersession rules adequate for a citable frozen release?",
+    "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
+    "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
+  ],
+  "semanticSha256": "1162edcd1bcd1bf2b03af339fa3899d6299dbc15821fbdb9a073f560a6099c6a"
+}

@@ -690,3 +690,9 @@ This is the durable decision log for the active master plan. New entries append;
 **Decision:** Adopt `civica-reviewer-dossiers/v1` for every proposed primary and alternate. Governance-measurement and data-curation reviews are estimated at 8–12 hours over three weeks; the larger Pulse review is estimated at 12–16 hours over four weeks and cannot be sent before GOV-015 exists. Each ask names one question, four artifacts, one deliverable, conflict/recusal terms, report-preservation and consented-publication terms, and pending outcome-independent honorarium language. Drafts state that a decline needs no explanation and triggers no materials or follow-up.
 
 **Why:** An open-ended request shifts Civica's scoping work onto reviewers and makes time, independence, and compensation impossible to assess. A bounded dossier lets a candidate make an informed choice, prevents implied endorsement, and protects a courteous exit while keeping critical or unresolved findings in the record.
+
+### APR-D132 — The Atlas review packet wraps the frozen G2 release without duplicating restricted inputs
+
+**Decision:** Adopt `civica-atlas-review-packet/2026-07-v1` as a versioned link-and-hash wrapper around the existing G2 release candidate. Its 15-item inventory binds the archive, codebook, schema dictionary, rights/source-input state, checksums, clean-room evidence, coverage/quality, limitations, citation, and correction policy, plus ten bounded review questions. Repository-relative paths, byte counts, and SHA-256 hashes make drift fail closed. The wrapper does not copy restricted publisher payloads or claim review has occurred.
+
+**Why:** Rebuilding a second release bundle would create competing frozen identities and additional rights risk. A hashed wrapper gives data-curation reviewers one complete, independently checkable scope while preserving the G2 archive as the canonical release object.
