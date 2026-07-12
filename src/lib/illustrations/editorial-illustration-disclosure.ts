@@ -23,6 +23,7 @@ export type DisclosureSurface =
   | "licensing-imagery"
   | "about-pointer"
   | "country-caption"
+  | "page-hero-disclosure"
   | "caption-styling";
 
 export interface DisclosureIssue {
@@ -238,8 +239,10 @@ function requireMatch(
 }
 
 export interface LicensingImageryCheckOptions {
-  /** True only after a validator proves complete per-asset coverage, not merely when a file exists. */
-  manifestExists: boolean;
+  /** True only after a validator proves every published asset has a manifest row. */
+  assetManifestCoverageProven: boolean;
+  /** Separate from asset coverage: false while historical model/prompt/reference records remain incomplete. */
+  completeGenerationRecords: boolean;
 }
 
 /**
@@ -272,6 +275,15 @@ export function checkLicensingImagerySection(
       "The imagery section must state the engravings are not (documentary) photographs.",
       "licensing-imagery",
     ),
+    options.assetManifestCoverageProven
+      ? requireMatch(
+          sectionText,
+          /illustration-manifest\.generated\.json|civica-editorial-illustration-manifest\/v1/i,
+          "missing-asset-manifest-link",
+          "The imagery section must link or name the proven complete asset manifest.",
+          "licensing-imagery",
+        )
+      : null,
     requireMatch(
       sectionText,
       /\bAI[- ]assisted\b|\bgenerative\s+(AI|model|image)\b|\bimage[- ]generation\s+tool/i,
@@ -341,7 +353,7 @@ export function checkLicensingImagerySection(
     ...requiredStatementIssues,
     ...findDocumentaryLanguage(sectionText),
     ...findPermissiveReuseGrant(sectionText),
-    ...findFalseCompleteManifestClaim(sectionText, options.manifestExists),
+    ...findFalseCompleteManifestClaim(sectionText, options.completeGenerationRecords),
     ...findFalseCompleteQaClaim(sectionText),
   ];
 }
@@ -485,6 +497,47 @@ export function checkCountryCaptionDisclosure(componentSource: string): Disclosu
     });
   }
 
+  if (!/aria-label=["'][^"']*non-documentary[^"']*["']/i.test(figcaptionSource)) {
+    issues.push({
+      surface: "country-caption",
+      ruleId: "missing-non-documentary-accessible-name",
+      description: "The country/territory imagery link must identify the art as non-documentary to screen readers.",
+    });
+  }
+
+  return issues;
+}
+
+export function checkPageHeroDisclosure(componentSource: string): DisclosureIssue[] {
+  const issues: DisclosureIssue[] = [];
+  if (!/engraving\s*\?\s*\([\s\S]*?page-hero-art-disclosure/.test(componentSource)) {
+    issues.push({
+      surface: "page-hero-disclosure",
+      ruleId: "page-disclosure-not-gated-on-art",
+      description: "PageHero must render its art disclosure whenever an engraving is supplied.",
+    });
+  }
+  if (!/Editorial illustration/.test(componentSource) || !/AI-assisted, non-documentary/.test(componentSource)) {
+    issues.push({
+      surface: "page-hero-disclosure",
+      ruleId: "missing-page-art-language",
+      description: "PageHero must visibly identify engraving art as AI-assisted and non-documentary.",
+    });
+  }
+  if (!/href=["']\/licensing#imagery["']/.test(componentSource)) {
+    issues.push({
+      surface: "page-hero-disclosure",
+      ruleId: "missing-page-art-policy-link",
+      description: "PageHero art disclosure must link to /licensing#imagery.",
+    });
+  }
+  if (!/alt=["']["'][\s\S]{0,80}aria-hidden=["']true["']/.test(componentSource)) {
+    issues.push({
+      surface: "page-hero-disclosure",
+      ruleId: "page-art-not-decorative",
+      description: "The background art must stay decorative so its disclosure is announced once.",
+    });
+  }
   return issues;
 }
 

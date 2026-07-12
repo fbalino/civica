@@ -76,6 +76,8 @@ Use the standard container widths:
 
 **Engraving color is versioned, not session-tuned.** Japan light is the canonical owner-approved reference, and the current dark corpus uses the approved strength-60 grade. Exact hashes, tone/saturation/warmth ranges, contrast floors, output format, line/geometry invariants, and pass/fail references live in `plan/decisions/engraving-color-contract-v1.md` and its machine-readable JSON companion. Run `npm run validate:engraving-color-contract` after changing a canonical reference, grading parameters, or the batch report. Color grading may not disguise a semantic or landmark defect; those assets enter regeneration review.
 
+Every `<PageHero>` with engraving art visibly renders the canonical `Editorial illustration · AI-assisted, non-documentary` policy link. Country and territory mastheads use their landmark caption plus the equivalent accessible policy disclosure. Background art remains `alt=""` and `aria-hidden="true"` because the adjacent disclosure/caption carries the meaning once. Do not remove, rename, or page-localize these disclosures.
+
 Use `var(--space-*)` for new spacing decisions unless an existing component contract requires a fixed dimension.
 
 ## Elevation

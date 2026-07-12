@@ -290,7 +290,11 @@ export function FactbookHeaderStrip({
                 <span className="factbook-hero-caption-text">{heroCaption}</span>
               )
             ) : null}
-            <Link href="/licensing#imagery" className="factbook-hero-caption-link">
+            <Link
+              href="/licensing#imagery"
+              className="factbook-hero-caption-link"
+              aria-label="AI-assisted illustration; non-documentary editorial art"
+            >
               AI-assisted illustration
             </Link>
           </figcaption>

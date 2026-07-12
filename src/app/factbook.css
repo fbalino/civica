@@ -1223,6 +1223,25 @@
   max-width: 38rem;
   margin: 0 0 var(--space-6);
 }
+.page-hero-art-disclosure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-muted);
+}
+.page-hero-art-disclosure a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.page-hero-art-disclosure a:hover,
+.page-hero-art-disclosure a:focus-visible {
+  color: var(--color-accent);
+}
 /* Left-aligned canonical combobox inside the hero. */
 .factbook-hero-search {
   max-width: 34rem;

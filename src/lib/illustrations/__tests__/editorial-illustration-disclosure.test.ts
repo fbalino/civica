@@ -6,6 +6,7 @@ import {
   checkCaptionLinkStyling,
   checkCountryCaptionDisclosure,
   checkLicensingImagerySection,
+  checkPageHeroDisclosure,
   extractParagraphContaining,
   extractSectionById,
   findDocumentaryLanguage,
@@ -98,11 +99,23 @@ const PASSING_CAPTION_COMPONENT = `
             {heroCaption ? (
               <span className="factbook-hero-caption-text">{heroCaption}</span>
             ) : null}
-            <Link href="/licensing#imagery" className="factbook-hero-caption-link">
+            <Link href="/licensing#imagery" className="factbook-hero-caption-link" aria-label="AI-assisted illustration; non-documentary editorial art">
               AI-assisted illustration
             </Link>
           </figcaption>
         )}
+`;
+
+const PASSING_PAGE_HERO = `
+  {engraving ? (
+    <ParallaxImage alt="" aria-hidden="true" src={engraving.src} />
+  ) : null}
+  {engraving ? (
+    <HeroRevealItem className="page-hero-art-disclosure">
+      <span>Editorial illustration</span>
+      <Link href="/licensing#imagery">AI-assisted, non-documentary</Link>
+    </HeroRevealItem>
+  ) : null}
 `;
 
 const PASSING_CAPTION_CSS = `
@@ -153,19 +166,19 @@ test("extractParagraphContaining returns null when the needle is absent", () => 
 
 test("checkLicensingImagerySection accepts the full passing policy", () => {
   const section = extractSectionById(PASSING_LICENSING_PAGE, "imagery");
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.deepEqual(issues, []);
 });
 
 test("checkLicensingImagerySection reports a missing anchor as a single clear issue", () => {
-  const issues = checkLicensingImagerySection(null, { manifestExists: false });
+  const issues = checkLicensingImagerySection(null, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.equal(issues.length, 1);
   assert.equal(issues[0].ruleId, "missing-imagery-anchor");
 });
 
 test("checkLicensingImagerySection flags a missing tools statement", () => {
   const section = PASSING_LICENSING_SECTION.replaceAll("AI-assisted", "computer-assisted");
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(issues.some((i) => i.ruleId === "missing-tools-statement"), JSON.stringify(issues));
 });
 
@@ -174,7 +187,7 @@ test("checkLicensingImagerySection flags a missing records-incompleteness disclo
     /Civica does not currently retain a complete per-asset generation\s*\n\s*record for the launch corpus of country and territory engravings\.\s*\n\s*Assets created or replaced going forward retain that record\./,
     "Civica retains generation records for its engravings.",
   );
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(
     issues.some((i) => i.ruleId === "missing-records-incompleteness-disclosure"),
     JSON.stringify(issues),
@@ -186,7 +199,7 @@ test("checkLicensingImagerySection flags a false complete-manifest claim when no
     /Civica does not currently retain a complete per-asset generation[\s\S]*?retain that record\./,
     "Civica retains a complete generation record for every engraving in the corpus.",
   );
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(
     issues.some((i) => i.ruleId === "false-complete-manifest-claim"),
     JSON.stringify(issues),
@@ -198,13 +211,13 @@ test("checkLicensingImagerySection can allow a complete-manifest claim only afte
     /Civica does not currently retain a complete per-asset generation[\s\S]*?retain that record\./,
     "Civica retains a complete generation record for every engraving in the corpus.",
   );
-  const issues = checkLicensingImagerySection(section, { manifestExists: true });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: true, completeGenerationRecords: true });
   assert.ok(!issues.some((i) => i.ruleId === "false-complete-manifest-claim"), JSON.stringify(issues));
 });
 
 test("checkLicensingImagerySection flags a false complete-QA claim", () => {
   const section = `${PASSING_LICENSING_SECTION}\n<p>The launch corpus is fully audited.</p>`;
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(issues.some((i) => i.ruleId === "false-complete-qa-claim"), JSON.stringify(issues));
 });
 
@@ -212,7 +225,7 @@ test("checkLicensingImagerySection flags a missing correction path", () => {
   const section = PASSING_LICENSING_SECTION
     .replace("contact form", "feedback channel")
     .replace("investigate and correct it", "address it");
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(issues.some((i) => i.ruleId === "missing-correction-path"), JSON.stringify(issues));
 });
 
@@ -221,7 +234,7 @@ test("checkLicensingImagerySection flags a missing conservative reuse-rights sta
     /Civica does not currently grant a separate license for\s*\n\s*third-party reuse of editorial illustrations outside the site\./,
     "Reach out with questions.",
   );
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(
     issues.some((i) => i.ruleId === "missing-conservative-reuse-statement"),
     JSON.stringify(issues),
@@ -230,7 +243,7 @@ test("checkLicensingImagerySection flags a missing conservative reuse-rights sta
 
 test("checkLicensingImagerySection flags a permissive reuse grant contrary to the conservative posture", () => {
   const section = `${PASSING_LICENSING_SECTION}\n<p>These illustrations are free to reuse for any purpose.</p>`;
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(
     issues.some((i) => i.ruleId === "permissive-reuse-grant:free-to-reuse"),
     JSON.stringify(issues),
@@ -239,13 +252,13 @@ test("checkLicensingImagerySection flags a permissive reuse grant contrary to th
 
 test("checkLicensingImagerySection does not flag the negated reuse-rights sentence as a permissive grant", () => {
   const section = PASSING_LICENSING_SECTION;
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(!issues.some((i) => i.ruleId.startsWith("permissive-reuse-grant")), JSON.stringify(issues));
 });
 
 test("checkLicensingImagerySection flags documentary-photograph language", () => {
   const section = `${PASSING_LICENSING_SECTION}\n<p>Each engraving is an actual photograph of the landmark.</p>`;
-  const issues = checkLicensingImagerySection(section, { manifestExists: false });
+  const issues = checkLicensingImagerySection(section, { assetManifestCoverageProven: false, completeGenerationRecords: false });
   assert.ok(
     issues.some((i) => i.ruleId === "documentary-language:is-a-photograph"),
     JSON.stringify(issues),
@@ -359,10 +372,7 @@ test("checkCountryCaptionDisclosure flags a missing 'Editorial engraving' label"
 });
 
 test("checkCountryCaptionDisclosure flags a missing AI-assisted illustration link", () => {
-  const broken = PASSING_CAPTION_COMPONENT.replace(
-    '<Link href="/licensing#imagery" className="factbook-hero-caption-link">\n              AI-assisted illustration\n            </Link>',
-    "",
-  );
+  const broken = PASSING_CAPTION_COMPONENT.replace(/<Link href="\/licensing#imagery"[\s\S]*?<\/Link>/, "");
   const issues = checkCountryCaptionDisclosure(broken);
   assert.ok(
     issues.some((i) => i.ruleId === "missing-ai-assisted-illustration-link"),
@@ -370,8 +380,17 @@ test("checkCountryCaptionDisclosure flags a missing AI-assisted illustration lin
   );
 });
 
+test("checkCountryCaptionDisclosure requires a non-documentary accessible name", () => {
+  const broken = PASSING_CAPTION_COMPONENT.replace(' aria-label="AI-assisted illustration; non-documentary editorial art"', "");
+  const issues = checkCountryCaptionDisclosure(broken);
+  assert.ok(issues.some((i) => i.ruleId === "missing-non-documentary-accessible-name"), JSON.stringify(issues));
+});
+
 test("checkCountryCaptionDisclosure flags a link whose visible text isn't the disclosure copy", () => {
-  const broken = PASSING_CAPTION_COMPONENT.replace("AI-assisted illustration", "Learn more");
+  const broken = PASSING_CAPTION_COMPONENT.replace(
+    ">\n              AI-assisted illustration\n            </Link>",
+    ">\n              Learn more\n            </Link>",
+  );
   const issues = checkCountryCaptionDisclosure(broken);
   assert.ok(
     issues.some((i) => i.ruleId === "missing-ai-assisted-illustration-link"),
@@ -383,6 +402,15 @@ test("checkCountryCaptionDisclosure reports a missing figcaption as a single cle
   const issues = checkCountryCaptionDisclosure("export function FactbookHeaderStrip() { return null; }");
   assert.equal(issues.length, 1);
   assert.equal(issues[0].ruleId, "missing-caption-block");
+});
+
+test("checkPageHeroDisclosure accepts visible policy copy and decorative background art", () => {
+  assert.deepEqual(checkPageHeroDisclosure(PASSING_PAGE_HERO), []);
+});
+
+test("checkPageHeroDisclosure catches missing non-documentary copy", () => {
+  const issues = checkPageHeroDisclosure(PASSING_PAGE_HERO.replace("AI-assisted, non-documentary", "AI-assisted"));
+  assert.ok(issues.some((i) => i.ruleId === "missing-page-art-language"), JSON.stringify(issues));
 });
 
 // ---------------------------------------------------------------------------

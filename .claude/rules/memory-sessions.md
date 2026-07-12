@@ -752,3 +752,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Added a build gate for all 394 country WebPs/197 exact pairs, approved 3:2 sizes and file bounds, captions, manifest rows, dark color states, and duplicate/missing risks.
 - Removed the country/territory route's raw PNG fallback; unoptimized generation exports cannot silently become public.
 - Seeded tests catch every required failure class.
+
+## 2026-07-12 — EXP-012 art disclosure completed
+
+- Every engraved PageHero now carries a visible AI-assisted/non-documentary policy link; country/territory captions add the same classification to the accessible name.
+- Licensing links the complete 538-asset manifest while preserving the irrecoverable historical model/prompt/reference/seed limit and the incomplete human-review disclosure.
+- Representative About, Greenland, Japan, and licensing surfaces passed desktop/mobile/light/dark browser checks with no overflow or console errors.

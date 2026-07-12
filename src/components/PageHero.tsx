@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
@@ -137,6 +138,13 @@ export function PageHero({
         ) : null}
 
         {children != null ? <HeroRevealItem>{children}</HeroRevealItem> : null}
+
+        {engraving ? (
+          <HeroRevealItem className="page-hero-art-disclosure">
+            <span>Editorial illustration ·</span>
+            <Link href="/licensing#imagery">AI-assisted, non-documentary</Link>
+          </HeroRevealItem>
+        ) : null}
       </HeroReveal>
     </section>
   );

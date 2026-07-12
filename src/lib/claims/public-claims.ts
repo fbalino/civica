@@ -605,11 +605,14 @@ export const PUBLIC_CLAIMS = [
     surface: "licensing",
     routeOrArtifact: "/licensing#imagery",
     exactClaim:
-      "Civica does not currently retain a complete per-asset generation record — prompt text, reference imagery, and model version — for the launch corpus of country and territory engravings. Assets created or replaced going forward retain that record. Automated checks currently cover defined technical properties — asset presence, format, and dimensions — for territory engravings. Human visual review of what each engraving depicts and whether its caption correctly names the landmark is being strengthened over time; it is not yet complete or independently audited. Display of these engravings on Civica Atlas is authorized by Civica. Civica does not currently grant a separate license for third-party reuse of editorial illustrations outside the site; provenance and legal review of this imagery is pending.",
+      "The versioned illustration manifest covers every published engraving with route, subject, caption, pair, file identity, rights note, and QA state. Historical model, prompt, reference-image, and seed records remain incomplete. Automated inventory, pairing, format, file-bound, color-policy, and manifest-drift checks do not replace human landmark review, which is not yet complete or independently audited. Engravings are AI-assisted, non-documentary editorial illustrations and are not source evidence. Civica grants no separate third-party reuse license for them.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/app/licensing/page.tsx",
       "public/engravings/README.md",
+      "src/lib/illustrations/illustration-manifest.generated.json",
+      "scripts/generate-illustration-manifest.ts",
+      "scripts/validate-country-engravings.ts",
       "scripts/validate-territory-engravings.ts",
       "src/lib/data/engraving-captions.ts",
       "src/components/factbook/FactbookHeaderStrip.tsx",
@@ -620,7 +623,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/licensing/page.tsx",
       fragment:
-        "Civica does not currently retain a complete per-asset generation\n          record",
+        "Historical generation records remain incomplete: the launch\n          sessions did not retain prompt text",
     },
   },
   {
