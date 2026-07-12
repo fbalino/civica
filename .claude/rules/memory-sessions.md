@@ -740,3 +740,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Productionized the approved grade as `civica-engraving-grade/1.0.0` with single-file and manifest CLI modes.
 - Every preview/final output receives a parameter/hash/geometry/metric sidecar; exact reruns are no-writes and graded inputs are rejected.
 - Golden hash/metric, geometry, repeatability, manifest, and double-processing tests run in the editorial-illustration build gate.
+
+## 2026-07-12 — EXP-010 illustration manifest completed
+
+- Reconstructed `civica-editorial-illustration-manifest/v1` for all 538 tracked WebP assets with complete pairs/captions and recoverable file, route, Git, edit, rights, and QA metadata.
+- Original generation model/tool/prompt/reference sessions remain explicitly irrecoverable/unknown; Git capture dates are not generation dates.
+- Deterministic regeneration and drift checking now run in the editorial-illustration build gate.
