@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 148
-- **Remaining:** 155
-- **Progress:** 48.8%
+- **Completed:** 149
+- **Remaining:** 154
+- **Progress:** 49.2%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -172,7 +172,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-001** (P0) Build a canonical atlas surface/data matrix for every top-level route and country module. _Done when: the matrix maps each rendered module to query/API, tables/fields, source/provenance, coverage, empty/error behavior, tests, owner, and release inclusion; every production route/module has an explicit row._
 - [x] **ATL-002** (P0) Establish release coverage thresholds and honest coverage notes for every atlas domain. _Done when: countries/entities, government bodies/offices/people, legislatures/parties, elections, constitutions, organizations, bills, facts, indicators, images, and citations have computed completeness/freshness metrics, documented minimums, and UI behavior below minimum._
 - [x] **ATL-003** (P0) Make source-native longitudinal indicator history a first-class country and comparison surface. _Done when: readers can plot documented native indicators across available years with source/vintage/units/breaks, choose series/time range, download underlying observations, and distinguish missing data from no change; browser and query performance tests pass._
-- [ ] **ATL-004** (P1) Surface source agreement, disagreement, and resolver reasoning where multiple sources exist. _Done when: representative fact modules show the selected value, alternatives, vintages, source-family independence, and resolver rationale without implying every fact was reconciled; single-source facts are labelled plainly._
+- [x] **ATL-004** (P1) Surface source agreement, disagreement, and resolver reasoning where multiple sources exist. _Done when: representative fact modules show the selected value, alternatives, vintages, source-family independence, and resolver rationale without implying every fact was reconciled; single-source facts are labelled plainly._
 - [ ] **ATL-005** (P1) Add a neutral data-confidence/coverage view that does not grade country quality. _Done when: the view reports source coverage, freshness, agreement, and missingness as properties of Civica's evidence—not the country—and every component traces to DAT-005/006 metrics._
 - [ ] **ATL-006** (P0) Apply the sourced jurisdiction/status taxonomy consistently across country, territory, atlas, compare, search, API, sitemap, metadata, and exports. _Done when: DAT-004 fixtures pass on every surface, politically sensitive labels include sources/notes, and no hardcoded blanket status remains._
 - [ ] **ATL-007** (P0) Audit and qualify the expanded elections corpus before calling it global. _Done when: all 915 baseline rows are checked for event type, date semantics, status, jurisdiction identity, source, license, duplication, historical/upcoming distinction, and freshness; coverage report and UI claims reflect the verified result._

@@ -1004,3 +1004,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   release, artifact, transformation, method, and comparability limits.
 - Downloads are filtered per source through the rights manifest; visible data
   does not imply redistribution permission. Durable record: APR-D157.
+
+## 2026-07-12 — Agreement counts producing families
+
+- Fact panels distinguish single-source, agreement, resolver-selected
+  disagreement, and unavailable states.
+- Republishers collapse to the upstream producing family; projections,
+  compilations, and unknown lineage cannot manufacture corroboration.
+- Selected values, alternatives, vintages, and the deterministic trace appear
+  together. Durable record: APR-D158.

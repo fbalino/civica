@@ -974,3 +974,18 @@ has not earned publication. Keeping series separate avoids manufacturing a new
 construct, while visible gaps and lineage let readers judge comparability.
 Rights filtering preserves the distinction between reading a value on Civica
 and receiving a reusable bulk copy of it.
+
+### APR-D158 — Source agreement is a claim-family property
+
+**Decision:** Present fact evidence as single-source, within-tolerance
+agreement, resolver-selected disagreement, or unavailable. Count distinct
+verified producing families rather than database source IDs; republishers share
+their upstream family, projections do not corroborate measurements, and
+compilation or unknown lineage cannot establish independence. Show the selected
+row, alternatives, vintages, and complete deterministic decision trace together.
+
+**Why:** Several branded source rows can carry the same underlying observation.
+Treating them as independent would overstate evidence. A reader also needs to
+distinguish genuine agreement from a rule-based selection among different
+values, while a single-source fact should remain useful without acquiring a
+false reconciliation claim.

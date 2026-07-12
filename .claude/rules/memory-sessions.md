@@ -849,3 +849,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Refreshed the additive rights manifest through G2 and reviewer packet
   inventories. Browser QA, all 936 tests, claims gates, and the 105-page build
   passed.
+
+## 2026-07-12 — ATL-004 evidence reasoning completed
+
+- Extended the shared fact-source panel with evidence posture, producing-family
+  independence, precedence rationale, and the complete six-step trace.
+- Argentina population verified that World Bank and UN Data collapse to UN WPP
+  while CIA/Wikidata remain non-independent compilations and IMF projection
+  stays visible without corroborating measurements.
+- Desktop/mobile light/dark browser QA and all 939 claims tests passed.

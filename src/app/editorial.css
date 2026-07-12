@@ -1310,6 +1310,7 @@ legend.editorial-filter-label {
 .fact-value-panel {
   width: 360px;
   max-width: min(420px, calc(100vw - 2 * var(--space-3)));
+  max-height: calc(100vh - 2 * var(--space-3));
   box-sizing: border-box;
   background: var(--color-surface-primary);
   border: 1px solid var(--color-border-default);
@@ -1319,6 +1320,7 @@ legend.editorial-filter-label {
   text-align: left;
   white-space: normal;
   overflow-wrap: anywhere;
+  overflow-y: auto;
   color: var(--color-text-primary);
 }
 .fact-value-panel-host {
@@ -1370,6 +1372,58 @@ legend.editorial-filter-label {
   font-size: var(--text-14);
   color: var(--color-text-primary);
   line-height: 1.4;
+}
+
+.fact-value-evidence {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-hairline) solid var(--color-border-default);
+  border-left: var(--space-1) solid var(--color-status-info);
+  background: var(--color-select-bg);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.fact-value-evidence--agreement {
+  border-left-color: var(--color-status-success);
+}
+.fact-value-evidence--resolver_selected,
+.fact-value-evidence--unavailable {
+  border-left-color: var(--color-status-warning);
+}
+.fact-value-evidence p {
+  margin: 0;
+  color: var(--color-text-60);
+}
+.fact-value-evidence-rationale span {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+.fact-value-decision-trace summary {
+  cursor: pointer;
+  color: var(--color-text-60);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.fact-value-decision-trace ol {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+}
+.fact-value-decision-trace li strong,
+.fact-value-decision-trace li span,
+.fact-value-row-lineage {
+  display: block;
+}
+.fact-value-decision-trace li strong {
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+.fact-value-row-lineage {
+  margin-top: var(--space-1);
+  color: var(--color-text-50);
 }
 
 .fact-value-rows {
