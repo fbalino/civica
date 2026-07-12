@@ -1,6 +1,6 @@
 /**
  * PLT-008 — canonical security/exposure inventory of every route.ts
- * handler under src/app (99 files: public API, admin, cron, chat,
+ * handler under src/app (100 files: public API, admin, cron, chat,
  * pulse-coding, embed, export/downloads).
  *
  * This registry is the SOLE source of truth for route exposure
@@ -198,6 +198,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     sensitive: true,
     controls: ["rate-limit", "input-validation"],
     note: "Public Ask Civica chat proxy to a paid Anthropic model; two-layer (in-memory + durable) per-IP rate limit and hard input-size/shape caps enforced before any model call (2026-06-07 audit remediation).",
+  },
+  {
+    filePath: "api/citations/[entityType]/[id]/route.ts",
+    exposure: "public-read",
+    methods: ["GET"],
+    mutation: false,
+    sensitive: false,
+    controls: ["public"],
+    note: "ATL-019 public stable-entity-citation resolver (fact/institution/office/person/election/constitution-passage/organization/indicator); in-memory rate limited, no PII, no auth required by design.",
   },
   {
     filePath: "api/civica-index/corrections/route.ts",
