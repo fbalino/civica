@@ -47,6 +47,10 @@ export async function GET(
         type: org.type,
         joinYear: m.joinYear,
         role: m.role ?? null,
+        // ATL-012 — status/endYear distinguish current from historical
+        // (withdrawn) memberships; omitted status means current.
+        status: m.status ?? "current",
+        endYear: m.endYear ?? null,
       };
     })
     .filter(Boolean)

@@ -1491,6 +1491,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 }
 .intl-mem-row:hover { background: var(--atlas-paper-2); }
 .intl-mem-row--static { cursor: default; }
+/* ATL-012 — a historical (withdrawn) membership row is visually muted so a
+   reader scanning the list distinguishes it from current members without
+   losing the row from the record. */
+.intl-mem-row--historical { opacity: 0.62; }
 .intl-mem-row .dot { width: 8px; height: 8px; border-radius: 50%; }
 .intl-mem-row .name {
   font-family: var(--font-heading); font-size: var(--text-16); letter-spacing: -0.01em;
@@ -1513,6 +1517,9 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   border-color: var(--cat-un); color: var(--cat-un);
 }
 .intl-mem-row .role-badge.observer { color: var(--atlas-muted); }
+.intl-mem-row .role-badge.historical {
+  border-color: var(--atlas-muted); color: var(--atlas-muted);
+}
 .intl-mem-row .year {
   font-family: var(--font-mono); font-size: var(--text-12);
   color: var(--atlas-muted); letter-spacing: 0.06em;

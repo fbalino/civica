@@ -29,6 +29,14 @@ export interface Membership {
   countryId: string;
   joinYear: number;
   role?: MemberRole;
+  /**
+   * ATL-012 — membership status. Omitted/"current" means the country is a
+   * present-day member; "withdrawn" marks a membership that has formally
+   * ended (the row is retained for the historical record, not deleted).
+   */
+  status?: "current" | "withdrawn";
+  /** Year the membership ended. Only meaningful when status is "withdrawn". */
+  endYear?: number;
 }
 
 export interface OrganizationMemberCountryFallback {
@@ -233,7 +241,12 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 1975,
     hqCountry: "nga",
-    memberCount: 15,
+    // ATL-012: current membership (12), not the founding-era total (15) —
+    // Burkina Faso, Mali, and Niger formally withdrew in January 2025 after
+    // announcing their exit in January 2024. See MEMBERSHIPS below, where
+    // those three rows are retained with status: "withdrawn" rather than
+    // deleted, so the historical relationship stays queryable.
+    memberCount: 12,
     description: "Regional economic and political bloc of West African states.",
   },
   {
@@ -537,15 +550,21 @@ export const MEMBERSHIPS: Membership[] = [
     ["qat", 1981, "founding"], ["bhr", 1981, "founding"], ["omn", 1981, "founding"],
   ]),
 
-  // ECOWAS — 15 West African states. Note: Burkina Faso, Mali, and Niger
-  // announced withdrawal in 2024; retained here as historical members.
+  // ECOWAS — 12 current West African member states.
   ...orgMemberEntries("ecowas", [
     ["nga", 1975, "founding"], ["civ", 1975, "founding"], ["sen", 1975, "founding"],
-    ["gha", 1975, "founding"], ["mli", 1975, "founding"], ["bfa", 1975, "founding"],
-    ["ner", 1975, "founding"], ["ben", 1975, "founding"], ["tgo", 1975, "founding"],
+    ["gha", 1975, "founding"], ["ben", 1975, "founding"], ["tgo", 1975, "founding"],
     ["gin", 1975, "founding"], ["sle", 1975, "founding"], ["lbr", 1975, "founding"],
     ["gmb", 1975, "founding"], ["gnb", 1977], ["cpv", 1976],
   ]),
+  // ATL-012 — Burkina Faso, Mali, and Niger were ECOWAS founding members
+  // (1975) but jointly announced withdrawal in January 2024 (forming the
+  // Alliance of Sahel States) and formally exited in January 2025. Retained
+  // as explicit historical memberships rather than deleted, so the dated
+  // relationship — not a timeless "member" fact — is what's represented.
+  { orgId: "ecowas", countryId: "bfa", joinYear: 1975, role: "founding", status: "withdrawn", endYear: 2025 },
+  { orgId: "ecowas", countryId: "mli", joinYear: 1975, role: "founding", status: "withdrawn", endYear: 2025 },
+  { orgId: "ecowas", countryId: "ner", joinYear: 1975, role: "founding", status: "withdrawn", endYear: 2025 },
 
   // OIF — Atlas Francophone subset (observers + full)
   { orgId: "oif", countryId: "fra", joinYear: 1970, role: "founding" },

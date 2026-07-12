@@ -71,6 +71,8 @@ export default async function OrgDetailPage({
         joinYear: m.joinYear,
         role: m.role ?? null,
         inAtlas: !!c,
+        status: m.status ?? "current",
+        endYear: m.endYear ?? null,
       };
     })
     .filter((m): m is NonNullable<typeof m> => m !== null)
