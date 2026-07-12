@@ -469,8 +469,8 @@
     {
       "artifactId": "selected-product-code-6",
       "role": "selected-product-code",
-      "bytes": 2344,
-      "sha256": "32502cecb1d274d64fd7f96ffea37dfd9a3fd8457d0ee4842dce089a69e7d609",
+      "bytes": 2362,
+      "sha256": "ba452618d78dbb750b319acdc1e8ee87681507c2ac835c494faf6c779e851f41",
       "path": "scripts/validate-governance-evidence-dashboard.ts"
     },
     {
@@ -490,8 +490,8 @@
     {
       "artifactId": "selected-product-code-4",
       "role": "selected-product-code",
-      "bytes": 3282,
-      "sha256": "d7121d82d36f4253351e2c976193d90d3ef300f8b649c66ce6a0fa0224bf00a0",
+      "bytes": 7518,
+      "sha256": "20ded2ea1d1d858477972507dfbdb7e8fb75a796721aa02482f1fcfe800e7f6f",
       "path": "src/app/governance-evidence/page.tsx"
     },
     {
@@ -532,8 +532,8 @@
     {
       "artifactId": "selected-product-code-2",
       "role": "selected-product-code",
-      "bytes": 3584,
-      "sha256": "98ab532fc4671bd4f363f2d38bd4f57d6794f7700aa87d93c5e6043abf8d0024",
+      "bytes": 3620,
+      "sha256": "cda486edf6e955a4d223a04bb16fc623c82f4ef450607f43d893bb047ced1778",
       "path": "src/lib/db/queries-governance-evidence.ts"
     },
     {
@@ -544,5 +544,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "c25b3cfef132411e17bf690eb703042f19b419a629b7f8e7bd7fa1cbd109ba63"
+  "bundleSemanticSha256": "3019ec0dad84c5455e04f5141b2ae8422bd71cd2e16ef2827e0616e0bad14fc3"
 }

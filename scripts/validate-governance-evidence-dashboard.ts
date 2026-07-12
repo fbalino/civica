@@ -25,7 +25,7 @@ async function main() {
   assert.equal(exported.rows.filter((row) => row.valueStatus === "withheld").length, 3);
   const page = readFileSync("src/app/governance-evidence/page.tsx", "utf8");
   assert.doesNotMatch(page, /ScorePosition|letter grade|country-quality score[^<]*[0-9]/i);
-  assert.match(page, /does not average them, grade the country/);
+  assert.match(page, /does not\s+average them, grade\s+(?:the country|countries)/);
   console.log(`PASS — dashboard preserves all ${coverage.rows} native release cells; Japan fixture is exact and restricted exports fail closed.`);
 }
 main().catch((error) => { console.error(error); process.exit(1); });
