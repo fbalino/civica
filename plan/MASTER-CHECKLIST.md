@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 132
-- **Remaining:** 171
-- **Progress:** 43.6%
+- **Completed:** 133
+- **Remaining:** 170
+- **Progress:** 43.9%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -216,7 +216,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-008** (P1) Grade the approved country dark-image scope without unnecessary regeneration. _Done when: only owner-approved corpus/outliers are transformed, every output meets EXP-005 thresholds, a generated before/after metric report flags exceptions, browser sampling covers all generation batches, and originals/manifest remain available._
 - [ ] **EXP-009** (P2) Regenerate only semantically or compositionally failed illustrations after grading. _Done when: each regeneration has a documented failure reason, reference contract, complete prompt/tool/version/seed where available, landmark fact-check, light/dark relation, human approval, and no color-only regeneration._
 - [x] **EXP-010** (P0) Restore or reconstruct a complete country/page/territory illustration manifest. _Done when: all assets map to entity/route, depicted subject, caption, light/dark relationship, generation/edit history, model/tool, prompt or best available provenance, dimensions, hashes, rights/disclosure, QA status, and any irrecoverable provenance gap._
-- [ ] **EXP-011** (P0) Add `validate:country-engravings` and include it in CI. _Done when: validation checks exact pair coverage, WebP/fallback policy, dimensions/aspect, file-size bounds, caption/manifest coverage, duplicate/missing files, color-family thresholds, and raw PNG fallback risk; seeded failures are caught._
+- [x] **EXP-011** (P0) Add `validate:country-engravings` and include it in CI. _Done when: validation checks exact pair coverage, WebP/fallback policy, dimensions/aspect, file-size bounds, caption/manifest coverage, duplicate/missing files, color-family thresholds, and raw PNG fallback risk; seeded failures are caught._
 - [ ] **EXP-012** (P0) Integrate the editorial-illustration disclosure into captions, licensing, metadata, and accessible descriptions. _Done when: representative country/page/territory routes identify art as illustrative/non-documentary, captions remain concise, licensing links to the policy/manifest, screen-reader text is accurate, and no generated image is mistaken for source evidence._
 - [ ] **EXP-013** (P0) Move the country hero caption into valid, collision-free structure. _Done when: caption semantics are valid, desktop hero reserves a content row/region rather than relying on hardcoded offsets, it never overlaps Map/Images controls across the supported width/text matrix, and screenshot/geometry tests include 769px and 1440px._
 - [ ] **EXP-014** (P0) Create three design-system-compliant Explore navigation concepts before implementation: typography-first scholarly index, emblem-led compact menu, and true editorial mega menu. _Done when: each concept includes hierarchy, information architecture, keyboard/focus behavior, desktop/mobile relationship, performance budget, asset plan, light/dark states, and browser-rendered mockups under the dated mockup convention._

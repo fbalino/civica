@@ -28,9 +28,9 @@ Antique-atlas illustration assets for the almanac design language.
 Source exports from Codex are large PNGs (~4–5 MB). They are converted to **WebP**
 (`cwebp -q 80 -resize 1500 0`) — ~10× smaller, visually identical — before committing.
 
-The factbook lookup **prefers `<iso3>.webp` but falls back to `<iso3>.png`** for the
-light asset, so a raw PNG dropped into `countries/` appears immediately; convert it to
-WebP (and delete the PNG) before committing so the repo and page loads stay light.
+The factbook lookup is **WebP-only**. A raw generation PNG must never appear on a
+reader route: convert it, verify it, add its manifest metadata, and delete the PNG
+before committing. `npm run validate:country-engravings` fails on raw files.
 Dark-mode country art must be saved as `<iso3>-dark.webp`; generate it as a real
 nighttime engraving with a vignette that dissolves into the dark theme background
 rather than relying on CSS inversion.

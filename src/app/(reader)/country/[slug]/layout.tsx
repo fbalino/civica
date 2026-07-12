@@ -129,22 +129,17 @@ export default async function CountryLayout({
   const mapboxAvailable = Boolean(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
 
   const engravingCode = jurisdiction.iso3 ? jurisdiction.iso3.toLowerCase() : null;
-  // Prefer the optimized .webp; fall back to a raw .png drop (so new Codex
-  // exports saved to public/engravings/countries/ appear before conversion).
+  // Release art is WebP-only. Raw generation exports never enter a reader path.
   const engravingDir = join(process.cwd(), "public", "engravings", "countries");
   const territoryEngravingDir = join(process.cwd(), "public", "engravings", "territories");
   const iso3EngravingSrc = engravingCode
     ? existsSync(join(engravingDir, `${engravingCode}.webp`))
       ? `/engravings/countries/${engravingCode}.webp`
-      : existsSync(join(engravingDir, `${engravingCode}.png`))
-        ? `/engravings/countries/${engravingCode}.png`
-        : null
+      : null
     : null;
   const territoryEngravingSrc = existsSync(join(territoryEngravingDir, `${slug}.webp`))
     ? `/engravings/territories/${slug}.webp`
-    : existsSync(join(territoryEngravingDir, `${slug}.png`))
-      ? `/engravings/territories/${slug}.png`
-      : null;
+    : null;
   const countryEngravingSrc = iso3EngravingSrc ?? territoryEngravingSrc;
   const iso3EngravingDarkSrc =
     engravingCode && existsSync(join(engravingDir, `${engravingCode}-dark.webp`))

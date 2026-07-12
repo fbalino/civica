@@ -746,3 +746,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Reconstructed `civica-editorial-illustration-manifest/v1` for all 538 tracked WebP assets with complete pairs/captions and recoverable file, route, Git, edit, rights, and QA metadata.
 - Original generation model/tool/prompt/reference sessions remain explicitly irrecoverable/unknown; Git capture dates are not generation dates.
 - Deterministic regeneration and drift checking now run in the editorial-illustration build gate.
+
+## 2026-07-12 — EXP-011 country engraving gate completed
+
+- Added a build gate for all 394 country WebPs/197 exact pairs, approved 3:2 sizes and file bounds, captions, manifest rows, dark color states, and duplicate/missing risks.
+- Removed the country/territory route's raw PNG fallback; unoptimized generation exports cannot silently become public.
+- Seeded tests catch every required failure class.
