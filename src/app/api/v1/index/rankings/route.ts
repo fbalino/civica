@@ -12,6 +12,7 @@ import {
   shapeIndexRankingsItem,
   shapeIndexRankingsMeta,
 } from "@/lib/api/contract/shapes";
+import { retiredPulseScalarResponse } from "@/lib/api/pulse-scalar-retirement";
 
 type ExtendedTaxonomy =
   | GovernmentTaxonomyLens
@@ -51,21 +52,26 @@ function buildPeerLensCondition(
 }
 
 export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const requestedSort = url.searchParams.get("sort");
+  if (requestedSort?.trim().toLowerCase() === "cp") {
+    return retiredPulseScalarResponse();
+  }
+  const sort = requestedSort ?? "ci";
+  if (sort !== "ci") {
+    return withIndexDispositionDeprecation(apiError(
+      "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
+      400,
+    ));
+  }
+
   const rateLimited = withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const url = new URL(request.url);
     const quarterParam = url.searchParams.get("quarter");
-    const sort = url.searchParams.get("sort") ?? "ci";
-    if (sort !== "ci") {
-      return withIndexDispositionDeprecation(apiError(
-        "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
-        400,
-      ));
-    }
     const continent = url.searchParams.get("continent");
     const governmentType = url.searchParams.get("government_type");
     const taxonomyParam = url.searchParams.get("taxonomy");

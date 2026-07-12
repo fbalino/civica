@@ -1672,64 +1672,6 @@ export const pulseEvents = pgTable(
   ],
 );
 
-export const pulseDailyScores = pgTable(
-  "pulse_daily_scores",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    jurisdictionId: uuid("jurisdiction_id")
-      .references(() => jurisdictions.id)
-      .notNull(),
-    scoreDate: date("score_date").notNull(),
-    ciBaseline: real("ci_baseline").notNull(),
-    eventImpact: real("event_impact").notNull(),
-    pulseScore: real("pulse_score").notNull(),
-    activeEvents: integer("active_events").notNull(),
-    isLowConfidence: boolean("is_low_confidence").notNull().default(false),
-    // See the identical note on ciDimensionScores.methodologyVersion above:
-    // explicit named foreignKey() below, not inline .references(), because
-    // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
-    methodologyVersion: text("methodology_version").notNull(),
-    calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
-  },
-  (table) => [
-    uniqueIndex("idx_pulse_daily_unique").on(
-      table.jurisdictionId,
-      table.scoreDate,
-    ),
-    index("idx_pulse_daily_date").on(table.scoreDate),
-    index("idx_pulse_daily_jurisdiction").on(table.jurisdictionId),
-    foreignKey({
-      name: "pulse_daily_scores_methodology_version_ci_methodology_versions_",
-      columns: [table.methodologyVersion],
-      foreignColumns: [ciMethodologyVersions.id],
-    }),
-  ],
-);
-
-export const pulseChangelog = pgTable(
-  "pulse_changelog",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    jurisdictionId: uuid("jurisdiction_id")
-      .references(() => jurisdictions.id)
-      .notNull(),
-    scoreDate: date("score_date").notNull(),
-    eventId: uuid("event_id")
-      .references(() => pulseEvents.id)
-      .notNull(),
-    decayedImpact: real("decayed_impact").notNull(),
-    daysSinceEvent: integer("days_since_event").notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
-  },
-  (table) => [
-    index("idx_pulse_changelog_jurisdiction_date").on(
-      table.jurisdictionId,
-      table.scoreDate,
-    ),
-    index("idx_pulse_changelog_event").on(table.eventId),
-  ],
-);
-
 // --- International organizations (CIV-163) ---
 
 export const organizations = pgTable("organizations", {

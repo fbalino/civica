@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T08:47:36.373Z",
-  "sha256": "77923b09ba1780b8b11a924b73e0b3a7b3db738122798f9ee3760a7784dccfcb",
+  "generatedAt": "2026-07-12T09:19:59.635Z",
+  "sha256": "830db9e3a2af51bfe226771a1871df0601328e1c40cbe0d9a725e316abec7e91",
   "schema": {
     "columns": [
       {
@@ -5264,69 +5264,6 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
-        "table": "pulse_changelog",
-        "default": "gen_random_uuid()",
-        "nullable": "NO",
-        "position": 1
-      },
-      {
-        "udt": "uuid",
-        "name": "jurisdiction_id",
-        "type": "uuid",
-        "table": "pulse_changelog",
-        "default": null,
-        "nullable": "NO",
-        "position": 2
-      },
-      {
-        "udt": "date",
-        "name": "score_date",
-        "type": "date",
-        "table": "pulse_changelog",
-        "default": null,
-        "nullable": "NO",
-        "position": 3
-      },
-      {
-        "udt": "uuid",
-        "name": "event_id",
-        "type": "uuid",
-        "table": "pulse_changelog",
-        "default": null,
-        "nullable": "NO",
-        "position": 4
-      },
-      {
-        "udt": "float4",
-        "name": "decayed_impact",
-        "type": "real",
-        "table": "pulse_changelog",
-        "default": null,
-        "nullable": "NO",
-        "position": 5
-      },
-      {
-        "udt": "int4",
-        "name": "days_since_event",
-        "type": "integer",
-        "table": "pulse_changelog",
-        "default": null,
-        "nullable": "NO",
-        "position": 6
-      },
-      {
-        "udt": "timestamp",
-        "name": "created_at",
-        "type": "timestamp without time zone",
-        "table": "pulse_changelog",
-        "default": "now()",
-        "nullable": "YES",
-        "position": 7
-      },
-      {
-        "udt": "uuid",
-        "name": "id",
-        "type": "uuid",
         "table": "pulse_classification_attempts",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -6483,96 +6420,6 @@
         "default": null,
         "nullable": "YES",
         "position": 14
-      },
-      {
-        "udt": "uuid",
-        "name": "id",
-        "type": "uuid",
-        "table": "pulse_daily_scores",
-        "default": "gen_random_uuid()",
-        "nullable": "NO",
-        "position": 1
-      },
-      {
-        "udt": "uuid",
-        "name": "jurisdiction_id",
-        "type": "uuid",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 2
-      },
-      {
-        "udt": "date",
-        "name": "score_date",
-        "type": "date",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 3
-      },
-      {
-        "udt": "float4",
-        "name": "ci_baseline",
-        "type": "real",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 4
-      },
-      {
-        "udt": "float4",
-        "name": "event_impact",
-        "type": "real",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 5
-      },
-      {
-        "udt": "float4",
-        "name": "pulse_score",
-        "type": "real",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 6
-      },
-      {
-        "udt": "int4",
-        "name": "active_events",
-        "type": "integer",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 7
-      },
-      {
-        "udt": "bool",
-        "name": "is_low_confidence",
-        "type": "boolean",
-        "table": "pulse_daily_scores",
-        "default": "false",
-        "nullable": "NO",
-        "position": 8
-      },
-      {
-        "udt": "text",
-        "name": "methodology_version",
-        "type": "text",
-        "table": "pulse_daily_scores",
-        "default": null,
-        "nullable": "NO",
-        "position": 9
-      },
-      {
-        "udt": "timestamp",
-        "name": "calculated_at",
-        "type": "timestamp without time zone",
-        "table": "pulse_daily_scores",
-        "default": "now()",
-        "nullable": "NO",
-        "position": 10
       },
       {
         "udt": "uuid",
@@ -9730,21 +9577,6 @@
         "definition": "CREATE UNIQUE INDEX pulse_candidate_outcomes_pkey ON public.pulse_candidate_outcomes USING btree (id)"
       },
       {
-        "name": "idx_pulse_changelog_event",
-        "table": "pulse_changelog",
-        "definition": "CREATE INDEX idx_pulse_changelog_event ON public.pulse_changelog USING btree (event_id)"
-      },
-      {
-        "name": "idx_pulse_changelog_jurisdiction_date",
-        "table": "pulse_changelog",
-        "definition": "CREATE INDEX idx_pulse_changelog_jurisdiction_date ON public.pulse_changelog USING btree (jurisdiction_id, score_date)"
-      },
-      {
-        "name": "pulse_changelog_pkey",
-        "table": "pulse_changelog",
-        "definition": "CREATE UNIQUE INDEX pulse_changelog_pkey ON public.pulse_changelog USING btree (id)"
-      },
-      {
         "name": "idx_pulse_classification_attempt_cluster",
         "table": "pulse_classification_attempts",
         "definition": "CREATE INDEX idx_pulse_classification_attempt_cluster ON public.pulse_classification_attempts USING btree (cluster_id, config_hash, started_at)"
@@ -9933,26 +9765,6 @@
         "name": "pulse_corrections_pkey",
         "table": "pulse_corrections",
         "definition": "CREATE UNIQUE INDEX pulse_corrections_pkey ON public.pulse_corrections USING btree (id)"
-      },
-      {
-        "name": "idx_pulse_daily_date",
-        "table": "pulse_daily_scores",
-        "definition": "CREATE INDEX idx_pulse_daily_date ON public.pulse_daily_scores USING btree (score_date)"
-      },
-      {
-        "name": "idx_pulse_daily_jurisdiction",
-        "table": "pulse_daily_scores",
-        "definition": "CREATE INDEX idx_pulse_daily_jurisdiction ON public.pulse_daily_scores USING btree (jurisdiction_id)"
-      },
-      {
-        "name": "idx_pulse_daily_unique",
-        "table": "pulse_daily_scores",
-        "definition": "CREATE UNIQUE INDEX idx_pulse_daily_unique ON public.pulse_daily_scores USING btree (jurisdiction_id, score_date)"
-      },
-      {
-        "name": "pulse_daily_scores_pkey",
-        "table": "pulse_daily_scores",
-        "definition": "CREATE UNIQUE INDEX pulse_daily_scores_pkey ON public.pulse_daily_scores USING btree (id)"
       },
       {
         "name": "idx_pulse_dim_computation_run",
@@ -11272,11 +11084,6 @@
       },
       {
         "kind": "r",
-        "name": "pulse_changelog",
-        "definition": null
-      },
-      {
-        "kind": "r",
         "name": "pulse_classification_attempts",
         "definition": null
       },
@@ -11323,11 +11130,6 @@
       {
         "kind": "r",
         "name": "pulse_corrections",
-        "definition": null
-      },
-      {
-        "kind": "r",
-        "name": "pulse_daily_scores",
         "definition": null
       },
       {
@@ -12223,24 +12025,6 @@
         "definition": "FOREIGN KEY (stage_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
-        "name": "pulse_changelog_event_id_pulse_events_id_fk",
-        "type": "f",
-        "table": "pulse_changelog",
-        "definition": "FOREIGN KEY (event_id) REFERENCES pulse_events(id)"
-      },
-      {
-        "name": "pulse_changelog_jurisdiction_id_jurisdictions_id_fk",
-        "type": "f",
-        "table": "pulse_changelog",
-        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
-      },
-      {
-        "name": "pulse_changelog_pkey",
-        "type": "p",
-        "table": "pulse_changelog",
-        "definition": "PRIMARY KEY (id)"
-      },
-      {
         "name": "pulse_classification_attempt_contract_check",
         "type": "c",
         "table": "pulse_classification_attempts",
@@ -12526,24 +12310,6 @@
         "name": "pulse_corrections_pkey",
         "type": "p",
         "table": "pulse_corrections",
-        "definition": "PRIMARY KEY (id)"
-      },
-      {
-        "name": "pulse_daily_scores_jurisdiction_id_jurisdictions_id_fk",
-        "type": "f",
-        "table": "pulse_daily_scores",
-        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
-      },
-      {
-        "name": "pulse_daily_scores_methodology_version_ci_methodology_versions_",
-        "type": "f",
-        "table": "pulse_daily_scores",
-        "definition": "FOREIGN KEY (methodology_version) REFERENCES ci_methodology_versions(id)"
-      },
-      {
-        "name": "pulse_daily_scores_pkey",
-        "type": "p",
-        "table": "pulse_daily_scores",
         "definition": "PRIMARY KEY (id)"
       },
       {

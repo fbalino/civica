@@ -734,7 +734,8 @@ function validatePublicSurfaces(
   // src/lib/api/contract/examples.ts, which is where the runtime
   // snapshot is actually generated and schema-validated. Check both:
   // examples.ts does the generation, and page.tsx wires the endpoint
-  // in without ever publishing a forbidden scalar Pulse ranking.
+  // in while documenting the retired scalar parameter as a terminal 410,
+  // never as a supported Pulse ranking.
   const apiDocs = relative("src/app/api-docs/page.tsx");
   const contractExamples = relative("src/lib/api/contract/examples.ts");
   const contractRegistry = relative("src/lib/api/contract/registry.ts");
@@ -745,9 +746,10 @@ function validatePublicSurfaces(
       apiDocs.includes('"pulseMethodology"') &&
       !apiDocs.includes("sort=cp") &&
       !apiDocs.includes("ci | cp") &&
-      !contractRegistry.includes("sort=cp") &&
+      contractRegistry.includes('retired "cp" value') &&
+      contractRegistry.includes("returns 410") &&
       !contractRegistry.includes("ci | cp"),
-    "API docs must generate the Pulse runtime example and publish no scalar ranking contract",
+    "API docs must generate the Pulse runtime example and expose scalar CP only as a terminal 410 retirement contract",
   );
 
   const backtestPage = relative(

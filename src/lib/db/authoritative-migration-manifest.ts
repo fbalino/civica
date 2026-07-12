@@ -157,4 +157,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "fee307170e6a8df46fbdc0b59887ebb22547353093d90341d6d87291ae2f3289",
     baseline: false,
   },
+  {
+    id: "0026_magenta_xavin",
+    path: "drizzle/authoritative/0026_magenta_xavin.sql",
+    sha256: "c85245fbd9d0f48568ac7588a5d42a5649c71d4704e213647f2b30d9b3a4f61e",
+    baseline: false,
+  },
 ] as const;

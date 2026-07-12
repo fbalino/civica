@@ -546,32 +546,6 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Article metadata and excerpts follow publisher terms; model output is experimental.",
     deprecation: legacyPulse("pulse_events_v2"),
   },
-  pulse_daily_scores: {
-    definition: "Legacy Pulse v1 daily aggregate score rows.",
-    rowGrain: "One jurisdiction and calendar day.",
-    releaseScope: "research_beta",
-    sourceOrDerivation: "Legacy aggregation of pulse_events.",
-    cadence: "Historical only.",
-    vintageSemantics:
-      "date is aggregation day; calculated_at is computation time.",
-    rights:
-      "Derived experimental output; source-event restrictions remain applicable.",
-    deprecation: legacyPulse(
-      "pulse_dimensional_deltas and the Pulse v2 event ledger",
-    ),
-  },
-  pulse_changelog: {
-    definition: "Legacy Pulse v1 change log entries.",
-    rowGrain: "One recorded legacy Pulse change.",
-    releaseScope: "research_beta",
-    sourceOrDerivation:
-      "Civica-generated change metadata from legacy Pulse scores.",
-    cadence: "Historical only.",
-    vintageSemantics:
-      "created_at is change-record time; version identifies the legacy method state.",
-    rights: "Civica-authored metadata with linked event-source restrictions.",
-    deprecation: legacyPulse("Pulse v2 corrections and review ledger"),
-  },
   organizations: {
     definition:
       "International and regional organization identities and descriptors.",

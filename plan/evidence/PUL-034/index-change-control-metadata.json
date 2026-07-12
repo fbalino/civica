@@ -1,0 +1,38 @@
+{
+  "id": "pulse-scalar-retirement",
+  "toVersion": "civica-index-pulse-scalar-retirement-v18",
+  "evidence": {
+    "documentation": [
+      "src/app/api-docs/page.tsx",
+      "plan/evidence/PUL-034/README.md"
+    ],
+    "registry": [
+      "src/lib/api/contract/registry.ts",
+      "src/lib/claims/public-claims.ts"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-034/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-034/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/api/pulse-scalar-retirement.test.ts",
+      "src/lib/pulse/v1-retirement.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-v1-retirement.ts",
+      "scripts/validate-pulse-runtime-method.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:pulse-v1-retirement",
+    "validate:pulse-runtime"
+  ]
+}

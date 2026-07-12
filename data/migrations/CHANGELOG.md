@@ -68,6 +68,11 @@ queue-entry enforcement. The pre-contract pending backlog is retained
 unpublished as `legacy_quarantined`; the migration does not claim human review,
 approval, or rejection for those items.
 
+`0026_magenta_xavin` retires the empty `pulse_daily_scores` and
+`pulse_changelog` relations after PUL-034 removed every scalar Pulse v1 reader
+and writer. The migration fails closed if either relation contains a row and
+does not alter the retained legacy `pulse_events` evidence table.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

@@ -816,3 +816,20 @@ newer event dates and gave no operational account of delay. Explicit clocks
 and a fail-closed monitor make backlog state observable without presenting an
 internal response target as evidence that a classification is correct. Legacy
 quarantine preserves the old evidence without fabricating decisions.
+
+### APR-D149 — Scalar Pulse v1 is retired, not translated
+
+**Decision:** The abandoned Pulse v1 scalar score, CP ranking, and score embed
+are terminally retired. `sort=cp` returns a documented `410 Gone`; dimensional
+v2 effects remain named, separate, experimental API values and are never
+merged into a replacement scalar. The legacy v1 cron and CLI entry points fail
+before database or model access. The two empty scalar-output relations are
+dropped only through a migration that aborts if either contains a row. The
+separate legacy event ledger remains retained evidence.
+
+**Why:** Mapping multiple experimental dimensions onto one country number
+would invent a weighting and comparability decision before PUL-029. Leaving an
+empty table and executable writer in place would preserve a silent path back
+to a method the public contract already rejects. Fail-closed retirement removes
+that ambiguity without deleting the historical event records needed for audit
+and later evaluation.

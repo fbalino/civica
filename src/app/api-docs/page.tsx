@@ -56,7 +56,7 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "usage-examples", label: "Usage examples" },
   { id: "bulk-data", label: "Bulk data" },
   { id: "data-sources", label: "Data sources" },
-  { id: "widget-embed", label: "Widget embed" },
+  { id: "widget-embed", label: "Retired widget embed" },
 ];
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -185,44 +185,6 @@ function EndpointSection({
 function docExample(exampleId: ExampleId): string {
   return renderExample(exampleId);
 }
-
-const EMBED_PARAMS = [
-  {
-    name: "size",
-    type: "sm | md | lg | custom",
-    description:
-      "Widget dimensions. sm=300×80, md=320×180, lg=400×260. Use custom to build your own card with the include/w/h params below. Default: md",
-  },
-  {
-    name: "theme",
-    type: "light | dark",
-    description: "Override color scheme. Default: system prefers-color-scheme",
-  },
-  {
-    name: "dims",
-    type: "0 | 1",
-    description:
-      "Show available Civica Index dimension mini-bars in the large widget when real dimension scores are present. Default: 0",
-  },
-  {
-    name: "include",
-    type: "comma list",
-    description:
-      "size=custom only. Datapoints to render, in order: ci, capital, gov, pop, gdp, area. Default when omitted: ci,capital,gov.",
-  },
-  {
-    name: "w",
-    type: "integer",
-    description:
-      "size=custom only. Widget width in px. Clamped 280–600. Default 360.",
-  },
-  {
-    name: "h",
-    type: "integer",
-    description:
-      "size=custom only. Widget height in px. Clamped 120–800. Default 320.",
-  },
-];
 
 export default function ApiDocsPage() {
   const countriesRoute = getRouteContract("countries");
@@ -619,63 +581,18 @@ for country in resp.json()["data"]:
       <hr className="api-section-divider" />
 
       <section id="widget-embed" className="editorial-section">
-        <h2>Widget Embed</h2>
+        <h2>Retired Widget Embed</h2>
         <p className="api-intro">
-          Embed a live Civica Index widget on any website using a standard{" "}
-          <code>&lt;iframe&gt;</code>. Widgets update every 5 minutes and
-          respect the visitor&rsquo;s system color scheme by default. Override
-          with <code>?theme=light</code> or <code>?theme=dark</code>. Add{" "}
-          <code>?dims=1</code> to the large widget to show available Civica
-          Index dimension mini-bars when real dimension scores are present. For
-          full control, use <code>?size=custom</code> with{" "}
-          <code>?include=</code> to choose which datapoints render and{" "}
-          <code>?w=</code>/<code>?h=</code> to set the dimensions.
+          The legacy <code>/embed/:slug</code> widget is retired. Every request,
+          including requests with <code>include=ci</code> or{" "}
+          <code>include=cp</code>, returns <code>410 Gone</code> and is never
+          cached. Existing iframes show a short retirement notice with a link
+          to the <Link href="/governance-evidence">Governance Evidence</Link>{" "}
+          successor. Civica does not provide a replacement scalar Pulse score,
+          rank, or live score widget. Named experimental Pulse deltas remain
+          available by country from{" "}
+          <code>/api/v1/pulse/:country_slug/dimensions</code>.
         </p>
-
-        <div className="api-embed-block">
-          <p className="api-embed-size-label">Small — 300 × 80</p>
-          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=sm"
-        width="300" height="80" loading="lazy"
-        title="Civica Index — Brazil"></iframe>`}</CodeBlock>
-        </div>
-
-        <div className="api-embed-block">
-          <p className="api-embed-size-label">Medium — 320 × 180</p>
-          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/denmark?size=md"
-        width="320" height="180" loading="lazy"
-        title="Civica Index — Denmark"></iframe>`}</CodeBlock>
-        </div>
-
-        <div className="api-embed-block">
-          <p className="api-embed-size-label">
-            Large — 400 × 260 (optional CI dimensions)
-          </p>
-          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=lg&dims=1"
-        width="400" height="260" loading="lazy"
-        title="Civica Index — Brazil"></iframe>`}</CodeBlock>
-        </div>
-
-        <div className="api-embed-block">
-          <p className="api-embed-size-label">
-            Custom — pick your datapoints and dimensions
-          </p>
-          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=custom&include=ci,capital,pop&w=360&h=320"
-        width="360" height="320" loading="lazy"
-        title="Civica Index — Brazil"></iframe>`}</CodeBlock>
-        </div>
-
-        <div className="api-params api-params--embed">
-          <div className="api-params__header">
-            <span className="api-section-label">Query Parameters</span>
-          </div>
-          {EMBED_PARAMS.map((param) => (
-            <div key={param.name} className="api-params__row">
-              <code className="api-params__name">{param.name}</code>
-              <span className="api-params__type">{param.type}</span>
-              <span className="api-params__desc">{param.description}</span>
-            </div>
-          ))}
-        </div>
       </section>
     </MethodologyLayout>
   );

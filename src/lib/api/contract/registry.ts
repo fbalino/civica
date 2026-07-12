@@ -405,7 +405,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/rankings/route.ts",
     versioned: true,
     summary:
-      "DEPRECATED — preserved composite ranking endpoint. Civica no longer recommends a public country league table.",
+      "DEPRECATED — preserved composite ranking endpoint. The retired scalar Pulse sort value returns 410; Pulse is available only as named per-dimension experimental deltas.",
     params: [
       {
         name: "quarter",
@@ -426,7 +426,7 @@ export const API_ROUTES: RouteContract[] = [
         in: "query",
         type: "string",
         description:
-          'Must be "ci" (the only supported value) or omitted; any other value returns 400.',
+          'Omit or use "ci" for the preserved Index ranking. The retired "cp" value (case-insensitive) returns 410 with a link to the per-country dimensional successor; any other value returns 400.',
       },
       {
         name: "continent",
@@ -464,7 +464,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 429, 500],
+    errorStatuses: [400, 410, 429, 500],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexRankings",
   },
