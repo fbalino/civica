@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import { SourceDot } from "@/components/SourceDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
+import { Button } from "@/components/editorial/Button";
 import {
   CountrySearchCombobox,
   type CountrySearchOption,
@@ -14,6 +15,7 @@ import { resolvePartyColor } from "@/lib/data/party-colors";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 interface ElectionRow {
+  eventSourceUrl?: string | null;
   election: {
     id: string;
     electionDate: string | null;
@@ -51,6 +53,7 @@ interface ElectionRow {
       } | null;
     };
   } | null;
+  relatedContests?: RecentElectionRow[];
 }
 
 interface Coverage {
@@ -83,6 +86,14 @@ interface Stats {
   sovereignJurisdictions: number;
   sourceDatedUpcoming: number;
   projectionGroups: number;
+}
+
+interface CountryCoverageState {
+  historicalRecords: number;
+  sourceDatedFuture: number;
+  hasProjection: boolean;
+  compiledResults: number;
+  quarantinedRecords: number;
 }
 
 const REGIONS = [
@@ -137,13 +148,19 @@ export default function ElectionsClient({
   recent,
   stats,
   coverage,
-  dataAvailable,
+  countryOptions,
+  countryCoverage,
+  upcomingDataAvailable,
+  historicalDataAvailable,
 }: {
   upcoming: ElectionRow[];
   recent: ElectionRow[];
   stats: Stats | null;
   coverage: Coverage | null;
-  dataAvailable: boolean;
+  countryOptions: CountrySearchOption[];
+  countryCoverage: Record<string, CountryCoverageState>;
+  upcomingDataAvailable: boolean;
+  historicalDataAvailable: boolean;
 }) {
   const [regionFilter, setRegionFilter] = useState("All Regions");
   const [typeFilter, setTypeFilter] = useState("All Types");
@@ -151,22 +168,9 @@ export default function ElectionsClient({
   const [countryFilter, setCountryFilter] =
     useState<CountrySearchOption | null>(null);
 
-  // Search options: every distinct country that actually has an election on
-  // this page (search never offers a country with nothing to show).
-  const searchOptions = useMemo<CountrySearchOption[]>(() => {
-    const seen = new Map<string, CountrySearchOption>();
-    for (const e of [...upcoming, ...recent]) {
-      if (!seen.has(e.jurisdiction.slug)) {
-        seen.set(e.jurisdiction.slug, {
-          slug: e.jurisdiction.slug,
-          name: e.jurisdiction.name,
-          iso2: e.jurisdiction.iso2,
-          status: e.jurisdiction.status,
-        });
-      }
-    }
-    return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }, [upcoming, recent]);
+  const selectedCoverage = countryFilter
+    ? countryCoverage[countryFilter.slug]
+    : null;
 
   function passesFilters(e: ElectionRow): boolean {
     if (countryFilter && e.jurisdiction.slug !== countryFilter.slug)
@@ -240,7 +244,7 @@ export default function ElectionsClient({
         }}
         search={
           <CountrySearchCombobox
-            countries={searchOptions}
+            countries={countryOptions}
             placeholder="Filter by country&hellip;"
             ariaLabel="Filter elections by country"
             onSelect={(c) => setCountryFilter(c)}
@@ -312,10 +316,50 @@ export default function ElectionsClient({
           </span>
         </Reveal>
 
+        <Reveal as="aside" amount={0.3} className="editorial-banner editorial-banner--info">
+          <strong>Date semantics:</strong> election dates are Gregorian calendar
+          dates without a time of day or source time zone. UTC is used only to
+          prevent browser date shifts; it does not mean the event occurs at
+          midnight UTC. Projections are shown at year precision. Temporal labels
+          are frozen to the audited release dated {formatDate(coverage?.asOf ?? null)}.
+        </Reveal>
+
+        <Reveal
+          as="div"
+          amount={0.3}
+          style={{
+            display: "flex",
+            gap: "var(--space-3)",
+            flexWrap: "wrap",
+            marginBottom: "var(--space-6)",
+          }}
+        >
+          <Button
+            href="/api/v1/elections?format=json"
+            variant="secondary"
+            size="sm"
+          >
+            Export qualified JSON
+          </Button>
+          <Button
+            href="/api/v1/elections?format=csv"
+            variant="secondary"
+            size="sm"
+          >
+            Export qualified CSV
+          </Button>
+          <span className="editorial-empty">
+            Rights-filtered: restricted IPU and IDEA rows and fields are named
+            in the withheld manifest, not silently omitted.
+          </span>
+        </Reveal>
+
         {/* Filters */}
         <Reveal
           as="div"
           amount={0.4}
+          role="group"
+          aria-labelledby="election-filter-label"
           style={{
             display: "flex",
             gap: "var(--space-3)",
@@ -326,7 +370,14 @@ export default function ElectionsClient({
             borderTop: "1px solid var(--color-divider)",
           }}
         >
+          <span id="election-filter-label" className="sr-only">
+            Filter election records
+          </span>
+          <label className="sr-only" htmlFor="election-region-filter">
+            Region
+          </label>
           <select
+            id="election-region-filter"
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
             className="cv-select"
@@ -343,7 +394,9 @@ export default function ElectionsClient({
           {TYPES.map((t) => (
             <button
               key={t}
+              type="button"
               onClick={() => setTypeFilter(t)}
+              aria-pressed={typeFilter === t}
               className="index-continent-chip"
               style={{
                 ...(typeFilter === t
@@ -383,6 +436,34 @@ export default function ElectionsClient({
           )}
         </Reveal>
 
+        <p className="sr-only" aria-live="polite">
+          {filteredUpcoming.length} future records and {filteredRecent.length}{" "}
+          historical records match the current filters.
+        </p>
+
+        {countryFilter && selectedCoverage && (
+          <Reveal as="aside" amount={0.2} className="editorial-banner">
+            <strong>{countryFilter.name} coverage:</strong>{" "}
+            {selectedCoverage.historicalRecords > 0
+              ? `${selectedCoverage.historicalRecords} qualified historical ${selectedCoverage.historicalRecords === 1 ? "record" : "records"}`
+              : "no qualified historical record"}
+            ; {selectedCoverage.compiledResults > 0
+              ? `${selectedCoverage.compiledResults} with compiled results`
+              : "results not compiled"}
+            ; {selectedCoverage.sourceDatedFuture > 0
+              ? `${selectedCoverage.sourceDatedFuture} tentative source-dated future ${selectedCoverage.sourceDatedFuture === 1 ? "record" : "records"}`
+              : "no source-dated future election"}
+            ; {selectedCoverage.hasProjection
+              ? "a term-length projection is available"
+              : "no term-length projection is available"}.
+            {selectedCoverage.historicalRecords === 0 &&
+              selectedCoverage.sourceDatedFuture === 0 &&
+              !selectedCoverage.hasProjection && (
+                <> No election row in the audited release is qualified for public display.</>
+              )}
+          </Reveal>
+        )}
+
         {/* Upcoming Elections */}
         {filteredUpcoming.length > 0 && (
           <Reveal
@@ -405,18 +486,19 @@ export default function ElectionsClient({
               {filteredUpcoming.map((e) => {
                 const isEstimated = e.audit?.temporalClass === "projection_due";
                 return (
-                  <a
+                  <article
                     key={e.election.id}
-                    href={`/country/${e.jurisdiction.slug}`}
                     className="index-country-card"
-                    style={{ textDecoration: "none", color: "inherit" }}
                   >
                     <div className="index-card-top">
                       <CountryFlag iso2={e.jurisdiction.iso2} size={28} />
                       <div className="index-card-name-block">
-                        <span className="index-card-name">
+                        <a
+                          className="index-card-name"
+                          href={`/country/${e.jurisdiction.slug}`}
+                        >
                           {e.jurisdiction.name}
-                        </span>
+                        </a>
                         <span
                           className="index-card-capital"
                           style={{ textTransform: "capitalize" }}
@@ -447,10 +529,7 @@ export default function ElectionsClient({
                             >
                               {formatEstimate(e.election.electionDate)}
                             </span>
-                            <span
-                              onClick={(ev) => ev.preventDefault()}
-                              style={{ display: "inline-flex" }}
-                            >
+                            <span style={{ display: "inline-flex" }}>
                               <InfoTip
                                 content={ESTIMATE_NOTE}
                                 label="About this estimate"
@@ -490,7 +569,7 @@ export default function ElectionsClient({
                         </span>
                       )}
                     </div>
-                  </a>
+                  </article>
                 );
               })}
             </div>
@@ -508,7 +587,7 @@ export default function ElectionsClient({
               </h2>
             </div>
             <p className="editorial-empty">
-              {!dataAvailable
+              {!upcomingDataAvailable
                 ? "Election records are temporarily unavailable."
                 : anyFilterActive
                   ? "No qualified future date or term-length projection matches these filters."
@@ -517,16 +596,17 @@ export default function ElectionsClient({
           </Reveal>
         )}
 
-        {/* Recent Election Results Timeline — only elections that carry results
-            reach this section (query layer), so a card is never an empty box. */}
+        {/* Audited historical timeline. Result rows are an optional enhancement;
+            absence is rendered as a research-coverage state, not a blank card. */}
         <Reveal as="section" amount={0.1}>
           <div className="index-continent-header">
-            <h2 className="index-continent-title">Recent Results</h2>
+            <h2 className="index-continent-title">Historical Timeline</h2>
             <div className="index-continent-meta">
-              <span hidden={!dataAvailable}>
-                {filteredRecent.length} qualified election records
-              </span>
-              <span hidden={dataAvailable}>Data temporarily unavailable</span>
+              {historicalDataAvailable ? (
+                <span>{filteredRecent.length} qualified conceptual events</span>
+              ) : (
+                <span>Data temporarily unavailable</span>
+              )}
             </div>
           </div>
 
@@ -573,11 +653,11 @@ export default function ElectionsClient({
                   textAlign: "center",
                 }}
               >
-                {!dataAvailable
+                {!historicalDataAvailable
                   ? "Election data is temporarily unavailable."
                   : anyFilterActive
-                    ? "No compiled results match the current filters."
-                    : "No compiled results yet."}
+                    ? "No qualified historical event matches the current filters."
+                    : "This release contains no qualified historical event."}
               </p>
             )}
           </div>
@@ -645,6 +725,7 @@ export default function ElectionsClient({
 
 function TimelineCard({ election: e }: { election: ElectionRow }) {
   const [expanded, setExpanded] = useState(true);
+  const contentId = useId();
   const isLegislative =
     e.election.electionType?.toLowerCase() === "legislative";
   const dotColor = isLegislative
@@ -652,6 +733,11 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
     : "var(--color-branch-executive)";
   const rowSource = e.audit?.evidence.sourceId;
   const rowRetrievedAt = e.audit?.evidence.retrievedAt;
+  const results = (e as RecentElectionRow).results ?? [];
+  const relatedContests = e.relatedContests ?? [];
+  const hasCompiledResults =
+    results.length > 0 ||
+    relatedContests.some((contest) => (contest.results?.length ?? 0) > 0);
 
   return (
     <div
@@ -676,17 +762,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
       />
 
       <div
-        role="button"
-        tabIndex={0}
-        aria-expanded={expanded}
-        onClick={() => setExpanded(!expanded)}
-        onKeyDown={(ev) => {
-          if (ev.key === "Enter" || ev.key === " ") {
-            ev.preventDefault();
-            setExpanded((prev) => !prev);
-          }
-        }}
-        className="cv-card cv-card--interactive"
+        className="cv-card"
       >
         {/* Header */}
         <div
@@ -732,6 +808,17 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
           </span>
         </div>
 
+        <button
+          type="button"
+          className="btn btn--text btn--sm"
+          aria-expanded={expanded}
+          aria-controls={contentId}
+          onClick={() => setExpanded((current) => !current)}
+        >
+          {expanded ? "Hide details" : "Show details"}
+          <span aria-hidden="true">{expanded ? "↑" : "↓"}</span>
+        </button>
+
         {/* Meta */}
         <div
           style={{
@@ -756,8 +843,13 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
               <SourceDot source={rowSource} retrievedAt={rowRetrievedAt} />
             )}
           </span>
-          {e.election.electoralSystem && (
-            <span
+          {e.election.electoralSystem &&
+            rowSource === "ipu_parline" &&
+            e.eventSourceUrl && (
+            <a
+              href={e.eventSourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-12)",
@@ -768,10 +860,12 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
               }}
             >
               {e.election.electoralSystem}
-            </span>
+              <SourceDot source={rowSource} retrievedAt={rowRetrievedAt} />
+            </a>
           )}
         </div>
 
+        <div id={contentId} hidden={!expanded}>
         {/* Turnout — quiet stat, tabular numerals, sourced to IDEA. */}
         {e.election.turnoutPercent != null && (
           <div style={{ marginTop: "var(--space-4)" }}>
@@ -835,11 +929,26 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
         )}
 
         {/* Results */}
-        {expanded &&
-          (e as RecentElectionRow).results &&
-          (e as RecentElectionRow).results!.length > 0 && (
-            <ResultsBar results={(e as RecentElectionRow).results!} />
-          )}
+        {results.length > 0 && <ResultsBar results={results} />}
+
+        {!hasCompiledResults && (
+          <p className="editorial-empty">Results have not been compiled for this qualified event.</p>
+        )}
+
+        {relatedContests.map((contest) => (
+          <div key={contest.election.id} className="cv-card">
+            <p>
+              <strong>{contest.election.electionName ?? "Related chamber contest"}</strong>
+              {" · "}{formatDate(contest.election.electionDate)}
+            </p>
+            {(contest.results?.length ?? 0) > 0 ? (
+              <ResultsBar results={contest.results!} />
+            ) : (
+              <p className="editorial-empty">Results have not been compiled for this chamber contest.</p>
+            )}
+          </div>
+        ))}
+        </div>
       </div>
     </div>
   );
@@ -867,6 +976,12 @@ function ResultsBar({
 
   return (
     <div style={{ marginTop: "var(--space-5)" }}>
+      {usesSeats && (
+        <p className="editorial-empty">
+          Seat distribution. Any stored percentage is calculated from seats and
+          is not a vote-share measure.
+        </p>
+      )}
       {results.map((r, i) => {
         const label = r.candidateName || r.partyName || "Unknown";
         // Item 1: reuse the EXACT color source the legislature hemicycle uses

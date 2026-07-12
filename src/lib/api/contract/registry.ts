@@ -221,6 +221,86 @@ export const API_ROUTES: RouteContract[] = [
     exampleId: "countryDetail",
   },
   {
+    id: "elections",
+    docSectionId: "elections",
+    method: "GET",
+    pathTemplate: "/api/v1/elections",
+    filePath: "src/app/api/v1/elections/route.ts",
+    versioned: true,
+    summary:
+      "Qualified election research rows with date-only semantics and source provenance. JSON and CSV emit only verified CC0 Wikidata rows; IPU, IDEA, and derived projections are reported as withheld counts.",
+    params: [
+      {
+        name: "format",
+        in: "query",
+        type: "string",
+        description: '"json" (default) or "csv".',
+      },
+      {
+        name: "jurisdiction",
+        in: "query",
+        type: "string",
+        description: "Filter by slug, ISO-2, or ISO-3.",
+      },
+      {
+        name: "type",
+        in: "query",
+        type: "string",
+        description: "legislative | presidential",
+      },
+      {
+        name: "temporal_class",
+        in: "query",
+        type: "string",
+        description: "historical | source_dated_upcoming | projection_due",
+      },
+      {
+        name: "source_status",
+        in: "query",
+        type: "string",
+        description: "held | source_dated | tentative | unknown",
+      },
+      {
+        name: "jurisdiction_status",
+        in: "query",
+        type: "string",
+        description: "Filter by jurisdiction-status/v1 class.",
+      },
+      {
+        name: "from",
+        in: "query",
+        type: "date",
+        description: "Inclusive YYYY-MM-DD lower bound.",
+      },
+      {
+        name: "to",
+        in: "query",
+        type: "date",
+        description: "Inclusive YYYY-MM-DD upper bound.",
+      },
+      {
+        name: "has_results",
+        in: "query",
+        type: "boolean",
+        description:
+          "Filter the qualified pre-rights corpus by compiled-results availability.",
+      },
+      {
+        name: "has_turnout",
+        in: "query",
+        type: "boolean",
+        description:
+          "Filter the qualified pre-rights corpus by sourced-turnout availability.",
+      },
+    ],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [400, 429, 500, 503],
+    deprecation: null,
+    exampleId: "elections",
+  },
+  {
     id: "government-types",
     docSectionId: "government-types",
     method: "GET",

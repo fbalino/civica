@@ -39,6 +39,7 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "endpoints", label: "Endpoints" },
   { id: "countries", label: "List countries" },
   { id: "country-detail", label: "Country detail" },
+  { id: "elections", label: "Election research export" },
   { id: "government-types", label: "Government types (deprecated)" },
   { id: "peer-groupings", label: "Peer groupings" },
   { id: "index-rankings", label: "Index rankings" },
@@ -189,6 +190,7 @@ function docExample(exampleId: ExampleId): string {
 export default function ApiDocsPage() {
   const countriesRoute = getRouteContract("countries");
   const countryDetailRoute = getRouteContract("country-detail");
+  const electionsRoute = getRouteContract("elections");
   const governmentTypesRoute = getRouteContract("government-types");
   const peerGroupingsRoute = getRouteContract("peer-groupings");
   const indexRankingsRoute = getRouteContract("index-rankings");
@@ -320,6 +322,16 @@ export default function ApiDocsPage() {
           description={countryDetailRoute.summary}
           parameters={toDocParams(countryDetailRoute.params)}
           exampleResponse={docExample("countryDetail")}
+        />
+
+        <EndpointSection
+          id="elections"
+          routeId="elections"
+          method="GET"
+          path={electionsRoute.pathTemplate}
+          description={electionsRoute.summary}
+          parameters={toDocParams(electionsRoute.params)}
+          exampleResponse={docExample("elections")}
         />
 
         <EndpointSection

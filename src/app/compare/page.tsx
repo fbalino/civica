@@ -22,7 +22,10 @@ import {
 import { GovernanceEvidenceTable } from "@/components/governance-evidence/GovernanceEvidenceTable";
 import { Banner } from "@/components/editorial/Banner";
 import { CompareChambers } from "@/components/compare/CompareChambers";
-import { CompareElections } from "@/components/compare/CompareElections";
+import {
+  CompareElections,
+  type CompareElectionAvailability,
+} from "@/components/compare/CompareElections";
 import { CompareInternational } from "@/components/compare/CompareInternational";
 import { withOg } from "@/lib/og";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
@@ -142,9 +145,7 @@ export default async function ComparePage({
   let chambersArr: Array<
     Awaited<ReturnType<typeof getLegislatureComposition>>
   > = [];
-  let electionsArr: Array<
-    Awaited<ReturnType<typeof getElectionsByJurisdiction>>
-  > = [];
+  let electionAvailabilityArr: CompareElectionAvailability[] = [];
   let memberships: Awaited<
     ReturnType<typeof getInternationalMembershipsBySlugs>
   > = [];
@@ -155,22 +156,29 @@ export default async function ComparePage({
 
   if (validSlugs.length > 0) {
     try {
-      [
-        governanceEvidence,
-        govStructures,
-        chambersArr,
-        electionsArr,
-        memberships,
-      ] = await Promise.all([
-        Promise.all(validSlugs.map((slug) => getGovernanceEvidence(slug))),
-        Promise.all(ids.map((id) => getGovernmentStructure(id))),
-        Promise.all(ids.map((id) => getLegislatureComposition(id))),
-        Promise.all(ids.map((id) => getElectionsByJurisdiction(id))),
-        getInternationalMembershipsBySlugs(ids),
-      ]);
+      [governanceEvidence, govStructures, chambersArr, memberships] =
+        await Promise.all([
+          Promise.all(validSlugs.map((slug) => getGovernanceEvidence(slug))),
+          Promise.all(ids.map((id) => getGovernmentStructure(id))),
+          Promise.all(ids.map((id) => getLegislatureComposition(id))),
+          getInternationalMembershipsBySlugs(ids),
+        ]);
     } catch (err) {
       console.error("[/compare] section data fetch failed:", err);
     }
+    const electionResults = await Promise.allSettled(
+      ids.map((id) => getElectionsByJurisdiction(id)),
+    );
+    electionAvailabilityArr = electionResults.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return { status: "available", rows: result.value };
+      }
+      console.error(
+        `[/compare] election fetch failed for ${validSlugs[index]}`,
+        result.reason,
+      );
+      return { status: "temporarily_unavailable" };
+    });
     try {
       indicatorHistories = await Promise.all(
         validSlugs.map((slug) => getIndicatorHistoryForCountry(slug)),
@@ -267,7 +275,9 @@ export default async function ComparePage({
       name: jurisdiction.name,
       iso2: jurisdiction.iso2,
     },
-    elections: electionsArr[i] ?? [],
+    electionAvailability: electionAvailabilityArr[i] ?? {
+      status: "temporarily_unavailable",
+    },
     seriesColor: seriesColorFor(i),
   }));
 

@@ -43,6 +43,8 @@ export interface LegislatureData {
   coalition: string | null;
   /** ISO year of the next scheduled election, when known. */
   nextElection: string | null;
+  nextElectionBasis: "source_dated" | "term_projection" | null;
+  nextElectionStatus: "tentative" | "source_dated" | "unknown" | null;
 }
 
 /**
@@ -56,14 +58,14 @@ export interface LegislatureData {
  * hide the section entirely in that case.
  */
 export async function getLegislatureForJurisdiction(
-  jurisdictionId: string
+  jurisdictionId: string,
 ): Promise<LegislatureData | null> {
   const bodies = await db
     .select()
     .from(governmentBodies)
     .where(
       sql`${governmentBodies.jurisdictionId} = ${jurisdictionId}
-        AND ${governmentBodies.branch} = 'legislative'`
+        AND ${governmentBodies.branch} = 'legislative'`,
     )
     .orderBy(asc(governmentBodies.hierarchyLevel));
 
@@ -81,7 +83,7 @@ export async function getLegislatureForJurisdiction(
 
   function buildChamber(
     body: typeof lowerBody,
-    slot: "lower" | "upper"
+    slot: "lower" | "upper",
   ): LegislatureChamber {
     const bp = allParties.filter((p) => p.bodyId === body.id);
     const totalSeats =
@@ -91,8 +93,7 @@ export async function getLegislatureForJurisdiction(
     // Same data-quality guard as the atlas loader: if the sum of party
     // seats is 20%+ over the chamber total (multi-election aggregation
     // bug in some IPU/Wikidata syncs), normalise into the chamber total.
-    const isAggregated =
-      sumPartySeats > 0 && sumPartySeats > totalSeats * 1.2;
+    const isAggregated = sumPartySeats > 0 && sumPartySeats > totalSeats * 1.2;
 
     const seen = new Set<string>();
     let parties: LegislatureParty[] = bp.map((p, i) => {
@@ -147,7 +148,7 @@ export async function getLegislatureForJurisdiction(
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
         AND ${elections.electionType} ILIKE 'legislativ%'
-        AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`
+        AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
     .orderBy(desc(elections.electionDate));
 
@@ -157,7 +158,7 @@ export async function getLegislatureForJurisdiction(
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
         AND ${elections.electionType} ILIKE 'legislativ%'
-        AND ${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`
+        AND ${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
     .orderBy(asc(elections.electionDate));
 
@@ -191,7 +192,7 @@ export async function getLegislatureForJurisdiction(
   } else if (latestPast?.electionDate) {
     // No upcoming election scheduled, show the year of the most recent.
     nextElection = `Last: ${new Date(
-      latestPast.electionDate as unknown as string
+      latestPast.electionDate as unknown as string,
     ).getUTCFullYear()}`;
   }
 
@@ -200,5 +201,21 @@ export async function getLegislatureForJurisdiction(
     upper,
     coalition: null, // Coalition copy is not currently in the schema.
     nextElection,
+    nextElectionBasis:
+      futureAudit?.temporalClass === "projection_due"
+        ? "term_projection"
+        : futureAudit?.temporalClass === "source_dated_upcoming"
+          ? "source_dated"
+          : null,
+    nextElectionStatus:
+      futureAudit?.temporalClass === "projection_due"
+        ? "unknown"
+        : futureAudit?.sourceEventStatus === "tentative"
+          ? "tentative"
+          : futureAudit?.sourceEventStatus === "source_dated"
+            ? "source_dated"
+            : futureAudit
+              ? "unknown"
+              : null,
   };
 }

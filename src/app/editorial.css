@@ -3598,6 +3598,11 @@ a.constitution-xref-card-country:hover {
 
 .elsys-tabs {
   margin: var(--space-6) 0 var(--space-7);
+  max-width: 100%;
+  overflow-x: auto;
+}
+.elsys-tabs .segmented {
+  min-width: max-content;
 }
 
 /* Card shell */

@@ -937,6 +937,13 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       'Illustrative Example Response: {"data":{"world_bank_region"',
       "EndpointSection visibly labels every generated example response illustrative",
     ),
+    exemptClaim(
+      "api-docs.elections-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"schemaVersion":"election-research-export/v1"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
     runtimeClaim(
       "rankings.live-row-count",
       "src/app/rankings/page.tsx",
@@ -962,8 +969,15 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       "elections.filtered-recent-count",
       "src/app/elections/ElectionsClient.tsx",
       "/elections/ElectionsClient.tsx",
-      "{filteredRecent.length} qualified election records",
-      "client-side filtered result rows with generic load-failure copy",
+      "{filteredRecent.length} qualified conceptual events",
+      "client-side filtered audited conceptual events with a distinct load-failure state",
+    ),
+    runtimeClaim(
+      "elections.filtered-result-announcement",
+      "src/app/elections/ElectionsClient.tsx",
+      "/elections/ElectionsClient.tsx",
+      "{filteredUpcoming.length} future records and {filteredRecent.length} historical records",
+      "aria-live summary computed from the current qualified client-side filters",
     ),
     runtimeClaim(
       "elections.source-coverage",

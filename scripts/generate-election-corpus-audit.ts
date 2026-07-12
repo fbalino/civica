@@ -165,6 +165,8 @@ function jurisdictionIdentityFor(
     sourceRecordId: row.sourceRecordId,
     expectedJurisdictionId: row.expectedJurisdictionId,
     observedJurisdictionIds: row.observedJurisdictionIds,
+    observedScopeJurisdictionIds: row.observedScopeJurisdictionIds,
+    statusReason: row.statusReason,
     status: row.status as NonNullable<
       ElectionCorpusRow["jurisdictionIdentity"]
     >["status"],
@@ -472,10 +474,12 @@ async function collect(generatedAt: string, asOf: string) {
       sourceDatedUpcomingEvents,
       projectionGroups,
       quarantinedRows: audit.dispositionCounts.quarantined,
-      turnoutEligibleRows: audit.rows.filter((row) => row.fieldEligibility.turnout)
-        .length,
-      resultEligibleRows: audit.rows.filter((row) => row.fieldEligibility.results)
-        .length,
+      turnoutEligibleRows: publicRows.filter(
+        (row) => row.fieldEligibility.turnout,
+      ).length,
+      resultEligibleRows: publicRows.filter(
+        (row) => row.fieldEligibility.results,
+      ).length,
     },
     dispositionCounts: audit.dispositionCounts,
     issueCounts: audit.issueCounts,

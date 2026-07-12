@@ -695,6 +695,25 @@
   ],
   "products": [
     {
+      "productId": "election-qualified-export-v1",
+      "routeOrArtifact": "/api/v1/elections?format=json|csv",
+      "publicBulkExport": "allowed",
+      "fields": [
+        {
+          "fieldPattern": "data[].event|data[].jurisdiction|data[].provenance",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "withheld|audit|dateSemantics|filters|meta",
+          "lineage": "civica-derived",
+          "exportRule": "source-permission"
+        }
+      ],
+      "reason": "The election research export emits only qualified source rows with verified public-export permission. IPU, IDEA, IPU-derived projections, and unknown-source rows remain visible only as withheld counts and reasons.",
+      "requiresDerivationVersions": true
+    },
+    {
       "productId": "atlas-reference-export-v1",
       "routeOrArtifact": "/downloads/civica-atlas-2026-07-11.json.gz",
       "publicBulkExport": "allowed",

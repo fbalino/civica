@@ -45,6 +45,8 @@ export interface ElectionIntegrityContent {
     sourceRecordId: string | null;
     expectedJurisdictionId: string | null;
     observedJurisdictionIds: string[];
+    observedScopeJurisdictionIds: string[];
+    statusReason: string;
     status: string;
   } | null;
   results: ElectionIntegrityResult[];

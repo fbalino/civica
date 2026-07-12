@@ -71,11 +71,16 @@ export interface ElectionStatementProvenance {
 
 export interface ElectionJurisdictionIdentityEvidence {
   basis:
-    "wikidata_p17" | "ipu_election_code" | "ipu_chamber_code" | "unavailable";
+    | "wikidata_p17_p1001"
+    | "ipu_election_code"
+    | "ipu_chamber_code"
+    | "unavailable";
   sourceId: string | null;
   sourceRecordId: string | null;
   expectedJurisdictionId: string | null;
   observedJurisdictionIds: string[];
+  observedScopeJurisdictionIds: string[];
+  statusReason: string;
   status: "matched" | "missing" | "mismatch";
 }
 

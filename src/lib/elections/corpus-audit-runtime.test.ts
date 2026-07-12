@@ -59,6 +59,50 @@ test("public qualification fails closed when live content is not the audited con
   assert.equal(isAuditedPublicElection(row.rowId, `${expected}x`), false);
 });
 
+test("explicit Wikidata P1001 scope conflicts are quarantined", () => {
+  const fixtures = [
+    ["Q23018343", "Q11703"],
+    ["Q15206389", "Q34754"],
+    ["Q123751092", "Q3995"],
+  ] as const;
+
+  for (const [sourceRecordId, scopeJurisdictionId] of fixtures) {
+    const row = ELECTION_CORPUS_AUDIT.rows.find(
+      (candidate) =>
+        candidate.jurisdictionIdentity?.sourceRecordId === sourceRecordId,
+    );
+    assert.ok(row, `missing audited fixture ${sourceRecordId}`);
+    assert.equal(row.disposition, "quarantined");
+    assert.equal(row.jurisdictionIdentity?.status, "mismatch");
+    assert.equal(
+      row.jurisdictionIdentity?.statusReason,
+      "explicit_scope_mismatch",
+    );
+    assert.deepEqual(row.jurisdictionIdentity?.observedScopeJurisdictionIds, [
+      scopeJurisdictionId,
+    ]);
+    assert.ok(row.issueCodes.includes("JURISDICTION_IDENTITY_MISMATCH"));
+  }
+});
+
+test("qualified field-coverage counts exclude quarantined evidence", () => {
+  const publicRows = ELECTION_CORPUS_AUDIT.rows.filter(
+    (row) =>
+      row.disposition === "qualified_event" ||
+      row.disposition === "qualified_contest",
+  );
+  assert.equal(ELECTION_CORPUS_AUDIT.qualified.turnoutEligibleRows, 313);
+  assert.equal(ELECTION_CORPUS_AUDIT.qualified.resultEligibleRows, 174);
+  assert.equal(
+    ELECTION_CORPUS_AUDIT.qualified.turnoutEligibleRows,
+    publicRows.filter((row) => row.fieldEligibility.turnout).length,
+  );
+  assert.equal(
+    ELECTION_CORPUS_AUDIT.qualified.resultEligibleRows,
+    publicRows.filter((row) => row.fieldEligibility.results).length,
+  );
+});
+
 test("row fingerprint binds every public election, result, and evidence field", () => {
   const base: ElectionIntegrityContent = {
     id: "election-1",
@@ -75,11 +119,13 @@ test("row fingerprint binds every public election, result, and evidence field", 
     wikidataQid: "Q1",
     dateConfidence: "confirmed",
     jurisdictionIdentity: {
-      basis: "wikidata_p17",
+      basis: "wikidata_p17_p1001",
       sourceId: "source-1",
       sourceRecordId: "Q1",
       expectedJurisdictionId: "Q2",
       observedJurisdictionIds: ["Q2"],
+      observedScopeJurisdictionIds: [],
+      statusReason: "country_match_scope_unspecified",
       status: "matched",
     },
     results: [

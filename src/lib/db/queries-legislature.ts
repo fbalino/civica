@@ -1,10 +1,11 @@
-import { sql, desc, asc, eq } from "drizzle-orm";
+import { and, sql, desc, asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   elections,
   governmentBodies,
   legislatureParties,
   sources,
+  statements,
 } from "@/lib/db/schema";
 import {
   ELECTION_CORPUS_AUDIT,
@@ -63,6 +64,8 @@ export interface LegislatureKeyFacts {
   nextElectionYear: string | null;
   /** A source date is not necessarily an official schedule; projections are separate. */
   nextElectionBasis: "source_dated" | "term_projection" | null;
+  nextElectionStatus: "tentative" | "source_dated" | "held" | "unknown" | null;
+  lastElectionResultsStatus: "compiled" | "not_compiled" | null;
 }
 
 export interface LegislatureContext {
@@ -76,6 +79,10 @@ export interface LegislatureContext {
     retrievedAt: string | null;
   } | null;
   turnoutEvidence: {
+    sourceId: string;
+    retrievedAt: string | null;
+  } | null;
+  systemEvidence: {
     sourceId: string;
     retrievedAt: string | null;
   } | null;
@@ -107,7 +114,7 @@ function yearOf(value: unknown): string | null {
  * empty, which the UI renders as an absent cell rather than a placeholder.
  */
 export async function getLegislatureContext(
-  jurisdictionId: string
+  jurisdictionId: string,
 ): Promise<LegislatureContext> {
   const empty: LegislatureContext = {
     keyFacts: {
@@ -117,11 +124,14 @@ export async function getLegislatureContext(
       lastElectionName: null,
       nextElectionYear: null,
       nextElectionBasis: null,
+      nextElectionStatus: null,
+      lastElectionResultsStatus: null,
     },
     coalitions: [],
     partySyncAt: null,
     electionEvidence: null,
     turnoutEvidence: null,
+    systemEvidence: null,
   };
 
   // 1. Coalition flags, scoped to this jurisdiction's legislative bodies.
@@ -130,7 +140,7 @@ export async function getLegislatureContext(
     .from(governmentBodies)
     .where(
       sql`${governmentBodies.jurisdictionId} = ${jurisdictionId}
-        AND ${governmentBodies.branch} = 'legislative'`
+        AND ${governmentBodies.branch} = 'legislative'`,
     );
 
   const bodyIds = legislativeBodies.map((b) => b.id);
@@ -147,7 +157,7 @@ export async function getLegislatureContext(
       .from(legislatureParties)
       .where(
         sql`${legislatureParties.bodyId} IN ${bodyIds}
-          AND ${legislatureParties.isRulingCoalition} = true`
+          AND ${legislatureParties.isRulingCoalition} = true`,
       );
 
     const byBody = new Map<string, ChamberCoalition>();
@@ -183,7 +193,7 @@ export async function getLegislatureContext(
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
         AND ${elections.electionType} ILIKE 'legislativ%'
-        AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`
+        AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
     .orderBy(desc(elections.electionDate));
 
@@ -193,7 +203,7 @@ export async function getLegislatureContext(
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
         AND ${elections.electionType} ILIKE 'legislativ%'
-        AND ${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`
+        AND ${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
     .orderBy(asc(elections.electionDate));
 
@@ -214,11 +224,43 @@ export async function getLegislatureContext(
   const nextAudit = next ? getElectionAuditRow(next.id) : null;
   const pastAudit = past ? getElectionAuditRow(past.id) : null;
 
+  const systemStatements = past
+    ? await db
+        .select({
+          sourceId: statements.sourceId,
+          retrievedAt: statements.retrievedAt,
+          objectValue: statements.objectValue,
+        })
+        .from(statements)
+        .where(
+          and(
+            eq(statements.subjectTable, "elections"),
+            eq(statements.subjectId, past.id),
+            eq(statements.predicate, "ipu_last_election"),
+            eq(statements.sourceId, "ipu_parline"),
+          ),
+        )
+        .limit(1)
+    : [];
+  const systemStatement = systemStatements.find((statement) => {
+    try {
+      const value = JSON.parse(statement.objectValue ?? "{}") as {
+        electoral_system?: unknown;
+      };
+      return (
+        typeof value.electoral_system === "string" &&
+        value.electoral_system.trim().length > 0
+      );
+    } catch {
+      return false;
+    }
+  });
+
   const partySyncAt = await getPartySourceSyncAt().catch(() => null);
 
   return {
     keyFacts: {
-      electoralSystem: past?.electoralSystem ?? null,
+      electoralSystem: systemStatement ? (past?.electoralSystem ?? null) : null,
       turnoutPercent:
         past?.turnoutPercent != null &&
         isEligibleElectionField(past.id, "turnout")
@@ -233,6 +275,23 @@ export async function getLegislatureContext(
           : nextAudit?.temporalClass === "projection_due"
             ? "term_projection"
             : null,
+      nextElectionStatus:
+        nextAudit?.temporalClass === "projection_due"
+          ? "unknown"
+          : nextAudit?.sourceEventStatus === "tentative"
+            ? "tentative"
+            : nextAudit?.sourceEventStatus === "source_dated"
+              ? "source_dated"
+              : nextAudit?.sourceEventStatus === "held"
+                ? "held"
+                : nextAudit
+                  ? "unknown"
+                  : null,
+      lastElectionResultsStatus: past
+        ? isEligibleElectionField(past.id, "results")
+          ? "compiled"
+          : "not_compiled"
+        : null,
     },
     coalitions: coalitions.length > 0 ? coalitions : empty.coalitions,
     partySyncAt,
@@ -246,6 +305,14 @@ export async function getLegislatureContext(
       ? {
           sourceId: pastAudit.fieldEvidence.turnout.sourceId,
           retrievedAt: pastAudit.fieldEvidence.turnout.retrievedAt,
+        }
+      : null,
+    systemEvidence: systemStatement
+      ? {
+          sourceId: systemStatement.sourceId,
+          retrievedAt: systemStatement.retrievedAt
+            ? new Date(systemStatement.retrievedAt).toISOString()
+            : null,
         }
       : null,
   };

@@ -6,6 +6,7 @@ import { neon } from "@neondatabase/serverless";
 import { config } from "dotenv";
 
 import { stableStringify } from "../src/lib/data/frozen-vintage";
+import { assessWikidataJurisdictionIdentity } from "../src/lib/elections/jurisdiction-scope";
 
 config({ path: ".env.local", quiet: true });
 
@@ -36,6 +37,9 @@ type WikidataEntity = {
     P17?: Array<{
       mainsnak?: { datavalue?: { value?: { id?: string } } };
     }>;
+    P1001?: Array<{
+      mainsnak?: { datavalue?: { value?: { id?: string } } };
+    }>;
   };
 };
 
@@ -55,8 +59,11 @@ function countryCodeFromIpuChamber(value: string | null) {
   );
 }
 
-async function wikidataCountryClaims(eventQids: string[]) {
-  const result = new Map<string, string[]>();
+async function wikidataJurisdictionClaims(eventQids: string[]) {
+  const result = new Map<
+    string,
+    { countryJurisdictionIds: string[]; scopeJurisdictionIds: string[] }
+  >();
   for (let index = 0; index < eventQids.length; index += WIKIDATA_BATCH_SIZE) {
     const batch = eventQids.slice(index, index + WIKIDATA_BATCH_SIZE);
     const url = new URL(WIKIDATA_API);
@@ -78,17 +85,19 @@ async function wikidataCountryClaims(eventQids: string[]) {
       entities?: Record<string, WikidataEntity>;
     };
     for (const qid of batch) {
-      const claims = payload.entities?.[qid]?.claims?.P17 ?? [];
-      result.set(
-        qid,
+      const claims = payload.entities?.[qid]?.claims;
+      const claimIds = (propertyClaims: NonNullable<typeof claims>["P17"]) =>
         [
           ...new Set(
-            claims
+            (propertyClaims ?? [])
               .map((claim) => claim.mainsnak?.datavalue?.value?.id)
               .filter((value): value is string => Boolean(value)),
           ),
-        ].sort(),
-      );
+        ].sort();
+      result.set(qid, {
+        countryJurisdictionIds: claimIds(claims?.P17),
+        scopeJurisdictionIds: claimIds(claims?.P1001),
+      });
     }
   }
   return result;
@@ -143,26 +152,31 @@ async function collect(generatedAt: string) {
         .filter((qid): qid is string => Boolean(qid)),
     ),
   ].sort();
-  const countryClaims = await wikidataCountryClaims(eventQids);
+  const jurisdictionClaims = await wikidataJurisdictionClaims(eventQids);
 
   const auditedRows = rows.map((row) => {
     if (row.election_qid) {
-      const observed = countryClaims.get(row.election_qid) ?? [];
+      const observed = jurisdictionClaims.get(row.election_qid) ?? {
+        countryJurisdictionIds: [],
+        scopeJurisdictionIds: [],
+      };
+      const assessment = assessWikidataJurisdictionIdentity({
+        expectedJurisdictionId: row.jurisdiction_qid,
+        countryJurisdictionIds: observed.countryJurisdictionIds,
+        scopeJurisdictionIds: observed.scopeJurisdictionIds,
+      });
       return {
         rowId: row.row_id,
         jurisdictionId: row.jurisdiction_id,
         jurisdictionSlug: row.jurisdiction_slug,
-        basis: "wikidata_p17" as const,
+        basis: "wikidata_p17_p1001" as const,
         sourceId: "wikidata",
         sourceRecordId: row.election_qid,
         expectedJurisdictionId: row.jurisdiction_qid,
-        observedJurisdictionIds: observed,
-        status:
-          row.jurisdiction_qid && observed.includes(row.jurisdiction_qid)
-            ? ("matched" as const)
-            : observed.length === 0
-              ? ("missing" as const)
-              : ("mismatch" as const),
+        observedJurisdictionIds: observed.countryJurisdictionIds,
+        observedScopeJurisdictionIds: observed.scopeJurisdictionIds,
+        statusReason: assessment.reason,
+        status: assessment.status,
       };
     }
 
@@ -184,6 +198,13 @@ async function collect(generatedAt: string) {
       sourceRecordId: row.event_source_url ?? row.ipu_parline_id,
       expectedJurisdictionId: expectedIso2,
       observedJurisdictionIds: observedCode ? [observedCode] : [],
+      observedScopeJurisdictionIds: [],
+      statusReason:
+        expectedIso2 && observedCode === expectedIso2
+          ? "country_code_match"
+          : observedCode
+            ? "country_code_mismatch"
+            : "country_code_missing",
       status:
         expectedIso2 && observedCode === expectedIso2
           ? ("matched" as const)
@@ -197,8 +218,9 @@ async function collect(generatedAt: string) {
     matched: auditedRows.filter((row) => row.status === "matched").length,
     missing: auditedRows.filter((row) => row.status === "missing").length,
     mismatch: auditedRows.filter((row) => row.status === "mismatch").length,
-    wikidataP17: auditedRows.filter((row) => row.basis === "wikidata_p17")
-      .length,
+    wikidataP17P1001: auditedRows.filter(
+      (row) => row.basis === "wikidata_p17_p1001",
+    ).length,
     ipuElectionCode: auditedRows.filter(
       (row) => row.basis === "ipu_election_code",
     ).length,
@@ -207,11 +229,11 @@ async function collect(generatedAt: string) {
     ).length,
   };
   return {
-    schemaVersion: "election-jurisdiction-identity/v1" as const,
+    schemaVersion: "election-jurisdiction-identity/v2" as const,
     generatedAt,
     upstream: {
       wikidataApi: WIKIDATA_API,
-      wikidataProperty: "P17",
+      wikidataProperties: ["P17", "P1001"],
       ipuElectionCodePattern: "/elections/{ISO2}-*",
       ipuChamberCodePattern: "{ISO2}-{LC|UC}*",
     },
@@ -237,7 +259,7 @@ async function main() {
       );
     }
     console.log(
-      `PASS — ${artifact.counts.matched}/${artifact.rowCount} election rows retain matching publisher jurisdiction identity; ${artifact.counts.missing} remain explicitly missing.`,
+      `PASS — ${artifact.counts.matched}/${artifact.rowCount} election rows retain matching publisher jurisdiction identity; ${artifact.counts.missing} remain missing and ${artifact.counts.mismatch} remain conflicting.`,
     );
     return;
   }

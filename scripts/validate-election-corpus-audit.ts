@@ -227,10 +227,12 @@ const recomputedQualified = {
       rowById.get(group.primaryRowId)?.disposition === "projection_only",
   ).length,
   quarantinedRows: dispositions.quarantined,
-  turnoutEligibleRows: report.rows.filter((row) => row.fieldEligibility.turnout)
-    .length,
-  resultEligibleRows: report.rows.filter((row) => row.fieldEligibility.results)
-    .length,
+  turnoutEligibleRows: publicRows.filter(
+    (row) => row.fieldEligibility.turnout,
+  ).length,
+  resultEligibleRows: publicRows.filter(
+    (row) => row.fieldEligibility.results,
+  ).length,
 };
 for (const [key, value] of Object.entries(recomputedQualified)) {
   if (report.qualified[key as keyof typeof recomputedQualified] !== value)

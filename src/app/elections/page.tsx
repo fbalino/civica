@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import {
+  getFactbookCountryOptions,
+  getQualifiedElectionResearchRows,
   getUpcomingElections,
-  getRecentElectionsWithResults,
 } from "@/lib/db/queries";
 import ElectionsClient from "./ElectionsClient";
 import { withOg } from "@/lib/og";
@@ -27,7 +28,11 @@ export const metadata: Metadata = {
 
 export default async function ElectionsPage() {
   let upcoming: Awaited<ReturnType<typeof getUpcomingElections>> = [];
-  let recent: Awaited<ReturnType<typeof getRecentElectionsWithResults>> = [];
+  type ResearchRow = Awaited<
+    ReturnType<typeof getQualifiedElectionResearchRows>
+  >[number];
+  let recent: Array<ResearchRow & { relatedContests: ResearchRow[] }> = [];
+  let countryOptions: Awaited<ReturnType<typeof getFactbookCountryOptions>> = [];
   const stats: {
     qualifiedEvents: number;
     sovereignJurisdictions: number;
@@ -41,7 +46,8 @@ export default async function ElectionsPage() {
       ELECTION_CORPUS_AUDIT.qualified.sourceDatedUpcomingEvents,
     projectionGroups: getElectionProjectionDisplayGroupCount(),
   };
-  let electionDataAvailable = false;
+  let upcomingDataAvailable = false;
+  let historicalDataAvailable = false;
   const sourceById = new Map(
     ELECTION_CORPUS_AUDIT.sourceRights.map((source) => [
       source.sourceId,
@@ -66,20 +72,87 @@ export default async function ElectionsPage() {
       sourceById.get("international_idea")?.reviewStatus ?? "pending",
   };
 
-  try {
-    [upcoming, recent] = await Promise.all([
+  const [upcomingResult, recentResult, countryOptionsResult] =
+    await Promise.allSettled([
       getUpcomingElections(500),
       // Load every past election that carries compiled results (≈195 today) so
       // the hero country filter is honest — a country's older results-bearing
       // election must still surface when a reader narrows to it, not fall
       // outside a short recency window. Grouped by year in the client.
-      getRecentElectionsWithResults(400),
+      getQualifiedElectionResearchRows(),
+      getFactbookCountryOptions(),
     ]);
-    electionDataAvailable = true;
 
-  } catch (err) {
-    console.error("[elections] stats query failed:", err);
+  if (upcomingResult.status === "fulfilled") {
+    upcoming = upcomingResult.value;
+    upcomingDataAvailable = true;
+  } else {
+    console.error("[elections] future query failed:", upcomingResult.reason);
   }
+  if (recentResult.status === "fulfilled") {
+    const historicalRows = recentResult.value.filter(
+      (row) => row.audit.temporalClass === "historical",
+    );
+    recent = historicalRows
+      .filter((row) => row.audit.primaryRowId === row.election.id)
+      .map((row) => ({
+        ...row,
+        relatedContests: historicalRows.filter(
+          (candidate) =>
+            candidate.election.id !== row.election.id &&
+            candidate.audit.primaryRowId === row.election.id,
+        ),
+      }))
+      .sort((a, b) =>
+        (b.election.electionDate ?? "").localeCompare(
+          a.election.electionDate ?? "",
+        ),
+      );
+    historicalDataAvailable = true;
+  } else {
+    console.error("[elections] historical query failed:", recentResult.reason);
+  }
+  if (countryOptionsResult.status === "fulfilled") {
+    countryOptions = countryOptionsResult.value;
+  } else {
+    console.error(
+      "[elections] jurisdiction catalog query failed:",
+      countryOptionsResult.reason,
+    );
+  }
+
+  const countryCoverage = Object.fromEntries(
+    countryOptions.map((country) => {
+      const rows = ELECTION_CORPUS_AUDIT.rows.filter(
+        (row) => row.jurisdiction.slug === country.slug,
+      );
+      const publicRows = rows.filter(
+        (row) =>
+          row.disposition === "qualified_event" ||
+          row.disposition === "qualified_contest",
+      );
+      return [
+        country.slug,
+        {
+          historicalRecords: publicRows.filter(
+            (row) => row.temporalClass === "historical",
+          ).length,
+          sourceDatedFuture: publicRows.filter(
+            (row) => row.temporalClass === "source_dated_upcoming",
+          ).length,
+          hasProjection: rows.some(
+            (row) => row.disposition === "projection_only",
+          ),
+          compiledResults: publicRows.filter(
+            (row) => row.fieldEligibility.results,
+          ).length,
+          quarantinedRecords: rows.filter(
+            (row) => row.disposition === "quarantined",
+          ).length,
+        },
+      ];
+    }),
+  );
 
   // The full-bleed engraving hero (with the country typeahead) lives inside
   // ElectionsClient so the hero search can drive the client-side filter.
@@ -89,7 +162,10 @@ export default async function ElectionsPage() {
       recent={recent}
       stats={stats}
       coverage={coverage}
-      dataAvailable={electionDataAvailable}
+      countryOptions={countryOptions}
+      countryCoverage={countryCoverage}
+      upcomingDataAvailable={upcomingDataAvailable}
+      historicalDataAvailable={historicalDataAvailable}
     />
   );
 }

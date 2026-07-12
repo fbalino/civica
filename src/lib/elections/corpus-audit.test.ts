@@ -33,6 +33,8 @@ const base = (overrides: Partial<ElectionCorpusRow>): ElectionCorpusRow => ({
     sourceRecordId: "DE-LC01-E20250223",
     expectedJurisdictionId: "DE",
     observedJurisdictionIds: ["DE"],
+    observedScopeJurisdictionIds: [],
+    statusReason: "country_code_match",
     status: "matched",
   },
   provenance: { event: event() },
@@ -186,11 +188,13 @@ test("fails jurisdiction identity and source-status assessment closed", () => {
     base({
       id: "mismatched-identity",
       jurisdictionIdentity: {
-        basis: "wikidata_p17",
+        basis: "wikidata_p17_p1001",
         sourceId: "wikidata",
         sourceRecordId: "Q1",
         expectedJurisdictionId: "Q183",
         observedJurisdictionIds: ["Q142"],
+        observedScopeJurisdictionIds: [],
+        statusReason: "country_mismatch",
         status: "mismatch",
       },
     }),

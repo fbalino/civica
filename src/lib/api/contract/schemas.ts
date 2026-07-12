@@ -1802,3 +1802,133 @@ export const zCountryExportJson = z
       .strict(),
   })
   .strict();
+
+/* /api/v1/elections — qualified, rights-filtered election research export. */
+export const zElectionResearchExport = z
+  .object({
+    schemaVersion: z.literal("election-research-export/v1"),
+    generatedAt: z.string().datetime(),
+    audit: z
+      .object({
+        version: z.literal("election-corpus-audit/v1"),
+        asOf: z.string(),
+      })
+      .strict(),
+    dateSemantics: z
+      .object({
+        representation: z.literal("date_only"),
+        time: z.null(),
+        timeZone: z.null(),
+        note: z.string(),
+      })
+      .strict(),
+    filters: z
+      .object({
+        jurisdiction: z.string().optional(),
+        type: z.enum(["legislative", "presidential"]).optional(),
+        temporalClass: z
+          .enum(["historical", "source_dated_upcoming", "projection_due"])
+          .optional(),
+        sourceStatus: z.string().optional(),
+        jurisdictionStatus: z.string().optional(),
+        from: z.string().optional(),
+        to: z.string().optional(),
+        hasResults: z.boolean().optional(),
+        hasTurnout: z.boolean().optional(),
+      })
+      .strict(),
+    data: z.array(
+      z
+        .object({
+          id: z.string(),
+          conceptualEventKey: z.string().nullable(),
+          disposition: z.enum(["qualified_event", "qualified_contest"]),
+          jurisdiction: z
+            .object({
+              id: z.string(),
+              slug: z.string(),
+              name: z.string(),
+              iso2: z.string().nullable(),
+              iso3: z.string().nullable(),
+              status: z.string(),
+              statusLabel: z.string(),
+              disputed: z.boolean(),
+            })
+            .strict(),
+          event: z
+            .object({
+              name: z.string().nullable(),
+              type: z.enum(["legislative", "presidential"]),
+              date: z
+                .object({
+                  value: z.string().nullable(),
+                  representation: z.literal("date_only"),
+                  time: z.null(),
+                  timeZone: z.null(),
+                  timeZoneStatus: z.literal("not_provided_by_source"),
+                  basis: z.literal("source_confirmed"),
+                  precision: z.enum(["day", "month", "year", "unknown"]),
+                  role: z.enum(["election_day", "point_in_time", "unknown"]),
+                  temporalClass: z.enum([
+                    "historical",
+                    "source_dated_upcoming",
+                  ]),
+                  sourceStatus: z.enum(["held", "source_dated", "tentative"]),
+                })
+                .strict(),
+              electoralSystem: z.string().nullable(),
+            })
+            .strict(),
+          provenance: z
+            .object({
+              sourceId: z.literal("wikidata"),
+              sourceUrl: z.string().url(),
+              license: z.string(),
+              retrievedAt: z.string().datetime(),
+              rightsReview: z.literal("verified"),
+            })
+            .strict(),
+        })
+        .strict(),
+    ),
+    withheld: z
+      .object({
+        rows: z.number().int().nonnegative(),
+        projectionRows: z.number().int().nonnegative(),
+        bySource: z.array(
+          z
+            .object({
+              sourceId: z.string(),
+              count: z.number().int().positive(),
+              reason: z.string(),
+            })
+            .strict(),
+        ),
+        fields: z.array(
+          z
+            .object({
+              field: z.string(),
+              count: z.number().int().positive(),
+              reason: z.string(),
+            })
+            .strict(),
+        ),
+        reason: z.string(),
+      })
+      .strict(),
+    rights: z
+      .object({
+        manifest: z.literal("/api/rights-manifest"),
+        policy: z.literal("source-row-filtered"),
+      })
+      .strict(),
+    meta: z
+      .object({
+        auditedRowsMatchingFilters: z.number().int().nonnegative(),
+        qualifiedEventOrContestRowsMatchingFilters: z.number().int().nonnegative(),
+        projectionRowsMatchingFilters: z.number().int().nonnegative(),
+        emittedRows: z.number().int().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
