@@ -1,11 +1,24 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { ATLAS_EXPORT_VINTAGE_LABEL, buildAtlasExport, serializeAtlasExport } from "../src/lib/exports/atlas-release";
 
 const fixturePath = "data/fixtures/clean-room/atlas-input.v1.json";
 const expectedPath = "data/fixtures/clean-room/expected.v1.json";
 
-if (process.env.DATABASE_URL || process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY) {
+const credentialKeys = ["DATABASE_URL", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"];
+const hasCredentials = credentialKeys.some((key) => process.env[key]);
+if (hasCredentials && process.env.VERCEL && !process.env.CIVICA_CLEAN_ROOM_CHILD) {
+  const cleanEnvironment = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => !credentialKeys.includes(key)),
+  ) as NodeJS.ProcessEnv;
+  execFileSync(process.execPath, ["--import", "tsx", ...process.argv.slice(1)], {
+    env: { ...cleanEnvironment, CIVICA_CLEAN_ROOM_CHILD: "1" },
+    stdio: "inherit",
+  });
+  process.exit(0);
+}
+if (hasCredentials) {
   throw new Error("Clean-room fixture must not use database or model credentials");
 }
 
