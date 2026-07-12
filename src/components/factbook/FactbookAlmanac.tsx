@@ -1,12 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
-import { CountryFlag } from "@/components/CountryFlag";
-import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { CountryDirectory } from "@/components/country/CountryDirectory";
 import {
   AlmanacFilters,
   EMPTY_FILTER_STATE,
@@ -78,15 +77,6 @@ function continentToRegion(continent: string | null): RegionKey {
       return "all";
   }
 }
-
-const REGION_DOT: Record<RegionKey, string> = {
-  all: "var(--color-text-30)",
-  africa: "var(--color-status-warning)",
-  americas: "var(--color-accent)",
-  asia: "var(--color-status-info)",
-  europe: "var(--color-status-success)",
-  oceania: "var(--gov-semi)",
-};
 
 /** First-letter bucket for the index. Non A–Z names land under "#". */
 function indexLetter(name: string): string {
@@ -375,7 +365,7 @@ export function FactbookAlmanac({
           {alphabet.map((letter) => {
             const present = presentLetters.has(letter);
             return present ? (
-              <a key={letter} href={`#fb-letter-${letter}`} className="factbook-alpha">
+              <a key={letter} href={`#country-letter-${letter}`} className="factbook-alpha">
                 {letter}
               </a>
             ) : (
@@ -408,44 +398,11 @@ export function FactbookAlmanac({
             <p className="factbook-almanac-empty">No countries in this region.</p>
           )
         ) : (
-          // NB: this is a CSS multi-column masonry (`column-count`). A transform
-          // on each .factbook-letter-group would yank it out of the column flow
-          // and glitch the masonry, so we reveal the whole index as one block
-          // rather than per-letter stagger.
-          <Reveal className="factbook-index-cols" amount={0.05}>
-            {groups.map(({ letter, items }) => (
-              <section
-                key={letter}
-                id={`fb-letter-${letter}`}
-                className="factbook-letter-group"
-                aria-label={`Countries starting with ${letter}`}
-              >
-                <div className="factbook-letter-head">
-                  <span className="factbook-letter-drop">{letter}</span>
-                  <span className="factbook-letter-count">
-                    {items.length} {items.length === 1 ? "entry" : "entries"}
-                  </span>
-                </div>
-                {items.map((c) => (
-                  <Link
-                    key={c.id}
-                    href={`/country/${c.slug}`}
-                    className="factbook-idx-item"
-                  >
-                    <span className="factbook-idx-flag" aria-hidden="true">
-                      <CountryFlag iso2={c.iso2} size={21} />
-                    </span>
-                    <span className="factbook-idx-name">{c.name}</span>
-                    <span
-                      className="factbook-idx-dot"
-                      style={{ background: REGION_DOT[continentToRegion(c.continent)] }}
-                      aria-hidden="true"
-                    />
-                  </Link>
-                ))}
-              </section>
-            ))}
-          </Reveal>
+          <CountryDirectory
+            countries={inRegion}
+            hrefPrefix="/country"
+            animated
+          />
         )}
       </div>
     </div>

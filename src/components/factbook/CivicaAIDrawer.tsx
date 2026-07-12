@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CivicaChatMessage } from "@/components/civica-chat/CivicaChatMessage";
-import { BetaChip } from "@/components/editorial/BetaChip";
 import { onCivicaAsk } from "@/lib/shell/events";
 
 interface Message {
@@ -323,6 +322,7 @@ export function CivicaAIDrawer({
               gap: "var(--space-5)",
             }}
           >
+            <p className="factbook-drawer-verification">Verify important facts</p>
             {messages.map((m) => (
               <CivicaChatMessage
                 key={m.id}
@@ -383,15 +383,6 @@ export function CivicaAIDrawer({
           flexShrink: 0,
         }}
       >
-        <div
-          className="factbook-drawer-beta"
-          aria-label="Civica AI is in beta. Verify important answers."
-        >
-          <BetaChip />
-          <span className="factbook-drawer-beta__copy">
-            Verify important answers
-          </span>
-        </div>
         <input
           type="text"
           value={draft}

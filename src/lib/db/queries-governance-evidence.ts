@@ -5,7 +5,7 @@ import { GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES, GOVERNANCE_EVIDENCE_INDICAT
 import { normalizeCiSeriesType, type CiSeriesType } from "@/lib/ci/series-provenance";
 
 export async function getGovernanceEvidenceCountries() {
-  return db.select({ slug: jurisdictions.slug, name: jurisdictions.name, iso2: jurisdictions.iso2, iso3: jurisdictions.iso3, capital: jurisdictions.capital })
+  return db.select({ slug: jurisdictions.slug, name: jurisdictions.name, iso2: jurisdictions.iso2, iso3: jurisdictions.iso3, capital: jurisdictions.capital, continent: jurisdictions.continent })
     .from(jurisdictions)
     .where(eq(jurisdictions.type, "sovereign_state"))
     .orderBy(asc(jurisdictions.name));

@@ -34,7 +34,10 @@ function MetaPill({
     "factbook-meta-pill--government"
   );
   const valueSpan = (
-    <span className="factbook-meta-pill-value" style={{ color: "var(--color-text-primary)" }}>
+    <span
+      className="factbook-meta-pill-value"
+      style={{ color: valueCanTruncate ? "inherit" : "var(--color-text-primary)" }}
+    >
       {value}
     </span>
   );
@@ -91,6 +94,16 @@ function MetaPill({
   );
 }
 
+function governmentTypeClass(label: string): string {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("semi-presidential")) return "factbook-meta-pill--gov-semi";
+  if (normalized.includes("parliamentary")) return "factbook-meta-pill--gov-parliamentary";
+  if (normalized.includes("presidential")) return "factbook-meta-pill--gov-presidential";
+  if (normalized.includes("theocr")) return "factbook-meta-pill--gov-theocracy";
+  if (normalized.includes("monarch")) return "factbook-meta-pill--gov-monarchy";
+  return "factbook-meta-pill--gov-neutral";
+}
+
 function BetaTag() {
   return (
     <BetaChip
@@ -137,8 +150,11 @@ interface FactbookHeaderStripProps {
   heroCaption?: string | null;
   /** Optional dark-mode caption when the dark engraving depicts a different scene. */
   heroDarkCaption?: string | null;
-  /** The under-masthead navigation row — the 3-tab <CountryTabBar> on the
-   *  unified /country/[slug] page (Factbook · Civica Data · Constitution). */
+  /** Optional methodology disclosure shown on the same baseline as the
+   *  engraving caption. */
+  reconciliationNotice?: React.ReactNode;
+  /** The post-hero navigation row — the 3-tab <CountryTabBar> on the unified
+   *  /country/[slug] page (Factbook · Civica Data · Constitution). */
   nav?: React.ReactNode;
 }
 
@@ -188,6 +204,7 @@ export function FactbookHeaderStrip({
   engravingDarkSrc = null,
   heroCaption = null,
   heroDarkCaption = null,
+  reconciliationNotice,
   nav,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
@@ -253,7 +270,12 @@ export function FactbookHeaderStrip({
         )}
         {engravingSrc && (
           <figcaption className="factbook-hero-caption">
-            <span className="factbook-hero-caption-label">Editorial engraving</span>
+            {reconciliationNotice ? (
+              <span className="factbook-reconciliation-notice">
+                {reconciliationNotice}
+              </span>
+            ) : null}
+            <span className="factbook-hero-caption-label">Engraving</span>
             {heroCaption ? (
               engravingDarkSrc && heroDarkCaption ? (
                 <>
@@ -281,14 +303,19 @@ export function FactbookHeaderStrip({
             <h1 className="factbook-hero-name">{countryName}</h1>
           </div>
 
-          <div className="factbook-hero-pills">
-            {governmentTypeLabel && (
+          {governmentTypeLabel && (
+            <div className="factbook-government-type-row">
               <MetaPill
                 value={governmentTypeDisplay.value}
                 note={governmentTypeDisplay.note}
-                className="factbook-meta-pill--government"
+                className={`factbook-meta-pill--government ${governmentTypeClass(
+                  governmentTypeDisplay.value
+                )}`}
               />
-            )}
+            </div>
+          )}
+
+          <div className="factbook-hero-pills">
             {popStr ? (
               populationResolver?.canonical ? (
                 <span
@@ -404,7 +431,6 @@ export function FactbookHeaderStrip({
             )}
           </div>
 
-          <div className="factbook-hero-switcher-wrap">{nav}</div>
         </div>
 
         <div className="factbook-hero-boxes">
@@ -541,6 +567,8 @@ export function FactbookHeaderStrip({
           </button>
         </div>
       </section>
+
+      {nav ? <div className="country-tabbar-shell">{nav}</div> : null}
 
       <FactbookLightbox
         open={lbOpen}

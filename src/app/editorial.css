@@ -25,6 +25,7 @@
 }
 .editorial-page--wide  { max-width: 960px;  }
 .editorial-page--full  { max-width: 1200px; }
+.editorial-page--reference { max-width: var(--width-reference-shell); }
 
 @media (max-width: 480px) {
   .editorial-page { padding: 40px 18px 60px; }
@@ -2300,12 +2301,31 @@ legend.editorial-filter-label {
   margin: 0;
   line-height: var(--leading-normal);
 }
+.constitution-reader-attribution-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: var(--space-5);
+}
+.constitution-reader-attribution-row .btn {
+  white-space: nowrap;
+}
 .constitution-reader-attribution a {
   color: var(--color-accent);
   text-decoration: none;
 }
 .constitution-reader-attribution a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .constitution-reader-attribution-row {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .constitution-reader-attribution-row .btn {
+    justify-self: start;
+  }
 }
 
 .constitution-reader-layout {
@@ -4292,37 +4312,79 @@ a.constitution-xref-card-country:hover {
   }
 }
 
-/* ============================================================
-   Index grid — compact multi-column directory of links
-   ------------------------------------------------------------
-   For "browse everything" sections on landing surfaces (the
-   /governance-evidence country index is the canonical use). A plain
-   auto-fill grid of flag+name links; cells are link-only, so the
-   prose-anchor button guard does not apply here by design (see
-   src/lib/design/editorial-button-guard.test.ts allowlist).
-   ============================================================ */
-.editorial-index-grid {
-  list-style: none;
-  margin: var(--space-5) 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-1) var(--space-6);
+/* Canonical A–Z country directory. Shared by /country,
+   /governance-evidence, and the design-system reference. */
+.country-directory {
+  column-count: 4;
+  column-gap: var(--space-7);
 }
-.editorial-index-grid a {
+.country-directory__group {
+  break-inside: avoid;
+  margin-bottom: var(--space-6);
+}
+.country-directory__heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-default);
+}
+.country-directory__letter {
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent);
+  line-height: var(--leading-none);
+}
+.country-directory__count {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-muted);
+}
+.country-directory__item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-1);
   border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: var(--text-14);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
   text-decoration: none;
+  color: inherit;
+  transition: background var(--motion-fast) var(--motion-ease);
 }
-.editorial-index-grid a:hover,
-.editorial-index-grid a:focus-visible {
-  background: var(--color-card-bg);
-  color: var(--color-accent);
+.country-directory__item:hover,
+.country-directory__item:focus-visible {
+  background: var(--color-select-bg);
+}
+.country-directory__flag {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.country-directory__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-15);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.country-directory__dot {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+@media (max-width: 1080px) {
+  .country-directory { column-count: 3; }
+}
+@media (max-width: 768px) {
+  .country-directory {
+    column-count: 2;
+    column-gap: var(--space-5);
+  }
+}
+@media (max-width: 480px) {
+  .country-directory { column-count: 1; }
 }

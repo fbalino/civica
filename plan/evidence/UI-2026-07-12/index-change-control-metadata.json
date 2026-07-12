@@ -1,0 +1,13 @@
+{
+  "id": "country-reference-ui-and-directory",
+  "toVersion": "civica-index-country-reference-ui-v9",
+  "categories": ["input", "presentation"],
+  "evidence": {
+    "documentation": ["DESIGN.md"],
+    "registry": ["src/components/country/CountryDirectory.tsx"],
+    "release_note": ["plan/session-handoffs/2026-07-12-country-reference-ui.md"],
+    "migration_plan": ["plan/session-handoffs/2026-07-12-country-reference-ui.md"],
+    "golden_test": ["src/lib/design/editorial-button-guard.test.ts"],
+    "contract_test": ["src/lib/ci/quarantine-contract.test.ts"]
+  }
+}

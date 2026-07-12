@@ -86,7 +86,7 @@ export async function generateMetadata({
 // section is visibility-gated upfront so the nav never lists a phantom entry.
 // The masthead, tab bar, reconciliation notice, and AI drawer live in the shared
 // layout. The "jump to country" search + its sticky-bar handoff render here via
-// <CountryJumpSearch> — a normal-flow field above the shell that scrolls away,
+// <CountryJumpSearch> — a normal-flow field above the left sidebar that scrolls away,
 // so the sticky bar never shows alongside it.
 
 type SectionId =
@@ -443,18 +443,14 @@ export default async function CountryCivicaDataTab({
 
   return (
     <div className="factbook-tab">
-      {/* In-content country search + sticky-bar handoff — identical position
-       *  and geometry to the Factbook tab: a normal-flow field ABOVE the body
-       *  grid (not inside its padded box), so both tabs place it at exactly
-       *  the same offset and it scrolls away before the sticky bar reveals. */}
-      <CountryJumpSearch
-        country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-        countries={countryOptions}
-        className="civica-data-tab-search"
-      />
-
       <div className="civica-data-body">
-        <FactbookSidebar items={sidebarItems} />
+        <div className="factbook-left-rail">
+          <CountryJumpSearch
+            country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
+            countries={countryOptions}
+          />
+          <FactbookSidebar items={sidebarItems} />
+        </div>
 
         <CivicaDataSections
           items={items}

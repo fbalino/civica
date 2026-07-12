@@ -71,7 +71,7 @@ export default async function CountryConstitutionTab({
   // ── Empty state — no ingested constitution text ──────────────────────
   if (!constitution) {
     return (
-      <EditorialPage width="full">
+      <EditorialPage className="editorial-page editorial-page--full country-constitution-body">
         <header className="constitution-page-header">
           <div className="constitution-page-eyebrow">Constitution</div>
           <h1 className="editorial-page-title">
@@ -102,25 +102,11 @@ export default async function CountryConstitutionTab({
 
   // ── Reading state — the country's own constitution ───────────────────
   return (
-    <EditorialPage width="full">
+    <EditorialPage className="editorial-page editorial-page--full country-constitution-body">
       <header className="constitution-page-header">
-        <div className="constitution-page-eyebrow">Constitution</div>
         <h1 className="editorial-page-title">
           Constitution of {jurisdiction.name}
         </h1>
-        <div className="constitution-empty-state">
-          {/* Reuse the empty-state's stacked action column for a prominent,
-              on-brand CTA row — no per-page layout CSS needed. */}
-          <Link
-            className="btn btn--primary"
-            href={`/constitution?c=${encodeURIComponent(slug)}`}
-          >
-            Open in the Constitution Explorer
-            <span className="btn__arrow" aria-hidden="true">
-              →
-            </span>
-          </Link>
-        </div>
       </header>
 
       {/* Single-country reading column — renders its own year line, SourceDot
@@ -129,6 +115,7 @@ export default async function CountryConstitutionTab({
       <ConstitutionReadingColumn
         constitution={constitution}
         sourceRetrievedAt={sourceRetrievedAt}
+        explorerHref={`/constitution?c=${encodeURIComponent(slug)}`}
       />
     </EditorialPage>
   );

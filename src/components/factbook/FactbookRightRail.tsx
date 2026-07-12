@@ -217,37 +217,17 @@ export function FactbookRightRail({
           {sources.map((src, i) => (
             <div
               key={src.name}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "var(--space-3) 0",
-                borderBottom:
-                  i < sources.length - 1
-                    ? "1px solid var(--color-stat-border)"
-                    : "none",
-                fontSize: "var(--text-13)",
-              }}
+              className={`factbook-source-row${
+                i === sources.length - 1 ? " factbook-source-row--last" : ""
+              }`}
             >
-              <span
-                style={{
-                  color: "var(--color-text-85)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
+              <span className="factbook-source-row__name">
                 {src.name}
                 {src.sourceId ? (
                   <SourceDot source={src.sourceId} retrievedAt={src.date} />
                 ) : null}
               </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  color: "var(--color-text-40)",
-                }}
-              >
-                {src.date}
-              </span>
+              <span className="factbook-source-row__date">{src.date}</span>
             </div>
           ))}
         </div>

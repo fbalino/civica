@@ -5,7 +5,6 @@ import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo, CivicaLogoSprite } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { DevDesignMount } from "@/components/dev/DevDesignMount";
 import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildOrganization, buildWebSite } from "@/lib/seo/jsonld";
@@ -19,7 +18,6 @@ import "./civica-index.css";
 import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
-import "@/components/dev/dev-design.css";
 
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
@@ -126,7 +124,6 @@ export default function RootLayout({
           <main style={{ flex: 1 }}>{children}</main>
 
           <SiteFooter />
-          <DevDesignMount />
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { SourceDot } from "@/components/SourceDot";
 import {
@@ -14,6 +15,8 @@ interface ConstitutionReadingColumnProps {
   constitution: ConstitutionDetail;
   /** Constitute source last_sync_at, for the provenance dot. */
   sourceRetrievedAt: string | null;
+  /** Optional route back to the multi-country Constitution Explorer. */
+  explorerHref?: string;
   /**
    * Reports the topic keys of the section currently in view, so the
    * cross-reference pane can surface them as one-click chips.
@@ -34,6 +37,7 @@ function yearLine(year: number | null, yearUpdated: number | null): string {
 export function ConstitutionReadingColumn({
   constitution,
   sourceRetrievedAt,
+  explorerHref,
   onActiveTopicsChange,
 }: ConstitutionReadingColumnProps) {
   const { sections, groups } = useMemo(
@@ -91,21 +95,29 @@ export function ConstitutionReadingColumn({
           <span>{yearLine(constitution.year, constitution.yearUpdated)}</span>
           <SourceDot source="constitute_project" retrievedAt={sourceRetrievedAt} />
         </div>
-        <p className="constitution-reader-attribution">
-          Text from the{" "}
-          <a
-            href={
-              constitution.constituteProjectId
-                ? `https://www.constituteproject.org/constitution/${encodeURIComponent(constitution.constituteProjectId)}`
-                : "https://www.constituteproject.org/"
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Constitute Project
-          </a>{" "}
-          (Elkins, Ginsburg &amp; Melton), CC BY-NC 3.0.
-        </p>
+        <div className="constitution-reader-attribution-row">
+          <p className="constitution-reader-attribution">
+            Text from the{" "}
+            <a
+              href={
+                constitution.constituteProjectId
+                  ? `https://www.constituteproject.org/constitution/${encodeURIComponent(constitution.constituteProjectId)}`
+                  : "https://www.constituteproject.org/"
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Constitute Project
+            </a>{" "}
+            (Elkins, Ginsburg &amp; Melton), CC BY-NC 3.0.
+          </p>
+          {explorerHref ? (
+            <Link className="btn btn--secondary btn--sm" href={explorerHref}>
+              Open in the Constitution Explorer
+              <span className="btn__arrow" aria-hidden="true">→</span>
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       <div className="constitution-reader-layout">

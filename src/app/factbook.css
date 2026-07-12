@@ -9,7 +9,7 @@
 
 /* === Hero ================================================================= */
 .factbook-hero {
-  max-width: 1280px;
+  max-width: var(--width-reference-shell);
   margin: 0 auto;
   padding: var(--space-7) var(--space-6) var(--space-5);
   display: grid;
@@ -40,7 +40,10 @@
   border-bottom: none;
   overflow: hidden;
   padding-block: var(--space-8) var(--space-6);
-  padding-inline: max(var(--space-6), calc((100vw - 1280px) / 2));
+  padding-inline: max(
+    var(--space-6),
+    calc((100vw - var(--width-reference-content)) / 2)
+  );
 }
 .factbook-hero-art-img {
   position: absolute;
@@ -98,8 +101,6 @@
 .factbook-hero-caption-label {
   flex: 0 0 auto;
   font-size: var(--text-12);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
   color: var(--color-text-40);
 }
 .factbook-hero-caption-text {
@@ -150,9 +151,18 @@
   display: flex;
   flex-wrap: wrap;
   column-gap: var(--space-5);
-  row-gap: var(--space-3);
+  row-gap: var(--space-4);
   margin-top: var(--space-3);
   align-items: center;
+}
+.factbook-government-type-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.factbook-government-type-row + .factbook-hero-pills {
+  margin-top: 0;
 }
 
 /* v2 — vertical separators between stats (Pop · GDP · CI).
@@ -174,7 +184,44 @@
   max-width: 100%;
 }
 .factbook-meta-pill--government {
-  flex: 1 1 100%;
+  flex: 0 1 auto;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-chip);
+  font-weight: var(--font-weight-medium);
+}
+.factbook-meta-pill--gov-parliamentary {
+  --factbook-gov-color: var(--gov-parl);
+}
+.factbook-meta-pill--gov-presidential {
+  --factbook-gov-color: var(--gov-pres);
+}
+.factbook-meta-pill--gov-semi {
+  --factbook-gov-color: var(--gov-semi);
+}
+.factbook-meta-pill--gov-monarchy {
+  --factbook-gov-color: var(--gov-mon);
+}
+.factbook-meta-pill--gov-theocracy {
+  --factbook-gov-color: var(--gov-theo);
+}
+.factbook-meta-pill--government:not(.factbook-meta-pill--gov-neutral) {
+  color: var(--factbook-gov-color) !important;
+  background: color-mix(in oklab, var(--factbook-gov-color) 14%, transparent);
+}
+[data-theme="dark"] .factbook-meta-pill--government:not(.factbook-meta-pill--gov-neutral) {
+  color: color-mix(
+    in oklab,
+    var(--factbook-gov-color) 55%,
+    var(--color-text-primary)
+  ) !important;
+  background: color-mix(in oklab, var(--factbook-gov-color) 24%, transparent);
+}
+.factbook-meta-pill--gov-neutral {
+  color: var(--color-text-secondary) !important;
+  background: var(--color-surface-secondary);
+}
+.factbook-meta-pill--government > span[aria-hidden] {
+  background: currentColor !important;
 }
 .factbook-meta-pill-value {
   display: inline-block;
@@ -243,16 +290,15 @@
 .factbook-meta-pill-help:focus-visible::after {
   display: block;
 }
-.factbook-hero-switcher-wrap {
-  margin-top: auto;
-  padding-top: var(--space-5);
-}
-
 /* Three-tab strip (Factbook · Civica Data · Constitution) for the
-   unified /country/[slug] page. Sits under the masthead via the
-   FactbookHeaderStrip `nav` prop and reuses the canonical `.tab-nav`
-   link styling. Horizontal row + a bottom hairline rule so the active
-   tab's accent underline reads against a continuous baseline. */
+   unified /country/[slug] page. It follows the complete hero — including its
+   reconciliation and engraving disclosures — because it controls the content
+   below rather than the hero itself. */
+.country-tabbar-shell {
+  max-width: var(--width-reference-shell);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
 .country-tabbar {
   display: flex;
   align-items: stretch;
@@ -310,17 +356,13 @@
 }
 
 .factbook-reconciliation-notice {
-  border-bottom: 1px solid var(--color-border-default);
-  margin-bottom: var(--space-3);
-}
-.factbook-reconciliation-notice__inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: var(--space-2) var(--space-6) var(--space-3);
-  font-family: var(--font-mono);
+  margin-right: auto;
+  font-family: var(--font-body);
   font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: var(--tracking-wide);
+  text-align: left;
+  pointer-events: auto;
 }
 /* The inline "Beta" tag in the reconciliation notice is the <BetaChip>
    component (canonical sand <Chip>). Its former dedicated class was removed. */
@@ -335,7 +377,7 @@
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) 280px;
   gap: var(--space-7);
-  max-width: 1280px;
+  max-width: var(--width-reference-shell);
   margin: 0 auto;
   padding: var(--space-7) var(--space-6);
   padding-bottom: 120px; /* leave room for the docked Civica AI drawer */
@@ -380,9 +422,16 @@
   grid-template-columns: 240px minmax(0, 1fr) 280px;
   gap: var(--space-7);
   align-items: center;
-  max-width: 1280px;
+  max-width: var(--width-reference-shell);
   margin: 0 auto;
   padding: var(--space-3) var(--space-6);
+}
+.country-constitution-body {
+  max-width: var(--width-reference-shell);
+  padding-top: var(--space-7);
+}
+.country-constitution-body .constitution-page-header {
+  padding: 0 0 var(--space-5);
 }
 .factbook-sticky-country-search__country {
   min-width: 0;
@@ -427,28 +476,22 @@
 /* === Reusable country-jump search (in-content half of the handoff) =========
  * <CountryJumpSearch> renders this field in NORMAL FLOW at the top of a tab's
  * content, so it scrolls away; the sentinel that follows it drives the sticky
- * bar's reveal. Because it's not inside any sticky region, a sticky sidebar /
- * section nav below it can't trap it on screen — guaranteeing exactly one bar
- * at a time. The base rule centers the field on the tab's reading width; the
- * per-tab modifier classes only tune the max-width to match each tab's grid. */
+ * bar's reveal. It sits above the sticky section nav in the shared left rail,
+ * restoring the original country-page placement without trapping the field in
+ * the sticky region. */
 .country-jump-search {
   width: 100%;
-  margin: 0 auto var(--space-6);
+  margin: 0 0 var(--space-5);
 }
 .country-jump-search .country-search {
   width: 100%;
 }
-/* Factbook tab: align the field's right edge with the 3-column grid's content
- * width. Sidebar (240) + gap (var(--space-7)) + main, capped to the body. */
 .factbook-tab {
   min-width: 0;
 }
-.factbook-tab-search {
-  max-width: 520px;
-}
-/* Civica Data tab: the field sits above the master–detail shell. */
-.civica-data-tab-search {
-  max-width: 520px;
+.factbook-left-rail {
+  min-width: 0;
+  align-self: start;
 }
 /* The reveal sentinel is a zero-height marker — never takes layout space. */
 .country-jump-sentinel {
@@ -499,23 +542,14 @@
   border-radius: var(--radius-control);
 }
 
-.factbook-drawer-beta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
+.factbook-drawer-verification {
+  margin: 0;
   color: var(--color-text-60);
   font-family: var(--font-body);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   line-height: 1;
   text-transform: uppercase;
-}
-
-/* The AI drawer's "Beta" tag is the <BetaChip> component (canonical sand
-   <Chip>). Its former dedicated .factbook-drawer-beta__pill class was removed. */
-.factbook-drawer-beta__copy {
-  white-space: nowrap;
 }
 
 /* === Tablet (<= 1100px): drop right rail ================================== */
@@ -598,10 +632,6 @@
     order: 3;
     padding-inline: var(--space-5);
   }
-  .factbook-hero--art .factbook-hero-switcher-wrap {
-    margin-top: var(--space-4);
-  }
-
   .factbook-hero-boxes {
     width: 100%;
     gap: var(--space-3);
@@ -611,13 +641,12 @@
     width: auto;
     height: 100px;
   }
-  .factbook-reconciliation-notice__inner {
-    padding-right: var(--space-5);
-    padding-left: var(--space-5);
-  }
   .factbook-hero-pills {
     column-gap: var(--space-4);
     min-width: 0;
+  }
+  .country-tabbar-shell {
+    padding-inline: var(--space-5);
   }
   .factbook-meta-pill-help::after {
     position: fixed;
@@ -743,9 +772,6 @@
   .factbook-drawer--collapsed {
     border-radius: var(--radius-control);
   }
-  .factbook-drawer-beta__copy {
-    display: none;
-  }
   /* Body content gets extra bottom padding so the last section isn't
      hidden under the floating drawer at rest. */
   .factbook-body {
@@ -865,6 +891,34 @@
 }
 .factbook-source-hang .source-dot {
   margin-left: 0;
+}
+
+.factbook-source-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-stat-border);
+  font-size: var(--text-13);
+}
+.factbook-source-row--last {
+  border-bottom: 0;
+}
+.factbook-source-row__name {
+  min-width: 0;
+  color: var(--color-text-85);
+  line-height: var(--leading-normal);
+}
+.factbook-source-row__name .source-dot {
+  vertical-align: middle;
+}
+.factbook-source-row__date {
+  color: var(--color-text-40);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-normal);
+  white-space: nowrap;
 }
 
 /* === Bills section =======================================================
@@ -1432,75 +1486,7 @@ a.factbook-alpha:hover {
   pointer-events: none;
 }
 
-/* Multi-column masonry-style index */
-.factbook-index-cols {
-  column-count: 4;
-  column-gap: var(--space-7);
-}
-.factbook-letter-group {
-  break-inside: avoid;
-  margin-bottom: var(--space-6);
-}
-.factbook-letter-head {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  margin-bottom: var(--space-2);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-border-default);
-}
-.factbook-letter-drop {
-  font-family: var(--font-heading);
-  font-size: var(--text-24);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-accent);
-  line-height: 1;
-}
-.factbook-letter-count {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  color: var(--color-text-muted);
-}
-.factbook-idx-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 5px var(--space-1);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  color: inherit;
-  transition: background 120ms ease;
-}
-.factbook-idx-item:hover {
-  background: var(--color-select-bg);
-}
-.factbook-idx-flag {
-  display: inline-flex;
-  flex-shrink: 0;
-}
-.factbook-idx-name {
-  flex: 1;
-  min-width: 0;
-  font-family: var(--font-heading);
-  font-size: var(--text-15);
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.factbook-idx-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
-}
-
-@media (max-width: 1080px) {
-  .factbook-index-cols { column-count: 3; }
-}
 @media (max-width: 768px) {
-  .factbook-index-cols { column-count: 2; column-gap: var(--space-5); }
   .factbook-almanac { padding: var(--space-7) var(--space-5) var(--space-8); }
   /* Mobile: let the hero size to its content (matches the homepage hero). */
   .factbook-landing-hero { min-height: auto; }
@@ -1514,10 +1500,6 @@ a.factbook-alpha:hover {
     hyphens: auto;
   }
 }
-@media (max-width: 480px) {
-  .factbook-index-cols { column-count: 1; }
-}
-
 /* === Leaders section =====================================================
    Renders inside the Government section (or its own factbook-section,
    orchestrator's choice). One card per person with a stack of office

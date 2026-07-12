@@ -139,7 +139,7 @@ export default async function ConstitutionPage({
     return (
       <>
         <ConstitutionHero countries={searchOptions} />
-        <EditorialPage width="full">
+        <EditorialPage width="reference">
           <ConstitutionLanding
             countries={indexedCountries}
             featuredTopics={featuredTopics}
@@ -154,7 +154,7 @@ export default async function ConstitutionPage({
 
   if (!catalogAvailable) {
     return (
-      <EditorialPage width="full">
+      <EditorialPage width="reference">
         <header className="constitution-page-header">
           <div className="constitution-page-eyebrow">Constitutions</div>
           <h1 className="editorial-page-title">
@@ -182,7 +182,7 @@ export default async function ConstitutionPage({
   // ── Edge: every requested country lacks an ingested constitution ─────
   if (selectedSlugs.length === 0) {
     return (
-      <EditorialPage width="full">
+      <EditorialPage width="reference">
         <header className="constitution-page-header">
           <div className="constitution-page-eyebrow">Constitutions</div>
           <h1 className="editorial-page-title">No constitution on file</h1>
@@ -212,7 +212,7 @@ export default async function ConstitutionPage({
   if (!primaryConstitution) {
     // Defensive: indexed set said yes but the row failed to load.
     return (
-      <EditorialPage width="full">
+      <EditorialPage width="reference">
         <header className="constitution-page-header">
           <div className="constitution-page-eyebrow">Constitutions</div>
           <h1 className="editorial-page-title">Constitution unavailable</h1>
@@ -232,7 +232,7 @@ export default async function ConstitutionPage({
   }
 
   return (
-    <EditorialPage width="full">
+    <EditorialPage width="reference">
       <header className="constitution-page-header">
         <div className="constitution-page-eyebrow">Constitution Explorer</div>
         <h1 className="editorial-page-title">

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type EditorialWidth = "narrow" | "wide" | "full";
+type EditorialWidth = "narrow" | "wide" | "full" | "reference";
 
 interface EditorialPageProps {
   children: ReactNode;
@@ -10,6 +10,7 @@ interface EditorialPageProps {
    *   narrow → max-width 760px (short-form editorial / blog posts)
    *   wide   → max-width 960px (changelog/list surfaces)
    *   full   → max-width 1200px (atlas-scale layouts, no sidebar)
+   *   reference → 1280px content + gutters (multi-pane reference surfaces)
    *
    * IMPORTANT — read DESIGN.md before picking a width. Methodology
    * pages do NOT use any of these widths; they use
@@ -46,7 +47,9 @@ export function EditorialPage({
   footer,
 }: EditorialPageProps) {
   const widthClass =
-    width === "wide"
+    width === "reference"
+      ? " editorial-page--reference"
+      : width === "wide"
       ? " editorial-page--wide"
       : width === "full"
         ? " editorial-page--full"

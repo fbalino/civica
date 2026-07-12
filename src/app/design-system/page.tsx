@@ -14,14 +14,110 @@ import { SegmentedControlDemo } from "./SegmentedControlDemo";
 import { IndicatorTrendChartDemo } from "./IndicatorTrendChartDemo";
 import { IdeologyCompassDemo } from "./IdeologyCompassDemo";
 import { ExploreMenuDemo } from "./ExploreMenuDemo";
-import { DEV_TOKEN_GROUPS, type DevTokenGroup } from "@/components/dev/dev-tokens";
+import { CountryDirectory } from "@/components/country/CountryDirectory";
+import { MobileNav } from "@/components/MobileNav";
 
 import "./design-system.css";
 
 export const revalidate = 3600;
 
-const groupById = (id: string): DevTokenGroup | undefined =>
-  DEV_TOKEN_GROUPS.find((g) => g.id === id);
+type DesignTokenGroup = {
+  id: string;
+  title: string;
+  tokens: Array<{ cssVar: string; defaultValue?: string }>;
+};
+
+const tokenGroup = (
+  id: string,
+  title: string,
+  cssVars: string[],
+  defaults: Record<string, string> = {}
+): DesignTokenGroup => ({
+  id,
+  title,
+  tokens: cssVars.map((cssVar) => ({ cssVar, defaultValue: defaults[cssVar] })),
+});
+
+// Read-only catalog for the canonical design-system page. The former local
+// token editor and its mutable registry have been removed; these entries only
+// identify the live CSS variables demonstrated below.
+const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
+  tokenGroup("surface", "Surface palette", [
+    "--color-bg", "--color-surface-elevated", "--color-select-bg",
+    "--color-text-primary", "--color-text-60", "--color-text-50",
+    "--color-text-40", "--color-text-30", "--color-divider",
+    "--color-stat-border", "--color-card-bg", "--color-card-border",
+    "--color-card-hover-bg", "--color-card-hover-border", "--color-tooltip-bg",
+    "--color-tooltip-text", "--color-tooltip-border", "--color-grid-bg",
+    "--color-grid-cell", "--color-grid-cell-hover", "--color-grid-row-hover",
+  ]),
+  tokenGroup("accent", "Accent", ["--color-accent"]),
+  tokenGroup("signal", "Signal colors", [
+    "--color-success", "--color-warn", "--color-danger", "--color-info",
+  ]),
+  tokenGroup("indicator-ramp", "Indicator ramp (choropleth)", [
+    "--ramp-indicator-1", "--ramp-indicator-2", "--ramp-indicator-3",
+    "--ramp-indicator-4", "--ramp-indicator-5", "--ramp-no-data",
+  ]),
+  tokenGroup("gov", "Government type palette", [
+    "--gov-parl", "--gov-pres", "--gov-semi", "--gov-mon", "--gov-abs",
+    "--gov-theo", "--gov-one", "--gov-mil", "--gov-other",
+  ]),
+  tokenGroup("branch", "Government branch palette", [
+    "--color-branch-executive", "--color-branch-legislative",
+    "--color-branch-judicial", "--color-branch-monarchy",
+  ]),
+  tokenGroup("peer", "Peer-grouping lenses", [
+    "--peer-region-eap", "--peer-region-eca", "--peer-region-lac",
+    "--peer-region-mena", "--peer-region-na", "--peer-region-sa",
+    "--peer-region-ssa", "--peer-income-low", "--peer-income-lower-mid",
+    "--peer-income-upper-mid", "--peer-income-high",
+  ]),
+  tokenGroup("source", "Source provenance", [
+    "--color-source-live", "--color-source-frozen",
+  ]),
+  tokenGroup("atlas", "Atlas map", [
+    "--atlas-rule", "--atlas-rule-2", "--atlas-ocean", "--atlas-land",
+    "--atlas-land-dim", "--atlas-land-hover", "--atlas-land-selected",
+    "--atlas-accent-soft",
+  ]),
+  tokenGroup("spacing", "Spacing", [
+    "--space-1", "--space-2", "--space-3", "--space-4", "--space-5",
+    "--space-6", "--space-7", "--space-8", "--space-9",
+  ]),
+  tokenGroup(
+    "layout",
+    "Layout widths",
+    ["--width-reference-content", "--width-reference-shell"],
+    {
+      "--width-reference-content": "1280px content",
+      "--width-reference-shell": "1280px + two --space-6 gutters",
+    }
+  ),
+  tokenGroup("radii", "Radii", [
+    "--radius-sm", "--radius-md", "--radius-lg", "--radius-xl",
+    "--radius-2xl", "--radius-full", "--radius-control", "--radius-chip",
+    "--radius-search",
+  ]),
+  tokenGroup("shadows", "Shadows", [
+    "--shadow-hard", "--shadow-hard-sm", "--shadow-hard-md",
+    "--shadow-hard-lg", "--shadow-dark",
+  ]),
+  tokenGroup(
+    "motion",
+    "Motion",
+    ["--motion-fast", "--motion-base", "--motion-slow", "--motion-slower"],
+    {
+      "--motion-fast": "120ms",
+      "--motion-base": "180ms",
+      "--motion-slow": "300ms",
+      "--motion-slower": "500ms",
+    }
+  ),
+];
+
+const groupById = (id: string): DesignTokenGroup | undefined =>
+  DESIGN_TOKEN_GROUPS.find((group) => group.id === id);
 
 /** Color groups rendered as live swatch grids (in display order). */
 const COLOR_GROUP_IDS = [
@@ -61,7 +157,7 @@ const SAMPLE_CHAMBER = {
   ],
 };
 
-function SwatchGrid({ group }: { group: DevTokenGroup }) {
+function SwatchGrid({ group }: { group: DesignTokenGroup }) {
   return (
     <>
       <h3 className="ds-sub">{group.title}</h3>
@@ -82,6 +178,7 @@ function SwatchGrid({ group }: { group: DevTokenGroup }) {
 export default function DesignSystemPage() {
   const ramp = groupById("indicator-ramp");
   const spacing = groupById("spacing");
+  const layout = groupById("layout");
   const radii = groupById("radii");
   const shadows = groupById("shadows");
   const motion = groupById("motion");
@@ -202,6 +299,22 @@ export default function DesignSystemPage() {
                   <span className="bar" style={{ width: `var(${t.cssVar})` }} />
                 </div>
               ))}
+          </div>
+
+          <h3 className="ds-sub">Layout widths</h3>
+          <div
+            className="ds-row"
+            style={{
+              fontFamily: "var(--font-code)",
+              fontSize: "var(--text-13)",
+              color: "var(--color-text-secondary)",
+            }}
+          >
+            {layout?.tokens.map((token) => (
+              <span key={token.cssVar}>
+                {token.cssVar} · {token.defaultValue}
+              </span>
+            ))}
           </div>
 
           <h3 className="ds-sub">Radii</h3>
@@ -475,16 +588,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp ds-comp--wide">
-              <h4>Section header (real)</h4>
-              <SectionHeader
-                eyebrow="Evidence"
-                title="Readable structure."
-                dek="The same SectionHeader primitive used across reader and methodology pages."
-              />
-            </div>
-
-            <div className="ds-comp ds-comp--wide">
-              <h4>Index grid</h4>
+              <h4>Full-screen atlas menu (real)</h4>
               <p
                 style={{
                   margin: "0 0 var(--space-4)",
@@ -494,31 +598,50 @@ export default function DesignSystemPage() {
                   maxWidth: "48ch",
                 }}
               >
-                Compact auto-fill directory of links for &ldquo;browse
-                everything&rdquo; sections on landing surfaces (canonical use:
-                the /governance-evidence country index). Link-only by design —
-                never place buttons inside.
+                The hamburger opens the canonical full-viewport navigation:
+                image-led browse destinations, research and methodology
+                registers, search, status, and reference links. Escape closes
+                it and keyboard focus remains inside while open.
               </p>
-              <ul className="editorial-index-grid">
-                <li>
-                  <a href="#">Andorra</a>
-                </li>
-                <li>
-                  <a href="#">Barbados</a>
-                </li>
-                <li>
-                  <a href="#">Denmark</a>
-                </li>
-                <li>
-                  <a href="#">Guyana</a>
-                </li>
-                <li>
-                  <a href="#">Japan</a>
-                </li>
-                <li>
-                  <a href="#">Vatican City</a>
-                </li>
-              </ul>
+              <MobileNav />
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Section header (real)</h4>
+              <SectionHeader
+                eyebrow="Evidence"
+                title="Readable structure."
+                dek="The same SectionHeader primitive used across reader and methodology pages."
+              />
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Country directory (real)</h4>
+              <p
+                style={{
+                  margin: "0 0 var(--space-4)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-13)",
+                  color: "var(--color-text-muted)",
+                  maxWidth: "48ch",
+                }}
+              >
+                Shared A&ndash;Z country directory used by the country catalog
+                and Governance Evidence. Callers provide the destination; the
+                grouping, flags, region signals, and responsive columns remain
+                identical.
+              </p>
+              <CountryDirectory
+                hrefPrefix="/country"
+                countries={[
+                  { slug: "andorra", name: "Andorra", iso2: "AD", continent: "Europe" },
+                  { slug: "barbados", name: "Barbados", iso2: "BB", continent: "North America" },
+                  { slug: "denmark", name: "Denmark", iso2: "DK", continent: "Europe" },
+                  { slug: "guyana", name: "Guyana", iso2: "GY", continent: "South America" },
+                  { slug: "japan", name: "Japan", iso2: "JP", continent: "Asia" },
+                  { slug: "holy-see-vatican-city", name: "Vatican City", iso2: "VA", continent: "Europe" },
+                ]}
+              />
             </div>
 
             <div className="ds-comp ds-comp--wide">

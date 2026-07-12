@@ -9,7 +9,7 @@ interface CountryTabBarProps {
 
 // Three-tab strip for the unified /country/[slug] page (Factbook ·
 // Civica Data · Constitution). Rendered under the masthead via the
-// FactbookHeaderStrip `nav` prop. Uses the canonical `.tab-nav` /
+// FactbookHeaderStrip post-hero `nav` prop. Uses the canonical `.tab-nav` /
 // `.tab-nav--active` pattern (mixed-case Inter + accent underline) —
 // matches the global header NavLinks. Layout (horizontal row + bottom
 // hairline rule) lives in `.country-tabbar` in factbook.css.

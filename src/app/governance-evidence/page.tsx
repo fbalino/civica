@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { CountryFlag } from "@/components/CountryFlag";
+import { CountryDirectory } from "@/components/country/CountryDirectory";
 import { Banner } from "@/components/editorial/Banner";
 import { Button } from "@/components/editorial/Button";
 import { GovernanceEvidenceTable } from "@/components/governance-evidence/GovernanceEvidenceTable";
@@ -84,15 +85,11 @@ function GovernanceEvidenceLanding({ countries }: { countries: Countries }) {
                 : "Sovereign states."}
             </h2>
           </div>
-          <ul className="editorial-index-grid">
-            {countries.map((country) => (
-              <li key={country.slug}>
-                <Link href={`/governance-evidence?country=${country.slug}`}>
-                  <CountryFlag iso2={country.iso2} size={16} /> {country.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <CountryDirectory
+            countries={countries}
+            hrefPrefix="/governance-evidence"
+            queryParam="country"
+          />
         </section>
 
         <nav className="editorial-footer-nav">

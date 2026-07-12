@@ -10,10 +10,11 @@ interface FactbookSidebarProps {
   items: ReadonlyArray<FactbookSidebarItem>;
   /**
    * Optional in-sidebar country search. The country tab now renders the
-   * "jump to country" search above the body via <CountryJumpSearch> (a
-   * scroll-away field that hands off to the sticky bar), so the sticky
-   * sidebar omits its own search to avoid two bars at once. Pass `countries`
-   * only for standalone reader pages that still want a sidebar search.
+   * "jump to country" search immediately above this component in the shared
+   * left rail via <CountryJumpSearch>. That field scrolls away and hands off
+   * to the sticky bar, so this sticky sidebar omits its own search to avoid
+   * two bars at once. Pass `countries` only for standalone reader pages that
+   * still want a sidebar search.
    */
   countries?: ReadonlyArray<FactbookCountryOption>;
 }

@@ -212,38 +212,34 @@ export default async function CountryLayout({
         engravingDarkSrc={countryEngravingDarkSrc}
         heroCaption={heroCaption}
         heroDarkCaption={heroDarkCaption}
+        reconciliationNotice={
+          (headerFacts["population_total"]?.canonical &&
+            headerFacts["population_total"].canonical.sourceId !==
+              "cia_factbook") ||
+          (headerFacts["gdp_ppp_usd_billions"]?.canonical &&
+            headerFacts["gdp_ppp_usd_billions"].canonical.sourceId !==
+              "cia_factbook") ? (
+            <>
+              Some figures reconciled across multiple sources via Civica&apos;s
+              methodology ({reconciliation.version.replace(/-beta$/, "")}
+              {reconciliation.status === "beta" ? (
+                <>
+                  {" "}
+                  <BetaChip />
+                </>
+              ) : null}
+              ).{" "}
+              <Link
+                href="/country/methodology/reconciliation"
+                className="factbook-reconciliation-notice__link"
+              >
+                Methodology →
+              </Link>
+            </>
+          ) : null
+        }
         nav={<CountryTabBar slug={slug} />}
       />
-
-      {/* Show a one-line reconciliation disclosure whenever at least one
-       *  header fact has a non-CIA canonical source (i.e. the resolver
-       *  actually swapped in fresher data). Quiet when only CIA values
-       *  render. */}
-      {(headerFacts["population_total"]?.canonical &&
-        headerFacts["population_total"].canonical.sourceId !== "cia_factbook") ||
-      (headerFacts["gdp_ppp_usd_billions"]?.canonical &&
-        headerFacts["gdp_ppp_usd_billions"].canonical.sourceId !==
-          "cia_factbook") ? (
-        <div className="factbook-reconciliation-notice">
-          <div className="factbook-reconciliation-notice__inner">
-            Some figures reconciled across multiple sources via Civica&apos;s
-            methodology ({reconciliation.version.replace(/-beta$/, "")}
-            {reconciliation.status === "beta" ? (
-              <>
-                {" "}
-                <BetaChip />
-              </>
-            ) : null}
-            ).{" "}
-            <Link
-              href="/country/methodology/reconciliation"
-              className="factbook-reconciliation-notice__link"
-            >
-              Methodology →
-            </Link>
-          </div>
-        </div>
-      ) : null}
 
       {/* The "jump to another country" search + its sticky-bar handoff now
        *  live INSIDE each tab via <CountryJumpSearch> (a normal-flow field at

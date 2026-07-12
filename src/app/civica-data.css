@@ -11,14 +11,14 @@
 
 .civica-data-body {
   /* GEOMETRY CLONE of .factbook-body (factbook.css) — the two country tabs
-     share one surface: same 1280px cap, same 240px sidebar column, same
+     share one surface: same 1280px content width, same 240px sidebar column, same
      gap and padding, the SAME <FactbookSidebar> component. Owner mandate
      (2026-07-05): these tabs must never drift apart again. The only
      difference is the absent right rail (this tab has none). */
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   gap: var(--space-7);
-  max-width: 1280px;
+  max-width: var(--width-reference-shell);
   margin: 0 auto;
   padding: var(--space-7) var(--space-6);
   padding-bottom: 120px; /* clearance for the docked Civica AI drawer */

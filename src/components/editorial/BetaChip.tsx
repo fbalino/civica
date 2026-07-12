@@ -10,11 +10,10 @@ import { Chip } from "./Pill";
  *   .ci-beta-pill (civica-index.css)
  *   .editorial-beta-tag (editorial.css)
  *   .factbook-reconciliation-notice__beta (factbook.css)
- *   .factbook-drawer-beta__pill (factbook.css)
  *
  * Use it for the Index Beta tag, methodology Beta tags, reconciliation version
- * tags, advisory-board status, and the AI drawer disclosure. Content defaults to
- * "Beta" but can be any short status label (e.g. a version string).
+ * tags, and advisory-board status. Content defaults to "Beta" but can be any
+ * short status label (e.g. a version string).
  */
 
 interface BetaChipProps {

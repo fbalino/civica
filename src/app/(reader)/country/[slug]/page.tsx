@@ -38,8 +38,8 @@ export const revalidate = 3600;
 // move to the Civica Data tab. The masthead, tab bar, reconciliation notice,
 // and AI drawer live in the shared layout. The "jump to country" search +
 // its sticky-bar handoff render here via <CountryJumpSearch> — a normal-flow
-// field above the body that scrolls away, so the sticky bar never shows
-// alongside it.
+// field above the left sidebar that scrolls away, so the sticky bar never
+// shows alongside it.
 type SectionPlan = { id: string; label: string; sourceKey: string };
 
 const SECTION_PLAN: SectionPlan[] = [
@@ -186,18 +186,14 @@ export default async function CountryFactbookTab({
 
   return (
     <div className="factbook-tab">
-      {/* In-content country search + sticky-bar handoff. Normal-flow element
-       *  at the top of the tab content, so it scrolls away; the shared sticky
-       *  bar reveals only once it's out of view (never both). The sticky
-       *  `.factbook-sidebar` below no longer carries its own search. */}
-      <CountryJumpSearch
-        country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-        countries={countryOptions}
-        className="factbook-tab-search"
-      />
-
       <div className="factbook-body">
-        <FactbookSidebar items={sidebarItems} />
+        <div className="factbook-left-rail">
+          <CountryJumpSearch
+            country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
+            countries={countryOptions}
+          />
+          <FactbookSidebar items={sidebarItems} />
+        </div>
 
         <div className="factbook-main">
         {visibleSections.map((section) => {
