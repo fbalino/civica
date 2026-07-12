@@ -491,7 +491,7 @@ export default function ElectionsClient({
                     className="index-country-card"
                   >
                     <div className="index-card-top">
-                      <CountryFlag iso2={e.jurisdiction.iso2} size={28} />
+                      <CountryFlag iso2={e.jurisdiction.iso2} size={28} decorative />
                       <div className="index-card-name-block">
                         <a
                           className="index-card-name"
@@ -782,7 +782,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
               gap: "var(--space-3)",
             }}
           >
-            <CountryFlag iso2={e.jurisdiction.iso2} size={24} />
+            <CountryFlag iso2={e.jurisdiction.iso2} size={24} decorative />
             <span
               style={{
                 fontFamily: "var(--font-heading)",

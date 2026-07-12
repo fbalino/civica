@@ -64,7 +64,7 @@ function CountryPicker({
       >
         <div className="ci-compare-picker-slot">{slotLabel}</div>
         <div className="ci-compare-picker-name">
-          <CountryFlag iso2={selectedCountry.iso2} size={20} />
+          <CountryFlag iso2={selectedCountry.iso2} size={20} decorative />
           <span>{selectedCountry.name}</span>
         </div>
         <div className="ci-compare-picker-meta">

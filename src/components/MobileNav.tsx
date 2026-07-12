@@ -164,12 +164,14 @@ function MenuOverlay({
           className="theme-engraving-light"
           src="/engravings/hero.webp"
           alt=""
+          aria-hidden="true"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="theme-engraving-dark"
           src="/engravings/hero-dark.webp"
           alt=""
+          aria-hidden="true"
         />
       </div>
       <div className="mobile-menu__wash" aria-hidden="true" />
@@ -299,12 +301,14 @@ function ExploreLink({
           className="theme-engraving-light"
           src={`/engravings/spot-${item.engraving}.webp`}
           alt=""
+          aria-hidden="true"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="theme-engraving-dark"
           src={`/engravings/spot-${item.engraving}-dark.webp`}
           alt=""
+          aria-hidden="true"
         />
       </span>
       <span className="mobile-menu__explore-copy">

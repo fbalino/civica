@@ -96,7 +96,7 @@ export function CountryDirectory({
           className="country-directory__item"
         >
           <span className="country-directory__flag" aria-hidden="true">
-            <CountryFlag iso2={country.iso2} size={21} />
+            <CountryFlag iso2={country.iso2} size={21} decorative />
           </span>
           <span className="country-directory__name">
             {country.name}

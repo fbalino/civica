@@ -85,7 +85,7 @@ export function ConstitutionLanding({
               className="constitution-landing-card"
             >
               <span className="constitution-landing-card-flag" aria-hidden>
-                <CountryFlag iso2={c.iso2} size={22} />
+                <CountryFlag iso2={c.iso2} size={22} decorative />
               </span>
               <span className="constitution-landing-card-name">{c.name}</span>
               {c.year ? (

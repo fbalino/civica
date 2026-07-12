@@ -368,7 +368,7 @@ function ExcerptCard({
     >
       <div className="constitution-xref-card-head">
         <span className="constitution-xref-card-flag" aria-hidden>
-          <CountryFlag iso2={entry.iso2} size={18} />
+          <CountryFlag iso2={entry.iso2} size={18} decorative />
         </span>
         <Link
           href={`/constitution?c=${encodeURIComponent(entry.slug)}`}

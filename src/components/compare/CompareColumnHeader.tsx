@@ -20,7 +20,7 @@ export function CompareColumnHeader({
 }: CompareColumnHeaderProps) {
   return (
     <div className="compare-col-header" style={{ borderBottomColor: seriesColor }}>
-      <CountryFlag iso2={iso2} size={28} />
+      <CountryFlag iso2={iso2} size={28} decorative />
       <a href={`/country/${slug}`} className="compare-col-header-name">
         {name}
       </a>

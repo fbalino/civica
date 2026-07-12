@@ -218,7 +218,7 @@ export function CountrySearchCombobox({
               onClick={() => selectCountry(country)}
             >
               <span className="country-search__flag" aria-hidden="true">
-                <CountryFlag iso2={country.iso2} size={20} />
+                <CountryFlag iso2={country.iso2} size={20} decorative />
               </span>
               <span className="country-search__result-main">
                 <span className="country-search__result-name">

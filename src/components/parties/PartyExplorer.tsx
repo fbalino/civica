@@ -242,7 +242,7 @@ export function PartyExplorer({
         sortValue: (p) => p.country.name.toLowerCase(),
         render: (p) => (
           <span className="parties-cell-country">
-            <CountryFlag iso2={p.country.iso2} size={20} />
+            <CountryFlag iso2={p.country.iso2} size={20} decorative />
             <span className="parties-cell-country-name">{p.country.name}</span>
           </span>
         ),

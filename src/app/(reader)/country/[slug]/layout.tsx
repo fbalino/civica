@@ -110,17 +110,21 @@ export default async function CountryLayout({
     iso3: jurisdiction.iso3,
     slug: jurisdiction.slug,
   });
+  // alt="" (decorative): the lightbox renders `caption` as a visible caption
+  // immediately beside the enlarged image (FactbookLightbox.tsx), so a
+  // matching `alt` would announce the same sentence twice (DESIGN.md
+  // "Alternative text").
   const mapImages: LightboxImage[] = gallery
     ? gallery.mapImages.map((p) => ({
         src: wikimediaUrl(p.file, 1200),
-        alt: p.caption,
+        alt: "",
         caption: galleryCaption(p),
       }))
     : [];
   const photos: LightboxImage[] = gallery
     ? gallery.photos.map((p) => ({
         src: wikimediaUrl(p.file, 1200),
-        alt: p.caption,
+        alt: "",
         caption: galleryCaption(p),
       }))
     : [];

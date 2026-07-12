@@ -142,7 +142,7 @@ export function ConstitutionCountryBar({
             }`}
           >
             <span className="constitution-country-chip__flag" aria-hidden>
-              <CountryFlag iso2={c?.iso2 ?? null} size={16} />
+              <CountryFlag iso2={c?.iso2 ?? null} size={16} decorative />
             </span>
             <span className="constitution-country-chip__name">
               {c?.name ?? slug}
@@ -256,7 +256,7 @@ export function ConstitutionCountryBar({
                           className="constitution-add__option-flag"
                           aria-hidden
                         >
-                          <CountryFlag iso2={c.iso2} size={18} />
+                          <CountryFlag iso2={c.iso2} size={18} decorative />
                         </span>
                         <span className="constitution-add__option-name">
                           {c.name}

@@ -28,7 +28,7 @@ export function ConstitutionPassageCard({
     <article className="constitution-search-result" aria-labelledby={headingId}>
       <header className="constitution-search-result__header">
         <span className="constitution-search-result__flag" aria-hidden>
-          <CountryFlag iso2={result.jurisdiction.iso2} size={22} />
+          <CountryFlag iso2={result.jurisdiction.iso2} size={22} decorative />
         </span>
         <div className="constitution-search-result__identity">
           <h3 id={headingId} className="constitution-search-result__country">

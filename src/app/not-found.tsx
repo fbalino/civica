@@ -60,12 +60,14 @@ function CompassEngraving() {
         className="theme-engraving-light"
         src="/engravings/spot-compass.webp"
         alt=""
+        aria-hidden="true"
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="theme-engraving-dark"
         src="/engravings/spot-compass-dark.webp"
         alt=""
+        aria-hidden="true"
       />
     </div>
   );

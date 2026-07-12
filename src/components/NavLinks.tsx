@@ -29,12 +29,14 @@ function ExploreEngraving({ engraving }: { engraving: string }) {
         className="theme-engraving-light"
         src={`/engravings/spot-${engraving}.webp`}
         alt=""
+        aria-hidden="true"
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="theme-engraving-dark"
         src={`/engravings/spot-${engraving}-dark.webp`}
         alt=""
+        aria-hidden="true"
       />
     </span>
   );

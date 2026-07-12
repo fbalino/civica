@@ -456,7 +456,7 @@ function SystemCard({
                   }
                 >
                   <Link href={`/country/${c.slug}`} className="elsys-chip">
-                    <CountryFlag iso2={c.iso2} size={16} />
+                    <CountryFlag iso2={c.iso2} size={16} decorative />
                     {c.name}
                   </Link>
                 </Tooltip>

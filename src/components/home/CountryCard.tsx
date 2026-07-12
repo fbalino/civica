@@ -65,7 +65,7 @@ export function CountryCard({
         <div className="country-card-header">
           {iso2 ? (
             <span className="country-card-flag" aria-hidden="true">
-              <CountryFlag iso2={iso2} size={28} />
+              <CountryFlag iso2={iso2} size={28} decorative />
             </span>
           ) : null}
           <div className="country-card-titles">

@@ -193,6 +193,11 @@ export function FactbookLightbox({
       <img
         src={current.src}
         alt={current.alt}
+        // Decorative: `current.caption` renders in the visible caption block
+        // immediately below (same text as the source `alt`, always "" as of
+        // EXP-023), so the image itself is hidden from the accessibility
+        // tree to avoid announcing that sentence twice.
+        aria-hidden="true"
         style={{
           maxWidth: "90vw",
           maxHeight: "75vh",
@@ -253,6 +258,7 @@ export function FactbookLightbox({
               <img
                 src={img.src}
                 alt=""
+                aria-hidden="true"
                 style={{
                   width: "100%",
                   height: "100%",

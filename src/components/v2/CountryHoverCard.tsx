@@ -63,7 +63,7 @@ export function CountryHoverCard({
       <div className="v2-country-card__body">
         <header className="v2-country-card__header">
           <span className="v2-country-card__flag" aria-hidden="true">
-            <CountryFlag iso2={iso2} size={36} />
+            <CountryFlag iso2={iso2} size={36} decorative />
           </span>
           <div className="v2-country-card__title-stack">
             <h3 className="v2-country-card__name">{name}</h3>
@@ -85,7 +85,8 @@ export function CountryHoverCard({
             <img
               className={lightClassName}
               src={optimizedHeroSrc(heroImageUrl)}
-              alt={heroImageAlt ?? name}
+              alt=""
+              aria-hidden="true"
               loading="lazy"
               onError={(e) => {
                 // Gracefully hide the banner if the engraving 404s.
@@ -98,7 +99,8 @@ export function CountryHoverCard({
               <img
                 className="theme-engraving-dark"
                 src={optimizedHeroSrc(heroImageDarkUrl)}
-                alt={heroImageAlt ?? name}
+                alt=""
+                aria-hidden="true"
                 loading="lazy"
                 onError={() => setDarkImageFailed(true)}
               />

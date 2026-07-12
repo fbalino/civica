@@ -62,7 +62,8 @@ export function LeaderPortrait({
       <img
         className="lead-avatar-photo"
         src={wikimediaUrl(photoFile!, 240)}
-        alt={`Portrait of ${personName}`}
+        alt=""
+        aria-hidden="true"
         width={96}
         height={120}
         loading="lazy"
