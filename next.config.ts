@@ -26,7 +26,7 @@ const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://tiles.openfreemap.org https://api.mapbox.com",
+  "img-src 'self' data: blob: https://tiles.openfreemap.org https://api.mapbox.com https://flagcdn.com https://commons.wikimedia.org https://upload.wikimedia.org",
   "font-src 'self'",
   "connect-src 'self' https://tiles.openfreemap.org https://*.blob.vercel-storage.com https://api.mapbox.com https://events.mapbox.com",
   "worker-src 'self' blob:",
