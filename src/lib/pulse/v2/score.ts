@@ -44,6 +44,8 @@ export interface ScoreSummary {
   eventsConsidered: number;
   countriesScored: number;
   dimensionRowsWritten: number;
+  /** Events excluded by a current append-only absorption decision. */
+  absorbedEventsExcluded: number;
   /** distinct (country, dimension) tuples with non-trivial deltas (|δ| ≥ 1) */
   significantDeltas: number;
   dryRun: boolean;
@@ -63,6 +65,8 @@ export interface PublishedEvent {
   sourceIds: string[];
   publicationRunId: string;
   corroborationRunId: string;
+  absorptionDecisionKey: string | null;
+  absorptionOutcome: "absorbed" | "not_absorbed" | null;
 }
 
 export interface DimensionalDeltaPlan {
@@ -145,7 +149,7 @@ export async function calculateDimensionalDeltas(
     const days = daysSince(e.eventDate, today);
     const impact = decayedImpact(
       e.severityValue,
-      e.corroborationConfidence,
+      e.absorptionOutcome === "absorbed" ? 0 : e.corroborationConfidence,
       days,
       e.category
     );
@@ -220,6 +224,9 @@ export async function calculateDimensionalDeltas(
         countriesScored: countriesSeen.size,
         dimensionRowsWritten: planned.length,
         significantDeltas: significant,
+        absorbedEventsExcluded: events.filter(
+          (event) => event.absorptionOutcome === "absorbed",
+        ).length,
       };
       try {
         const batchQueries = [
@@ -272,6 +279,9 @@ export async function calculateDimensionalDeltas(
     countriesScored: countriesSeen.size,
     dimensionRowsWritten: written,
     significantDeltas: significant,
+    absorbedEventsExcluded: events.filter(
+      (event) => event.absorptionOutcome === "absorbed",
+    ).length,
     dryRun: options.dryRun ?? false,
     planned: planned.sort((a, b) => `${a.jurisdictionId}:${a.dimension}`.localeCompare(`${b.jurisdictionId}:${b.dimension}`)),
   };
@@ -283,6 +293,8 @@ function validatePublishedEvents(events: PublishedEvent[]): void {
     if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("score fixture has a blank event or jurisdiction id");
     if (!event.publicationRunId.trim()) throw new Error(`score fixture has no publication run: ${event.id}`);
     if (!event.corroborationRunId.trim()) throw new Error(`score fixture has no corroboration run: ${event.id}`);
+    if (event.absorptionOutcome === "absorbed" && !event.absorptionDecisionKey)
+      throw new Error(`score fixture has absorbed status without decision evidence: ${event.id}`);
     if (!PULSE_DIMENSIONS.includes(event.dimension)) throw new Error(`score fixture has an invalid dimension: ${event.dimension}`);
     if (!Number.isFinite(event.severityValue) || !Number.isFinite(event.corroborationConfidence)) throw new Error(`score fixture has invalid numeric input: ${event.id}`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) throw new Error(`score fixture has an invalid event date: ${event.id}`);
@@ -374,6 +386,8 @@ async function loadPublishedEvents(
       derivation_versions,
       publication_run_id,
       corroboration_run_id,
+      absorption.absorption_key,
+      absorption.outcome AS absorption_outcome,
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
@@ -382,6 +396,14 @@ async function loadPublishedEvents(
         ORDER BY ps.source_id
       ) AS source_ids
     FROM pulse_events_v2
+    LEFT JOIN LATERAL (
+      SELECT a.absorption_key, a.outcome
+      FROM pulse_event_absorptions a
+      WHERE a.event_id = pulse_events_v2.id
+        AND a.as_of <= CURRENT_DATE
+      ORDER BY a.as_of DESC, a.decided_at DESC, a.absorption_key DESC
+      LIMIT 1
+    ) absorption ON true
     WHERE published = true
       AND projection_status = 'current'
       AND publication_run_id IS NOT NULL
@@ -393,7 +415,7 @@ async function loadPublishedEvents(
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>)
-    .map((r) => ({
+    .map((r): PublishedEvent => ({
       id: String(r.id),
       jurisdictionId: String(r.jurisdiction_id),
       dimension: r.dimension as PulseDimension,
@@ -405,6 +427,14 @@ async function loadPublishedEvents(
       derivationVersions: r.derivation_versions as DerivationVersionEnvelope,
       publicationRunId: String(r.publication_run_id),
       corroborationRunId: String(r.corroboration_run_id),
+      absorptionDecisionKey: r.absorption_key
+        ? String(r.absorption_key)
+        : null,
+      absorptionOutcome:
+        r.absorption_outcome === "absorbed" ||
+        r.absorption_outcome === "not_absorbed"
+          ? r.absorption_outcome
+          : null,
       sourceIds: Array.isArray(r.source_ids) ? r.source_ids.map(String) : [],
     }))
     .filter((event) => isPulseClassificationValid(event));

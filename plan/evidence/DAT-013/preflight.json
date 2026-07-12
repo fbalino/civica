@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T10:28:38.953Z",
+  "generatedAt": "2026-07-12T10:52:38.288Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -28,7 +28,8 @@
     "0024_dark_maginty",
     "0025_careful_the_professor",
     "0026_magenta_xavin",
-    "0027_smart_tempest"
+    "0027_smart_tempest",
+    "0028_complex_carlie_cooper"
   ],
   "plans": [
     {
@@ -672,7 +673,7 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 68614,
+        "research_evidence_history": 69319,
         "statements": 6768,
         "terms": 5475
       },
@@ -750,10 +751,10 @@
         "pulse_incident_assignments": 1507,
         "pulse_incident_resolutions": 479,
         "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 25,
+        "pulse_pipeline_runs": 27,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 68614
+        "research_evidence_history": 69319
       },
       "writesPerformed": 0
     },
@@ -780,11 +781,11 @@
       "liveRowCounts": {
         "pulse_classification_attempts": 385,
         "pulse_cluster_classification_states": 385,
-        "pulse_event_decisions": 3927,
+        "pulse_event_decisions": 4307,
         "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 25,
+        "pulse_pipeline_runs": 27,
         "raw_events": 1507,
-        "research_evidence_history": 68614
+        "research_evidence_history": 69319
       },
       "writesPerformed": 0
     },
@@ -811,7 +812,7 @@
         "pulse_incidents": 1224,
         "pulse_review_obligations": 175,
         "pulse_review_sla_events": 175,
-        "research_evidence_history": 68614
+        "research_evidence_history": 69319
       },
       "writesPerformed": 0
     },
@@ -853,9 +854,34 @@
       "invariantPlan": "npm run db:plan -- --id=0027_smart_tempest --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_dimensional_delta_history": 975,
+        "pulse_dimensional_delta_history": 1300,
         "pulse_dimensional_deltas": 325,
-        "research_evidence_history": 68614
+        "research_evidence_history": 69319
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0028_complex_carlie_cooper",
+      "artifact": "drizzle/authoritative/0028_complex_carlie_cooper.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "fbef51106cc6765704a9dc6994c0c3ca6479ddd8e1667419bd1e7817f5541c1a",
+      "affectedRelations": [
+        "ci_dimension_scores",
+        "pulse_event_absorptions",
+        "pulse_events_v2",
+        "research_evidence_history"
+      ],
+      "statementCount": 10,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0028_complex_carlie_cooper-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0028_complex_carlie_cooper --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_dimension_scores": 4867,
+        "pulse_event_absorptions": 0,
+        "pulse_events_v2": 384,
+        "research_evidence_history": 69319
       },
       "writesPerformed": 0
     },
@@ -1059,7 +1085,7 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384,
-        "research_evidence_history": 68614
+        "research_evidence_history": 69319
       },
       "writesPerformed": 0
     },

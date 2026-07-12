@@ -25,6 +25,8 @@ const event: PublishedEvent = {
   sourceIds: ["source-1"],
   publicationRunId: "33333333-3333-4333-8333-333333333333",
   corroborationRunId: "55555555-5555-4555-8555-555555555555",
+  absorptionDecisionKey: null,
+  absorptionOutcome: null,
 };
 const runRef = createPulsePipelineRunRef("score", {
   id: "44444444-4444-4444-8444-444444444444",
@@ -164,4 +166,26 @@ test("current-event and prior-state jurisdictions form one deduplicated union", 
   assert.equal(priorRows.length, 5);
   assert.ok(priorRows.every((row) => row.deltaValue === 0));
   assert.ok(priorRows.every((row) => row.contributingEventIds.length === 0));
+});
+
+test("absorption evidence suppresses impact without mutating corroboration", async () => {
+  const absorbed: PublishedEvent = {
+    ...event,
+    absorptionDecisionKey:
+      "pulse-absorption/sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    absorptionOutcome: "absorbed",
+  };
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events: [absorbed],
+    existingJurisdictionIds: [],
+    dryRun: true,
+    now,
+    runRef,
+  });
+  assert.equal(absorbed.corroborationConfidence, 0.8);
+  assert.equal(result.absorbedEventsExcluded, 1);
+  assert.ok(result.planned.every((row) => row.deltaValue === 0));
+  assert.ok(
+    result.planned.every((row) => row.contributingEventIds.length === 0),
+  );
 });

@@ -745,6 +745,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
     deprecation: active,
   },
+  pulse_event_absorptions: {
+    definition:
+      "Append-only decisions about whether one explicitly linked Pulse event is already represented in a later comparable fixed-scale Index observation.",
+    rowGrain:
+      "One event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+    cadence:
+      "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+    vintageSemantics:
+      "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+    rights:
+      "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+    deprecation: active,
+  },
   pulse_event_decisions: {
     definition:
       "Append-only, axis-specific Pulse decisions and refutations underlying the current event projection.",

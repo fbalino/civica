@@ -815,3 +815,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   unsupported automatic publications, and preserved 13 human-reviewed ones.
 - Runtime `pulse-v2.13-beta`, live invariants, 912 tests, API contracts,
   light/dark browser QA, and the full production build passed.
+
+## 2026-07-12 — PUL-037 absorption evidence completed
+
+- Replaced destructive decoupling with append-only, exact-event absorption
+  decisions gated by sequential comparable fixed-scale Index observations.
+- Applied authoritative migration 0028; production is at 29/29 migrations and
+  73 tables. The live ledger contains zero invented absorption decisions.
+- Scoring excludes a confirmed absorbed event without changing its
+  corroboration confidence. Runtime `pulse-v2.14-beta`, 920 tests, TypeScript,
+  live migration/retention/absorption invariants, browser QA, and the full
+  production build passed.

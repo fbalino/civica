@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "b487bfcf9fec2f803354bdd9c2d167444cd71103b2ea7864fb8c69513c2c05e8",
+  "schemaFingerprint": "5e56696fcedf3a02450c088b9313577691c4d100696d7736f9dd18d86c54c4d5",
   "summary": {
-    "tables": 72,
-    "columns": 990,
+    "tables": 73,
+    "columns": 1015,
     "publicAtlasTables": 18,
-    "researchBetaTables": 22,
+    "researchBetaTables": 23,
     "supportTables": 11,
     "internalTables": 19,
     "privateTables": 2,
@@ -19808,6 +19808,657 @@
           "cadence": "Daily after classification/corroboration and on rescore.",
           "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_event_absorptions",
+      "exportName": "pulseEventAbsorptions",
+      "definition": "Append-only decisions about whether one explicitly linked Pulse event is already represented in a later comparable fixed-scale Index observation.",
+      "rowGrain": "One event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+      "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+      "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+      "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "absorption_key",
+          "propertyName": "absorptionKey",
+          "definition": "Absorption key recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "as_of",
+          "propertyName": "asOf",
+          "definition": "Upstream effective or observation date for the value.",
+          "sqlType": "date",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "ISO 8601 calendar date",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_absorptions_event_as_of"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "As of follows this table contract. as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "current_ci_release_id",
+          "propertyName": "currentCiReleaseId",
+          "definition": "Current ci release id recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_absorptions_release"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "current_score",
+          "propertyName": "currentScore",
+          "definition": "Current score recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decided_at",
+          "propertyName": "decidedAt",
+          "definition": "Decided at recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_absorptions_event_as_of"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "Decided at follows this table contract. as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension",
+          "propertyName": "dimension",
+          "definition": "Dimension recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_event_absorptions_release"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_id",
+          "propertyName": "eventId",
+          "definition": "Event id; relational link to pulse_events_v2.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_events_v2.id",
+            "indexGroups": [
+              "idx_pulse_event_absorptions_event_as_of"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_events_v2.id; substantive provenance follows this table's source contract.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_refs",
+          "propertyName": "evidenceRefs",
+          "definition": "Evidence refs recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "fixed_scale_id",
+          "propertyName": "fixedScaleId",
+          "definition": "Fixed scale id recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "link_actor_type",
+          "propertyName": "linkActorType",
+          "definition": "Link actor type recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "link_method_version",
+          "propertyName": "linkMethodVersion",
+          "definition": "Link method version recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "link_standing",
+          "propertyName": "linkStanding",
+          "definition": "Link standing recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "outcome",
+          "propertyName": "outcome",
+          "definition": "Outcome recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "previous_ci_release_id",
+          "propertyName": "previousCiReleaseId",
+          "definition": "Previous ci release id recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "previous_score",
+          "propertyName": "previousScore",
+          "definition": "Previous score recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rationale",
+          "propertyName": "rationale",
+          "definition": "Rationale recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reasons",
+          "propertyName": "reasons",
+          "definition": "Reasons recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "score_delta",
+          "propertyName": "scoreDelta",
+          "definition": "Score delta recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersedes_absorption_key",
+          "propertyName": "supersedesAbsorptionKey",
+          "definition": "Supersedes absorption key; relational link to pulse_event_absorptions.absorption_key.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_event_absorptions.absorption_key",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_event_absorptions.absorption_key; substantive provenance follows this table's source contract.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "threshold",
+          "propertyName": "threshold",
+          "definition": "Threshold recorded for the event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+          "cadence": "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+          "vintageSemantics": "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+          "rights": "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
           "deprecation": {
             "status": "active"
           }

@@ -25,8 +25,8 @@ import { resolveCiRelease } from "../src/lib/ci/release-selection";
 async function main() {
   const db = createDb();
 
-  // --decouple-dry-run runs the absorption check without zeroing.
-  // Useful when validating the helper before next quarterly fires.
+  // --decouple-dry-run rehearses append-only absorption assessment. The
+  // routine never mutates corroboration confidence.
   const decoupleDryRun = process.argv.includes("--decouple-dry-run");
 
   const positional = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
@@ -64,29 +64,28 @@ async function main() {
   // generic; cast for the helper which needs schema-typed inference.
   const decouple = await decoupleAbsorbedEvents(
     db as unknown as NeonHttpDatabase<typeof schema>,
-    quarter,
+    release.releaseId,
     {
-      methodologyVersion,
       dryRun: decoupleDryRun,
     }
   );
-  if (decouple.noPreviousQuarter) {
+  if (decouple.noComparableRelease) {
     console.log(
-      "  No previous beta quarter found — first run, nothing to decouple."
+      "  No earlier comparable fixed-scale release was found; no event can be absorbed."
     );
   } else {
-    const verb = decoupleDryRun ? "would be zeroed" : "zeroed";
-    console.log(
-      `  (country, dim) pairs crossed threshold: ${decouple.pairsCrossed}`
-    );
-    console.log(`  pulse_events_v2 rows ${verb}:           ${decouple.eventsZeroed}`);
+    const verb = decoupleDryRun ? "planned" : "written";
+    console.log(`  explicit event links examined:          ${decouple.explicitLinksExamined}`);
+    console.log(`  append-only decisions ${verb}:          ${decouple.decisionsPlanned}`);
+    console.log(`  events supported as absorbed:           ${decouple.eventsAbsorbed}`);
+    console.log(`  corroboration confidence rows zeroed:   ${decouple.eventsZeroed}`);
     if (Object.keys(decouple.byDimension).length) {
       for (const [dim, count] of Object.entries(decouple.byDimension)) {
         console.log(`    ${dim.padEnd(22)} ${count} pair${count === 1 ? "" : "s"}`);
       }
     }
     if (decoupleDryRun) {
-      console.log(`  --decouple-dry-run: no UPDATE issued.`);
+      console.log(`  --decouple-dry-run: no decision INSERT issued.`);
     }
   }
 }

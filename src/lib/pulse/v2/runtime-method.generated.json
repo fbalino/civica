@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "e4b3e0c2b51b99a0e49f31716c90d6fe9cd5df5a6d09d9138b54fe11640ee7b3",
+  "contractHash": "1da4b090c4df21e2639f02b5dd124e744bd41f02c886289320b95708941c51f0",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -339,11 +339,14 @@
   },
   "mixed_legacy_unversioned": false,
   "numericDeltas": {
-    "absorbedIntoIndexPolicy": "non_durable_zero_then_daily_recompute_can_restore",
+    "absorbedIntoIndexPolicy": "separate_versioned_decision_never_mutates_corroboration",
+    "absorptionEvidence": "append_only_explicit_event_link_fixed_scale",
+    "absorptionMultiplier": "absorbed_zero_otherwise_one",
     "boundsPerDimension": {
       "lower": -15,
       "upper": 10
     },
+    "currentAbsorptionStanding": "none_no_sequential_comparable_release",
     "currentProjection": "one_row_per_jurisdiction_dimension",
     "dimensions": [
       "democratic_quality",
@@ -352,7 +355,7 @@
       "corruption_control",
       "stability"
     ],
-    "impactFormula": "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
+    "impactFormula": "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)",
     "includedEvents": "published_only",
     "inputMethodCoverage": "row_level_versioned_with_explicit_legacy",
     "noEventState": "zero_tombstone_internal_public_null",
@@ -632,7 +635,7 @@
     },
     "version": "pulse-review-sla/v1"
   },
-  "schemaVersion": "1.12.0",
+  "schemaVersion": "1.13.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -645,5 +648,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.13-beta"
+  "version": "pulse-v2.14-beta"
 }

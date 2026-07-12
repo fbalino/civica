@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T09:48:08.885Z",
-  "sha256": "79dc9062ac22f342d681aa0c05670ca49ba2b60f9d7ce99d8ea69940f0baf4bb",
+  "generatedAt": "2026-07-12T10:45:43.077Z",
+  "sha256": "fc08487405140b281d4f13055e12ae2edec78b6352f0a8c149c016aae7a4db31",
   "schema": {
     "columns": [
       {
@@ -6695,6 +6695,231 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "pulse_event_absorptions",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "absorption_key",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "event_id",
+        "type": "uuid",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "dimension",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "outcome",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "previous_ci_release_id",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "current_ci_release_id",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "float4",
+        "name": "previous_score",
+        "type": "real",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "float4",
+        "name": "current_score",
+        "type": "real",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "float4",
+        "name": "score_delta",
+        "type": "real",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "float4",
+        "name": "threshold",
+        "type": "real",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "fixed_scale_id",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "link_standing",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "link_actor_type",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "link_method_version",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "date",
+        "name": "as_of",
+        "type": "date",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "rationale",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "_text",
+        "name": "evidence_refs",
+        "type": "ARRAY",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 21
+      },
+      {
+        "udt": "_text",
+        "name": "reasons",
+        "type": "ARRAY",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 22
+      },
+      {
+        "udt": "text",
+        "name": "supersedes_absorption_key",
+        "type": "text",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "YES",
+        "position": 23
+      },
+      {
+        "udt": "timestamp",
+        "name": "decided_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_absorptions",
+        "default": null,
+        "nullable": "NO",
+        "position": 24
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_absorptions",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 25
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_event_decisions",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -9956,6 +10181,26 @@
         "definition": "CREATE UNIQUE INDEX pulse_dimensional_deltas_pkey ON public.pulse_dimensional_deltas USING btree (id)"
       },
       {
+        "name": "idx_pulse_event_absorptions_event_as_of",
+        "table": "pulse_event_absorptions",
+        "definition": "CREATE INDEX idx_pulse_event_absorptions_event_as_of ON public.pulse_event_absorptions USING btree (event_id, as_of, decided_at)"
+      },
+      {
+        "name": "idx_pulse_event_absorptions_release",
+        "table": "pulse_event_absorptions",
+        "definition": "CREATE INDEX idx_pulse_event_absorptions_release ON public.pulse_event_absorptions USING btree (current_ci_release_id, dimension)"
+      },
+      {
+        "name": "pulse_event_absorptions_absorption_key_unique",
+        "table": "pulse_event_absorptions",
+        "definition": "CREATE UNIQUE INDEX pulse_event_absorptions_absorption_key_unique ON public.pulse_event_absorptions USING btree (absorption_key)"
+      },
+      {
+        "name": "pulse_event_absorptions_pkey",
+        "table": "pulse_event_absorptions",
+        "definition": "CREATE UNIQUE INDEX pulse_event_absorptions_pkey ON public.pulse_event_absorptions USING btree (id)"
+      },
+      {
         "name": "idx_pulse_event_decisions_cluster_kind_time",
         "table": "pulse_event_decisions",
         "definition": "CREATE INDEX idx_pulse_event_decisions_cluster_kind_time ON public.pulse_event_decisions USING btree (cluster_id, kind, decided_at)"
@@ -10416,6 +10661,11 @@
         "name": "civica_reject_pulse_dimensional_delta_history_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_dimensional_delta_history_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n\tRAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_reject_pulse_event_absorptions_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_event_absorptions_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'pulse_event_absorptions is append-only';\nEND;\n$function$\n"
       },
       {
         "name": "civica_reject_pulse_incident_evidence_mutation",
@@ -10925,6 +11175,11 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_dimensional_deltas FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "pulse_event_absorptions_append_only",
+        "table": "pulse_event_absorptions",
+        "definition": "CREATE TRIGGER pulse_event_absorptions_append_only BEFORE DELETE OR UPDATE ON pulse_event_absorptions FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_event_absorptions_mutation()"
+      },
+      {
         "name": "pulse_event_decisions_append_only",
         "table": "pulse_event_decisions",
         "definition": "CREATE TRIGGER pulse_event_decisions_append_only BEFORE DELETE OR UPDATE ON pulse_event_decisions FOR EACH ROW EXECUTE FUNCTION civica_protect_pulse_event_decisions()"
@@ -11320,6 +11575,11 @@
         "kind": "v",
         "name": "pulse_evaluation_evidence",
         "definition": " SELECT 'classifier_disposition'::text AS evidence_kind,\n    re.id::text AS evidence_id,\n        CASE\n            WHEN re.classification_disposition = 'non_governance'::text THEN 'false_negative_candidate'::text\n            WHEN re.classification_disposition = 'invalid'::text THEN 'invalid_classification_candidate'::text\n            ELSE re.classification_disposition\n        END AS outcome,\n    jsonb_build_object('raw_event', to_jsonb(re.*), 'decision', re.classification_decision, 'reason', re.classification_reason) AS payload,\n    COALESCE(re.classified_at, re.created_at) AS recorded_at\n   FROM raw_events re\n  WHERE re.classification_disposition <> 'pending'::text\nUNION ALL\n SELECT 'human_review'::text AS evidence_kind,\n    pe.id::text AS evidence_id,\n        CASE\n            WHEN pe.review_status = 'rejected'::text THEN 'false_positive_candidate'::text\n            ELSE 'reviewed_event'::text\n        END AS outcome,\n    to_jsonb(pe.*) AS payload,\n    pe.updated_at AS recorded_at\n   FROM pulse_events_v2 pe\n  WHERE pe.human_reviewed = true OR pe.review_status = 'rejected'::text;"
+      },
+      {
+        "kind": "r",
+        "name": "pulse_event_absorptions",
+        "definition": null
       },
       {
         "kind": "r",
@@ -12568,6 +12828,42 @@
         "type": "c",
         "table": "pulse_dimensional_deltas",
         "definition": "CHECK (window_days = 365 AND window_start = (score_as_of - window_days))"
+      },
+      {
+        "name": "pulse_event_absorptions_absorption_key_unique",
+        "type": "u",
+        "table": "pulse_event_absorptions",
+        "definition": "UNIQUE (absorption_key)"
+      },
+      {
+        "name": "pulse_event_absorptions_contract_check",
+        "type": "c",
+        "table": "pulse_event_absorptions",
+        "definition": "CHECK (schema_version = 'pulse-event-absorption/v1'::text AND absorption_key ~ '^pulse-absorption/sha256:[a-f0-9]{64}$'::text AND (dimension = ANY (ARRAY['democratic_quality'::text, 'rule_of_law'::text, 'freedom_rights'::text, 'corruption_control'::text])) AND (outcome = ANY (ARRAY['absorbed'::text, 'not_absorbed'::text])) AND previous_ci_release_id <> current_ci_release_id AND previous_score <> 'NaN'::real AND current_score <> 'NaN'::real AND score_delta <> 'NaN'::real AND threshold > 0::double precision AND btrim(fixed_scale_id) <> ''::text AND (link_standing = ANY (ARRAY['confirmed'::text, 'candidate'::text])) AND (link_actor_type = ANY (ARRAY['human_reviewer'::text, 'source_native_exact_link'::text, 'model_candidate'::text])) AND btrim(link_method_version) <> ''::text AND btrim(method_version) <> ''::text AND btrim(rationale) <> ''::text AND cardinality(evidence_refs) >= 2 AND (outcome = 'absorbed'::text AND link_standing = 'confirmed'::text AND (link_actor_type = ANY (ARRAY['human_reviewer'::text, 'source_native_exact_link'::text])) AND cardinality(reasons) = 0 OR outcome = 'not_absorbed'::text AND cardinality(reasons) > 0))"
+      },
+      {
+        "name": "pulse_event_absorptions_event_id_pulse_events_v2_id_fk",
+        "type": "f",
+        "table": "pulse_event_absorptions",
+        "definition": "FOREIGN KEY (event_id) REFERENCES pulse_events_v2(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_absorptions_jurisdiction_id_jurisdictions_id_fk",
+        "type": "f",
+        "table": "pulse_event_absorptions",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_absorptions_pkey",
+        "type": "p",
+        "table": "pulse_event_absorptions",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_event_absorptions_supersedes_key_fk",
+        "type": "f",
+        "table": "pulse_event_absorptions",
+        "definition": "FOREIGN KEY (supersedes_absorption_key) REFERENCES pulse_event_absorptions(absorption_key) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_event_decisions_contract_check",

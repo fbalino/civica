@@ -132,7 +132,7 @@ test("the production writer rejects one-run automatic publication before databas
       model: "claude-fixture",
       role: "classify",
       promptVersion: "prompt-fixture",
-      methodVersion: "pulse-v2.13-beta",
+      methodVersion: "pulse-v2.14-beta",
       configurationHash: "config-fixture",
       configuredEngineCount: 3,
       category: "judicial_purge",

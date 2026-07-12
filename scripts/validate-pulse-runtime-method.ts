@@ -660,9 +660,15 @@ function validateClusteringAndScoring(
   const calculateIndex = relative("scripts/calculate-ci-v2.ts");
   check(
     state,
-    decouple.includes("corroborationConfidence: 0") &&
-      calculateIndex.includes("decoupleAbsorbedEvents"),
-    "Events absorbed into an Index recompute must be zeroed before Pulse recomputation",
+    decouple.includes("pulseEventAbsorptions") &&
+      decouple.includes("onConflictDoNothing") &&
+      !decouple.includes("corroborationConfidence:") &&
+      !decouple.includes(".update(pulseEventsV2)") &&
+      calculateIndex.includes("decoupleAbsorbedEvents") &&
+      relative("src/lib/pulse/v2/score.ts").includes(
+        'e.absorptionOutcome === "absorbed" ? 0 : e.corroborationConfidence',
+      ),
+    "Absorption must be append-only event evidence and must not mutate corroboration confidence",
   );
 }
 

@@ -169,4 +169,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "0952f3e56354b8152192a233465ac29b04d4943836067cc29a6a1df6009bf846",
     baseline: false,
   },
+  {
+    id: "0028_complex_carlie_cooper",
+    path: "drizzle/authoritative/0028_complex_carlie_cooper.sql",
+    sha256: "fbef51106cc6765704a9dc6994c0c3ca6479ddd8e1667419bd1e7817f5541c1a",
+    baseline: false,
+  },
 ] as const;

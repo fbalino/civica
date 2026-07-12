@@ -869,3 +869,22 @@ ensemble result. Deriving the label from retained evidence makes the claim
 reproducible and prevents a confidence estimate or subscription-agent run from
 becoming a false quorum. Separate human authority preserves valid editorial
 decisions without rewriting model evidence.
+
+### APR-D152 — Pulse absorption is separate append-only evidence
+
+**Decision:** Adopt `pulse-event-absorption/v1` under runtime method
+`pulse-v2.14-beta`. An event can be marked absorbed only when an exact,
+confirmed event-to-observation link joins sequential Index releases with the
+same fixed input/display scale and dimension identity, the movement clears the
+declared threshold in the event's direction, and the decision carries method,
+reason, evidence references, actor, and as-of time. Model-only candidates and
+aggregate movement cannot confirm absorption. Decisions are append-only and
+scoring reads the latest applicable decision without changing corroboration
+confidence. The current same-period release set supports no absorption.
+
+**Why:** Destructively zeroing confidence merges two different claims: whether
+an event is corroborated and whether a later Index observation already reflects
+it. Separate evidence preserves both histories, prevents later corroboration
+from erasing an earlier decision, and makes reruns deterministic. Requiring a
+fixed-scale sequential comparison and an explicit event link prevents ordinary
+country-level score movement from being attributed to an event by inference.

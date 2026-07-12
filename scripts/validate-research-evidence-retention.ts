@@ -44,6 +44,10 @@ const deltaHistoryMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0027_smart_tempest.sql"),
   "utf8",
 );
+const absorptionMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0028_complex_carlie_cooper.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -79,7 +83,8 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !incidentMigration.includes(`ON ${relation}`) &&
     !classificationMigration.includes(`ON ${relation}`) &&
     !reviewSlaMigration.includes(`ON ${relation}`) &&
-    !deltaHistoryMigration.includes(`ON ${relation}`)
+    !deltaHistoryMigration.includes(`ON ${relation}`) &&
+    !absorptionMigration.includes(`ON ${relation}`)
   ) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
@@ -92,6 +97,7 @@ for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
     classificationMigration,
     reviewSlaMigration,
     deltaHistoryMigration,
+    absorptionMigration,
   ];
   const guarded = sources.some((source) =>
     new RegExp(
@@ -228,6 +234,7 @@ async function main() {
               ('pulse_incident_resolutions', 'pulse_incident_resolutions_append_only'),
               ('pulse_classification_attempts', 'pulse_classification_attempts_append_only'),
               ('pulse_dimensional_delta_history', 'pulse_dimensional_delta_history_append_only'),
+              ('pulse_event_absorptions', 'pulse_event_absorptions_append_only'),
               ('pulse_review_sla_events', 'pulse_review_sla_events_append_only')
             )`,
       sql`SELECT count(*)::int AS n FROM pg_constraint

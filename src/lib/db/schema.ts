@@ -2394,6 +2394,75 @@ export const pulseIncidentResolutions = pgTable(
 );
 
 /**
+ * Append-only evidence that an explicitly linked Pulse event is already
+ * represented by a later, comparable fixed-scale Index observation. This
+ * ledger never mutates corroboration confidence; scoring reads its latest
+ * as-of decision separately.
+ */
+export const pulseEventAbsorptions = pgTable(
+  "pulse_event_absorptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    absorptionKey: text("absorption_key").notNull().unique(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    outcome: text("outcome")
+      .$type<"absorbed" | "not_absorbed">()
+      .notNull(),
+    previousCiReleaseId: text("previous_ci_release_id").notNull(),
+    currentCiReleaseId: text("current_ci_release_id").notNull(),
+    previousScore: real("previous_score").notNull(),
+    currentScore: real("current_score").notNull(),
+    scoreDelta: real("score_delta").notNull(),
+    threshold: real("threshold").notNull(),
+    fixedScaleId: text("fixed_scale_id").notNull(),
+    linkStanding: text("link_standing")
+      .$type<"confirmed" | "candidate">()
+      .notNull(),
+    linkActorType: text("link_actor_type")
+      .$type<
+        "human_reviewer" | "source_native_exact_link" | "model_candidate"
+      >()
+      .notNull(),
+    linkMethodVersion: text("link_method_version").notNull(),
+    methodVersion: text("method_version").notNull(),
+    asOf: date("as_of").notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    reasons: text("reasons").array().notNull(),
+    supersedesAbsorptionKey: text("supersedes_absorption_key"),
+    decidedAt: timestamp("decided_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_event_absorptions_event_as_of").on(
+      table.eventId,
+      table.asOf,
+      table.decidedAt,
+    ),
+    index("idx_pulse_event_absorptions_release").on(
+      table.currentCiReleaseId,
+      table.dimension,
+    ),
+    foreignKey({
+      name: "pulse_event_absorptions_supersedes_key_fk",
+      columns: [table.supersedesAbsorptionKey],
+      foreignColumns: [table.absorptionKey],
+    }).onDelete("restrict"),
+    check(
+      "pulse_event_absorptions_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-event-absorption/v1' AND ${table.absorptionKey} ~ '^pulse-absorption/sha256:[a-f0-9]{64}$' AND ${table.dimension} IN ('democratic_quality','rule_of_law','freedom_rights','corruption_control') AND ${table.outcome} IN ('absorbed','not_absorbed') AND ${table.previousCiReleaseId} <> ${table.currentCiReleaseId} AND ${table.previousScore} <> 'NaN'::real AND ${table.currentScore} <> 'NaN'::real AND ${table.scoreDelta} <> 'NaN'::real AND ${table.threshold} > 0 AND btrim(${table.fixedScaleId}) <> '' AND ${table.linkStanding} IN ('confirmed','candidate') AND ${table.linkActorType} IN ('human_reviewer','source_native_exact_link','model_candidate') AND btrim(${table.linkMethodVersion}) <> '' AND btrim(${table.methodVersion}) <> '' AND btrim(${table.rationale}) <> '' AND cardinality(${table.evidenceRefs}) >= 2 AND ((${table.outcome} = 'absorbed' AND ${table.linkStanding} = 'confirmed' AND ${table.linkActorType} IN ('human_reviewer','source_native_exact_link') AND cardinality(${table.reasons}) = 0) OR (${table.outcome} = 'not_absorbed' AND cardinality(${table.reasons}) > 0))`,
+    ),
+  ],
+);
+
+/**
  * Append-only, stage-specific Pulse decisions. `pulse_events_v2` remains the
  * current-state projection used by readers and scoring; this table preserves
  * the independent judgments that produced or later challenged that state.

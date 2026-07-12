@@ -94,8 +94,8 @@ import {
   PULSE_REVIEW_SLA_VERSION,
 } from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.12.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.13-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.13.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.14-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -495,9 +495,12 @@ export interface PulseRuntimeMethodContract {
       lower: number;
       upper: number;
     };
-    impactFormula: "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)";
+    impactFormula: "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)";
     scoreStageOrder: ["corroborate", "score"];
-    absorbedIntoIndexPolicy: "non_durable_zero_then_daily_recompute_can_restore";
+    absorptionEvidence: "append_only_explicit_event_link_fixed_scale";
+    absorptionMultiplier: "absorbed_zero_otherwise_one";
+    currentAbsorptionStanding: "none_no_sequential_comparable_release";
+    absorbedIntoIndexPolicy: "separate_versioned_decision_never_mutates_corroboration";
   };
   evaluation: {
     backtestMatchesCurrentProduction: false;
@@ -903,10 +906,13 @@ export function buildPulseRuntimeMethod(
         upper: facts.deltaBounds.upper,
       },
       impactFormula:
-        "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
+        "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)",
       scoreStageOrder: ["corroborate", "score"],
+      absorptionEvidence: "append_only_explicit_event_link_fixed_scale",
+      absorptionMultiplier: "absorbed_zero_otherwise_one",
+      currentAbsorptionStanding: "none_no_sequential_comparable_release",
       absorbedIntoIndexPolicy:
-        "non_durable_zero_then_daily_recompute_can_restore",
+        "separate_versioned_decision_never_mutates_corroboration",
     },
     evaluation: {
       backtestMatchesCurrentProduction: false,

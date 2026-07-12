@@ -17,7 +17,7 @@ const run = (
   model: `${provider}-fixture`,
   role: "classify",
   promptVersion: "pulse-classifier-prompt/sha256:" + "a".repeat(64),
-  methodVersion: "pulse-v2.13-beta",
+  methodVersion: "pulse-v2.14-beta",
   configurationHash: "pulse-classification-config/sha256:" + "b".repeat(64),
   configuredEngineCount: 3,
   category,

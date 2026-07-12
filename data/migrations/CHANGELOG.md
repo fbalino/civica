@@ -79,6 +79,13 @@ does not alter the retained legacy `pulse_events` evidence table.
 current rows receive deterministic dates from `last_computed_at` and are copied
 once into history; later history rows reject updates and deletions.
 
+`0028_complex_carlie_cooper` adds the append-only
+`pulse-event-absorption/v1` evidence ledger. An absorption decision binds one
+explicit event link to two sequential fixed-scale Index releases, exact
+dimension scores, method, as-of date, rationale, and evidence references.
+Corroboration confidence remains unchanged; scoring reads the latest retained
+decision separately.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

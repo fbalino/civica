@@ -1,241 +1,230 @@
 /**
- * Phase 5.6 — CI/Pulse double-counting prevention.
+ * PUL-037 — explicit, append-only CI/Pulse absorption evidence.
  *
- * When a quarterly CI recompute lands, V-Dem and WGI data refreshes
- * absorb events that were previously only visible in the Pulse layer.
- * Without intervention, those events would be counted twice — once
- * by the Pulse, once by the new structural CI score.
- *
- * This helper compares the just-computed CI v2 dimensional scores
- * against the previous quarter's. For each (country, dimension) where
- * the score moved by ≥ threshold points, walks all published
- * pulse_events_v2 rows for that (country, dimension) whose event_date
- * pre-dates the new quarter's calculation, and zeros their
- * `corroboration_confidence`. The downstream score recomputation then
- * naturally drops them. The audit trail in `review_notes` records the
- * reason.
- *
- * Conservative by design: we keep the event row, just zero its
- * contribution. If a dispute later surfaces that a particular event
- * was wrongly absorbed, the original severity + classifier audit
- * remain intact.
+ * This compatibility entry point no longer mutates corroboration confidence.
+ * It assesses only caller-supplied event links against two closed,
+ * sequential, fixed-scale Index releases and stores the decision separately.
  */
 
-import { and, eq, lt, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import {
   ciDimensionScores,
+  pulseEventAbsorptions,
   pulseEventsV2,
 } from "@/lib/db/schema";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import type * as schema from "@/lib/db/schema";
+import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import {
+  CI_RELEASE_CONTRACTS,
+  resolveCiRelease,
+  type CiReleaseContract,
+} from "@/lib/ci/release-selection";
+import {
+  assessEventAbsorption,
+  comparableFixedScaleReleaseReasons,
+  type AbsorptionAssessment,
+  type ExplicitAbsorptionLink,
+} from "./absorption";
+import type { PulseDimension } from "./types";
 
 type Db = NeonHttpDatabase<typeof schema>;
-
-/** CI v2 dimensions whose names line up with Pulse dimensions. The
- *  Pulse-only `stability` dimension is intentionally NOT in this list
- *  because no CI v2 dimension absorbs it. */
-const SHARED_DIMENSIONS = [
+const ABSORBABLE_DIMENSIONS = [
   "democratic_quality",
   "rule_of_law",
   "freedom_rights",
   "corruption_control",
 ] as const;
 
-/** Default trigger: a CI dimension move of ≥ 3 points means the
- *  upstream data has materially shifted, so events feeding the same
- *  dimension before this recompute are likely already absorbed. */
-export const DEFAULT_DECOUPLE_THRESHOLD = 3;
-
 export interface DecoupleSummary {
-  /** True when the helper was a no-op because there's no previous
-   *  quarter to compare against (first beta-quarter run). */
-  noPreviousQuarter: boolean;
-  /** (country, dim) pairs that crossed the threshold. */
-  pairsCrossed: number;
-  /** pulse_events_v2 rows whose corroboration_confidence got zeroed. */
-  eventsZeroed: number;
-  /** Per-dimension breakdown for log output. */
+  noComparableRelease: boolean;
+  explicitLinksExamined: number;
+  decisionsPlanned: number;
+  decisionsWritten: number;
+  eventsAbsorbed: number;
+  eventsZeroed: 0;
   byDimension: Record<string, number>;
+  planned: AbsorptionAssessment[];
+  dryRun: boolean;
 }
 
-interface DimensionScorePair {
-  jurisdictionId: string;
-  dimension: string;
-  current: number;
-  previous: number;
-  delta: number;
+export interface DecoupleOptions {
+  links?: ExplicitAbsorptionLink[];
+  dryRun?: boolean;
+  now?: Date;
+  write?: (db: Db, plan: AbsorptionAssessment, decidedAt: Date) => Promise<void>;
 }
 
-/**
- * Run the decouple pass. Pass `dryRun=true` to compute everything but
- * skip the UPDATE.
- */
-export async function decoupleAbsorbedEvents(
+function priorComparableRelease(
+  current: CiReleaseContract,
+  dimension: string,
+): CiReleaseContract | null {
+  return [...CI_RELEASE_CONTRACTS]
+    .filter(
+      (candidate) =>
+        candidate.series.observationPeriodEnd < current.series.observationPeriodEnd &&
+        comparableFixedScaleReleaseReasons(candidate, current, dimension).length === 0,
+    )
+    .sort((a, b) =>
+      b.series.observationPeriodEnd.localeCompare(a.series.observationPeriodEnd),
+    )[0] ?? null;
+}
+
+async function loadReleaseScore(
   db: Db,
-  newQuarter: string,
-  opts: {
-    methodologyVersion?: string;
-    threshold?: number;
-    dryRun?: boolean;
-  } = {}
-): Promise<DecoupleSummary> {
-  const methodologyVersion = opts.methodologyVersion ?? CURRENT_CI_METHODOLOGY_VERSION;
-  const threshold = opts.threshold ?? DEFAULT_DECOUPLE_THRESHOLD;
-  const dryRun = opts.dryRun ?? false;
-
-  const previousQuarter = await findPreviousQuarter(
-    db,
-    newQuarter,
-    methodologyVersion
-  );
-
-  if (!previousQuarter) {
-    return {
-      noPreviousQuarter: true,
-      pairsCrossed: 0,
-      eventsZeroed: 0,
-      byDimension: {},
-    };
-  }
-
-  // Pull both quarters' dimensional scores in one go for the shared
-  // dimensions, then JOIN per-country.
-  const result = await db.execute(sql`
-    SELECT
-      cur.jurisdiction_id,
-      cur.dimension,
-      cur.normalized_score AS current_score,
-      prev.normalized_score AS previous_score
-    FROM ci_dimension_scores cur
-    JOIN ci_dimension_scores prev
-      ON prev.jurisdiction_id = cur.jurisdiction_id
-      AND prev.dimension = cur.dimension
-      AND prev.methodology_version = cur.methodology_version
-      AND prev.quarter = ${previousQuarter}
-    WHERE cur.quarter = ${newQuarter}
-      AND cur.methodology_version = ${methodologyVersion}
-      AND cur.dimension IN ${SHARED_DIMENSIONS}
-  `);
-
-  const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
-
-  const pairs: DimensionScorePair[] = (rows as Array<Record<string, unknown>>)
-    .map((r) => {
-      const current = Number(r.current_score);
-      const previous = Number(r.previous_score);
-      return {
-        jurisdictionId: String(r.jurisdiction_id),
-        dimension: String(r.dimension),
-        current,
-        previous,
-        delta: current - previous,
-      };
-    })
-    .filter((p) => Math.abs(p.delta) >= threshold);
-
-  const byDimension: Record<string, number> = {};
-  let eventsZeroed = 0;
-
-  // Cutoff for the absorbed-event window. A CI vintage is labelled
-  // `${dataYear}-Q4` (see ci/normalize.ts `yearToQuarter`) but absorbs
-  // the FULL calendar data year, not just Q4. So we zero every Pulse
-  // event dated within that data year (and earlier), using an exclusive
-  // cutoff of the first day of the FOLLOWING year — not the quarter
-  // start, which would leave Jan–Sep in-year events to be double-counted.
-  const cutoffDate = absorbedYearCutoffDate(newQuarter);
-
-  for (const pair of pairs) {
-    byDimension[pair.dimension] = (byDimension[pair.dimension] ?? 0) + 1;
-
-    // Find the affected events
-    const affected = await db
-      .select({ id: pulseEventsV2.id })
-      .from(pulseEventsV2)
+  release: CiReleaseContract,
+  jurisdictionId: string,
+  dimension: string,
+): Promise<number> {
+  const rules = release.dimensions
+    .filter((rule) => rule.dimension === dimension)
+    .sort((a, b) => a.priority - b.priority);
+  for (const rule of rules) {
+    const rows = await db
+      .select({ score: ciDimensionScores.normalizedScore })
+      .from(ciDimensionScores)
       .where(
         and(
-          eq(pulseEventsV2.jurisdictionId, pair.jurisdictionId),
-          eq(pulseEventsV2.dimension, pair.dimension),
-          eq(pulseEventsV2.published, true),
-          eq(pulseEventsV2.projectionStatus, "current"),
-          lt(pulseEventsV2.eventDate, cutoffDate),
-          sql`${pulseEventsV2.corroborationConfidence} > 0`
-        )
+          eq(ciDimensionScores.jurisdictionId, jurisdictionId),
+          eq(ciDimensionScores.dimension, dimension),
+          eq(ciDimensionScores.quarter, release.quarter),
+          eq(ciDimensionScores.methodologyVersion, release.methodologyVersion),
+          eq(ciDimensionScores.sourceId, rule.sourceId),
+          eq(ciDimensionScores.indicatorId, rule.indicatorId),
+          eq(ciDimensionScores.artifactHash, rule.artifactSha256),
+        ),
       );
-
-    if (!dryRun && affected.length > 0) {
-      const note = `Absorbed by CI v2 ${newQuarter} recompute (dim moved ${pair.delta.toFixed(2)})`;
-      await db
-        .update(pulseEventsV2)
-        .set({
-          corroborationConfidence: 0,
-          reviewNotes: sql`COALESCE(${pulseEventsV2.reviewNotes} || E'\\n', '') || ${note}`,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(pulseEventsV2.jurisdictionId, pair.jurisdictionId),
-            eq(pulseEventsV2.dimension, pair.dimension),
-            eq(pulseEventsV2.published, true),
-            eq(pulseEventsV2.projectionStatus, "current"),
-            lt(pulseEventsV2.eventDate, cutoffDate),
-            sql`${pulseEventsV2.corroborationConfidence} > 0`
-          )
-        );
-    }
-
-    eventsZeroed += affected.length;
+    if (rows.length > 1)
+      throw new Error(
+        `${release.releaseId}/${jurisdictionId}/${dimension} has duplicate closed-release rows`,
+      );
+    if (rows[0]) return Number(rows[0].score);
   }
+  throw new Error(
+    `${release.releaseId}/${jurisdictionId}/${dimension} has no closed-release observation`,
+  );
+}
 
+async function loadLinkedEvent(
+  db: Db,
+  link: ExplicitAbsorptionLink,
+) {
+  const rows = await db
+    .select({
+      id: pulseEventsV2.id,
+      jurisdictionId: pulseEventsV2.jurisdictionId,
+      dimension: pulseEventsV2.dimension,
+      eventDate: pulseEventsV2.eventDate,
+      severityValue: pulseEventsV2.severityValue,
+    })
+    .from(pulseEventsV2)
+    .where(eq(pulseEventsV2.id, link.eventId));
+  if (rows.length !== 1)
+    throw new Error(`explicit absorption link has no unique event: ${link.eventId}`);
   return {
-    noPreviousQuarter: false,
-    pairsCrossed: pairs.length,
-    eventsZeroed,
-    byDimension,
+    ...rows[0],
+    dimension: rows[0].dimension as PulseDimension,
+    eventDate: String(rows[0].eventDate),
   };
 }
 
-/** Find the most-recent quarter strictly before `newQuarter` that has
- *  rows under the given methodologyVersion in ci_dimension_scores. */
-async function findPreviousQuarter(
+async function writeAbsorption(
   db: Db,
-  newQuarter: string,
-  methodologyVersion: string
-): Promise<string | null> {
-  const result = await db.execute(sql`
-    SELECT DISTINCT quarter
-    FROM ci_dimension_scores
-    WHERE methodology_version = ${methodologyVersion}
-      AND quarter < ${newQuarter}
-    ORDER BY quarter DESC
-    LIMIT 1
-  `);
-  const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
-  const row = (rows as Array<Record<string, unknown>>)[0];
-  return row ? String(row.quarter) : null;
+  plan: AbsorptionAssessment,
+  decidedAt: Date,
+): Promise<void> {
+  await db
+    .insert(pulseEventAbsorptions)
+    .values({
+      schemaVersion: plan.schemaVersion,
+      absorptionKey: plan.absorptionKey,
+      eventId: plan.eventId,
+      jurisdictionId: plan.jurisdictionId,
+      dimension: plan.dimension,
+      outcome: plan.outcome,
+      previousCiReleaseId: plan.previousCiReleaseId,
+      currentCiReleaseId: plan.currentCiReleaseId,
+      previousScore: plan.previousScore,
+      currentScore: plan.currentScore,
+      scoreDelta: plan.scoreDelta,
+      threshold: plan.threshold,
+      fixedScaleId: plan.fixedScaleId,
+      linkStanding: plan.linkStanding,
+      linkActorType: plan.linkActorType,
+      linkMethodVersion: plan.linkMethodVersion,
+      methodVersion: plan.methodVersion,
+      asOf: plan.asOf,
+      rationale: plan.rationale,
+      evidenceRefs: plan.evidenceRefs,
+      reasons: plan.reasons,
+      supersedesAbsorptionKey: plan.supersedesAbsorptionKey,
+      decidedAt,
+    })
+    .onConflictDoNothing({ target: pulseEventAbsorptions.absorptionKey });
 }
 
 /**
- * Exclusive cutoff for the data year a CI vintage absorbs.
- *
- * CI vintages are labelled `${dataYear}-Q4` but each represents a full
- * calendar data year (see ci/normalize.ts `yearToQuarter`). To zero
- * every Pulse event the new CI release already absorbed, the exclusive
- * cutoff (used with `event_date < cutoff`) is the first day of the year
- * AFTER the data year, so the entire absorbed year — Jan through Dec —
- * is covered. Falls back conservatively to the year after the parsed
- * year for any non-standard quarter label.
+ * Assess explicit links for a closed Index release. With no supplied links,
+ * the operation is an intentional no-op. Aggregate country/dimension movement
+ * can never select events by itself.
  */
-function absorbedYearCutoffDate(quarter: string): string {
-  const match = quarter.match(/^(\d{4})-Q[1-4]$/);
-  const dataYear = match ? parseInt(match[1], 10) : NaN;
-  if (Number.isNaN(dataYear)) {
-    // Unparseable label — fall back to the leading 4-digit year if any,
-    // else a far-future cutoff so we err toward zeroing more (the
-    // conservative double-count-prevention choice).
-    const yearMatch = quarter.match(/^(\d{4})/);
-    const year = yearMatch ? parseInt(yearMatch[1], 10) : 9999;
-    return `${year + 1}-01-01`;
+export async function decoupleAbsorbedEvents(
+  db: Db,
+  currentReleaseId: string = CURRENT_CI_RELEASE_ID,
+  opts: DecoupleOptions = {},
+): Promise<DecoupleSummary> {
+  const currentRelease = resolveCiRelease(currentReleaseId);
+  const links = opts.links ?? [];
+  const now = opts.now ?? new Date();
+  const byDimension: Record<string, number> = {};
+  const planned: AbsorptionAssessment[] = [];
+  let hasComparable = ABSORBABLE_DIMENSIONS.some((dimension) =>
+    priorComparableRelease(currentRelease, dimension),
+  );
+
+  for (const link of links) {
+    if (link.currentReleaseId !== currentRelease.releaseId)
+      throw new Error(
+        `link ${link.eventId} names ${link.currentReleaseId}, expected ${currentRelease.releaseId}`,
+      );
+    const previousRelease = priorComparableRelease(currentRelease, link.dimension);
+    if (!previousRelease) continue;
+    const event = await loadLinkedEvent(db, link);
+    const [previousScore, currentScore] = await Promise.all([
+      loadReleaseScore(db, previousRelease, event.jurisdictionId, event.dimension),
+      loadReleaseScore(db, currentRelease, event.jurisdictionId, event.dimension),
+    ]);
+    const plan = assessEventAbsorption({
+      event,
+      previousRelease,
+      currentRelease,
+      previousScore,
+      currentScore,
+      link,
+      asOf: currentRelease.series.calculatedAt.slice(0, 10),
+    });
+    planned.push(plan);
+    byDimension[plan.dimension] = (byDimension[plan.dimension] ?? 0) + 1;
   }
-  return `${dataYear + 1}-01-01`;
+
+  let decisionsWritten = 0;
+  if (!opts.dryRun) {
+    for (const plan of planned) {
+      if (opts.write) await opts.write(db, plan, now);
+      else await writeAbsorption(db, plan, now);
+      decisionsWritten++;
+    }
+  }
+
+  return {
+    noComparableRelease: !hasComparable,
+    explicitLinksExamined: links.length,
+    decisionsPlanned: planned.length,
+    decisionsWritten,
+    eventsAbsorbed: planned.filter((plan) => plan.outcome === "absorbed").length,
+    eventsZeroed: 0,
+    byDimension,
+    planned: planned.sort((a, b) => a.absorptionKey.localeCompare(b.absorptionKey)),
+    dryRun: opts.dryRun ?? false,
+  };
 }

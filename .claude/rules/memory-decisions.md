@@ -977,3 +977,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   requires the publication gate and resolved primary jurisdiction.
 - Human review remains a separate publication authority and never rewrites
   model agreement. Durable record: APR-D151.
+
+## 2026-07-12 — Pulse absorption is separate append-only evidence
+
+- Absorption requires an exact confirmed event link and sequential comparable
+  fixed-scale Index observations; model-only and aggregate links fail closed.
+- The decision stores method, reason, evidence, actor, and as-of time without
+  mutating corroboration confidence. The current same-period release set
+  supports no absorption. Durable record: APR-D152.

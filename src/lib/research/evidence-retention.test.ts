@@ -36,6 +36,10 @@ const deltaHistoryMigration = readFileSync(
   "drizzle/authoritative/0027_smart_tempest.sql",
   "utf8",
 );
+const absorptionMigration = readFileSync(
+  "drizzle/authoritative/0028_complex_carlie_cooper.sql",
+  "utf8",
+);
 const classify = readFileSync("src/lib/pulse/v2/classify.ts", "utf8");
 const subscriptionApply = readFileSync(
   "scripts/pulse-apply-classifications.ts",
@@ -54,7 +58,8 @@ test("every protected relation receives a synchronous retention trigger", () => 
         exclusionMigration.includes(`ON ${relation}`) ||
         incidentMigration.includes(`ON ${relation}`) ||
         classificationMigration.includes(`ON ${relation}`) ||
-        reviewSlaMigration.includes(`ON ${relation}`),
+        reviewSlaMigration.includes(`ON ${relation}`) ||
+        absorptionMigration.includes(`ON ${relation}`),
     );
   }
   assert.match(migration, /BEFORE UPDATE OR DELETE/);
@@ -72,6 +77,7 @@ test("Pulse evidence ledgers are append-only", () => {
         classificationMigration,
         reviewSlaMigration,
         deltaHistoryMigration,
+        absorptionMigration,
       ].some((source) =>
         new RegExp(
           `CREATE\\s+TRIGGER\\s+[a-z0-9_]+_append_only[\\s\\S]{0,160}BEFORE\\s+UPDATE\\s+OR\\s+DELETE\\s+ON\\s+"?${relation}"?[\\s\\S]{0,160}EXECUTE\\s+FUNCTION`,
@@ -88,6 +94,7 @@ test("Pulse evidence ledgers are append-only", () => {
     /pulse_classification_attempts_append_only/,
   );
   assert.match(reviewSlaMigration, /pulse_review_sla_events_append_only/);
+  assert.match(absorptionMigration, /pulse_event_absorptions_append_only/);
   assert.match(
     deltaHistoryMigration,
     /pulse_dimensional_delta_history_append_only/,
