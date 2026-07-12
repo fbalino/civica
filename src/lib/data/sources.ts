@@ -40,6 +40,7 @@ export const SOURCE_NAMES: Record<string, string> = {
   freedom_house: "Freedom House",
   transparency_intl: "Transparency International",
   undp_hdi: "UNDP HDI",
+  unesco_uis: "UNESCO UIS",
   global_peace_index: "Global Peace Index",
   fragile_states_index: "Fragile States Index",
   rsf_press_freedom: "RSF Press Freedom",

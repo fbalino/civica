@@ -500,6 +500,17 @@
   font-size: var(--text-12);
   color: var(--color-text-30);
 }
+/* The named source backing the column, beside its provenance dot (EXP-042):
+   every ranking column declares which publisher it orders by. */
+.rankings-col-source {
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+  white-space: nowrap;
+}
+/* Visible flag when a column's cells do not all share one source. */
+.rankings-col-source--mixed {
+  color: var(--color-status-warn);
+}
 
 /* ── Rankings page: country identity cell ──────────────────────────── */
 .rankings-country-cell {

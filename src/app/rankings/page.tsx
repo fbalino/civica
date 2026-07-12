@@ -59,8 +59,13 @@ export default async function RankingsPage() {
       <div className="editorial-page editorial-page--full">
         {/* PROVENANCE_COVERAGE: rankings.metric-cell */}
         <Banner variant="info">
-          Each populated metric cell carries a source/freshness dot. Rights
-          vary by publisher; consult{" "}
+          Each column orders countries by one named source, shown under its
+          header — ranking is only meaningful within a single publisher&rsquo;s
+          methodology, so this table never mixes publishers inside a column
+          without flagging it. Reconciliation across sources happens on{" "}
+          <Link href="/country/methodology/reconciliation">country pages</Link>
+          , not here. Each populated metric cell carries a source/freshness
+          dot. Rights vary by publisher; consult{" "}
           <Link href="/licensing#reuse">Licensing</Link> before reuse. The{" "}
           <Link href="/methodology/approach#reader-pages">
             provenance coverage audit

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 302
-- **Completed:** 124
-- **Remaining:** 178
-- **Progress:** 41.1%
+- **Completed:** 125
+- **Remaining:** 177
+- **Progress:** 41.4%
 - **Priority mix:** P0 186 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -247,7 +247,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-039** (P0) Repair the country masthead grid so hero content anchors to the bottom over the scrim. _Done when: the `--art` masthead defines explicit content and caption rows, title/stat/tab content sits at the hero base at 769px, 1024px, and 1440px in both themes, the caption keeps its reserved final row, and a geometry check plus browser-check log are stored as evidence._
 - [x] **EXP-040** (P1) Stop editorial prose link rules from restyling canonical buttons. _Done when: anchor color rules in shared editorial scopes exclude `.btn` and button-derived classes, the `/civica-index` primary button renders canonical colors in both themes, and a regression check covers a button rendered inside `.editorial-section`._
 - [x] **EXP-041** (P0) Give `/governance-evidence` a design-system landing and flagship register. _Done when: visiting without a country shows a landing with hero treatment, explainer, and full country selection instead of a hardcoded default country; `?country=` deep links still resolve; the country view keeps its provenance and rights links; and light/dark plus desktop/mobile browser checks pass with no hardcoded values._
-- [ ] **EXP-042** (P1) Name the backing source visibly on every rankings column. _Done when: each metric column header shows its source name beside the provenance dot, a short note explains the one-source-per-column rule and points to country-page reconciliation, a column whose cells mix sources surfaces a visible flag, and browser checks pass in both themes._
+- [x] **EXP-042** (P1) Name the backing source visibly on every rankings column. _Done when: each metric column header shows its source name beside the provenance dot, a short note explains the one-source-per-column rule and points to country-page reconciliation, a column whose cells mix sources surfaces a visible flag, and browser checks pass in both themes._
 
 ## Area 08 — Platform, Security, Performance, and Operations
 

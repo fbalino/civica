@@ -6,6 +6,7 @@ import {
 } from "@/components/editorial/SortableDataTable";
 import { SourceDot } from "@/components/SourceDot";
 import { CountryFlag } from "@/components/CountryFlag";
+import { sourceLabel } from "@/lib/data/sources";
 import type { RankingCountryRow } from "@/lib/db/queries";
 
 /**
@@ -155,11 +156,26 @@ function ColumnMeta({
     }
   }
 
+  const mixed = bySource.size > 1;
+
   return (
     <span className="rankings-col-meta">
       {unit && <span className="rankings-col-unit">{unit}</span>}
       {source && (
-        <SourceDot source={source} retrievedAt={winner?.retrievedAt ?? null} />
+        <>
+          <span
+            className={
+              mixed
+                ? "rankings-col-source rankings-col-source--mixed"
+                : "rankings-col-source"
+            }
+          >
+            {/* Name the publisher the column orders by; flag columns whose
+                cells do not all share it (EXP-042). */}
+            {mixed ? `mixed · mostly ${sourceLabel(source)}` : sourceLabel(source)}
+          </span>
+          <SourceDot source={source} retrievedAt={winner?.retrievedAt ?? null} />
+        </>
       )}
     </span>
   );
