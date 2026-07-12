@@ -31,6 +31,11 @@
   max-width: none;
   aspect-ratio: 3 / 2;
   max-height: 80vh;
+  /* Explicit rows: the content row absorbs all free height so the caption row
+     stays caption-sized. Without this, both auto rows stretch equally inside
+     the fixed-aspect hero and the title/tab block floats to the vertical
+     middle instead of anchoring to the base over the scrim. */
+  grid-template-rows: minmax(0, 1fr) auto;
   align-items: end;
   border-bottom: none;
   overflow: hidden;

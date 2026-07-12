@@ -304,11 +304,14 @@
   color: var(--color-text-primary);
   font-weight: 500;
 }
-.editorial-section a {
+/* Prose links only — .btn anchors keep the button component's own colors.
+   Without the :not(.btn) guard this class+type selector outspecifies
+   .btn--primary and recolors button text to the accent (red-on-navy). */
+.editorial-section a:not(.btn) {
   color: var(--color-accent);
   text-decoration: none;
 }
-.editorial-section a:hover {
+.editorial-section a:not(.btn):hover {
   text-decoration: underline;
 }
 .editorial-section code {
