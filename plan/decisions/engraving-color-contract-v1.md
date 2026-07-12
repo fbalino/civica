@@ -59,3 +59,17 @@ is family consistency, not cast.
 - Final orangeFrac/meanSat thresholds derive from the owner-selected strength
   on `plan/evidence/EXP-006/pilot-sheet-v2.html`, superseding the withdrawn
   v1 numbers.
+
+## Adopted setting (owner decision, 2026-07-12)
+- **Strength 60**: saturation ×0.730, hue −6.0°, brightness ×1.018, WebP q88.
+- Applied to all 196 tracked dark engravings except `gbr-dark.webp` (palette
+  outlier; regeneration candidate — grading would flatten it). Corpus measured
+  result: mean orangeFrac 0.548 → 0.454, mean saturation 0.341 after; warm
+  sepia identity retained by design. Full per-file record:
+  `plan/evidence/EXP-006/corpus-batch-s60-report.json`.
+- Acceptance for graded dark assets is recipe-determinism, not a hard hue
+  ceiling: an asset passes when it is byte-reproducible from its git-history
+  original through the strength-60 recipe. Originals recoverable via git.
+- France remains a regeneration candidate (style); its graded version is an
+  approved interim. This contract governs color acceptance of any future
+  regenerated dark assets as well.

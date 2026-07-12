@@ -1,0 +1,2179 @@
+{
+ "summary": {
+  "strength": 60,
+  "params": {
+   "saturation": 0.73,
+   "hue": -6,
+   "brightness": 1.018
+  },
+  "count": 196,
+  "excluded": [
+   {
+    "file": "gbr-dark.webp",
+    "reason": "palette outlier (already cool); regeneration candidate — grading would flatten it"
+   }
+  ],
+  "beforeOrangeMean": 0.548,
+  "afterOrangeMean": 0.4541,
+  "afterOrangeMax": 0.9128,
+  "afterSatMean": 0.3405
+ },
+ "report": [
+  {
+   "file": "afg-dark.webp",
+   "before": {
+    "orangeFrac": 0.8678,
+    "meanSat": 0.3767
+   },
+   "after": {
+    "orangeFrac": 0.5513,
+    "meanSat": 0.2779
+   }
+  },
+  {
+   "file": "ago-dark.webp",
+   "before": {
+    "orangeFrac": 0.7119,
+    "meanSat": 0.4617
+   },
+   "after": {
+    "orangeFrac": 0.646,
+    "meanSat": 0.347
+   }
+  },
+  {
+   "file": "alb-dark.webp",
+   "before": {
+    "orangeFrac": 0.7372,
+    "meanSat": 0.5202
+   },
+   "after": {
+    "orangeFrac": 0.6757,
+    "meanSat": 0.3909
+   }
+  },
+  {
+   "file": "and-dark.webp",
+   "before": {
+    "orangeFrac": 0.725,
+    "meanSat": 0.4425
+   },
+   "after": {
+    "orangeFrac": 0.651,
+    "meanSat": 0.3319
+   }
+  },
+  {
+   "file": "are-dark.webp",
+   "before": {
+    "orangeFrac": 0.2945,
+    "meanSat": 0.201
+   },
+   "after": {
+    "orangeFrac": 0.2024,
+    "meanSat": 0.1616
+   }
+  },
+  {
+   "file": "arg-dark.webp",
+   "before": {
+    "orangeFrac": 0.6219,
+    "meanSat": 0.4571
+   },
+   "after": {
+    "orangeFrac": 0.5828,
+    "meanSat": 0.3455
+   }
+  },
+  {
+   "file": "arm-dark.webp",
+   "before": {
+    "orangeFrac": 0.5798,
+    "meanSat": 0.4388
+   },
+   "after": {
+    "orangeFrac": 0.5415,
+    "meanSat": 0.3253
+   }
+  },
+  {
+   "file": "atg-dark.webp",
+   "before": {
+    "orangeFrac": 0.673,
+    "meanSat": 0.4892
+   },
+   "after": {
+    "orangeFrac": 0.6199,
+    "meanSat": 0.3667
+   }
+  },
+  {
+   "file": "aus-dark.webp",
+   "before": {
+    "orangeFrac": 0.4629,
+    "meanSat": 0.5208
+   },
+   "after": {
+    "orangeFrac": 0.4072,
+    "meanSat": 0.4187
+   }
+  },
+  {
+   "file": "aut-dark.webp",
+   "before": {
+    "orangeFrac": 0.5093,
+    "meanSat": 0.5388
+   },
+   "after": {
+    "orangeFrac": 0.4338,
+    "meanSat": 0.4173
+   }
+  },
+  {
+   "file": "aze-dark.webp",
+   "before": {
+    "orangeFrac": 0.6192,
+    "meanSat": 0.5832
+   },
+   "after": {
+    "orangeFrac": 0.5208,
+    "meanSat": 0.4523
+   }
+  },
+  {
+   "file": "bdi-dark.webp",
+   "before": {
+    "orangeFrac": 0.8742,
+    "meanSat": 0.4155
+   },
+   "after": {
+    "orangeFrac": 0.7355,
+    "meanSat": 0.312
+   }
+  },
+  {
+   "file": "bel-dark.webp",
+   "before": {
+    "orangeFrac": 0.9768,
+    "meanSat": 0.4348
+   },
+   "after": {
+    "orangeFrac": 0.9027,
+    "meanSat": 0.3355
+   }
+  },
+  {
+   "file": "ben-dark.webp",
+   "before": {
+    "orangeFrac": 0.7102,
+    "meanSat": 0.4293
+   },
+   "after": {
+    "orangeFrac": 0.6399,
+    "meanSat": 0.318
+   }
+  },
+  {
+   "file": "bfa-dark.webp",
+   "before": {
+    "orangeFrac": 0.7537,
+    "meanSat": 0.4501
+   },
+   "after": {
+    "orangeFrac": 0.714,
+    "meanSat": 0.3354
+   }
+  },
+  {
+   "file": "bgd-dark.webp",
+   "before": {
+    "orangeFrac": 0.5267,
+    "meanSat": 0.5437
+   },
+   "after": {
+    "orangeFrac": 0.4825,
+    "meanSat": 0.4235
+   }
+  },
+  {
+   "file": "bgr-dark.webp",
+   "before": {
+    "orangeFrac": 0.8913,
+    "meanSat": 0.4677
+   },
+   "after": {
+    "orangeFrac": 0.8248,
+    "meanSat": 0.3579
+   }
+  },
+  {
+   "file": "bhr-dark.webp",
+   "before": {
+    "orangeFrac": 0.5205,
+    "meanSat": 0.6106
+   },
+   "after": {
+    "orangeFrac": 0.4384,
+    "meanSat": 0.4767
+   }
+  },
+  {
+   "file": "bhs-dark.webp",
+   "before": {
+    "orangeFrac": 0.6781,
+    "meanSat": 0.3926
+   },
+   "after": {
+    "orangeFrac": 0.5482,
+    "meanSat": 0.294
+   }
+  },
+  {
+   "file": "bih-dark.webp",
+   "before": {
+    "orangeFrac": 0.7879,
+    "meanSat": 0.4445
+   },
+   "after": {
+    "orangeFrac": 0.6787,
+    "meanSat": 0.3309
+   }
+  },
+  {
+   "file": "blr-dark.webp",
+   "before": {
+    "orangeFrac": 0.4223,
+    "meanSat": 0.5549
+   },
+   "after": {
+    "orangeFrac": 0.3772,
+    "meanSat": 0.4261
+   }
+  },
+  {
+   "file": "blz-dark.webp",
+   "before": {
+    "orangeFrac": 0.6926,
+    "meanSat": 0.3735
+   },
+   "after": {
+    "orangeFrac": 0.6104,
+    "meanSat": 0.2804
+   }
+  },
+  {
+   "file": "bol-dark.webp",
+   "before": {
+    "orangeFrac": 0.7887,
+    "meanSat": 0.3903
+   },
+   "after": {
+    "orangeFrac": 0.67,
+    "meanSat": 0.2992
+   }
+  },
+  {
+   "file": "bra-dark.webp",
+   "before": {
+    "orangeFrac": 0.7022,
+    "meanSat": 0.4028
+   },
+   "after": {
+    "orangeFrac": 0.6301,
+    "meanSat": 0.3004
+   }
+  },
+  {
+   "file": "brb-dark.webp",
+   "before": {
+    "orangeFrac": 0.4804,
+    "meanSat": 0.6199
+   },
+   "after": {
+    "orangeFrac": 0.4096,
+    "meanSat": 0.4833
+   }
+  },
+  {
+   "file": "brn-dark.webp",
+   "before": {
+    "orangeFrac": 0.7018,
+    "meanSat": 0.4433
+   },
+   "after": {
+    "orangeFrac": 0.6753,
+    "meanSat": 0.3321
+   }
+  },
+  {
+   "file": "btn-dark.webp",
+   "before": {
+    "orangeFrac": 0.7948,
+    "meanSat": 0.4033
+   },
+   "after": {
+    "orangeFrac": 0.7021,
+    "meanSat": 0.3026
+   }
+  },
+  {
+   "file": "bwa-dark.webp",
+   "before": {
+    "orangeFrac": 0.7052,
+    "meanSat": 0.3423
+   },
+   "after": {
+    "orangeFrac": 0.5139,
+    "meanSat": 0.2676
+   }
+  },
+  {
+   "file": "caf-dark.webp",
+   "before": {
+    "orangeFrac": 0.7026,
+    "meanSat": 0.5874
+   },
+   "after": {
+    "orangeFrac": 0.6581,
+    "meanSat": 0.4383
+   }
+  },
+  {
+   "file": "can-dark.webp",
+   "before": {
+    "orangeFrac": 0.9786,
+    "meanSat": 0.5025
+   },
+   "after": {
+    "orangeFrac": 0.9128,
+    "meanSat": 0.3802
+   }
+  },
+  {
+   "file": "che-dark.webp",
+   "before": {
+    "orangeFrac": 0.2295,
+    "meanSat": 0.211
+   },
+   "after": {
+    "orangeFrac": 0.1154,
+    "meanSat": 0.1682
+   }
+  },
+  {
+   "file": "chl-dark.webp",
+   "before": {
+    "orangeFrac": 0.6759,
+    "meanSat": 0.49
+   },
+   "after": {
+    "orangeFrac": 0.6286,
+    "meanSat": 0.3597
+   }
+  },
+  {
+   "file": "chn-dark.webp",
+   "before": {
+    "orangeFrac": 0.6224,
+    "meanSat": 0.4685
+   },
+   "after": {
+    "orangeFrac": 0.5804,
+    "meanSat": 0.3472
+   }
+  },
+  {
+   "file": "civ-dark.webp",
+   "before": {
+    "orangeFrac": 0.5127,
+    "meanSat": 0.5185
+   },
+   "after": {
+    "orangeFrac": 0.4646,
+    "meanSat": 0.3895
+   }
+  },
+  {
+   "file": "cmr-dark.webp",
+   "before": {
+    "orangeFrac": 0.6763,
+    "meanSat": 0.4279
+   },
+   "after": {
+    "orangeFrac": 0.6472,
+    "meanSat": 0.3206
+   }
+  },
+  {
+   "file": "cod-dark.webp",
+   "before": {
+    "orangeFrac": 0.7806,
+    "meanSat": 0.4587
+   },
+   "after": {
+    "orangeFrac": 0.6187,
+    "meanSat": 0.3404
+   }
+  },
+  {
+   "file": "cog-dark.webp",
+   "before": {
+    "orangeFrac": 0.5551,
+    "meanSat": 0.5436
+   },
+   "after": {
+    "orangeFrac": 0.5098,
+    "meanSat": 0.4193
+   }
+  },
+  {
+   "file": "col-dark.webp",
+   "before": {
+    "orangeFrac": 0.5787,
+    "meanSat": 0.4412
+   },
+   "after": {
+    "orangeFrac": 0.5439,
+    "meanSat": 0.3253
+   }
+  },
+  {
+   "file": "com-dark.webp",
+   "before": {
+    "orangeFrac": 0.6073,
+    "meanSat": 0.4714
+   },
+   "after": {
+    "orangeFrac": 0.5735,
+    "meanSat": 0.344
+   }
+  },
+  {
+   "file": "cpv-dark.webp",
+   "before": {
+    "orangeFrac": 0.7634,
+    "meanSat": 0.3908
+   },
+   "after": {
+    "orangeFrac": 0.655,
+    "meanSat": 0.2916
+   }
+  },
+  {
+   "file": "cri-dark.webp",
+   "before": {
+    "orangeFrac": 0.5035,
+    "meanSat": 0.4577
+   },
+   "after": {
+    "orangeFrac": 0.4632,
+    "meanSat": 0.3398
+   }
+  },
+  {
+   "file": "cub-dark.webp",
+   "before": {
+    "orangeFrac": 0.5817,
+    "meanSat": 0.474
+   },
+   "after": {
+    "orangeFrac": 0.5364,
+    "meanSat": 0.3519
+   }
+  },
+  {
+   "file": "cyp-dark.webp",
+   "before": {
+    "orangeFrac": 0.6156,
+    "meanSat": 0.5514
+   },
+   "after": {
+    "orangeFrac": 0.5456,
+    "meanSat": 0.4126
+   }
+  },
+  {
+   "file": "cze-dark.webp",
+   "before": {
+    "orangeFrac": 0.646,
+    "meanSat": 0.525
+   },
+   "after": {
+    "orangeFrac": 0.5842,
+    "meanSat": 0.4116
+   }
+  },
+  {
+   "file": "deu-dark.webp",
+   "before": {
+    "orangeFrac": 0.7814,
+    "meanSat": 0.5238
+   },
+   "after": {
+    "orangeFrac": 0.7462,
+    "meanSat": 0.4005
+   }
+  },
+  {
+   "file": "dji-dark.webp",
+   "before": {
+    "orangeFrac": 0.5438,
+    "meanSat": 0.5767
+   },
+   "after": {
+    "orangeFrac": 0.4981,
+    "meanSat": 0.4613
+   }
+  },
+  {
+   "file": "dma-dark.webp",
+   "before": {
+    "orangeFrac": 0.6518,
+    "meanSat": 0.5041
+   },
+   "after": {
+    "orangeFrac": 0.6103,
+    "meanSat": 0.3773
+   }
+  },
+  {
+   "file": "dnk-dark.webp",
+   "before": {
+    "orangeFrac": 0.6663,
+    "meanSat": 0.4694
+   },
+   "after": {
+    "orangeFrac": 0.4919,
+    "meanSat": 0.35
+   }
+  },
+  {
+   "file": "dom-dark.webp",
+   "before": {
+    "orangeFrac": 0.5439,
+    "meanSat": 0.4286
+   },
+   "after": {
+    "orangeFrac": 0.4717,
+    "meanSat": 0.3259
+   }
+  },
+  {
+   "file": "dza-dark.webp",
+   "before": {
+    "orangeFrac": 0.7527,
+    "meanSat": 0.4774
+   },
+   "after": {
+    "orangeFrac": 0.6986,
+    "meanSat": 0.3543
+   }
+  },
+  {
+   "file": "ecu-dark.webp",
+   "before": {
+    "orangeFrac": 0.6402,
+    "meanSat": 0.5889
+   },
+   "after": {
+    "orangeFrac": 0.5862,
+    "meanSat": 0.4531
+   }
+  },
+  {
+   "file": "egy-dark.webp",
+   "before": {
+    "orangeFrac": 0.3838,
+    "meanSat": 0.6747
+   },
+   "after": {
+    "orangeFrac": 0.3278,
+    "meanSat": 0.5555
+   }
+  },
+  {
+   "file": "eri-dark.webp",
+   "before": {
+    "orangeFrac": 0.4695,
+    "meanSat": 0.6313
+   },
+   "after": {
+    "orangeFrac": 0.4224,
+    "meanSat": 0.4895
+   }
+  },
+  {
+   "file": "esp-dark.webp",
+   "before": {
+    "orangeFrac": 0.4804,
+    "meanSat": 0.3289
+   },
+   "after": {
+    "orangeFrac": 0.352,
+    "meanSat": 0.2615
+   }
+  },
+  {
+   "file": "est-dark.webp",
+   "before": {
+    "orangeFrac": 0.8398,
+    "meanSat": 0.5023
+   },
+   "after": {
+    "orangeFrac": 0.7876,
+    "meanSat": 0.3805
+   }
+  },
+  {
+   "file": "eth-dark.webp",
+   "before": {
+    "orangeFrac": 0.6422,
+    "meanSat": 0.662
+   },
+   "after": {
+    "orangeFrac": 0.5555,
+    "meanSat": 0.5075
+   }
+  },
+  {
+   "file": "fin-dark.webp",
+   "before": {
+    "orangeFrac": 0.9145,
+    "meanSat": 0.3839
+   },
+   "after": {
+    "orangeFrac": 0.7636,
+    "meanSat": 0.2966
+   }
+  },
+  {
+   "file": "fji-dark.webp",
+   "before": {
+    "orangeFrac": 0.5317,
+    "meanSat": 0.7402
+   },
+   "after": {
+    "orangeFrac": 0.4094,
+    "meanSat": 0.5638
+   }
+  },
+  {
+   "file": "fra-dark.webp",
+   "before": {
+    "orangeFrac": 0.7973,
+    "meanSat": 0.5349
+   },
+   "after": {
+    "orangeFrac": 0.7765,
+    "meanSat": 0.4098
+   }
+  },
+  {
+   "file": "fsm-dark.webp",
+   "before": {
+    "orangeFrac": 0.3975,
+    "meanSat": 0.4105
+   },
+   "after": {
+    "orangeFrac": 0.2896,
+    "meanSat": 0.331
+   }
+  },
+  {
+   "file": "gab-dark.webp",
+   "before": {
+    "orangeFrac": 0.7579,
+    "meanSat": 0.5927
+   },
+   "after": {
+    "orangeFrac": 0.7002,
+    "meanSat": 0.4524
+   }
+  },
+  {
+   "file": "geo-dark.webp",
+   "before": {
+    "orangeFrac": 0.7587,
+    "meanSat": 0.4243
+   },
+   "after": {
+    "orangeFrac": 0.6851,
+    "meanSat": 0.3254
+   }
+  },
+  {
+   "file": "gha-dark.webp",
+   "before": {
+    "orangeFrac": 0.6018,
+    "meanSat": 0.6589
+   },
+   "after": {
+    "orangeFrac": 0.5446,
+    "meanSat": 0.5071
+   }
+  },
+  {
+   "file": "gin-dark.webp",
+   "before": {
+    "orangeFrac": 0.4878,
+    "meanSat": 0.6602
+   },
+   "after": {
+    "orangeFrac": 0.3932,
+    "meanSat": 0.5202
+   }
+  },
+  {
+   "file": "gmb-dark.webp",
+   "before": {
+    "orangeFrac": 0.591,
+    "meanSat": 0.4243
+   },
+   "after": {
+    "orangeFrac": 0.5099,
+    "meanSat": 0.3176
+   }
+  },
+  {
+   "file": "gnb-dark.webp",
+   "before": {
+    "orangeFrac": 0.365,
+    "meanSat": 0.713
+   },
+   "after": {
+    "orangeFrac": 0.2938,
+    "meanSat": 0.5554
+   }
+  },
+  {
+   "file": "gnq-dark.webp",
+   "before": {
+    "orangeFrac": 0.789,
+    "meanSat": 0.4494
+   },
+   "after": {
+    "orangeFrac": 0.7438,
+    "meanSat": 0.3365
+   }
+  },
+  {
+   "file": "grc-dark.webp",
+   "before": {
+    "orangeFrac": 0.4874,
+    "meanSat": 0.6053
+   },
+   "after": {
+    "orangeFrac": 0.4336,
+    "meanSat": 0.4864
+   }
+  },
+  {
+   "file": "grd-dark.webp",
+   "before": {
+    "orangeFrac": 0.5984,
+    "meanSat": 0.5494
+   },
+   "after": {
+    "orangeFrac": 0.5352,
+    "meanSat": 0.4247
+   }
+  },
+  {
+   "file": "gtm-dark.webp",
+   "before": {
+    "orangeFrac": 0.362,
+    "meanSat": 0.6905
+   },
+   "after": {
+    "orangeFrac": 0.3169,
+    "meanSat": 0.5431
+   }
+  },
+  {
+   "file": "guy-dark.webp",
+   "before": {
+    "orangeFrac": 0.4607,
+    "meanSat": 0.6604
+   },
+   "after": {
+    "orangeFrac": 0.433,
+    "meanSat": 0.5196
+   }
+  },
+  {
+   "file": "hnd-dark.webp",
+   "before": {
+    "orangeFrac": 0.3212,
+    "meanSat": 0.6944
+   },
+   "after": {
+    "orangeFrac": 0.2391,
+    "meanSat": 0.537
+   }
+  },
+  {
+   "file": "hrv-dark.webp",
+   "before": {
+    "orangeFrac": 0.5557,
+    "meanSat": 0.4854
+   },
+   "after": {
+    "orangeFrac": 0.4979,
+    "meanSat": 0.3612
+   }
+  },
+  {
+   "file": "hti-dark.webp",
+   "before": {
+    "orangeFrac": 0.3582,
+    "meanSat": 0.6692
+   },
+   "after": {
+    "orangeFrac": 0.2865,
+    "meanSat": 0.5355
+   }
+  },
+  {
+   "file": "hun-dark.webp",
+   "before": {
+    "orangeFrac": 0.8748,
+    "meanSat": 0.4525
+   },
+   "after": {
+    "orangeFrac": 0.8466,
+    "meanSat": 0.347
+   }
+  },
+  {
+   "file": "idn-dark.webp",
+   "before": {
+    "orangeFrac": 0.3835,
+    "meanSat": 0.5487
+   },
+   "after": {
+    "orangeFrac": 0.326,
+    "meanSat": 0.4361
+   }
+  },
+  {
+   "file": "ind-dark.webp",
+   "before": {
+    "orangeFrac": 0.6627,
+    "meanSat": 0.6149
+   },
+   "after": {
+    "orangeFrac": 0.6348,
+    "meanSat": 0.4777
+   }
+  },
+  {
+   "file": "irl-dark.webp",
+   "before": {
+    "orangeFrac": 0.4386,
+    "meanSat": 0.619
+   },
+   "after": {
+    "orangeFrac": 0.4019,
+    "meanSat": 0.493
+   }
+  },
+  {
+   "file": "irn-dark.webp",
+   "before": {
+    "orangeFrac": 0.4539,
+    "meanSat": 0.6454
+   },
+   "after": {
+    "orangeFrac": 0.4152,
+    "meanSat": 0.5154
+   }
+  },
+  {
+   "file": "irq-dark.webp",
+   "before": {
+    "orangeFrac": 0.3714,
+    "meanSat": 0.6304
+   },
+   "after": {
+    "orangeFrac": 0.3273,
+    "meanSat": 0.5039
+   }
+  },
+  {
+   "file": "isl-dark.webp",
+   "before": {
+    "orangeFrac": 0.7737,
+    "meanSat": 0.5215
+   },
+   "after": {
+    "orangeFrac": 0.713,
+    "meanSat": 0.3886
+   }
+  },
+  {
+   "file": "isr-dark.webp",
+   "before": {
+    "orangeFrac": 0.3348,
+    "meanSat": 0.6166
+   },
+   "after": {
+    "orangeFrac": 0.303,
+    "meanSat": 0.4916
+   }
+  },
+  {
+   "file": "ita-dark.webp",
+   "before": {
+    "orangeFrac": 0.5322,
+    "meanSat": 0.6656
+   },
+   "after": {
+    "orangeFrac": 0.4877,
+    "meanSat": 0.5195
+   }
+  },
+  {
+   "file": "jam-dark.webp",
+   "before": {
+    "orangeFrac": 0.382,
+    "meanSat": 0.6639
+   },
+   "after": {
+    "orangeFrac": 0.3304,
+    "meanSat": 0.5165
+   }
+  },
+  {
+   "file": "jor-dark.webp",
+   "before": {
+    "orangeFrac": 0.3509,
+    "meanSat": 0.6311
+   },
+   "after": {
+    "orangeFrac": 0.3041,
+    "meanSat": 0.5005
+   }
+  },
+  {
+   "file": "jpn-dark.webp",
+   "before": {
+    "orangeFrac": 0.4997,
+    "meanSat": 0.6547
+   },
+   "after": {
+    "orangeFrac": 0.4207,
+    "meanSat": 0.5057
+   }
+  },
+  {
+   "file": "kaz-dark.webp",
+   "before": {
+    "orangeFrac": 0.8141,
+    "meanSat": 0.4885
+   },
+   "after": {
+    "orangeFrac": 0.8006,
+    "meanSat": 0.3704
+   }
+  },
+  {
+   "file": "ken-dark.webp",
+   "before": {
+    "orangeFrac": 0.6844,
+    "meanSat": 0.6526
+   },
+   "after": {
+    "orangeFrac": 0.6466,
+    "meanSat": 0.4808
+   }
+  },
+  {
+   "file": "kgz-dark.webp",
+   "before": {
+    "orangeFrac": 0.4558,
+    "meanSat": 0.2911
+   },
+   "after": {
+    "orangeFrac": 0.2168,
+    "meanSat": 0.219
+   }
+  },
+  {
+   "file": "khm-dark.webp",
+   "before": {
+    "orangeFrac": 0.8012,
+    "meanSat": 0.3736
+   },
+   "after": {
+    "orangeFrac": 0.6818,
+    "meanSat": 0.2959
+   }
+  },
+  {
+   "file": "kir-dark.webp",
+   "before": {
+    "orangeFrac": 0.6333,
+    "meanSat": 0.5495
+   },
+   "after": {
+    "orangeFrac": 0.5851,
+    "meanSat": 0.4199
+   }
+  },
+  {
+   "file": "kna-dark.webp",
+   "before": {
+    "orangeFrac": 0.4012,
+    "meanSat": 0.3027
+   },
+   "after": {
+    "orangeFrac": 0.2532,
+    "meanSat": 0.243
+   }
+  },
+  {
+   "file": "kor-dark.webp",
+   "before": {
+    "orangeFrac": 0.6361,
+    "meanSat": 0.4842
+   },
+   "after": {
+    "orangeFrac": 0.5943,
+    "meanSat": 0.3632
+   }
+  },
+  {
+   "file": "kwt-dark.webp",
+   "before": {
+    "orangeFrac": 0.4994,
+    "meanSat": 0.3197
+   },
+   "after": {
+    "orangeFrac": 0.357,
+    "meanSat": 0.2396
+   }
+  },
+  {
+   "file": "lao-dark.webp",
+   "before": {
+    "orangeFrac": 0.6491,
+    "meanSat": 0.4615
+   },
+   "after": {
+    "orangeFrac": 0.5576,
+    "meanSat": 0.3601
+   }
+  },
+  {
+   "file": "lbn-dark.webp",
+   "before": {
+    "orangeFrac": 0.5411,
+    "meanSat": 0.2957
+   },
+   "after": {
+    "orangeFrac": 0.3121,
+    "meanSat": 0.2212
+   }
+  },
+  {
+   "file": "lbr-dark.webp",
+   "before": {
+    "orangeFrac": 0.5728,
+    "meanSat": 0.4
+   },
+   "after": {
+    "orangeFrac": 0.4679,
+    "meanSat": 0.3041
+   }
+  },
+  {
+   "file": "lby-dark.webp",
+   "before": {
+    "orangeFrac": 0.6184,
+    "meanSat": 0.3974
+   },
+   "after": {
+    "orangeFrac": 0.4806,
+    "meanSat": 0.3064
+   }
+  },
+  {
+   "file": "lca-dark.webp",
+   "before": {
+    "orangeFrac": 0.3562,
+    "meanSat": 0.2599
+   },
+   "after": {
+    "orangeFrac": 0.2324,
+    "meanSat": 0.2102
+   }
+  },
+  {
+   "file": "lie-dark.webp",
+   "before": {
+    "orangeFrac": 0.4386,
+    "meanSat": 0.3354
+   },
+   "after": {
+    "orangeFrac": 0.2815,
+    "meanSat": 0.2605
+   }
+  },
+  {
+   "file": "lka-dark.webp",
+   "before": {
+    "orangeFrac": 0.5307,
+    "meanSat": 0.487
+   },
+   "after": {
+    "orangeFrac": 0.4846,
+    "meanSat": 0.3657
+   }
+  },
+  {
+   "file": "lso-dark.webp",
+   "before": {
+    "orangeFrac": 0.5708,
+    "meanSat": 0.3915
+   },
+   "after": {
+    "orangeFrac": 0.424,
+    "meanSat": 0.2915
+   }
+  },
+  {
+   "file": "ltu-dark.webp",
+   "before": {
+    "orangeFrac": 0.5802,
+    "meanSat": 0.3889
+   },
+   "after": {
+    "orangeFrac": 0.4286,
+    "meanSat": 0.2959
+   }
+  },
+  {
+   "file": "lux-dark.webp",
+   "before": {
+    "orangeFrac": 0.4566,
+    "meanSat": 0.3797
+   },
+   "after": {
+    "orangeFrac": 0.3385,
+    "meanSat": 0.2941
+   }
+  },
+  {
+   "file": "lva-dark.webp",
+   "before": {
+    "orangeFrac": 0.554,
+    "meanSat": 0.2955
+   },
+   "after": {
+    "orangeFrac": 0.3155,
+    "meanSat": 0.2304
+   }
+  },
+  {
+   "file": "mar-dark.webp",
+   "before": {
+    "orangeFrac": 0.2567,
+    "meanSat": 0.4576
+   },
+   "after": {
+    "orangeFrac": 0.1525,
+    "meanSat": 0.3659
+   }
+  },
+  {
+   "file": "mco-dark.webp",
+   "before": {
+    "orangeFrac": 0.5271,
+    "meanSat": 0.4055
+   },
+   "after": {
+    "orangeFrac": 0.4234,
+    "meanSat": 0.312
+   }
+  },
+  {
+   "file": "mda-dark.webp",
+   "before": {
+    "orangeFrac": 0.397,
+    "meanSat": 0.4636
+   },
+   "after": {
+    "orangeFrac": 0.2883,
+    "meanSat": 0.364
+   }
+  },
+  {
+   "file": "mdg-dark.webp",
+   "before": {
+    "orangeFrac": 0.3905,
+    "meanSat": 0.3681
+   },
+   "after": {
+    "orangeFrac": 0.2859,
+    "meanSat": 0.2844
+   }
+  },
+  {
+   "file": "mdv-dark.webp",
+   "before": {
+    "orangeFrac": 0.5176,
+    "meanSat": 0.4014
+   },
+   "after": {
+    "orangeFrac": 0.4037,
+    "meanSat": 0.3137
+   }
+  },
+  {
+   "file": "mex-dark.webp",
+   "before": {
+    "orangeFrac": 0.4505,
+    "meanSat": 0.5397
+   },
+   "after": {
+    "orangeFrac": 0.3322,
+    "meanSat": 0.4346
+   }
+  },
+  {
+   "file": "mhl-dark.webp",
+   "before": {
+    "orangeFrac": 0.3747,
+    "meanSat": 0.3074
+   },
+   "after": {
+    "orangeFrac": 0.2194,
+    "meanSat": 0.2356
+   }
+  },
+  {
+   "file": "mkd-dark.webp",
+   "before": {
+    "orangeFrac": 0.5095,
+    "meanSat": 0.4708
+   },
+   "after": {
+    "orangeFrac": 0.4007,
+    "meanSat": 0.3619
+   }
+  },
+  {
+   "file": "mli-dark.webp",
+   "before": {
+    "orangeFrac": 0.6353,
+    "meanSat": 0.4385
+   },
+   "after": {
+    "orangeFrac": 0.5246,
+    "meanSat": 0.3327
+   }
+  },
+  {
+   "file": "mlt-dark.webp",
+   "before": {
+    "orangeFrac": 0.6589,
+    "meanSat": 0.5031
+   },
+   "after": {
+    "orangeFrac": 0.6106,
+    "meanSat": 0.3794
+   }
+  },
+  {
+   "file": "mmr-dark.webp",
+   "before": {
+    "orangeFrac": 0.9246,
+    "meanSat": 0.434
+   },
+   "after": {
+    "orangeFrac": 0.7874,
+    "meanSat": 0.3259
+   }
+  },
+  {
+   "file": "mne-dark.webp",
+   "before": {
+    "orangeFrac": 0.2849,
+    "meanSat": 0.3964
+   },
+   "after": {
+    "orangeFrac": 0.2061,
+    "meanSat": 0.3281
+   }
+  },
+  {
+   "file": "mng-dark.webp",
+   "before": {
+    "orangeFrac": 0.4554,
+    "meanSat": 0.3824
+   },
+   "after": {
+    "orangeFrac": 0.3082,
+    "meanSat": 0.3165
+   }
+  },
+  {
+   "file": "moz-dark.webp",
+   "before": {
+    "orangeFrac": 0.5652,
+    "meanSat": 0.4752
+   },
+   "after": {
+    "orangeFrac": 0.461,
+    "meanSat": 0.367
+   }
+  },
+  {
+   "file": "mrt-dark.webp",
+   "before": {
+    "orangeFrac": 0.4971,
+    "meanSat": 0.4375
+   },
+   "after": {
+    "orangeFrac": 0.3771,
+    "meanSat": 0.3495
+   }
+  },
+  {
+   "file": "mus-dark.webp",
+   "before": {
+    "orangeFrac": 0.7019,
+    "meanSat": 0.475
+   },
+   "after": {
+    "orangeFrac": 0.6214,
+    "meanSat": 0.3614
+   }
+  },
+  {
+   "file": "mwi-dark.webp",
+   "before": {
+    "orangeFrac": 0.5019,
+    "meanSat": 0.4186
+   },
+   "after": {
+    "orangeFrac": 0.3947,
+    "meanSat": 0.3216
+   }
+  },
+  {
+   "file": "mys-dark.webp",
+   "before": {
+    "orangeFrac": 0.5883,
+    "meanSat": 0.3739
+   },
+   "after": {
+    "orangeFrac": 0.4168,
+    "meanSat": 0.2887
+   }
+  },
+  {
+   "file": "nam-dark.webp",
+   "before": {
+    "orangeFrac": 0.4432,
+    "meanSat": 0.35
+   },
+   "after": {
+    "orangeFrac": 0.3171,
+    "meanSat": 0.2805
+   }
+  },
+  {
+   "file": "ner-dark.webp",
+   "before": {
+    "orangeFrac": 0.4036,
+    "meanSat": 0.3648
+   },
+   "after": {
+    "orangeFrac": 0.2847,
+    "meanSat": 0.277
+   }
+  },
+  {
+   "file": "nga-dark.webp",
+   "before": {
+    "orangeFrac": 0.5893,
+    "meanSat": 0.4407
+   },
+   "after": {
+    "orangeFrac": 0.4721,
+    "meanSat": 0.3357
+   }
+  },
+  {
+   "file": "nic-dark.webp",
+   "before": {
+    "orangeFrac": 0.6604,
+    "meanSat": 0.45
+   },
+   "after": {
+    "orangeFrac": 0.5533,
+    "meanSat": 0.3445
+   }
+  },
+  {
+   "file": "nld-dark.webp",
+   "before": {
+    "orangeFrac": 0.6633,
+    "meanSat": 0.419
+   },
+   "after": {
+    "orangeFrac": 0.5409,
+    "meanSat": 0.3231
+   }
+  },
+  {
+   "file": "nor-dark.webp",
+   "before": {
+    "orangeFrac": 0.6145,
+    "meanSat": 0.4532
+   },
+   "after": {
+    "orangeFrac": 0.503,
+    "meanSat": 0.3477
+   }
+  },
+  {
+   "file": "npl-dark.webp",
+   "before": {
+    "orangeFrac": 0.4614,
+    "meanSat": 0.4459
+   },
+   "after": {
+    "orangeFrac": 0.3962,
+    "meanSat": 0.362
+   }
+  },
+  {
+   "file": "nru-dark.webp",
+   "before": {
+    "orangeFrac": 0.4069,
+    "meanSat": 0.4044
+   },
+   "after": {
+    "orangeFrac": 0.3043,
+    "meanSat": 0.3313
+   }
+  },
+  {
+   "file": "nzl-dark.webp",
+   "before": {
+    "orangeFrac": 0.579,
+    "meanSat": 0.3951
+   },
+   "after": {
+    "orangeFrac": 0.4687,
+    "meanSat": 0.3029
+   }
+  },
+  {
+   "file": "omn-dark.webp",
+   "before": {
+    "orangeFrac": 0.4963,
+    "meanSat": 0.427
+   },
+   "after": {
+    "orangeFrac": 0.3988,
+    "meanSat": 0.3294
+   }
+  },
+  {
+   "file": "pak-dark.webp",
+   "before": {
+    "orangeFrac": 0.5482,
+    "meanSat": 0.4662
+   },
+   "after": {
+    "orangeFrac": 0.4584,
+    "meanSat": 0.3569
+   }
+  },
+  {
+   "file": "pan-dark.webp",
+   "before": {
+    "orangeFrac": 0.4763,
+    "meanSat": 0.4653
+   },
+   "after": {
+    "orangeFrac": 0.394,
+    "meanSat": 0.3566
+   }
+  },
+  {
+   "file": "per-dark.webp",
+   "before": {
+    "orangeFrac": 0.6959,
+    "meanSat": 0.3586
+   },
+   "after": {
+    "orangeFrac": 0.5185,
+    "meanSat": 0.2787
+   }
+  },
+  {
+   "file": "phl-dark.webp",
+   "before": {
+    "orangeFrac": 0.4629,
+    "meanSat": 0.2859
+   },
+   "after": {
+    "orangeFrac": 0.3086,
+    "meanSat": 0.2294
+   }
+  },
+  {
+   "file": "plw-dark.webp",
+   "before": {
+    "orangeFrac": 0.4931,
+    "meanSat": 0.4723
+   },
+   "after": {
+    "orangeFrac": 0.3956,
+    "meanSat": 0.3634
+   }
+  },
+  {
+   "file": "png-dark.webp",
+   "before": {
+    "orangeFrac": 0.5063,
+    "meanSat": 0.4604
+   },
+   "after": {
+    "orangeFrac": 0.4089,
+    "meanSat": 0.3506
+   }
+  },
+  {
+   "file": "pol-dark.webp",
+   "before": {
+    "orangeFrac": 0.5695,
+    "meanSat": 0.3542
+   },
+   "after": {
+    "orangeFrac": 0.3845,
+    "meanSat": 0.2765
+   }
+  },
+  {
+   "file": "prk-dark.webp",
+   "before": {
+    "orangeFrac": 0.5539,
+    "meanSat": 0.4289
+   },
+   "after": {
+    "orangeFrac": 0.4631,
+    "meanSat": 0.3304
+   }
+  },
+  {
+   "file": "prt-dark.webp",
+   "before": {
+    "orangeFrac": 0.1815,
+    "meanSat": 0.1768
+   },
+   "after": {
+    "orangeFrac": 0.0901,
+    "meanSat": 0.1461
+   }
+  },
+  {
+   "file": "pry-dark.webp",
+   "before": {
+    "orangeFrac": 0.3981,
+    "meanSat": 0.4676
+   },
+   "after": {
+    "orangeFrac": 0.3222,
+    "meanSat": 0.3619
+   }
+  },
+  {
+   "file": "pse-dark.webp",
+   "before": {
+    "orangeFrac": 0.5021,
+    "meanSat": 0.4838
+   },
+   "after": {
+    "orangeFrac": 0.3974,
+    "meanSat": 0.3712
+   }
+  },
+  {
+   "file": "qat-dark.webp",
+   "before": {
+    "orangeFrac": 0.4818,
+    "meanSat": 0.3618
+   },
+   "after": {
+    "orangeFrac": 0.3461,
+    "meanSat": 0.2873
+   }
+  },
+  {
+   "file": "rou-dark.webp",
+   "before": {
+    "orangeFrac": 0.4059,
+    "meanSat": 0.253
+   },
+   "after": {
+    "orangeFrac": 0.2199,
+    "meanSat": 0.209
+   }
+  },
+  {
+   "file": "rus-dark.webp",
+   "before": {
+    "orangeFrac": 0.3348,
+    "meanSat": 0.2268
+   },
+   "after": {
+    "orangeFrac": 0.2383,
+    "meanSat": 0.181
+   }
+  },
+  {
+   "file": "rwa-dark.webp",
+   "before": {
+    "orangeFrac": 0.3351,
+    "meanSat": 0.2678
+   },
+   "after": {
+    "orangeFrac": 0.2096,
+    "meanSat": 0.2157
+   }
+  },
+  {
+   "file": "sau-dark.webp",
+   "before": {
+    "orangeFrac": 0.4332,
+    "meanSat": 0.3157
+   },
+   "after": {
+    "orangeFrac": 0.2921,
+    "meanSat": 0.2593
+   }
+  },
+  {
+   "file": "sdn-dark.webp",
+   "before": {
+    "orangeFrac": 0.5141,
+    "meanSat": 0.3487
+   },
+   "after": {
+    "orangeFrac": 0.3682,
+    "meanSat": 0.2739
+   }
+  },
+  {
+   "file": "sen-dark.webp",
+   "before": {
+    "orangeFrac": 0.7284,
+    "meanSat": 0.4756
+   },
+   "after": {
+    "orangeFrac": 0.7028,
+    "meanSat": 0.3662
+   }
+  },
+  {
+   "file": "sgp-dark.webp",
+   "before": {
+    "orangeFrac": 0.6858,
+    "meanSat": 0.5069
+   },
+   "after": {
+    "orangeFrac": 0.6451,
+    "meanSat": 0.3845
+   }
+  },
+  {
+   "file": "slb-dark.webp",
+   "before": {
+    "orangeFrac": 0.5534,
+    "meanSat": 0.4256
+   },
+   "after": {
+    "orangeFrac": 0.4749,
+    "meanSat": 0.3298
+   }
+  },
+  {
+   "file": "sle-dark.webp",
+   "before": {
+    "orangeFrac": 0.496,
+    "meanSat": 0.5212
+   },
+   "after": {
+    "orangeFrac": 0.4512,
+    "meanSat": 0.397
+   }
+  },
+  {
+   "file": "slv-dark.webp",
+   "before": {
+    "orangeFrac": 0.7114,
+    "meanSat": 0.6019
+   },
+   "after": {
+    "orangeFrac": 0.6439,
+    "meanSat": 0.4569
+   }
+  },
+  {
+   "file": "smr-dark.webp",
+   "before": {
+    "orangeFrac": 0.4591,
+    "meanSat": 0.2597
+   },
+   "after": {
+    "orangeFrac": 0.306,
+    "meanSat": 0.207
+   }
+  },
+  {
+   "file": "som-dark.webp",
+   "before": {
+    "orangeFrac": 0.5297,
+    "meanSat": 0.3595
+   },
+   "after": {
+    "orangeFrac": 0.4092,
+    "meanSat": 0.2837
+   }
+  },
+  {
+   "file": "srb-dark.webp",
+   "before": {
+    "orangeFrac": 0.6481,
+    "meanSat": 0.462
+   },
+   "after": {
+    "orangeFrac": 0.5825,
+    "meanSat": 0.3479
+   }
+  },
+  {
+   "file": "ssd-dark.webp",
+   "before": {
+    "orangeFrac": 0.5297,
+    "meanSat": 0.3429
+   },
+   "after": {
+    "orangeFrac": 0.3924,
+    "meanSat": 0.2707
+   }
+  },
+  {
+   "file": "stp-dark.webp",
+   "before": {
+    "orangeFrac": 0.1834,
+    "meanSat": 0.1858
+   },
+   "after": {
+    "orangeFrac": 0.0522,
+    "meanSat": 0.1534
+   }
+  },
+  {
+   "file": "sur-dark.webp",
+   "before": {
+    "orangeFrac": 0.6741,
+    "meanSat": 0.4776
+   },
+   "after": {
+    "orangeFrac": 0.6391,
+    "meanSat": 0.3633
+   }
+  },
+  {
+   "file": "svk-dark.webp",
+   "before": {
+    "orangeFrac": 0.6978,
+    "meanSat": 0.4829
+   },
+   "after": {
+    "orangeFrac": 0.6589,
+    "meanSat": 0.3652
+   }
+  },
+  {
+   "file": "svn-dark.webp",
+   "before": {
+    "orangeFrac": 0.4878,
+    "meanSat": 0.5474
+   },
+   "after": {
+    "orangeFrac": 0.4243,
+    "meanSat": 0.4313
+   }
+  },
+  {
+   "file": "swe-dark.webp",
+   "before": {
+    "orangeFrac": 0.6489,
+    "meanSat": 0.3673
+   },
+   "after": {
+    "orangeFrac": 0.4654,
+    "meanSat": 0.2751
+   }
+  },
+  {
+   "file": "swz-dark.webp",
+   "before": {
+    "orangeFrac": 0.553,
+    "meanSat": 0.5007
+   },
+   "after": {
+    "orangeFrac": 0.4845,
+    "meanSat": 0.3598
+   }
+  },
+  {
+   "file": "syc-dark.webp",
+   "before": {
+    "orangeFrac": 0.4199,
+    "meanSat": 0.2997
+   },
+   "after": {
+    "orangeFrac": 0.2717,
+    "meanSat": 0.2435
+   }
+  },
+  {
+   "file": "syr-dark.webp",
+   "before": {
+    "orangeFrac": 0.2082,
+    "meanSat": 0.1752
+   },
+   "after": {
+    "orangeFrac": 0.1234,
+    "meanSat": 0.1478
+   }
+  },
+  {
+   "file": "tcd-dark.webp",
+   "before": {
+    "orangeFrac": 0.7073,
+    "meanSat": 0.5581
+   },
+   "after": {
+    "orangeFrac": 0.6642,
+    "meanSat": 0.4141
+   }
+  },
+  {
+   "file": "tgo-dark.webp",
+   "before": {
+    "orangeFrac": 0.6473,
+    "meanSat": 0.4614
+   },
+   "after": {
+    "orangeFrac": 0.5983,
+    "meanSat": 0.3438
+   }
+  },
+  {
+   "file": "tha-dark.webp",
+   "before": {
+    "orangeFrac": 0.61,
+    "meanSat": 0.377
+   },
+   "after": {
+    "orangeFrac": 0.4752,
+    "meanSat": 0.2977
+   }
+  },
+  {
+   "file": "tjk-dark.webp",
+   "before": {
+    "orangeFrac": 0.5292,
+    "meanSat": 0.3717
+   },
+   "after": {
+    "orangeFrac": 0.3913,
+    "meanSat": 0.2798
+   }
+  },
+  {
+   "file": "tkm-dark.webp",
+   "before": {
+    "orangeFrac": 0.1977,
+    "meanSat": 0.1725
+   },
+   "after": {
+    "orangeFrac": 0.1098,
+    "meanSat": 0.1427
+   }
+  },
+  {
+   "file": "tls-dark.webp",
+   "before": {
+    "orangeFrac": 0.4011,
+    "meanSat": 0.283
+   },
+   "after": {
+    "orangeFrac": 0.2526,
+    "meanSat": 0.2179
+   }
+  },
+  {
+   "file": "ton-dark.webp",
+   "before": {
+    "orangeFrac": 0.5732,
+    "meanSat": 0.4334
+   },
+   "after": {
+    "orangeFrac": 0.5037,
+    "meanSat": 0.3244
+   }
+  },
+  {
+   "file": "tto-dark.webp",
+   "before": {
+    "orangeFrac": 0.3052,
+    "meanSat": 0.2155
+   },
+   "after": {
+    "orangeFrac": 0.1817,
+    "meanSat": 0.1755
+   }
+  },
+  {
+   "file": "tun-dark.webp",
+   "before": {
+    "orangeFrac": 0.2625,
+    "meanSat": 0.1982
+   },
+   "after": {
+    "orangeFrac": 0.1248,
+    "meanSat": 0.1532
+   }
+  },
+  {
+   "file": "tur-dark.webp",
+   "before": {
+    "orangeFrac": 0.1429,
+    "meanSat": 0.1578
+   },
+   "after": {
+    "orangeFrac": 0.0609,
+    "meanSat": 0.1262
+   }
+  },
+  {
+   "file": "tuv-dark.webp",
+   "before": {
+    "orangeFrac": 0.123,
+    "meanSat": 0.1627
+   },
+   "after": {
+    "orangeFrac": 0.053,
+    "meanSat": 0.1356
+   }
+  },
+  {
+   "file": "twn-dark.webp",
+   "before": {
+    "orangeFrac": 0.2729,
+    "meanSat": 0.1942
+   },
+   "after": {
+    "orangeFrac": 0.1703,
+    "meanSat": 0.1565
+   }
+  },
+  {
+   "file": "tza-dark.webp",
+   "before": {
+    "orangeFrac": 0.5661,
+    "meanSat": 0.4341
+   },
+   "after": {
+    "orangeFrac": 0.491,
+    "meanSat": 0.3331
+   }
+  },
+  {
+   "file": "uga-dark.webp",
+   "before": {
+    "orangeFrac": 0.4147,
+    "meanSat": 0.3517
+   },
+   "after": {
+    "orangeFrac": 0.2907,
+    "meanSat": 0.2759
+   }
+  },
+  {
+   "file": "ukr-dark.webp",
+   "before": {
+    "orangeFrac": 0.1764,
+    "meanSat": 0.1619
+   },
+   "after": {
+    "orangeFrac": 0.0852,
+    "meanSat": 0.1333
+   }
+  },
+  {
+   "file": "ury-dark.webp",
+   "before": {
+    "orangeFrac": 0.3109,
+    "meanSat": 0.2158
+   },
+   "after": {
+    "orangeFrac": 0.1844,
+    "meanSat": 0.1757
+   }
+  },
+  {
+   "file": "usa-dark.webp",
+   "before": {
+    "orangeFrac": 0.6047,
+    "meanSat": 0.2924
+   },
+   "after": {
+    "orangeFrac": 0.2784,
+    "meanSat": 0.2356
+   }
+  },
+  {
+   "file": "uzb-dark.webp",
+   "before": {
+    "orangeFrac": 0.1915,
+    "meanSat": 0.1633
+   },
+   "after": {
+    "orangeFrac": 0.0911,
+    "meanSat": 0.1327
+   }
+  },
+  {
+   "file": "vat-dark.webp",
+   "before": {
+    "orangeFrac": 0.509,
+    "meanSat": 0.7696
+   },
+   "after": {
+    "orangeFrac": 0.3786,
+    "meanSat": 0.5682
+   }
+  },
+  {
+   "file": "vct-dark.webp",
+   "before": {
+    "orangeFrac": 0.2557,
+    "meanSat": 0.2103
+   },
+   "after": {
+    "orangeFrac": 0.17,
+    "meanSat": 0.1645
+   }
+  },
+  {
+   "file": "ven-dark.webp",
+   "before": {
+    "orangeFrac": 0.5529,
+    "meanSat": 0.3262
+   },
+   "after": {
+    "orangeFrac": 0.4029,
+    "meanSat": 0.2637
+   }
+  },
+  {
+   "file": "vnm-dark.webp",
+   "before": {
+    "orangeFrac": 0.5338,
+    "meanSat": 0.3467
+   },
+   "after": {
+    "orangeFrac": 0.3615,
+    "meanSat": 0.2753
+   }
+  },
+  {
+   "file": "vut-dark.webp",
+   "before": {
+    "orangeFrac": 0.5977,
+    "meanSat": 0.3559
+   },
+   "after": {
+    "orangeFrac": 0.4456,
+    "meanSat": 0.2818
+   }
+  },
+  {
+   "file": "wsm-dark.webp",
+   "before": {
+    "orangeFrac": 0.2385,
+    "meanSat": 0.2197
+   },
+   "after": {
+    "orangeFrac": 0.1189,
+    "meanSat": 0.1806
+   }
+  },
+  {
+   "file": "xkx-dark.webp",
+   "before": {
+    "orangeFrac": 0.6308,
+    "meanSat": 0.5774
+   },
+   "after": {
+    "orangeFrac": 0.5872,
+    "meanSat": 0.4424
+   }
+  },
+  {
+   "file": "yem-dark.webp",
+   "before": {
+    "orangeFrac": 0.5698,
+    "meanSat": 0.3721
+   },
+   "after": {
+    "orangeFrac": 0.4287,
+    "meanSat": 0.2932
+   }
+  },
+  {
+   "file": "zaf-dark.webp",
+   "before": {
+    "orangeFrac": 0.6444,
+    "meanSat": 0.495
+   },
+   "after": {
+    "orangeFrac": 0.6127,
+    "meanSat": 0.3716
+   }
+  },
+  {
+   "file": "zmb-dark.webp",
+   "before": {
+    "orangeFrac": 0.5126,
+    "meanSat": 0.3681
+   },
+   "after": {
+    "orangeFrac": 0.3944,
+    "meanSat": 0.2874
+   }
+  },
+  {
+   "file": "zwe-dark.webp",
+   "before": {
+    "orangeFrac": 0.4465,
+    "meanSat": 0.3567
+   },
+   "after": {
+    "orangeFrac": 0.2987,
+    "meanSat": 0.2831
+   }
+  }
+ ]
+}
