@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import YAML from "yaml";
 import { AUTHORSHIP_RECORD, authorshipErrors } from "../src/lib/research/authorship";
 import { buildAuthorshipArtifact } from "./generate-authorship-record";
@@ -25,9 +25,16 @@ for (const path of citationFiles) {
 }
 
 const pattern = `^author: Civica\\s+${"Team"}$`;
-const search = spawnSync("rg", ["-l", pattern, "content/blog"], { encoding: "utf8" });
-assert.ok(search.status === 0 || search.status === 1, search.stderr);
-const matches = search.stdout.trim();
+function findFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    return entry.isDirectory() ? findFiles(path) : entry.isFile() ? [path] : [];
+  });
+}
+const bylinePattern = new RegExp(pattern, "m");
+const matches = findFiles("content/blog")
+  .filter((path) => bylinePattern.test(readFileSync(path, "utf8")))
+  .join("\n");
 assert.equal(matches, "", `anonymous blog bylines remain: ${matches}`);
 
 assert.equal(AUTHORSHIP_RECORD.responsibleAuthor.orcid, null);
