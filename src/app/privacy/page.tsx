@@ -9,6 +9,7 @@ import {
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { withOg } from "@/lib/og";
+import { ADVISORY_APPLICATION_POLICY } from "@/lib/research/advisory-application";
 
 export const revalidate = 3600;
 
@@ -29,6 +30,7 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "no-accounts", label: "No accounts, no tracking" },
   { id: "storage", label: "In your browser" },
   { id: "messages", label: "What you send us" },
+  { id: "applications", label: "Board applications" },
   { id: "servers", label: "Hosting & logs" },
   { id: "data-licensing", label: "About the data" },
   { id: "contact", label: "Questions" },
@@ -42,7 +44,7 @@ export default function PrivacyPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Privacy Policy</h1>
-        <p className="editorial-page-meta">Last updated: July 4, 2026</p>
+        <p className="editorial-page-meta">Last updated: July 11, 2026</p>
         <p className="editorial-page-subtitle">
           Civica Atlas is a public reference site. There are no visitor
           accounts, no sign-up, and no advertising or analytics trackers. This
@@ -76,8 +78,9 @@ export default function PrivacyPage() {
               tracking pixels.
             </li>
             <li>
-              We do not sell, rent, or share personal information, because we
-              do not collect a store of it in the first place.
+              We do not sell or rent personal information. Information sent
+              through the contact and advisory-board forms is stored only for
+              the purposes described below.
             </li>
           </ul>
         </section>
@@ -116,7 +119,7 @@ export default function PrivacyPage() {
           <SectionHeader
             eyebrow="When you write to us"
             title="Information you choose to send"
-            dek="Two features let you send content on purpose. Here is where it goes."
+            dek="Three features let you send content on purpose. Here is where it goes."
           />
 
           <ul>
@@ -124,8 +127,13 @@ export default function PrivacyPage() {
               <strong>Contact form.</strong> If you use the{" "}
               <Link href="/contact">contact form</Link>, the details you type
               there (such as your message and any email address you provide)
-              are sent to the Civica editorial team so we can reply. We use
-              them to respond to you and nothing else.
+              are stored in the Civica project database so Fernando Balino can
+              read and respond. They are not used for advertising or sold.
+            </li>
+            <li>
+              <strong>Advisory-board application.</strong> The{" "}
+              <Link href="/about/advisory-board/apply">application form</Link>{" "}
+              stores the fields and consent described in the next section.
             </li>
             <li>
               <strong>Ask Civica assistant.</strong> Messages you type into
@@ -134,6 +142,26 @@ export default function PrivacyPage() {
               Avoid typing sensitive personal information into it.
             </li>
           </ul>
+        </section>
+
+        <section id="applications" className="editorial-section">
+          <SectionHeader
+            eyebrow="Expressions of interest"
+            title="Advisory-board applications"
+            dek="Applications are private recruitment records, not public profiles or evidence of appointment."
+          />
+
+          <p><strong>What is collected.</strong> {ADVISORY_APPLICATION_POLICY.collectedFields.join(", ")}.</p>
+          <p><strong>Purpose.</strong> {ADVISORY_APPLICATION_POLICY.purpose}</p>
+          <p><strong>Access and processors.</strong> {ADVISORY_APPLICATION_POLICY.access}</p>
+          <p><strong>Retention.</strong> {ADVISORY_APPLICATION_POLICY.retention}</p>
+          <p><strong>Access, correction, and deletion.</strong> {ADVISORY_APPLICATION_POLICY.deletion}</p>
+          <p><strong>Security.</strong> {ADVISORY_APPLICATION_POLICY.security}</p>
+          <p><strong>IP and abuse prevention.</strong> {ADVISORY_APPLICATION_POLICY.ipUse}</p>
+          <p><strong>Receipt and response.</strong> {ADVISORY_APPLICATION_POLICY.response}</p>
+          <p className="editorial-page-meta">
+            Application notice {ADVISORY_APPLICATION_POLICY.schemaVersion}; effective {ADVISORY_APPLICATION_POLICY.effectiveOn}.
+          </p>
         </section>
 
         <section id="servers" className="editorial-section">

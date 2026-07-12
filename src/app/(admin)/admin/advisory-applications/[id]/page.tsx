@@ -13,6 +13,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
 import { Chip } from "@/components/editorial/Pill";
+import { advisoryApplicationRetentionDeadline } from "@/lib/research/advisory-application";
 
 export const metadata: Metadata = {
   title: "Application detail — Civica admin",
@@ -95,6 +96,8 @@ export default async function AdvisoryApplicationDetailPage({
           <Chip>{app.expertiseArea}</Chip>
           <span className="admin-meta-sep">·</span>
           <span>Received {formatDate(app.createdAt)}</span>
+          <span className="admin-meta-sep">·</span>
+          <span>Delete by {formatDate(advisoryApplicationRetentionDeadline(new Date(app.createdAt)))}</span>
         </p>
       </header>
 
@@ -134,6 +137,25 @@ export default async function AdvisoryApplicationDetailPage({
             ) : null}
           </dl>
         </div>
+      </section>
+
+      <section className="admin-section">
+        <h2 className="admin-section-title">Retention and deletion</h2>
+        <p className="admin-section-intro">
+          The public application notice commits Civica to deleting this record
+          within 18 months of receipt. Appointment records are created separately.
+          Permanent deletion cannot be undone.
+        </p>
+        <form method="post" action={`/api/admin/advisory-applications/${app.id}`} className="admin-action-form">
+          <input type="hidden" name="intent" value="delete" />
+          <label>
+            <input type="checkbox" name="confirm" value="delete" required />{" "}
+            I understand this permanently deletes the application.
+          </label>
+          <button type="submit" className="btn btn--secondary btn--sm">
+            Delete application permanently
+          </button>
+        </form>
       </section>
 
       <section className="admin-section">

@@ -275,7 +275,7 @@ export function FactbookHeaderStrip({
                 {reconciliationNotice}
               </span>
             ) : null}
-            <span className="factbook-hero-caption-label">Engraving</span>
+            <span className="factbook-hero-caption-label">Editorial engraving</span>
             {heroCaption ? (
               engravingDarkSrc && heroDarkCaption ? (
                 <>

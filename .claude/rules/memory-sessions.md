@@ -721,3 +721,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Published `civica-advisory-board-charter/v1` with five expertise lanes, advisory-only authority, two-year terms, bounded workload, conflict, confidentiality, compensation, departure, consented-publication, and nonendorsement rules.
 - Standing service is unpaid; substantial reviews remain separate, optional, and eligible only for outcome-independent owner-approved honoraria.
 - The public roster explicitly says no members have been appointed. GOV-007 is next.
+
+## 2026-07-12 — GOV-007 advisory application completed
+
+- The public form now matches all five charter lanes and requires consent to `civica-advisory-application-privacy/v1`.
+- Client/server validation, durable hashed rate limiting, honeypot handling, explicit storage failure, protected admin delivery, retention deadline, and confirmed deletion are executable.
+- New rows retain no applicant IP. The form and `/privacy#applications` publish the fields, purpose, access, processors, 18-month retention, deletion, security, and onscreen-only response terms.
+- While verifying GOV-007, the build exposed reference-header drift that shortened the required country-art disclosure; EXP-043 restored `Editorial engraving` and the licensing gate.

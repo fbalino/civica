@@ -1,167 +1,103 @@
+import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
-import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import { checkDurableRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import {
+  ADVISORY_APPLICATION_LIMITS,
+  ADVISORY_APPLICATION_POLICY_VERSION,
+  validateAdvisoryApplication,
+  type AdvisoryApplicationInput,
+} from "@/lib/research/advisory-application";
 
 // Per-IP rate limit: max 5 applications per 30 minutes. Applications are a
 // deliberate, one-time act — a tighter window than the contact form's 5/10min.
 const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 
-const MAX_NAME_LEN = 120;
-const MAX_EMAIL_LEN = 254;
-const MAX_INSTITUTION_LEN = 200;
-const MAX_ROLE_LEN = 160;
-const MAX_EXPERTISE_LEN = 160;
-const MAX_EXPERIENCE_LEN = 5000;
-const MAX_LINKS_LEN = 2000;
-const MAX_CV_URL_LEN = 500;
-
-const MIN_EXPERIENCE_LEN = 40;
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-/** Accept only http(s) URLs. Applicant-supplied links/CV links must be
- *  real web addresses so an admin can click them safely. */
-function isValidHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+function json(body: unknown, status: number, headers: Record<string, string> = {}) {
+  return NextResponse.json(body, {
+    status,
+    headers: { "Cache-Control": "no-store", ...headers },
   });
 }
 
 export async function POST(req: NextRequest) {
-  const ip = getRequestIp(req);
-
-  const rateLimit = checkInMemoryRateLimit({
-    scope: "advisory-applications",
-    key: ip,
-    max: RATE_LIMIT_MAX,
-    windowMs: RATE_LIMIT_WINDOW_MS,
-  });
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many applications. Please wait before trying again." },
-      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
-    );
+  let raw = "";
+  try {
+    raw = await req.text();
+  } catch {
+    return json({ error: "Invalid request body." }, 400);
+  }
+  if (raw.length > ADVISORY_APPLICATION_LIMITS.requestBody) {
+    return json({ error: "Request body is too large." }, 413);
   }
 
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("not an object");
+    body = parsed as Record<string, unknown>;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return json({ error: "Invalid JSON body." }, 400);
   }
 
   // Honeypot: bots fill this hidden field, humans leave it empty.
   if (body._trap) {
-    // Return 200 to avoid tipping off bots, but don't store anything.
-    return NextResponse.json({ success: true });
+    // Match the real success response so the endpoint reveals no filter signal.
+    return json({ success: true, receipt: "onscreen-only" }, 201);
   }
 
-  const { name, email, institution, role, expertiseArea, experience, links, cvUrl } =
-    body;
-
-  const errors: Record<string, string> = {};
-
-  if (!name || typeof name !== "string" || name.trim().length === 0) {
-    errors.name = "Name is required.";
-  } else if (name.trim().length > MAX_NAME_LEN) {
-    errors.name = `Name must be ${MAX_NAME_LEN} characters or fewer.`;
-  }
-
-  if (!email || typeof email !== "string" || email.trim().length === 0) {
-    errors.email = "Email is required.";
-  } else if (email.trim().length > MAX_EMAIL_LEN || !isValidEmail(email.trim())) {
-    errors.email = "A valid email address is required.";
-  }
-
-  if (!institution || typeof institution !== "string" || institution.trim().length === 0) {
-    errors.institution = "Institution is required.";
-  } else if (institution.trim().length > MAX_INSTITUTION_LEN) {
-    errors.institution = `Institution must be ${MAX_INSTITUTION_LEN} characters or fewer.`;
-  }
-
-  if (!role || typeof role !== "string" || role.trim().length === 0) {
-    errors.role = "Role or title is required.";
-  } else if (role.trim().length > MAX_ROLE_LEN) {
-    errors.role = `Role must be ${MAX_ROLE_LEN} characters or fewer.`;
-  }
-
-  if (
-    !expertiseArea ||
-    typeof expertiseArea !== "string" ||
-    expertiseArea.trim().length === 0
-  ) {
-    errors.expertiseArea = "Area of expertise is required.";
-  } else if (expertiseArea.trim().length > MAX_EXPERTISE_LEN) {
-    errors.expertiseArea = `Area of expertise must be ${MAX_EXPERTISE_LEN} characters or fewer.`;
-  }
-
-  if (!experience || typeof experience !== "string" || experience.trim().length === 0) {
-    errors.experience = "A short experience statement is required.";
-  } else if (experience.trim().length < MIN_EXPERIENCE_LEN) {
-    errors.experience = `Please write at least ${MIN_EXPERIENCE_LEN} characters.`;
-  } else if (experience.trim().length > MAX_EXPERIENCE_LEN) {
-    errors.experience = `Statement must be ${MAX_EXPERIENCE_LEN} characters or fewer.`;
-  }
-
-  // Links: optional, but if present must be within length. Free text so a
-  // scholar can paste several URLs / handles.
-  if (links != null && typeof links !== "string") {
-    errors.links = "Links must be text.";
-  } else if (typeof links === "string" && links.trim().length > MAX_LINKS_LEN) {
-    errors.links = `Links must be ${MAX_LINKS_LEN} characters or fewer.`;
-  }
-
-  // CV link: optional. When present, must be a real http(s) URL so it's
-  // safely clickable from the admin queue.
-  if (cvUrl != null && typeof cvUrl !== "string") {
-    errors.cvUrl = "CV link must be text.";
-  } else if (typeof cvUrl === "string" && cvUrl.trim().length > 0) {
-    if (cvUrl.trim().length > MAX_CV_URL_LEN) {
-      errors.cvUrl = `CV link must be ${MAX_CV_URL_LEN} characters or fewer.`;
-    } else if (!isValidHttpUrl(cvUrl.trim())) {
-      errors.cvUrl = "Enter a valid link starting with http:// or https://.";
-    }
-  }
+  const value = (key: string) => (typeof body[key] === "string" ? body[key] as string : "");
+  const application: AdvisoryApplicationInput = {
+    name: value("name"),
+    email: value("email"),
+    institution: value("institution"),
+    role: value("role"),
+    expertiseArea: value("expertiseArea"),
+    experience: value("experience"),
+    links: value("links"),
+    cvUrl: value("cvUrl"),
+    consent: body.consent === true && body.privacyNoticeVersion === ADVISORY_APPLICATION_POLICY_VERSION,
+  };
+  const errors = validateAdvisoryApplication(application);
 
   if (Object.keys(errors).length > 0) {
-    return NextResponse.json({ errors }, { status: 422 });
+    return json({ errors }, 422);
   }
 
-  const linksValue =
-    typeof links === "string" && links.trim().length > 0 ? links.trim() : null;
-  const cvUrlValue =
-    typeof cvUrl === "string" && cvUrl.trim().length > 0 ? cvUrl.trim() : null;
-
-  await db.insert(advisoryApplications).values({
-    name: (name as string).trim(),
-    email: (email as string).trim().toLowerCase(),
-    institution: (institution as string).trim(),
-    role: (role as string).trim(),
-    expertiseArea: (expertiseArea as string).trim(),
-    experience: (experience as string).trim(),
-    links: linksValue,
-    cvUrl: cvUrlValue,
-    ipAddress: ip,
-    status: "new",
+  const ipKey = createHash("sha256").update(`advisory:${getRequestIp(req)}`).digest("hex");
+  const rateLimit = await checkDurableRateLimit({
+    scope: "advisory-applications",
+    key: ipKey,
+    limit: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
   });
+  if (!rateLimit.allowed) {
+    return json(
+      { error: "Too many applications. Please wait before trying again." },
+      429,
+      { "Retry-After": String(Math.max(1, Math.ceil(rateLimit.retryAfterMs / 1000))) },
+    );
+  }
+
+  try {
+    await db.insert(advisoryApplications).values({
+      name: application.name.trim(),
+      email: application.email.trim().toLowerCase(),
+      institution: application.institution.trim(),
+      role: application.role.trim(),
+      expertiseArea: application.expertiseArea.trim(),
+      experience: application.experience.trim(),
+      links: application.links.trim() || null,
+      cvUrl: application.cvUrl.trim() || null,
+      // The rate limiter uses a short-lived hashed bucket; applicant IP is not retained here.
+      ipAddress: null,
+      status: "new",
+    });
+  } catch {
+    return json({ error: "The application could not be stored. Please try again later." }, 503);
+  }
 
   // Notification: this mirrors the contact form exactly — no transactional
   // email provider is configured, so the owner reads new applications via the
@@ -170,5 +106,5 @@ export async function POST(req: NextRequest) {
   // RESEND_API_KEY (or similar) and call the provider here AND in
   // src/app/api/contact/route.ts so both inboxes stay consistent.
 
-  return NextResponse.json({ success: true }, { status: 201 });
+  return json({ success: true, receipt: "onscreen-only" }, 201);
 }

@@ -1869,9 +1869,8 @@ export const correctionLog = pgTable("correction_log", {
 });
 
 /**
- * Placeholder schema for the academic advisory board described in
- * v2 methodology spec §3.1. Table ships empty; rows arrive via
- * manual INSERT once recruitment happens.
+ * Consented public profiles for appointed advisory-board members. The table
+ * ships empty; an application never creates a member row automatically.
  */
 export const advisoryBoardMembers = pgTable("advisory_board_members", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -1888,8 +1887,7 @@ export const advisoryBoardMembers = pgTable("advisory_board_members", {
 });
 
 /**
- * Inbound applications to join the academic advisory board
- * (v2 methodology spec §3.1). Populated by the public
+ * Private expressions of interest in the advisory board. Populated by the public
  * `/about/advisory-board/apply` form, which POSTs to the
  * `/api/advisory-applications` route handler. The owner reads new
  * applications through the authed admin surface at
@@ -1918,6 +1916,7 @@ export const advisoryApplications = pgTable("advisory_applications", {
   links: text("links"),
   /** Applicant-supplied CV link (scholar page / personal site / hosted PDF) */
   cvUrl: text("cv_url"),
+  /** Legacy nullable column. New submissions do not retain applicant IPs. */
   ipAddress: text("ip_address"),
   /** Triage lifecycle: new → reviewed → contacted → archived */
   status: text("status").notNull().default("new"),

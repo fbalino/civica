@@ -65,6 +65,9 @@
   border-radius: var(--radius-xl);
   resize: vertical;
 }
+.contact-textarea--compact {
+  min-height: calc(var(--space-8) * 3);
+}
 .contact-input::placeholder,
 .contact-textarea::placeholder {
   color: var(--color-text-30);
@@ -104,6 +107,45 @@
   margin-top: var(--space-5);
 }
 
+.contact-privacy-box {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-hover-bg);
+  color: var(--color-text-60);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+}
+.contact-privacy-box p,
+.contact-privacy-box ul {
+  margin: var(--space-3) 0 0;
+}
+.contact-privacy-box a {
+  color: var(--color-accent);
+}
+.contact-privacy-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: var(--font-weight-regular);
+}
+.contact-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+.contact-consent input {
+  flex: none;
+  margin-top: var(--space-1);
+  accent-color: var(--color-accent);
+}
+
 /* ── Category chip row ──────────────────────────────────────────── */
 
 .contact-chip-group {
@@ -124,6 +166,9 @@
    without an inline style (the Banner primitive owns its own margins). */
 .contact-alert {
   margin-top: var(--space-5);
+}
+.contact-validation-summary {
+  margin-bottom: var(--space-5);
 }
 
 /* ── Form footer (required hint + submit) ───────────────────────── */

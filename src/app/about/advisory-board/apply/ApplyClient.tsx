@@ -6,24 +6,18 @@ import { Banner } from "@/components/editorial/Banner";
 import { Button } from "@/components/editorial/Button";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { StatusDot } from "@/components/editorial/StatusDot";
+import {
+  ADVISORY_APPLICATION_LIMITS,
+  ADVISORY_APPLICATION_POLICY,
+  validateAdvisoryApplication,
+  type AdvisoryApplicationErrors,
+  type AdvisoryApplicationField,
+  type AdvisoryApplicationInput,
+} from "@/lib/research/advisory-application";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
-interface FormValues {
-  name: string;
-  email: string;
-  institution: string;
-  role: string;
-  expertiseArea: string;
-  experience: string;
-  links: string;
-  cvUrl: string;
-}
-
-type FieldKey = keyof FormValues;
-type FieldErrors = Partial<Record<FieldKey, string>>;
-
-const EMPTY: FormValues = {
+const EMPTY: AdvisoryApplicationInput = {
   name: "",
   email: "",
   institution: "",
@@ -32,40 +26,8 @@ const EMPTY: FormValues = {
   experience: "",
   links: "",
   cvUrl: "",
+  consent: false,
 };
-
-const MIN_EXPERIENCE_LEN = 40;
-
-function isValidHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-function validate(values: FormValues): FieldErrors {
-  const errors: FieldErrors = {};
-  if (!values.name.trim()) errors.name = "Required";
-  if (!values.email.trim()) {
-    errors.email = "Required";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-    errors.email = "Enter a valid email";
-  }
-  if (!values.institution.trim()) errors.institution = "Required";
-  if (!values.role.trim()) errors.role = "Required";
-  if (!values.expertiseArea.trim()) errors.expertiseArea = "Required";
-  if (!values.experience.trim()) {
-    errors.experience = "Required";
-  } else if (values.experience.trim().length < MIN_EXPERIENCE_LEN) {
-    errors.experience = `At least ${MIN_EXPERIENCE_LEN} characters`;
-  }
-  if (values.cvUrl.trim() && !isValidHttpUrl(values.cvUrl.trim())) {
-    errors.cvUrl = "Enter a link starting with http:// or https://";
-  }
-  return errors;
-}
 
 function FieldLabel({
   htmlFor,
@@ -95,9 +57,9 @@ function SuccessPanel() {
         Thanks &mdash; your application is in.
       </h2>
       <p className="contact-success-body">
-        We review advisory-board applications as recruitment proceeds and reach
-        out by email when there&rsquo;s a fit. There&rsquo;s no need to apply
-        again.
+        This page is your receipt; no confirmation email is sent. Fernando
+        Balino reviews applications and may write when follow-up is useful.
+        Submission does not guarantee a reply, appointment, or review assignment.
       </p>
       <Button variant="secondary" size="sm" href="/about/advisory-board">
         Back to the advisory board
@@ -107,8 +69,8 @@ function SuccessPanel() {
 }
 
 export default function ApplyClient() {
-  const [values, setValues] = useState<FormValues>(EMPTY);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [values, setValues] = useState<AdvisoryApplicationInput>(EMPTY);
+  const [errors, setErrors] = useState<AdvisoryApplicationErrors>({});
   const [state, setState] = useState<FormState>("idle");
   const [serverError, setServerError] = useState<string | null>(null);
   // Honeypot: a real, visually-hidden field a human never sees or fills, but a
@@ -125,9 +87,10 @@ export default function ApplyClient() {
   const experienceId = useId();
   const linksId = useId();
   const cvUrlId = useId();
+  const consentId = useId();
 
   const handleChange =
-    (field: FieldKey) =>
+    (field: Exclude<AdvisoryApplicationField, "consent">) =>
     (
       e: React.ChangeEvent<
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -139,7 +102,7 @@ export default function ApplyClient() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const next = validate(values);
+    const next = validateAdvisoryApplication(values);
     if (Object.keys(next).length) {
       setErrors(next);
       setState("idle");
@@ -151,7 +114,11 @@ export default function ApplyClient() {
       const res = await fetch("/api/advisory-applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, _trap: trap }),
+        body: JSON.stringify({
+          ...values,
+          privacyNoticeVersion: ADVISORY_APPLICATION_POLICY.schemaVersion,
+          _trap: trap,
+        }),
       });
       if (res.status === 201) {
         setState("success");
@@ -185,11 +152,16 @@ export default function ApplyClient() {
     >
       <section className="editorial-section">
         <p className="editorial-page-subtitle">
-          Civica is collecting expressions of interest for a planned independent
-          advisory board in governance measurement, political methodology, and
-          comparative politics. No board review or endorsement has occurred yet.
-          If that&rsquo;s your field, tell us about yourself &mdash; a human on
-          the team reads every application.
+          Civica Atlas accepts private expressions of interest across the five
+          charter areas: governance measurement, political event data,
+          research-data curation, data-heavy accessibility, and source rights.
+          Fernando Balino reads each application. Applying is not an appointment,
+          a review, or an endorsement.
+        </p>
+        <p>
+          Read the <Link href="/about/advisory-board">board charter</Link> before
+          applying. It explains the advisory-only remit, expected workload,
+          conflicts, compensation, confidentiality, and publication terms.
         </p>
       </section>
 
@@ -200,17 +172,7 @@ export default function ApplyClient() {
           <form className="contact-card" onSubmit={submit} noValidate>
             {/* Honeypot — visually hidden, off the tab order, hidden from AT.
                 Humans never fill it; bots do, and the API drops those. */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                width: "1px",
-                height: "1px",
-                overflow: "hidden",
-                clip: "rect(0 0 0 0)",
-                whiteSpace: "nowrap",
-              }}
-            >
+            <div aria-hidden="true" className="sr-only">
               <label htmlFor="advisory-website">
                 Leave this field empty
                 <input
@@ -224,6 +186,11 @@ export default function ApplyClient() {
                 />
               </label>
             </div>
+            {Object.keys(errors).length > 0 ? (
+              <div role="alert" className="contact-validation-summary">
+                <Banner variant="danger">Review the highlighted fields before submitting.</Banner>
+              </div>
+            ) : null}
             <div className="contact-field contact-row">
               <div>
                 <FieldLabel htmlFor={nameId} required>
@@ -232,13 +199,16 @@ export default function ApplyClient() {
                 <input
                   id={nameId}
                   type="text"
+                  required
                   autoComplete="name"
+                  maxLength={ADVISORY_APPLICATION_LIMITS.name}
                   value={values.name}
                   onChange={handleChange("name")}
                   className="contact-input"
                   aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? `${nameId}-error` : undefined}
                 />
-                {errors.name && <div className="contact-error">{errors.name}</div>}
+                {errors.name && <div className="contact-error" id={`${nameId}-error`}>{errors.name}</div>}
               </div>
               <div>
                 <FieldLabel htmlFor={emailId} required>
@@ -247,14 +217,17 @@ export default function ApplyClient() {
                 <input
                   id={emailId}
                   type="email"
+                  required
                   autoComplete="email"
+                  maxLength={ADVISORY_APPLICATION_LIMITS.email}
                   value={values.email}
                   onChange={handleChange("email")}
                   className="contact-input"
                   aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? `${emailId}-error` : undefined}
                 />
                 {errors.email && (
-                  <div className="contact-error">{errors.email}</div>
+                  <div className="contact-error" id={`${emailId}-error`}>{errors.email}</div>
                 )}
               </div>
             </div>
@@ -262,19 +235,23 @@ export default function ApplyClient() {
             <div className="contact-field contact-row">
               <div>
                 <FieldLabel htmlFor={institutionId} required>
-                  Institution
+                  Institution or affiliation
                 </FieldLabel>
                 <input
                   id={institutionId}
                   type="text"
+                  required
                   autoComplete="organization"
+                  maxLength={ADVISORY_APPLICATION_LIMITS.institution}
+                  placeholder="Institution or Independent"
                   value={values.institution}
                   onChange={handleChange("institution")}
                   className="contact-input"
                   aria-invalid={!!errors.institution}
+                  aria-describedby={errors.institution ? `${institutionId}-error` : undefined}
                 />
                 {errors.institution && (
-                  <div className="contact-error">{errors.institution}</div>
+                  <div className="contact-error" id={`${institutionId}-error`}>{errors.institution}</div>
                 )}
               </div>
               <div>
@@ -284,14 +261,17 @@ export default function ApplyClient() {
                 <input
                   id={roleId}
                   type="text"
+                  required
                   autoComplete="organization-title"
+                  maxLength={ADVISORY_APPLICATION_LIMITS.role}
                   placeholder="e.g. Associate Professor of Political Science"
                   value={values.role}
                   onChange={handleChange("role")}
                   className="contact-input"
                   aria-invalid={!!errors.role}
+                  aria-describedby={errors.role ? `${roleId}-error` : undefined}
                 />
-                {errors.role && <div className="contact-error">{errors.role}</div>}
+                {errors.role && <div className="contact-error" id={`${roleId}-error`}>{errors.role}</div>}
               </div>
             </div>
 
@@ -302,14 +282,17 @@ export default function ApplyClient() {
               <input
                 id={expertiseId}
                 type="text"
-                placeholder="e.g. Governance measurement · Comparative politics · Political methodology"
+                required
+                placeholder="e.g. Political event data · Accessibility · Source rights"
+                maxLength={ADVISORY_APPLICATION_LIMITS.expertiseArea}
                 value={values.expertiseArea}
                 onChange={handleChange("expertiseArea")}
                 className="contact-input"
                 aria-invalid={!!errors.expertiseArea}
+                aria-describedby={errors.expertiseArea ? `${expertiseId}-error` : undefined}
               />
               {errors.expertiseArea && (
-                <div className="contact-error">{errors.expertiseArea}</div>
+                <div className="contact-error" id={`${expertiseId}-error`}>{errors.expertiseArea}</div>
               )}
             </div>
 
@@ -319,14 +302,18 @@ export default function ApplyClient() {
               </FieldLabel>
               <textarea
                 id={experienceId}
-                placeholder="Your background in governance indices or comparative measurement, and why you'd like to review the Civica Index methodology."
+                required
+                placeholder="Describe the experience you would bring to the charter area you named and why Civica's work interests you."
+                minLength={ADVISORY_APPLICATION_LIMITS.experienceMin}
+                maxLength={ADVISORY_APPLICATION_LIMITS.experienceMax}
                 value={values.experience}
                 onChange={handleChange("experience")}
                 className="contact-textarea"
                 aria-invalid={!!errors.experience}
+                aria-describedby={errors.experience ? `${experienceId}-error` : undefined}
               />
               {errors.experience && (
-                <div className="contact-error">{errors.experience}</div>
+                <div className="contact-error" id={`${experienceId}-error`}>{errors.experience}</div>
               )}
             </div>
 
@@ -337,13 +324,14 @@ export default function ApplyClient() {
               <textarea
                 id={linksId}
                 placeholder="Publications, Google Scholar, ORCID, LinkedIn — one per line."
+                maxLength={ADVISORY_APPLICATION_LIMITS.links}
                 value={values.links}
                 onChange={handleChange("links")}
-                className="contact-textarea"
-                style={{ minHeight: "100px" }}
+                className="contact-textarea contact-textarea--compact"
                 aria-invalid={!!errors.links}
+                aria-describedby={errors.links ? `${linksId}-error` : undefined}
               />
-              {errors.links && <div className="contact-error">{errors.links}</div>}
+              {errors.links && <div className="contact-error" id={`${linksId}-error`}>{errors.links}</div>}
             </div>
 
             <div className="contact-field">
@@ -353,12 +341,14 @@ export default function ApplyClient() {
                 type="url"
                 inputMode="url"
                 placeholder="https:// — a link to your CV, scholar page, or personal site"
+                maxLength={ADVISORY_APPLICATION_LIMITS.cvUrl}
                 value={values.cvUrl}
                 onChange={handleChange("cvUrl")}
                 className="contact-input"
                 aria-invalid={!!errors.cvUrl}
+                aria-describedby={errors.cvUrl ? `${cvUrlId}-error` : undefined}
               />
-              {errors.cvUrl && <div className="contact-error">{errors.cvUrl}</div>}
+              {errors.cvUrl && <div className="contact-error" id={`${cvUrlId}-error`}>{errors.cvUrl}</div>}
               <p className="contact-field-hint">
                 We accept a link rather than a file upload. Paste a CV link, a
                 Google Scholar profile, or your institutional page.
@@ -371,12 +361,37 @@ export default function ApplyClient() {
               </div>
             )}
 
-            <p className="contact-field-hint contact-privacy-line">
-              Applications are stored privately and read only by the Civica team
-              for advisory-board review. See our{" "}
-              <Link href="/privacy">privacy notice</Link> for how we handle your
-              information.
-            </p>
+            <div className="contact-privacy-box">
+              <h2 className="contact-privacy-title">Application privacy</h2>
+              <p>{ADVISORY_APPLICATION_POLICY.purpose}</p>
+              <ul>
+                <li><strong>Fields:</strong> {ADVISORY_APPLICATION_POLICY.collectedFields.join(", ")}.</li>
+                <li><strong>Access:</strong> {ADVISORY_APPLICATION_POLICY.access}</li>
+                <li><strong>Retention:</strong> {ADVISORY_APPLICATION_POLICY.retention}</li>
+                <li><strong>Deletion:</strong> {ADVISORY_APPLICATION_POLICY.deletion}</li>
+                <li><strong>Security:</strong> {ADVISORY_APPLICATION_POLICY.security}</li>
+                <li><strong>Response:</strong> {ADVISORY_APPLICATION_POLICY.response}</li>
+              </ul>
+              <p>
+                Full details are in the <Link href="/privacy#applications">privacy notice</Link>. Policy version {ADVISORY_APPLICATION_POLICY.schemaVersion}, effective {ADVISORY_APPLICATION_POLICY.effectiveOn}.
+              </p>
+              <label className="contact-consent" htmlFor={consentId}>
+                <input
+                  id={consentId}
+                  type="checkbox"
+                  required
+                  checked={values.consent}
+                  onChange={(event) => {
+                    setValues((previous) => ({ ...previous, consent: event.target.checked }));
+                    if (errors.consent) setErrors((previous) => ({ ...previous, consent: undefined }));
+                  }}
+                  aria-invalid={!!errors.consent}
+                  aria-describedby={errors.consent ? `${consentId}-error` : undefined}
+                />
+                <span>I have read these terms and consent to this processing for my application.</span>
+              </label>
+              {errors.consent ? <div className="contact-error" id={`${consentId}-error`}>{errors.consent}</div> : null}
+            </div>
 
             <div className="contact-form-foot">
               <span className="contact-required-hint">* required</span>

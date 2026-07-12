@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 302
-- **Completed:** 127
-- **Remaining:** 175
-- **Progress:** 42.1%
-- **Priority mix:** P0 186 · P1 111 · P2 5
+- **Total tasks:** 303
+- **Completed:** 129
+- **Remaining:** 174
+- **Progress:** 42.6%
+- **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -248,6 +248,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-040** (P1) Stop editorial prose link rules from restyling canonical buttons. _Done when: anchor color rules in shared editorial scopes exclude `.btn` and button-derived classes, the `/civica-index` primary button renders canonical colors in both themes, and a regression check covers a button rendered inside `.editorial-section`._
 - [x] **EXP-041** (P0) Give `/governance-evidence` a design-system landing and flagship register. _Done when: visiting without a country shows a landing with hero treatment, explainer, and full country selection instead of a hardcoded default country; `?country=` deep links still resolve; the country view keeps its provenance and rights links; and light/dark plus desktop/mobile browser checks pass with no hardcoded values._
 - [x] **EXP-042** (P1) Name the backing source visibly on every rankings column. _Done when: each metric column header shows its source name beside the provenance dot, a short note explains the one-source-per-column rule and points to country-page reconciliation, a column whose cells mix sources surfaces a visible flag, and browser checks pass in both themes._
+- [x] **EXP-043** (P0) Restore the country-engraving disclosure after the reference-header redesign. _Done when: every country hero with art visibly carries the exact `Editorial engraving` label and linked `AI-assisted illustration` disclosure, and `npm run validate:editorial-illustrations` passes._
 
 ## Area 08 — Platform, Security, Performance, and Operations
 
@@ -318,7 +319,7 @@ Source: `plan/10-academic-governance-review-and-outreach.md`
 - [x] **GOV-004** (P1) Publish a detailed AI/model-use disclosure for research and editorial production. _Done when: it distinguishes code assistance, audits, classification, annotation proposals, illustration, prose, and final human responsibility; lists versioned systems where material; explains validation and limitations; no model is presented as a peer reviewer._
 - [x] **GOV-005** (P0) Define release, methodology-version, correction, retraction, and supersession authority. _Done when: policies name approvers, semantic version triggers, emergency correction process, historical preservation, DOI/version relationships, notice locations, and appeal/report channels; a tabletop scenario produces the expected artifacts._
 - [x] **GOV-006** (P0) Redefine the advisory board's remit and independence. _Done when: a public charter states purpose, expertise sought, advisory/nonendorsement status, term, workload, confidentiality/publicity, conflicts, compensation posture, removal/resignation, publication of names/reviews, and that board service does not automatically validate every Civica claim._
-- [ ] **GOV-007** (P0) Make the advisory-board application route operational, accessible, private, and honest. _Done when: route copy matches GOV-006; form delivery/acknowledgement/anti-spam/validation/error states work; consent, collected fields, retention, access, deletion, security, and response expectations are published; no placeholder roster implies appointed members._
+- [x] **GOV-007** (P0) Make the advisory-board application route operational, accessible, private, and honest. _Done when: route copy matches GOV-006; form delivery/acknowledgement/anti-spam/validation/error states work; consent, collected fields, retention, access, deletion, security, and response expectations are published; no placeholder roster implies appointed members._
 - [x] **GOV-008** (P0) Define reviewer roles and selection criteria before naming people. _Done when: separate criteria cover governance measurement, political event data, research-data curation/open science, accessibility, and legal/source rights; minimum expertise, independence, conflicts, geographic/method diversity, deliverable, and exclusion criteria are documented._
 - [x] **GOV-009** (P1) Build a public-evidence reviewer longlist without contacting anyone. _Done when: at least eight qualified candidates per core scholarly lane are recorded with current affiliation, relevant recent work/method contribution, public professional contact channel, fit rationale, conflicts/dependencies, geographic/method perspective, and source links; no private contact data is collected._
 - [x] **GOV-010** (P1) Rank a reviewer shortlist through a documented rubric. _Done when: scoring covers expertise, exact task fit, independence, conflicts, availability signal, diversity of methodological perspective, and communication burden; at least three alternates per lane remain; owner approval is queued before contact._

@@ -36,6 +36,8 @@ function isStatus(value: unknown): value is Status {
 interface StatusBody {
   status?: string;
   redirect?: string;
+  intent?: string;
+  confirm?: string;
 }
 
 async function readBody(
@@ -51,6 +53,8 @@ async function readBody(
         redirect: form.get("redirect")
           ? String(form.get("redirect"))
           : undefined,
+        intent: form.get("intent") ? String(form.get("intent")) : undefined,
+        confirm: form.get("confirm") ? String(form.get("confirm")) : undefined,
       },
     };
   }
@@ -69,6 +73,17 @@ export async function POST(
 
   const { id } = await params;
   const { body, isForm } = await readBody(request);
+
+  if (body.intent === "delete") {
+    if (body.confirm !== "delete") return NextResponse.json({ error: "deletion confirmation required" }, { status: 400 });
+    const deleted = await db
+      .delete(advisoryApplications)
+      .where(eq(advisoryApplications.id, id))
+      .returning({ id: advisoryApplications.id });
+    if (deleted.length === 0) return NextResponse.json({ error: "application not found" }, { status: 404 });
+    if (isForm) return NextResponse.redirect(new URL("/admin/advisory-applications", request.url), 303);
+    return NextResponse.json({ ok: true, id, deleted: true, reviewerId: auth.reviewerId });
+  }
 
   if (!isStatus(body.status)) {
     return NextResponse.json({ error: "invalid status" }, { status: 400 });
