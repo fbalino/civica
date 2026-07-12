@@ -22,6 +22,15 @@ interface ConstitutionReadingColumnProps {
    * cross-reference pane can surface them as one-click chips.
    */
   onActiveTopicsChange?: (topics: string[]) => void;
+  /**
+   * When `false`, the in-column outline nav is suppressed and only the reading
+   * body renders. The `/country/[slug]/constitution` tab sets this so the
+   * outline lives in the shared `<FactbookSidebar>` left rail instead — the
+   * same country search + sidebar + body geometry as the other two country
+   * tabs. Defaults to `true` so the standalone Constitution Explorer keeps its
+   * self-contained outline.
+   */
+  showOutline?: boolean;
 }
 
 /** Human year range for the metadata line. */
@@ -39,6 +48,7 @@ export function ConstitutionReadingColumn({
   sourceRetrievedAt,
   explorerHref,
   onActiveTopicsChange,
+  showOutline = true,
 }: ConstitutionReadingColumnProps) {
   const { sections, groups } = useMemo(
     () => buildArticleNav(constitution.articles),
@@ -149,8 +159,15 @@ export function ConstitutionReadingColumn({
         </div>
       </div>
 
-      <div className="constitution-reader-layout">
-        {/* In-column article nav — grouped by part where headings allow. */}
+      <div
+        className={`constitution-reader-layout${
+          showOutline ? "" : " constitution-reader-layout--no-outline"
+        }`}
+      >
+        {/* In-column article nav — grouped by part where headings allow.
+            Suppressed on the country tab, where the outline lives in the
+            shared <FactbookSidebar> left rail instead. */}
+        {showOutline ? (
         <nav
           className="constitution-reader-nav"
           aria-label={`${constitution.name} constitution outline`}
@@ -227,6 +244,7 @@ export function ConstitutionReadingColumn({
             })}
           </ol>
         </nav>
+        ) : null}
 
         {/* The reading column. */}
         <article className="constitution-reader-body">

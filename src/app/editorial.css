@@ -2408,6 +2408,13 @@ legend.editorial-filter-label {
   gap: var(--space-6);
   align-items: start;
 }
+/* Country-tab variant: the outline lives in the shared <FactbookSidebar> left
+   rail, so the reading body spans the full content column with no in-column
+   nav gutter. */
+.constitution-reader-layout--no-outline {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
 .constitution-reader-nav {
   position: sticky;
   top: 72px;
