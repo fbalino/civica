@@ -539,10 +539,10 @@
     {
       "artifactId": "rights-manifest-code",
       "role": "rights",
-      "bytes": 13829,
-      "sha256": "caf733f79bc7994d496e5627f8f247da2f0f72cf653a8d9eba51c04454ea5a85",
+      "bytes": 16767,
+      "sha256": "a1071ab37e61aaffd9604ec4092fa2eb22a7d9aefc3ad8d392e25851b5054d45",
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "773a72ac5eb850eb80374ebc5aa282a0c9645322ef07da2eb31ceed5002594a8"
+  "bundleSemanticSha256": "88705f0728b0908f184d3e036fb1d0fd2d55375a113673bcf10242e992758b87"
 }

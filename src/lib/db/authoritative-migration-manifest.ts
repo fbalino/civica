@@ -181,4 +181,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "ed1bc1179ddec1fe7ed40cf91629c6f5fcd0498eee8f0df4376c468aa53591a0",
     baseline: false,
   },
+  {
+    id: "0030_cute_namora",
+    path: "drizzle/authoritative/0030_cute_namora.sql",
+    sha256: "e46264cd7c4925b38adab616703c59e3a82fa458d42536fc73f72a8e2257ee13",
+    baseline: false,
+  },
 ] as const;

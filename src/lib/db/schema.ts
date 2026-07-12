@@ -38,7 +38,14 @@ import {
   foreignKey,
   check,
   primaryKey,
+  customType,
 } from "drizzle-orm/pg-core";
+
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
 
 export const jurisdictions = pgTable("jurisdictions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -363,6 +370,77 @@ export const constitutionTopicExcerpts = pgTable(
     index("idx_constitution_topic_excerpts_topic").on(table.topicKey),
     index("idx_constitution_topic_excerpts_jurisdiction").on(
       table.jurisdictionId,
+    ),
+  ],
+);
+
+/**
+ * Version-bound, passage-grain search and citation index for Constitute's
+ * English-language service representation. Superseded rows remain resolvable;
+ * only `is_current` rows enter public search.
+ */
+export const constitutionPassages = pgTable(
+  "constitution_passages",
+  {
+    passageId: text("passage_id").primaryKey(),
+    schemaVersion: text("schema_version").notNull(),
+    searchIndexVersion: text("search_index_version").notNull(),
+    constitutionId: uuid("constitution_id")
+      .references(() => constitutions.id, { onDelete: "restrict" })
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    sourceDocumentId: text("source_document_id").notNull(),
+    sourceSectionId: text("source_section_id").notNull(),
+    sectionOrder: integer("section_order").notNull(),
+    anchorId: text("anchor_id").notNull(),
+    headingLabel: text("heading_label"),
+    topicKeys: jsonb("topic_keys").$type<string[]>().notNull(),
+    plainText: text("plain_text").notNull(),
+    contentSha256: text("content_sha256").notNull(),
+    languageCode: text("language_code").notNull(),
+    languageBasis: text("language_basis").notNull(),
+    translationStatus: text("translation_status").notNull(),
+    originalLanguageCode: text("original_language_code"),
+    translator: text("translator"),
+    sourceId: text("source_id")
+      .references(() => sources.id, { onDelete: "restrict" })
+      .notNull(),
+    sourceUrl: text("source_url").notNull(),
+    retrievalUrl: text("retrieval_url").notNull(),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    isCurrent: boolean("is_current").notNull().default(true),
+    supersededAt: timestamp("superseded_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    searchVector: tsvector("search_vector")
+      .generatedAlwaysAs(
+        dsql`setweight(to_tsvector('english'::regconfig, coalesce("heading_label", '')), 'A') || setweight(to_tsvector('english'::regconfig, coalesce("plain_text", '')), 'B')`,
+      )
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_constitution_passages_current_section")
+      .on(table.constitutionId, table.sourceSectionId)
+      .where(dsql`${table.isCurrent} = true`),
+    index("idx_constitution_passages_search")
+      .using("gin", table.searchVector)
+      .where(dsql`${table.isCurrent} = true`),
+    index("idx_constitution_passages_topics")
+      .using("gin", table.topicKeys)
+      .where(dsql`${table.isCurrent} = true`),
+    index("idx_constitution_passages_jurisdiction").on(
+      table.jurisdictionId,
+      table.isCurrent,
+    ),
+    index("idx_constitution_passages_document_order").on(
+      table.constitutionId,
+      table.isCurrent,
+      table.sectionOrder,
+    ),
+    check(
+      "constitution_passages_contract_check",
+      dsql`${table.schemaVersion} = 'constitution-passage/v1' AND ${table.searchIndexVersion} = 'constitution-search-index/english-v1' AND ${table.passageId} ~ '^constitution-passage/sha256:[a-f0-9]{64}$' AND btrim(${table.sourceDocumentId}) <> '' AND btrim(${table.sourceSectionId}) <> '' AND ${table.sectionOrder} >= 0 AND ${table.anchorId} ~ '^sec-[A-Za-z0-9-]+$' AND jsonb_typeof(${table.topicKeys}) = 'array' AND btrim(${table.plainText}) <> '' AND ${table.contentSha256} ~ '^[a-f0-9]{64}$' AND ${table.languageCode} = 'en' AND ${table.languageBasis} = 'constitute-service-lang-parameter' AND ${table.translationStatus} = 'publisher-supplied-language-version-translation-status-unknown' AND ${table.originalLanguageCode} IS NULL AND ${table.translator} IS NULL AND ${table.sourceId} = 'constitute_project' AND ${table.sourceUrl} ~ '^https://www[.]constituteproject[.]org/constitution/' AND ${table.retrievalUrl} ~ '^https://www[.]constituteproject[.]org/service/html[?]' AND ((${table.isCurrent} = true AND ${table.supersededAt} IS NULL) OR (${table.isCurrent} = false AND ${table.supersededAt} IS NOT NULL))`,
     ),
   ],
 );

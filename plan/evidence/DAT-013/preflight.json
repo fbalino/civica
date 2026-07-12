@@ -1166,6 +1166,25 @@
         "sources": 56
       },
       "writesPerformed": 0
+    },
+    {
+      "id": "0030_cute_namora",
+      "artifact": "drizzle/authoritative/0030_cute_namora.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "e46264cd7c4925b38adab616703c59e3a82fa458d42536fc73f72a8e2257ee13",
+      "affectedRelations": [
+        "constitution_passages"
+      ],
+      "statementCount": 20,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0030_cute_namora-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0030_cute_namora --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "constitution_passages": "missing"
+      },
+      "writesPerformed": 0
     }
   ]
 }

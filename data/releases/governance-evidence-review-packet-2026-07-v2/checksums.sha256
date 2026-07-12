@@ -46,4 +46,4 @@ b214383d5294640f182c29c070d3dbc5d704e6cae53104cd3d81ea97f09dfc95  src/lib/ci/gov
 de469f2c7465b7bc3effac5dd006b06f2dcb7b1f46a1b0d182e0ff9fca1624e7  src/lib/ci/governance-evidence.ts
 3b120071672ac3e54c3ac8cc480585ffbe27c9a69cb5866cd6b09cb3ac9e8287  src/lib/ci/series-provenance.ts
 cda486edf6e955a4d223a04bb16fc623c82f4ef450607f43d893bb047ced1778  src/lib/db/queries-governance-evidence.ts
-caf733f79bc7994d496e5627f8f247da2f0f72cf653a8d9eba51c04454ea5a85  src/lib/rights/manifest.ts
+a1071ab37e61aaffd9604ec4092fa2eb22a7d9aefc3ad8d392e25851b5054d45  src/lib/rights/manifest.ts

@@ -64,7 +64,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 
 ## Database
 
-- Schema: `src/lib/db/schema.ts` — **76 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **77 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -137,7 +137,7 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 
 ## Research evidence retention
 
-- `research-evidence-retention/v1` protects the registered evidence-bearing relations with
+- `research-evidence-retention/v1` protects 35 registered evidence-bearing relations with
   synchronous UPDATE/DELETE history triggers. The ledger is append-only and
   records complete before/after state, reason, actor, operation, and time.
 - Pulse negative classifications remain in `raw_events` with a terminal

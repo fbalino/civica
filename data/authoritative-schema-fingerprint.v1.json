@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T11:15:07.748Z",
-  "sha256": "c9394bb5117cc317a599da21847fd11c0621c6f51fb30670b983ded61a5bffe7",
+  "generatedAt": "2026-07-12T16:11:06.727Z",
+  "sha256": "e71419b97a4585fb5c993645ce732240271a5f73d29da32c252c644e21b5e7a4",
   "schema": {
     "columns": [
       {
@@ -1956,6 +1956,240 @@
         "default": null,
         "nullable": "NO",
         "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "passage_id",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "search_index_version",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "constitution_id",
+        "type": "uuid",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "source_document_id",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "source_section_id",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "int4",
+        "name": "section_order",
+        "type": "integer",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "anchor_id",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "heading_label",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "jsonb",
+        "name": "topic_keys",
+        "type": "jsonb",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "plain_text",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "content_sha256",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "language_code",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "language_basis",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "translation_status",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "original_language_code",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "translator",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "retrieval_url",
+        "type": "text",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 21
+      },
+      {
+        "udt": "timestamp",
+        "name": "retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 22
+      },
+      {
+        "udt": "bool",
+        "name": "is_current",
+        "type": "boolean",
+        "table": "constitution_passages",
+        "default": "true",
+        "nullable": "NO",
+        "position": 23
+      },
+      {
+        "udt": "timestamp",
+        "name": "superseded_at",
+        "type": "timestamp without time zone",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "YES",
+        "position": 24
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "constitution_passages",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 25
+      },
+      {
+        "udt": "tsvector",
+        "name": "search_vector",
+        "type": "tsvector",
+        "table": "constitution_passages",
+        "default": null,
+        "nullable": "NO",
+        "position": 26
       },
       {
         "udt": "uuid",
@@ -9997,6 +10231,36 @@
         "definition": "CREATE UNIQUE INDEX idx_conditions_unique ON public.civica_conditions_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id)"
       },
       {
+        "name": "constitution_passages_pkey",
+        "table": "constitution_passages",
+        "definition": "CREATE UNIQUE INDEX constitution_passages_pkey ON public.constitution_passages USING btree (passage_id)"
+      },
+      {
+        "name": "idx_constitution_passages_current_section",
+        "table": "constitution_passages",
+        "definition": "CREATE UNIQUE INDEX idx_constitution_passages_current_section ON public.constitution_passages USING btree (constitution_id, source_section_id) WHERE (is_current = true)"
+      },
+      {
+        "name": "idx_constitution_passages_document_order",
+        "table": "constitution_passages",
+        "definition": "CREATE INDEX idx_constitution_passages_document_order ON public.constitution_passages USING btree (constitution_id, is_current, section_order)"
+      },
+      {
+        "name": "idx_constitution_passages_jurisdiction",
+        "table": "constitution_passages",
+        "definition": "CREATE INDEX idx_constitution_passages_jurisdiction ON public.constitution_passages USING btree (jurisdiction_id, is_current)"
+      },
+      {
+        "name": "idx_constitution_passages_search",
+        "table": "constitution_passages",
+        "definition": "CREATE INDEX idx_constitution_passages_search ON public.constitution_passages USING gin (search_vector) WHERE (is_current = true)"
+      },
+      {
+        "name": "idx_constitution_passages_topics",
+        "table": "constitution_passages",
+        "definition": "CREATE INDEX idx_constitution_passages_topics ON public.constitution_passages USING gin (topic_keys) WHERE (is_current = true)"
+      },
+      {
         "name": "constitution_topic_excerpts_pkey",
         "table": "constitution_topic_excerpts",
         "definition": "CREATE UNIQUE INDEX constitution_topic_excerpts_pkey ON public.constitution_topic_excerpts USING btree (id)"
@@ -11089,6 +11353,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.ci_research_panel_rows_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF EXISTS (\n    SELECT 1 FROM public.ci_research_panel_releases\n    WHERE id = COALESCE(OLD.release_id, NEW.release_id) AND status = 'complete'\n  ) THEN\n    RAISE EXCEPTION 'completed Civica Index research panel rows are immutable';\n  END IF;\n  RETURN COALESCE(NEW, OLD);\nEND;\n$function$\n"
       },
       {
+        "name": "civica_capture_constitution_passage_history",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_constitution_passage_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text := COALESCE(after_row->>'passage_id', before_row->>'passage_id');\nBEGIN\n  IF evidence_id IS NULL OR evidence_id !~ '^constitution-passage/sha256:[a-f0-9]{64}$' THEN\n    RAISE EXCEPTION 'constitution passage history requires canonical passage_id';\n  END IF;\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    lower(TG_OP) || '_retained_by_atl_009', current_user\n  );\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_capture_research_evidence_history",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_research_evidence_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text;\n  evidence_actor text;\n  evidence_reason text;\nBEGIN\n  evidence_id := COALESCE(after_row->>'id', before_row->>'id', md5(before_row::text));\n  evidence_actor := COALESCE(\n    NULLIF(after_row->>'reviewer_id', ''),\n    NULLIF(after_row->>'actor_id', ''),\n    NULLIF(before_row->>'reviewer_id', ''),\n    current_user\n  );\n  evidence_reason := COALESCE(\n    NULLIF(after_row->>'status_reason', ''),\n    NULLIF(after_row->>'review_notes', ''),\n    NULLIF(after_row->>'disposition', ''),\n    NULLIF(after_row->>'classification_reason', ''),\n    NULLIF(before_row->>'status_reason', ''),\n    lower(TG_OP) || '_retained_by_dat_016'\n  );\n\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    evidence_reason, evidence_actor\n  );\n\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -11491,6 +11760,11 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON civica_conditions_scores FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "constitution_passages_dat_016_retain_mutation",
+        "table": "constitution_passages",
+        "definition": "CREATE TRIGGER constitution_passages_dat_016_retain_mutation BEFORE DELETE OR UPDATE ON constitution_passages FOR EACH ROW EXECUTE FUNCTION civica_capture_constitution_passage_history()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "constitution_topic_excerpts",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON constitution_topic_excerpts FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -11890,6 +12164,11 @@
       {
         "kind": "r",
         "name": "civica_conditions_scores",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "constitution_passages",
         "definition": null
       },
       {
@@ -12477,6 +12756,36 @@
         "type": "f",
         "table": "civica_conditions_scores",
         "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "constitution_passages_constitution_id_constitutions_id_fk",
+        "type": "f",
+        "table": "constitution_passages",
+        "definition": "FOREIGN KEY (constitution_id) REFERENCES constitutions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "constitution_passages_contract_check",
+        "type": "c",
+        "table": "constitution_passages",
+        "definition": "CHECK (schema_version = 'constitution-passage/v1'::text AND search_index_version = 'constitution-search-index/english-v1'::text AND passage_id ~ '^constitution-passage/sha256:[a-f0-9]{64}$'::text AND btrim(source_document_id) <> ''::text AND btrim(source_section_id) <> ''::text AND section_order >= 0 AND anchor_id ~ '^sec-[A-Za-z0-9-]+$'::text AND jsonb_typeof(topic_keys) = 'array'::text AND btrim(plain_text) <> ''::text AND content_sha256 ~ '^[a-f0-9]{64}$'::text AND language_code = 'en'::text AND language_basis = 'constitute-service-lang-parameter'::text AND translation_status = 'publisher-supplied-language-version-translation-status-unknown'::text AND original_language_code IS NULL AND translator IS NULL AND source_id = 'constitute_project'::text AND source_url ~ '^https://www[.]constituteproject[.]org/constitution/'::text AND retrieval_url ~ '^https://www[.]constituteproject[.]org/service/html[?]'::text AND (is_current = true AND superseded_at IS NULL OR is_current = false AND superseded_at IS NOT NULL))"
+      },
+      {
+        "name": "constitution_passages_jurisdiction_id_jurisdictions_id_fk",
+        "type": "f",
+        "table": "constitution_passages",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "constitution_passages_pkey",
+        "type": "p",
+        "table": "constitution_passages",
+        "definition": "PRIMARY KEY (passage_id)"
+      },
+      {
+        "name": "constitution_passages_source_id_sources_id_fk",
+        "type": "f",
+        "table": "constitution_passages",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE RESTRICT"
       },
       {
         "name": "constitution_topic_excerpts_constitution_id_constitutions_id_fk",

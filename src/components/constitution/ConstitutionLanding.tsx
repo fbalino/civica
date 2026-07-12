@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import type { IndexedConstitutionCountry } from "@/lib/db/queries-constitution";
+import { ConstitutionSearchForm } from "./ConstitutionSearchForm";
 
 interface FeaturedTopic {
   key: string;
@@ -65,6 +66,10 @@ export function ConstitutionLanding({
         structure of the courts — so you can trace how each one answers the same
         question.
       </p>
+
+      <section className="constitution-landing-section constitution-landing-search">
+        <ConstitutionSearchForm />
+      </section>
 
       <section className="constitution-landing-section">
         <h2 className="constitution-landing-heading">Start with a country</h2>

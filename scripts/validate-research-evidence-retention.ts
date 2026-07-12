@@ -52,6 +52,10 @@ const informationEnvironmentMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0029_whole_dazzler.sql"),
   "utf8",
 );
+const constitutionPassageMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0030_cute_namora.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -89,7 +93,10 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !reviewSlaMigration.includes(`ON ${relation}`) &&
     !deltaHistoryMigration.includes(`ON ${relation}`) &&
     !absorptionMigration.includes(`ON ${relation}`) &&
-    !informationEnvironmentMigration.includes(`ON ${relation}`)
+    !informationEnvironmentMigration.includes(`ON ${relation}`) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
+      constitutionPassageMigration,
+    )
   ) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
@@ -226,8 +233,16 @@ async function main() {
         to_regclass('research_evidence_history') IS NOT NULL AS history,
         to_regclass('pulse_evaluation_evidence') IS NOT NULL AS pulse_view,
         to_regclass('reconciliation_evaluation_evidence') IS NOT NULL AS reconciliation_view`,
-      sql`SELECT count(*)::int AS n FROM pg_trigger
-          WHERE tgname = 'dat_016_retain_mutation' AND NOT tgisinternal`,
+      sql`SELECT count(DISTINCT c.relname)::int AS n
+          FROM pg_trigger t
+          JOIN pg_class c ON c.oid = t.tgrelid
+          JOIN pg_proc p ON p.oid = t.tgfoid
+          WHERE NOT t.tgisinternal
+            AND c.relname = ANY(${[...RETAINED_EVIDENCE_RELATIONS]})
+            AND p.proname IN (
+              'civica_capture_research_evidence_history',
+              'civica_capture_constitution_passage_history'
+            )`,
       sql`SELECT count(*)::int AS n FROM pg_trigger
           WHERE tgname = 'research_evidence_history_append_only' AND NOT tgisinternal`,
       sql`SELECT count(*)::int AS n

@@ -53,6 +53,7 @@ import { db } from "../src/lib/db";
 import { jurisdictions, constitutions } from "../src/lib/db/schema";
 import {
   parseConstitutionHtml,
+  replaceCurrentConstitutionPassages,
   replaceTopicExcerpts,
   type StructuredArticle,
   type ParsedSection,
@@ -127,14 +128,17 @@ async function main(): Promise<void> {
       jurisdictionId: constitutions.jurisdictionId,
       slug: jurisdictions.slug,
       name: jurisdictions.name,
+      sourceDocumentId: constitutions.constituteProjectId,
+      lastFetched: constitutions.lastFetched,
     })
     .from(constitutions)
-    .innerJoin(jurisdictions, eq(jurisdictions.id, constitutions.jurisdictionId));
+    .innerJoin(
+      jurisdictions,
+      eq(jurisdictions.id, constitutions.jurisdictionId),
+    );
 
   const wantSlugs = args.slugs ? new Set(args.slugs) : null;
-  const targets = directory.filter(
-    (r) => !wantSlugs || wantSlugs.has(r.slug),
-  );
+  const targets = directory.filter((r) => !wantSlugs || wantSlugs.has(r.slug));
 
   if (wantSlugs) {
     const found = new Set(targets.map((t) => t.slug));
@@ -184,7 +188,9 @@ async function main(): Promise<void> {
       parsed = parseConstitutionHtml(heavy.fullTextHtml);
     } catch (err) {
       const reason = (err as Error)?.message ?? String(err);
-      console.log(`[${i + 1}/${targets.length}] ${t.name} (${t.slug}) — PARSE FAILED: ${reason}`);
+      console.log(
+        `[${i + 1}/${targets.length}] ${t.name} (${t.slug}) — PARSE FAILED: ${reason}`,
+      );
       continue;
     }
 
@@ -232,6 +238,18 @@ async function main(): Promise<void> {
       t.constitutionId,
       parsed,
     );
+    if (!t.sourceDocumentId || !t.lastFetched) {
+      throw new Error(
+        `${t.slug} lacks source document identity or retrieval time; passage index fails closed`,
+      );
+    }
+    await replaceCurrentConstitutionPassages(db, {
+      constitutionId: t.constitutionId,
+      jurisdictionId: t.jurisdictionId,
+      sourceDocumentId: t.sourceDocumentId,
+      retrievedAt: t.lastFetched,
+      articles: storedArticles,
+    });
     excerptsTotal += excerptRows;
     updated++;
     console.log(`${line}  ✓ ${excerptRows} excerpts`);
@@ -254,9 +272,13 @@ async function main(): Promise<void> {
       `  ⚠ DRIFT WARNING: ${driftEntriesTotal} parsed entries across ${driftConstitutions} constitution(s) embed nested class="section" markup (expected 0)`,
     );
   } else {
-    console.log("  Nested-section drift guard: 0 entries embed class=\"section\" ✓");
+    console.log(
+      '  Nested-section drift guard: 0 entries embed class="section" ✓',
+    );
   }
-  console.log("  (sources.last_sync_at intentionally NOT stamped — local re-parse.)");
+  console.log(
+    "  (sources.last_sync_at intentionally NOT stamped — local re-parse.)",
+  );
 }
 
 main()

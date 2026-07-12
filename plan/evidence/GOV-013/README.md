@@ -19,6 +19,9 @@ Every linked path is read during generation, byte-counted, and SHA-256 hashed. T
 - `node plan/tools/validate-master-plan.mjs`
 - `npm run build`
 
-Semantic hash: `1162edcd1bcd1bf2b03af339fa3899d6299dbc15821fbdb9a073f560a6099c6a`.
+Semantic hash: `a325ea2a69497f8f311b3253698a1504e6f4eab87c71210af726651de4f8866b`
+(the packet reproduces from current code; its hash advanced as the rights
+manifest and G2 bundle it inventories legitimately changed — most recently the
+ATL-009 Constitute rights record).
 
 The packet is ready to review, but no review or endorsement has occurred and no reviewer was contacted.

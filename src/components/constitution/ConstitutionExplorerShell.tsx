@@ -67,6 +67,7 @@ export function ConstitutionExplorerShell({
           activeArticleTopics={activeArticleTopics}
           hasPeers={hasPeers}
           initialTopic={initialTopic}
+          sourceRetrievedAt={sourceRetrievedAt}
         />
       </div>
     </div>

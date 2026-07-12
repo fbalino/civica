@@ -2191,8 +2191,8 @@ legend.editorial-filter-label {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: calc(var(--space-8) - var(--space-2));
+  height: calc(var(--space-8) - var(--space-2));
   padding: 0;
   border: none;
   background: transparent;
@@ -2203,6 +2203,22 @@ legend.editorial-filter-label {
 .constitution-country-chip__x:hover {
   color: var(--color-accent);
   background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+.constitution-country-chip__x:focus-visible,
+.constitution-add__trigger:focus-visible,
+.constitution-add__option:focus-visible,
+.constitution-reader-nav-toggle:focus-visible,
+.constitution-reader-nav-part:focus-visible,
+.constitution-reader-nav-article:focus-visible,
+.constitution-topic-chip:focus-visible,
+.constitution-xref-change:focus-visible,
+.constitution-topic-category-head:focus-visible,
+.constitution-topic-option:focus-visible,
+.constitution-xref-add:focus-visible,
+.constitution-xref-excerpt-meta a:focus-visible,
+.constitution-search-result a:focus-visible {
+  outline: var(--space-1) solid var(--color-accent);
+  outline-offset: var(--space-1);
 }
 
 .constitution-add {
@@ -2295,6 +2311,10 @@ legend.editorial-filter-label {
 }
 .constitution-add__option:hover {
   background: var(--color-card-hover-bg);
+}
+.constitution-add__option.is-active {
+  background: var(--color-card-hover-bg);
+  color: var(--color-accent);
 }
 .constitution-add__option:disabled {
   cursor: default;
@@ -2405,6 +2425,9 @@ legend.editorial-filter-label {
   color: var(--color-text-40);
   margin-bottom: var(--space-3);
 }
+.constitution-reader-nav-toggle {
+  display: none;
+}
 .constitution-reader-nav-list {
   list-style: none;
   margin: 0;
@@ -2465,6 +2488,13 @@ legend.editorial-filter-label {
 }
 .constitution-section {
   scroll-margin-top: 88px;
+}
+.constitution-section:focus {
+  outline: none;
+}
+.constitution-section:focus-visible {
+  outline: var(--space-1) solid var(--color-accent);
+  outline-offset: var(--space-3);
 }
 .constitution-section--part {
   margin-top: var(--space-7);
@@ -2707,6 +2737,10 @@ legend.editorial-filter-label {
   color: var(--color-accent);
   font-weight: 500;
 }
+.constitution-topic-option.is-active {
+  background: var(--color-card-hover-bg);
+  color: var(--color-accent);
+}
 .constitution-topic-empty {
   padding: var(--space-4) var(--space-3);
   font-family: var(--font-body);
@@ -2724,6 +2758,9 @@ legend.editorial-filter-label {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+.constitution-xref-skeleton {
+  height: calc(var(--space-9) + var(--space-7));
 }
 .constitution-xref-card {
   border: 1px solid var(--color-card-border);
@@ -2831,6 +2868,40 @@ a.constitution-xref-card-country:hover {
   font-size: var(--text-13);
   color: var(--color-text-40);
   margin: 0;
+}
+.constitution-xref-error {
+  margin-bottom: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.constitution-xref-excerpt-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: var(--leading-normal);
+  color: var(--color-text-40);
+}
+.constitution-xref-excerpt-source {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.constitution-xref-excerpt-meta a {
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.constitution-xref-excerpt-meta a:hover {
+  text-decoration: underline;
+}
+.constitution-xref-excerpt .cite-accordion {
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
 }
 .constitution-xref-notable {
   margin-top: var(--space-3);
@@ -2943,6 +3014,230 @@ a.constitution-xref-card-country:hover {
   gap: var(--space-2);
 }
 
+/* ── Cross-corpus constitutional text search ─────────────────────── */
+.constitution-landing-search {
+  max-width: calc(var(--space-9) * 10);
+  padding: var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+.constitution-search-form__label {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  color: var(--color-text-primary);
+}
+.constitution-search-form__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+.constitution-search-form__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-search);
+  background: var(--color-page-bg);
+}
+.constitution-search-form__field:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 var(--space-1)
+    color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.constitution-search-form__icon {
+  width: var(--space-5);
+  height: var(--space-5);
+  flex: 0 0 auto;
+  color: var(--color-text-40);
+}
+.constitution-search-form__field input {
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--space-8) - var(--space-2));
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+}
+.constitution-search-form__field input::placeholder {
+  color: var(--color-text-40);
+}
+.constitution-search-form__filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.constitution-search-form__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.constitution-search-form__filter input {
+  min-height: calc(var(--space-8) - var(--space-2));
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-search);
+  outline: 0;
+  background: var(--color-page-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  letter-spacing: var(--tracking-normal);
+  text-transform: none;
+}
+.constitution-search-form__filter input:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 var(--space-1)
+    color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.constitution-search-form__hint {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+  color: var(--color-text-40);
+}
+.constitution-search-form__catalog-warning {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.constitution-search-page-header {
+  margin-bottom: var(--space-7);
+}
+.constitution-search-page-header .constitution-search-form {
+  margin-top: var(--space-6);
+  max-width: calc(var(--space-9) * 10);
+}
+.constitution-search-results__summary {
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-card-border);
+}
+.constitution-search-results__summary h2 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-primary);
+}
+.constitution-search-results__summary p,
+.constitution-search-results__limit-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-50);
+}
+.constitution-search-results__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.constitution-search-result {
+  padding: var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+.constitution-search-result__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.constitution-search-result__flag {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-top: var(--space-1);
+}
+.constitution-search-result__identity {
+  flex: 1;
+  min-width: 0;
+}
+.constitution-search-result__country {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.constitution-search-result__section {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-50);
+}
+.constitution-search-result__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.constitution-search-result__excerpt {
+  margin: var(--space-5) 0;
+  padding-left: var(--space-5);
+  border-left: var(--space-1) solid var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+}
+.constitution-search-result__excerpt mark {
+  padding: 0 var(--space-1);
+  background: color-mix(in oklab, var(--color-status-warning) 28%, transparent);
+  color: inherit;
+}
+.constitution-search-result__context {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-card-border);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: var(--leading-normal);
+  color: var(--color-text-40);
+}
+.constitution-search-result__source {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.constitution-search-result__source a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.constitution-search-result__source a:hover {
+  text-decoration: underline;
+}
+.constitution-search-result__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+.constitution-search-results__limit-note {
+  margin-top: var(--space-5);
+}
+
 /* ── Responsive: collapse to a single column ────────────────────────── */
 @media (max-width: 1100px) {
   /* Stack the compare pane beneath the reading column (which keeps its own
@@ -2970,6 +3265,68 @@ a.constitution-xref-card-country:hover {
     margin-bottom: var(--space-5);
     padding-bottom: var(--space-5);
     border-bottom: 1px solid var(--color-card-border);
+  }
+  .constitution-reader-nav-title {
+    display: none;
+  }
+  .constitution-reader-nav-toggle {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: calc(var(--space-8) - var(--space-2));
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    background: var(--color-card-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-13);
+    text-align: left;
+    cursor: pointer;
+  }
+  .constitution-reader-nav-current {
+    overflow: hidden;
+    color: var(--color-text-50);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .constitution-reader-nav-toggle-icon {
+    transition: transform var(--motion-fast) var(--motion-ease-out);
+  }
+  .constitution-reader-nav-toggle[aria-expanded="true"]
+    .constitution-reader-nav-toggle-icon {
+    transform: rotate(180deg);
+  }
+  .constitution-reader-nav-list[data-mobile-open="false"] {
+    display: none;
+  }
+  .constitution-reader-nav-list {
+    margin-top: var(--space-3);
+  }
+  .constitution-reader-nav-part,
+  .constitution-reader-nav-article,
+  .constitution-topic-category-head,
+  .constitution-topic-option,
+  .constitution-add__option {
+    min-height: calc(var(--space-8) - var(--space-2));
+  }
+  .constitution-search-form__row,
+  .constitution-search-form__filters {
+    grid-template-columns: 1fr;
+  }
+  .constitution-search-form__row .btn {
+    width: 100%;
+  }
+  .constitution-search-result {
+    padding: var(--space-5);
+  }
+  .constitution-search-result__header {
+    flex-wrap: wrap;
+  }
+  .constitution-search-result__context {
+    flex-direction: column;
   }
   .constitution-page-title-sub {
     display: block;

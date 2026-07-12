@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { SourceDot } from "@/components/SourceDot";
@@ -66,18 +66,47 @@ export function ConstitutionReadingColumn({
   }, [sections]);
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
+  const [outlineOpen, setOutlineOpen] = useState(false);
+  const outlineId = useId();
+
+  const activeLabel = useMemo(() => {
+    for (const group of groups) {
+      if (active === group.id) return group.label;
+      const entry = group.entries.find((candidate) => candidate.id === active);
+      if (entry) return entry.label;
+    }
+    return "Browse sections";
+  }, [active, groups]);
 
   useEffect(() => {
     if (!onActiveTopicsChange) return;
     onActiveTopicsChange(topicsByDomId.get(active) ?? []);
   }, [active, topicsByDomId, onActiveTopicsChange]);
 
+  useEffect(() => {
+    const focusHashTarget = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id || !sectionIds.includes(id)) return;
+      const target = document.getElementById(id);
+      if (!(target instanceof HTMLElement)) return;
+      target.focus({ preventScroll: true });
+    };
+    focusHashTarget();
+    window.addEventListener("hashchange", focusHashTarget);
+    return () => window.removeEventListener("hashchange", focusHashTarget);
+  }, [sectionIds]);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - (56 + 16);
-    window.scrollTo({ top, behavior: "smooth" });
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
     history.replaceState(null, "", `#${id}`);
+    if (el instanceof HTMLElement) el.focus({ preventScroll: true });
+    setOutlineOpen(false);
   };
 
   const toggleGroup = (id: string) =>
@@ -127,7 +156,26 @@ export function ConstitutionReadingColumn({
           aria-label={`${constitution.name} constitution outline`}
         >
           <div className="constitution-reader-nav-title">Outline</div>
-          <ol className="constitution-reader-nav-list">
+          <button
+            type="button"
+            className="constitution-reader-nav-toggle"
+            aria-expanded={outlineOpen}
+            aria-controls={outlineId}
+            onClick={() => setOutlineOpen((value) => !value)}
+          >
+            <span>Outline</span>
+            <span className="constitution-reader-nav-current">
+              {activeLabel}
+            </span>
+            <span className="constitution-reader-nav-toggle-icon" aria-hidden>
+              ↓
+            </span>
+          </button>
+          <ol
+            id={outlineId}
+            className="constitution-reader-nav-list"
+            data-mobile-open={outlineOpen ? "true" : "false"}
+          >
             {groups.map((group) => {
               const isSingleGroup = groups.length === 1;
               const expanded = isSingleGroup || openGroups.has(group.id);
@@ -140,15 +188,22 @@ export function ConstitutionReadingColumn({
                       active === group.id || groupActive ? " is-active" : ""
                     }`}
                     aria-expanded={expanded}
+                    aria-controls={`${outlineId}-${group.id}`}
                     onClick={() => {
-                      if (!isSingleGroup) toggleGroup(group.id);
-                      scrollTo(group.entries[0]?.id ?? group.id);
+                      if (isSingleGroup) {
+                        scrollTo(group.entries[0]?.id ?? group.id);
+                      } else {
+                        toggleGroup(group.id);
+                      }
                     }}
                   >
                     {group.label}
                   </button>
                   {expanded && group.entries.length > 0 ? (
-                    <ol className="constitution-reader-nav-articles">
+                    <ol
+                      id={`${outlineId}-${group.id}`}
+                      className="constitution-reader-nav-articles"
+                    >
                       {group.entries.map((entry) => (
                         <li key={entry.id}>
                           <a
@@ -179,6 +234,7 @@ export function ConstitutionReadingColumn({
             <section
               key={section.domId}
               id={section.domId}
+              tabIndex={-1}
               className={`constitution-section${
                 section.partId ? " constitution-section--part" : ""
               }`}

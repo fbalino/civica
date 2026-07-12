@@ -41,12 +41,13 @@ const verified = (
   derivatives: boolean,
   attributionRequired: boolean,
   restrictions: readonly string[] = [],
+  reviewedAt: string = VERIFIED_AT,
 ): SourceRightsRecord => ({
   sourceId,
   licenseId,
   termsUrl,
   reviewStatus: "verified",
-  reviewedAt: VERIFIED_AT,
+  reviewedAt,
   publicExport,
   commercialUse,
   derivatives,
@@ -56,6 +57,23 @@ const verified = (
 });
 
 const VERIFIED_SOURCE_RIGHTS: Readonly<Record<string, SourceRightsRecord>> = {
+  constitute_project: verified(
+    "constitute_project",
+    "CC-BY-NC-3.0",
+    "https://www.constituteproject.org/content/terms",
+    "non-commercial-only",
+    false,
+    true,
+    true,
+    [
+      "Interactive display is permitted only for a non-commercial, no-fee deployment",
+      "Attribute Constitute and preserve the CC BY-NC 3.0 notice",
+      "Commercial use and charging a fee are prohibited by the publisher terms",
+      "Bulk constitution-text export remains blocked by Civica policy",
+      "Official license statement: https://www.constituteproject.org/content/about?lang=e",
+    ],
+    "2026-07-12",
+  ),
   cia_factbook: verified(
     "cia_factbook",
     "US-PUBLIC-DOMAIN",
@@ -194,9 +212,31 @@ export interface ProductRightsRecord {
   fields: readonly ProductFieldRights[];
   reason: string;
   requiresDerivationVersions: boolean;
+  interactiveDisplay?: "allowed-non-commercial" | "blocked";
 }
 
 export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
+  {
+    productId: "constitution-search-display-v1",
+    routeOrArtifact: "/api/constitution/search",
+    publicBulkExport: "blocked",
+    interactiveDisplay: "allowed-non-commercial",
+    fields: [
+      {
+        fieldPattern: "data[].passage.highlightSegments",
+        lineage: "source-row",
+        exportRule: "blocked",
+      },
+      {
+        fieldPattern: "data[].provenance|data[].citationUrl|corpus|rights",
+        lineage: "civica-derived",
+        exportRule: "blocked",
+      },
+    ],
+    reason:
+      "Constitute text may be shown only as bounded, attributed interactive excerpts on a non-commercial, no-fee deployment. Bulk export and unrestricted corpus access remain blocked.",
+    requiresDerivationVersions: true,
+  },
   {
     productId: "election-qualified-export-v1",
     routeOrArtifact: "/api/v1/elections?format=json|csv",
@@ -396,6 +436,64 @@ export interface ExportRightsDecision {
   productId: string;
   blockedSources: readonly string[];
   reason: string;
+}
+
+export interface InteractiveDisplayRightsDecision {
+  allowed: boolean;
+  productId: string;
+  sourceId: string;
+  reason: string;
+}
+
+export function evaluateInteractiveDisplay(
+  productId: string,
+  sourceId: string,
+  deployment: { commercial: boolean; feeBearing: boolean },
+): InteractiveDisplayRightsDecision {
+  const product = PRODUCT_RIGHTS.find((row) => row.productId === productId);
+  const source = sourceRights(sourceId);
+  if (!product || product.interactiveDisplay !== "allowed-non-commercial") {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason: "Product has no verified interactive-display permission.",
+    };
+  }
+  if (!source || source.reviewStatus !== "verified") {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason: "Source terms have not completed verification.",
+    };
+  }
+  if (
+    source.publicExport !== "non-commercial-only" ||
+    source.commercialUse !== false
+  ) {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason: "Source rights do not match the non-commercial display contract.",
+    };
+  }
+  if (deployment.commercial || deployment.feeBearing) {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason:
+        "Constitution display is suspended on commercial or fee-bearing deployments.",
+    };
+  }
+  return {
+    allowed: true,
+    productId,
+    sourceId,
+    reason: "Verified non-commercial interactive display.",
+  };
 }
 
 export function evaluatePublicExport(

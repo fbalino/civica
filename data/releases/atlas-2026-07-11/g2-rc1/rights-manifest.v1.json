@@ -134,18 +134,21 @@
     },
     {
       "sourceId": "constitute_project",
-      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
-      "termsUrl": "https://www.constituteproject.org/service/",
-      "reviewStatus": "pending",
-      "reviewedAt": null,
+      "licenseId": "CC-BY-NC-3.0",
+      "termsUrl": "https://www.constituteproject.org/content/terms",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-12",
       "publicExport": "non-commercial-only",
       "commercialUse": false,
-      "derivatives": null,
-      "attributionRequired": null,
+      "derivatives": true,
+      "attributionRequired": true,
       "shareAlikeRequired": false,
       "restrictions": [
-        "Source-specific terms have not completed DAT-003 verification",
-        "Bulk export remains blocked until the terms record is verified"
+        "Interactive display is permitted only for a non-commercial, no-fee deployment",
+        "Attribute Constitute and preserve the CC BY-NC 3.0 notice",
+        "Commercial use and charging a fee are prohibited by the publisher terms",
+        "Bulk constitution-text export remains blocked by Civica policy",
+        "Official license statement: https://www.constituteproject.org/content/about?lang=e"
       ]
     },
     {
@@ -694,6 +697,26 @@
     }
   ],
   "products": [
+    {
+      "productId": "constitution-search-display-v1",
+      "routeOrArtifact": "/api/constitution/search",
+      "publicBulkExport": "blocked",
+      "interactiveDisplay": "allowed-non-commercial",
+      "fields": [
+        {
+          "fieldPattern": "data[].passage.highlightSegments",
+          "lineage": "source-row",
+          "exportRule": "blocked"
+        },
+        {
+          "fieldPattern": "data[].provenance|data[].citationUrl|corpus|rights",
+          "lineage": "civica-derived",
+          "exportRule": "blocked"
+        }
+      ],
+      "reason": "Constitute text may be shown only as bounded, attributed interactive excerpts on a non-commercial, no-fee deployment. Bulk export and unrestricted corpus access remain blocked.",
+      "requiresDerivationVersions": true
+    },
     {
       "productId": "election-qualified-export-v1",
       "routeOrArtifact": "/api/v1/elections?format=json|csv",

@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "atl-009-constitution-corpus-audit/v1",
+  "auditDate": "2026-07-12",
+  "mode": "read-only-live-database",
+  "featureState": "not_applied",
+  "corpus": {
+    "documents": 186,
+    "jurisdictions": 186,
+    "structuredSections": 96127,
+    "topicExcerpts": 30537,
+    "topicKeys": 329,
+    "jurisdictionCatalog": 253,
+    "sovereignStateCatalog": 194,
+    "coveredSovereignStates": 183,
+    "sovereignCoveragePercent": 94.3,
+    "includedNonSovereignEntities": [
+      "Kosovo",
+      "Palestine",
+      "Taiwan"
+    ],
+    "missingSovereignStates": [
+      "Belgium",
+      "Burkina Faso",
+      "Central African Republic",
+      "Chad",
+      "Colombia",
+      "Gabon",
+      "Guinea",
+      "Holy See (Vatican City)",
+      "Oman",
+      "San Marino",
+      "Syria"
+    ]
+  },
+  "documentIntegrity": {
+    "missingProjectIds": 0,
+    "missingEnactmentYears": 0,
+    "missingAmendmentYears": 43,
+    "emptyFullTextDocuments": 0,
+    "emptyStructuredDocuments": 0,
+    "duplicateJurisdictionGroups": 0,
+    "duplicateProjectIdGroups": 0,
+    "exactDuplicateFullTextGroups": 0,
+    "earliestEnactmentYear": 1215,
+    "latestEnactmentYear": 2026,
+    "earliestFetch": "2026-07-02T03:01:05.784Z",
+    "latestFetch": "2026-07-02T03:06:11.383Z"
+  },
+  "sectionIntegrity": {
+    "missingSectionIds": 0,
+    "duplicateSectionIdGroupsWithinDocument": 0,
+    "generatedDomAnchorCollisionGroups": 0,
+    "missingHeadings": 20,
+    "missingHeadingDocuments": {
+      "north-macedonia": 3,
+      "tunisia": 1,
+      "united-states": 16
+    },
+    "emptyHtmlSections": 1,
+    "emptyHtmlFixture": "mexico:section/896",
+    "sectionsWithoutTopics": 74339,
+    "stableAcrossResync": false,
+    "stabilityBoundary": "Current raw section IDs and generated DOM anchors are unique, but no immutable document version or content hash is retained."
+  },
+  "excerptIntegrity": {
+    "emptyExcerpts": 0,
+    "missingSectionReferences": 0,
+    "orphanSectionReferences": 0,
+    "duplicateNaturalKeyGroups": 0,
+    "topicLabelDriftKeys": 0,
+    "missingArticleLabels": 1,
+    "missingArticleLabelFixture": "tunisia:god:section/ddd"
+  },
+  "languageAndTranslation": {
+    "ingestRequestedLanguage": "en",
+    "storedContentLanguageField": false,
+    "storedSourceLanguageField": false,
+    "storedTranslationStatusField": false,
+    "storedTranslatorField": false,
+    "documentsWithHtmlLangMarker": 0,
+    "supportablePublicDisclosure": "English text supplied by the Constitute Project; whether a document is original-language English or a translation is not recorded in the current Civica capture."
+  },
+  "provenanceAndRights": {
+    "documentsWithStatementProvenance": 20,
+    "documentsWithoutStatementProvenance": 166,
+    "statementCoveragePercent": 10.8,
+    "statementsWithSourceUrl": 20,
+    "statementsWithSourceLicense": 20,
+    "statementsWithSourceHash": 0,
+    "staleStatementUrls": [
+      {
+        "jurisdiction": "Bangladesh",
+        "statementDocument": "Bangladesh_2014",
+        "currentDocument": "Bangladesh_2018"
+      },
+      {
+        "jurisdiction": "Nigeria",
+        "statementDocument": "Nigeria_2011",
+        "currentDocument": "Nigeria_2023"
+      }
+    ],
+    "databaseSourceLicense": "non-commercial",
+    "rightsManifestReviewStatus": "pending",
+    "rightsManifestPublicExport": "non-commercial-only",
+    "bulkSearchExportAllowed": false,
+    "readerLicenseClaimRequiresReconciliation": true
+  },
+  "storageAndIndexes": {
+    "constitutionsTotalRelation": "41 MB",
+    "excerptsTotalRelation": "39 MB",
+    "constitutionIndexes": [
+      "constitutions_pkey(id)"
+    ],
+    "excerptIndexes": [
+      "constitution_topic_excerpts_pkey(id)",
+      "idx_constitution_topic_excerpts_jurisdiction(jurisdiction_id)",
+      "idx_constitution_topic_excerpts_topic(topic_key)"
+    ],
+    "fullTextSearchIndexPresent": false,
+    "passageSearchRelationPresent": false,
+    "installedExtensions": [
+      "pgcrypto",
+      "plpgsql"
+    ]
+  },
+  "performanceBaseline": {
+    "warning": "Live HTTP wall times include Neon/network variability; EXPLAIN execution does not include transmission of large JSON payloads.",
+    "naiveFullDocumentIlike": {
+      "query": "%freedom of expression%",
+      "matchingDocuments": 91,
+      "databaseExecutionMs": 197.337
+    },
+    "topicThreeJurisdictionsDatabaseExecutionMs": 0.363,
+    "notablePeerSortDatabaseExecutionMs": 4.976,
+    "structuredDocumentPayloads": [
+      {
+        "jurisdiction": "Denmark",
+        "bytes": 55356,
+        "observedWallMsRange": [281.1, 758.2]
+      },
+      {
+        "jurisdiction": "India",
+        "bytes": 1005383,
+        "observedWallMsRange": [302.3, 984.0]
+      },
+      {
+        "jurisdiction": "United Kingdom",
+        "bytes": 2616720,
+        "observedWallMsRange": [356.5, 485.8]
+      }
+    ],
+    "acceptanceCeilings": {
+      "warmDatabaseP95Ms": 100,
+      "warmApiP95Ms": 300,
+      "coldApiP95Ms": 750,
+      "maximumSearchResponseBytes": 250000,
+      "absoluteQueryTimeoutMs": 1000,
+      "pageSize": 20
+    }
+  },
+  "sparseAndScaleFixtures": {
+    "largestDocument": "united-kingdom",
+    "largestDocumentSections": 3926,
+    "largestStructuredPayloadFixture": "united-kingdom",
+    "largeDocumentFixture": "india",
+    "smallestStructuredDocument": "denmark",
+    "smallestStructuredDocumentSections": 70,
+    "smallestExcerptCorpus": "denmark",
+    "smallestExcerptCount": 19,
+    "broadTopic": "amend",
+    "broadTopicJurisdictions": 181,
+    "rareTopics": [
+      "civilmil",
+      "prisonrg"
+    ],
+    "rareTopicJurisdictions": 1
+  }
+}

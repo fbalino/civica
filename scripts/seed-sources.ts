@@ -54,7 +54,7 @@ const SOURCES = [
     id: "constitute_project",
     name: "Constitute Project",
     baseUrl: "https://www.constituteproject.org/service/",
-    license: "non-commercial",
+    license: "CC-BY-NC-3.0",
     isCommercialUseAllowed: false,
     lastSyncAt: null,
   },

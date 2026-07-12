@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { CountryFlag } from "@/components/CountryFlag";
@@ -40,9 +47,11 @@ export function ConstitutionCountryBar({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const listboxId = useId();
 
   const bySlug = useMemo(
     () => new Map(countries.map((c) => [c.slug, c])),
@@ -50,18 +59,23 @@ export function ConstitutionCountryBar({
   );
 
   const canAddMore = selectedSlugs.length < maxSlugs;
+  const closePopover = useCallback(() => {
+    setOpen(false);
+    setQuery("");
+    setActiveSlug(null);
+  }, []);
 
   // Close on outside click / Escape (Escape returns focus to the trigger).
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        closePopover();
       }
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setOpen(false);
+        closePopover();
         triggerRef.current?.focus();
       }
     };
@@ -71,12 +85,11 @@ export function ConstitutionCountryBar({
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [closePopover, open]);
 
   // Focus the search input when the popover opens.
   useEffect(() => {
     if (open) inputRef.current?.focus();
-    else setQuery("");
   }, [open]);
 
   const q = query.trim().toLowerCase();
@@ -92,6 +105,20 @@ export function ConstitutionCountryBar({
     return base.slice(0, q ? 60 : 250);
   }, [countries, q]);
 
+  const available = filtered.filter((c) => !selectedSlugs.includes(c.slug));
+
+  const moveActive = (direction: 1 | -1) => {
+    if (available.length === 0) return;
+    const current = available.findIndex((c) => c.slug === activeSlug);
+    const next =
+      current < 0
+        ? direction > 0
+          ? 0
+          : available.length - 1
+        : (current + direction + available.length) % available.length;
+    setActiveSlug(available[next].slug);
+  };
+
   const removeCountry = (slug: string) => {
     router.push(buildHref(selectedSlugs.filter((s) => s !== slug)));
   };
@@ -99,7 +126,7 @@ export function ConstitutionCountryBar({
   const addPeer = (slug: string) => {
     if (selectedSlugs.includes(slug)) return;
     router.push(buildHref([...selectedSlugs, slug].slice(0, maxSlugs)));
-    setOpen(false);
+    closePopover();
   };
 
   return (
@@ -141,15 +168,20 @@ export function ConstitutionCountryBar({
             ref={triggerRef}
             type="button"
             className="constitution-add__trigger"
-            aria-haspopup="listbox"
+            aria-haspopup="dialog"
             aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
+            aria-controls={open ? `${listboxId}-dialog` : undefined}
+            onClick={() => {
+              if (open) closePopover();
+              else setOpen(true);
+            }}
           >
             + Add country
           </button>
           {open ? (
             <div
               className="constitution-add__menu"
+              id={`${listboxId}-dialog`}
               role="dialog"
               aria-label="Add a constitution to compare"
             >
@@ -160,12 +192,42 @@ export function ConstitutionCountryBar({
                   type="search"
                   value={query}
                   placeholder="Search countries…"
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setActiveSlug(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      moveActive(e.key === "ArrowDown" ? 1 : -1);
+                    } else if (e.key === "Home" && available.length > 0) {
+                      e.preventDefault();
+                      setActiveSlug(available[0].slug);
+                    } else if (e.key === "End" && available.length > 0) {
+                      e.preventDefault();
+                      setActiveSlug(available[available.length - 1].slug);
+                    } else if (e.key === "Enter" && activeSlug) {
+                      e.preventDefault();
+                      addPeer(activeSlug);
+                    }
+                  }}
                   aria-label="Search indexed constitutions"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls={listboxId}
+                  aria-expanded="true"
+                  aria-activedescendant={
+                    activeSlug ? `${listboxId}-${activeSlug}` : undefined
+                  }
                   autoComplete="off"
                 />
               </div>
-              <ul className="constitution-add__list" role="listbox">
+              <ul
+                className="constitution-add__list"
+                id={listboxId}
+                role="listbox"
+                aria-label="Indexed constitutions"
+              >
                 {filtered.map((c) => {
                   const isSelected = selectedSlugs.includes(c.slug);
                   const yr =
@@ -176,12 +238,18 @@ export function ConstitutionCountryBar({
                     <li key={c.slug}>
                       <button
                         type="button"
+                        id={`${listboxId}-${c.slug}`}
                         role="option"
                         aria-selected={isSelected}
                         className={`constitution-add__option${
                           isSelected ? " is-selected" : ""
+                        }${activeSlug === c.slug ? " is-active" : ""
                         }`}
                         disabled={isSelected}
+                        tabIndex={-1}
+                        onMouseMove={() => {
+                          if (!isSelected) setActiveSlug(c.slug);
+                        }}
                         onClick={() => addPeer(c.slug)}
                       >
                         <span

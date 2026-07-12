@@ -15,6 +15,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "ci_ingestion_runs",
   "civica_conditions_scores",
   "constitutions",
+  "constitution_passages",
   "constitution_topic_excerpts",
   "correction_log",
   "country_facts",

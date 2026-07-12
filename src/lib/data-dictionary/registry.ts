@@ -170,6 +170,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Constitute Project non-commercial terms; document redistribution must remain rights-filtered.",
     deprecation: active,
   },
+  constitution_passages: {
+    definition:
+      "Version-bound searchable and citable passages derived from Constitute's English-language service representation.",
+    rowGrain:
+      "One source document version, source section, language representation, and normalized content version.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+    cadence:
+      "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+    vintageSemantics:
+      "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+    rights:
+      "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+    deprecation: active,
+  },
   constitution_topic_excerpts: {
     definition: "Derived topic-to-passage index for constitution comparison.",
     rowGrain:

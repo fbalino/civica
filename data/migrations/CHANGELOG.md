@@ -95,6 +95,17 @@ release automatically; release, value, and pin rows reject updates/deletes.
 The registered RSF 2026 context remains disabled for production weighting and
 observability while rights and validation are pending.
 
+`0030_cute_namora` adds the normalized, version-bound
+`constitution_passages` relation, partial GIN indexes for English lexical text
+and topic filtering, current-section uniqueness, exact source/language/hash
+metadata, and canonical passage-id history retention. The migration creates no
+passage rows by itself: after applying it, run
+`npm run backfill:constitution-passages -- --dry-run`, then the write command,
+and verify exactly 96,126 current non-empty passages with
+`npm run validate:constitution-search:live`. Superseded passage versions remain
+resolvable. Recovery uses the isolated pre-change backup or a reviewed forward
+compensation; do not drop retained passage/history rows as an ordinary rollback.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

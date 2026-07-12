@@ -57,6 +57,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
   shared("0027_smart_tempest", "drizzle/authoritative/0027_smart_tempest.sql", "mixed", "journaled"),
   shared("0028_complex_carlie_cooper", "drizzle/authoritative/0028_complex_carlie_cooper.sql", "schema", "journaled"),
   shared("0029_whole_dazzler", "drizzle/authoritative/0029_whole_dazzler.sql", "mixed", "journaled"),
+  shared("0030_cute_namora", "drizzle/authoritative/0030_cute_namora.sql", "schema", "journaled"),
   ...[
     "backfill-cia-vintage", "backfill-election-results", "backfill-growth-methodology",
     "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels",

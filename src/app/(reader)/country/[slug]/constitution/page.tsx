@@ -74,9 +74,9 @@ export default async function CountryConstitutionTab({
       <EditorialPage className="editorial-page editorial-page--full country-constitution-body">
         <header className="constitution-page-header">
           <div className="constitution-page-eyebrow">Constitution</div>
-          <h1 className="editorial-page-title">
+          <h2 className="editorial-page-title">
             No constitution text is available for {jurisdiction.name} yet
-          </h1>
+          </h2>
         </header>
         <div className="constitution-empty-state">
           <p>
@@ -104,9 +104,9 @@ export default async function CountryConstitutionTab({
   return (
     <EditorialPage className="editorial-page editorial-page--full country-constitution-body">
       <header className="constitution-page-header">
-        <h1 className="editorial-page-title">
+        <h2 className="editorial-page-title">
           Constitution of {jurisdiction.name}
-        </h1>
+        </h2>
       </header>
 
       {/* Single-country reading column — renders its own year line, SourceDot

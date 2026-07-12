@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
+import { SourceDot } from "@/components/SourceDot";
+import { Banner } from "@/components/editorial/Banner";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getTopicLabel } from "@/lib/constitute/topics";
+import { constitutionSectionDomId } from "@/lib/constitution/article-nav";
 import { sanitizeConstitutionHtml } from "@/lib/constitution/sanitize-html";
 import type { TopicExcerptCountry } from "@/lib/db/queries-constitution";
 import { ConstitutionTopicPicker } from "./ConstitutionTopicPicker";
@@ -25,6 +29,7 @@ interface ConstitutionCrossReferencePaneProps {
    * topic" chip). Already validated against the taxonomy by the caller.
    */
   initialTopic?: string | null;
+  sourceRetrievedAt: string | null;
 }
 
 /**
@@ -41,6 +46,7 @@ export function ConstitutionCrossReferencePane({
   activeArticleTopics,
   hasPeers,
   initialTopic = null,
+  sourceRetrievedAt,
 }: ConstitutionCrossReferencePaneProps) {
   // Seed from `?topic=` so a landing "Explore by topic" chip lands directly on
   // the chosen topic. Lazy initializer so it applies on first render (SSR +
@@ -52,6 +58,7 @@ export function ConstitutionCrossReferencePane({
   const [notable, setNotable] = useState<TopicExcerptCountry[]>([]);
   const [loading, setLoading] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   // Fetch excerpts whenever the topic or the peer set changes.
   //
@@ -69,6 +76,7 @@ export function ConstitutionCrossReferencePane({
       isCurrent: () => boolean,
     ) => {
       setLoading(true);
+      setLoadError(false);
       try {
         const params = new URLSearchParams();
         params.set("topic", topic);
@@ -81,6 +89,7 @@ export function ConstitutionCrossReferencePane({
           if (isCurrent()) {
             setCountries([]);
             setNotable([]);
+            setLoadError(true);
           }
           return;
         }
@@ -117,6 +126,7 @@ export function ConstitutionCrossReferencePane({
         if (isCurrent()) {
           setCountries([]);
           setNotable([]);
+          setLoadError(true);
         }
       } finally {
         if (isCurrent()) setLoading(false);
@@ -129,6 +139,7 @@ export function ConstitutionCrossReferencePane({
     if (!selectedTopic) {
       setCountries([]);
       setNotable([]);
+      setLoadError(false);
       return;
     }
     const controller = new AbortController();
@@ -216,8 +227,15 @@ export function ConstitutionCrossReferencePane({
         <div className="constitution-xref-results">
           {loading ? (
             <div className="constitution-xref-loading">
-              <div className="skeleton" style={{ height: 96 }} />
-              <div className="skeleton" style={{ height: 96 }} />
+              <div className="skeleton constitution-xref-skeleton" />
+              <div className="skeleton constitution-xref-skeleton" />
+            </div>
+          ) : loadError ? (
+            <div role="alert">
+              <Banner variant="danger" className="constitution-xref-error">
+                These comparison passages could not be loaded. Try this topic
+                again in a moment.
+              </Banner>
             </div>
           ) : (
             <>
@@ -225,7 +243,13 @@ export function ConstitutionCrossReferencePane({
                 const entry = countries.find((c) => c.slug === slug);
                 if (entry) {
                   return (
-                    <ExcerptCard key={slug} entry={entry} isPrimary={slug === primary.slug} />
+                    <ExcerptCard
+                      key={slug}
+                      entry={entry}
+                      isPrimary={slug === primary.slug}
+                      sourceRetrievedAt={sourceRetrievedAt}
+                      selectedSlugs={slugs}
+                    />
                   );
                 }
                 // Country selected but no excerpt for this topic.
@@ -248,7 +272,14 @@ export function ConstitutionCrossReferencePane({
                     How others treat this topic
                   </div>
                   {notable.map((entry) => (
-                    <ExcerptCard key={entry.slug} entry={entry} isPrimary={false} showAdd />
+                    <ExcerptCard
+                      key={entry.slug}
+                      entry={entry}
+                      isPrimary={false}
+                      showAdd
+                      sourceRetrievedAt={sourceRetrievedAt}
+                      selectedSlugs={slugs}
+                    />
                   ))}
                 </div>
               ) : null}
@@ -322,10 +353,14 @@ function ExcerptCard({
   entry,
   isPrimary,
   showAdd,
+  sourceRetrievedAt,
+  selectedSlugs,
 }: {
   entry: TopicExcerptCountry;
   isPrimary: boolean;
   showAdd?: boolean;
+  sourceRetrievedAt: string | null;
+  selectedSlugs: string[];
 }) {
   return (
     <div
@@ -342,7 +377,7 @@ function ExcerptCard({
           {entry.name}
         </Link>
         {showAdd ? (
-          <AddPeerLink slug={entry.slug} />
+          <AddPeerLink slug={entry.slug} selectedSlugs={selectedSlugs} />
         ) : null}
       </div>
       <div className="constitution-xref-card-body">
@@ -353,6 +388,13 @@ function ExcerptCard({
           const showLabel =
             !!ex.articleLabel &&
             !excerptHeadingMatchesLabel(ex.excerptHtml, ex.articleLabel);
+          const anchorId = ex.sectionId
+            ? constitutionSectionDomId(ex.sectionId)
+            : null;
+          const readerPath = `/constitution?c=${encodeURIComponent(entry.slug)}${
+            anchorId ? `#${anchorId}` : ""
+          }`;
+          const citationUrl = `https://civicaatlas.org${readerPath}`;
           return (
           <div key={`${ex.sectionId}-${i}`} className="constitution-xref-excerpt">
             {showLabel ? (
@@ -369,6 +411,23 @@ function ExcerptCard({
                 __html: sanitizeConstitutionHtml(ex.excerptHtml),
               }}
             />
+            <div className="constitution-xref-excerpt-meta">
+              <span className="constitution-xref-excerpt-source">
+                <SourceDot
+                  source="constitute_project"
+                  retrievedAt={sourceRetrievedAt}
+                />
+                Constitute Project · CC BY-NC 3.0
+              </span>
+              <Link href={readerPath}>Open passage</Link>
+            </div>
+            <CiteAccordion
+              subject={entry.name}
+              pageTitle={ex.articleLabel ?? "Constitutional provision"}
+              url={citationUrl}
+              dataVintage={sourceRetrievedAt}
+              sourceNames={["Constitute Project"]}
+            />
           </div>
           );
         })}
@@ -378,15 +437,18 @@ function ExcerptCard({
 }
 
 /** "Add to compare" link — appends the slug to the current `?c=` set. */
-function AddPeerLink({ slug }: { slug: string }) {
-  const [href, setHref] = useState(`/constitution?c=${encodeURIComponent(slug)}`);
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const current = params.getAll("c");
-    if (!current.includes(slug)) current.push(slug);
-    const qs = current.map((s) => `c=${encodeURIComponent(s)}`).join("&");
-    setHref(`/constitution?${qs}`);
-  }, [slug]);
+function AddPeerLink({
+  slug,
+  selectedSlugs,
+}: {
+  slug: string;
+  selectedSlugs: string[];
+}) {
+  const current = selectedSlugs.includes(slug)
+    ? selectedSlugs
+    : [...selectedSlugs, slug];
+  const qs = current.map((value) => `c=${encodeURIComponent(value)}`).join("&");
+  const href = `/constitution?${qs}`;
   return (
     <Link href={href} className="constitution-xref-add">
       + Add to compare

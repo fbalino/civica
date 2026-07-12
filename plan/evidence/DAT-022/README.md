@@ -20,8 +20,8 @@ ingestion from bytes that were never retained.
 ## Verification
 
 - `npm run package:g2-atlas` produced byte-identical ZIP hashes on two runs.
-- Archive: 1,869,053 bytes; SHA-256
-  `bb845c3d6e0b17ceb834399afc84b3f52baaf272e02a993efd2112ebc9de9543`.
+- Archive: 1,869,727 bytes; SHA-256
+  `727d517ed9d9a57c97fd652e735b51352aea26519bf78c328aec1bbdefa6ba19`.
 - `npm run validate:g2-atlas` passed all 13 G2 checklist components and verified
   every file, archive entry, code artifact, manifest, citation field, and hash.
 - `npm run reproduce:g2-atlas -- --strict-clean` rebuilt 253 jurisdictions,

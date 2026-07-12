@@ -2,11 +2,11 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "754901c406c6600f014f8a437126439a7788d8da852e500d3688958019a8497a",
+  "schemaFingerprint": "a53b8db835156312f08538e8a8c0f1ea57a29edded2e4b63f5d645d1d8b1b8bb",
   "summary": {
-    "tables": 76,
-    "columns": 1064,
-    "publicAtlasTables": 18,
+    "tables": 77,
+    "columns": 1090,
+    "publicAtlasTables": 19,
     "researchBetaTables": 24,
     "supportTables": 11,
     "internalTables": 21,
@@ -5799,6 +5799,692 @@
           "cadence": "Per upstream annual/source release.",
           "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "constitution_passages",
+      "exportName": "constitutionPassages",
+      "definition": "Version-bound searchable and citable passages derived from Constitute's English-language service representation.",
+      "rowGrain": "One source document version, source section, language representation, and normalized content version.",
+      "releaseScope": "atlas_public",
+      "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+      "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+      "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+      "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "anchor_id",
+          "propertyName": "anchorId",
+          "definition": "Anchor id recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "constitution_id",
+          "propertyName": "constitutionId",
+          "definition": "Constitution id; relational link to constitutions.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "constitutions.id",
+            "indexGroups": [
+              "idx_constitution_passages_current_section",
+              "idx_constitution_passages_document_order"
+            ],
+            "uniqueGroups": [
+              "idx_constitution_passages_current_section"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing constitutions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "content_sha256",
+          "propertyName": "contentSha256",
+          "definition": "Content sha256 recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "heading_label",
+          "propertyName": "headingLabel",
+          "definition": "Heading label recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "is_current",
+          "propertyName": "isCurrent",
+          "definition": "Is current recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "boolean",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_constitution_passages_jurisdiction",
+              "idx_constitution_passages_document_order"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [
+              "idx_constitution_passages_jurisdiction"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "language_basis",
+          "propertyName": "languageBasis",
+          "definition": "Language basis recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "language_code",
+          "propertyName": "languageCode",
+          "definition": "Language code recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "original_language_code",
+          "propertyName": "originalLanguageCode",
+          "definition": "Original language code recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "passage_id",
+          "propertyName": "passageId",
+          "definition": "Passage id recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "plain_text",
+          "propertyName": "plainText",
+          "definition": "Plain text recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "retrieval_url",
+          "propertyName": "retrievalUrl",
+          "definition": "Retrieval url recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "retrieved_at",
+          "propertyName": "retrievedAt",
+          "definition": "Timestamp when Civica retrieved the upstream material.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "Civica retrieval/processing time; distinct from source observation and release vintage.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "search_index_version",
+          "propertyName": "searchIndexVersion",
+          "definition": "Search index version recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "search_vector",
+          "propertyName": "searchVector",
+          "definition": "Search vector recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "tsvector",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_constitution_passages_search"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "section_order",
+          "propertyName": "sectionOrder",
+          "definition": "Section order recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_constitution_passages_document_order"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_document_id",
+          "propertyName": "sourceDocumentId",
+          "definition": "Source document id recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "sources.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_section_id",
+          "propertyName": "sourceSectionId",
+          "definition": "Source section id recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_constitution_passages_current_section"
+            ],
+            "uniqueGroups": [
+              "idx_constitution_passages_current_section"
+            ]
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_url",
+          "propertyName": "sourceUrl",
+          "definition": "Direct upstream URL captured for this record when available.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "superseded_at",
+          "propertyName": "supersededAt",
+          "definition": "Superseded at recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "Superseded at follows this table contract. retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "topic_keys",
+          "propertyName": "topicKeys",
+          "definition": "Topic keys recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_constitution_passages_topics"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "translation_status",
+          "propertyName": "translationStatus",
+          "definition": "Translation status recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "translator",
+          "propertyName": "translator",
+          "definition": "Translator recorded for the source document version, source section, language representation, and normalized content version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+          "cadence": "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+          "vintageSemantics": "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+          "rights": "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
           "deprecation": {
             "status": "active"
           }
