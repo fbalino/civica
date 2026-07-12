@@ -45,3 +45,17 @@ is family consistency, not cast.
   visibly muddy; global desaturation alone is rejected.
 - OUT OF SCOPE for grading: fra (style), gbr (palette outlier) — regeneration
   candidates; graded versions retained for reference only.
+
+## Owner calibration (2026-07-12)
+- The corpus-wide warm/sepia tint is intentional identity, not a defect. v1's
+  split-tone targets overcorrected toward cool monochrome and are withdrawn;
+  recipe-B outputs stay in evidence as the recorded overcorrection example
+  (recipe A remains the under-correction example).
+- The active recipe family is the gentle ladder: strength s (0–100) maps to
+  saturation 1−0.0045·s, hue −0.10·s°, brightness 1+0.0003·s. Even at s=100
+  the sepia character survives. The owner's stated intent is a "very slight"
+  reduction; the interactive sheet defaults to s=25 (saturation ×0.888,
+  hue −2.5°).
+- Final orangeFrac/meanSat thresholds derive from the owner-selected strength
+  on `plan/evidence/EXP-006/pilot-sheet-v2.html`, superseding the withdrawn
+  v1 numbers.
