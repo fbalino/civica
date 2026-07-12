@@ -18,11 +18,14 @@ title: "Civica Atlas: 2026-07-11 frozen Atlas release candidate"
 # PUBLIC_CLAIM: citation.index-estimate
 # PUBLIC_CLAIM: citation.pulse-signal
 # PUBLIC_CLAIM: citation.provenance-coverage
-abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles with the explicitly experimental Civica Index and Civica Pulse research outputs."
+abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles and source-native governance evidence with preserved Civica Index research and the experimental Civica Pulse event ledger."
 type: dataset
 authors:
-  - name: "Civica Atlas"
-    website: "https://civicaatlas.org"
+  - given-names: "Fernando"
+    family-names: "Balino"
+    affiliation: "Independent project; no institutional affiliation claimed"
+    website: "https://civicaatlas.org/contact"
+publisher: "Civica Atlas"
 version: "atlas-2026-07-11-g2-rc1"
 date-released: 2026-07-11
 url: "https://civicaatlas.org/downloads/civica-atlas-2026-07-11.json.gz"

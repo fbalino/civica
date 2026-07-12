@@ -21,8 +21,11 @@ title: "Civica Atlas"
 abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles and source-native governance evidence with preserved Civica Index research and the experimental Civica Pulse event ledger."
 type: dataset
 authors:
-  - name: "Civica Atlas"
-    website: "https://civicaatlas.org"
+  - given-names: "Fernando"
+    family-names: "Balino"
+    affiliation: "Independent project; no institutional affiliation claimed"
+    website: "https://civicaatlas.org/contact"
+publisher: "Civica Atlas"
 url: "https://civicaatlas.org"
 repository-code: "https://github.com/fbalino/civica"
 keywords:

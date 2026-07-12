@@ -139,8 +139,11 @@ title: "${citation.title}"
 version: "${citation.version}"
 type: dataset
 authors:
-  - name: "Civica Atlas"
-    website: "https://civicaatlas.org"
+  - given-names: "Fernando"
+    family-names: "Balino"
+    affiliation: "Independent project; no institutional affiliation claimed"
+    website: "https://civicaatlas.org/contact"
+publisher: "Civica Atlas"
 url: "${citation.url}"
 repository-code: "https://github.com/fbalino/civica"
 abstract: "A replication and bounded external-review packet for a source-native governance evidence dashboard, including the no-winner Index tournament and adopted disposition."

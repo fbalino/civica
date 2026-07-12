@@ -1,14 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 interface ShareButtonsProps {
   url: string;
   title: string;
 }
 
+const subscribeToShareAvailability = () => () => {};
+const getShareAvailability = () => typeof navigator.share === "function";
+const getServerShareAvailability = () => false;
+
 export function ShareButtons({ url, title }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
+  const canNativeShare = useSyncExternalStore(
+    subscribeToShareAvailability,
+    getShareAvailability,
+    getServerShareAvailability,
+  );
 
   const handleCopy = async () => {
     try {
@@ -43,7 +52,7 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
 
   return (
     <div className="post-share">
-      <button onClick={handleCopy} className="post-share-btn">
+      <button type="button" onClick={handleCopy} className="post-share-btn">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <rect x="5" y="5" width="9" height="9" rx="1" />
           <path d="M3 11V3a1 1 0 0 1 1-1h8" />
@@ -72,8 +81,8 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
         </svg>
         LinkedIn
       </a>
-      {typeof navigator !== "undefined" && "share" in navigator && (
-        <button onClick={handleShare} className="post-share-btn">
+      {canNativeShare && (
+        <button type="button" onClick={handleShare} className="post-share-btn">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="4" cy="8" r="2" />
             <circle cx="12" cy="4" r="2" />

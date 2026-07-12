@@ -238,8 +238,8 @@
     {
       "artifactId": "packet-citation",
       "role": "packet-document",
-      "bytes": 601,
-      "sha256": "d0ed7179c77b37f77be89475889e00c2f348b50d48d2022fdc78201cd3b75e8f",
+      "bytes": 742,
+      "sha256": "fa0e80bbcc6deeb2812c6a47967e309c4fe42282a4835afdfe30e052366d2465",
       "path": "data/releases/governance-evidence-review-packet-2026-07-v2/CITATION.cff"
     },
     {
@@ -504,8 +504,8 @@
     {
       "artifactId": "review-packet-builder",
       "role": "selected-product-code",
-      "bytes": 10552,
-      "sha256": "6afa5d80195dc0d7d5694abf3f5abb38432f4f99f136036167878b08f2ab8b90",
+      "bytes": 10693,
+      "sha256": "18989be2e0848ecce4cd3593746231fe0a05ebf4dd67e89ac8939a963b467d47",
       "path": "src/lib/ci/governance-evidence-review-package.ts"
     },
     {
@@ -544,5 +544,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "f4db3dd1edf665f9d0bd56513268571028077e65ee6727fdbcb9d9df3fec2d80"
+  "bundleSemanticSha256": "c25b3cfef132411e17bf690eb703042f19b419a629b7f8e7bd7fa1cbd109ba63"
 }

@@ -3,7 +3,7 @@ b33e849ec082e8042a90b274aabdb4b694342d2aa5ce44ad1a9317b4ea129cce  data/releases/
 3134aa8aa70c102dd3421ae396fbb6777d646fb02630588cdc1cadddb3ef9a94  data/releases/ci-research-panel-2000-2024-v3/coverage.v3.json
 f9f83964c34693cc17944e418818f0092c2a03f158f32e5e3adddfa50bfe0c84  data/releases/ci-research-panel-2000-2024-v3/manifest.v3.json
 92046b4016b28d19ca49574f760c76cf8ecf4aa64f216c9cd474797a829a0b91  data/releases/ci-series-provenance-audit-2026-07-v1/manifest.v1.json
-d0ed7179c77b37f77be89475889e00c2f348b50d48d2022fdc78201cd3b75e8f  data/releases/governance-evidence-review-packet-2026-07-v2/CITATION.cff
+fa0e80bbcc6deeb2812c6a47967e309c4fe42282a4835afdfe30e052366d2465  data/releases/governance-evidence-review-packet-2026-07-v2/CITATION.cff
 ea3bcc481d715b15ed4e3c0a081503d81a2d362e089ff675f47d147c423b6747  data/releases/governance-evidence-review-packet-2026-07-v2/codebook.v1.csv
 e69eadcd2933c36bea966297db86ddab1c65c48c8fb94d530fa959290b028252  data/releases/governance-evidence-review-packet-2026-07-v2/command-map.v1.json
 71c5553b5e943c4d2538d00b78be42a60052f60006f0cb358447140d118332f7  data/releases/governance-evidence-review-packet-2026-07-v2/README.md
@@ -41,7 +41,7 @@ b5421a7945b01efb0ca3e64c68b1b940257f479793410a0304dc9403a7408982  scripts/valida
 6bf9432491827c85cabeec581a68354714672495fbc7d48528d72efc9344ae00  src/app/api/governance-evidence/[slug]/route.ts
 d7121d82d36f4253351e2c976193d90d3ef300f8b649c66ce6a0fa0224bf00a0  src/app/governance-evidence/page.tsx
 7f11dcbd969d8804244c7c75ad9c5b085d452e5b6d01afc6d09d32bc754cbe1e  src/components/governance-evidence/GovernanceEvidenceTable.tsx
-6afa5d80195dc0d7d5694abf3f5abb38432f4f99f136036167878b08f2ab8b90  src/lib/ci/governance-evidence-review-package.ts
+18989be2e0848ecce4cd3593746231fe0a05ebf4dd67e89ac8939a963b467d47  src/lib/ci/governance-evidence-review-package.ts
 b214383d5294640f182c29c070d3dbc5d704e6cae53104cd3d81ea97f09dfc95  src/lib/ci/governance-evidence-review-packet.ts
 de469f2c7465b7bc3effac5dd006b06f2dcb7b1f46a1b0d182e0ff9fca1624e7  src/lib/ci/governance-evidence.ts
 3b120071672ac3e54c3ac8cc480585ffbe27c9a69cb5866cd6b09cb3ac9e8287  src/lib/ci/series-provenance.ts

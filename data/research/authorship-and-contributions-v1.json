@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "civica-authorship-contributions/v1",
+  "effectiveOn": "2026-07-11",
+  "responsibleAuthor": {
+    "givenNames": "Fernando",
+    "familyNames": "Balino",
+    "displayName": "Fernando Balino",
+    "affiliation": "Independent project; no institutional affiliation claimed",
+    "independentStatus": true,
+    "orcid": null,
+    "orcidStatus": "not_provided_and_no_reliable_public_match_located_2026-07-11",
+    "contact": "https://civicaatlas.org/contact",
+    "roles": [
+      "conceptualization",
+      "methodology",
+      "data_curation",
+      "software",
+      "validation",
+      "visualization",
+      "writing_review_editing",
+      "project_administration",
+      "resources"
+    ],
+    "accountability": "Responsible human author and publisher: approves release claims and accepts responsibility for the integrity, correction, and retraction of Civica-authored work."
+  },
+  "organizationalPublisher": {
+    "name": "Civica Atlas",
+    "url": "https://civicaatlas.org",
+    "justification": "Civica Atlas is retained as the project and publisher name for discovery and continuity. It never replaces the named responsible human in citation or release authorship metadata."
+  },
+  "authorshipRules": [
+    "Every Civica-authored release and canonical citation names at least one accountable human author.",
+    "Organization-only authorship is prohibited unless a versioned exception explains why no individual can be named and identifies a public accountability contact; no such exception currently exists.",
+    "Software agents, language models, and tools are disclosed as assistance where material but are never authors or peer reviewers.",
+    "Source publishers and external reviewers are credited for their own work and roles; they are not made Civica authors without their explicit consent and an authorship-level contribution.",
+    "A byline records responsibility for the published work. Detailed drafting and tool assistance belong in contribution and AI-use disclosures."
+  ],
+  "contributionHistory": [
+    {
+      "period": "2026-04-13",
+      "contribution": "Initiated the repository and directed the first Atlas, source-pipeline, country-page, navigation, and reconciliation foundation.",
+      "evidence": "Git history beginning at commit 0359b07; named commits by Fernando Balino."
+    },
+    {
+      "period": "2026-04-14/2026-06-30",
+      "contribution": "Directed and accepted the comparative-reference product, data integrations, methodology surfaces, Index and Pulse experiments, editorial content, and visual system as the sole project owner.",
+      "evidence": "Repository history and dated project plans; detailed artifact-level history remains in Git."
+    },
+    {
+      "period": "2026-07-01/present",
+      "contribution": "Directed the academic-readiness program, including provenance, reproducibility, rights, release, Index disposition, Pulse validation preparation, governance, and external-review planning.",
+      "evidence": "plan/MASTER-CHECKLIST.md, plan/DECISIONS.md, plan/PROGRESS.md, and linked task evidence."
+    }
+  ],
+  "contributorHistoryRule": "Add a named contributor only with consent, exact role ids, contribution period, artifact evidence, affiliation/independent status, contact route, and ORCID when the person supplies one. Preserve prior records when roles change.",
+  "semanticSha256": "9983945550d0186e39ab921b91b038e0c8511f4adde08e62a1d66bd7b1719f05"
+}
