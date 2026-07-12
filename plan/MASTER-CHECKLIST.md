@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 144
-- **Remaining:** 159
-- **Progress:** 47.5%
+- **Completed:** 145
+- **Remaining:** 158
+- **Progress:** 47.9%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -147,7 +147,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [ ] **PUL-022** (P0) Evaluate retrieval recall and source outages independently of classification accuracy. _Done when: a benchmark of known and randomly audited events quantifies missed eligible events, duplicate load, latency, and outage effects; alert thresholds and coverage disclosures respond to failures._
 - [ ] **PUL-023** (P1) Evaluate clustering and attribution with dedicated gold pairs/events. _Done when: pairwise/B-cubed or justified cluster metrics and attribution accuracy meet preregistered thresholds on held-out examples, with error ledgers for overmerge, undermerge, and wrong-country cases._
 - [ ] **PUL-024** (P1) Add drift monitoring for source mix, language mix, model versions, taxonomy labels, confidence, abstention, and review overturns. _Done when: baseline distributions and alert thresholds are versioned, a seeded distribution shift triggers an alert, and alerts link to affected rows and remediation runbook._
-- [ ] **PUL-025** (P0) Replace the current historical backtest with separate regression, retrospective-validity, and prospective-shadow protocols. _Done when: famous shocks are labelled regression fixtures; retrospective samples penalize spurious dimensions and missed events; a locked prospective protocol forbids tuning on future labels; the current ensemble and full pipeline are evaluated._
+- [x] **PUL-025** (P0) Replace the current historical backtest with separate regression, retrospective-validity, and prospective-shadow protocols. _Done when: famous shocks are labelled regression fixtures; retrospective samples penalize spurious dimensions and missed events; a locked prospective protocol forbids tuning on future labels; the current ensemble and full pipeline are evaluated._
 - [ ] **PUL-026** (P0) Run a prospective shadow period sized by the preregistered protocol. _Done when: the locked pipeline operates for the required dates/sample, all outputs are retained before human labels, no post hoc rule is applied without a new version, and results/limitations are published regardless of outcome._
 - [ ] **PUL-027** (P1) Correct decay-window and event-lifecycle inconsistencies before any scoring experiment. _Done when: lookback windows cannot truncate events before configured half-lives, supersession/persistence/recurrence rules are explicit, deterministic fixtures cover all half-lives/bounds, and historical recomputation is versioned._
 - [ ] **PUL-028** (P1) If ledger validation passes, preregister a separate numeric-signal research model and baseline contest. _Done when: the model defines the estimand, causal/non-causal claim, aggregation, observability, uncertainty, decay, source bias, and simple baselines; thresholds are locked before winner results and “no public signal” is an allowed decision._

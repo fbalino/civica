@@ -78,6 +78,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/pulse/v2/score.ts", category: "weight_or_model" },
   { path: "src/lib/pulse/v2/press-freedom.ts", category: "weight_or_model" },
   { path: "src/lib/pulse/v2/corroborate.ts", category: "weight_or_model" },
+  { path: "src/lib/pulse/v2/validation-protocol.ts", category: "weight_or_model" },
   { path: "src/lib/ci/missingness-policy.ts", category: "missingness" },
   { path: "src/lib/pulse/v2/information-environment-evidence.ts", category: "missingness" },
   { path: "src/lib/ci/uncertainty-policy.ts", category: "uncertainty" },

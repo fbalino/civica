@@ -909,3 +909,21 @@ imputation. Classification-time pins prevent later dataset or corroboration
 runs from rewriting history. Keeping the data inactive preserves the
 distinction between auditable context, a sensitivity assumption, and a
 validated correction for reporting asymmetry.
+
+### APR-D154 — Pulse validation has three non-substitutable lanes
+
+**Decision:** Adopt `pulse-validation-protocol/v1` as a locked but not-started
+protocol. The ten named historical shocks are regression fixtures with no
+inferential role. Retrospective validity uses the frozen event-candidate,
+system-negative, and country-day frames and counts end-to-end failures. A
+separate 90-day prospective window freezes the entire current production
+pipeline before independent human labels are opened. Semantic method changes
+end that window and require a new version. Results must be reported even when
+underpowered, inconclusive, or adverse.
+
+**Why:** Famous cases can expose software regressions but cannot estimate
+retrieval failures, false positives, or population accuracy. Retrospective
+sampling covers retained history; a future, label-blind window tests evidence
+that was unavailable when the method was locked. Keeping these purposes
+separate prevents a successful smoke test or high model agreement from being
+presented as external validity.

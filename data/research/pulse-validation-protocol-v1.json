@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "pulse-validation-protocol/v1",
+  "lockedAt": "2026-07-12T12:00:00.000Z",
+  "status": "preregistered_not_started",
+  "currentRuntimeMethod": "pulse-v2.15-beta",
+  "labelPolicy": {
+    "ownerAndModelOutputsAreGold": false,
+    "independentHumanGoldRequired": true,
+    "prospectiveLabelEmbargo": "No prospective human label may be opened until the retained window outputs and sampling frame are frozen.",
+    "prohibited": [
+      "tuning_on_prospective_labels",
+      "dropping_pipeline_failures",
+      "reclassifying_misses_as_out_of_scope_after_labels",
+      "changing_thresholds_without_a_new_protocol_version",
+      "substituting_famous_cases_for_probability_samples"
+    ]
+  },
+  "lanes": {
+    "regression": {
+      "purpose": "Named historical shocks guard known taxonomy, parser, direction, and lifecycle behavior.",
+      "cases": [
+        "afghanistan-2021",
+        "brazil-2023",
+        "colombia-2016",
+        "ethiopia-2020",
+        "hungary-2010",
+        "myanmar-2021",
+        "niger-2023",
+        "poland-2023",
+        "sri-lanka-2022",
+        "tunisia-2021"
+      ],
+      "selection": "hand_curated_famous_cases",
+      "inferentialUse": "none",
+      "currentLegacyHarness": "single_engine_smoke_test_not_current_production_validation",
+      "requiredCurrentRun": "The exact frozen production ingestion-to-publication pipeline must also process the fixtures before any current-method claim.",
+      "failureMeaning": "A failed known-case expectation is a regression defect; a pass supplies no population performance estimate."
+    },
+    "retrospectiveValidity": {
+      "purpose": "Estimate full-pipeline errors on label-blind frozen probability samples from the retained pre-lock period.",
+      "period": {
+        "start": "2026-04-13",
+        "end": "2026-07-11",
+        "days": 90
+      },
+      "frozenProtocol": "pulse-evaluation-sampling-frame/v1",
+      "frames": [
+        {
+          "id": "retained_event_candidate_census",
+          "initialDraw": 384,
+          "analysisTarget": 384,
+          "errorRoles": [
+            "false_positive",
+            "wrong_category_or_dimension",
+            "spurious_extra_dimension",
+            "wrong_severity",
+            "wrong_jurisdiction",
+            "publication_error"
+          ]
+        },
+        {
+          "id": "system_negative_probability",
+          "initialDraw": 536,
+          "analysisTarget": 482,
+          "errorRoles": [
+            "missed_event",
+            "false_abstention",
+            "deduplication_error",
+            "invalid_input_handling"
+          ]
+        },
+        {
+          "id": "country_day_retrieval_probability",
+          "initialDraw": 536,
+          "analysisTarget": 482,
+          "errorRoles": [
+            "retrieval_miss",
+            "false_no_event",
+            "insufficient_observation_misstatement",
+            "source_outage_effect"
+          ]
+        }
+      ],
+      "pipelineRequirement": "Evaluate retrieval, clustering, attribution, classification, severity, abstention, publication, and observability separately and end to end.",
+      "failureRetention": "Every sampled failure remains in denominators and error ledgers."
+    },
+    "prospectiveShadow": {
+      "purpose": "Measure the frozen current pipeline on future evidence that was unavailable when the method was locked.",
+      "durationDays": 90,
+      "extensionRule": "The window ends after 90 consecutive UTC days. An underpowered yield is reported as underpowered; dates are not extended after labels.",
+      "population": "All retrieved items, clusters, attempts, decisions, incident assignments, events, review obligations, and dimensional outputs created inside the window.",
+      "sampling": "After window closure, construct label-blind event-candidate, system-negative, and country-day frames with the frozen v1 allocator and seed derived only from the window identity.",
+      "requiredPipelineStages": [
+        "ingest",
+        "cluster",
+        "classify",
+        "corroborate",
+        "review",
+        "score"
+      ],
+      "outputRetention": "Stage runs and all evidence-bearing inputs, attempts, decisions, projections, history, exclusions, and failures are retained before labels exist.",
+      "methodChangeRule": "Any semantic pipeline, prompt, model panel, ontology, source-basket, threshold, or publication-rule change ends the current window and requires a new protocol version/window.",
+      "reportingRule": "Publish the frozen results and limitations regardless of whether thresholds pass."
+    }
+  },
+  "startPrerequisites": [
+    "protocol_artifact_and_hash_checked_in",
+    "runtime_method_and_every_stage_version_frozen",
+    "scheduled_ingest_cluster_classify_score_and_review_sla_routes_enabled",
+    "one_successful_current_version_run_for_each_automatic_stage",
+    "append_only_evidence_and_output_history_live_validators_pass",
+    "source_coverage_and_observability_snapshot_recorded",
+    "no_prospective_human_labels_exist",
+    "start_instant_and_planned_end_date_recorded_before_first_eligible_retrieval"
+  ],
+  "analysisBoundary": {
+    "currentEnsembleRequired": true,
+    "fullPipelineRequired": true,
+    "agreementIsPerformanceMetric": false,
+    "regressionCanPromoteMethod": false,
+    "noResultIsAllowed": true
+  },
+  "semanticSha256": "89bea0ceb83090725e9a65a39e7e96a0f8e5badcae988493cd06873267a329e3"
+}
