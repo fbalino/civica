@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 168
-- **Remaining:** 135
-- **Progress:** 55.4%
+- **Completed:** 169
+- **Remaining:** 134
+- **Progress:** 55.8%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -360,5 +360,5 @@ Source: `plan/11-brand-legal-and-licensing.md`
 - [ ] **BRD-012** (P0) Align privacy policy and actual data handling for contact, advisory applications, analytics, admin logs, chat, reviewer workflows, and error monitoring. _Done when: a data-flow/retention/access/deletion/security/subprocessor inventory matches implemented behavior, consent/notice is contextual, unnecessary fields are removed, and professional/manual review is queued._
 - [ ] **BRD-013** (P1) Align terms/API/embed/download conditions with real capabilities and rights. _Done when: acceptable use, attribution, rate limits, uptime/no-warranty, experimental outputs, redistribution restrictions, corrections, embedding, automated access, and termination/deprecation terms match code/docs and avoid granting rights Civica lacks._
 - [x] **BRD-014** (P1) Publish accessibility and responsible-disclosure/security contact statements. _Done when: accessibility target/current limitations/feedback process and security reporting/safe-harbor posture are accurate, monitored contact paths work, and response/triage runbooks are tested._
-- [ ] **BRD-015** (P1) Add copyright/trademark/data-rights complaint and correction handling. _Done when: a documented intake authenticates claims, preserves evidence, supports temporary containment, legal/editorial review, counter/appeal where applicable, final action, requester response, and public correction/version history without exposing personal data._
+- [x] **BRD-015** (P1) Add copyright/trademark/data-rights complaint and correction handling. _Done when: a documented intake authenticates claims, preserves evidence, supports temporary containment, legal/editorial review, counter/appeal where applicable, final action, requester response, and public correction/version history without exposing personal data._
 - [ ] **BRD-016** (P0) Produce the G6 brand/legal/licensing readiness memo. _Done when: name decision, counsel/manual outcomes, code license, rights manifests, noncommercial gate, asset audit, privacy/terms/accessibility/security statements, open risks, and approved release/outreach constraints are summarized with no unwaived P0 finding._
