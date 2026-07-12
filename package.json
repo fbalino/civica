@@ -303,6 +303,7 @@
     "validate:doc-references": "tsx scripts/validate-doc-references.ts",
     "validate:replication-surface": "tsx scripts/validate-replication-surface.ts",
     "validate:api-docs": "tsx scripts/validate-api-docs.ts",
+    "validate:route-inventory": "tsx scripts/validate-route-inventory.ts",
     "validate:metadata": "tsx scripts/validate-metadata.ts",
     "validate:editorial-illustrations": "tsx scripts/validate-editorial-illustration-disclosure.ts && npm run validate:engraving-color-contract && npm run validate:engraving-grader && npm run validate:illustration-manifest && npm run validate:country-engravings",
     "validate:engraving-color-contract": "tsx scripts/validate-engraving-color-contract.ts",

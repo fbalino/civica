@@ -79,6 +79,12 @@ export const CLAIMS_DOCS_GATE_MANIFEST: GateManifest = {
       description: "Generated API docs and examples match the endpoint contract registry.",
     },
     {
+      id: "route-inventory",
+      npmScript: "validate:route-inventory",
+      categories: ["routes-anchors"],
+      description: "Every route.ts handler is registered by exposure/mutation/sensitivity/controls; unregistered or drifted routes fail closed.",
+    },
+    {
       id: "unit-tests",
       npmScript: "test",
       categories: ["methodology-fixtures"],
@@ -231,7 +237,7 @@ export const STALE_COPY_FIXTURE_EVIDENCE: Record<GateCategory, string> = {
   "numeric-templates":
     "src/lib/claims/public-numeric-claims.test.ts — stale live literal and missing-fallback fixtures",
   "routes-anchors":
-    "src/lib/docs/__tests__/doc-concepts.test.ts — stale route and broken-anchor fixtures",
+    "src/lib/docs/__tests__/doc-concepts.test.ts — stale route and broken-anchor fixtures; src/lib/api/route-inventory/__tests__/route-inventory.test.ts — phantom route, stale entry, and uncontrolled cron/admin/public-mutation fixtures",
   "api-examples":
     "src/lib/api/contract/__tests__/contract.test.ts — missing/excess response-field fixtures",
   "methodology-fixtures":
