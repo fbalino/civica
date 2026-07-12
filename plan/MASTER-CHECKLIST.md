@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 155
-- **Remaining:** 148
-- **Progress:** 51.2%
+- **Completed:** 156
+- **Remaining:** 147
+- **Progress:** 51.5%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -193,7 +193,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [ ] **ATL-022** (P2) Create a source-native governance-change explorer only after ATL-003. _Done when: “movers/backsliding” views use declared external series and time windows, show uncertainty/revisions and sensitivity to start/end dates, avoid Civica letter grades, and allow no-ranking when comparability is insufficient._
 - [ ] **ATL-023** (P1) Publish at least three reproducible reconciliation or institutional-data case studies. _Done when: each case has a research question, frozen input rows, decision trail, code/notebook, output, source rights, limitations, stable citation, and a test that regenerates its tables/figures._
 - [ ] **ATL-024** (P1) Add an evidence-backed data-error/report-correction flow. _Done when: a reader can report a precise entity/field/release/source issue; submissions are authenticated against abuse, acknowledged, triaged, linked to corrections, and covered by privacy/retention policy and delivery tests._
-- [ ] **ATL-025** (P1) Reconcile every older roadmap/mockup promise with the atlas-first release. _Done when: each existing dated plan/mockup is tagged imported/completed/superseded/deferred/post-release with evidence and any still-valid open work has a task ID in this master plan; no active pointer targets a noncanonical plan._
+- [x] **ATL-025** (P1) Reconcile every older roadmap/mockup promise with the atlas-first release. _Done when: each existing dated plan/mockup is tagged imported/completed/superseded/deferred/post-release with evidence and any still-valid open work has a task ID in this master plan; no active pointer targets a noncanonical plan._
 - [ ] **ATL-026** (P0) Persist every Civica Conditions component value, reference year, source, missingness, and inclusion decision. _Done when: economic/HDI/security rows can be decomposed into exact components and years, mixed-year inputs follow an adopted alignment rule or are refused/flagged, and no composite is labelled solely with the newest component year._
 - [ ] **ATL-027** (P0) Freeze Conditions reference distributions and transformations by release. _Done when: reference population/period, means/SDs or other normalization parameters, direction, included components, and missingness are stored/queryable; rerunning a release is deterministic and cannot shift prior values silently._
 - [ ] **ATL-028** (P0) Validate or redesign the “economic stability” construct. _Done when: a cited theory distinguishes stable growth from boom/rebound/volatility, candidate definitions and sensitivity are tested on frozen longitudinal data, external/native baselines are compared, and a resolution permits separate indicators/no composite if no construct passes._
