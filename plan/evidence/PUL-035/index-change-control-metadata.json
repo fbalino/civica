@@ -1,0 +1,38 @@
+{
+  "id": "pulse-dimensional-output-history",
+  "toVersion": "civica-index-pulse-dimensional-output-history-v19",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-035/README.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "src/lib/claims/public-claims.ts"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-035/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-035/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/score-fixture.test.ts",
+      "src/lib/pulse/v2/runtime-method.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-delta-lifecycle.ts",
+      "scripts/validate-pulse-runtime-method.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:pulse-delta-lifecycle",
+    "validate:pulse-runtime"
+  ]
+}

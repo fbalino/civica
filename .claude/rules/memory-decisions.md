@@ -959,3 +959,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Exceptions are append-only and bounded; they never restore completeness.
 - Pre-contract pending items are unpublished legacy quarantine, not human
   decisions. Durable record: APR-D148.
+
+## 2026-07-12 — Pulse expiry uses internal tombstones and public nulls
+
+- Scoring covers the union of eligible-event and existing-projection
+  jurisdictions under an inclusive 365-day window.
+- No-event dimensions receive internal zero tombstones; public reads return
+  `null` and make no stability inference.
+- Every score run writes immutable history and the current projection in one
+  atomic batch. Durable record: APR-D150.

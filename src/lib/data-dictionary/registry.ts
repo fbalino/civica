@@ -910,14 +910,31 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   },
   pulse_dimensional_deltas: {
     definition:
-      "Experimental per-dimension effects assigned to reviewed Pulse v2 events.",
-    rowGrain: "One event, Civica Index dimension, and scoring method version.",
+      "Current experimental Pulse effect for one jurisdiction and Civica Index dimension.",
+    rowGrain:
+      "One current-state row per jurisdiction and Civica Index dimension.",
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Versioned experimental scoring from verified Pulse v2 event classifications.",
     cadence: "Daily after classification/corroboration and on rescore.",
     vintageSemantics:
-      "created_at is scoring time; method_version fixes the scoring interpretation.",
+      "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+    rights:
+      "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+    deprecation: active,
+  },
+  pulse_dimensional_delta_history: {
+    definition:
+      "Immutable, versioned history of every computed Pulse dimensional output, including zero-output clearing rows.",
+    rowGrain:
+      "One score run, jurisdiction, and Civica Index dimension under pulse-dimensional-delta-history/v1.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
+    cadence:
+      "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
+    vintageSemantics:
+      "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
     rights:
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
     deprecation: active,

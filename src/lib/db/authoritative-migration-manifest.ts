@@ -163,4 +163,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "c85245fbd9d0f48568ac7588a5d42a5649c71d4704e213647f2b30d9b3a4f61e",
     baseline: false,
   },
+  {
+    id: "0027_smart_tempest",
+    path: "drizzle/authoritative/0027_smart_tempest.sql",
+    sha256: "0952f3e56354b8152192a233465ac29b04d4943836067cc29a6a1df6009bf846",
+    baseline: false,
+  },
 ] as const;

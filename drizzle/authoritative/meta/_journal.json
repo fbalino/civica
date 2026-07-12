@@ -190,6 +190,13 @@
       "when": 1783847539082,
       "tag": "0026_magenta_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1783848978147,
+      "tag": "0027_smart_tempest",
+      "breakpoints": true
     }
   ]
 }

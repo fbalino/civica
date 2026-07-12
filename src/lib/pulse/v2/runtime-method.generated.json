@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "0536127af43af79b1dc6e9ff81ff45ed3dcbd6d4ffed49ff7c1fd48b1529f701",
+  "contractHash": "dccb865c4dd8c6f923c2db5b5d9c45b5599b391f0adde36bcaba5948efe33992",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -344,6 +344,7 @@
       "lower": -15,
       "upper": 10
     },
+    "currentProjection": "one_row_per_jurisdiction_dimension",
     "dimensions": [
       "democratic_quality",
       "rule_of_law",
@@ -354,6 +355,8 @@
     "impactFormula": "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
     "includedEvents": "published_only",
     "inputMethodCoverage": "row_level_versioned_with_explicit_legacy",
+    "noEventState": "zero_tombstone_internal_public_null",
+    "outputHistory": "append_only_per_score_run_jurisdiction_dimension",
     "publicStatus": "public_experimental",
     "scalar": "none",
     "scoreStageOrder": [
@@ -361,7 +364,9 @@
       "score"
     ],
     "shape": "per_dimension",
-    "trailingWindowDays": 365
+    "trailingWindowDays": 365,
+    "windowBoundary": "inclusive_365_days_future_excluded",
+    "writeAtomicity": "history_projection_and_run_completion_one_transaction"
   },
   "observability": {
     "absentNumericEffect": "withheld",
@@ -623,7 +628,7 @@
     },
     "version": "pulse-review-sla/v1"
   },
-  "schemaVersion": "1.10.0",
+  "schemaVersion": "1.11.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -636,5 +641,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.11-beta"
+  "version": "pulse-v2.12-beta"
 }

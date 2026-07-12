@@ -2146,7 +2146,7 @@ export const pulseEventsV2 = pgTable(
     eventDate: date("event_date").notNull(),
     /** Taxonomy category from spec §3.2 (e.g. "judicial_purge") */
     category: text("category").notNull(),
-    /** dq | rol | fnr | cc | stability */
+    /** democratic_quality | rule_of_law | freedom_rights | corruption_control | stability */
     dimension: text("dimension").notNull(),
     /**
      * low_pos | moderate_pos | high_pos |
@@ -2613,6 +2613,12 @@ export const pulseDimensionalDeltas = pgTable(
     computationRunId: uuid("computation_run_id")
       .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
       .notNull(),
+    /** Inclusive end date of the score window. */
+    scoreAsOf: date("score_as_of").notNull(),
+    /** Inclusive start date of the score window. */
+    windowStart: date("window_start").notNull(),
+    /** Closed production contract: trailing 365 calendar days. */
+    windowDays: integer("window_days").notNull(),
     lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
   },
   (table) => [
@@ -2623,6 +2629,83 @@ export const pulseDimensionalDeltas = pgTable(
     index("idx_pulse_dim_jurisdiction").on(table.jurisdictionId),
     index("idx_pulse_dim_derivation_version").on(table.derivationVersionKey),
     index("idx_pulse_dim_computation_run").on(table.computationRunId),
+    check(
+      "pulse_dimensional_deltas_dimension_check",
+      dsql`${table.dimension} IN ('democratic_quality', 'rule_of_law', 'freedom_rights', 'corruption_control', 'stability')`,
+    ),
+    check(
+      "pulse_dimensional_deltas_value_check",
+      dsql`${table.deltaValue} <> 'NaN'::real AND ${table.deltaValue} >= -15 AND ${table.deltaValue} <= 10`,
+    ),
+    check(
+      "pulse_dimensional_deltas_window_check",
+      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
+  ],
+);
+
+/**
+ * Immutable history of every versioned Pulse dimensional output.
+ *
+ * The mutable table above is the current-state projection. This relation is
+ * the reproducibility ledger: each score run records exactly one row for every
+ * jurisdiction/dimension output it computed, including zero-output clearing
+ * rows. Database triggers reject UPDATE and DELETE.
+ */
+export const pulseDimensionalDeltaHistory = pgTable(
+  "pulse_dimensional_delta_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version")
+      .notNull()
+      .default("pulse-dimensional-delta-history/v1"),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    deltaValue: real("delta_value").notNull(),
+    contributingEventIds: uuid("contributing_event_ids").array().notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
+    computationRunId: uuid("computation_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    scoreAsOf: date("score_as_of").notNull(),
+    windowStart: date("window_start").notNull(),
+    windowDays: integer("window_days").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_dim_history_run_jurisdiction_dimension").on(
+      table.computationRunId,
+      table.jurisdictionId,
+      table.dimension,
+    ),
+    index("idx_pulse_dim_history_jurisdiction_as_of").on(
+      table.jurisdictionId,
+      table.scoreAsOf,
+    ),
+    index("idx_pulse_dim_history_derivation_version").on(
+      table.derivationVersionKey,
+    ),
+    check(
+      "pulse_dimensional_delta_history_schema_check",
+      dsql`${table.schemaVersion} = 'pulse-dimensional-delta-history/v1'`,
+    ),
+    check(
+      "pulse_dimensional_delta_history_dimension_check",
+      dsql`${table.dimension} IN ('democratic_quality', 'rule_of_law', 'freedom_rights', 'corruption_control', 'stability')`,
+    ),
+    check(
+      "pulse_dimensional_delta_history_value_check",
+      dsql`${table.deltaValue} <> 'NaN'::real AND ${table.deltaValue} >= -15 AND ${table.deltaValue} <= 10`,
+    ),
+    check(
+      "pulse_dimensional_delta_history_window_check",
+      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
   ],
 );
 

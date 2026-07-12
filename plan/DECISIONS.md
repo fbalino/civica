@@ -833,3 +833,21 @@ empty table and executable writer in place would preserve a silent path back
 to a method the public contract already rejects. Fail-closed retirement removes
 that ambiguity without deleting the historical event records needed for audit
 and later evaluation.
+
+### APR-D150 — Pulse absence clears the projection and preserves the run
+
+**Decision:** Pulse scoring uses a closed 365-day window and evaluates the
+union of jurisdictions with eligible events and jurisdictions with an existing
+projection. A jurisdiction with no eligible event receives five internal zero
+tombstones with empty contributor lists. The country-dimensions API returns
+`null` for those rows. Each computation writes an append-only history row and
+the current projection with the same run, as-of date, window, value,
+contributors, and derivation envelope. History, projection, and successful run
+completion share one atomic database batch.
+
+**Why:** Leaving a prior nonzero row in place after its final event ages out
+turns yesterday's evidence into a current claim. Deleting the row would remove
+the record needed to reproduce the transition. An internal tombstone clears
+the current state while the public null preserves the distinction between no
+eligible event, low observation, and stability. Immutable per-run outputs make
+later method comparisons and exact historical replay possible.

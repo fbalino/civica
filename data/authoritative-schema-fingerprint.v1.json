@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T09:19:59.635Z",
-  "sha256": "830db9e3a2af51bfe226771a1871df0601328e1c40cbe0d9a725e316abec7e91",
+  "generatedAt": "2026-07-12T09:48:08.885Z",
+  "sha256": "79dc9062ac22f342d681aa0c05670ca49ba2b60f9d7ce99d8ea69940f0baf4bb",
   "schema": {
     "columns": [
       {
@@ -6425,6 +6425,123 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "pulse_dimensional_delta_history",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_dimensional_delta_history",
+        "default": "'pulse-dimensional-delta-history/v1'::text",
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "dimension",
+        "type": "text",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "float4",
+        "name": "delta_value",
+        "type": "real",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "_uuid",
+        "name": "contributing_event_ids",
+        "type": "ARRAY",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "derivation_version_key",
+        "type": "text",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "jsonb",
+        "name": "derivation_versions",
+        "type": "jsonb",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "computation_run_id",
+        "type": "uuid",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "date",
+        "name": "score_as_of",
+        "type": "date",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "date",
+        "name": "window_start",
+        "type": "date",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "int4",
+        "name": "window_days",
+        "type": "integer",
+        "table": "pulse_dimensional_delta_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_dimensional_delta_history",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_dimensional_deltas",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -6501,6 +6618,33 @@
         "default": null,
         "nullable": "NO",
         "position": 9
+      },
+      {
+        "udt": "date",
+        "name": "score_as_of",
+        "type": "date",
+        "table": "pulse_dimensional_deltas",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "date",
+        "name": "window_start",
+        "type": "date",
+        "table": "pulse_dimensional_deltas",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "int4",
+        "name": "window_days",
+        "type": "integer",
+        "table": "pulse_dimensional_deltas",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
       },
       {
         "udt": "text",
@@ -9767,6 +9911,26 @@
         "definition": "CREATE UNIQUE INDEX pulse_corrections_pkey ON public.pulse_corrections USING btree (id)"
       },
       {
+        "name": "idx_pulse_dim_history_derivation_version",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CREATE INDEX idx_pulse_dim_history_derivation_version ON public.pulse_dimensional_delta_history USING btree (derivation_version_key)"
+      },
+      {
+        "name": "idx_pulse_dim_history_jurisdiction_as_of",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CREATE INDEX idx_pulse_dim_history_jurisdiction_as_of ON public.pulse_dimensional_delta_history USING btree (jurisdiction_id, score_as_of)"
+      },
+      {
+        "name": "idx_pulse_dim_history_run_jurisdiction_dimension",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_dim_history_run_jurisdiction_dimension ON public.pulse_dimensional_delta_history USING btree (computation_run_id, jurisdiction_id, dimension)"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_pkey",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CREATE UNIQUE INDEX pulse_dimensional_delta_history_pkey ON public.pulse_dimensional_delta_history USING btree (id)"
+      },
+      {
         "name": "idx_pulse_dim_computation_run",
         "table": "pulse_dimensional_deltas",
         "definition": "CREATE INDEX idx_pulse_dim_computation_run ON public.pulse_dimensional_deltas USING btree (computation_run_id)"
@@ -10247,6 +10411,11 @@
         "name": "civica_reject_pulse_coding_evidence_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_coding_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse coding packets and audit rows are append-only';\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_reject_pulse_dimensional_delta_history_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_dimensional_delta_history_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n\tRAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
       },
       {
         "name": "civica_reject_pulse_incident_evidence_mutation",
@@ -10746,6 +10915,11 @@
         "definition": "CREATE TRIGGER pulse_coding_packets_append_only BEFORE DELETE OR UPDATE ON pulse_coding_packets FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_coding_evidence_mutation()"
       },
       {
+        "name": "pulse_dimensional_delta_history_append_only",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CREATE TRIGGER pulse_dimensional_delta_history_append_only BEFORE DELETE OR UPDATE ON pulse_dimensional_delta_history FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_dimensional_delta_history_mutation()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "pulse_dimensional_deltas",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_dimensional_deltas FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -11130,6 +11304,11 @@
       {
         "kind": "r",
         "name": "pulse_corrections",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_dimensional_delta_history",
         "definition": null
       },
       {
@@ -12313,10 +12492,58 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "pulse_dimensional_delta_history_computation_run_id_pulse_pipeli",
+        "type": "f",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "FOREIGN KEY (computation_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_dimension_check",
+        "type": "c",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CHECK (dimension = ANY (ARRAY['democratic_quality'::text, 'rule_of_law'::text, 'freedom_rights'::text, 'corruption_control'::text, 'stability'::text]))"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_jurisdiction_id_jurisdictions_i",
+        "type": "f",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_pkey",
+        "type": "p",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_schema_check",
+        "type": "c",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CHECK (schema_version = 'pulse-dimensional-delta-history/v1'::text)"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_value_check",
+        "type": "c",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CHECK (delta_value <> 'NaN'::real AND delta_value >= '-15'::integer::double precision AND delta_value <= 10::double precision)"
+      },
+      {
+        "name": "pulse_dimensional_delta_history_window_check",
+        "type": "c",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CHECK (window_days = 365 AND window_start = (score_as_of - window_days))"
+      },
+      {
         "name": "pulse_dimensional_deltas_computation_run_id_pulse_pipeline_runs",
         "type": "f",
         "table": "pulse_dimensional_deltas",
         "definition": "FOREIGN KEY (computation_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_dimensional_deltas_dimension_check",
+        "type": "c",
+        "table": "pulse_dimensional_deltas",
+        "definition": "CHECK (dimension = ANY (ARRAY['democratic_quality'::text, 'rule_of_law'::text, 'freedom_rights'::text, 'corruption_control'::text, 'stability'::text]))"
       },
       {
         "name": "pulse_dimensional_deltas_jurisdiction_id_jurisdictions_id_fk",
@@ -12329,6 +12556,18 @@
         "type": "p",
         "table": "pulse_dimensional_deltas",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_dimensional_deltas_value_check",
+        "type": "c",
+        "table": "pulse_dimensional_deltas",
+        "definition": "CHECK (delta_value <> 'NaN'::real AND delta_value >= '-15'::integer::double precision AND delta_value <= 10::double precision)"
+      },
+      {
+        "name": "pulse_dimensional_deltas_window_check",
+        "type": "c",
+        "table": "pulse_dimensional_deltas",
+        "definition": "CHECK (window_days = 365 AND window_start = (score_as_of - window_days))"
       },
       {
         "name": "pulse_event_decisions_contract_check",

@@ -797,3 +797,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   quarantine. Production migration and live retention invariants pass.
 - Claims, 898 tests, design tokens, API contracts, full build, and light/dark
   reader browser checks passed.
+
+## 2026-07-12 — PUL-035 dimensional lifecycle completed
+
+- Added exact 365-day inclusion and 366-day/future exclusion, prior-state
+  clearing, internal zero tombstones, and public null behavior.
+- Applied migration 0027; production is at 28/28 migrations with 72 public
+  tables and 650 immutable dimensional outputs across two score runs.
+- Live lifecycle checks, 907 tests, claims, TypeScript, light/dark browser QA,
+  and the full production build passed.

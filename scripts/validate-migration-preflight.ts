@@ -4,7 +4,10 @@ import { resolve } from "node:path";
 import { MIGRATION_ARTIFACTS } from "../src/lib/db/migration-registry";
 
 const root = process.cwd();
-const report = JSON.parse(readFileSync(resolve(root, "plan/evidence/DAT-013/preflight.json"), "utf8")) as { plans: Array<{ id: string; artifact: string; sha256: string; affectedRelations: string[]; liveRowCounts: Record<string, number | "missing">; writesPerformed: number }> };
+const report = JSON.parse(readFileSync(resolve(root, "plan/evidence/DAT-013/preflight.json"), "utf8")) as {
+  appliedAuthoritativeMigrationIds?: string[];
+  plans: Array<{ id: string; artifact: string; sha256: string; affectedRelations: string[]; liveRowCounts: Record<string, number | "missing">; writesPerformed: number }>;
+};
 const errors: string[] = [];
 const byId = new Map(report.plans.map((plan) => [plan.id, plan]));
 for (const entry of MIGRATION_ARTIFACTS) {
@@ -21,7 +24,13 @@ for (const entry of MIGRATION_ARTIFACTS) {
       `CREATE\\s+TABLE(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"?(?:public\\.)?${relation}"?\\b`,
       "i",
     ).test(source);
-    if (count === "missing" && !createsRelation) {
+    const dropsRelation = new RegExp(
+      `DROP\\s+TABLE(?:\\s+IF\\s+EXISTS)?\\s+"?(?:public\\.)?${relation}"?\\b`,
+      "i",
+    ).test(source);
+    const appliedDestructivePostState =
+      dropsRelation && report.appliedAuthoritativeMigrationIds?.includes(entry.id);
+    if (count === "missing" && !createsRelation && !appliedDestructivePostState) {
       errors.push(`${entry.id}/${relation} is unexpectedly missing before migration`);
     } else if (count !== "missing" && (!Number.isSafeInteger(count) || count < 0)) {
       errors.push(`${entry.id}/${relation} lacks a valid live row count`);

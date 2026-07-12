@@ -11,9 +11,13 @@
  * the event ages out.
  */
 
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { pulseDimensionalDeltas } from "@/lib/db/schema";
+import {
+  pulseDimensionalDeltaHistory,
+  pulseDimensionalDeltas,
+  pulsePipelineRuns,
+} from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { decayedImpact, daysSince } from "./decay";
 import {
@@ -69,6 +73,9 @@ export interface DimensionalDeltaPlan {
   derivationVersionKey: string;
   derivationVersions: DerivationVersionEnvelope;
   computationRunId: string;
+  scoreAsOf: string;
+  windowStart: string;
+  windowDays: number;
 }
 
 export interface ScoreOptions {
@@ -91,8 +98,16 @@ export async function calculateDimensionalDeltas(
     .toISOString()
     .slice(0, 10);
 
-  const events = options.events ?? await loadPublishedEvents(db, windowStart);
-  validatePublishedEvents(events);
+  const candidateEvents =
+    options.events ?? (await loadPublishedEvents(db, windowStart));
+  validatePublishedEvents(candidateEvents);
+  const todayDate = today.toISOString().slice(0, 10);
+  // Enforce the window in the pure scorer as well as its SQL loader. This
+  // keeps fixtures, replays, and future callers from reviving an aged-out or
+  // future event by supplying a preloaded array that bypasses the query.
+  const events = candidateEvents.filter(
+    (event) => event.eventDate >= windowStart && event.eventDate <= todayDate,
+  );
   const run =
     options.runRef ??
     createPulsePipelineRunRef("score", {
@@ -106,9 +121,13 @@ export async function calculateDimensionalDeltas(
         ],
       ),
     });
-  const persistRun = !options.dryRun && !options.events && !options.runRef;
+  const persistRun =
+    !options.dryRun && !options.events && !options.runRef && !options.write;
   if (persistRun) await startPulsePipelineRun(db, run);
   const existingJurisdictionIds = options.existingJurisdictionIds ?? await loadExistingJurisdictionIds(db);
+  if (existingJurisdictionIds.some((id) => !id.trim())) {
+    throw new Error("score fixture has a blank existing jurisdiction id");
+  }
 
   // Bucket by (jurisdictionId, dimension)
   type Key = string; // `${jurisdictionId}::${dimension}`
@@ -180,27 +199,70 @@ export async function calculateDimensionalDeltas(
         derivationVersionKey: versions.key,
         derivationVersions: versions.envelope,
         computationRunId: run.id,
+        scoreAsOf: todayDate,
+        windowStart,
+        windowDays: SCORE_WINDOW_DAYS,
       };
       planned.push(plan);
-      if (!options.dryRun) {
-        if (options.write) await options.write(db, plan);
-        else await writeDimensionalDelta(db, plan, today);
-        written++;
-      }
       if (Math.abs(clamped) >= 1) significant++;
     }
   }
 
-  if (persistRun) {
-    await finishPulsePipelineRun(db, run.id, {
-      status: "completed",
-      counts: {
+  if (!options.dryRun) {
+    if (options.write) {
+      for (const plan of planned) {
+        await options.write(db, plan);
+        written++;
+      }
+    } else if (persistRun) {
+      const counts = {
         eventsConsidered: events.length,
         countriesScored: countriesSeen.size,
-        dimensionRowsWritten: written,
+        dimensionRowsWritten: planned.length,
         significantDeltas: significant,
-      },
-    });
+      };
+      try {
+        const batchQueries = [
+          ...planned.flatMap((plan) =>
+            dimensionalDeltaWriteQueries(db, plan, today),
+          ),
+          db
+            .update(pulsePipelineRuns)
+            .set({
+              status: "completed",
+              counts,
+              failures: [],
+              completedAt: new Date(),
+            })
+            .where(eq(pulsePipelineRuns.id, run.id)),
+        ] as unknown as Parameters<typeof db.batch>[0];
+        // neon-http exposes atomic transactions through batch(); its callback
+        // transaction API deliberately throws. The batch contains every
+        // immutable output, current projection, and successful run close.
+        await db.batch(batchQueries);
+        written = planned.length;
+      } catch (error) {
+        await finishPulsePipelineRun(db, run.id, {
+          status: "failed",
+          counts: { ...counts, dimensionRowsWritten: 0 },
+          failures: [
+            {
+              component: "pulse_dimensional_delta_history",
+              message:
+                error instanceof Error
+                  ? error.message.slice(0, 500)
+                  : "Unknown atomic score write failure",
+            },
+          ],
+        });
+        throw error;
+      }
+    } else {
+      for (const plan of planned) {
+        await writeDimensionalDelta(db, plan, today);
+        written++;
+      }
+    }
   }
 
   return {
@@ -235,8 +297,25 @@ async function loadExistingJurisdictionIds(db: Db): Promise<string[]> {
     .map((row) => String(row.jurisdiction_id));
 }
 
-async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Date): Promise<void> {
-  await db
+function dimensionalDeltaWriteQueries(
+  db: Db,
+  plan: DimensionalDeltaPlan,
+  now: Date,
+) {
+  const history = db.insert(pulseDimensionalDeltaHistory).values({
+    schemaVersion: "pulse-dimensional-delta-history/v1",
+    jurisdictionId: plan.jurisdictionId,
+    dimension: plan.dimension,
+    deltaValue: plan.deltaValue,
+    contributingEventIds: plan.contributingEventIds,
+    derivationVersionKey: plan.derivationVersionKey,
+    derivationVersions: plan.derivationVersions,
+    computationRunId: plan.computationRunId,
+    scoreAsOf: plan.scoreAsOf,
+    windowStart: plan.windowStart,
+    windowDays: plan.windowDays,
+  });
+  const projection = db
     .insert(pulseDimensionalDeltas)
     .values({
       jurisdictionId: plan.jurisdictionId,
@@ -246,6 +325,10 @@ async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Da
       derivationVersionKey: plan.derivationVersionKey,
       derivationVersions: plan.derivationVersions,
       computationRunId: plan.computationRunId,
+      scoreAsOf: plan.scoreAsOf,
+      windowStart: plan.windowStart,
+      windowDays: plan.windowDays,
+      lastComputedAt: now,
     })
     .onConflictDoUpdate({
       target: [pulseDimensionalDeltas.jurisdictionId, pulseDimensionalDeltas.dimension],
@@ -255,9 +338,23 @@ async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Da
         derivationVersionKey: plan.derivationVersionKey,
         derivationVersions: plan.derivationVersions,
         computationRunId: plan.computationRunId,
+        scoreAsOf: plan.scoreAsOf,
+        windowStart: plan.windowStart,
+        windowDays: plan.windowDays,
         lastComputedAt: now,
       },
     });
+  return [history, projection] as const;
+}
+
+async function writeDimensionalDelta(
+  db: Db,
+  plan: DimensionalDeltaPlan,
+  now: Date,
+): Promise<void> {
+  const [history, projection] = dimensionalDeltaWriteQueries(db, plan, now);
+  await history;
+  await projection;
 }
 
 async function loadPublishedEvents(

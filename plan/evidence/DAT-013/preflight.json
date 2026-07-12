@@ -1,5 +1,35 @@
 {
-  "generatedAt": "2026-07-12T09:17:56.599Z",
+  "generatedAt": "2026-07-12T09:53:25.246Z",
+  "appliedAuthoritativeMigrationIds": [
+    "0000_authoritative_baseline",
+    "0001_aspiring_bloodaxe",
+    "0002_quarantine_numeric_outliers",
+    "0003_mixed_mockingbird",
+    "0004_naive_dust",
+    "0005_freeze_reconciliation_candidates",
+    "0006_staged_candidate_publication",
+    "0007_slippery_warhawk",
+    "0008_material_wildside",
+    "0009_ambiguous_maverick",
+    "0010_early_hawkeye",
+    "0011_freeze_ci_research_panel",
+    "0012_fix_panel_release_staging_delete",
+    "0013_real_bromley",
+    "0014_boring_tana_nile",
+    "0015_steep_cyclops",
+    "0016_loving_maggott",
+    "0017_validate_decision_supersession",
+    "0018_rich_phalanx",
+    "0019_careless_avengers",
+    "0020_attach_candidate_retention_trigger",
+    "0021_steep_brood",
+    "0022_puzzling_killraven",
+    "0023_wide_gorilla_man",
+    "0024_dark_maginty",
+    "0025_careful_the_professor",
+    "0026_magenta_xavin",
+    "0027_smart_tempest"
+  ],
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -642,7 +672,7 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 67284,
+        "research_evidence_history": 67934,
         "statements": 6768,
         "terms": 5475
       },
@@ -720,10 +750,10 @@
         "pulse_incident_assignments": 1507,
         "pulse_incident_resolutions": 479,
         "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 23,
+        "pulse_pipeline_runs": 24,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 67284
+        "research_evidence_history": 67934
       },
       "writesPerformed": 0
     },
@@ -752,9 +782,9 @@
         "pulse_cluster_classification_states": 385,
         "pulse_event_decisions": 3927,
         "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 23,
+        "pulse_pipeline_runs": 24,
         "raw_events": 1507,
-        "research_evidence_history": 67284
+        "research_evidence_history": 67934
       },
       "writesPerformed": 0
     },
@@ -781,7 +811,7 @@
         "pulse_incidents": 1224,
         "pulse_review_obligations": 175,
         "pulse_review_sla_events": 175,
-        "research_evidence_history": 67284
+        "research_evidence_history": 67934
       },
       "writesPerformed": 0
     },
@@ -801,8 +831,31 @@
       "invariantPlan": "npm run db:plan -- --id=0026_magenta_xavin --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_changelog": 0,
-        "pulse_daily_scores": 0
+        "pulse_changelog": "missing",
+        "pulse_daily_scores": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0027_smart_tempest",
+      "artifact": "drizzle/authoritative/0027_smart_tempest.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "0952f3e56354b8152192a233465ac29b04d4943836067cc29a6a1df6009bf846",
+      "affectedRelations": [
+        "pulse_dimensional_delta_history",
+        "pulse_dimensional_deltas",
+        "research_evidence_history"
+      ],
+      "statementCount": 21,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0027_smart_tempest-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0027_smart_tempest --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_dimensional_delta_history": 650,
+        "pulse_dimensional_deltas": 325,
+        "research_evidence_history": 67934
       },
       "writesPerformed": 0
     },

@@ -73,6 +73,12 @@ approval, or rejection for those items.
 and writer. The migration fails closed if either relation contains a row and
 does not alter the retained legacy `pulse_events` evidence table.
 
+`0027_smart_tempest` adds the append-only
+`pulse-dimensional-delta-history/v1` output ledger and explicit inclusive
+365-day lookback metadata to the current Pulse dimensional projection. Existing
+current rows receive deterministic dates from `last_computed_at` and are copied
+once into history; later history rows reject updates and deletions.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

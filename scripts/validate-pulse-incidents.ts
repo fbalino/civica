@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
+import { PULSE_DELTA_ALGORITHM_VERSION } from "../src/lib/pulse/v2/versioning";
 
 config({ path: ".env.local", override: true });
 
@@ -92,7 +93,7 @@ async function main() {
           WHERE status = 'running') AS running_runs,
         (SELECT count(*)::int FROM pulse_dimensional_deltas
           WHERE derivation_versions->'algorithm'->>'id'
-            <> 'pulse-delta/decay-window-v2.2+incident-resolution-v1') AS stale_delta_rows
+            <> ${PULSE_DELTA_ALGORITHM_VERSION}) AS stale_delta_rows
     `;
     for (const field of [
       "invalid_incidents",

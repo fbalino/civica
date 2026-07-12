@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.11-beta");
+  assert.equal(method.version, "pulse-v2.12-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -44,6 +44,22 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.equal(method.observability.absentNumericEffect, "withheld");
   assert.equal(method.observability.countryQualityInference, "prohibited");
   assert.equal(method.numericDeltas.trailingWindowDays, 365);
+  assert.equal(
+    method.numericDeltas.windowBoundary,
+    "inclusive_365_days_future_excluded",
+  );
+  assert.equal(
+    method.numericDeltas.noEventState,
+    "zero_tombstone_internal_public_null",
+  );
+  assert.equal(
+    method.numericDeltas.outputHistory,
+    "append_only_per_score_run_jurisdiction_dimension",
+  );
+  assert.equal(
+    method.numericDeltas.writeAtomicity,
+    "history_projection_and_run_completion_one_transaction",
+  );
   assert.equal(method.evaluation.backtestMatchesCurrentProduction, false);
   assert.equal(
     method.evaluation.currentProductionValidatedByExistingBacktest,

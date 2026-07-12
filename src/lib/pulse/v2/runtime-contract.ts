@@ -94,8 +94,8 @@ import {
   PULSE_REVIEW_SLA_VERSION,
 } from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.10.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.11-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.11.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.12-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -482,6 +482,11 @@ export interface PulseRuntimeMethodContract {
     includedEvents: "published_only";
     inputMethodCoverage: "row_level_versioned_with_explicit_legacy";
     trailingWindowDays: number;
+    windowBoundary: "inclusive_365_days_future_excluded";
+    currentProjection: "one_row_per_jurisdiction_dimension";
+    noEventState: "zero_tombstone_internal_public_null";
+    outputHistory: "append_only_per_score_run_jurisdiction_dimension";
+    writeAtomicity: "history_projection_and_run_completion_one_transaction";
     boundsPerDimension: {
       lower: number;
       upper: number;
@@ -877,6 +882,12 @@ export function buildPulseRuntimeMethod(
       includedEvents: "published_only",
       inputMethodCoverage: "row_level_versioned_with_explicit_legacy",
       trailingWindowDays: facts.scoreWindowDays,
+      windowBoundary: "inclusive_365_days_future_excluded",
+      currentProjection: "one_row_per_jurisdiction_dimension",
+      noEventState: "zero_tombstone_internal_public_null",
+      outputHistory: "append_only_per_score_run_jurisdiction_dimension",
+      writeAtomicity:
+        "history_projection_and_run_completion_one_transaction",
       boundsPerDimension: {
         lower: facts.deltaBounds.lower,
         upper: facts.deltaBounds.upper,

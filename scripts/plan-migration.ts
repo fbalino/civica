@@ -15,6 +15,14 @@ async function main() {
   if (entries.length === 0) throw new Error(`Unknown migration id: ${id}`);
   const countCache = new Map<string, number | "missing">();
   const sql = args.has("live") ? (() => { if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required for --live row counts"); return neon(process.env.DATABASE_URL); })() : null;
+  let appliedAuthoritativeMigrationIds: string[] = [];
+  if (sql) {
+    const [ledger] = await sql`SELECT to_regclass('civica_meta.schema_migrations')::text AS name`;
+    if (ledger?.name) {
+      const rows = await sql`SELECT id FROM civica_meta.schema_migrations ORDER BY id`;
+      appliedAuthoritativeMigrationIds = rows.map((row) => String(row.id));
+    }
+  }
   const reports = [];
   for (const entry of entries) {
     const source = readFileSync(resolve(process.cwd(), entry.path), "utf8");
@@ -33,7 +41,13 @@ async function main() {
   }
     reports.push({ ...plan, liveRowCounts: args.has("live") ? rowCounts : "not_requested", writesPerformed: 0 });
   }
-  const payload = args.has("all") ? { generatedAt: new Date().toISOString(), plans: reports } : reports[0];
+  const payload = args.has("all")
+    ? {
+        generatedAt: new Date().toISOString(),
+        appliedAuthoritativeMigrationIds,
+        plans: reports,
+      }
+    : reports[0];
   const serialized = `${JSON.stringify(payload, null, 2)}\n`;
   const output = args.get("out");
   if (output && output !== "true") { writeFileSync(resolve(process.cwd(), output), serialized); console.log(`Wrote ${reports.length} zero-write migration plan(s) to ${output}.`); }

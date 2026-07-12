@@ -38,6 +38,13 @@ SLA event ledger. Queue entry, escalation, bounded exceptions, disposition, and
 the pre-contract legacy-quarantine boundary remain available for audit. A
 legacy-quarantined item is unpublished and is not a human review decision.
 
+Pulse dimensional scores have a mutable current-state projection and a separate
+append-only `pulse-dimensional-delta-history/v1` ledger. Every computation
+records its score run, jurisdiction, dimension, contributing event IDs,
+derivation envelope, score date, and trailing 365-day lookback. Zero-output
+clearing rows remain in that ledger so an aged-out signal can be reproduced
+without treating its deleted or zeroed current projection as historical truth.
+
 `pulse_evaluation_evidence` provides one internal query surface for:
 
 - classifier negatives that may become false-negative cases after adjudication;
