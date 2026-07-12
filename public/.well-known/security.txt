@@ -1,0 +1,7 @@
+# Civica Atlas — responsible disclosure (RFC 9116)
+Contact: https://civicaatlas.org/contact
+Contact: mailto:admin@civicaatlas.org
+Expires: 2027-07-12T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://civicaatlas.org/.well-known/security.txt
+Policy: https://civicaatlas.org/accessibility#security
