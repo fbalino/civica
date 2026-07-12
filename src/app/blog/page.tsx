@@ -129,7 +129,9 @@ export default function BlogIndex() {
         <span className="record-subnav-grow" />
       </nav>
 
-      <main className="record-main">
+      {/* Not a <main>: the root layout already provides the page's single main
+          landmark, so this content block is a <div>. */}
+      <div className="record-main">
         {/* Lead story */}
         <Reveal as="article" className="record-lead" amount={0.2}>
           <Link
@@ -297,7 +299,7 @@ export default function BlogIndex() {
             </aside>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

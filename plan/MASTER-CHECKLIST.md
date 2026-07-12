@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 178
-- **Remaining:** 125
-- **Progress:** 58.7%
+- **Completed:** 179
+- **Remaining:** 124
+- **Progress:** 59.1%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -241,7 +241,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [ ] **EXP-033** (P0) Make Atlas selection/compare behavior accessible and truthful on pointer, keyboard, and touch. _Done when: the map has a page H1 and synchronized accessible country list or focusable controls, selection/state are announced, keyboard activation works, touch has an explicit two-country compare flow or no impossible instruction, and map/list values remain synchronized._
 - [ ] **EXP-034** (P1) Repair document landmarks, headings, labels, sticky offsets, and form error semantics across live routes. _Done when: pages have one main and logical H1–Hn order, header/nav/dialogs are labelled and nonnested, Ask Civica and all form controls have accessible names, invalid fields link errors and receive focus, sticky UI clears the header, and automated/keyboard fixtures cover every identified class._
 - [ ] **EXP-035** (P1) Make provenance controls precise and accessible. _Done when: `SourceDot` and related disclosures expose source, exact as-of/last-sync timestamp when available, upstream vintage, rights, live/frozen/experimental state and accessible name; month-only display cannot hide a materially stale value; fixtures cover missing/unknown times._
-- [ ] **EXP-036** (P1) Align Record/article metadata and image rendering with visible content. _Done when: Open Graph/social images use the same resolved cover as the page, article/index contain one main landmark, inline images declare stable dimensions/responsive sizes/alt semantics and meet byte budgets, and layout-shift/social-card tests pass._
+- [x] **EXP-036** (P1) Align Record/article metadata and image rendering with visible content. _Done when: Open Graph/social images use the same resolved cover as the page, article/index contain one main landmark, inline images declare stable dimensions/responsive sizes/alt semantics and meet byte budgets, and layout-shift/social-card tests pass._
 - [x] **EXP-037** (P0) Remove nested interactive elements from country map/media tiles. _Done when: map activation and OpenStreetMap/Protomaps attribution are sibling controls with independent names/focus behavior, no link/button/control is nested inside another interactive element, HTML/accessibility tests pass, and tile click/keyboard behavior remains correct._
 - [ ] **EXP-038** (P1) Run an English-first editorial copy-quality pass on key reader surfaces. _Done when: home, about, methodology landing, country-page module intros, Governance Evidence explainers, licensing, and contact/advisory copy are reviewed for clarity, plain language, and audience fit; drafts are written and owner-approved in English before any other language; approved copy preserves registered claims and passes the claims/docs gate; and browser checks confirm the rendered pages._
 - [x] **EXP-039** (P0) Repair the country masthead grid so hero content anchors to the bottom over the scrim. _Done when: the `--art` masthead defines explicit content and caption rows, title/stat/tab content sits at the hero base at 769px, 1024px, and 1440px in both themes, the caption keeps its reserved final row, and a geometry check plus browser-check log are stored as evidence._

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { isValidElement } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import {
@@ -10,6 +11,8 @@ import {
   slugifyCaption,
   resolveBlogImage,
   resolvePostCover,
+  resolveBlogSocialImage,
+  readBlogImageDimensions,
 } from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
@@ -34,7 +37,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) return {};
-  const coverUrl = post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined;
+  // The OG/social image must be the SAME cover the page renders (resolved from
+  // dedicated cover → first-placeholder engraving → frontmatter), not the raw
+  // frontmatter coverImage (usually null). withOg falls back to the site
+  // default social image when there is no resolvable cover file.
+  const social = resolveBlogSocialImage(post);
   return {
     title: post.title,
     description: post.description,
@@ -47,18 +54,7 @@ export async function generateMetadata({
       publishedTime: post.date,
       authors: [post.author],
       tags: post.tags,
-      // Use the post's own cover image when it has one; withOg falls back to
-      // the site default social image when `coverUrl` is undefined.
-      images: coverUrl
-        ? [
-            {
-              url: coverUrl,
-              width: 1672,
-              height: 941,
-              alt: post.coverAlt ?? post.title,
-            },
-          ]
-        : undefined,
+      images: social ? [{ url: social.url, alt: social.alt }] : undefined,
     }),
   };
 }
@@ -141,10 +137,22 @@ function makeMdxComponents(slug: string, coverSlug: string | null) {
       if (coverSlug && captionSlug === coverSlug) return null; // cover -> hero
       const img = caption ? resolveBlogImage(slug, caption) : null;
       if (img) {
+        // Declare the image's REAL intrinsic dimensions so the space is
+        // reserved exactly and there is no layout shift (blog engravings are
+        // not all 16:9 — some are portrait). alt="" — the figcaption carries
+        // the description, so the image is decorative for assistive tech.
+        const dims = readBlogImageDimensions(img) ?? { width: 1600, height: 900 };
         return (
           <figure className="post-figure">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img} alt={caption} loading="lazy" />
+            <Image
+              src={img}
+              alt=""
+              width={dims.width}
+              height={dims.height}
+              sizes="(max-width: 700px) 100vw, 700px"
+              loading="lazy"
+              style={{ width: "100%", height: "auto" }}
+            />
             <figcaption>{caption}</figcaption>
           </figure>
         );
@@ -419,7 +427,9 @@ export default async function BlogPostPage({
           </aside>
 
           {/* Prose */}
-          <main className="post-prose">
+          {/* Not a <main>: the root layout provides the single page main
+              landmark; this is the article's reading column. */}
+          <div className="post-prose">
             {/* Lede — the dek opens the reading column. */}
             {post.description && (
               <p className="post-lede">{post.description}</p>
@@ -428,7 +438,7 @@ export default async function BlogPostPage({
               source={renderBlogPipeTables(post.content)}
               components={makeMdxComponents(post.slug, coverSlug)}
             />
-          </main>
+          </div>
 
           {/* Right rail (empty — breathing room) */}
           <aside className="post-rail" />

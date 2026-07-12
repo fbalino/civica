@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { SITE_URL } from "@/lib/site";
 
 export interface BlogPost {
   slug: string;
@@ -119,4 +120,83 @@ export function resolvePostCover(post: BlogPost): PostCover {
   const img = cap ? resolveBlogImage(post.slug, cap) : null;
   if (img) return { image: img, caption: cap, firstPlaceholderIsCover: true };
   return { image: post.coverImage, caption: post.coverCaption, firstPlaceholderIsCover: false };
+}
+
+/**
+ * Read the intrinsic pixel dimensions of a public blog image (WebP or PNG) by
+ * parsing its header. Server-side only (reads the filesystem at build time).
+ * Used so inline `next/image` figures declare the image's REAL aspect ratio and
+ * reserve exact space (no layout shift) — blog engravings are not all 16:9.
+ * Returns null when unreadable.
+ */
+export function readBlogImageDimensions(
+  publicRelPath: string,
+): { width: number; height: number } | null {
+  try {
+    const abs = path.join(
+      process.cwd(),
+      "public",
+      publicRelPath.replace(/^\//, ""),
+    );
+    const b = fs.readFileSync(abs);
+    // PNG: "PNG" signature, IHDR width/height big-endian at bytes 16/20.
+    if (b.length > 24 && b.slice(1, 4).toString("latin1") === "PNG") {
+      return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
+    }
+    // WebP: RIFF....WEBP + a VP8/VP8L/VP8X chunk.
+    if (
+      b.length > 30 &&
+      b.slice(0, 4).toString("latin1") === "RIFF" &&
+      b.slice(8, 12).toString("latin1") === "WEBP"
+    ) {
+      const format = b.slice(12, 16).toString("latin1");
+      if (format === "VP8X") {
+        return {
+          width: 1 + (b[24] | (b[25] << 8) | (b[26] << 16)),
+          height: 1 + (b[27] | (b[28] << 8) | (b[29] << 16)),
+        };
+      }
+      if (format === "VP8 ") {
+        return {
+          width: b.readUInt16LE(26) & 0x3fff,
+          height: b.readUInt16LE(28) & 0x3fff,
+        };
+      }
+      if (format === "VP8L") {
+        const bits = b.readUInt32LE(21);
+        return {
+          width: (bits & 0x3fff) + 1,
+          height: ((bits >> 14) & 0x3fff) + 1,
+        };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export interface BlogSocialImage {
+  /** Absolute URL to the resolved cover, ready for og:image / twitter:image. */
+  url: string;
+  /** Social/OG alt text. */
+  alt: string;
+}
+
+/**
+ * The Open Graph / social image for a post — the SAME cover the page renders
+ * (`resolvePostCover`), as an absolute URL. This is the fix for the drift where
+ * `generateMetadata` used the raw frontmatter `coverImage` (usually null) while
+ * the page rendered a resolved engraving/dedicated cover. Returns null when the
+ * post has no shareable cover file (the page then shows a generated
+ * HemicycleCover, which is not a static social image).
+ */
+export function resolveBlogSocialImage(post: BlogPost): BlogSocialImage | null {
+  const cover = resolvePostCover(post);
+  if (!cover.image) return null;
+  const url = cover.image.startsWith("http")
+    ? cover.image
+    : `${SITE_URL}${cover.image}`;
+  const alt = post.coverAlt ?? cover.caption ?? post.title;
+  return { url, alt };
 }
