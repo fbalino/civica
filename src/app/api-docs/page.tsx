@@ -227,8 +227,9 @@ export default function ApiDocsPage() {
           The Civica API provides read-only access to government structure data
           for sovereign states. All <code>/api/v1/*</code> responses are JSON.
           No authentication is required. A frozen, rights-filtered Atlas
-          reference package is available below. The former mixed-source
-          per-country download remains withheld.
+          reference package and a per-country research export (JSON/CSV) are
+          available below; both include only facts whose selected source
+          carries verified public-export terms.
         </p>
 
         <div className="api-info-card">
@@ -243,11 +244,10 @@ export default function ApiDocsPage() {
               throttle of {countriesRoute.rateLimit?.max} requests per{" "}
               {(countriesRoute.rateLimit?.windowMs ?? 0) / 1000} seconds
               (in-memory, per server instance — not a durable global counter).
-              The withheld <code>/api/countries/:slug/export</code> route
-              returns 503 and does not consume the ordinary API allowance.
-              Exceeding a live endpoint&rsquo;s limit returns 429 with a{" "}
-              <code>Retry-After</code>
-              header.
+              Exceeding a live <code>/api/v1/*</code> endpoint&rsquo;s limit
+              returns 429 with a <code>Retry-After</code> header. The bulk{" "}
+              <code>/api/countries/:slug/export</code> route is not
+              currently rate-limited.
             </p>
           </div>
           <div className="api-info-card__row">
@@ -256,8 +256,8 @@ export default function ApiDocsPage() {
               Every <code>/api/v1/*</code> endpoint supports cross-origin
               requests (<code>Access-Control-Allow-Origin: *</code>). The bulk{" "}
               <code>/api/countries/:slug/export</code> endpoint does not send
-              CORS headers. It currently returns only a rights-blocked status
-              response.
+              CORS headers, so a cross-origin browser fetch to it is blocked;
+              same-origin and server-side requests are unaffected.
             </p>
           </div>
           <div className="api-info-card__row">

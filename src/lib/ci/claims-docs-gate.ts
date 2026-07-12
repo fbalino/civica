@@ -121,6 +121,12 @@ export const CLAIMS_DOCS_GATE_MANIFEST: GateManifest = {
       description: "Data/code reuse-rights claims match the interim rights registry; no false open-source/MIT/complete-manifest/blanket-open-data language on required surfaces.",
     },
     {
+      id: "terms-conditions",
+      npmScript: "validate:terms-conditions",
+      categories: ["terminology-policy"],
+      description: "Terms of Use, API Docs, and Licensing prose state only real capabilities and rights; no unsupported access/rate-limit/embed/download claims.",
+    },
+    {
       id: "provenance-claims",
       npmScript: "validate:provenance-claims",
       categories: ["registry-coverage", "terminology-policy"],

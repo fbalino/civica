@@ -318,6 +318,7 @@
     "validate:policy-surface": "tsx scripts/validate-policy-surface.ts",
     "validate:claims-docs": "tsx scripts/validate-claims-docs.ts",
     "validate:rights-claims": "tsx scripts/validate-rights-claims.ts",
+    "validate:terms-conditions": "tsx scripts/validate-terms-conditions.ts",
     "validate:rights-manifest": "tsx scripts/validate-rights-manifest.ts",
     "validate:jurisdiction-status": "tsx scripts/validate-jurisdiction-status.ts",
     "validate:fact-coverage": "tsx scripts/validate-fact-coverage-report.ts",
