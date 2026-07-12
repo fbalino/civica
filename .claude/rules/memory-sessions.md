@@ -129,6 +129,25 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 
 ## Admin auth / env / infra gotchas
 
+- **Adding ANY dependency drifts the reproducibility packets → cascade regen.**
+  Several frozen release artifacts pin the FULL `package-lock.json` (or a hash
+  chain rooted in it), so installing even an unrelated devDependency fails
+  `npm run build` with "artifact inventory drift" / "reproduction environment
+  drift". Observed chain (adding `@playwright/test` for QA-009): (1)
+  `governance-evidence-review-packet-2026-07-v2` pins package-lock → regen with
+  `npm run reproduce:governance-evidence-review-packet`; (2) the G2 Atlas
+  candidate pins the environment → `npm run package:g2-atlas` (changes the
+  `.zip` SHA-256); (3) the atlas review packet pins the G2 archive hash →
+  `npm run generate:atlas-review-packet`; (4) update the stale g2-hash refs in
+  `plan/PROGRESS.md`, `plan/evidence/DAT-022|DAT-024/README.md`,
+  `plan/evidence/ATL-009/completion.md`. The underlying DATA never changes —
+  only environment fingerprints + dependent hashes. Enumerate the full cascade
+  up front with `grep -rln package-lock scripts/ data/` (only governance packet
+  pins it directly; g2/atlas-review chain off it). `validate:index-review-packet`
+  and `validate:index-research-archive` do NOT pin live package-lock (they hash a
+  fixed code/artifact set), so they don't drift on dep changes. Run the FULL
+  `npm run build` (dev server STOPPED) to confirm green — each attempt is minutes.
+
 - **Next.js `.env` does dotenv-EXPANSION on `$`.** Any value in `.env.local` with an
   unescaped `$name` is treated as a variable reference and silently mangled at load
   (a `$` segment starting with a letter → expanded to empty). This bit `ADMIN_PASSWORD_HASH`
