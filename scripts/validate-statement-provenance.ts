@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { config } from "dotenv";
 import { neon } from "@neondatabase/serverless";
 
@@ -37,7 +37,18 @@ const cabinetSource = readFileSync("src/lib/factbook/cia-cabinets-sync.ts", "utf
 if (!officeholderSource.includes("subjectId: termId") || !cabinetSource.includes("subjectId: termId")) {
   errors.push("term statement producers do not persist the returned term id");
 }
-const discoveredProducers = execFileSync("rg", ["-l", "insert\\(statements\\)|db\\.insert\\(statements\\)", "src", "scripts", "-g", "*.ts"], { encoding: "utf8" }).trim().split("\n").filter(Boolean).sort();
+function findTypeScriptFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return findTypeScriptFiles(path);
+    return entry.isFile() && entry.name.endsWith(".ts") ? [path] : [];
+  });
+}
+
+const discoveredProducers = ["src", "scripts"]
+  .flatMap(findTypeScriptFiles)
+  .filter((path) => /insert\(statements\)|db\.insert\(statements\)/.test(readFileSync(path, "utf8")))
+  .sort();
 if (JSON.stringify(discoveredProducers) !== JSON.stringify(producerPaths)) {
   errors.push(`statement producer inventory drift: ${JSON.stringify(discoveredProducers)}`);
 }
