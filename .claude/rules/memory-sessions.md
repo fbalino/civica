@@ -764,3 +764,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Moved engraving layers and figcaption under a semantic figure while preserving the caption's dedicated grid row through the shared display-contents composition.
 - Parallax now tracks the nearest section, so the semantic wrapper cannot become a boxless scroll target.
 - Exact 769px dark and 1440px light geometry passed with no content/media overlap, overflow, or console errors; the shared header entered Index presentation change control.
+
+## 2026-07-12 — EXP-037 country map controls completed
+
+- Split the noninteractive map preview, full-tile activation button, and provider attribution into sibling elements with independent accessible names.
+- Disabled MapLibre attribution injection for previews while retaining it in interactive maps; OpenStreetMap and Protomaps/OpenFreeMap remain separately linked beside the tile.
+- Pointer activation, focus restoration, Enter activation, zero nested controls, and two attribution links passed in the local browser.

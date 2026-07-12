@@ -768,3 +768,9 @@ This is the durable decision log for the active master plan. New entries append;
 **Decision:** Country and territory hero art and its caption share a real `<figure>` parent. The wrapper uses the canonical `display: contents` composition so image and caption remain direct participants in the existing hero grid: content occupies `minmax(0, 1fr)` and the caption occupies the final `auto` row. ParallaxImage resolves its scroll target with the nearest section, not its immediate parent, so the semantic wrapper cannot create a degenerate motion target. The shared header component is now part of Index presentation change control because it can render research-score metadata.
 
 **Why:** The earlier collision fix reserved the right space but left invalid HTML. A normal boxed figure would repair semantics while breaking grid placement and parallax. The contents wrapper keeps the layout invariant and gives the caption its correct structural owner. Protecting the shared header closes a gap in the existing append-only presentation registry.
+
+### APR-D145 — Map previews, activation, and attribution remain separate controls
+
+**Decision:** A country masthead map preview is noninteractive and cannot inject MapLibre controls. One native button overlays the preview and opens the interactive map. OpenStreetMap and Protomaps/OpenFreeMap attribution links sit outside that button with their own accessible names and focus stops. Closing the map returns focus to the activation button; explicit Enter and Space handling preserves keyboard operation in browser and assistive-technology paths.
+
+**Why:** Putting MapLibre attribution links inside a full-tile button created invalid nested interaction and ambiguous focus behavior. Separating the three responsibilities keeps attribution usable without weakening the large activation target or hiding the map's data and provider credits.

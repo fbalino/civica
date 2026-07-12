@@ -1,0 +1,20 @@
+{
+  "route": "/country/japan",
+  "activationAccessibleName": "Explore the interactive map of Japan",
+  "activationCount": 1,
+  "pointerOpenedDialog": true,
+  "pointerHitTargets": {
+    "tileCenter": "activation button",
+    "openStreetMapCenter": "OpenStreetMap attribution link",
+    "providerCenter": "Protomaps attribution link"
+  },
+  "focusReturnedToActivation": true,
+  "enterOpenedDialog": true,
+  "nestedInteractiveDescendants": 0,
+  "attributionLinkCount": 2,
+  "attributionLinks": [
+    "OpenStreetMap map-data attribution (opens in a new tab)",
+    "Protomaps map-provider attribution (opens in a new tab)"
+  ],
+  "consoleErrors": []
+}

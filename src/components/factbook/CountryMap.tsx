@@ -107,7 +107,10 @@ export function CountryMap({
         interactive,
         dragRotate: false,
         pitchWithRotate: false,
-        attributionControl: { compact: true },
+        // The non-interactive masthead preview supplies its attribution as
+        // sibling links beside the activation button. Letting MapLibre inject
+        // links into that preview would create nested interactive controls.
+        attributionControl: interactive ? { compact: true } : false,
       });
       mapRef.current = map;
 
