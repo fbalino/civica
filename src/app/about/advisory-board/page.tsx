@@ -1,27 +1,43 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { advisoryBoardMembers } from "@/lib/db/schema";
-import { eq, asc } from "drizzle-orm";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Banner } from "@/components/editorial/Banner";
-import { BetaChip } from "@/components/editorial/BetaChip";
 import { Button } from "@/components/editorial/Button";
+import { Chip } from "@/components/editorial/Pill";
 import { advisoryBoard } from "@/lib/content/site-state";
+import { ADVISORY_BOARD_CHARTER } from "@/lib/research/advisory-board-charter";
 
 export const revalidate = 3600;
 
-const ADVISORY_BOARD_STATUS_LABEL: Record<string, string> = {
-  "coming-soon": "Coming soon",
+const STATUS_LABEL: Record<string, string> = {
+  "coming-soon": "Planned — no members appointed",
   recruiting: "Recruiting",
   active: "Active",
 };
 
 export const metadata: Metadata = {
-  title: "Planned Advisory Board — Recruitment",
-  description: `Recruitment information for a planned independent advisory board of ${advisoryBoard.targetSize.min}–${advisoryBoard.targetSize.max} scholars. No board review or endorsement has occurred yet.`,
+  title: "Advisory Board Charter and Recruitment",
+  description:
+    "The Civica Atlas advisory-board charter: remit, independence, workload, conflicts, compensation, publication terms, and current recruitment status.",
   alternates: { canonical: "https://civicaatlas.org/about/advisory-board" },
 };
+
+const SECTIONS = [
+  { id: "purpose", label: "Purpose and expertise" },
+  { id: "authority", label: "Advisory status" },
+  { id: "terms", label: "Terms and workload" },
+  { id: "conflicts", label: "Conflicts" },
+  { id: "confidentiality", label: "Confidentiality" },
+  { id: "compensation", label: "Compensation" },
+  { id: "departure", label: "Resignation and removal" },
+  { id: "publication", label: "Names and reviews" },
+  { id: "roster", label: "Current roster" },
+] as const;
 
 interface Member {
   id: string;
@@ -42,89 +58,122 @@ export default async function AdvisoryBoardPage() {
       .where(eq(advisoryBoardMembers.isActive, true))
       .orderBy(asc(advisoryBoardMembers.displayOrder), asc(advisoryBoardMembers.name));
   } catch {
-    // DB unavailable
+    // The public charter remains readable when the roster database is unavailable.
   }
 
+  const charter = ADVISORY_BOARD_CHARTER;
+  const status = STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status;
+
   return (
-    <EditorialPage>
-      <nav className="editorial-breadcrumbs">
-        <Link href="/about">← About</Link>
-        <span>/</span>
-        Advisory board
-      </nav>
+    <MethodologyLayout items={SECTIONS}>
+      <EditorialPage>
+        <SmartBreadcrumbs />
 
-      <header>
-        <h1 className="editorial-page-title">
-          Advisory board
-          <BetaChip inHeading>
-            {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}
-          </BetaChip>
-        </h1>
+        <h1 className="editorial-page-title">Advisory board charter</h1>
         <p className="editorial-page-subtitle">
-          Recruitment for planned independent review of the Civica Index methodology.
+          Independent advice with a narrow remit, disclosed conflicts, and no implied endorsement.
         </p>
-      </header>
-
-      {/* PUBLIC_CLAIM: advisory.independent-review-plan */}
-      <p className="editorial-page-subtitle" style={{ margin: "0 0 32px" }}>
-        Civica plans to invite an independent academic advisory board of{" "}
-        {advisoryBoard.targetSize.min}–{advisoryBoard.targetSize.max} scholars
-        with expertise in governance measurement, political methodology, or
-        comparative politics. If appointed, its planned remit is to review the
-        methodology {advisoryBoard.reviewCadence} and request changes.
-        Recruitment does not mean a board exists, a review has occurred, or any
-        scholar endorses Civica.
-      </p>
-
-      <Banner variant="warn">
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "12px 18px", fontFamily: "var(--font-body)", fontSize: "var(--text-13)", letterSpacing: "var(--tracking-wide)" }}>
-          <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-status-warning)", flexShrink: 0, display: "inline-block" }} />
-          {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}{" "}
-          — recruitment follows {advisoryBoard.recruitmentTrigger}; no date is claimed.
+        <div className="editorial-page-meta">
+          <Chip variant="sand">{status}</Chip>
+          <span>{charter.schemaVersion}</span>
+          <span>Effective {charter.effectiveOn}</span>
         </div>
-      </Banner>
 
-      <div style={{ marginTop: "var(--space-7)" }}>
-        <Button href="/about/advisory-board/apply" variant="primary" arrow>
-          Apply to join
-        </Button>
-      </div>
+        {/* PUBLIC_CLAIM: advisory.independent-review-plan */}
+        <Banner variant="warn">
+          <strong>{status}.</strong> An application or invitation is not membership. Recruitment does not mean a board exists, a review has occurred, or any scholar endorses Civica.
+        </Banner>
 
-      <section className="editorial-section" style={{ marginTop: "48px" }}>
-        <h2>Board criteria</h2>
-        <p>
-          <strong>Per methodology spec §3.1:</strong>
-        </p>
-        <ul>
-          <li>Recognized scholars in governance measurement, political methodology, or comparative politics.</li>
-          <li>At least one member with direct experience on an established governance index (V-Dem associate, Freedom House methodologist, or similar).</li>
-          <li>Geographic and disciplinary diversity across the full board.</li>
-          <li>Public listing on this page with affiliations and areas of expertise.</li>
-        </ul>
-      </section>
+        <section className="editorial-section" id="purpose">
+          <h2>Purpose and expertise sought</h2>
+          <p>{charter.purpose}</p>
+          <ul>
+            {charter.expertiseSought.map((expertise) => <li key={expertise}>{expertise}</li>)}
+          </ul>
+        </section>
 
-      {/* Members list */}
-      <section className="editorial-section">
-        {members.length === 0 ? (
-          <p style={{ color: "var(--color-text-40)", paddingTop: "32px", paddingBottom: "32px", borderTop: "1px solid var(--color-card-border)", borderBottom: "1px solid var(--color-card-border)" }}>
-            Members to be announced.
+        <section className="editorial-section" id="authority">
+          <h2>Advisory, not an endorsement</h2>
+          <p>
+            The board gives advice and may recommend correction, redesign, suspension, or retirement. It has no publication veto and does not replace Fernando Balino as the accountable decision-maker. Material disagreement and Civica&apos;s response remain in the review record when publication consent permits.
           </p>
-        ) : (
-          members.map((m) => (
-            <div key={m.id} style={{ borderTop: "1px solid var(--color-card-border)", padding: "24px 0" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-22)", fontWeight: 400, letterSpacing: "-0.01em", color: "var(--color-text-primary)", margin: "0 0 4px" }}>{m.name}</h2>
-              <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-12)", letterSpacing: "var(--tracking-wide)", textTransform: "uppercase", color: "var(--color-text-40)", margin: "0 0 10px" }}>{m.affiliation}</div>
-              <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", lineHeight: 1.6, color: "var(--color-text-60)" }}>{m.expertise}</div>
+          <p><strong>{charter.publication.nonEndorsement}</strong></p>
+        </section>
+
+        <section className="editorial-section" id="terms">
+          <h2>Terms and workload</h2>
+          <p>Appointments last {charter.appointment.termMonths} months. {charter.appointment.renewal}</p>
+          <p>{charter.workload.expectedAnnualHours} {charter.workload.ordinaryWork}</p>
+          <p>{charter.workload.extraReview}</p>
+        </section>
+
+        <section className="editorial-section" id="conflicts">
+          <h2>Conflicts and independence</h2>
+          <p>{charter.conflicts.disclosure}</p>
+          <ul>{charter.conflicts.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}</ul>
+          <p>{charter.conflicts.sourceRule}</p>
+        </section>
+
+        <section className="editorial-section" id="confidentiality">
+          <h2>Confidentiality and publication</h2>
+          <p>{charter.confidentialityAndPublicity.default}</p>
+          <p>{charter.confidentialityAndPublicity.confidential}</p>
+          <p>{charter.confidentialityAndPublicity.publicity}</p>
+        </section>
+
+        <section className="editorial-section" id="compensation">
+          <h2>Compensation</h2>
+          <p>{charter.compensation.boardService}</p>
+          <p>{charter.compensation.scopedReviews}</p>
+          <p>{charter.compensation.independence}</p>
+        </section>
+
+        <section className="editorial-section" id="departure">
+          <h2>Resignation and removal</h2>
+          <p>{charter.resignationAndRemoval.resignation}</p>
+          <p>Removal may follow:</p>
+          <ul>{charter.resignationAndRemoval.removalGrounds.map((ground) => <li key={ground}>{ground}</li>)}</ul>
+          <p>{charter.resignationAndRemoval.process}</p>
+        </section>
+
+        <section className="editorial-section" id="publication">
+          <h2>Names, reviews, and responses</h2>
+          <p>{charter.publication.names}</p>
+          <p>{charter.publication.reviews}</p>
+          <p>{charter.publication.authorResponse}</p>
+        </section>
+
+        <section className="editorial-section" id="roster">
+          <h2>Current roster</h2>
+          {members.length === 0 ? (
+            <div className="editorial-empty">
+              <p><strong>No members have been appointed.</strong></p>
+              <p>Applications are expressions of interest and are not published.</p>
             </div>
-          ))
-        )}
-      </section>
+          ) : (
+            members.map((member) => (
+              <article className="editorial-card" key={member.id}>
+                <div className="editorial-card-head">
+                  <h3 className="editorial-card-headline">{member.name}</h3>
+                  <Chip variant="neutral">{member.affiliation}</Chip>
+                </div>
+                <p className="editorial-card-desc">{member.expertise}</p>
+              </article>
+            ))
+          )}
+        </section>
 
-      <hr style={{ border: "none", borderTop: "1px solid var(--color-card-border)", margin: "40px 0" }} />
+        <section className="editorial-section">
+          <h2>Apply</h2>
+          <p>{charter.appointment.selection}</p>
+          <Button href="/about/advisory-board/apply" variant="primary" arrow>Submit an expression of interest</Button>
+        </section>
 
-      <footer className="editorial-footer-nav">
-        <Link href="/civica-index/methodology">← Civica Index methodology</Link>
-      </footer>
-    </EditorialPage>
+        <footer className="editorial-footer-nav">
+          <Link href="/about">← About Civica Atlas</Link>
+          <Link href="/policies">Research publication policies →</Link>
+        </footer>
+      </EditorialPage>
+    </MethodologyLayout>
   );
 }

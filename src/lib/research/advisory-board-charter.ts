@@ -1,0 +1,79 @@
+import { createHash } from "node:crypto";
+
+export const ADVISORY_BOARD_CHARTER_VERSION = "civica-advisory-board-charter/v1" as const;
+
+export const ADVISORY_BOARD_CHARTER = Object.freeze({
+  schemaVersion: ADVISORY_BOARD_CHARTER_VERSION,
+  effectiveOn: "2026-07-11",
+  status: "recruitment_open_no_members_implied",
+  purpose:
+    "Give independent, documented advice on Atlas data stewardship, governance measurement, political event data, reproducibility, accessibility, and source rights. The board identifies errors, unsupported claims, and research priorities; it does not market Civica or confer academic status.",
+  expertiseSought: Object.freeze([
+    "comparative governance and measurement",
+    "political event data, retrieval, and content analysis",
+    "research-data curation, reproducibility, and preservation",
+    "data-heavy web accessibility and assistive-technology use",
+    "database rights, open-data licensing, and research-data reuse",
+  ]),
+  statusAndAuthority: Object.freeze({
+    advisoryOnly: true,
+    publicationVeto: false,
+    endorsementImplied: false,
+    claimValidationImplied: false,
+    finalDecisionMaker: "Fernando Balino",
+    dissentRule: "Material board disagreement and the author's response remain in the review record when publication consent permits.",
+  }),
+  appointment: Object.freeze({
+    termMonths: 24,
+    renewal: "One additional term by mutual written agreement after a conflict, participation, and composition review.",
+    targetSize: "A small cross-method board; no minimum roster is implied before appointments are accepted and published with consent.",
+    selection: "Selection follows the predeclared reviewer criteria, exact board needs, conflicts, and composition. Application, invitation, or discussion does not create membership.",
+  }),
+  workload: Object.freeze({
+    expectedAnnualHours: "Approximately 8–16 hours per year for board service, agreed before appointment.",
+    ordinaryWork: "Up to two scheduled board discussions and one short annual governance/readiness review.",
+    extraReview: "A substantial artifact review is separately scoped, optional, scheduled, and compensated or declined without affecting membership.",
+  }),
+  confidentialityAndPublicity: Object.freeze({
+    default: "Use public or release-ready materials whenever possible.",
+    confidential: "Confidential access is limited to the named assignment, minimum necessary material, stated retention/deletion duty, and a clear end date.",
+    publicity: "Membership, affiliation, term dates, expertise, and review attribution are public only with specific consent. Civica does not announce an invitation or application.",
+  }),
+  conflicts: Object.freeze({
+    disclosure: "Disclose relevant financial, professional, personal, institutional, source-project, funder, vendor, political, and competitive interests at appointment, annually, and before each assignment.",
+    outcomes: ["disclose and manage", "recuse and use a non-conflicted reviewer", "exclude from the affected decision or end the appointment"],
+    sourceRule: "A member cannot be the sole judge of Civica's treatment of the member's own source, method, employer product, or prior Civica work.",
+  }),
+  compensation: Object.freeze({
+    boardService: "The standing board role is unpaid unless a future published charter version states otherwise.",
+    scopedReviews: "Separately requested substantial reviews may receive the same owner-approved, outcome-independent honorarium offered for comparable scope.",
+    independence: "Payment never depends on agreement, endorsement, continued service, or a favorable conclusion.",
+  }),
+  resignationAndRemoval: Object.freeze({
+    resignation: "A member may resign at any time without giving a reason. Completed agreed work is handled under its payment terms.",
+    removalGrounds: ["unmanaged conflict", "confidentiality or research-integrity breach", "misrepresentation of board authority", "harassment or unsafe conduct", "sustained non-participation after a private check-in"],
+    process: "Fernando Balino gives written notice and a chance to respond unless immediate access removal is needed for safety or confidentiality. The roster records the end date; private personal details are not published.",
+  }),
+  publication: Object.freeze({
+    names: "Publish a member's name, affiliation, bio, photograph, and term only with item-specific consent.",
+    reviews: "Preserve original reviews. Publication, quotation, and attribution each require explicit consent; anonymous publication may be offered.",
+    authorResponse: "Civica publishes its response separately and records accepted, rejected, and unresolved findings.",
+    nonEndorsement: "Board service validates neither Civica Atlas as a whole nor every claim, dataset, method, Index/Pulse output, release, or later change.",
+  }),
+  reviewCadence: "Review this charter annually and whenever workload, compensation, authority, confidentiality, or publication terms change.",
+});
+
+export function advisoryBoardCharterHash(value: unknown): string {
+  return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+export function advisoryBoardCharterErrors(record: typeof ADVISORY_BOARD_CHARTER = ADVISORY_BOARD_CHARTER): string[] {
+  const errors: string[] = [];
+  if (record.schemaVersion !== ADVISORY_BOARD_CHARTER_VERSION) errors.push("wrong schema version");
+  if (record.expertiseSought.length !== 5) errors.push("expertise lanes incomplete");
+  if (!record.statusAndAuthority.advisoryOnly || record.statusAndAuthority.publicationVeto || record.statusAndAuthority.endorsementImplied) errors.push("advisory/nonendorsement boundary drifted");
+  if (!record.compensation.independence.includes("never depends")) errors.push("outcome-independent compensation missing");
+  if (!record.publication.nonEndorsement.includes("validates neither")) errors.push("claim-validation boundary missing");
+  if (record.resignationAndRemoval.removalGrounds.length < 5) errors.push("removal process incomplete");
+  return errors;
+}

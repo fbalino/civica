@@ -715,3 +715,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Named Fernando's gated release, methodology, correction, retraction, supersession, emergency, and restoration authority.
 - Frozen corrections use new versions/DOIs and bidirectional relations; retractions keep resolvable tombstones.
 - Three no-write tabletops prove material-error, methodology-failure, and rights/security paths. GOV-006 is next.
+
+## 2026-07-11 — GOV-006 advisory-board charter completed
+
+- Published `civica-advisory-board-charter/v1` with five expertise lanes, advisory-only authority, two-year terms, bounded workload, conflict, confidentiality, compensation, departure, consented-publication, and nonendorsement rules.
+- Standing service is unpaid; substantial reviews remain separate, optional, and eligible only for outcome-independent owner-approved honoraria.
+- The public roster explicitly says no members have been appointed. GOV-007 is next.
