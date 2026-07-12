@@ -691,3 +691,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Prepared role, independence, conflict, qualification, sourcing, outreach, timing, and compensation materials without contacting anyone.
 - Executable planning covers 1,456 initial packets and 2,912 assignments; the base budget is $45,615 pending owner approval and a paid timing pilot.
 - Spark's read-only audit exposed that two coder-ready packet releases are still missing. PUL-041 now owns them before recruitment or PUL-018.
+
+## 2026-07-11 — GOV-001 publication governance completed
+
+- Adopted a ten-domain charter naming Fernando Balino as the current accountable human and disclosing the project's single-owner governance concentration.
+- Agents, models, and anonymous groups have no decision authority; independent reviewers retain their conclusions and original reports.
+- Each domain has required evidence and a blocking condition. GOV-002 is next for accountable authorship and contributor identity.
