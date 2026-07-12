@@ -34,7 +34,6 @@ import {
 } from "../src/lib/pulse/v2/classify";
 import {
   EVENT_CATEGORY_INDEX,
-  HUMAN_REVIEW_TIERS,
   SEVERITY_TIER_RANGES,
 } from "../src/lib/pulse/v2/taxonomy";
 import { corroborateEvents } from "../src/lib/pulse/v2/corroborate";
@@ -58,9 +57,7 @@ interface Decision {
   severityTier: SeverityTier;
   severityValue: number;
   subjectIso3: string | null;
-  /** high | medium | low — low routes to human review instead of
-   *  auto-publishing (replaces the old same-prompt-different-temperature
-   *  "agreement" signal with a classify→verify confidence). */
+  /** Retained subscription-agent self-assessment; never an agreement signal. */
   confidence?: "high" | "medium" | "low";
 }
 
@@ -189,6 +186,7 @@ async function main() {
       run: 1,
       temp: 0,
       model: "claude-code-agent",
+      role: "classify",
       category: d.category,
       dimension: cat.dimension,
       severityTier: d.severityTier,
@@ -205,7 +203,7 @@ async function main() {
       severityTier: d.severityTier,
       severityValue,
       classifierRuns: [run],
-      classifierAgreement: "two_of_three", // single trusted agent ⇒ neutral boost
+      classifierAgreement: "none",
       headline: cluster.title.slice(0, 200),
       description: cluster.body.slice(0, 1500),
     };
@@ -225,18 +223,11 @@ async function main() {
         )}) — treating as "low" (routes to human review).`,
       );
     }
-    const conf: "high" | "medium" | "low" =
-      d.confidence === "high" ||
-      d.confidence === "medium" ||
-      d.confidence === "low"
-        ? d.confidence
-        : "low";
     const ok: ClassifyOneResult = {
       classified,
-      // Auto-publish only when the tier is not review-gated AND the agent's
-      // classify→verify confidence is not low. Low-confidence events go to
-      // the human review queue (published=false) instead of scoring silently.
-      autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier) && conf !== "low",
+      // A subscription-agent result is one stored run, not an independent
+      // ensemble. It always enters the human review queue.
+      autoPublished: false,
       // This legacy subscription-agent import did not preserve the verifier's
       // four independent judgments or a subject-attribution verdict.
       verification: null,

@@ -208,6 +208,11 @@ export interface ReviewEventDetail {
     model: string;
     /** Vendor engine that produced the run (ensemble rows; absent on legacy). */
     provider?: string;
+    role?: "classify" | "verify";
+    promptVersion?: string;
+    methodVersion?: string;
+    configurationHash?: string;
+    configuredEngineCount?: number;
     category: string;
     dimension: string;
     severityTier: string;

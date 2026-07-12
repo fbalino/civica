@@ -94,8 +94,8 @@ import {
   PULSE_REVIEW_SLA_VERSION,
 } from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.11.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.12-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.12.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.13-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -214,6 +214,9 @@ export interface PulseRuntimeMethodContract {
       decode: "deterministic";
       categoryConsensus: "strict_majority_of_successful_voters";
       minimumQuorum: 2;
+      agreementEvidence: "stored_provider_distinct_prompt_versioned_classify_runs";
+      singleEnginePublication: "queue_only";
+      legacyAgreementPolicy: "unsupported_labels_cleared_and_automatic_rows_quarantined";
       selfConfidenceRange: { lower: 0; upper: 1 };
       invalidSelfConfidencePolicy: "reject_response_as_unusable";
       severityValuePolicy: "require_finite_number_then_tier_clamp";
@@ -392,6 +395,7 @@ export interface PulseRuntimeMethodContract {
     };
   };
   publicationPolicy: {
+    automaticEligibility: "stored_ensemble_and_gate_and_resolved_subject";
     majorityNone: "drop_not_governance_event";
     severityAggregation: "majority_with_ties_to_more_severe";
     numericSeverityAggregation: "median_of_winning_category_voters_then_tier_clamp";
@@ -613,6 +617,11 @@ export function buildPulseRuntimeMethod(
         decode: "deterministic",
         categoryConsensus: "strict_majority_of_successful_voters",
         minimumQuorum: 2,
+        agreementEvidence:
+          "stored_provider_distinct_prompt_versioned_classify_runs",
+        singleEnginePublication: "queue_only",
+        legacyAgreementPolicy:
+          "unsupported_labels_cleared_and_automatic_rows_quarantined",
         selfConfidenceRange: { lower: 0, upper: 1 },
         invalidSelfConfidencePolicy: "reject_response_as_unusable",
         severityValuePolicy: "require_finite_number_then_tier_clamp",
@@ -787,6 +796,7 @@ export function buildPulseRuntimeMethod(
       },
     },
     publicationPolicy: {
+      automaticEligibility: "stored_ensemble_and_gate_and_resolved_subject",
       majorityNone: "drop_not_governance_event",
       severityAggregation: "majority_with_ties_to_more_severe",
       numericSeverityAggregation:

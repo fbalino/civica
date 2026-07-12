@@ -204,7 +204,7 @@ test("a verifier objection routes a degraded majority to review", () => {
   );
 });
 
-test("single-engine mode queues every verifier objection", () => {
+test("single-engine mode always queues because one classifier is not an ensemble", () => {
   const objections: Array<VerifyResultLite | null> = [
     null,
     { ...CONFIRMED_VERIFY, confidence: "low" },
@@ -225,7 +225,7 @@ test("single-engine mode queues every verifier objection", () => {
   }
   assert.equal(
     singleEngineRequiresReview("moderate_neg", CONFIRMED_VERIFY),
-    false,
+    true,
   );
 });
 

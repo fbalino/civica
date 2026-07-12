@@ -939,6 +939,16 @@ function pulseVersionIdentityExample(
                 provider: "deepseek",
                 model: "deepseek-v4-flash",
               },
+              {
+                role: "classify" as const,
+                provider: "glm",
+                model: "glm-4.7",
+              },
+              {
+                role: "classify" as const,
+                provider: "anthropic",
+                model: "claude-haiku-4-5",
+              },
             ]
           : [],
       upstreamRunIds: [],
@@ -952,6 +962,49 @@ const pulseExampleVersionSet = {
   containsLegacy: false,
   comparableAsSingleSeries: true,
 };
+
+const pulseExamplePromptVersion = "pulse-classifier-prompt/example";
+const pulseExampleConfigurationHash =
+  `pulse-classification-config/sha256:${"b".repeat(64)}`;
+
+function pulseUnanimousClassifierRuns() {
+  const shared = {
+    temp: 0,
+    role: "classify" as const,
+    promptVersion: pulseExamplePromptVersion,
+    methodVersion: pulseSnapshot.version,
+    configurationHash: pulseExampleConfigurationHash,
+    configuredEngineCount: 3,
+    category: "judicial_independence_rollback",
+    dimension: "rule_of_law",
+    severityTier: "moderate_neg",
+    severityValue: -1.2,
+  };
+
+  return [
+    {
+      ...shared,
+      run: 1,
+      provider: "deepseek",
+      model: "deepseek-v4-flash",
+      rationale: "Court decision restricts judicial review scope.",
+    },
+    {
+      ...shared,
+      run: 2,
+      provider: "glm",
+      model: "glm-4.7",
+      rationale: "The ruling narrows review of executive decrees.",
+    },
+    {
+      ...shared,
+      run: 3,
+      provider: "anthropic",
+      model: "claude-haiku-4-5",
+      rationale: "The institutional change reduces judicial oversight.",
+    },
+  ];
+}
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/pulse/[country_slug]/dimensions
@@ -1247,18 +1300,7 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
       severityTier: "moderate_neg",
       severityValue: -1.2,
       classifierAgreement: "all",
-      classifierRuns: [
-        {
-          run: 1,
-          temp: 0,
-          provider: "deepseek",
-          category: "judicial_independence_rollback",
-          dimension: "rule_of_law",
-          severityTier: "moderate_neg",
-          severityValue: -1.2,
-          rationale: "Court decision restricts judicial review scope.",
-        },
-      ],
+      classifierRuns: pulseUnanimousClassifierRuns(),
       corroborationConfidence: 0.42,
       legacyInformationContextPresent: true,
       humanReviewed: false,

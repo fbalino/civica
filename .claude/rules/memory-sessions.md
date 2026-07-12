@@ -806,3 +806,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   tables and 650 immutable dimensional outputs across two score runs.
 - Live lifecycle checks, 907 tests, claims, TypeScript, light/dark browser QA,
   and the full production build passed.
+
+## 2026-07-12 — PUL-036 stored agreement completed
+
+- Agreement now derives from provider-distinct, prompt-versioned stored runs;
+  single-run and subscription-agent classifications always queue.
+- The production repair cleared 355 unsupported labels, quarantined 191
+  unsupported automatic publications, and preserved 13 human-reviewed ones.
+- Runtime `pulse-v2.13-beta`, live invariants, 912 tests, API contracts,
+  light/dark browser QA, and the full production build passed.

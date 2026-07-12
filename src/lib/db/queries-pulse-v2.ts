@@ -639,6 +639,12 @@ export interface PulseV2ClassifierRun {
   model?: string;
   /** Vendor engine that produced the run (ensemble rows; absent on legacy). */
   provider?: string;
+  /** Stored-run derivation metadata; absent on retained legacy evidence. */
+  role?: "classify" | "verify";
+  promptVersion?: string;
+  methodVersion?: string;
+  configurationHash?: string;
+  configuredEngineCount?: number;
   category: string;
   dimension: string;
   severityTier: string;

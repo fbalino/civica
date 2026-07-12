@@ -15,7 +15,7 @@ import {
 } from "./runtime-contract";
 
 export const PULSE_CLASSIFICATION_ALGORITHM_VERSION =
-  "pulse-classification/ensemble-verify-subject-v2.1" as const;
+  "pulse-classification/stored-ensemble-verify-subject-v2.2" as const;
 export const PULSE_DELTA_ALGORITHM_VERSION =
   "pulse-delta/decay-window-v2.3+incident-resolution-v1+output-history-v1" as const;
 export const PULSE_CLASSIFIER_PROMPT_VERSION = contentVersion(

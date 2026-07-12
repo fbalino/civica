@@ -68,7 +68,6 @@ import {
   VERIFY_SYSTEM_PROMPT,
   type ClassifyResultLite,
   type VerifyResultLite,
-  agreementFromConfidence,
   parseClassify,
   parseVerify,
 } from "./classifier-prompt";
@@ -91,7 +90,7 @@ import {
   resolveProviderConfig,
   type ResolvedProviderConfig,
 } from "./provider";
-import { clampSeverityToTier, computeConsensus } from "./ensemble";
+import { clampSeverityToTier } from "./ensemble";
 import type { EnsembleRun } from "./ensemble";
 import {
   ensembleRequiresReview,
@@ -134,6 +133,10 @@ import {
   type ClassificationQueueMetricsRow,
 } from "./classification-state-store";
 import { PULSE_JURISDICTION_ATTRIBUTION_VERSION } from "./jurisdiction-entities";
+import {
+  deriveStoredEnsemble,
+  storedRunsPermitAutomaticPublication,
+} from "./stored-ensemble";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -196,6 +199,16 @@ export const CURRENT_CLASSIFICATION_CONFIG_HASH =
 /** Verify-run ordinal in classifierRuns (kept distinct from the classify
  *  runs' 1..N ordinals so React keys and audit rows never collide). */
 const VERIFY_RUN_ORDINAL = 10;
+
+function runEvidence(role: "classify" | "verify") {
+  return {
+    role,
+    promptVersion: PULSE_CLASSIFIER_PROMPT_VERSION,
+    methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+    configurationHash: CURRENT_CLASSIFICATION_CONFIG_HASH,
+    configuredEngineCount: CLASSIFY_ENSEMBLE.length,
+  } as const;
+}
 
 export interface ClusterToClassify {
   clusterId: string;
@@ -657,15 +670,13 @@ async function classifyOneSingle(
   // A failed verify pass is conservative: treat as low confidence so the
   // event routes to human review rather than auto-publishing unverified.
   const confidence = verify?.confidence ?? "low";
-  const effectiveConfidence = verifierObjects(verify) ? "low" : confidence;
-  const agreement: ClassifierAgreement =
-    agreementFromConfidence(effectiveConfidence);
 
   const classifyRun: ClassifierRun = {
     run: 1,
     temp: 0,
     provider: CLASSIFY_CONFIG.provider,
     model: CLASSIFY_CONFIG.model,
+    ...runEvidence("classify"),
     category: first.category,
     dimension: cat.dimension,
     severityTier: first.severityTier,
@@ -679,6 +690,7 @@ async function classifyOneSingle(
     temp: 0,
     provider: VERIFY_CONFIG.provider,
     model: VERIFY_CONFIG.model,
+    ...runEvidence("verify"),
     category: first.category,
     dimension: cat.dimension,
     severityTier: first.severityTier,
@@ -699,7 +711,7 @@ async function classifyOneSingle(
     severityTier: first.severityTier,
     severityValue,
     classifierRuns: [classifyRun, verifyRun],
-    classifierAgreement: agreement,
+    classifierAgreement: "none",
     headline: cluster.title.slice(0, 200),
     description: cluster.body.slice(0, 1500),
   };
@@ -763,6 +775,7 @@ async function classifyOneEnsemble(
       temp: 0,
       provider: cfg.provider,
       model: cfg.model,
+      ...runEvidence("classify"),
       category: result.category,
       dimension: cat?.dimension ?? "stability",
       severityTier: result.severityTier,
@@ -776,7 +789,13 @@ async function classifyOneEnsemble(
   // No engine returned anything usable — treat as a hard failure.
   if (runs.length === 0) return null;
 
-  const consensus = computeConsensus(runs, CLASSIFY_ENSEMBLE.length);
+  const storedDerivation = deriveStoredEnsemble(classifyRuns);
+  if (!storedDerivation.valid) {
+    throw new Error(
+      `Stored ensemble evidence is invalid: ${storedDerivation.reasons.join(", ")}`,
+    );
+  }
+  const consensus = storedDerivation.consensus;
 
   // Majority "none" (or a plurality "none" deadlock resolving to none) means
   // the ensemble agrees this is not a governance event — drop the cluster.
@@ -888,6 +907,7 @@ function buildEnsembleResult(
       temp: 0,
       provider: VERIFY_CONFIG.provider,
       model: VERIFY_CONFIG.model,
+      ...runEvidence("verify"),
       category: consensus.category,
       dimension,
       severityTier: consensus.severityTier,
@@ -1457,6 +1477,35 @@ export async function writeEvent(
   result: ClassifyOneResult,
   classificationRunId: string,
 ): Promise<string | null> {
+  const storedDerivation = deriveStoredEnsemble(
+    result.classified.classifierRuns,
+  );
+  if (
+    result.classified.classifierAgreement !==
+    storedDerivation.consensus.agreement
+  ) {
+    throw new Error(
+      `Classifier agreement must be derived from stored independent runs; received ${result.classified.classifierAgreement}, derived ${storedDerivation.consensus.agreement}.`,
+    );
+  }
+  const verifyStored = result.classified.classifierRuns.some(
+    (run) => run.role === "verify",
+  );
+  const gateRequiresReview = ensembleRequiresReview(
+    storedDerivation.consensus,
+    result.verification,
+    { forceReview: false, verifySkipped: !verifyStored },
+  );
+  if (
+    result.autoPublished &&
+    (!storedRunsPermitAutomaticPublication(result.classified.classifierRuns) ||
+      gateRequiresReview ||
+      !result.subjectAttribution?.primaryJurisdictionId)
+  ) {
+    throw new Error(
+      "Automatic publication requires stored provider-distinct versioned votes, the publication gate, and resolved subject attribution.",
+    );
+  }
   // Initial corroborationConfidence — provisional. Phase 5.7's
   // corroborate.ts can recompute. For now use a baseline based on
   // agreement and the LLM's averaged self-confidence.

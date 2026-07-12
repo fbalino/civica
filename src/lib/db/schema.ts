@@ -2158,15 +2158,16 @@ export const pulseEventsV2 = pgTable(
     /** Computed by the corroboration step, range [0, 1] */
     corroborationConfidence: real("corroboration_confidence").notNull(),
     /** Reasoning passes preserved for audit. Current ensemble rows contain
-     *  one entry per successful classify voter plus the verify entry;
+     *  one provider/model/prompt/method/config-versioned entry per successful
+     *  classify voter plus the verify entry;
      *  retained single-engine rows contain classify + verify; older agent and
      *  temperature-variant rows use other unversioned shapes. Shape:
      *  [{run, temp, model, category, dimension, severity, confidence, raw}, ...] */
     classifierRuns: jsonb("classifier_runs").notNull(),
     /** 'all' | 'two_of_three' | 'none' — drives confidence boost/penalty.
-     *  Current ensemble rows store voter consensus. Retained single-engine
-     *  rows map verify confidence to these compatibility labels; older rows
-     *  are mixed and unversioned. */
+     *  Current rows derive this only from stored provider-distinct,
+     *  prompt-versioned classify runs. Unsupported legacy labels are cleared
+     *  to none without rewriting the retained run evidence. */
     classifierAgreement: text("classifier_agreement").notNull(),
     derivationVersionKey: text("derivation_version_key").notNull(),
     derivationVersions: jsonb("derivation_versions")

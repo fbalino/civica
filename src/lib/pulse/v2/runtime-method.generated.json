@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "dccb865c4dd8c6f923c2db5b5d9c45b5599b391f0adde36bcaba5948efe33992",
+  "contractHash": "e4b3e0c2b51b99a0e49f31716c90d6fe9cd5df5a6d09d9138b54fe11640ee7b3",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -406,6 +406,7 @@
       "mode": "single_engine_classify_verify"
     },
     "classify": {
+      "agreementEvidence": "stored_provider_distinct_prompt_versioned_classify_runs",
       "attemptSchemaVersion": "pulse-classification-attempt/v1",
       "categoryConsensus": "strict_majority_of_successful_voters",
       "claimLeaseMinutes": 30,
@@ -428,6 +429,7 @@
         }
       ],
       "invalidSelfConfidencePolicy": "reject_response_as_unusable",
+      "legacyAgreementPolicy": "unsupported_labels_cleared_and_automatic_rows_quarantined",
       "minimumQuorum": 2,
       "mode": "cross_vendor_ensemble",
       "noneDisposition": "terminal_none_not_failure",
@@ -445,6 +447,7 @@
         "upper": 1
       },
       "severityValuePolicy": "require_finite_number_then_tier_clamp",
+      "singleEnginePublication": "queue_only",
       "stateSchemaVersion": "pulse-classification-state/v1",
       "statuses": [
         "classified",
@@ -503,6 +506,7 @@
     }
   },
   "publicationPolicy": {
+    "automaticEligibility": "stored_ensemble_and_gate_and_resolved_subject",
     "majorityNone": "drop_not_governance_event",
     "numericSeverityAggregation": "median_of_winning_category_voters_then_tier_clamp",
     "reviewGates": {
@@ -628,7 +632,7 @@
     },
     "version": "pulse-review-sla/v1"
   },
-  "schemaVersion": "1.11.0",
+  "schemaVersion": "1.12.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -641,5 +645,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.12-beta"
+  "version": "pulse-v2.13-beta"
 }

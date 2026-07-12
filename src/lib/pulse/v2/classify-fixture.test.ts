@@ -6,6 +6,7 @@ import {
   classifyClusters,
   classificationDecisionInputs,
   selectProvisionalJurisdiction,
+  writeEvent,
   type ClassifyOneResult,
   type ClusterToClassify,
 } from "./classify";
@@ -118,6 +119,35 @@ test("malformed classification fixtures fail before classification or writes", a
     /attribution is incomplete/,
   );
   assert.equal(calls, 0);
+});
+
+test("the production writer rejects one-run automatic publication before database access", async () => {
+  const oneRun = structuredClone(result);
+  oneRun.classified.classifierAgreement = "none";
+  oneRun.classified.classifierRuns = [
+    {
+      run: 1,
+      temp: 0,
+      provider: "anthropic",
+      model: "claude-fixture",
+      role: "classify",
+      promptVersion: "prompt-fixture",
+      methodVersion: "pulse-v2.13-beta",
+      configurationHash: "config-fixture",
+      configuredEngineCount: 3,
+      category: "judicial_purge",
+      dimension: "rule_of_law",
+      severityTier: "moderate_neg",
+      severityValue: -4,
+      selfConfidence: 0.9,
+      rationale: "fixture",
+      raw: JSON.stringify({ pass: "classify", runnerUp: "none" }),
+    },
+  ];
+  await assert.rejects(
+    writeEvent({} as Db, cluster, oneRun, runRef.id),
+    /Automatic publication requires stored provider-distinct versioned votes/,
+  );
 });
 
 test("strict mode surfaces classifier failures", async () => {

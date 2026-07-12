@@ -85,5 +85,11 @@ data-backfill-cia-vintage · data-backfill-election-results ·
 data-backfill-growth-methodology · data-backfill-methodology-version ·
 data-backfill-territory-iso2 · data-backfill-upstream-vintage-labels ·
 data-bridge-cia-legacy-to-canonical · data-cleanup-bad-offices ·
-data-create-rate-limits-table · data-reseed-bug3-corrupted ·
+data-create-rate-limits-table · data-repair-pulse-agreement · data-reseed-bug3-corrupted ·
 data-restore-overdemoted-disputes
+
+`data-repair-pulse-agreement` recomputes the current agreement projection from
+stored provider-distinct, prompt-versioned classify runs. Unsupported labels
+become `none`; automatic rows without that evidence enter legacy quarantine.
+Human-reviewed publication remains intact, and the retention trigger records
+every prior projection.

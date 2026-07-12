@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T09:53:25.246Z",
+  "generatedAt": "2026-07-12T10:28:38.953Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -672,7 +672,7 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 67934,
+        "research_evidence_history": 68614,
         "statements": 6768,
         "terms": 5475
       },
@@ -750,10 +750,10 @@
         "pulse_incident_assignments": 1507,
         "pulse_incident_resolutions": 479,
         "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 24,
+        "pulse_pipeline_runs": 25,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 67934
+        "research_evidence_history": 68614
       },
       "writesPerformed": 0
     },
@@ -782,9 +782,9 @@
         "pulse_cluster_classification_states": 385,
         "pulse_event_decisions": 3927,
         "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 24,
+        "pulse_pipeline_runs": 25,
         "raw_events": 1507,
-        "research_evidence_history": 67934
+        "research_evidence_history": 68614
       },
       "writesPerformed": 0
     },
@@ -811,7 +811,7 @@
         "pulse_incidents": 1224,
         "pulse_review_obligations": 175,
         "pulse_review_sla_events": 175,
-        "research_evidence_history": 67934
+        "research_evidence_history": 68614
       },
       "writesPerformed": 0
     },
@@ -853,9 +853,9 @@
       "invariantPlan": "npm run db:plan -- --id=0027_smart_tempest --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_dimensional_delta_history": 650,
+        "pulse_dimensional_delta_history": 975,
         "pulse_dimensional_deltas": 325,
-        "research_evidence_history": 67934
+        "research_evidence_history": 68614
       },
       "writesPerformed": 0
     },
@@ -1039,6 +1039,27 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "rate_limits": 22
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-repair-pulse-agreement",
+      "artifact": "scripts/repair-pulse-agreement.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "0b4bd4cb499e45689dd8852693239f7e9b611b78e6bd6e2866287ac8cc39f191",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "research_evidence_history"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-repair-pulse-agreement-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-repair-pulse-agreement --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "research_evidence_history": 68614
       },
       "writesPerformed": 0
     },

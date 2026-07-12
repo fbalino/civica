@@ -59,6 +59,6 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "backfill-cia-vintage", "backfill-election-results", "backfill-growth-methodology",
     "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels",
     "bridge-cia-legacy-to-canonical", "cleanup-bad-offices", "create-rate-limits-table",
-    "reseed-bug3-corrupted", "restore-overdemoted-disputes",
+    "repair-pulse-agreement", "reseed-bug3-corrupted", "restore-overdemoted-disputes",
   ].map((id) => shared(`data-${id}`, `scripts/${id}.ts`, id === "create-rate-limits-table" ? "mixed" : "data", "operational_data_change")),
 ] as const;

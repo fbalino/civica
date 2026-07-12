@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.12-beta");
+  assert.equal(method.version, "pulse-v2.13-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -193,6 +193,15 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
   assert.equal(providers.classify.successfulProviderRunsRecorded, true);
   assert.equal(providers.classify.configuredProviderSetPersisted, true);
   assert.equal(providers.classify.providerFailuresPersisted, false);
+  assert.equal(
+    providers.classify.agreementEvidence,
+    "stored_provider_distinct_prompt_versioned_classify_runs",
+  );
+  assert.equal(providers.classify.singleEnginePublication, "queue_only");
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.publicationPolicy.automaticEligibility,
+    "stored_ensemble_and_gate_and_resolved_subject",
+  );
   assert.equal(
     providers.classify.stateSchemaVersion,
     "pulse-classification-state/v1",

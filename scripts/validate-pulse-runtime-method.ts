@@ -339,8 +339,8 @@ function validateClassifierAndReview(
     state,
     classify.includes("singleEngineRequiresReview(") &&
       publicationGate.includes("export function singleEngineRequiresReview") &&
-      publicationGate.includes("verifierObjects(verify)"),
-    "Single-engine mode must route every verifier objection to review",
+      publicationGate.includes("return true"),
+    "Single-engine mode must always route to review",
   );
   check(
     state,

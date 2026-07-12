@@ -851,3 +851,21 @@ the record needed to reproduce the transition. An internal tombstone clears
 the current state while the public null preserves the distinction between no
 eligible event, low observation, and stability. Immutable per-run outputs make
 later method comparisons and exact historical replay possible.
+
+### APR-D151 — Pulse agreement is a stored-evidence derivation
+
+**Decision:** Adopt `pulse-stored-ensemble/v1` under runtime method
+`pulse-v2.13-beta`. A supported agreement label requires at least two
+provider-distinct classify runs with the same explicit prompt, method,
+configuration hash, and configured panel size. Duplicate providers, mixed
+versions, legacy evidence, and one-run results derive agreement `none`.
+Automatic publication additionally requires the publication gate and a
+resolved primary jurisdiction. Human approval remains independent and may
+publish an event without changing its ensemble agreement. Unsupported legacy
+automatic publications are retained as `legacy_quarantined` projections.
+
+**Why:** A label supplied by a script can make one model call look like an
+ensemble result. Deriving the label from retained evidence makes the claim
+reproducible and prevents a confidence estimate or subscription-agent run from
+becoming a false quorum. Separate human authority preserves valid editorial
+decisions without rewriting model evidence.

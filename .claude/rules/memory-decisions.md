@@ -968,3 +968,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   `null` and make no stability inference.
 - Every score run writes immutable history and the current projection in one
   atomic batch. Durable record: APR-D150.
+
+## 2026-07-12 — Pulse agreement derives from retained votes
+
+- Supported agreement requires provider-distinct stored classify runs sharing
+  prompt, method, configuration, and panel identity.
+- Single-run and legacy evidence derive `none`; automatic publication also
+  requires the publication gate and resolved primary jurisdiction.
+- Human review remains a separate publication authority and never rewrites
+  model agreement. Durable record: APR-D151.
