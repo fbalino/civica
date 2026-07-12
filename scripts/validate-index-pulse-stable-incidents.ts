@@ -17,7 +17,7 @@ checks.push([
   "dimensional scoring is not current-projection-only with incident-wide evidence",
 ]);
 checks.push([
-  runtime.includes('PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.9-beta"') &&
+  runtime.includes('PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.10-beta"') &&
     runtime.includes('strategy: "stable_incident_resolution"'),
   "the Pulse runtime contract does not name the stable-incident method",
 ]);

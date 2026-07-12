@@ -780,3 +780,22 @@ This is the durable decision log for the active master plan. New entries append;
 **Decision:** Adopt `pulse-incident-resolution/v1`. A stable incident owns raw-report assignments and can carry successive event projections without erasing any source, decision, or prior projection. Incoming reports compare with the current batch and recent persisted incidents inside 48 hours. Compatible exact normalized identities may merge automatically. Exact normalized headlines may also merge when resolved country, calendar date, and labels agree. Multilingual semantic matches and the lexical fallback create review candidates only. Blank headlines are quarantined. Confirmed merges select one current projection and trigger new corroboration and dimensional-score runs under an incident-aware algorithm version.
 
 **Why:** Run-local cluster IDs allowed later reports about the same occurrence to become separate scored events. A narrow automatic gate repairs exact duplicates without turning approximate similarity into an irreversible merge. The candidate ledger preserves uncertain matches for review and future error analysis.
+
+### APR-D147 — Pulse classification state is configuration-keyed and bounded
+
+**Decision:** Adopt `pulse-classification-state/v1`. Each cluster and complete
+classifier configuration has one current state: `classified`, `none`,
+`retryable_failure`, or `terminal_failure`. Every claim and settlement also
+writes an append-only attempt phase. Never-attempted work precedes due retries.
+Retryable failures receive at most three attempts with bounded backoff;
+authentication errors and exhausted retries terminate. A valid `none` outcome
+is terminal but is not a failure. Configuration hashes include the actual
+models, prompts, method, ontology, publication gate, decoding modes, and retry
+policy, while excluding secrets and run-local identity.
+
+**Why:** Inferring pending work from missing events caused terminal outcomes to
+be reconsidered and made provider spending, failures, and backlog age
+unobservable. Stable configuration identity permits intentional re-evaluation
+after a real method change without repeating identical terminal work. Atomic
+leases prevent overlapping workers from paying for the same cluster, and the
+attempt ledger keeps operational failures available for later error studies.

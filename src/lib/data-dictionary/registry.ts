@@ -710,6 +710,36 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
     deprecation: active,
   },
+  pulse_cluster_classification_states: {
+    definition:
+      "Current terminal or retryable classifier state for a Pulse cluster under one content-addressed configuration.",
+    rowGrain: "One raw cluster and classifier-configuration pair.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+    cadence:
+      "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+    vintageSemantics:
+      "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+    rights:
+      "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+    deprecation: active,
+  },
+  pulse_classification_attempts: {
+    definition:
+      "Append-only start and terminal evidence for each claimed Pulse classifier attempt.",
+    rowGrain:
+      "One started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+    cadence: "Append-only when an attempt is claimed and when it settles.",
+    vintageSemantics:
+      "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+    rights:
+      "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+    deprecation: active,
+  },
   raw_events: {
     definition:
       "Deduplicated raw Pulse v2 inputs plus retained terminal classification dispositions.",

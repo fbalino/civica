@@ -776,3 +776,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Added stable Pulse incidents, append-only report assignments and resolution findings, current/superseded/quarantined event projections, and exact live invariants.
 - Applied the hash-pinned repair: five confirmed duplicate pairs, 474 review-only candidates, 380 current projections, and fresh corroboration and score runs.
 - Drained all 128 waiting reports after recovering one failed partial cluster run without deleting evidence. Claims, 883 tests, TypeScript, build, migration, retention, runtime, live invariants, and the Pulse methodology browser check passed.
+
+## 2026-07-12 — PUL-032 classification state completed
+
+- Added configuration-keyed cluster state, append-only attempt phases, atomic
+  claims, new-before-retry ordering, bounded backoff, and queue observability.
+- Applied authoritative migration 0024 and verified the 25/25 production
+  ledger. Backfill retained 384 classified and one terminal state without
+  inventing provider history.
+- The live queue remains 841 never-attempted clusters. This task made no model
+  calls. Claims, design, build, migration, retention, runtime, live invariant,
+  and methodology browser checks passed.

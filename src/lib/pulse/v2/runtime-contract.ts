@@ -77,9 +77,17 @@ import {
   PULSE_DECISION_LEDGER_VERSION,
   type PulseDecisionKind,
 } from "./decision-ledger";
+import {
+  PULSE_CLASSIFICATION_ATTEMPT_VERSION,
+  PULSE_CLASSIFICATION_CLAIM_LEASE_MS,
+  PULSE_CLASSIFICATION_CONFIG_VERSION,
+  PULSE_CLASSIFICATION_RETRY_POLICY,
+  PULSE_CLASSIFICATION_STATUSES,
+  PULSE_CLASSIFICATION_STATE_VERSION,
+} from "./classification-state";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.8.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.9-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.9.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.10-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -203,8 +211,22 @@ export interface PulseRuntimeMethodContract {
       severityValuePolicy: "require_finite_number_then_tier_clamp";
       degradedRunsRecorded: false;
       successfulProviderRunsRecorded: true;
-      configuredProviderSetPersisted: false;
+      configuredProviderSetPersisted: true;
       providerFailuresPersisted: false;
+      stateSchemaVersion: typeof PULSE_CLASSIFICATION_STATE_VERSION;
+      attemptSchemaVersion: typeof PULSE_CLASSIFICATION_ATTEMPT_VERSION;
+      configSchemaVersion: typeof PULSE_CLASSIFICATION_CONFIG_VERSION;
+      statuses: string[];
+      queueOrder: "new_then_due_retry_oldest_first";
+      retryExhaustionDisposition: "terminal_failure";
+      noneDisposition: "terminal_none_not_failure";
+      claimLeaseMinutes: number;
+      retryPolicy: {
+        maxAttempts: number;
+        initialDelayMinutes: number;
+        multiplier: number;
+        maximumDelayHours: number;
+      };
     };
     verify: {
       engine: PulseProviderRef;
@@ -560,8 +582,24 @@ export function buildPulseRuntimeMethod(
         severityValuePolicy: "require_finite_number_then_tier_clamp",
         degradedRunsRecorded: false,
         successfulProviderRunsRecorded: true,
-        configuredProviderSetPersisted: false,
+        configuredProviderSetPersisted: true,
         providerFailuresPersisted: false,
+        stateSchemaVersion: PULSE_CLASSIFICATION_STATE_VERSION,
+        attemptSchemaVersion: PULSE_CLASSIFICATION_ATTEMPT_VERSION,
+        configSchemaVersion: PULSE_CLASSIFICATION_CONFIG_VERSION,
+        statuses: [...PULSE_CLASSIFICATION_STATUSES],
+        queueOrder: "new_then_due_retry_oldest_first",
+        retryExhaustionDisposition: "terminal_failure",
+        noneDisposition: "terminal_none_not_failure",
+        claimLeaseMinutes: PULSE_CLASSIFICATION_CLAIM_LEASE_MS / 60_000,
+        retryPolicy: {
+          maxAttempts: PULSE_CLASSIFICATION_RETRY_POLICY.maxAttempts,
+          initialDelayMinutes:
+            PULSE_CLASSIFICATION_RETRY_POLICY.initialDelayMs / 60_000,
+          multiplier: PULSE_CLASSIFICATION_RETRY_POLICY.multiplier,
+          maximumDelayHours:
+            PULSE_CLASSIFICATION_RETRY_POLICY.maxDelayMs / 3_600_000,
+        },
       },
       verify: {
         engine: providerRef(facts.verifyEngine),

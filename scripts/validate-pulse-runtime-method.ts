@@ -429,9 +429,9 @@ function validateClassifierAndReview(
     state,
     snapshot.providers.classify.degradedRunsRecorded === false &&
       snapshot.providers.classify.successfulProviderRunsRecorded === true &&
-      snapshot.providers.classify.configuredProviderSetPersisted === false &&
+      snapshot.providers.classify.configuredProviderSetPersisted === true &&
       snapshot.providers.classify.providerFailuresPersisted === false,
-    "Contract must not overstate persisted degradation/provider-failure evidence",
+    "Contract must distinguish persisted configuration from missing per-provider failure detail",
   );
   check(
     state,

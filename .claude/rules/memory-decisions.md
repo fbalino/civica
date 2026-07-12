@@ -941,3 +941,13 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - `pulse-incident-resolution/v1` gives raw reports and event projections a stable incident identity while retaining every prior source, decision, assignment, and projection.
 - Exact, label-compatible matches can merge inside 48 hours. Semantic and lexical matches remain review candidates and cannot change publication or scores by themselves.
 - Confirmed merges trigger fresh corroboration and incident-aware deltas. Blank headlines cannot publish. Durable record: APR-D146.
+
+## 2026-07-12 — Pulse classification state is explicit and bounded
+
+- Each cluster and classifier configuration has one closed current state plus
+  append-only claim and settlement evidence.
+- Never-attempted work precedes retries; retryable failures receive at most
+  three attempts. Terminal `none` is distinct from failure and is not called
+  again under an identical configuration.
+- Configuration identity includes models, prompts, method, ontology,
+  publication gate, decoding, and retry policy. Durable record: APR-D147.

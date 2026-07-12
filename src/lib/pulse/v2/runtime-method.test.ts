@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.9-beta");
+  assert.equal(method.version, "pulse-v2.10-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -172,8 +172,25 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
   );
   assert.equal(providers.classify.degradedRunsRecorded, false);
   assert.equal(providers.classify.successfulProviderRunsRecorded, true);
-  assert.equal(providers.classify.configuredProviderSetPersisted, false);
+  assert.equal(providers.classify.configuredProviderSetPersisted, true);
   assert.equal(providers.classify.providerFailuresPersisted, false);
+  assert.equal(
+    providers.classify.stateSchemaVersion,
+    "pulse-classification-state/v1",
+  );
+  assert.deepEqual(providers.classify.statuses, [
+    "classified",
+    "none",
+    "retryable_failure",
+    "terminal_failure",
+  ]);
+  assert.equal(providers.classify.queueOrder, "new_then_due_retry_oldest_first");
+  assert.equal(
+    providers.classify.retryExhaustionDisposition,
+    "terminal_failure",
+  );
+  assert.equal(providers.classify.noneDisposition, "terminal_none_not_failure");
+  assert.equal(providers.classify.retryPolicy.maxAttempts, 3);
   assert.equal(
     providers.verify.malformedVerdictOrAxesPolicy,
     "reject_as_failed_objection",

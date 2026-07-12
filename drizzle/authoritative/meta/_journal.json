@@ -169,6 +169,13 @@
       "when": 1783838792420,
       "tag": "0023_wide_gorilla_man",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1783843381474,
+      "tag": "0024_dark_maginty",
+      "breakpoints": true
     }
   ]
 }

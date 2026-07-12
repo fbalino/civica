@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T07:12:01.536Z",
+  "generatedAt": "2026-07-12T08:06:45.651Z",
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -642,7 +642,7 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 62329,
+        "research_evidence_history": 66303,
         "statements": 6768,
         "terms": 5475
       },
@@ -717,13 +717,44 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384,
-        "pulse_incident_assignments": "missing",
-        "pulse_incident_resolutions": "missing",
-        "pulse_incidents": "missing",
-        "pulse_pipeline_runs": 10,
+        "pulse_incident_assignments": 1507,
+        "pulse_incident_resolutions": 479,
+        "pulse_incidents": 1224,
+        "pulse_pipeline_runs": 19,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 62329
+        "research_evidence_history": 66303
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0024_dark_maginty",
+      "artifact": "drizzle/authoritative/0024_dark_maginty.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "5bf4ce195a3927b0712c87d7407645a2e57426b9131e20a837af83ca335523f7",
+      "affectedRelations": [
+        "pulse_classification_attempts",
+        "pulse_cluster_classification_states",
+        "pulse_event_decisions",
+        "pulse_events_v2",
+        "pulse_pipeline_runs",
+        "raw_events",
+        "research_evidence_history"
+      ],
+      "statementCount": 33,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0024_dark_maginty-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0024_dark_maginty --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_classification_attempts": "missing",
+        "pulse_cluster_classification_states": "missing",
+        "pulse_event_decisions": 3448,
+        "pulse_events_v2": 384,
+        "pulse_pipeline_runs": 19,
+        "raw_events": 1507,
+        "research_evidence_history": 66303
       },
       "writesPerformed": 0
     },

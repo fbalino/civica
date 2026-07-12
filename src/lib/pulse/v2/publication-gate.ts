@@ -9,6 +9,9 @@ import { HUMAN_REVIEW_TIERS } from "./taxonomy";
 import type { VerifyResultLite } from "./classifier-prompt";
 import type { ClassifierAgreement, SeverityTier } from "./types";
 
+export const PULSE_PUBLICATION_GATE_VERSION =
+  "pulse-publication-gate/ensemble-review-v2" as const;
+
 export interface EnsembleGateConsensus {
   agreement: ClassifierAgreement;
   selfConfidence: number;

@@ -27,6 +27,10 @@ const incidentMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0023_wide_gorilla_man.sql"),
   "utf8",
 );
+const classificationMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0024_dark_maginty.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -55,12 +59,17 @@ function sourceFiles(directory: string): string[] {
 }
 
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
-  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`) && !exclusionMigration.includes(`ON ${relation}`) && !incidentMigration.includes(`ON ${relation}`)) {
+  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`) && !exclusionMigration.includes(`ON ${relation}`) && !incidentMigration.includes(`ON ${relation}`) && !classificationMigration.includes(`ON ${relation}`)) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
 }
 for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
-  const sources = [decisionMigration, exclusionMigration, incidentMigration];
+  const sources = [
+    decisionMigration,
+    exclusionMigration,
+    incidentMigration,
+    classificationMigration,
+  ];
   const guarded = sources.some((source) =>
     new RegExp(
       `CREATE\\s+TRIGGER\\s+[a-z0-9_]+_append_only[\\s\\S]{0,160}BEFORE\\s+UPDATE\\s+OR\\s+DELETE\\s+ON\\s+"?${relation}"?[\\s\\S]{0,160}EXECUTE\\s+FUNCTION`,
@@ -173,7 +182,8 @@ async function main() {
             AND (c.relname, t.tgname) IN (
               ('pulse_event_decisions', 'pulse_event_decisions_append_only'),
               ('pulse_incident_assignments', 'pulse_incident_assignments_append_only'),
-              ('pulse_incident_resolutions', 'pulse_incident_resolutions_append_only')
+              ('pulse_incident_resolutions', 'pulse_incident_resolutions_append_only'),
+              ('pulse_classification_attempts', 'pulse_classification_attempts_append_only')
             )`,
       sql`SELECT count(*)::int AS n FROM pg_constraint
           WHERE conname IN (

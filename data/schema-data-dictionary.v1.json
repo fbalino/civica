@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "ca97b014a30698270d8a6e1e8c303f2bb4da90578cd9f79ad7f0aa8ae1aa3c38",
+  "schemaFingerprint": "9639f2a35c63d4ea6b7dd3ff12fadf21f1d6d1b1eb1ad5d4f65d5bb41c10d657",
   "summary": {
-    "tables": 69,
-    "columns": 922,
+    "tables": 71,
+    "columns": 959,
     "publicAtlasTables": 18,
-    "researchBetaTables": 21,
+    "researchBetaTables": 23,
     "supportTables": 11,
     "internalTables": 17,
     "privateTables": 2,
@@ -15831,6 +15831,1006 @@
             "status": "legacy",
             "replacement": "Pulse v2 corrections and review ledger",
             "note": "Retained for historical Beta replay; not the current Pulse v2 production contract."
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_classification_attempts",
+      "exportName": "pulseClassificationAttempts",
+      "definition": "Append-only start and terminal evidence for each claimed Pulse classifier attempt.",
+      "rowGrain": "One started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+      "cadence": "Append-only when an attempt is claimed and when it settles.",
+      "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+      "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "attempt_key",
+          "propertyName": "attemptKey",
+          "definition": "Attempt key recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_attempt_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_attempt_key"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cluster_id",
+          "propertyName": "clusterId",
+          "definition": "Cluster id recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_attempt_phase",
+              "idx_pulse_classification_attempt_cluster"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_attempt_phase"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "completed_at",
+          "propertyName": "completedAt",
+          "definition": "Timestamp when the operation completed.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "Completed at follows this table contract. started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "config_hash",
+          "propertyName": "configHash",
+          "definition": "Config hash recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_attempt_phase",
+              "idx_pulse_classification_attempt_cluster"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_attempt_phase"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "error_code",
+          "propertyName": "errorCode",
+          "definition": "Error code recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "error_message",
+          "propertyName": "errorMessage",
+          "definition": "Error message recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "incident_id",
+          "propertyName": "incidentId",
+          "definition": "Incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "metadata",
+          "propertyName": "metadata",
+          "definition": "Structured metadata governed by this table's row contract.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "model_call_count",
+          "propertyName": "modelCallCount",
+          "definition": "Model call count recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "next_retry_at",
+          "propertyName": "nextRetryAt",
+          "definition": "Next retry at recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "Next retry at follows this table contract. started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "ordinal",
+          "propertyName": "ordinal",
+          "definition": "Ordinal recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_attempt_phase"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_attempt_phase"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "outcome",
+          "propertyName": "outcome",
+          "definition": "Outcome recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_attempt_phase"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_attempt_phase"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "run_id",
+          "propertyName": "runId",
+          "definition": "Immutable Pulse pipeline-stage run linked to this audit action.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_classification_attempt_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "started_at",
+          "propertyName": "startedAt",
+          "definition": "Timestamp when the operation started.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_attempt_cluster"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+          "cadence": "Append-only when an attempt is claimed and when it settles.",
+          "vintageSemantics": "Started at follows this table contract. started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+          "rights": "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_cluster_classification_states",
+      "exportName": "pulseClusterClassificationStates",
+      "definition": "Current terminal or retryable classifier state for a Pulse cluster under one content-addressed configuration.",
+      "rowGrain": "One raw cluster and classifier-configuration pair.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+      "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+      "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+      "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "attempt_count",
+          "propertyName": "attemptCount",
+          "definition": "Attempt count recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cluster_id",
+          "propertyName": "clusterId",
+          "definition": "Cluster id recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_state_cluster_config"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_state_cluster_config"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "config",
+          "propertyName": "config",
+          "definition": "Config recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "config_hash",
+          "propertyName": "configHash",
+          "definition": "Config hash recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_state_cluster_config",
+              "idx_pulse_classification_state_queue"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_classification_state_cluster_config"
+            ]
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_id",
+          "propertyName": "eventId",
+          "definition": "Event id; relational link to pulse_events_v2.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_events_v2.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_events_v2.id; substantive provenance follows this table's source contract.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "first_attempt_at",
+          "propertyName": "firstAttemptAt",
+          "definition": "First attempt at recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "First attempt at follows this table contract. Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "incident_id",
+          "propertyName": "incidentId",
+          "definition": "Incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_pulse_classification_state_incident"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "last_attempt_at",
+          "propertyName": "lastAttemptAt",
+          "definition": "Last attempt at recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Last attempt at follows this table contract. Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "last_error_code",
+          "propertyName": "lastErrorCode",
+          "definition": "Last error code recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "last_error_message",
+          "propertyName": "lastErrorMessage",
+          "definition": "Last error message recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "last_run_id",
+          "propertyName": "lastRunId",
+          "definition": "Last run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_classification_state_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "lease_expires_at",
+          "propertyName": "leaseExpiresAt",
+          "definition": "Lease expires at recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Lease expires at follows this table contract. Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "max_attempts",
+          "propertyName": "maxAttempts",
+          "definition": "Max attempts recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "next_retry_at",
+          "propertyName": "nextRetryAt",
+          "definition": "Next retry at recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_state_queue"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Next retry at follows this table contract. Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_classification_state_queue"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "terminal_at",
+          "propertyName": "terminalAt",
+          "definition": "Terminal at recorded for the raw cluster and classifier-configuration pair.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Terminal at follows this table contract. Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "updated_at",
+          "propertyName": "updatedAt",
+          "definition": "Timestamp when Civica last updated this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+          "cadence": "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+          "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
+          "rights": "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+          "deprecation": {
+            "status": "active"
           }
         }
       ]

@@ -53,6 +53,14 @@ report-assignment and collision-resolution evidence, one-current-projection
 enforcement, blank-headline quarantine, and the historical linkage needed for
 the controlled PUL-031 duplicate repair.
 
+`0024_dark_maginty` adds version-keyed Pulse cluster-classification state,
+append-only attempt evidence, atomic leases, new-before-retry ordering,
+deterministic bounded backoff, terminal exhaustion, sanitized errors, and
+queue age/depth reporting. The backfill covers only directly provable event,
+non-event, and invalid outcomes; historic call counts and per-provider failure
+details remain unknown. Recovery uses an isolated pre-change backup or a
+reviewed forward compensation, never in-place evidence reversal.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

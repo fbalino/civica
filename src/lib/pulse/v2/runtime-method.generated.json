@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "0b43f27403ab865809a99510d203ea231c03a04c36dfdf0739c37f235c1a0220",
+  "contractHash": "cde8f9fd63446bbfa72d4597c070e27b17c2a965a289a939b95f1a1cc05392ed",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -401,8 +401,11 @@
       "mode": "single_engine_classify_verify"
     },
     "classify": {
+      "attemptSchemaVersion": "pulse-classification-attempt/v1",
       "categoryConsensus": "strict_majority_of_successful_voters",
-      "configuredProviderSetPersisted": false,
+      "claimLeaseMinutes": 30,
+      "configSchemaVersion": "pulse-classification-config/v1",
+      "configuredProviderSetPersisted": true,
       "decode": "deterministic",
       "degradedRunsRecorded": false,
       "engines": [
@@ -422,12 +425,28 @@
       "invalidSelfConfidencePolicy": "reject_response_as_unusable",
       "minimumQuorum": 2,
       "mode": "cross_vendor_ensemble",
+      "noneDisposition": "terminal_none_not_failure",
       "providerFailuresPersisted": false,
+      "queueOrder": "new_then_due_retry_oldest_first",
+      "retryExhaustionDisposition": "terminal_failure",
+      "retryPolicy": {
+        "initialDelayMinutes": 15,
+        "maxAttempts": 3,
+        "maximumDelayHours": 6,
+        "multiplier": 4
+      },
       "selfConfidenceRange": {
         "lower": 0,
         "upper": 1
       },
       "severityValuePolicy": "require_finite_number_then_tier_clamp",
+      "stateSchemaVersion": "pulse-classification-state/v1",
+      "statuses": [
+        "classified",
+        "none",
+        "retryable_failure",
+        "terminal_failure"
+      ],
       "successfulProviderRunsRecorded": true
     },
     "reviewSummary": {
@@ -542,7 +561,7 @@
       }
     }
   },
-  "schemaVersion": "1.8.0",
+  "schemaVersion": "1.9.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -555,5 +574,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.9-beta"
+  "version": "pulse-v2.10-beta"
 }

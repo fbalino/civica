@@ -34,6 +34,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "pulse_events_v2",
   "pulse_incidents",
   "pulse_candidate_outcomes",
+  "pulse_cluster_classification_states",
   "pulse_review_audit_log",
   "pulse_sources",
   "raw_events",
@@ -47,6 +48,7 @@ export const APPEND_ONLY_EVIDENCE_RELATIONS = [
   "pulse_event_decisions",
   "pulse_incident_assignments",
   "pulse_incident_resolutions",
+  "pulse_classification_attempts",
 ] as const;
 
 export type RetainedEvidenceRelation =

@@ -2292,6 +2292,123 @@ export const pulseEventsV2 = pgTable(
   ],
 );
 
+/**
+ * Current classifier state for one raw cluster under one stable classifier
+ * configuration. The row is a mutable projection; research-evidence history
+ * retains every prior value while `pulse_classification_attempts` preserves
+ * the attempt ledger directly.
+ */
+export const pulseClusterClassificationStates = pgTable(
+  "pulse_cluster_classification_states",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    clusterId: uuid("cluster_id").notNull(),
+    incidentId: uuid("incident_id").references(() => pulseIncidents.id, {
+      onDelete: "restrict",
+    }),
+    configHash: text("config_hash").notNull(),
+    config: jsonb("config").$type<Record<string, unknown>>().notNull(),
+    status: text("status")
+      .$type<
+        | "classified"
+        | "none"
+        | "retryable_failure"
+        | "terminal_failure"
+      >()
+      .notNull(),
+    attemptCount: integer("attempt_count").notNull(),
+    maxAttempts: integer("max_attempts").notNull(),
+    firstAttemptAt: timestamp("first_attempt_at").notNull(),
+    lastAttemptAt: timestamp("last_attempt_at").notNull(),
+    nextRetryAt: timestamp("next_retry_at"),
+    terminalAt: timestamp("terminal_at"),
+    leaseExpiresAt: timestamp("lease_expires_at"),
+    lastErrorCode: text("last_error_code"),
+    lastErrorMessage: text("last_error_message"),
+    lastRunId: uuid("last_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    eventId: uuid("event_id").references(() => pulseEventsV2.id, {
+      onDelete: "restrict",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_classification_state_cluster_config").on(
+      table.clusterId,
+      table.configHash,
+    ),
+    index("idx_pulse_classification_state_queue").on(
+      table.configHash,
+      table.status,
+      table.nextRetryAt,
+    ),
+    index("idx_pulse_classification_state_incident").on(table.incidentId),
+    index("idx_pulse_classification_state_run").on(table.lastRunId),
+    check(
+      "pulse_classification_state_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-classification-state/v1' AND ${table.configHash} ~ '^pulse-classification-config/v1/sha256:[a-f0-9]{64}$' AND jsonb_typeof(${table.config}) = 'object' AND ${table.status} IN ('classified','none','retryable_failure','terminal_failure') AND ${table.attemptCount} BETWEEN 1 AND ${table.maxAttempts} AND ${table.maxAttempts} BETWEEN 1 AND 10 AND ${table.lastAttemptAt} >= ${table.firstAttemptAt} AND ((${table.status} = 'retryable_failure' AND ${table.nextRetryAt} IS NOT NULL AND ${table.terminalAt} IS NULL AND ${table.eventId} IS NULL AND ${table.lastErrorCode} IS NOT NULL AND ${table.lastErrorMessage} IS NOT NULL) OR (${table.status} = 'terminal_failure' AND ${table.nextRetryAt} IS NULL AND ${table.terminalAt} IS NOT NULL AND ${table.eventId} IS NULL AND ${table.lastErrorCode} IS NOT NULL AND ${table.lastErrorMessage} IS NOT NULL) OR (${table.status} = 'none' AND ${table.nextRetryAt} IS NULL AND ${table.terminalAt} IS NOT NULL AND ${table.eventId} IS NULL AND ${table.lastErrorCode} IS NULL AND ${table.lastErrorMessage} IS NULL) OR (${table.status} = 'classified' AND ${table.nextRetryAt} IS NULL AND ${table.terminalAt} IS NOT NULL AND ${table.eventId} IS NOT NULL AND ${table.lastErrorCode} IS NULL AND ${table.lastErrorMessage} IS NULL))`,
+    ),
+  ],
+);
+
+/** Append-only evidence for every claimed classifier attempt. */
+export const pulseClassificationAttempts = pgTable(
+  "pulse_classification_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    attemptKey: text("attempt_key").notNull(),
+    clusterId: uuid("cluster_id").notNull(),
+    incidentId: uuid("incident_id").references(() => pulseIncidents.id, {
+      onDelete: "restrict",
+    }),
+    configHash: text("config_hash").notNull(),
+    ordinal: integer("ordinal").notNull(),
+    runId: uuid("run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    outcome: text("outcome")
+      .$type<
+        | "started"
+        | "classified"
+        | "none"
+        | "retryable_failure"
+        | "terminal_failure"
+      >()
+      .notNull(),
+    modelCallCount: integer("model_call_count").notNull(),
+    startedAt: timestamp("started_at").notNull(),
+    completedAt: timestamp("completed_at"),
+    nextRetryAt: timestamp("next_retry_at"),
+    errorCode: text("error_code"),
+    errorMessage: text("error_message"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_classification_attempt_key").on(table.attemptKey),
+    uniqueIndex("idx_pulse_classification_attempt_phase").on(
+      table.clusterId,
+      table.configHash,
+      table.ordinal,
+      table.outcome,
+    ),
+    index("idx_pulse_classification_attempt_run").on(table.runId),
+    index("idx_pulse_classification_attempt_cluster").on(
+      table.clusterId,
+      table.configHash,
+      table.startedAt,
+    ),
+    check(
+      "pulse_classification_attempt_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-classification-attempt/v1' AND ${table.attemptKey} ~ '^pulse-classification-attempt/sha256:[a-f0-9]{64}$' AND ${table.configHash} ~ '^pulse-classification-config/v1/sha256:[a-f0-9]{64}$' AND ${table.ordinal} BETWEEN 1 AND 10 AND ${table.outcome} IN ('started','classified','none','retryable_failure','terminal_failure') AND ${table.modelCallCount} >= 0 AND jsonb_typeof(${table.metadata}) = 'object' AND ((${table.outcome} = 'started' AND ${table.completedAt} IS NULL AND ${table.errorCode} IS NULL AND ${table.errorMessage} IS NULL) OR (${table.outcome} IN ('classified','none') AND ${table.completedAt} IS NOT NULL AND ${table.nextRetryAt} IS NULL AND ${table.errorCode} IS NULL AND ${table.errorMessage} IS NULL) OR (${table.outcome} = 'retryable_failure' AND ${table.completedAt} IS NOT NULL AND ${table.nextRetryAt} IS NOT NULL AND ${table.errorCode} IS NOT NULL AND ${table.errorMessage} IS NOT NULL) OR (${table.outcome} = 'terminal_failure' AND ${table.completedAt} IS NOT NULL AND ${table.nextRetryAt} IS NULL AND ${table.errorCode} IS NOT NULL AND ${table.errorMessage} IS NOT NULL))`,
+    ),
+  ],
+);
+
 /** Append-only candidate and confirmed resolution ledger for incident clashes. */
 export const pulseIncidentResolutions = pgTable(
   "pulse_incident_resolutions",

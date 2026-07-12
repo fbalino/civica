@@ -1,0 +1,38 @@
+{
+  "id": "pulse-classification-state-contract-fixtures",
+  "toVersion": "civica-index-pulse-classification-state-v14",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-032/change-control-followup.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "plan/evidence/PUL-032/change-control-followup.md"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-032/change-control-followup.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-032/migration-plan.md",
+      "plan/evidence/PUL-032/change-control-followup.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/classification-state.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "scripts/validate-index-pulse-classification-state.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:index-pulse-classification-state",
+    "validate:pulse-classification-state"
+  ]
+}

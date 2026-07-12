@@ -145,4 +145,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "3e561cffdaaeb6ed1a1c42527f97e8775012ba00a87c26d5e2b68ddfcf2efef8",
     baseline: false,
   },
+  {
+    id: "0024_dark_maginty",
+    path: "drizzle/authoritative/0024_dark_maginty.sql",
+    sha256: "5bf4ce195a3927b0712c87d7407645a2e57426b9131e20a837af83ca335523f7",
+    baseline: false,
+  },
 ] as const;
