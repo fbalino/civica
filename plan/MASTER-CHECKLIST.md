@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 298
-- **Completed:** 115
-- **Remaining:** 183
-- **Progress:** 38.6%
+- **Completed:** 116
+- **Remaining:** 182
+- **Progress:** 38.9%
 - **Priority mix:** P0 184 · P1 109 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -321,7 +321,7 @@ Source: `plan/10-academic-governance-review-and-outreach.md`
 - [x] **GOV-011** (P1) Prepare personalized reviewer dossiers and narrow asks. _Done when: each shortlisted person has a one-page dossier explaining why them, exact bounded review question, artifacts, expected hours/deliverable, conflict/publication terms, honorarium posture, and respectful contact draft; no generic “review everything” request remains._
 - [ ] **GOV-012** (P1) Decide and document reviewer honoraria/resources. _Done when: owner approves a budget or explicit no-honorarium posture, payment/tax/logistics and independence safeguards are defined, offers are consistent for comparable work, and no payment is contingent on a favorable conclusion._
 - [x] **GOV-013** (P0) Assemble the atlas/data-curation review packet. _Done when: frozen release candidate, codebook, data dictionary, rights/source/input manifests, checksums, clean-room instructions/results, coverage/quality reports, correction policy, and a bounded review questionnaire are versioned and independently link-checked._
-- [ ] **GOV-014** (P0) Assemble the Index review packet after the tournament. _Done when: preregistration, candidates/baselines, frozen panel, code/environment, analyses, sensitivity/uncertainty/subgroup results, decision thresholds, failures, proposed disposition, misuse analysis, and exact questions are reproducible from one versioned bundle._
+- [x] **GOV-014** (P0) Assemble the Index review packet after the tournament. _Done when: preregistration, candidates/baselines, frozen panel, code/environment, analyses, sensitivity/uncertainty/subgroup results, decision thresholds, failures, proposed disposition, misuse analysis, and exact questions are reproducible from one versioned bundle._
 - [ ] **GOV-015** (P0) Assemble the Pulse review packet after prospective evaluation. _Done when: construct/codebook, source/observability design, sample/power plan, annotation/adjudication, frozen gold data as rights permit, full-pipeline metrics, subgroup/calibration/error ledgers, prospective protocol/results, disposition proposal, and exact questions are versioned._
 - [ ] **GOV-016** (P0) Pass the agent-complete entry gate before solicitation. _Done when: QA-020 reports G4 pass, every P0/P1 agent-verifiable task is checked with evidence, only enumerated human/external checks remain, reviewer packets match the tested release commit/data, and owner signs the contact-ready list._
 - [ ] **GOV-017** (P1) Contact reviewers in staged small batches only after GOV-016. _Done when: approved personalized messages are sent through authorized channels, consent/conflict/availability/outcome are tracked, follow-up limits are respected, and no mass outreach or implied endorsement occurs._
