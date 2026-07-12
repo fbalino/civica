@@ -377,7 +377,8 @@
     "validate:index-review-packet": "npm run validate:governance-evidence-review-packet && tsx scripts/validate-index-review-packet.ts",
     "validate:lint": "tsx scripts/validate-lint.ts",
     "validate:secrets": "tsx scripts/scan-secrets.ts",
-    "validate:secrets:history": "tsx scripts/scan-secrets.ts --history"
+    "validate:secrets:history": "tsx scripts/scan-secrets.ts --history",
+    "validate:deps": "npm audit --audit-level=critical --omit=dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
@@ -421,5 +422,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5",
     "world-atlas": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
