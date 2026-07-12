@@ -703,3 +703,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Canonical and frozen-release citations now name Fernando Balino personally and retain Civica Atlas as publisher.
 - The project claims no institutional affiliation and records no ORCID because none was supplied or reliably found.
 - Nine contribution roles and three history periods are machine-readable; 15 generic blog bylines now name the accountable author. GOV-003 is next.
+
+## 2026-07-11 — GOV-004 AI-use disclosure completed
+
+- Published eight distinct model/agent roles with exact production systems where known, controls, and limitations.
+- Internal audits and GPT-5.3 Spark coding pilots are explicitly non-peer-review and non-gold; Fernando retains publication responsibility.
+- Historical session and launch-image metadata gaps remain visible rather than inferred. GOV-005 is next while GOV-003 awaits owner facts.
