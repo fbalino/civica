@@ -9,35 +9,93 @@
     { "path": "/api/cron/bills/br", "schedule": "30 4 * * *" },
     { "path": "/api/cron/bills/de", "schedule": "0 5 * * *" },
     { "path": "/api/cron/bills/fr", "schedule": "30 5 * * *" },
-    { "path": "/api/cron/factbook/sync-wikidata", "schedule": "0 6 1 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-officeholders", "schedule": "0 2 8 * *" },
+    {
+      "path": "/api/cron/factbook/sync-wikidata",
+      "schedule": "0 6 1 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-officeholders",
+      "schedule": "0 2 8 * *"
+    },
     { "path": "/api/cron/factbook/sync-cia-cabinets", "schedule": "0 1 * * *" },
     { "path": "/api/cron/factbook/refresh-cache", "schedule": "30 6 * * *" },
-    { "path": "/api/cron/factbook/sync-classifications", "schedule": "0 7 15 7 *" },
+    {
+      "path": "/api/cron/factbook/sync-classifications",
+      "schedule": "0 7 15 7 *"
+    },
     { "path": "/api/cron/factbook/sync-wdi", "schedule": "0 8 2 1,4,7,10 *" },
     { "path": "/api/cron/factbook/sync-imf-weo", "schedule": "0 9 5 4,10 *" },
-    { "path": "/api/cron/factbook/sync-un-data", "schedule": "0 11 3 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-who-gho", "schedule": "0 10 2 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-unesco-uis", "schedule": "0 12 4 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-undp-hdi", "schedule": "0 13 6 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-oecd-stat", "schedule": "0 14 7 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-fao-faostat", "schedule": "0 15 8 1,4,7,10 *" },
+    {
+      "path": "/api/cron/factbook/sync-un-data",
+      "schedule": "0 11 3 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-who-gho",
+      "schedule": "0 10 2 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-unesco-uis",
+      "schedule": "0 12 4 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-undp-hdi",
+      "schedule": "0 13 6 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-oecd-stat",
+      "schedule": "0 14 7 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-fao-faostat",
+      "schedule": "0 15 8 1,4,7,10 *"
+    },
     { "path": "/api/cron/factbook/sync-ilo-ilostat", "schedule": "0 9 5 11 *" },
-    { "path": "/api/cron/factbook/sync-eurostat", "schedule": "0 16 9 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-wto-stats", "schedule": "0 9 25 1,4,7,10 *" },
+    {
+      "path": "/api/cron/factbook/sync-eurostat",
+      "schedule": "0 16 9 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-wto-stats",
+      "schedule": "0 9 25 1,4,7,10 *"
+    },
     { "path": "/api/cron/factbook/sync-insee-fr", "schedule": "0 4 1 * *" },
-    { "path": "/api/cron/factbook/sync-us-census", "schedule": "0 18 11 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-ons-uk", "schedule": "0 19 11 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-ibge-br", "schedule": "0 22 11 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-statcan-ca", "schedule": "0 21 11 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-stats-sa", "schedule": "0 23 11 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/auto-resolve-disputes", "schedule": "30 2 * * *" },
-    { "path": "/api/cron/factbook/snapshot-vintage", "schedule": "0 4 15 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/verify-reconciliation", "schedule": "45 3 * * *" },
+    {
+      "path": "/api/cron/factbook/sync-us-census",
+      "schedule": "0 18 11 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-ons-uk",
+      "schedule": "0 19 11 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-ibge-br",
+      "schedule": "0 22 11 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-statcan-ca",
+      "schedule": "0 21 11 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/sync-stats-sa",
+      "schedule": "0 23 11 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/auto-resolve-disputes",
+      "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/factbook/snapshot-vintage",
+      "schedule": "0 4 15 1,4,7,10 *"
+    },
+    {
+      "path": "/api/cron/factbook/verify-reconciliation",
+      "schedule": "45 3 * * *"
+    },
 
     { "path": "/api/cron/pulse/v2/ingest", "schedule": "0 8 * * *" },
     { "path": "/api/cron/pulse/v2/cluster", "schedule": "20 8 * * *" },
     { "path": "/api/cron/pulse/v2/classify", "schedule": "40 8 * * *" },
-    { "path": "/api/cron/pulse/v2/score", "schedule": "0 9 * * *" }
+    { "path": "/api/cron/pulse/v2/score", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/pulse/v2/review-sla", "schedule": "10 */6 * * *" }
   ]
 }

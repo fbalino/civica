@@ -689,7 +689,8 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
-    cadence: "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+    cadence:
+      "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
     vintageSemantics:
       "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
     rights:
@@ -703,7 +704,8 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
-    cadence: "Append-only whenever collision detection or qualified review issues a new pair decision.",
+    cadence:
+      "Append-only whenever collision detection or qualified review issues a new pair decision.",
     vintageSemantics:
       "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
     rights:
@@ -792,7 +794,8 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
-    cadence: "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+    cadence:
+      "Append-only whenever a candidate is excluded or a decision axis is refuted.",
     vintageSemantics:
       "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
     rights:
@@ -817,7 +820,8 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   pulse_coding_studies: {
     definition:
       "Version-pinned independent-coding studies kept separate from production Pulse review and scoring.",
-    rowGrain: "One coding study over one frozen packet set and method contract.",
+    rowGrain:
+      "One coding study over one frozen packet set and method contract.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Created by an authorized study administrator from a label-blind packet manifest.",
@@ -845,14 +849,16 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   pulse_coding_participants: {
     definition:
       "Pseudonymous role-bearing participants with hashed, revocable coding-workspace credentials.",
-    rowGrain: "One coder, adjudicator, or study administrator identity in one study.",
+    rowGrain:
+      "One coder, adjudicator, or study administrator identity in one study.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
     cadence: "On invitation, access, expiry, or revocation.",
     vintageSemantics:
       "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
-    rights: "Private access-control metadata; never part of a public research release.",
+    rights:
+      "Private access-control metadata; never part of a public research release.",
     deprecation: active,
   },
   pulse_coding_assignments: {
@@ -876,20 +882,24 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
-    cadence: "Once when the second coder locks, with idempotent repair after interruption.",
+    cadence:
+      "Once when the second coder locks, with idempotent repair after interruption.",
     vintageSemantics:
       "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
-    rights: "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+    rights:
+      "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
     deprecation: active,
   },
   pulse_coding_adjudications: {
     definition:
       "Separate terminal adjudication records that preserve rather than overwrite both raw coder submissions.",
-    rowGrain: "One resolved or explicitly unresolved adjudication for one comparison.",
+    rowGrain:
+      "One resolved or explicitly unresolved adjudication for one comparison.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
-    cadence: "Once after both coder submissions lock; terminal rows are immutable.",
+    cadence:
+      "Once after both coder submissions lock; terminal rows are immutable.",
     vintageSemantics:
       "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
     rights:
@@ -899,14 +909,16 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   pulse_coding_audit_log: {
     definition:
       "Append-only access and state-transition history for independent coding studies.",
-    rowGrain: "One access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+    rowGrain:
+      "One access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Generated by role-gated coding services and database-enforced workflow transitions.",
     cadence: "Append-only for every meaningful coding-workspace action.",
     vintageSemantics:
       "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
-    rights: "Private operational audit metadata; exports omit credential hashes.",
+    rights:
+      "Private operational audit metadata; exports omit credential hashes.",
     deprecation: active,
   },
   pulse_sources: {
@@ -947,6 +959,35 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "created_at is review-action time; payloads preserve the state at that time.",
     rights:
       "Internal review metadata; embedded source evidence retains publisher rights.",
+    deprecation: active,
+  },
+  pulse_review_obligations: {
+    definition:
+      "Current operational human-review obligation under a versioned Pulse service-level contract.",
+    rowGrain: "One Pulse event and review-SLA version.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+    cadence:
+      "Created at queue entry and retained through claim or terminal disposition transitions.",
+    vintageSemantics:
+      "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+    rights:
+      "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+    deprecation: active,
+  },
+  pulse_review_sla_events: {
+    definition:
+      "Append-only operational events for Pulse queue entry, escalation, bounded exceptions, disposition, and legacy quarantine.",
+    rowGrain: "One content-addressed SLA event on one review obligation.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+    cadence: "Append-only when a review obligation changes operational state.",
+    vintageSemantics:
+      "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+    rights:
+      "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
     deprecation: active,
   },
   backtest_cases: {

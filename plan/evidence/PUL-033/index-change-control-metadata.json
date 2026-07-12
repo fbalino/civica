@@ -1,0 +1,39 @@
+{
+  "id": "pulse-human-review-service-level",
+  "toVersion": "civica-index-pulse-review-sla-v15",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-033/README.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-033/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-033/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/review-sla.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "scripts/validate-pulse-review-sla.ts",
+      "scripts/validate-index-pulse-classification-state.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:index-pulse-classification-state",
+    "validate:pulse-classification-state",
+    "validate:pulse-review-sla"
+  ]
+}

@@ -11,6 +11,10 @@ import {
   type PulseV2ChangelogRow,
 } from "@/lib/db/queries-pulse-v2";
 import { pulse } from "@/lib/content/site-state";
+import {
+  loadPulseReviewSlaReport,
+  type PulseReviewSlaReport,
+} from "@/lib/pulse/v2/review-sla-store";
 import { PulseChangelogFilterClient } from "./PulseChangelogFilterClient";
 
 export const revalidate = 3600;
@@ -42,15 +46,17 @@ function formatAsOfDate(iso: string): string {
 export default async function PulseChangelogPage() {
   let countries: Array<{ slug: string; name: string }> = [];
   let events: PulseV2ChangelogRow[] = [];
+  let reviewSla: PulseReviewSlaReport | null = null;
 
   try {
-    const [countryRows, published, review] = await Promise.all([
+    const [countryRows, published, review, sla] = await Promise.all([
       db
         .select({ slug: jurisdictions.slug, name: jurisdictions.name })
         .from(jurisdictions)
         .orderBy(jurisdictions.name),
       getPulseV2Changelog({ publishedOnly: true, limit: 2500 }),
       getPulseV2Changelog({ publishedOnly: false, limit: 2500 }),
+      loadPulseReviewSlaReport(),
     ]);
 
     countries = countryRows;
@@ -60,6 +66,7 @@ export default async function PulseChangelogPage() {
       seen.add(row.id);
       return true;
     });
+    reviewSla = sla;
   } catch {
     // Keep the public changelog shell renderable during DB outages.
   }
@@ -74,6 +81,11 @@ export default async function PulseChangelogPage() {
   const freshnessNote = mostRecentEventDate
     ? `The most recent classified event in this result set is dated ${formatAsOfDate(mostRecentEventDate)}.`
     : "No classified-event date is available in the current result set.";
+  const reviewCompletenessNote = !reviewSla
+    ? "Review-SLA state is unavailable, so daily completeness is not assessable."
+    : reviewSla.dailyCompletenessEligible
+      ? "No active review obligation is currently past its internal deadline; this does not establish daily completeness."
+      : `Daily completeness is withheld because ${reviewSla.breachedUnexcepted + reviewSla.breachedExcepted} active review obligations are past deadline.`;
 
   return (
     <>
@@ -91,7 +103,8 @@ export default async function PulseChangelogPage() {
         }
         description={
           <>
-            Experimental, model-assisted governance-event classifications. {freshnessNote}
+            Experimental, model-assisted governance-event classifications.{" "}
+            {freshnessNote}
           </>
         }
       />
@@ -101,18 +114,21 @@ export default async function PulseChangelogPage() {
           The Civica Pulse Beta is an experimental event ledger, not a live or
           continuous measure of governance change. The entries below reflect the
           most recent completed data available to this page. Under the current
-          pipeline contract, high-positive, severe-negative, and
-          catastrophic-negative classifications; deadlocks/no quorum; and weak
-          or degraded majorities paired with a verifier objection (low
-          confidence; a revised/rejected verdict; a negative category, severity,
-          subject, or event check; or failed/unavailable verification) are
-          queued for human review. Queued and rejected rows do <strong>not</strong>{" "}
-          affect API-only experimental deltas. Other entries may be auto-published,
-          so “published” does not mean “human-reviewed.” For some older rejected
-          rows, the legacy rejection origin is unverified because no reviewer
-          audit record is available. The ledger also contains older, unversioned
-          classifier generations; agreement labels are displayed conservatively
-          when a literal voter count cannot be proven. See the{" "}
+          review contract, {reviewCompletenessNote} Pre-contract review items
+          remain unpublished in a separate legacy quarantine and are not
+          described as reviewed or rejected. Under the current pipeline
+          contract, high-positive, severe-negative, and catastrophic-negative
+          classifications; deadlocks/no quorum; and weak or degraded majorities
+          paired with a verifier objection (low confidence; a revised/rejected
+          verdict; a negative category, severity, subject, or event check; or
+          failed/unavailable verification) are queued for human review. Queued
+          and rejected rows do <strong>not</strong> affect API-only experimental
+          deltas. Other entries may be auto-published, so “published” does not
+          mean “human-reviewed.” For some older rejected rows, the legacy
+          rejection origin is unverified because no reviewer audit record is
+          available. The ledger also contains older, unversioned classifier
+          generations; agreement labels are displayed conservatively when a
+          literal voter count cannot be proven. See the{" "}
           <Link href="/civica-index/methodology/pulse">Pulse methodology</Link>{" "}
           for the full pipeline.
         </div>

@@ -85,9 +85,17 @@ import {
   PULSE_CLASSIFICATION_STATUSES,
   PULSE_CLASSIFICATION_STATE_VERSION,
 } from "./classification-state";
+import {
+  PULSE_REVIEW_COMPLIANCE_STATES,
+  PULSE_REVIEW_HEALTH_STATES,
+  PULSE_REVIEW_OBLIGATION_STATES,
+  PULSE_REVIEW_PRIORITY_BY_SEVERITY,
+  PULSE_REVIEW_SLA_TARGETS,
+  PULSE_REVIEW_SLA_VERSION,
+} from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.9.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.10-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.10.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.11-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -441,7 +449,30 @@ export interface PulseRuntimeMethodContract {
         reviewStatus: "rejected";
         humanReviewed: false;
       };
+      legacyQuarantined: {
+        published: false;
+        reviewStatus: "legacy_quarantined";
+        humanReviewed: false;
+      };
     };
+  };
+  reviewServiceLevel: {
+    version: typeof PULSE_REVIEW_SLA_VERSION;
+    priorityBySeverity: typeof PULSE_REVIEW_PRIORITY_BY_SEVERITY;
+    targets: typeof PULSE_REVIEW_SLA_TARGETS;
+    obligationStates: string[];
+    complianceStates: string[];
+    healthStates: string[];
+    queueOrder: "priority_then_due_then_queued_then_id";
+    monitor: {
+      route: "/api/cron/pulse/v2/review-sla";
+      cron: "10 */6 * * *";
+      delivery: "persisted_idempotent_event_plus_structured_server_log";
+    };
+    exceptionRule: "append_only_bounded_explanation_never_restores_completeness";
+    dailyCompletenessRule: "withheld_on_breach_or_unknown";
+    reportClockArithmetic: "explicit_timestamp_cast_before_interval";
+    legacyRule: string;
   };
   numericDeltas: {
     publicStatus: "public_experimental";
@@ -811,7 +842,32 @@ export function buildPulseRuntimeMethod(
           reviewStatus: "rejected",
           humanReviewed: false,
         },
+        legacyQuarantined: {
+          published: false,
+          reviewStatus: "legacy_quarantined",
+          humanReviewed: false,
+        },
       },
+    },
+    reviewServiceLevel: {
+      version: PULSE_REVIEW_SLA_VERSION,
+      priorityBySeverity: PULSE_REVIEW_PRIORITY_BY_SEVERITY,
+      targets: PULSE_REVIEW_SLA_TARGETS,
+      obligationStates: [...PULSE_REVIEW_OBLIGATION_STATES],
+      complianceStates: [...PULSE_REVIEW_COMPLIANCE_STATES],
+      healthStates: [...PULSE_REVIEW_HEALTH_STATES],
+      queueOrder: "priority_then_due_then_queued_then_id",
+      monitor: {
+        route: "/api/cron/pulse/v2/review-sla",
+        cron: "10 */6 * * *",
+        delivery: "persisted_idempotent_event_plus_structured_server_log",
+      },
+      exceptionRule:
+        "append_only_bounded_explanation_never_restores_completeness",
+      dailyCompletenessRule: "withheld_on_breach_or_unknown",
+      reportClockArithmetic: "explicit_timestamp_cast_before_interval",
+      legacyRule:
+        "Pre-contract pending items remain unpublished in legacy quarantine and are not counted as reviewed, approved, rejected, or SLA-compliant.",
     },
     numericDeltas: {
       publicStatus: "public_experimental",

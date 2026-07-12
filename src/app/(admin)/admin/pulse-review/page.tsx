@@ -7,6 +7,7 @@ import { AdminRow } from "@/app/(admin)/AdminRow";
 import { getPulseReviewQueue } from "@/lib/db/queries-pulse-review";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
 import { loadPulseSourceCoverageReport } from "@/lib/pulse/v2/source-coverage";
+import { loadPulseReviewSlaReport } from "@/lib/pulse/v2/review-sla-store";
 
 export const metadata: Metadata = {
   title: "Pulse review queue — Civica admin",
@@ -107,6 +108,15 @@ function formatTimestamp(value: string | null): string {
   });
 }
 
+function formatAge(from: string, to: string): string {
+  const hours = Math.max(
+    0,
+    Math.floor((new Date(to).getTime() - new Date(from).getTime()) / 3_600_000),
+  );
+  if (hours < 48) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+}
+
 export default async function PulseReviewQueuePage({
   searchParams,
 }: PageProps) {
@@ -121,9 +131,10 @@ export default async function PulseReviewQueuePage({
   const limit = 50;
   const offset = (page - 1) * limit;
 
-  const [{ rows, totalPending }, sourceCoverage] = await Promise.all([
+  const [{ rows, totalPending }, sourceCoverage, sla] = await Promise.all([
     getPulseReviewQueue({ dimension, severity, limit, offset }),
     loadPulseSourceCoverageReport(),
+    loadPulseReviewSlaReport(),
   ]);
 
   const baseParams = { dimension, severity };
@@ -147,6 +158,89 @@ export default async function PulseReviewQueuePage({
           </span>
         </p>
       </header>
+
+      <section className="admin-section" aria-labelledby="review-sla-title">
+        <h2 id="review-sla-title" className="admin-section-title">
+          Review service level
+        </h2>
+        <p className="admin-section-intro">
+          Internal operating targets under {sla.slaVersion}: catastrophic
+          classifications are due in 24 hours, severe and high-positive items in
+          72 hours, and other queued items in seven days. These are review
+          controls, not staffed guarantees or validation claims.
+        </p>
+        <p className="admin-meta">
+          <Chip
+            variant={
+              sla.healthState === "incomplete_review_sla"
+                ? "danger"
+                : sla.active
+                  ? "warn"
+                  : "success"
+            }
+          >
+            {sla.healthState.replaceAll("_", " ")}
+          </Chip>
+          <span>{sla.active} active</span>
+          <span className="admin-meta-sep">·</span>
+          <span>{sla.escalationDue} escalated</span>
+          <span className="admin-meta-sep">·</span>
+          <span>
+            {sla.breachedUnexcepted + sla.breachedExcepted} past deadline
+          </span>
+          <span className="admin-meta-sep">·</span>
+          <span>{sla.activeExceptions} active exceptions</span>
+          <span className="admin-meta-sep">·</span>
+          <span>{sla.legacyQuarantined} legacy quarantined</span>
+        </p>
+        <div className="admin-table-scroll">
+          <DataTable className="admin-table">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Open</th>
+                <th>Escalation due</th>
+                <th>Past deadline</th>
+                <th>Oldest active age</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sla.byPriority.map((priority) => (
+                <tr key={priority.priority}>
+                  <td>
+                    <Chip
+                      variant={
+                        priority.priority === "critical"
+                          ? "danger"
+                          : priority.priority === "urgent"
+                            ? "warn"
+                            : "neutral"
+                      }
+                    >
+                      {priority.priority}
+                    </Chip>
+                  </td>
+                  <td>{priority.open}</td>
+                  <td>{priority.escalationDue}</td>
+                  <td>{priority.breached}</td>
+                  <td>
+                    {priority.oldestQueuedAt
+                      ? formatAge(priority.oldestQueuedAt, sla.generatedAt)
+                      : "None"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
+        </div>
+        {!sla.dailyCompletenessEligible ? (
+          <div className="admin-note">
+            Daily-completeness wording is withheld while any review obligation
+            is past deadline. An exception explains delay but does not restore
+            completeness.
+          </div>
+        ) : null}
+      </section>
 
       <section
         className="admin-section"
@@ -276,7 +370,9 @@ export default async function PulseReviewQueuePage({
         <div className="admin-empty">
           <strong>Nothing to review</strong>
           {totalPending === 0
-            ? "Every queued event has been reviewed."
+            ? sla.legacyQuarantined > 0
+              ? "The active queue is empty. Pre-contract items remain retained in the separate legacy quarantine and are not counted as reviewed."
+              : "The active queue is empty."
             : "No events match these filters."}
         </div>
       ) : (
@@ -288,7 +384,7 @@ export default async function PulseReviewQueuePage({
                 <th>Dimension</th>
                 <th>Severity</th>
                 <th>Consensus</th>
-                <th className="num">Date</th>
+                <th className="num">SLA / age</th>
               </tr>
             </thead>
             <tbody>
@@ -353,7 +449,22 @@ export default async function PulseReviewQueuePage({
                     )}
                   </td>
                   <td className="num admin-cell-date">
-                    {formatDate(event.eventDate)}
+                    <Chip
+                      variant={
+                        event.complianceState.startsWith("breached")
+                          ? "danger"
+                          : event.complianceState === "escalation_due"
+                            ? "warn"
+                            : "neutral"
+                      }
+                    >
+                      {event.priority}
+                    </Chip>
+                    <span className="admin-row-secondary">
+                      {formatAge(event.queuedAt, sla.generatedAt)} old · due{" "}
+                      {formatDate(event.dueAt)}
+                      {event.exceptionActive ? " · exception active" : ""}
+                    </span>
                   </td>
                 </AdminRow>
               ))}

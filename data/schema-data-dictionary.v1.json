@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "9639f2a35c63d4ea6b7dd3ff12fadf21f1d6d1b1eb1ad5d4f65d5bb41c10d657",
+  "schemaFingerprint": "04d57dd34b3d02e9b8327e5ce6076423af34e21ef8fbd8b96d2eaf8df10e8981",
   "summary": {
-    "tables": 71,
-    "columns": 959,
+    "tables": 73,
+    "columns": 991,
     "publicAtlasTables": 18,
     "researchBetaTables": 23,
     "supportTables": 11,
-    "internalTables": 17,
+    "internalTables": 19,
     "privateTables": 2,
     "legacyTables": 3
   },
@@ -23677,6 +23677,866 @@
           "cadence": "Event-driven on review action.",
           "vintageSemantics": "created_at is review-action time; payloads preserve the state at that time.",
           "rights": "Internal review metadata; embedded source evidence retains publisher rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_review_obligations",
+      "exportName": "pulseReviewObligations",
+      "definition": "Current operational human-review obligation under a versioned Pulse service-level contract.",
+      "rowGrain": "One Pulse event and review-SLA version.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+      "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+      "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+      "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "claim_expires_at",
+          "propertyName": "claimExpiresAt",
+          "definition": "Claim expires at recorded for the Pulse event and review-SLA version.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Claim expires at follows this table contract. queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "claimed_at",
+          "propertyName": "claimedAt",
+          "definition": "Claimed at recorded for the Pulse event and review-SLA version.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Claimed at follows this table contract. queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "claimed_by",
+          "propertyName": "claimedBy",
+          "definition": "Claimed by recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "disposition",
+          "propertyName": "disposition",
+          "definition": "Disposition recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dispositioned_at",
+          "propertyName": "dispositionedAt",
+          "definition": "Dispositioned at recorded for the Pulse event and review-SLA version.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Dispositioned at follows this table contract. queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dispositioned_by",
+          "propertyName": "dispositionedBy",
+          "definition": "Dispositioned by recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "due_at",
+          "propertyName": "dueAt",
+          "definition": "Due at recorded for the Pulse event and review-SLA version.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_obligation_active_due",
+              "idx_pulse_review_obligation_priority_due"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Due at follows this table contract. queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "escalate_at",
+          "propertyName": "escalateAt",
+          "definition": "Escalate at recorded for the Pulse event and review-SLA version.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Escalate at follows this table contract. queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_id",
+          "propertyName": "eventId",
+          "definition": "Event id; relational link to pulse_events_v2.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_events_v2.id",
+            "indexGroups": [
+              "idx_pulse_review_obligation_event_version"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_review_obligation_event_version"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_events_v2.id; substantive provenance follows this table's source contract.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "incident_id",
+          "propertyName": "incidentId",
+          "definition": "Incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_pulse_review_obligation_incident"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "priority",
+          "propertyName": "priority",
+          "definition": "Priority recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_obligation_priority_due"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "queued_at",
+          "propertyName": "queuedAt",
+          "definition": "Queued at recorded for the Pulse event and review-SLA version.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Queued at follows this table contract. queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "queued_at_basis",
+          "propertyName": "queuedAtBasis",
+          "definition": "Queued at basis recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "sla_version",
+          "propertyName": "slaVersion",
+          "definition": "Sla version recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_obligation_event_version"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_review_obligation_event_version"
+            ]
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "state",
+          "propertyName": "state",
+          "definition": "State recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_obligation_active_due"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "trigger_reason",
+          "propertyName": "triggerReason",
+          "definition": "Trigger reason recorded for the Pulse event and review-SLA version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "updated_at",
+          "propertyName": "updatedAt",
+          "definition": "Timestamp when Civica last updated this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+          "cadence": "Created at queue entry and retained through claim or terminal disposition transitions.",
+          "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
+          "rights": "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_review_sla_events",
+      "exportName": "pulseReviewSlaEvents",
+      "definition": "Append-only operational events for Pulse queue entry, escalation, bounded exceptions, disposition, and legacy quarantine.",
+      "rowGrain": "One content-addressed SLA event on one review obligation.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+      "cadence": "Append-only when a review obligation changes operational state.",
+      "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+      "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "actor",
+          "propertyName": "actor",
+          "definition": "Actor recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "effective_at",
+          "propertyName": "effectiveAt",
+          "definition": "Effective at recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_sla_event_obligation",
+              "idx_pulse_review_sla_event_kind"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "Effective at follows this table contract. effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_key",
+          "propertyName": "eventKey",
+          "definition": "Event key recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_sla_event_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_review_sla_event_key"
+            ]
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "expires_at",
+          "propertyName": "expiresAt",
+          "definition": "Expires at recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "Expires at follows this table contract. effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "kind",
+          "propertyName": "kind",
+          "definition": "Kind recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_review_sla_event_kind"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "metadata",
+          "propertyName": "metadata",
+          "definition": "Structured metadata governed by this table's row contract.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "note",
+          "propertyName": "note",
+          "definition": "Note recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "obligation_id",
+          "propertyName": "obligationId",
+          "definition": "Obligation id; relational link to pulse_review_obligations.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_review_obligations.id",
+            "indexGroups": [
+              "idx_pulse_review_sla_event_obligation"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_review_obligations.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reason_code",
+          "propertyName": "reasonCode",
+          "definition": "Reason code recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the content-addressed SLA event on one review obligation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+          "cadence": "Append-only when a review obligation changes operational state.",
+          "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+          "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
           "deprecation": {
             "status": "active"
           }

@@ -134,6 +134,8 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "verifierProse",
     "subjectAttributorProse",
     "reviewTiersProse",
+    "reviewSlaVersion",
+    "reviewSlaTargetsProse",
     "weakConfidenceThreshold",
     "classificationMaxAttempts",
     "classificationInitialRetryMinutes",

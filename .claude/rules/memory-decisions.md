@@ -951,3 +951,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   again under an identical configuration.
 - Configuration identity includes models, prompts, method, ontology,
   publication gate, decoding, and retry policy. Durable record: APR-D147.
+
+## 2026-07-12 — Pulse review SLAs are operational safeguards
+
+- Review targets are 24 hours for catastrophic-negative, 72 hours for
+  severe-negative/high-positive, and seven days for other queued items.
+- Exceptions are append-only and bounded; they never restore completeness.
+- Pre-contract pending items are unpublished legacy quarantine, not human
+  decisions. Durable record: APR-D148.

@@ -10,7 +10,7 @@ for (const [path, source, fragments] of [
     "runtime-contract.ts",
     runtime,
     [
-      'PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.10-beta"',
+      'PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.11-beta"',
       "PULSE_CLASSIFICATION_STATE_VERSION",
       "new_then_due_retry_oldest_first",
       "terminal_none_not_failure",
@@ -48,5 +48,5 @@ for (const [path, source, fragments] of [
 }
 
 console.log(
-  "PASS — the protected Index/Pulse surface binds pulse-v2.10-beta to versioned classifier state, bounded terminal retries, and disclosed queue behavior.",
+  "PASS — the protected Index/Pulse surface preserves versioned classifier state, bounded terminal retries, and disclosed queue behavior under pulse-v2.11-beta.",
 );

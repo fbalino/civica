@@ -2310,12 +2310,7 @@ export const pulseClusterClassificationStates = pgTable(
     configHash: text("config_hash").notNull(),
     config: jsonb("config").$type<Record<string, unknown>>().notNull(),
     status: text("status")
-      .$type<
-        | "classified"
-        | "none"
-        | "retryable_failure"
-        | "terminal_failure"
-      >()
+      .$type<"classified" | "none" | "retryable_failure" | "terminal_failure">()
       .notNull(),
     attemptCount: integer("attempt_count").notNull(),
     maxAttempts: integer("max_attempts").notNull(),
@@ -2731,6 +2726,110 @@ export const pulseReviewAuditLog = pgTable(
 );
 
 /**
+ * PUL-033 — one operational human-review obligation for each event admitted
+ * to the pending queue under a named SLA contract. Historic pre-contract work
+ * is retained as `legacy_quarantined`; that state is not a human decision.
+ */
+export const pulseReviewObligations = pgTable(
+  "pulse_review_obligations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull(),
+    incidentId: uuid("incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    slaVersion: text("sla_version").notNull(),
+    priority: text("priority")
+      .$type<"critical" | "urgent" | "standard">()
+      .notNull(),
+    triggerReason: text("trigger_reason").notNull(),
+    queuedAt: timestamp("queued_at").notNull(),
+    queuedAtBasis: text("queued_at_basis")
+      .$type<"recorded" | "created_at_proxy">()
+      .notNull(),
+    escalateAt: timestamp("escalate_at").notNull(),
+    dueAt: timestamp("due_at").notNull(),
+    state: text("state")
+      .$type<"open" | "claimed" | "dispositioned" | "legacy_quarantined">()
+      .notNull(),
+    claimedBy: text("claimed_by"),
+    claimedAt: timestamp("claimed_at"),
+    claimExpiresAt: timestamp("claim_expires_at"),
+    disposition: text("disposition"),
+    dispositionedBy: text("dispositioned_by"),
+    dispositionedAt: timestamp("dispositioned_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_review_obligation_event_version").on(
+      table.eventId,
+      table.slaVersion,
+    ),
+    index("idx_pulse_review_obligation_active_due").on(
+      table.state,
+      table.dueAt,
+    ),
+    index("idx_pulse_review_obligation_priority_due").on(
+      table.priority,
+      table.dueAt,
+    ),
+    index("idx_pulse_review_obligation_incident").on(table.incidentId),
+    check(
+      "pulse_review_obligation_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-review-obligation/v1' AND ${table.slaVersion} = 'pulse-review-sla/v1' AND ${table.priority} IN ('critical','urgent','standard') AND ${table.queuedAtBasis} IN ('recorded','created_at_proxy') AND ${table.state} IN ('open','claimed','dispositioned','legacy_quarantined') AND btrim(${table.triggerReason}) <> '' AND ${table.queuedAt} <= ${table.escalateAt} AND ${table.escalateAt} <= ${table.dueAt} AND ((${table.state} = 'open' AND ${table.claimedBy} IS NULL AND ${table.claimedAt} IS NULL AND ${table.claimExpiresAt} IS NULL AND ${table.disposition} IS NULL AND ${table.dispositionedBy} IS NULL AND ${table.dispositionedAt} IS NULL) OR (${table.state} = 'claimed' AND btrim(${table.claimedBy}) <> '' AND ${table.claimedAt} IS NOT NULL AND ${table.claimExpiresAt} > ${table.claimedAt} AND ${table.disposition} IS NULL AND ${table.dispositionedBy} IS NULL AND ${table.dispositionedAt} IS NULL) OR (${table.state} IN ('dispositioned','legacy_quarantined') AND btrim(${table.disposition}) <> '' AND btrim(${table.dispositionedBy}) <> '' AND ${table.dispositionedAt} IS NOT NULL))`,
+    ),
+  ],
+);
+
+/** Append-only operational record for queue entry, escalation and exceptions. */
+export const pulseReviewSlaEvents = pgTable(
+  "pulse_review_sla_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    eventKey: text("event_key").notNull(),
+    obligationId: uuid("obligation_id")
+      .references(() => pulseReviewObligations.id, { onDelete: "restrict" })
+      .notNull(),
+    kind: text("kind")
+      .$type<
+        | "enqueued"
+        | "claimed"
+        | "released"
+        | "escalated"
+        | "exception_granted"
+        | "exception_expired"
+        | "dispositioned"
+        | "legacy_quarantined"
+      >()
+      .notNull(),
+    actor: jsonb("actor").$type<Record<string, unknown>>().notNull(),
+    reasonCode: text("reason_code").notNull(),
+    note: text("note").notNull(),
+    effectiveAt: timestamp("effective_at").notNull(),
+    expiresAt: timestamp("expires_at"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_review_sla_event_key").on(table.eventKey),
+    index("idx_pulse_review_sla_event_obligation").on(
+      table.obligationId,
+      table.effectiveAt,
+    ),
+    index("idx_pulse_review_sla_event_kind").on(table.kind, table.effectiveAt),
+    check(
+      "pulse_review_sla_event_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-review-sla-event/v1' AND ${table.eventKey} ~ '^pulse-review-sla-event/sha256:[a-f0-9]{64}$' AND ${table.kind} IN ('enqueued','claimed','released','escalated','exception_granted','exception_expired','dispositioned','legacy_quarantined') AND jsonb_typeof(${table.actor}) = 'object' AND jsonb_typeof(${table.metadata}) = 'object' AND btrim(${table.reasonCode}) <> '' AND btrim(${table.note}) <> '' AND ((${table.kind} = 'exception_granted' AND ${table.expiresAt} > ${table.effectiveAt}) OR (${table.kind} <> 'exception_granted' AND ${table.expiresAt} IS NULL))`,
+    ),
+  ],
+);
+
+/**
  * PUL-017 — independent double-coding workspace.
  *
  * These tables are deliberately separate from production Pulse events and the
@@ -2901,9 +3000,7 @@ export const pulseCodingComparisons = pgTable(
     generatedAt: timestamp("generated_at").defaultNow().notNull(),
   },
   (table) => [
-    index("idx_pulse_coding_comparison_disagreements").on(
-      table.generatedAt,
-    ),
+    index("idx_pulse_coding_comparison_disagreements").on(table.generatedAt),
     check(
       "pulse_coding_comparisons_contract_check",
       dsql`${table.coderAssignmentAId} <> ${table.coderAssignmentBId} AND ${table.comparisonSha256} ~ '^[a-f0-9]{64}$' AND jsonb_typeof(${table.comparison}) = 'object'`,

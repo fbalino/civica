@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Chip } from "@/components/editorial/Pill";
+import { DataTable } from "@/components/editorial/DataTable";
 import { SourceDot } from "@/components/SourceDot";
 import {
   getPulseReviewEvent,
   getPulseReviewAuditTrail,
+  getPulseReviewSlaDetail,
 } from "@/lib/db/queries-pulse-review";
 import { EVENT_CATEGORIES } from "@/lib/pulse/v2/taxonomy";
 import { PULSE_DIMENSIONS } from "@/lib/pulse/v2/types";
@@ -82,7 +84,10 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
   const event = await getPulseReviewEvent(id);
   if (!event) notFound();
 
-  const auditTrail = await getPulseReviewAuditTrail(id);
+  const [auditTrail, sla] = await Promise.all([
+    getPulseReviewAuditTrail(id),
+    getPulseReviewSlaDetail(id),
+  ]);
 
   const aiSummary = await ensurePulseSummary({
     eventId: event.id,
@@ -259,6 +264,131 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
       </section>
 
       <section className="admin-section">
+        <h2 className="admin-section-title">Review service level</h2>
+        {sla ? (
+          <>
+            <p className="admin-section-intro">
+              Priority {sla.priority} · queued {formatDate(sla.queuedAt)} · due{" "}
+              {formatDate(sla.dueAt)} · state {sla.state.replaceAll("_", " ")}.
+            </p>
+            {sla.events.length ? (
+              <div className="admin-table-scroll">
+                <DataTable className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Reason</th>
+                      <th>Recorded</th>
+                      <th>Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sla.events.map((entry, index) => (
+                      <tr key={`${entry.kind}-${entry.effectiveAt}-${index}`}>
+                        <td>{entry.kind.replaceAll("_", " ")}</td>
+                        <td>
+                          {entry.reasonCode.replaceAll("_", " ")}
+                          <span className="admin-row-secondary">
+                            {entry.note}
+                          </span>
+                        </td>
+                        <td>{formatDate(entry.effectiveAt)}</td>
+                        <td>
+                          {entry.expiresAt
+                            ? formatDate(entry.expiresAt)
+                            : "Not applicable"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </DataTable>
+              </div>
+            ) : null}
+            {event.reviewStatus === "pending" ? (
+              <form
+                action={`/api/admin/pulse-review/${event.id}/exception`}
+                method="post"
+                className="admin-card"
+              >
+                <input
+                  type="hidden"
+                  name="redirect"
+                  value={`/admin/pulse-review/${event.id}`}
+                />
+                <div className="admin-grid-form">
+                  <label
+                    className="admin-field-label"
+                    htmlFor="exceptionReason"
+                  >
+                    Exception reason
+                  </label>
+                  <select
+                    id="exceptionReason"
+                    name="reason"
+                    className="admin-select"
+                    required
+                  >
+                    <option value="">Select a bounded reason</option>
+                    <option value="source_access_failure">
+                      Source access failure
+                    </option>
+                    <option value="language_or_expertise_needed">
+                      Language or expertise needed
+                    </option>
+                    <option value="identity_resolution_pending">
+                      Identity resolution pending
+                    </option>
+                    <option value="evidence_conflict">Evidence conflict</option>
+                    <option value="legal_or_security_hold">
+                      Legal or security hold
+                    </option>
+                    <option value="reviewer_conflict">Reviewer conflict</option>
+                    <option value="system_outage">System outage</option>
+                  </select>
+
+                  <label
+                    className="admin-field-label"
+                    htmlFor="exceptionExpiry"
+                  >
+                    Expires at (UTC)
+                  </label>
+                  <input
+                    id="exceptionExpiry"
+                    name="expiresAt"
+                    type="datetime-local"
+                    className="admin-input"
+                    required
+                  />
+
+                  <label className="admin-field-label" htmlFor="exceptionNote">
+                    Explanation
+                  </label>
+                  <textarea
+                    id="exceptionNote"
+                    name="note"
+                    className="admin-textarea"
+                    minLength={12}
+                    required
+                  />
+                </div>
+                <p className="admin-hint">
+                  Exceptions are append-only, expire within 30 days, and never
+                  restore a daily-completeness claim.
+                </p>
+                <button type="submit" className="btn btn--secondary btn--sm">
+                  Record exception
+                </button>
+              </form>
+            ) : null}
+          </>
+        ) : (
+          <div className="admin-note">
+            No versioned review obligation is attached to this historical event.
+          </div>
+        )}
+      </section>
+
+      <section className="admin-section">
         <h2 className="admin-section-title">Decision</h2>
         <p className="admin-section-intro">
           Approve as-is, edit the classification before approving, or reject the
@@ -266,124 +396,136 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
           scoring.
         </p>
 
-        <form
-          action={`/api/admin/pulse-review/${event.id}`}
-          method="post"
-          className="admin-card"
-        >
-          <div className="admin-grid-form">
-            <input type="hidden" name="redirect" value="/admin/pulse-review" />
+        {event.reviewStatus === "pending" ? (
+          <form
+            action={`/api/admin/pulse-review/${event.id}`}
+            method="post"
+            className="admin-card"
+          >
+            <div className="admin-grid-form">
+              <input
+                type="hidden"
+                name="redirect"
+                value="/admin/pulse-review"
+              />
 
-            <label className="admin-field-label" htmlFor="category">
-              Category
-            </label>
-            <select
-              id="category"
-              name="category"
-              defaultValue={event.category}
-              className="admin-select"
-            >
-              {EVENT_CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              <label className="admin-field-label" htmlFor="category">
+                Category
+              </label>
+              <select
+                id="category"
+                name="category"
+                defaultValue={event.category}
+                className="admin-select"
+              >
+                {EVENT_CATEGORIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
 
-            <label className="admin-field-label" htmlFor="dimension">
-              Dimension
-            </label>
-            <select
-              id="dimension"
-              name="dimension"
-              defaultValue={event.dimension}
-              className="admin-select"
-            >
-              {PULSE_DIMENSIONS.map((d) => (
-                <option key={d} value={d}>
-                  {dimensionLabel(d)}
-                </option>
-              ))}
-            </select>
+              <label className="admin-field-label" htmlFor="dimension">
+                Dimension
+              </label>
+              <select
+                id="dimension"
+                name="dimension"
+                defaultValue={event.dimension}
+                className="admin-select"
+              >
+                {PULSE_DIMENSIONS.map((d) => (
+                  <option key={d} value={d}>
+                    {dimensionLabel(d)}
+                  </option>
+                ))}
+              </select>
 
-            <label className="admin-field-label" htmlFor="severityTier">
-              Severity tier
-            </label>
-            <select
-              id="severityTier"
-              name="severityTier"
-              defaultValue={event.severityTier}
-              className="admin-select"
-            >
-              {SEVERITY_TIERS.map((t) => (
-                <option key={t} value={t}>
-                  {severityTierLongLabel(t)}
-                </option>
-              ))}
-            </select>
+              <label className="admin-field-label" htmlFor="severityTier">
+                Severity tier
+              </label>
+              <select
+                id="severityTier"
+                name="severityTier"
+                defaultValue={event.severityTier}
+                className="admin-select"
+              >
+                {SEVERITY_TIERS.map((t) => (
+                  <option key={t} value={t}>
+                    {severityTierLongLabel(t)}
+                  </option>
+                ))}
+              </select>
 
-            <label className="admin-field-label" htmlFor="severityValue">
-              Severity value
-            </label>
-            <input
-              id="severityValue"
-              name="severityValue"
-              type="number"
-              min={-10}
-              max={10}
-              step={1}
-              defaultValue={event.severityValue}
-              className="admin-input"
-            />
+              <label className="admin-field-label" htmlFor="severityValue">
+                Severity value
+              </label>
+              <input
+                id="severityValue"
+                name="severityValue"
+                type="number"
+                min={-10}
+                max={10}
+                step={1}
+                defaultValue={event.severityValue}
+                className="admin-input"
+              />
 
-            <label className="admin-field-label" htmlFor="notes">
-              Reviewer notes
-            </label>
-            <textarea
-              id="notes"
-              name="notes"
-              rows={3}
-              defaultValue={event.reviewNotes ?? ""}
-              placeholder="Optional rationale for the decision."
-              className="admin-textarea"
-            />
+              <label className="admin-field-label" htmlFor="notes">
+                Reviewer notes
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                rows={3}
+                defaultValue={event.reviewNotes ?? ""}
+                placeholder="Optional rationale for the decision."
+                className="admin-textarea"
+              />
 
-            <div className="admin-actions admin-actions--full">
-              {unresolved ? (
-                <span className="admin-hint">
-                  Unresolved candidates must be edited to a valid taxonomy
-                  category, dimension, severity tier, and value before
-                  publication.
-                </span>
-              ) : (
+              <div className="admin-actions admin-actions--full">
+                {unresolved ? (
+                  <span className="admin-hint">
+                    Unresolved candidates must be edited to a valid taxonomy
+                    category, dimension, severity tier, and value before
+                    publication.
+                  </span>
+                ) : (
+                  <button
+                    type="submit"
+                    name="action"
+                    value="approve"
+                    className="btn btn--sm admin-btn-success"
+                  >
+                    ✓ Approve as-is
+                  </button>
+                )}
                 <button
                   type="submit"
                   name="action"
-                  value="approve"
-                  className="btn btn--sm admin-btn-success"
+                  value="edit"
+                  className="btn btn--sm admin-btn-accent"
                 >
-                  ✓ Approve as-is
+                  ✎ Save edits + approve
                 </button>
-              )}
-              <button
-                type="submit"
-                name="action"
-                value="edit"
-                className="btn btn--sm admin-btn-accent"
-              >
-                ✎ Save edits + approve
-              </button>
-              <button
-                type="submit"
-                name="action"
-                value="reject"
-                className="btn btn--sm admin-btn-danger"
-              >
-                ✕ Reject
-              </button>
+                <button
+                  type="submit"
+                  name="action"
+                  value="reject"
+                  className="btn btn--sm admin-btn-danger"
+                >
+                  ✕ Reject
+                </button>
+              </div>
             </div>
+          </form>
+        ) : (
+          <div className="admin-note">
+            This event is not in the active review queue. Legacy-quarantined
+            items remain unpublished and are not treated as reviewed or
+            rejected.
           </div>
-        </form>
+        )}
       </section>
 
       {auditTrail.length > 0 ? (

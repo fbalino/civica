@@ -189,6 +189,8 @@ export default async function PulseMethodologyPage() {
         (tier) => REVIEW_TIER_LABELS[tier] ?? tier,
       ),
     ),
+    reviewSlaVersion: method.reviewServiceLevel.version,
+    reviewSlaTargetsProse: `catastrophic-negative items within ${method.reviewServiceLevel.targets.critical.dueAfterMs / 3_600_000} hours; severe-negative and high-positive items within ${method.reviewServiceLevel.targets.urgent.dueAfterMs / 3_600_000} hours; and other queued items within ${method.reviewServiceLevel.targets.standard.dueAfterMs / 86_400_000} days`,
     weakConfidenceThreshold:
       method.publicationPolicy.reviewGates.verifierObjectionWithWeakConsensus
         .selfConfidenceBelow,
@@ -207,7 +209,8 @@ export default async function PulseMethodologyPage() {
     clusterEmbeddingModel: method.clustering.semantic.model,
     clusterWindowHours: method.clustering.dateWindowHours,
     clusterSemanticThreshold: method.clustering.semantic.threshold,
-    clusterSemanticOnlyThreshold: method.clustering.semantic.unanchoredThreshold,
+    clusterSemanticOnlyThreshold:
+      method.clustering.semantic.unanchoredThreshold,
     clusterLexicalThreshold: method.clustering.lexicalFallback.threshold,
     clusterLexicalAnchorThreshold:
       method.clustering.lexicalFallback.anchorOverlapThreshold,

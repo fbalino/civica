@@ -1285,6 +1285,7 @@ export const zPulsePublicationOrigin = z.enum([
   "human_edited",
   "human_rejected",
   "legacy_rejected_unverified",
+  "legacy_quarantined",
   "queued",
 ]);
 
@@ -1479,6 +1480,7 @@ export const zPulseMethodologySnapshot = z
     clustering: z.unknown(),
     corroboration: z.unknown(),
     publicationPolicy: z.unknown(),
+    reviewServiceLevel: z.unknown(),
     numericDeltas: z.unknown(),
     evaluation: z.unknown(),
     contractHash: z.string(),

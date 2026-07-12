@@ -528,6 +528,8 @@ const DERIVED_INPUTS: Readonly<Record<string, string>> = {
   "pulse.v2.cluster": "admitted Pulse v2 article rows from pulse.v2.ingest",
   "pulse.v2.classify": "Pulse v2 clusters from pulse.v2.cluster",
   "pulse.v2.score": "verified Pulse v2 classifications and corroboration state",
+  "pulse.v2.review-sla":
+    "current Pulse review obligations and append-only SLA event evidence",
 };
 
 export function productionPipelineContracts(): readonly PipelineInputContract[] {

@@ -799,3 +799,20 @@ unobservable. Stable configuration identity permits intentional re-evaluation
 after a real method change without repeating identical terminal work. Atomic
 leases prevent overlapping workers from paying for the same cluster, and the
 attempt ledger keeps operational failures available for later error studies.
+
+### APR-D148 — Pulse review deadlines are operational, not validity claims
+
+**Decision:** Adopt `pulse-review-sla/v1`. Catastrophic-negative items are
+critical and due within 24 hours; severe-negative and high-positive items are
+urgent and due within 72 hours; other review-gated items are due within seven
+days. Queue entry creates a database obligation with a frozen deadline.
+Escalations and bounded exceptions are append-only. An exception explains a
+delay but never restores daily-completeness wording. Pre-contract pending rows
+remain unpublished as `legacy_quarantined`, distinct from approval, rejection,
+or human review.
+
+**Why:** Severity sorting alone allowed older review work to disappear behind
+newer event dates and gave no operational account of delay. Explicit clocks
+and a fail-closed monitor make backlog state observable without presenting an
+internal response target as evidence that a classification is correct. Legacy
+quarantine preserves the old evidence without fabricating decisions.

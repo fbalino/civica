@@ -6,7 +6,7 @@
 ## Scope
 
 Civica keeps the evidence needed to reproduce and challenge its factual and
-experimental outputs. The protected registry currently covers 33 relations:
+experimental outputs. The protected registry currently covers 34 relations:
 country facts and disputes, Index inputs and outputs, Pulse inputs and review
 records, elections, constitutions, legislatures, organizations, officeholders,
 provenance statements, corrections, and backtest records.
@@ -32,6 +32,11 @@ append-only attempt ledger. State updates retain their before/after rows; an
 attempt records its claim and completed outcome as separate immutable entries.
 Retryable failures keep a sanitized error and next-eligible time. Successful,
 none, and exhausted outcomes are terminal for that configuration.
+
+Human-review operations add a retained obligation projection and an append-only
+SLA event ledger. Queue entry, escalation, bounded exceptions, disposition, and
+the pre-contract legacy-quarantine boundary remain available for audit. A
+legacy-quarantined item is unpublished and is not a human review decision.
 
 `pulse_evaluation_evidence` provides one internal query surface for:
 

@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.10-beta");
+  assert.equal(method.version, "pulse-v2.11-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -101,7 +101,10 @@ test("current contract states the non-negotiable publication boundaries", () => 
     method.providers.subject.attributionVersion,
     "pulse-jurisdiction-attribution/v2",
   );
-  assert.deepEqual(method.providers.subject.acceptedScopes, ["single", "multi"]);
+  assert.deepEqual(method.providers.subject.acceptedScopes, [
+    "single",
+    "multi",
+  ]);
   assert.equal(
     method.providers.subject.inputContext,
     "human_readable_versioned_entity_candidates",
@@ -184,7 +187,10 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
     "retryable_failure",
     "terminal_failure",
   ]);
-  assert.equal(providers.classify.queueOrder, "new_then_due_retry_oldest_first");
+  assert.equal(
+    providers.classify.queueOrder,
+    "new_then_due_retry_oldest_first",
+  );
   assert.equal(
     providers.classify.retryExhaustionDisposition,
     "terminal_failure",
@@ -255,6 +261,28 @@ test("review gates encode the actual ensemble boolean logic", () => {
     reviewStatus: "rejected",
     humanReviewed: false,
   });
+  assert.deepEqual(policy.states.legacyQuarantined, {
+    published: false,
+    reviewStatus: "legacy_quarantined",
+    humanReviewed: false,
+  });
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.version,
+    "pulse-review-sla/v1",
+  );
+  assert.deepEqual(CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.targets, {
+    critical: { escalationAfterMs: 0, dueAfterMs: 86_400_000 },
+    urgent: { escalationAfterMs: 86_400_000, dueAfterMs: 259_200_000 },
+    standard: { escalationAfterMs: 432_000_000, dueAfterMs: 604_800_000 },
+  });
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.dailyCompletenessRule,
+    "withheld_on_breach_or_unknown",
+  );
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.reportClockArithmetic,
+    "explicit_timestamp_cast_before_interval",
+  );
 });
 
 test("daily cadence includes corroboration and scoring in the score route", () => {

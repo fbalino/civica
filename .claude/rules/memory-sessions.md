@@ -787,3 +787,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - The live queue remains 841 never-attempted clusters. This task made no model
   calls. Claims, design, build, migration, retention, runtime, live invariant,
   and methodology browser checks passed.
+
+## 2026-07-12 — PUL-033 review SLA completed
+
+- Added versioned severity deadlines, database-created obligations,
+  append-only escalation/exceptions, a six-hour monitor, and dashboard age and
+  breach metrics.
+- Retained 175 pre-contract pending events as unpublished, non-human legacy
+  quarantine. Production migration and live retention invariants pass.
+- Claims, 898 tests, design tokens, API contracts, full build, and light/dark
+  reader browser checks passed.

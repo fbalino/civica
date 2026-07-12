@@ -121,6 +121,8 @@ export function PulseEventDetailCard({
               <Pill variant="danger">Human rejected</Pill>
             ) : event.publicationOrigin === "legacy_rejected_unverified" ? (
               <Pill variant="warn">Rejected · origin unverified</Pill>
+            ) : event.publicationOrigin === "legacy_quarantined" ? (
+              <Pill variant="warn">Legacy quarantine · not reviewed</Pill>
             ) : event.publicationOrigin === "queued" ? (
               <Pill variant="warn">Queued for review</Pill>
             ) : event.publicationOrigin === "human_edited" ? (

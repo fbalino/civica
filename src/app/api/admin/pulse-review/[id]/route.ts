@@ -121,6 +121,12 @@ export async function POST(
       { status: 409 },
     );
   }
+  if (existing.reviewStatus !== "pending" || existing.published) {
+    return NextResponse.json(
+      { error: "event is no longer pending human review" },
+      { status: 409 },
+    );
+  }
 
   const before = {
     category: existing.category,
@@ -137,8 +143,8 @@ export async function POST(
   let dimension = existing.dimension;
   let severityTier = existing.severityTier;
   let severityValue = existing.severityValue;
-  let published = existing.published;
-  let reviewStatus = existing.reviewStatus;
+  let published: boolean = existing.published;
+  let reviewStatus: string = existing.reviewStatus;
 
   if (body.action === "approve") {
     published = true;
@@ -218,6 +224,8 @@ export async function POST(
       and(
         eq(pulseEventsV2.id, id),
         eq(pulseEventsV2.projectionStatus, "current"),
+        eq(pulseEventsV2.reviewStatus, "pending"),
+        eq(pulseEventsV2.published, false),
       ),
     )
     .returning({ id: pulseEventsV2.id });

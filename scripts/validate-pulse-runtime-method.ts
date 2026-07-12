@@ -199,10 +199,16 @@ function validateCadence(
   const actual = (vercel.crons ?? [])
     .filter((cron) => cron.path.startsWith("/api/cron/pulse/"))
     .map((cron) => ({ path: cron.path, schedule: cron.schedule }));
-  const expected = snapshot.cadence.stages.map((stage) => ({
-    path: stage.route,
-    schedule: stage.cron,
-  }));
+  const expected = [
+    ...snapshot.cadence.stages.map((stage) => ({
+      path: stage.route,
+      schedule: stage.cron,
+    })),
+    {
+      path: snapshot.reviewServiceLevel.monitor.route,
+      schedule: snapshot.reviewServiceLevel.monitor.cron,
+    },
+  ];
   checkEqual(
     state,
     actual,

@@ -151,4 +151,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "5bf4ce195a3927b0712c87d7407645a2e57426b9131e20a837af83ca335523f7",
     baseline: false,
   },
+  {
+    id: "0025_careful_the_professor",
+    path: "drizzle/authoritative/0025_careful_the_professor.sql",
+    sha256: "fee307170e6a8df46fbdc0b59887ebb22547353093d90341d6d87291ae2f3289",
+    baseline: false,
+  },
 ] as const;

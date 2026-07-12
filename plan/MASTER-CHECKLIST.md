@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 138
-- **Remaining:** 165
-- **Progress:** 45.5%
+- **Completed:** 139
+- **Remaining:** 164
+- **Progress:** 45.9%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -155,7 +155,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [ ] **PUL-030** (P0) Release the selected Pulse ledger product with operational safeguards. _Done when: versioned ledger UI/API/export, evidence/provenance, codebook, source coverage, observability, corrections, review status, limitations, tests, cron monitoring, cost controls, and reproducibility package pass their gates; any numeric layer matches PUL-029 exactly._
 - [x] **PUL-031** (P0) Repair and backfill duplicate real-world incidents before any further scoring evaluation. _Done when: new reports compare against recent persisted clusters, multilingual/semantic matching has a production-capable path and fallback limits, canonical incident IDs and post-classification collision detection exist, empty headlines cannot publish, confirmed duplicate clusters are merged with sources retained, and affected deltas are recalculated/versioned._
 - [x] **PUL-032** (P0) Persist terminal/retry classification state per cluster and pipeline version. _Done when: `classified`, `none`, `retryable_failure`, and `terminal_failure` record attempts/errors/times/next retry/config hash; new work precedes bounded retries; a second identical run makes zero model calls for terminal-none clusters; queue depth/oldest age are observable._
-- [ ] **PUL-033** (P0) Define and enforce human-review service levels by severity. _Done when: queue dashboards/alerts show age and severity, severe/catastrophic/high-positive items escalate, backlog is deduplicated and dispositioned, daily-completeness claims turn off when SLA fails, and no item can age past SLA without a recorded exception._
+- [x] **PUL-033** (P0) Define and enforce human-review service levels by severity. _Done when: queue dashboards/alerts show age and severity, severe/catastrophic/high-positive items escalate, backlog is deduplicated and dispositioned, daily-completeness claims turn off when SLA fails, and no item can age past SLA without a recorded exception._
 - [ ] **PUL-034** (P0) Remove or explicitly deprecate abandoned scalar Pulse read paths. _Done when: `sort=cp`, embed CP, legacy rankings, docs, caches, and public APIs either use the selected v2 disposition or return a documented deprecation/error; zero live path reads empty `pulse_daily_scores`; contract tests prove deterministic behavior._
 - [ ] **PUL-035** (P0) Clear dimensional score rows when a jurisdiction has no in-window events. _Done when: recomputation iterates the union of current-event and existing-score jurisdictions, zeroes/deletes aged-out rows, a 366-day fixture returns no signal, and versioned historical outputs remain reproducible._
 - [ ] **PUL-036** (P0) Derive ensemble agreement and publication eligibility only from stored independent runs. _Done when: no script/admin/subscription path can write a literal unsupported `two_of_three`/`all`, agreement is recomputed from provider/model/prompt-versioned runs, product-specific Pulse metadata replaces CI metadata in all APIs, and one-run auto-publication fixtures fail._

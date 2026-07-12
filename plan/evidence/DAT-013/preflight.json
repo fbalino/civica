@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T08:06:45.651Z",
+  "generatedAt": "2026-07-12T08:58:42.744Z",
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -642,7 +642,7 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 66303,
+        "research_evidence_history": 66575,
         "statements": 6768,
         "terms": 5475
       },
@@ -720,10 +720,10 @@
         "pulse_incident_assignments": 1507,
         "pulse_incident_resolutions": 479,
         "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 19,
+        "pulse_pipeline_runs": 21,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 66303
+        "research_evidence_history": 66575
       },
       "writesPerformed": 0
     },
@@ -748,13 +748,40 @@
       "invariantPlan": "npm run db:plan -- --id=0024_dark_maginty --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_classification_attempts": "missing",
-        "pulse_cluster_classification_states": "missing",
-        "pulse_event_decisions": 3448,
+        "pulse_classification_attempts": 385,
+        "pulse_cluster_classification_states": 385,
+        "pulse_event_decisions": 3543,
         "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 19,
+        "pulse_pipeline_runs": 21,
         "raw_events": 1507,
-        "research_evidence_history": 66303
+        "research_evidence_history": 66575
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0025_careful_the_professor",
+      "artifact": "drizzle/authoritative/0025_careful_the_professor.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "fee307170e6a8df46fbdc0b59887ebb22547353093d90341d6d87291ae2f3289",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "pulse_incidents",
+        "pulse_review_obligations",
+        "pulse_review_sla_events",
+        "research_evidence_history"
+      ],
+      "statementCount": 42,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0025_careful_the_professor-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0025_careful_the_professor --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "pulse_incidents": 1224,
+        "pulse_review_obligations": 175,
+        "pulse_review_sla_events": 175,
+        "research_evidence_history": 66575
       },
       "writesPerformed": 0
     },

@@ -282,6 +282,16 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
       sources: [],
       implementationPaths: ["src/lib/pulse/v2/score.ts"],
     },
+    {
+      id: "pulse.v2.review-sla",
+      route: "/api/cron/pulse/v2/review-sla",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/pulse/v2/review-sla/route.ts",
+        "src/lib/pulse/v2/review-sla-store.ts",
+      ],
+    },
   ] as const;
 
 export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] =

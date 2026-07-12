@@ -176,6 +176,13 @@
       "when": 1783843381474,
       "tag": "0024_dark_maginty",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1783845305457,
+      "tag": "0025_careful_the_professor",
+      "breakpoints": true
     }
   ]
 }

@@ -61,6 +61,13 @@ non-event, and invalid outcomes; historic call counts and per-provider failure
 details remain unknown. Recovery uses an isolated pre-change backup or a
 reviewed forward compensation, never in-place evidence reversal.
 
+`0025_careful_the_professor` adds `pulse-review-sla/v1`: one retained
+obligation per queued event, severity-based deadlines, append-only escalation
+and bounded-exception evidence, a scheduled fail-closed monitor, and database
+queue-entry enforcement. The pre-contract pending backlog is retained
+unpublished as `legacy_quarantined`; the migration does not claim human review,
+approval, or rejection for those items.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

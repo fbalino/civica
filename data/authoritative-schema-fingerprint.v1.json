@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T08:14:57.153Z",
-  "sha256": "3f108a531f90f96397a0cd387fca41fcccd0c3862ef16e4535355ecc99501283",
+  "generatedAt": "2026-07-12T08:47:36.373Z",
+  "sha256": "77923b09ba1780b8b11a924b73e0b3a7b3db738122798f9ee3760a7784dccfcb",
   "schema": {
     "columns": [
       {
@@ -8108,6 +8108,294 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "pulse_review_obligations",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "event_id",
+        "type": "uuid",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "incident_id",
+        "type": "uuid",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "sla_version",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "priority",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "trigger_reason",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "queued_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "queued_at_basis",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "timestamp",
+        "name": "escalate_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "due_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "state",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "claimed_by",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "timestamp",
+        "name": "claimed_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "timestamp",
+        "name": "claim_expires_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "disposition",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "dispositioned_by",
+        "type": "text",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "timestamp",
+        "name": "dispositioned_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "timestamp",
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_obligations",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_review_sla_events",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "event_key",
+        "type": "text",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "obligation_id",
+        "type": "uuid",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "kind",
+        "type": "text",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "jsonb",
+        "name": "actor",
+        "type": "jsonb",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "reason_code",
+        "type": "text",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "note",
+        "type": "text",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "timestamp",
+        "name": "effective_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "timestamp",
+        "name": "expires_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "jsonb",
+        "name": "metadata",
+        "type": "jsonb",
+        "table": "pulse_review_sla_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_review_sla_events",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_sources",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -9912,6 +10200,51 @@
         "definition": "CREATE UNIQUE INDEX pulse_review_audit_log_pkey ON public.pulse_review_audit_log USING btree (id)"
       },
       {
+        "name": "idx_pulse_review_obligation_active_due",
+        "table": "pulse_review_obligations",
+        "definition": "CREATE INDEX idx_pulse_review_obligation_active_due ON public.pulse_review_obligations USING btree (state, due_at)"
+      },
+      {
+        "name": "idx_pulse_review_obligation_event_version",
+        "table": "pulse_review_obligations",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_review_obligation_event_version ON public.pulse_review_obligations USING btree (event_id, sla_version)"
+      },
+      {
+        "name": "idx_pulse_review_obligation_incident",
+        "table": "pulse_review_obligations",
+        "definition": "CREATE INDEX idx_pulse_review_obligation_incident ON public.pulse_review_obligations USING btree (incident_id)"
+      },
+      {
+        "name": "idx_pulse_review_obligation_priority_due",
+        "table": "pulse_review_obligations",
+        "definition": "CREATE INDEX idx_pulse_review_obligation_priority_due ON public.pulse_review_obligations USING btree (priority, due_at)"
+      },
+      {
+        "name": "pulse_review_obligations_pkey",
+        "table": "pulse_review_obligations",
+        "definition": "CREATE UNIQUE INDEX pulse_review_obligations_pkey ON public.pulse_review_obligations USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_review_sla_event_key",
+        "table": "pulse_review_sla_events",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_review_sla_event_key ON public.pulse_review_sla_events USING btree (event_key)"
+      },
+      {
+        "name": "idx_pulse_review_sla_event_kind",
+        "table": "pulse_review_sla_events",
+        "definition": "CREATE INDEX idx_pulse_review_sla_event_kind ON public.pulse_review_sla_events USING btree (kind, effective_at)"
+      },
+      {
+        "name": "idx_pulse_review_sla_event_obligation",
+        "table": "pulse_review_sla_events",
+        "definition": "CREATE INDEX idx_pulse_review_sla_event_obligation ON public.pulse_review_sla_events USING btree (obligation_id, effective_at)"
+      },
+      {
+        "name": "pulse_review_sla_events_pkey",
+        "table": "pulse_review_sla_events",
+        "definition": "CREATE UNIQUE INDEX pulse_review_sla_events_pkey ON public.pulse_review_sla_events USING btree (id)"
+      },
+      {
         "name": "idx_pulse_sources_event",
         "table": "pulse_sources",
         "definition": "CREATE INDEX idx_pulse_sources_event ON public.pulse_sources USING btree (event_id)"
@@ -10109,9 +10442,19 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_incident_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_reject_pulse_review_sla_event_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_review_sla_event_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_reject_research_evidence_history_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_research_evidence_history_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'research_evidence_history is append-only';\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_sync_pulse_review_obligation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_sync_pulse_review_obligation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  obligation_id uuid;\n  queue_time timestamp;\n  priority_value text;\n  escalate_time timestamp;\n  due_time timestamp;\nBEGIN\n  IF NEW.review_status = 'pending'\n     AND NEW.published = false\n     AND NEW.projection_status = 'current' THEN\n    queue_time := CASE\n      WHEN TG_OP = 'INSERT' THEN NEW.created_at\n      ELSE NEW.updated_at\n    END;\n    priority_value := CASE\n      WHEN NEW.severity_tier = 'catastrophic_neg' THEN 'critical'\n      WHEN NEW.severity_tier IN ('severe_neg', 'high_pos') THEN 'urgent'\n      ELSE 'standard'\n    END;\n    escalate_time := CASE\n      WHEN priority_value = 'critical' THEN queue_time\n      WHEN priority_value = 'urgent' THEN queue_time + interval '24 hours'\n      ELSE queue_time + interval '5 days'\n    END;\n    due_time := CASE\n      WHEN priority_value = 'critical' THEN queue_time + interval '24 hours'\n      WHEN priority_value = 'urgent' THEN queue_time + interval '72 hours'\n      ELSE queue_time + interval '7 days'\n    END;\n\n    INSERT INTO pulse_review_obligations (\n      schema_version, event_id, incident_id, sla_version, priority,\n      trigger_reason, queued_at, queued_at_basis, escalate_at, due_at, state\n    ) VALUES (\n      'pulse-review-obligation/v1', NEW.id, NEW.incident_id,\n      'pulse-review-sla/v1', priority_value, 'publication_gate', queue_time,\n      'recorded', escalate_time, due_time, 'open'\n    )\n    ON CONFLICT (event_id, sla_version) DO NOTHING\n    RETURNING id INTO obligation_id;\n\n    IF obligation_id IS NOT NULL THEN\n      INSERT INTO pulse_review_sla_events (\n        schema_version, event_key, obligation_id, kind, actor, reason_code,\n        note, effective_at, expires_at, metadata\n      ) VALUES (\n        'pulse-review-sla-event/v1',\n        'pulse-review-sla-event/sha256:' || encode(\n          digest(obligation_id::text || E'\\nenqueued\\n' || queue_time::text, 'sha256'),\n          'hex'\n        ),\n        obligation_id, 'enqueued',\n        '{\"type\":\"database_trigger\",\"version\":\"pulse-review-sla/v1\"}'::jsonb,\n        'publication_gate',\n        'Classification entered the human-review queue under pulse-review-sla/v1.',\n        queue_time, NULL,\n        jsonb_build_object('priority', priority_value, 'dueAt', due_time)\n      ) ON CONFLICT (event_key) DO NOTHING;\n    END IF;\n  END IF;\n\n  IF TG_OP = 'UPDATE'\n     AND OLD.review_status = 'pending'\n     AND NEW.review_status <> 'pending' THEN\n    UPDATE pulse_review_obligations\n    SET state = 'dispositioned',\n        claimed_by = NULL,\n        claimed_at = NULL,\n        claim_expires_at = NULL,\n        disposition = NEW.review_status,\n        dispositioned_by = COALESCE(NULLIF(NEW.reviewer_id, ''), 'system:event-transition'),\n        dispositioned_at = NEW.updated_at,\n        updated_at = NEW.updated_at\n    WHERE event_id = NEW.id\n      AND sla_version = 'pulse-review-sla/v1'\n      AND state IN ('open','claimed')\n    RETURNING id INTO obligation_id;\n\n    IF obligation_id IS NOT NULL THEN\n      INSERT INTO pulse_review_sla_events (\n        schema_version, event_key, obligation_id, kind, actor, reason_code,\n        note, effective_at, expires_at, metadata\n      ) VALUES (\n        'pulse-review-sla-event/v1',\n        'pulse-review-sla-event/sha256:' || encode(\n          digest(obligation_id::text || E'\\ndispositioned\\n' || NEW.review_status || E'\\n' || NEW.updated_at::text, 'sha256'),\n          'hex'\n        ),\n        obligation_id, 'dispositioned',\n        jsonb_build_object(\n          'type', CASE WHEN NEW.human_reviewed THEN 'human_reviewer' ELSE 'system_transition' END,\n          'reviewerId', NEW.reviewer_id\n        ),\n        NEW.review_status,\n        'The event left the active review queue.',\n        NEW.updated_at, NULL,\n        jsonb_build_object('humanReviewed', NEW.human_reviewed, 'published', NEW.published)\n      ) ON CONFLICT (event_key) DO NOTHING;\n    END IF;\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "civica_validate_complete_candidate_winner",
@@ -10631,6 +10974,11 @@
         "definition": "CREATE TRIGGER pul_004_event_classification_lineage_immutable BEFORE UPDATE ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION pul_004_guard_event_classification_lineage()"
       },
       {
+        "name": "pulse_review_obligation_sync",
+        "table": "pulse_events_v2",
+        "definition": "CREATE TRIGGER pulse_review_obligation_sync AFTER INSERT OR UPDATE OF review_status, published, projection_status ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION civica_sync_pulse_review_obligation()"
+      },
+      {
         "name": "pulse_incident_assignments_append_only",
         "table": "pulse_incident_assignments",
         "definition": "CREATE TRIGGER pulse_incident_assignments_append_only BEFORE DELETE OR UPDATE ON pulse_incident_assignments FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_incident_evidence_mutation()"
@@ -10659,6 +11007,16 @@
         "name": "dat_016_retain_mutation",
         "table": "pulse_review_audit_log",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_review_audit_log FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "dat_016_retain_mutation",
+        "table": "pulse_review_obligations",
+        "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_review_obligations FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "pulse_review_sla_events_append_only",
+        "table": "pulse_review_sla_events",
+        "definition": "CREATE TRIGGER pulse_review_sla_events_append_only BEFORE DELETE OR UPDATE ON pulse_review_sla_events FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_review_sla_event_mutation()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -11030,6 +11388,16 @@
       {
         "kind": "r",
         "name": "pulse_review_audit_log",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_review_obligations",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_review_sla_events",
         "definition": null
       },
       {
@@ -12311,6 +12679,12 @@
         "definition": "FOREIGN KEY (publication_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
+        "name": "pulse_events_v2_review_status_check",
+        "type": "c",
+        "table": "pulse_events_v2",
+        "definition": "CHECK ((review_status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'edited'::text, 'legacy_quarantined'::text])) AND (review_status <> 'pending'::text OR published = false AND human_reviewed = false) AND (review_status <> 'legacy_quarantined'::text OR published = false AND human_reviewed = false AND reviewer_id IS NULL))"
+      },
+      {
         "name": "pulse_incident_assignments_contract_check",
         "type": "c",
         "table": "pulse_incident_assignments",
@@ -12447,6 +12821,48 @@
         "type": "f",
         "table": "pulse_review_audit_log",
         "definition": "FOREIGN KEY (run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_review_obligation_contract_check",
+        "type": "c",
+        "table": "pulse_review_obligations",
+        "definition": "CHECK (schema_version = 'pulse-review-obligation/v1'::text AND sla_version = 'pulse-review-sla/v1'::text AND (priority = ANY (ARRAY['critical'::text, 'urgent'::text, 'standard'::text])) AND (queued_at_basis = ANY (ARRAY['recorded'::text, 'created_at_proxy'::text])) AND (state = ANY (ARRAY['open'::text, 'claimed'::text, 'dispositioned'::text, 'legacy_quarantined'::text])) AND btrim(trigger_reason) <> ''::text AND queued_at <= escalate_at AND escalate_at <= due_at AND (state = 'open'::text AND claimed_by IS NULL AND claimed_at IS NULL AND claim_expires_at IS NULL AND disposition IS NULL AND dispositioned_by IS NULL AND dispositioned_at IS NULL OR state = 'claimed'::text AND btrim(claimed_by) <> ''::text AND claimed_at IS NOT NULL AND claim_expires_at > claimed_at AND disposition IS NULL AND dispositioned_by IS NULL AND dispositioned_at IS NULL OR (state = ANY (ARRAY['dispositioned'::text, 'legacy_quarantined'::text])) AND btrim(disposition) <> ''::text AND btrim(dispositioned_by) <> ''::text AND dispositioned_at IS NOT NULL))"
+      },
+      {
+        "name": "pulse_review_obligations_event_id_pulse_events_v2_id_fk",
+        "type": "f",
+        "table": "pulse_review_obligations",
+        "definition": "FOREIGN KEY (event_id) REFERENCES pulse_events_v2(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_review_obligations_incident_id_pulse_incidents_id_fk",
+        "type": "f",
+        "table": "pulse_review_obligations",
+        "definition": "FOREIGN KEY (incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_review_obligations_pkey",
+        "type": "p",
+        "table": "pulse_review_obligations",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_review_sla_event_contract_check",
+        "type": "c",
+        "table": "pulse_review_sla_events",
+        "definition": "CHECK (schema_version = 'pulse-review-sla-event/v1'::text AND event_key ~ '^pulse-review-sla-event/sha256:[a-f0-9]{64}$'::text AND (kind = ANY (ARRAY['enqueued'::text, 'claimed'::text, 'released'::text, 'escalated'::text, 'exception_granted'::text, 'exception_expired'::text, 'dispositioned'::text, 'legacy_quarantined'::text])) AND jsonb_typeof(actor) = 'object'::text AND jsonb_typeof(metadata) = 'object'::text AND btrim(reason_code) <> ''::text AND btrim(note) <> ''::text AND (kind = 'exception_granted'::text AND expires_at > effective_at OR kind <> 'exception_granted'::text AND expires_at IS NULL))"
+      },
+      {
+        "name": "pulse_review_sla_events_obligation_id_pulse_review_obligations_",
+        "type": "f",
+        "table": "pulse_review_sla_events",
+        "definition": "FOREIGN KEY (obligation_id) REFERENCES pulse_review_obligations(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_review_sla_events_pkey",
+        "type": "p",
+        "table": "pulse_review_sla_events",
+        "definition": "PRIMARY KEY (id)"
       },
       {
         "name": "pulse_sources_event_id_pulse_events_v2_id_fk",

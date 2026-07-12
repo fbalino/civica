@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "cde8f9fd63446bbfa72d4597c070e27b17c2a965a289a939b95f1a1cc05392ed",
+  "contractHash": "0536127af43af79b1dc6e9ff81ff45ed3dcbd6d4ffed49ff7c1fd48b1529f701",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -549,6 +549,11 @@
         "published": false,
         "reviewStatus": "rejected"
       },
+      "legacyQuarantined": {
+        "humanReviewed": false,
+        "published": false,
+        "reviewStatus": "legacy_quarantined"
+      },
       "legacyRejectedUnverified": {
         "humanReviewed": false,
         "published": false,
@@ -561,7 +566,64 @@
       }
     }
   },
-  "schemaVersion": "1.9.0",
+  "reviewServiceLevel": {
+    "complianceStates": [
+      "within_sla",
+      "escalation_due",
+      "breached_unexcepted",
+      "breached_excepted",
+      "dispositioned_on_time",
+      "dispositioned_late",
+      "legacy_quarantined"
+    ],
+    "dailyCompletenessRule": "withheld_on_breach_or_unknown",
+    "exceptionRule": "append_only_bounded_explanation_never_restores_completeness",
+    "healthStates": [
+      "complete",
+      "current_reviews_pending",
+      "incomplete_review_sla",
+      "not_assessable"
+    ],
+    "legacyRule": "Pre-contract pending items remain unpublished in legacy quarantine and are not counted as reviewed, approved, rejected, or SLA-compliant.",
+    "monitor": {
+      "cron": "10 */6 * * *",
+      "delivery": "persisted_idempotent_event_plus_structured_server_log",
+      "route": "/api/cron/pulse/v2/review-sla"
+    },
+    "obligationStates": [
+      "open",
+      "claimed",
+      "dispositioned",
+      "legacy_quarantined"
+    ],
+    "priorityBySeverity": {
+      "catastrophic_neg": "critical",
+      "high_pos": "urgent",
+      "low_neg": "standard",
+      "low_pos": "standard",
+      "moderate_neg": "standard",
+      "moderate_pos": "standard",
+      "severe_neg": "urgent"
+    },
+    "queueOrder": "priority_then_due_then_queued_then_id",
+    "reportClockArithmetic": "explicit_timestamp_cast_before_interval",
+    "targets": {
+      "critical": {
+        "dueAfterMs": 86400000,
+        "escalationAfterMs": 0
+      },
+      "standard": {
+        "dueAfterMs": 604800000,
+        "escalationAfterMs": 432000000
+      },
+      "urgent": {
+        "dueAfterMs": 259200000,
+        "escalationAfterMs": 86400000
+      }
+    },
+    "version": "pulse-review-sla/v1"
+  },
+  "schemaVersion": "1.10.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -574,5 +636,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.10-beta"
+  "version": "pulse-v2.11-beta"
 }
