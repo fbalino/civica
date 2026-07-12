@@ -1,0 +1,265 @@
+{
+  "schemaVersion": "civica-reviewer-selection/v1",
+  "adoptedOn": "2026-07-11",
+  "status": "adopted_pre_contact_policy",
+  "contactGate": "Public-evidence research may proceed before G4. No invitation, availability inquiry, direct message, email, form submission, or intermediary contact may occur before GOV-016 passes and the owner approves the contact-ready list.",
+  "purpose": "Select independent specialists for bounded criticism of named Civica artifacts. Selection is not endorsement, advisory-board appointment, authorship, or validation of Civica as a whole.",
+  "sharedMinimums": [
+    "The candidate's current professional role and claimed expertise are supported by a public institutional or professional page.",
+    "At least one public work product from 2023 onward, or an enduring current standards/implementation role, demonstrates exact fit to the assigned review question.",
+    "The candidate can review the supplied language and format or Civica can provide an agreed accessible alternative without changing the evidence.",
+    "The candidate agrees to disclose relevant financial, professional, personal, institutional, source-project, and competitive relationships before receiving confidential material."
+  ],
+  "evidencePolicy": {
+    "allowed": "Public institutional pages, professional profiles, standards roles, publications, project documentation, public contact pages, and public conflict disclosures.",
+    "prohibited": "Personal phone numbers, private addresses, non-public email addresses, inferred protected traits, scraped personal accounts, availability guesses, and undisclosed third-party background reports.",
+    "freshness": "Affiliation, professional contact route, and current activity must be rechecked within 30 days before owner shortlist approval and again before contact.",
+    "uncertainty": "Unknown availability, conflicts, identity, or current role stays unknown; it is never filled by inference."
+  },
+  "independenceTiers": [
+    {
+      "id": "manage_and_disclose",
+      "rule": "Adjacent prior work or source-project affiliation is disclosed and may be managed when it does not overlap the assigned judgment."
+    },
+    {
+      "id": "recuse_overlapping_judgment",
+      "rule": "A current or material relationship with an artifact, source, method, or organization under direct review requires recusal from that judgment and a non-affiliated reviewer for it."
+    },
+    {
+      "id": "exclude",
+      "rule": "Current Civica authorship, decision authority, contingent compensation, an unmanageable financial/competitive relationship, or refusal to disclose conflicts excludes the person for this cycle."
+    }
+  ],
+  "sharedExclusions": [
+    "No verifiable lane-specific expertise or current professional identity.",
+    "Only a private/personal contact path is available.",
+    "Current Civica author, contributor, employee, decision-maker, or paid consultant beyond a standardized reviewer honorarium.",
+    "Compensation, publicity, future work, or any benefit is contingent on a favorable conclusion.",
+    "Same-institution, recent mentoring, close collaboration, joint-grant, personal, financial, academic-rivalry, or competitive conflict that cannot be disclosed and managed.",
+    "The person cannot meet the agreed scope, accessible format, confidentiality/publication terms, or deadline.",
+    "The candidate is selected mainly for prestige, audience reach, political alignment, or a predicted favorable view rather than exact task competence."
+  ],
+  "panelComposition": {
+    "scholarlyLonglistMinimumPerLane": 8,
+    "scholarlyAlternateMinimumPerLane": 3,
+    "nonSourceAffiliatedReviewerRequiredForOverlappingJudgments": true,
+    "geographicRule": "For each core scholarly lane, retain qualified perspectives based outside the US and EU/UK when the public-evidence pool permits; document a failed search rather than lowering expertise thresholds.",
+    "methodRule": "Do not let a core lane collapse onto one project, estimator, data tradition, or institutional network. Retain both implementation and critical/measurement perspectives.",
+    "careerRule": "Include qualified hands-on mid-career or practitioner candidates alongside senior scholars; fame and seniority are not scoring criteria.",
+    "accessibilityRule": "Accessibility review combines WCAG-EM-capable evaluation with direct assistive-technology or disability-user perspective; one person may satisfy both only when public evidence supports both.",
+    "legalRule": "The legal/source-rights lane includes relevant open-data/database-rights expertise, but release legal advice requires counsel professionally qualified for the applicable jurisdiction. Scholarship alone is not legal clearance."
+  },
+  "reviewRecord": [
+    "reviewer identity and consented public attribution state",
+    "artifact version and exact bounded questions",
+    "declared conflicts, independence tier, recusals, and paired judgments",
+    "hours/honorarium terms and confirmation that payment is outcome-independent",
+    "original report and evidence references",
+    "author response, accepted/rejected changes, reasons, and unresolved disagreements"
+  ],
+  "lanes": [
+    {
+      "id": "governance_measurement",
+      "label": "Governance measurement and comparative indices",
+      "coreScholarlyLane": true,
+      "reviewPacket": "GOV-014 Index tournament packet",
+      "boundedQuestion": "Did the preregistered tournament test originality, redundancy, stability, uncertainty, usefulness, and misuse fairly, and does the no-winner/source-native disposition follow from the evidence?",
+      "minimumExpertise": [
+        "Peer-reviewed or equivalent methods work on cross-national governance/democracy measurement, construct validity, aggregation, latent variables, uncertainty, or comparative index evaluation.",
+        "Ability to inspect reproducible code/results and separate source quality, measurement design, presentation usefulness, and normative judgment."
+      ],
+      "acceptedEvidence": [
+        "Recent methods publication or current major measurement-project methodology role.",
+        "Documented independent critique, replication, sensitivity analysis, or construction of a comparable cross-national measure."
+      ],
+      "independenceRules": [
+        "Source-project affiliation is disclosed, not automatically disqualifying.",
+        "A reviewer affiliated with a Civica input source cannot be the sole reviewer of that source's treatment or the tournament conclusion."
+      ],
+      "conflictRules": [
+        "Record roles with V-Dem, WGI/World Bank, Freedom House, Transparency International/CPI, or a competing index.",
+        "Recuse from judgments about the reviewer's own measure, code, or institutional product."
+      ],
+      "geographicAndMethodDiversity": [
+        "Retain source-project builders and outside critics.",
+        "Retain more than one measurement tradition and qualified perspectives beyond the North Atlantic pool."
+      ],
+      "deliverable": [
+        "Structured memo answering each frozen tournament/disposition question with evidence and severity-ranked findings.",
+        "Explicit statement of supported claims, unsupported claims, required changes, and unresolved methodological disagreement."
+      ],
+      "exclusionCriteria": [
+        "General democracy commentary without a measurement-method contribution.",
+        "A direct stake in reviving or suppressing a candidate measure that cannot be managed by recusal and pairing."
+      ]
+    },
+    {
+      "id": "political_event_data",
+      "label": "Political event data",
+      "coreScholarlyLane": true,
+      "reviewPacket": "GOV-015 Pulse packet",
+      "boundedQuestion": "Are the ledger construct, ontology, retrieval boundaries, three sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for the claims Pulse proposes?",
+      "minimumExpertise": [
+        "Hands-on construction, coding, validation, or methodological critique of political/conflict/event data.",
+        "Demonstrated work on at least one of media-selection bias, retrieval evaluation, event deduplication, intercoder reliability, machine-versus-human coding, temporal/geographic attribution, or calibration."
+      ],
+      "acceptedEvidence": [
+        "Recent event-data methods publication, dataset methods leadership, or reproducible audit.",
+        "Operational codebook, validation, or error-analysis contribution to a recognized event-data project."
+      ],
+      "independenceRules": [
+        "ACLED, GDELT, ICEWS, UCDP, or comparable affiliation is disclosed and paired with an outside perspective when its methods are directly compared.",
+        "Production-model or source-provider involvement cannot substitute for an independent judgment of Civica's errors."
+      ],
+      "conflictRules": [
+        "Record current dataset governance, vendor, model-provider, source-provider, or competing-product roles.",
+        "Recuse from evaluation cells that use the reviewer's own unpublished answer key or directly managed benchmark."
+      ],
+      "geographicAndMethodDiversity": [
+        "Retain both event-data builders and selection-bias/error-analysis critics.",
+        "Retain regional/language expertise relevant to non-English and non-Western media environments."
+      ],
+      "deliverable": [
+        "Structured memo on construct, sampling, coding, observability, metrics, subgroup limits, and prospective protocol.",
+        "Error taxonomy and explicit assessment of which ledger/numeric claims remain supportable or unsupported."
+      ],
+      "exclusionCriteria": [
+        "Use of event data only as an end user, without methodological or coding contribution.",
+        "Treating model agreement, owner review, or famous-case performance as independent validation."
+      ]
+    },
+    {
+      "id": "research_data_curation",
+      "label": "Research-data curation and open science",
+      "coreScholarlyLane": true,
+      "reviewPacket": "GOV-013 Atlas packet and reproducibility sections of GOV-014/GOV-015",
+      "boundedQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "minimumExpertise": [
+        "Professional or scholarly practice in research-data curation, repository certification, FAIR implementation, data citation, preservation, or reproducibility review.",
+        "Ability to test the release as a designated user rather than review documentation by appearance alone."
+      ],
+      "acceptedEvidence": [
+        "Current repository/data-stewardship role, CoreTrustSeal or comparable assessment experience, or standards contribution.",
+        "Recent curation, preservation, data-citation, preregistration, or reproducibility work product."
+      ],
+      "independenceRules": [
+        "Repository/vendor affiliation is disclosed when the person recommends a service or deposit path.",
+        "A reviewer must not certify their own prior Civica curation work."
+      ],
+      "conflictRules": [
+        "Record commercial archive, repository, DOI-provider, publishing-platform, or consulting relationships relevant to a recommendation.",
+        "Separate standards conformance assessment from marketing a preferred hosting product."
+      ],
+      "geographicAndMethodDiversity": [
+        "Retain both hands-on repository/data-library practice and reproducible-research methodology.",
+        "Include perspectives from institutions with different resource levels and preservation contexts."
+      ],
+      "deliverable": [
+        "Completed artifact checklist plus attempted clean-room reproduction and link/checksum report.",
+        "Severity-ranked gaps in findability, access conditions, interoperability, reuse, preservation, citation, and correction history."
+      ],
+      "exclusionCriteria": [
+        "General open-source advocacy without research-data curation or preservation practice.",
+        "A platform sales role without independent curation evidence or full conflict disclosure."
+      ]
+    },
+    {
+      "id": "accessibility",
+      "label": "Accessibility",
+      "coreScholarlyLane": false,
+      "reviewPacket": "Version-pinned live-site WCAG-EM audit scope",
+      "boundedQuestion": "Can keyboard, screen-reader, magnification, reduced-motion, color/contrast, and cognitive-access users complete the named country, data-table, map, chart, search, citation, export, and correction tasks?",
+      "minimumExpertise": [
+        "Demonstrated WCAG conformance evaluation of data-heavy web applications, including manual testing; automated scanners alone are insufficient.",
+        "Practical testing with relevant assistive technologies and ability to document reproducible user-impact findings."
+      ],
+      "acceptedEvidence": [
+        "Recent accessibility audit/report, recognized evaluation practice, standards contribution, or equivalent public professional portfolio.",
+        "Documented lived assistive-technology experience may satisfy user-perspective requirements but is never demanded as personal medical disclosure."
+      ],
+      "independenceRules": [
+        "The evaluator did not implement or approve the audited Civica UI.",
+        "User participants are not treated as conformance certifiers unless they separately meet the evaluator criteria."
+      ],
+      "conflictRules": [
+        "Record tool-vendor, remediation-vendor, certification, litigation-support, or prior Civica relationships.",
+        "Tool affiliation cannot make one automated product the sole basis for a conformance conclusion."
+      ],
+      "geographicAndMethodDiversity": [
+        "Combine standards/conformance skill with direct disability or assistive-technology user perspective.",
+        "Cover more than one assistive-technology/browser combination and both desktop and mobile tasks."
+      ],
+      "deliverable": [
+        "WCAG-EM-structured report with scope, sample, environment, success-criterion mapping, reproduction steps, user impact, severity, and retest status.",
+        "Separate conformance findings from usability observations and from automated-tool warnings."
+      ],
+      "exclusionCriteria": [
+        "Generic design review or automated scan without knowledgeable human evaluation.",
+        "Unverifiable accessibility thought leadership with no audit, testing, standards, or user-practice evidence."
+      ]
+    },
+    {
+      "id": "legal_source_rights",
+      "label": "Legal and source rights",
+      "coreScholarlyLane": false,
+      "reviewPacket": "Rights manifest, source-input manifest, licensing/terms, exports, embeds, and release bundle",
+      "boundedQuestion": "Do Civica's source-by-source terms, database/copyright treatment, attribution, non-commercial restrictions, public exports, embeds, code licensing, and reader disclosures support the intended release and uses?",
+      "minimumExpertise": [
+        "Substantive practice or scholarship in database rights, copyright, open-data licensing, research-data reuse, or non-commercial-license interpretation.",
+        "For legal clearance, current professional qualification in the relevant jurisdiction and ability to state the scope and limits of the advice."
+      ],
+      "acceptedEvidence": [
+        "Current bar/law-society or equivalent professional record plus relevant matters/publications, or recognized database/open-licensing scholarship for the non-clearance scholarly role.",
+        "Recent public guidance, case analysis, standards/licence drafting, or institutional data-rights practice."
+      ],
+      "independenceRules": [
+        "Source-provider work is disclosed; counsel recuses from interpreting a client's disputed terms unless all parties approve a managed role.",
+        "A scholarly reviewer may identify issues but cannot supply release legal clearance without the required professional qualification."
+      ],
+      "conflictRules": [
+        "Record representation, employment, board, funding, litigation, or paid advisory relationships with Civica sources, competitors, or proposed repositories.",
+        "IPU/Constitute or other non-commercial-source relationships require source-specific recusal and independent interpretation."
+      ],
+      "geographicAndMethodDiversity": [
+        "Cover the jurisdictions implicated by the release, including EU database rights and the project's operating/release jurisdictions as counsel determines.",
+        "Combine practical clearance experience with open-data/research-reuse expertise where one person cannot cover both."
+      ],
+      "deliverable": [
+        "Source-by-source issue table with applicable jurisdiction, permission/exception/uncertainty, allowed and prohibited uses, required wording, risk severity, and remediation.",
+        "Signed scope statement distinguishing legal advice, scholarly analysis, unresolved source permission, and owner risk decision."
+      ],
+      "exclusionCriteria": [
+        "General IP practice without database, data-licensing, or research-data reuse evidence.",
+        "Unqualified legal clearance, undisclosed source representation, or a definitive opinion outside the reviewer's jurisdiction and retained scope."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "COPE Ethical Guidelines for Peer Reviewers",
+      "url": "https://publicationethics.org/guidance/guideline/ethical-guidelines-peer-reviewers",
+      "use": "scope matching, objectivity, confidentiality, competing interests, and timeliness"
+    },
+    {
+      "title": "W3C Evaluating Web Accessibility Overview",
+      "url": "https://www.w3.org/WAI/test-evaluate/",
+      "use": "knowledgeable human evaluation, WCAG-EM, combined expertise, and involving users with disabilities"
+    },
+    {
+      "title": "CoreTrustSeal Frequently Asked Questions",
+      "url": "https://www.coretrustseal.org/why-certification/frequently-asked-questions/",
+      "use": "peer-repository review, designated-community expertise, preservation, and evidence-based assessment"
+    },
+    {
+      "title": "Creative Commons Data guidance",
+      "url": "https://wiki.creativecommons.org/wiki/data",
+      "use": "copyright and database-right distinctions in open-data licensing"
+    },
+    {
+      "title": "ABA Model Rule 1.1 — Competence",
+      "url": "https://www.americanbar.org/groups/professional_responsibility/publications/model_rules_of_professional_conduct/rule_1_1_competence/",
+      "use": "professional legal competence; local professional rules still govern retained counsel"
+    }
+  ],
+  "semanticSha256": "7dc0df47ce2d0bdd28888edcecd2173e9e19fb7672b48f369ffd5ea020e6f663"
+}
