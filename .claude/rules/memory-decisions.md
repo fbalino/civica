@@ -923,3 +923,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - `pulse-independent-coding/v1` hides production, owner, model, peer, adjudication, and answer-key fields from each coder.
 - Raw labels and every disagreement remain immutable and visible; adjudication is separate and may remain unresolved.
 - Agent dry runs diagnose instructions only. Only qualified independent human coding may later enter a gold release. Durable record: APR-D124.
+
+## 2026-07-11 — Pulse coding uses a separate role-gated workspace
+
+- `/admin/pulse-coding` is structurally separate from production review. Coders never receive peer labels, including after lock.
+- Raw locks, comparisons, terminal adjudications, and substantive audit history are database-enforced; owner access remains status-only until a study is closed and disagreements are terminal.
+- Export timestamps and export-log rows do not affect the semantic hash. Agent and synthetic records stay non-gold. Durable record: APR-D125.

@@ -1,0 +1,38 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "fable",
+  "model_usage": {
+    "claude-fable-5": {
+      "inputTokens": 14544,
+      "outputTokens": 14605,
+      "cacheReadInputTokens": 937076,
+      "cacheCreationInputTokens": 145172,
+      "webSearchRequests": 0,
+      "costUSD": 4.716206,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "27807f54-f03a-4369-be02-fb915adf66d9",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "PUL-017 IA/interaction review complete. Recommendation: a distinct role-gated /admin/pulse-coding workspace (never an extension of /admin/pulse-review, which renders exactly the forbidden production/model fields), preceded by a session-layer extension because the current single-owner admin cookie cannot represent two coders plus an adjudicator. Report specifies the seven minimum views, per-role hidden information, a two-pane packet-coding layout on existing admin.css/design-system primitives with a mandatory boundary-catalog category picker, nine non-negotiable safeguards (runtime forbidden-field scan, pre-lock peer 403, DB lock immutability, reuse of coder-protocol.ts validators, packet-hash/version pinning, adjudicator\u2260coder, no majority-vote affordance, dry-run-not-gold labeling, codebook-gap recode flow), plus route map, nav labels, status vocabulary, and an acceptance checklist.",
+    "artifacts": [
+      "/Users/fernandobalino/.claude/plans/fable-5-workflow-zany-yeti.md"
+    ],
+    "changed_files": [],
+    "commands_run": [
+      "ls/find over src/app/(admin) and src/app/api/admin",
+      "grep class inventory of src/app/admin.css",
+      "wc -l on admin.css, codebook, pulse-review detail page"
+    ],
+    "verification": "Read-only review: grounded in DESIGN.md, plan/05-pulse-event-ledger-and-validation.md (PUL-017), plan/research/pulse-independent-coding-codebook-v1.md, plan/evidence/PUL-016/README.md, src/lib/pulse/v2/coder-protocol.ts, src/lib/admin/session.ts, the (admin) layout/nav, pulse-review list and detail pages, and admin.css. No files modified; no code executed beyond read-only listing/grep.",
+    "needs_user": false,
+    "next_action": "Owner review of the recommendation; if adopted, PUL-017 implementation starts with the role-bearing session/identity layer, then routes and views per the report's route map and acceptance checklist."
+  },
+  "duration_ms": 244505,
+  "num_turns": 16,
+  "returncode": 0
+}

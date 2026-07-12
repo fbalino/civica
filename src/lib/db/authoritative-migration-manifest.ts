@@ -127,4 +127,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "2f8d819d16e43b5e87113c2abd806ce372446a7d4d2623d1f6bd2046fc85c673",
     baseline: false,
   },
+  {
+    id: "0021_steep_brood",
+    path: "drizzle/authoritative/0021_steep_brood.sql",
+    sha256: "8814ccc36cab9a39ec174770a4beca9616ceda8d9a084703c082e333d29586dc",
+    baseline: false,
+  },
+  {
+    id: "0022_puzzling_killraven",
+    path: "drizzle/authoritative/0022_puzzling_killraven.sql",
+    sha256: "2ae084640c77328d440b7f7a059c395b6a62ba2e93e08b44c1fd4e4f9507cf02",
+    baseline: false,
+  },
 ] as const;

@@ -741,6 +741,101 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated attribution metadata; referenced source evidence retains publisher-specific restrictions.",
     deprecation: active,
   },
+  pulse_coding_studies: {
+    definition:
+      "Version-pinned independent-coding studies kept separate from production Pulse review and scoring.",
+    rowGrain: "One coding study over one frozen packet set and method contract.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Created by an authorized study administrator from a label-blind packet manifest.",
+    cadence: "On study setup, closure, or explicit new-version creation.",
+    vintageSemantics:
+      "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+    rights:
+      "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+    deprecation: active,
+  },
+  pulse_coding_packets: {
+    definition:
+      "Immutable country-day evidence snapshots assigned for blinded independent coding.",
+    rowGrain: "One frozen packet in one coding study.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+    cadence: "Append-only during study setup.",
+    vintageSemantics:
+      "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+    rights:
+      "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+    deprecation: active,
+  },
+  pulse_coding_participants: {
+    definition:
+      "Pseudonymous role-bearing participants with hashed, revocable coding-workspace credentials.",
+    rowGrain: "One coder, adjudicator, or study administrator identity in one study.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+    cadence: "On invitation, access, expiry, or revocation.",
+    vintageSemantics:
+      "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+    rights: "Private access-control metadata; never part of a public research release.",
+    deprecation: active,
+  },
+  pulse_coding_assignments: {
+    definition:
+      "Role-scoped packet assignments containing editable drafts and immutable locked raw coder submissions.",
+    rowGrain: "One participant slot on one frozen packet.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+    cadence: "Assigned once, optionally draft-saved, then locked once.",
+    vintageSemantics:
+      "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+    rights:
+      "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+    deprecation: active,
+  },
+  pulse_coding_comparisons: {
+    definition:
+      "Immutable axis-by-axis comparisons generated only after both independent coder submissions lock.",
+    rowGrain: "One two-coder comparison for one packet.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
+    cadence: "Once when the second coder locks, with idempotent repair after interruption.",
+    vintageSemantics:
+      "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+    rights: "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+    deprecation: active,
+  },
+  pulse_coding_adjudications: {
+    definition:
+      "Separate terminal adjudication records that preserve rather than overwrite both raw coder submissions.",
+    rowGrain: "One resolved or explicitly unresolved adjudication for one comparison.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+    cadence: "Once after both coder submissions lock; terminal rows are immutable.",
+    vintageSemantics:
+      "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+    rights:
+      "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+    deprecation: active,
+  },
+  pulse_coding_audit_log: {
+    definition:
+      "Append-only access and state-transition history for independent coding studies.",
+    rowGrain: "One access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated by role-gated coding services and database-enforced workflow transitions.",
+    cadence: "Append-only for every meaningful coding-workspace action.",
+    vintageSemantics:
+      "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+    rights: "Private operational audit metadata; exports omit credential hashes.",
+    deprecation: active,
+  },
   pulse_sources: {
     definition:
       "Evidence-source links between Pulse v2 events and raw publisher items.",

@@ -18,6 +18,11 @@ import type {
   PulseCandidateKind,
   PulseCandidateOutcome,
 } from "@/lib/pulse/v2/candidate-outcome";
+import type {
+  PulseCodingAdjudicationInput,
+  PulseCodingPacketSnapshot,
+  PulseCodingSubmissionEnvelope,
+} from "@/lib/pulse/v2/coding-workspace";
 import {
   pgTable,
   uuid,
@@ -2448,6 +2453,254 @@ export const pulseReviewAuditLog = pgTable(
       table.createdAt,
     ),
     index("idx_pulse_review_audit_run").on(table.runId),
+  ],
+);
+
+/**
+ * PUL-017 — independent double-coding workspace.
+ *
+ * These tables are deliberately separate from production Pulse events and the
+ * owner review queue. A coding study pins one unlabeled packet set and exact
+ * method versions; no production label, model vote, or owner decision belongs
+ * in this graph.
+ */
+export const pulseCodingStudies = pgTable(
+  "pulse_coding_studies",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull().unique(),
+    schemaVersion: text("schema_version").notNull(),
+    title: text("title").notNull(),
+    purpose: text("purpose").notNull(),
+    protocolVersion: text("protocol_version").notNull(),
+    codebookVersion: text("codebook_version").notNull(),
+    ontologyVersion: text("ontology_version").notNull(),
+    datasetVersion: text("dataset_version").notNull(),
+    packetSetSha256: text("packet_set_sha256").notNull(),
+    traceSetSha256: text("trace_set_sha256"),
+    status: text("status").notNull().default("setup"),
+    createdBy: text("created_by").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    closedAt: timestamp("closed_at"),
+  },
+  (table) => [
+    check(
+      "pulse_coding_studies_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-coding-workspace/v1' AND ${table.purpose} IN ('instruction_pilot','evaluation') AND ${table.status} IN ('setup','active','closed') AND ${table.protocolVersion} <> '' AND ${table.codebookVersion} <> '' AND ${table.ontologyVersion} <> '' AND ${table.datasetVersion} <> '' AND ${table.packetSetSha256} ~ '^[a-f0-9]{64}$' AND (${table.traceSetSha256} IS NULL OR ${table.traceSetSha256} ~ '^[a-f0-9]{64}$')`,
+    ),
+    uniqueIndex("idx_pulse_coding_study_identity").on(
+      table.protocolVersion,
+      table.packetSetSha256,
+    ),
+    index("idx_pulse_coding_study_status").on(table.status, table.createdAt),
+  ],
+);
+
+export const pulseCodingPackets = pgTable(
+  "pulse_coding_packets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studyId: uuid("study_id")
+      .references(() => pulseCodingStudies.id, { onDelete: "restrict" })
+      .notNull(),
+    packetKey: text("packet_key").notNull(),
+    analysisStatus: text("analysis_status").notNull(),
+    packetSnapshot: jsonb("packet_snapshot")
+      .$type<PulseCodingPacketSnapshot>()
+      .notNull(),
+    packetSnapshotSha256: text("packet_snapshot_sha256").notNull(),
+    importedAt: timestamp("imported_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_coding_packet_key").on(
+      table.studyId,
+      table.packetKey,
+    ),
+    uniqueIndex("idx_pulse_coding_packet_hash").on(
+      table.studyId,
+      table.packetSnapshotSha256,
+    ),
+    index("idx_pulse_coding_packet_status").on(
+      table.studyId,
+      table.analysisStatus,
+    ),
+    check(
+      "pulse_coding_packets_contract_check",
+      dsql`${table.analysisStatus} IN ('analysis_candidate','reserve','pilot') AND ${table.packetSnapshotSha256} ~ '^[a-f0-9]{64}$' AND jsonb_typeof(${table.packetSnapshot}) = 'object'`,
+    ),
+  ],
+);
+
+export const pulseCodingParticipants = pgTable(
+  "pulse_coding_participants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studyId: uuid("study_id")
+      .references(() => pulseCodingStudies.id, { onDelete: "restrict" })
+      .notNull(),
+    pseudonym: text("pseudonym").notNull(),
+    role: text("role").notNull(),
+    actorType: text("actor_type").notNull(),
+    useStatus: text("use_status").notNull(),
+    credentialHash: text("credential_hash").notNull().unique(),
+    status: text("status").notNull().default("active"),
+    expiresAt: timestamp("expires_at"),
+    lastAccessAt: timestamp("last_access_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    revokedAt: timestamp("revoked_at"),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_coding_participant_pseudonym").on(
+      table.studyId,
+      table.pseudonym,
+    ),
+    index("idx_pulse_coding_participant_role").on(
+      table.studyId,
+      table.role,
+      table.status,
+    ),
+    check(
+      "pulse_coding_participants_contract_check",
+      dsql`${table.role} IN ('coder','adjudicator','study_admin') AND ${table.actorType} IN ('qualified_human','agent_dry_pilot') AND ${table.useStatus} IN ('evaluation_candidate','dry_run_not_gold') AND ${table.status} IN ('active','revoked') AND ${table.credentialHash} ~ '^[a-f0-9]{64}$' AND (${table.actorType} <> 'agent_dry_pilot' OR ${table.useStatus} = 'dry_run_not_gold')`,
+    ),
+  ],
+);
+
+export const pulseCodingAssignments = pgTable(
+  "pulse_coding_assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    packetId: uuid("packet_id")
+      .references(() => pulseCodingPackets.id, { onDelete: "restrict" })
+      .notNull(),
+    participantId: uuid("participant_id")
+      .references(() => pulseCodingParticipants.id, { onDelete: "restrict" })
+      .notNull(),
+    slot: text("slot").notNull(),
+    status: text("status").notNull().default("assigned"),
+    draft: jsonb("draft").$type<PulseCodingSubmissionEnvelope>(),
+    draftSha256: text("draft_sha256"),
+    submission: jsonb("submission").$type<PulseCodingSubmissionEnvelope>(),
+    submissionSha256: text("submission_sha256"),
+    assignedAt: timestamp("assigned_at").defaultNow().notNull(),
+    draftUpdatedAt: timestamp("draft_updated_at"),
+    lockedAt: timestamp("locked_at"),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_coding_assignment_slot").on(
+      table.packetId,
+      table.slot,
+    ),
+    uniqueIndex("idx_pulse_coding_assignment_participant").on(
+      table.packetId,
+      table.participantId,
+    ),
+    index("idx_pulse_coding_assignment_queue").on(
+      table.participantId,
+      table.status,
+      table.assignedAt,
+    ),
+    check(
+      "pulse_coding_assignments_contract_check",
+      dsql`${table.slot} IN ('coder_a','coder_b','adjudicator') AND ${table.status} IN ('assigned','draft','locked') AND (${table.draftSha256} IS NULL OR ${table.draftSha256} ~ '^[a-f0-9]{64}$') AND (${table.submissionSha256} IS NULL OR ${table.submissionSha256} ~ '^[a-f0-9]{64}$') AND ((${table.status} = 'locked' AND ${table.submission} IS NOT NULL AND ${table.submissionSha256} IS NOT NULL AND ${table.lockedAt} IS NOT NULL) OR (${table.status} <> 'locked' AND ${table.submission} IS NULL AND ${table.submissionSha256} IS NULL AND ${table.lockedAt} IS NULL))`,
+    ),
+  ],
+);
+
+export const pulseCodingComparisons = pgTable(
+  "pulse_coding_comparisons",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    packetId: uuid("packet_id")
+      .references(() => pulseCodingPackets.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    coderAssignmentAId: uuid("coder_assignment_a_id")
+      .references(() => pulseCodingAssignments.id, { onDelete: "restrict" })
+      .notNull(),
+    coderAssignmentBId: uuid("coder_assignment_b_id")
+      .references(() => pulseCodingAssignments.id, { onDelete: "restrict" })
+      .notNull(),
+    comparison: jsonb("comparison").notNull(),
+    comparisonSha256: text("comparison_sha256").notNull(),
+    disagreementAxes: text("disagreement_axes").array().notNull(),
+    generatedAt: timestamp("generated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_coding_comparison_disagreements").on(
+      table.generatedAt,
+    ),
+    check(
+      "pulse_coding_comparisons_contract_check",
+      dsql`${table.coderAssignmentAId} <> ${table.coderAssignmentBId} AND ${table.comparisonSha256} ~ '^[a-f0-9]{64}$' AND jsonb_typeof(${table.comparison}) = 'object'`,
+    ),
+  ],
+);
+
+export const pulseCodingAdjudications = pgTable(
+  "pulse_coding_adjudications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    comparisonId: uuid("comparison_id")
+      .references(() => pulseCodingComparisons.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    adjudicatorAssignmentId: uuid("adjudicator_assignment_id")
+      .references(() => pulseCodingAssignments.id, { onDelete: "restrict" })
+      .notNull(),
+    status: text("status").notNull().default("pending"),
+    resolution: jsonb("resolution").$type<PulseCodingAdjudicationInput>(),
+    resolutionSha256: text("resolution_sha256"),
+    reasonCodes: text("reason_codes").array().notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    resolvedAt: timestamp("resolved_at"),
+  },
+  (table) => [
+    index("idx_pulse_coding_adjudication_status").on(
+      table.status,
+      table.createdAt,
+    ),
+    check(
+      "pulse_coding_adjudications_contract_check",
+      dsql`${table.status} IN ('pending','resolved','unresolved') AND ((${table.status} = 'pending' AND ${table.resolution} IS NULL AND ${table.resolutionSha256} IS NULL AND ${table.resolvedAt} IS NULL) OR (${table.status} IN ('resolved','unresolved') AND ${table.resolution} IS NOT NULL AND ${table.resolutionSha256} ~ '^[a-f0-9]{64}$' AND ${table.resolvedAt} IS NOT NULL AND cardinality(${table.reasonCodes}) > 0))`,
+    ),
+  ],
+);
+
+export const pulseCodingAuditLog = pgTable(
+  "pulse_coding_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studyId: uuid("study_id").references(() => pulseCodingStudies.id, {
+      onDelete: "restrict",
+    }),
+    packetId: uuid("packet_id").references(() => pulseCodingPackets.id, {
+      onDelete: "restrict",
+    }),
+    participantId: uuid("participant_id").references(
+      () => pulseCodingParticipants.id,
+      { onDelete: "restrict" },
+    ),
+    actorId: text("actor_id").notNull(),
+    actorRole: text("actor_role").notNull(),
+    action: text("action").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id"),
+    requestId: text("request_id").unique(),
+    beforeSha256: text("before_sha256"),
+    afterSha256: text("after_sha256"),
+    details: jsonb("details").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_coding_audit_study").on(table.studyId, table.createdAt),
+    index("idx_pulse_coding_audit_packet").on(table.packetId, table.createdAt),
+    index("idx_pulse_coding_audit_actor").on(table.actorId, table.createdAt),
+    check(
+      "pulse_coding_audit_contract_check",
+      dsql`${table.actorRole} IN ('coder','adjudicator','study_admin','system','anonymous') AND ${table.action} IN ('study_created','packet_imported','participant_issued','participant_revoked','assignment_created','draft_saved','submission_locked','comparison_generated','adjudication_recorded','export_generated','access_granted','access_denied') AND ${table.entityType} <> '' AND jsonb_typeof(${table.details}) = 'object' AND (${table.beforeSha256} IS NULL OR ${table.beforeSha256} ~ '^[a-f0-9]{64}$') AND (${table.afterSha256} IS NULL OR ${table.afterSha256} ~ '^[a-f0-9]{64}$')`,
+    ),
   ],
 );
 

@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "66339877ebfc08910afbcfc5c77742225113dee65695875dd5859d2dc625bebf",
+  "schemaFingerprint": "4f28818bab5325a29a2a41e1462fecade93df8430c652cf195c6b6490b6f3b0a",
   "summary": {
-    "tables": 59,
-    "columns": 793,
+    "tables": 66,
+    "columns": 871,
     "publicAtlasTables": 18,
     "researchBetaTables": 18,
     "supportTables": 11,
-    "internalTables": 10,
+    "internalTables": 17,
     "privateTables": 2,
     "legacyTables": 3
   },
@@ -15831,6 +15831,2145 @@
             "status": "legacy",
             "replacement": "Pulse v2 corrections and review ledger",
             "note": "Retained for historical Beta replay; not the current Pulse v2 production contract."
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_adjudications",
+      "exportName": "pulseCodingAdjudications",
+      "definition": "Separate terminal adjudication records that preserve rather than overwrite both raw coder submissions.",
+      "rowGrain": "One resolved or explicitly unresolved adjudication for one comparison.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+      "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+      "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+      "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "adjudicator_assignment_id",
+          "propertyName": "adjudicatorAssignmentId",
+          "definition": "Adjudicator assignment id; relational link to pulse_coding_assignments.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_coding_assignments.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_assignments.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "comparison_id",
+          "propertyName": "comparisonId",
+          "definition": "Comparison id; relational link to pulse_coding_comparisons.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": "pulse_coding_comparisons.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_comparisons.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_adjudication_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "notes",
+          "propertyName": "notes",
+          "definition": "Free-text notes recorded for review or interpretation.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reason_codes",
+          "propertyName": "reasonCodes",
+          "definition": "Reason codes recorded for the resolved or explicitly unresolved adjudication for one comparison.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "resolution",
+          "propertyName": "resolution",
+          "definition": "Resolution recorded for the resolved or explicitly unresolved adjudication for one comparison.",
+          "sqlType": "jsonb",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "resolution_sha256",
+          "propertyName": "resolutionSha256",
+          "definition": "Resolution sha256 recorded for the resolved or explicitly unresolved adjudication for one comparison.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "resolved_at",
+          "propertyName": "resolvedAt",
+          "definition": "Resolved at recorded for the resolved or explicitly unresolved adjudication for one comparison.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "Resolved at follows this table contract. created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_adjudication_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
+          "cadence": "Once after both coder submissions lock; terminal rows are immutable.",
+          "vintageSemantics": "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
+          "rights": "Civica-generated adjudication metadata; selected or new annotations inherit packet evidence restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_assignments",
+      "exportName": "pulseCodingAssignments",
+      "definition": "Role-scoped packet assignments containing editable drafts and immutable locked raw coder submissions.",
+      "rowGrain": "One participant slot on one frozen packet.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+      "cadence": "Assigned once, optionally draft-saved, then locked once.",
+      "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+      "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "assigned_at",
+          "propertyName": "assignedAt",
+          "definition": "Assigned at recorded for the participant slot on one frozen packet.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_assignment_queue"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "Assigned at follows this table contract. assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "draft",
+          "propertyName": "draft",
+          "definition": "Draft recorded for the participant slot on one frozen packet.",
+          "sqlType": "jsonb",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "draft_sha256",
+          "propertyName": "draftSha256",
+          "definition": "Draft sha256 recorded for the participant slot on one frozen packet.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "draft_updated_at",
+          "propertyName": "draftUpdatedAt",
+          "definition": "Draft updated at recorded for the participant slot on one frozen packet.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "Draft updated at follows this table contract. assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "locked_at",
+          "propertyName": "lockedAt",
+          "definition": "Locked at recorded for the participant slot on one frozen packet.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "Locked at follows this table contract. assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_id",
+          "propertyName": "packetId",
+          "definition": "Packet id; relational link to pulse_coding_packets.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_coding_packets.id",
+            "indexGroups": [
+              "idx_pulse_coding_assignment_slot",
+              "idx_pulse_coding_assignment_participant"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_assignment_slot",
+              "idx_pulse_coding_assignment_participant"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_packets.id; substantive provenance follows this table's source contract.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "participant_id",
+          "propertyName": "participantId",
+          "definition": "Participant id; relational link to pulse_coding_participants.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_coding_participants.id",
+            "indexGroups": [
+              "idx_pulse_coding_assignment_participant",
+              "idx_pulse_coding_assignment_queue"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_assignment_participant"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_participants.id; substantive provenance follows this table's source contract.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "slot",
+          "propertyName": "slot",
+          "definition": "Slot recorded for the participant slot on one frozen packet.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_assignment_slot"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_assignment_slot"
+            ]
+          },
+          "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_assignment_queue"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "submission",
+          "propertyName": "submission",
+          "definition": "Submission recorded for the participant slot on one frozen packet.",
+          "sqlType": "jsonb",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "submission_sha256",
+          "propertyName": "submissionSha256",
+          "definition": "Submission sha256 recorded for the participant slot on one frozen packet.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Assigned by study administration; coder responses use the pinned independent-coding contract and runtime validators.",
+          "cadence": "Assigned once, optionally draft-saved, then locked once.",
+          "vintageSemantics": "assigned_at, draft_updated_at, and locked_at are workflow times; the embedded submission pins packet and method versions.",
+          "rights": "Civica-generated annotation plus restricted packet evidence references; raw submissions remain immutable.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_audit_log",
+      "exportName": "pulseCodingAuditLog",
+      "definition": "Append-only access and state-transition history for independent coding studies.",
+      "rowGrain": "One access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+      "cadence": "Append-only for every meaningful coding-workspace action.",
+      "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+      "rights": "Private operational audit metadata; exports omit credential hashes.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "action",
+          "propertyName": "action",
+          "definition": "Action recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "actor_id",
+          "propertyName": "actorId",
+          "definition": "Actor id recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_audit_actor"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "actor_role",
+          "propertyName": "actorRole",
+          "definition": "Actor role recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "after_sha256",
+          "propertyName": "afterSha256",
+          "definition": "After sha256 recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "before_sha256",
+          "propertyName": "beforeSha256",
+          "definition": "Before sha256 recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_audit_study",
+              "idx_pulse_coding_audit_packet",
+              "idx_pulse_coding_audit_actor"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "details",
+          "propertyName": "details",
+          "definition": "Details recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_id",
+          "propertyName": "entityId",
+          "definition": "Entity id recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_type",
+          "propertyName": "entityType",
+          "definition": "Entity type recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_id",
+          "propertyName": "packetId",
+          "definition": "Packet id; relational link to pulse_coding_packets.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_coding_packets.id",
+            "indexGroups": [
+              "idx_pulse_coding_audit_packet"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_packets.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "participant_id",
+          "propertyName": "participantId",
+          "definition": "Participant id; relational link to pulse_coding_participants.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_coding_participants.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_participants.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "request_id",
+          "propertyName": "requestId",
+          "definition": "Request id recorded for the access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by role-gated coding services and database-enforced workflow transitions.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "study_id",
+          "propertyName": "studyId",
+          "definition": "Study id; relational link to pulse_coding_studies.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_coding_studies.id",
+            "indexGroups": [
+              "idx_pulse_coding_audit_study"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_studies.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only for every meaningful coding-workspace action.",
+          "vintageSemantics": "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
+          "rights": "Private operational audit metadata; exports omit credential hashes.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_comparisons",
+      "exportName": "pulseCodingComparisons",
+      "definition": "Immutable axis-by-axis comparisons generated only after both independent coder submissions lock.",
+      "rowGrain": "One two-coder comparison for one packet.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
+      "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+      "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+      "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "coder_assignment_a_id",
+          "propertyName": "coderAssignmentAId",
+          "definition": "Coder assignment a id; relational link to pulse_coding_assignments.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_coding_assignments.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_assignments.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "coder_assignment_b_id",
+          "propertyName": "coderAssignmentBId",
+          "definition": "Coder assignment b id; relational link to pulse_coding_assignments.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_coding_assignments.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_assignments.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "comparison",
+          "propertyName": "comparison",
+          "definition": "Comparison recorded for the two-coder comparison for one packet.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "comparison_sha256",
+          "propertyName": "comparisonSha256",
+          "definition": "Comparison sha256 recorded for the two-coder comparison for one packet.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "disagreement_axes",
+          "propertyName": "disagreementAxes",
+          "definition": "Disagreement axes recorded for the two-coder comparison for one packet.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "generated_at",
+          "propertyName": "generatedAt",
+          "definition": "Generated at recorded for the two-coder comparison for one packet.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_comparison_disagreements"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "Generated at follows this table contract. generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_id",
+          "propertyName": "packetId",
+          "definition": "Packet id; relational link to pulse_coding_packets.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": "pulse_coding_packets.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_packets.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once when the second coder locks, with idempotent repair after interruption.",
+          "vintageSemantics": "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
+          "rights": "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_packets",
+      "exportName": "pulseCodingPackets",
+      "definition": "Immutable country-day evidence snapshots assigned for blinded independent coding.",
+      "rowGrain": "One frozen packet in one coding study.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+      "cadence": "Append-only during study setup.",
+      "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+      "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "analysis_status",
+          "propertyName": "analysisStatus",
+          "definition": "Analysis status recorded for the frozen packet in one coding study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_packet_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "imported_at",
+          "propertyName": "importedAt",
+          "definition": "Imported at recorded for the frozen packet in one coding study.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "Imported at follows this table contract. imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_key",
+          "propertyName": "packetKey",
+          "definition": "Packet key recorded for the frozen packet in one coding study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_packet_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_packet_key"
+            ]
+          },
+          "sourceOrDerivation": "Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_snapshot",
+          "propertyName": "packetSnapshot",
+          "definition": "Packet snapshot recorded for the frozen packet in one coding study.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_snapshot_sha256",
+          "propertyName": "packetSnapshotSha256",
+          "definition": "Packet snapshot sha256 recorded for the frozen packet in one coding study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_packet_hash"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_packet_hash"
+            ]
+          },
+          "sourceOrDerivation": "Generated from the preregistered evaluation sample and rights-safe evidence/search traces without labels or model output.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "study_id",
+          "propertyName": "studyId",
+          "definition": "Study id; relational link to pulse_coding_studies.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_coding_studies.id",
+            "indexGroups": [
+              "idx_pulse_coding_packet_key",
+              "idx_pulse_coding_packet_hash",
+              "idx_pulse_coding_packet_status"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_packet_key",
+              "idx_pulse_coding_packet_hash"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_studies.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only during study setup.",
+          "vintageSemantics": "imported_at is storage time; packet_snapshot_sha256 fixes the exact evidence and method context shown to coders.",
+          "rights": "Internal research packet; each evidence item retains publisher and source-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_participants",
+      "exportName": "pulseCodingParticipants",
+      "definition": "Pseudonymous role-bearing participants with hashed, revocable coding-workspace credentials.",
+      "rowGrain": "One coder, adjudicator, or study administrator identity in one study.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+      "cadence": "On invitation, access, expiry, or revocation.",
+      "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+      "rights": "Private access-control metadata; never part of a public research release.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "actor_type",
+          "propertyName": "actorType",
+          "definition": "Actor type recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "credential_hash",
+          "propertyName": "credentialHash",
+          "definition": "Credential hash recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "expires_at",
+          "propertyName": "expiresAt",
+          "definition": "Expires at recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "Expires at follows this table contract. created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "last_access_at",
+          "propertyName": "lastAccessAt",
+          "definition": "Last access at recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "Last access at follows this table contract. created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "pseudonym",
+          "propertyName": "pseudonym",
+          "definition": "Pseudonym recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_participant_pseudonym"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_participant_pseudonym"
+            ]
+          },
+          "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "revoked_at",
+          "propertyName": "revokedAt",
+          "definition": "Revoked at recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "Revoked at follows this table contract. created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "role",
+          "propertyName": "role",
+          "definition": "Role recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_participant_role"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_participant_role"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "study_id",
+          "propertyName": "studyId",
+          "definition": "Study id; relational link to pulse_coding_studies.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_coding_studies.id",
+            "indexGroups": [
+              "idx_pulse_coding_participant_pseudonym",
+              "idx_pulse_coding_participant_role"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_participant_pseudonym"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_coding_studies.id; substantive provenance follows this table's source contract.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "use_status",
+          "propertyName": "useStatus",
+          "definition": "Use status recorded for the coder, adjudicator, or study administrator identity in one study.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
+          "cadence": "On invitation, access, expiry, or revocation.",
+          "vintageSemantics": "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
+          "rights": "Private access-control metadata; never part of a public research release.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_coding_studies",
+      "exportName": "pulseCodingStudies",
+      "definition": "Version-pinned independent-coding studies kept separate from production Pulse review and scoring.",
+      "rowGrain": "One coding study over one frozen packet set and method contract.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+      "cadence": "On study setup, closure, or explicit new-version creation.",
+      "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+      "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "closed_at",
+          "propertyName": "closedAt",
+          "definition": "Closed at recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "Closed at follows this table contract. created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "codebook_version",
+          "propertyName": "codebookVersion",
+          "definition": "Codebook version recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_study_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_by",
+          "propertyName": "createdBy",
+          "definition": "Created by recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dataset_version",
+          "propertyName": "datasetVersion",
+          "definition": "Dataset version recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "ontology_version",
+          "propertyName": "ontologyVersion",
+          "definition": "Ontology version recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "packet_set_sha256",
+          "propertyName": "packetSetSha256",
+          "definition": "Packet set sha256 recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_study_identity"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_study_identity"
+            ]
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "protocol_version",
+          "propertyName": "protocolVersion",
+          "definition": "Protocol version recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_study_identity"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_coding_study_identity"
+            ]
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "purpose",
+          "propertyName": "purpose",
+          "definition": "Purpose recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "slug",
+          "propertyName": "slug",
+          "definition": "Stable URL-safe Civica identifier.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_coding_study_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "title",
+          "propertyName": "title",
+          "definition": "Title recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "trace_set_sha256",
+          "propertyName": "traceSetSha256",
+          "definition": "Trace set sha256 recorded for the coding study over one frozen packet set and method contract.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by an authorized study administrator from a label-blind packet manifest.",
+          "cadence": "On study setup, closure, or explicit new-version creation.",
+          "vintageSemantics": "created_at is setup time; dataset, packet-set, protocol, codebook, and ontology versions remain pinned for the study lifetime.",
+          "rights": "Civica-generated study metadata; packet evidence retains source-specific restrictions.",
+          "deprecation": {
+            "status": "active"
           }
         }
       ]

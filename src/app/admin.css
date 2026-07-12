@@ -972,6 +972,266 @@
   gap: var(--space-2);
 }
 
+/* ── Independent coding workspace (PUL-017) ─────────────────────────────── */
+
+.admin-nav-context {
+  margin: 0;
+  padding: 0 var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
+.coding-signin-footnote {
+  margin-top: var(--space-5);
+  margin-bottom: 0;
+}
+
+.coding-signin-footnote a {
+  color: var(--color-accent);
+}
+
+.coding-dashboard-actions,
+.coding-version-strip {
+  margin-top: var(--space-5);
+}
+
+.coding-version-strip,
+.coding-search-family-list,
+.coding-axis-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.coding-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.coding-pane-head {
+  margin-bottom: var(--space-4);
+}
+
+.coding-search-family-list,
+.coding-axis-list {
+  margin-bottom: var(--space-5);
+}
+
+.coding-sticky-form {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-5));
+}
+
+.coding-evidence-card {
+  margin-bottom: var(--space-4);
+}
+
+.coding-evidence-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.coding-evidence-id,
+.coding-subheading {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.coding-textarea-compact {
+  min-height: calc(var(--space-8) + var(--space-5));
+}
+
+.coding-fieldset {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0;
+}
+
+.coding-radio-row,
+.coding-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+}
+
+.coding-radio-row input,
+.coding-check-row input {
+  margin-top: var(--space-1);
+  accent-color: var(--color-accent);
+}
+
+.coding-builder {
+  border-top: 1px solid var(--color-border-default);
+  padding-top: var(--space-5);
+}
+
+.coding-builder--candidate {
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 28%, var(--color-border-default));
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  background: color-mix(in oklab, var(--color-status-warning) 7%, var(--color-surface-primary));
+}
+
+.coding-builder-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.coding-event-card,
+.coding-candidate-card,
+.coding-label-card {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-top: var(--space-4);
+  background: var(--color-surface-primary);
+}
+
+.coding-label-card {
+  background: var(--color-page-bg);
+}
+
+.coding-boundary {
+  border-left: 1px solid var(--color-accent);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0 var(--space-4);
+  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-surface-primary));
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.coding-boundary summary {
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.coding-boundary dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-3);
+  margin: var(--space-3) 0 0;
+}
+
+.coding-boundary dt {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.coding-boundary dd {
+  margin: 0;
+}
+
+.coding-validation-errors {
+  border: 1px solid color-mix(in oklab, var(--color-status-danger) 35%, var(--color-border-default));
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-status-danger) 8%, var(--color-surface-primary));
+  padding: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+}
+
+.coding-validation-errors ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+.coding-comparison-grid,
+.coding-reason-grid,
+.coding-export-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.coding-summary-event {
+  border-top: 1px solid var(--color-border-default);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.coding-summary-label {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.coding-summary-label p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.coding-json-editor,
+.coding-json-readout,
+.coding-access-code code {
+  font-family: var(--font-code);
+  font-size: var(--text-12);
+}
+
+.coding-json-editor {
+  min-height: calc(var(--space-9) * 4);
+}
+
+.coding-json-readout {
+  overflow: auto;
+  white-space: pre-wrap;
+  color: var(--color-text-primary);
+}
+
+.coding-access-code code {
+  display: block;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-page-bg);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 960px) {
+  .coding-workspace-grid,
+  .coding-comparison-grid,
+  .coding-reason-grid,
+  .coding-export-list {
+    grid-template-columns: 1fr;
+  }
+
+  .coding-sticky-form {
+    position: static;
+  }
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {

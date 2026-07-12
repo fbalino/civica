@@ -679,3 +679,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Frozen 61 operational category boundaries, six worked examples, and 12 answer-free blinded pilot packets under `pulse-independent-coding/v1`.
 - Two separate GPT-5.3 Codex Spark dry runs passed the final contract; three disagreements remain visible and no agent output is eligible as gold.
 - Three rejected attempts improved the schema, packet naming, and affected-jurisdiction rule. 815 tests, claims, and the 98-page build pass. PUL-017 is next.
+
+## 2026-07-11 — PUL-017 independent coding workspace completed
+
+- A dedicated coder/adjudicator application now enforces separate sessions, blind raw labels, immutable locks, separate adjudication, and stable audit exports across routes and database triggers.
+- The live 12-packet dry pilot retains 24 locked submissions, 12 comparisons, and three unresolved disagreements; all temporary access is revoked.
+- Browser QA, the 23-migration live ledger, 823 tests, claims, TypeScript, and the production build pass. PUL-018 is next.

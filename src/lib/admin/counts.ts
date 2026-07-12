@@ -18,6 +18,8 @@ import {
   dataDisputes,
   advisoryApplications,
   contactSubmissions,
+  pulseCodingComparisons,
+  pulseCodingAdjudications,
 } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
@@ -30,6 +32,8 @@ export interface AdminCounts {
   advisoryNew: number;
   /** Contact messages not yet read (status='new'). */
   messagesNew: number;
+  /** Locked double-coded packets awaiting a terminal adjudication. */
+  codingReady: number;
 }
 
 async function countOr0(
@@ -52,7 +56,7 @@ async function countOr0(
  * one failing query can't take down the others.
  */
 export async function getAdminCounts(): Promise<AdminCounts> {
-  const [pulsePending, disputesOpen, advisoryNew, messagesNew] =
+  const [pulsePending, disputesOpen, advisoryNew, messagesNew, codingReady] =
     await Promise.all([
       countOr0("pulse", async () => {
         const rows = await db
@@ -87,7 +91,21 @@ export async function getAdminCounts(): Promise<AdminCounts> {
           .where(eq(contactSubmissions.status, "new"));
         return rows[0]?.n ?? 0;
       }),
+      countOr0("coding", async () => {
+        const rows = await db
+          .select({ n: sql<number>`count(*)::int` })
+          .from(pulseCodingComparisons)
+          .leftJoin(
+            pulseCodingAdjudications,
+            eq(
+              pulseCodingAdjudications.comparisonId,
+              pulseCodingComparisons.id,
+            ),
+          )
+          .where(sql`${pulseCodingAdjudications.id} IS NULL`);
+        return rows[0]?.n ?? 0;
+      }),
     ]);
 
-  return { pulsePending, disputesOpen, advisoryNew, messagesNew };
+  return { pulsePending, disputesOpen, advisoryNew, messagesNew, codingReady };
 }

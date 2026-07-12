@@ -27,6 +27,7 @@ const NAV_HREFS = [
   "/admin/data-disputes",
   "/admin/advisory-applications",
   "/admin/messages",
+  "/admin/pulse-coding",
   "/admin/data-disputes/audit",
 ];
 
@@ -112,6 +113,23 @@ export function AdminNav({ counts }: { counts: AdminCounts }) {
           </li>
         ))}
       </ul>
+
+      <div className="admin-nav-secondary">
+        <h2 className="admin-nav-title">Research coding</h2>
+        <ul className="admin-nav-list">
+          <li>
+            <Link
+              href="/admin/pulse-coding"
+              className={`admin-nav-link${
+                isActive(pathname, "/admin/pulse-coding") ? " is-active" : ""
+              }`}
+            >
+              <span className="admin-nav-label">Independent coding</span>
+              <CountBadge count={counts.codingReady} attention />
+            </Link>
+          </li>
+        </ul>
+      </div>
 
       <div className="admin-nav-secondary">
         <ul className="admin-nav-list">

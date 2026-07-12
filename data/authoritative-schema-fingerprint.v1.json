@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T18:59:14.449Z",
-  "sha256": "43eead7c0839bb187fed41fec65f673437c57c5ebb84056300b88c8302ec41bb",
+  "generatedAt": "2026-07-11T23:59:48.987Z",
+  "sha256": "ddd2543e3165a9e68a2289d43235796ec93bf537b7de6b82bd28f5cde3f69527",
   "schema": {
     "columns": [
       {
@@ -5327,6 +5327,708 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "pulse_coding_adjudications",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "adjudicator_assignment_id",
+        "type": "uuid",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "pulse_coding_adjudications",
+        "default": "'pending'::text",
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "jsonb",
+        "name": "resolution",
+        "type": "jsonb",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "resolution_sha256",
+        "type": "text",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "_text",
+        "name": "reason_codes",
+        "type": "ARRAY",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "notes",
+        "type": "text",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_adjudications",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "resolved_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "uuid",
+        "name": "comparison_id",
+        "type": "uuid",
+        "table": "pulse_coding_adjudications",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_coding_assignments",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "packet_id",
+        "type": "uuid",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "participant_id",
+        "type": "uuid",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "slot",
+        "type": "text",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "pulse_coding_assignments",
+        "default": "'assigned'::text",
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "jsonb",
+        "name": "draft",
+        "type": "jsonb",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "draft_sha256",
+        "type": "text",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "jsonb",
+        "name": "submission",
+        "type": "jsonb",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "submission_sha256",
+        "type": "text",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "timestamp",
+        "name": "assigned_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_assignments",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "draft_updated_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "locked_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_coding_audit_log",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "study_id",
+        "type": "uuid",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "packet_id",
+        "type": "uuid",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "participant_id",
+        "type": "uuid",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "actor_id",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "actor_role",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "action",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "entity_type",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "entity_id",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "request_id",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "before_sha256",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "after_sha256",
+        "type": "text",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "jsonb",
+        "name": "details",
+        "type": "jsonb",
+        "table": "pulse_coding_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_audit_log",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_coding_comparisons",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "packet_id",
+        "type": "uuid",
+        "table": "pulse_coding_comparisons",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "coder_assignment_a_id",
+        "type": "uuid",
+        "table": "pulse_coding_comparisons",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "coder_assignment_b_id",
+        "type": "uuid",
+        "table": "pulse_coding_comparisons",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "jsonb",
+        "name": "comparison",
+        "type": "jsonb",
+        "table": "pulse_coding_comparisons",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "comparison_sha256",
+        "type": "text",
+        "table": "pulse_coding_comparisons",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "_text",
+        "name": "disagreement_axes",
+        "type": "ARRAY",
+        "table": "pulse_coding_comparisons",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "generated_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_comparisons",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_coding_packets",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "study_id",
+        "type": "uuid",
+        "table": "pulse_coding_packets",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "packet_key",
+        "type": "text",
+        "table": "pulse_coding_packets",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "analysis_status",
+        "type": "text",
+        "table": "pulse_coding_packets",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "jsonb",
+        "name": "packet_snapshot",
+        "type": "jsonb",
+        "table": "pulse_coding_packets",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "packet_snapshot_sha256",
+        "type": "text",
+        "table": "pulse_coding_packets",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "timestamp",
+        "name": "imported_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_packets",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_coding_participants",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "study_id",
+        "type": "uuid",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "pseudonym",
+        "type": "text",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "role",
+        "type": "text",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "actor_type",
+        "type": "text",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "use_status",
+        "type": "text",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "credential_hash",
+        "type": "text",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "pulse_coding_participants",
+        "default": "'active'::text",
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "timestamp",
+        "name": "expires_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "timestamp",
+        "name": "last_access_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_participants",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "revoked_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_participants",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_coding_studies",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "slug",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "title",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "purpose",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "protocol_version",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "codebook_version",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "ontology_version",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "dataset_version",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "packet_set_sha256",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "trace_set_sha256",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": "'setup'::text",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "created_by",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_studies",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "timestamp",
+        "name": "closed_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_corrections",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -7963,6 +8665,141 @@
         "definition": "CREATE UNIQUE INDEX pulse_changelog_pkey ON public.pulse_changelog USING btree (id)"
       },
       {
+        "name": "idx_pulse_coding_adjudication_status",
+        "table": "pulse_coding_adjudications",
+        "definition": "CREATE INDEX idx_pulse_coding_adjudication_status ON public.pulse_coding_adjudications USING btree (status, created_at)"
+      },
+      {
+        "name": "pulse_coding_adjudications_comparison_id_unique",
+        "table": "pulse_coding_adjudications",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_adjudications_comparison_id_unique ON public.pulse_coding_adjudications USING btree (comparison_id)"
+      },
+      {
+        "name": "pulse_coding_adjudications_pkey",
+        "table": "pulse_coding_adjudications",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_adjudications_pkey ON public.pulse_coding_adjudications USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_coding_assignment_participant",
+        "table": "pulse_coding_assignments",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_assignment_participant ON public.pulse_coding_assignments USING btree (packet_id, participant_id)"
+      },
+      {
+        "name": "idx_pulse_coding_assignment_queue",
+        "table": "pulse_coding_assignments",
+        "definition": "CREATE INDEX idx_pulse_coding_assignment_queue ON public.pulse_coding_assignments USING btree (participant_id, status, assigned_at)"
+      },
+      {
+        "name": "idx_pulse_coding_assignment_slot",
+        "table": "pulse_coding_assignments",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_assignment_slot ON public.pulse_coding_assignments USING btree (packet_id, slot)"
+      },
+      {
+        "name": "pulse_coding_assignments_pkey",
+        "table": "pulse_coding_assignments",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_assignments_pkey ON public.pulse_coding_assignments USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_coding_audit_actor",
+        "table": "pulse_coding_audit_log",
+        "definition": "CREATE INDEX idx_pulse_coding_audit_actor ON public.pulse_coding_audit_log USING btree (actor_id, created_at)"
+      },
+      {
+        "name": "idx_pulse_coding_audit_packet",
+        "table": "pulse_coding_audit_log",
+        "definition": "CREATE INDEX idx_pulse_coding_audit_packet ON public.pulse_coding_audit_log USING btree (packet_id, created_at)"
+      },
+      {
+        "name": "idx_pulse_coding_audit_study",
+        "table": "pulse_coding_audit_log",
+        "definition": "CREATE INDEX idx_pulse_coding_audit_study ON public.pulse_coding_audit_log USING btree (study_id, created_at)"
+      },
+      {
+        "name": "pulse_coding_audit_log_pkey",
+        "table": "pulse_coding_audit_log",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_audit_log_pkey ON public.pulse_coding_audit_log USING btree (id)"
+      },
+      {
+        "name": "pulse_coding_audit_log_request_id_unique",
+        "table": "pulse_coding_audit_log",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_audit_log_request_id_unique ON public.pulse_coding_audit_log USING btree (request_id)"
+      },
+      {
+        "name": "idx_pulse_coding_comparison_disagreements",
+        "table": "pulse_coding_comparisons",
+        "definition": "CREATE INDEX idx_pulse_coding_comparison_disagreements ON public.pulse_coding_comparisons USING btree (generated_at)"
+      },
+      {
+        "name": "pulse_coding_comparisons_packet_id_unique",
+        "table": "pulse_coding_comparisons",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_comparisons_packet_id_unique ON public.pulse_coding_comparisons USING btree (packet_id)"
+      },
+      {
+        "name": "pulse_coding_comparisons_pkey",
+        "table": "pulse_coding_comparisons",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_comparisons_pkey ON public.pulse_coding_comparisons USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_coding_packet_hash",
+        "table": "pulse_coding_packets",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_packet_hash ON public.pulse_coding_packets USING btree (study_id, packet_snapshot_sha256)"
+      },
+      {
+        "name": "idx_pulse_coding_packet_key",
+        "table": "pulse_coding_packets",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_packet_key ON public.pulse_coding_packets USING btree (study_id, packet_key)"
+      },
+      {
+        "name": "idx_pulse_coding_packet_status",
+        "table": "pulse_coding_packets",
+        "definition": "CREATE INDEX idx_pulse_coding_packet_status ON public.pulse_coding_packets USING btree (study_id, analysis_status)"
+      },
+      {
+        "name": "pulse_coding_packets_pkey",
+        "table": "pulse_coding_packets",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_packets_pkey ON public.pulse_coding_packets USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_coding_participant_pseudonym",
+        "table": "pulse_coding_participants",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_participant_pseudonym ON public.pulse_coding_participants USING btree (study_id, pseudonym)"
+      },
+      {
+        "name": "idx_pulse_coding_participant_role",
+        "table": "pulse_coding_participants",
+        "definition": "CREATE INDEX idx_pulse_coding_participant_role ON public.pulse_coding_participants USING btree (study_id, role, status)"
+      },
+      {
+        "name": "pulse_coding_participants_credential_hash_unique",
+        "table": "pulse_coding_participants",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_participants_credential_hash_unique ON public.pulse_coding_participants USING btree (credential_hash)"
+      },
+      {
+        "name": "pulse_coding_participants_pkey",
+        "table": "pulse_coding_participants",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_participants_pkey ON public.pulse_coding_participants USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_coding_study_identity",
+        "table": "pulse_coding_studies",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_study_identity ON public.pulse_coding_studies USING btree (protocol_version, packet_set_sha256)"
+      },
+      {
+        "name": "idx_pulse_coding_study_status",
+        "table": "pulse_coding_studies",
+        "definition": "CREATE INDEX idx_pulse_coding_study_status ON public.pulse_coding_studies USING btree (status, created_at)"
+      },
+      {
+        "name": "pulse_coding_studies_pkey",
+        "table": "pulse_coding_studies",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_studies_pkey ON public.pulse_coding_studies USING btree (id)"
+      },
+      {
+        "name": "pulse_coding_studies_slug_unique",
+        "table": "pulse_coding_studies",
+        "definition": "CREATE UNIQUE INDEX pulse_coding_studies_slug_unique ON public.pulse_coding_studies USING btree (slug)"
+      },
+      {
         "name": "pulse_corrections_pkey",
         "table": "pulse_corrections",
         "definition": "CREATE UNIQUE INDEX pulse_corrections_pkey ON public.pulse_corrections USING btree (id)"
@@ -8305,6 +9142,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
+        "name": "civica_protect_locked_pulse_coding_assignment",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_locked_pulse_coding_assignment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'Pulse coding assignments cannot be deleted';\n  END IF;\n  IF OLD.status = 'locked' THEN\n    RAISE EXCEPTION 'Locked Pulse coding submissions are immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_protect_pulse_event_decisions",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_pulse_event_decisions()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse decisions are append-only; record a superseding decision instead';\nEND;\n$function$\n"
@@ -8315,9 +9157,24 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_pulse_raw_evidence()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'raw Pulse evidence is append-only';\n  END IF;\n  IF NEW.source_id IS DISTINCT FROM OLD.source_id\n     OR NEW.external_id IS DISTINCT FROM OLD.external_id\n     OR NEW.source_url IS DISTINCT FROM OLD.source_url\n     OR NEW.source_type IS DISTINCT FROM OLD.source_type\n     OR NEW.jurisdiction_id IS DISTINCT FROM OLD.jurisdiction_id\n     OR NEW.raw_country_name IS DISTINCT FROM OLD.raw_country_name\n     OR NEW.event_date IS DISTINCT FROM OLD.event_date\n     OR NEW.retrieved_at IS DISTINCT FROM OLD.retrieved_at\n     OR NEW.title IS DISTINCT FROM OLD.title\n     OR NEW.body IS DISTINCT FROM OLD.body\n     OR NEW.raw IS DISTINCT FROM OLD.raw\n     OR NEW.evidence_identity_key IS DISTINCT FROM OLD.evidence_identity_key\n     OR NEW.evidence_content_hash IS DISTINCT FROM OLD.evidence_content_hash\n     OR NEW.evidence_language IS DISTINCT FROM OLD.evidence_language\n     OR NEW.evidence_publisher IS DISTINCT FROM OLD.evidence_publisher\n     OR NEW.evidence_attribution IS DISTINCT FROM OLD.evidence_attribution\n     OR NEW.evidence_rights IS DISTINCT FROM OLD.evidence_rights\n     OR NEW.evidence_retention IS DISTINCT FROM OLD.evidence_retention THEN\n    RAISE EXCEPTION 'raw Pulse evidence identity is immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_protect_terminal_pulse_coding_adjudication",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_terminal_pulse_coding_adjudication()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'Pulse coding adjudications cannot be deleted';\n  END IF;\n  IF OLD.status IN ('resolved', 'unresolved') THEN\n    RAISE EXCEPTION 'Terminal Pulse coding adjudications are immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_pulse_coding_has_forbidden_field",
+        "identity": "payload jsonb",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_pulse_coding_has_forbidden_field(payload jsonb)\n RETURNS boolean\n LANGUAGE sql\n IMMUTABLE\nAS $function$\n  WITH RECURSIVE walk(value) AS (\n    SELECT COALESCE(payload, 'null'::jsonb)\n    UNION ALL\n    SELECT child.value\n    FROM walk\n    CROSS JOIN LATERAL (\n      SELECT entry.value\n      FROM jsonb_each(\n        CASE WHEN jsonb_typeof(walk.value) = 'object'\n          THEN walk.value ELSE '{}'::jsonb END\n      ) AS entry\n      UNION ALL\n      SELECT element.value\n      FROM jsonb_array_elements(\n        CASE WHEN jsonb_typeof(walk.value) = 'array'\n          THEN walk.value ELSE '[]'::jsonb END\n      ) AS element(value)\n    ) AS child\n  )\n  SELECT EXISTS (\n    SELECT 1\n    FROM walk\n    CROSS JOIN LATERAL jsonb_object_keys(\n      CASE WHEN jsonb_typeof(walk.value) = 'object'\n        THEN walk.value ELSE '{}'::jsonb END\n    ) AS object_key(key)\n    WHERE object_key.key IN (\n      'productionLabel', 'productionDisposition', 'publishedStatus',\n      'modelVote', 'modelConfidence', 'ownerApproval',\n      'otherCoderSubmission', 'adjudicatedAnswer', 'goldLabel', 'truth'\n    )\n  );\n$function$\n"
+      },
+      {
         "name": "civica_reject_frozen_vintage_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_frozen_vintage_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' OR OLD.vintage_label IS NOT NULL THEN\n    RAISE EXCEPTION 'frozen vintage % is immutable; publish a new superseding version', OLD.vintage_label;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_reject_pulse_coding_evidence_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_coding_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse coding packets and audit rows are append-only';\nEND;\n$function$\n"
       },
       {
         "name": "civica_reject_research_evidence_history_mutation",
@@ -8333,6 +9190,21 @@
         "name": "civica_validate_frozen_vintage_insert",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_frozen_vintage_insert()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  parsed text[];\n  published_period text;\n  prior_label text;\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' THEN\n    parsed := regexp_match(NEW.vintage_label, '^Civica Atlas Reconciled (v[^[:space:]]+) — vintage ([0-9]{4}-Q[1-4])$');\n    IF parsed IS NULL OR NEW.methodology_version <> parsed[1] THEN\n      RAISE EXCEPTION 'Atlas vintage label and methodology_version disagree';\n    END IF;\n    published_period := parsed[2];\n    SELECT vintage_label INTO prior_label FROM country_fact_vintages\n      WHERE vintage_label <> NEW.vintage_label\n        AND vintage_label LIKE '%vintage ' || published_period LIMIT 1;\n    IF prior_label IS NOT NULL AND NEW.supersedes_vintage_label IS NULL THEN\n      RAISE EXCEPTION 'corrected Atlas vintage must name supersedes_vintage_label';\n    END IF;\n  ELSE\n    IF NEW.vintage_label IS NULL THEN RETURN NEW; END IF;\n    parsed := regexp_match(NEW.vintage_label, '^Civica Index ([0-9]{4}) Q([1-4]) \\(([^)]+)\\)$');\n    IF parsed IS NULL OR NEW.quarter <> parsed[1] || '-Q' || parsed[2]\n       OR lower(NEW.methodology_version) <> lower(parsed[3]) THEN\n      RAISE EXCEPTION 'Civica Index vintage label, quarter, and methodology_version disagree';\n    END IF;\n    SELECT vintage_label INTO prior_label FROM ci_composite_scores\n      WHERE quarter = NEW.quarter AND vintage_label IS NOT NULL\n        AND vintage_label <> NEW.vintage_label LIMIT 1;\n    IF prior_label IS NOT NULL AND NEW.supersedes_vintage_label IS NULL THEN\n      RAISE EXCEPTION 'corrected Civica Index vintage must name supersedes_vintage_label';\n    END IF;\n  END IF;\n\n  IF NEW.supersedes_vintage_label IS NOT NULL AND NOT EXISTS (\n    SELECT 1 FROM (\n      SELECT vintage_label FROM country_fact_vintages WHERE TG_TABLE_NAME = 'country_fact_vintages'\n      UNION ALL\n      SELECT vintage_label FROM ci_composite_scores WHERE TG_TABLE_NAME = 'ci_composite_scores'\n    ) prior WHERE prior.vintage_label = NEW.supersedes_vintage_label\n  ) THEN\n    RAISE EXCEPTION 'supersedes_vintage_label does not identify an existing frozen vintage';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_pulse_coding_adjudication",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_coding_adjudication()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  comparison_packet uuid;\n  assignment_packet uuid;\n  assignment_slot text;\nBEGIN\n  SELECT packet_id\n  INTO comparison_packet\n  FROM pulse_coding_comparisons\n  WHERE id = NEW.comparison_id;\n\n  SELECT packet_id, slot\n  INTO assignment_packet, assignment_slot\n  FROM pulse_coding_assignments\n  WHERE id = NEW.adjudicator_assignment_id;\n\n  IF assignment_packet IS DISTINCT FROM comparison_packet\n     OR assignment_slot <> 'adjudicator' THEN\n    RAISE EXCEPTION 'Pulse coding adjudication requires the comparison packet adjudicator assignment';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_pulse_coding_assignment",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_coding_assignment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  participant_role text;\n  participant_study uuid;\n  packet_study uuid;\nBEGIN\n  SELECT role, study_id\n  INTO participant_role, participant_study\n  FROM pulse_coding_participants\n  WHERE id = NEW.participant_id;\n\n  SELECT study_id\n  INTO packet_study\n  FROM pulse_coding_packets\n  WHERE id = NEW.packet_id;\n\n  IF participant_study IS DISTINCT FROM packet_study THEN\n    RAISE EXCEPTION 'Pulse coding participant and packet belong to different studies';\n  END IF;\n  IF NEW.slot IN ('coder_a', 'coder_b') AND participant_role <> 'coder' THEN\n    RAISE EXCEPTION 'Pulse coding coder slots require a coder participant';\n  END IF;\n  IF NEW.slot = 'adjudicator' AND participant_role <> 'adjudicator' THEN\n    RAISE EXCEPTION 'Pulse coding adjudicator slot requires an adjudicator participant';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_pulse_coding_comparison",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_coding_comparison()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  assignment_a_packet uuid;\n  assignment_a_slot text;\n  assignment_a_status text;\n  assignment_b_packet uuid;\n  assignment_b_slot text;\n  assignment_b_status text;\nBEGIN\n  SELECT packet_id, slot, status\n  INTO assignment_a_packet, assignment_a_slot, assignment_a_status\n  FROM pulse_coding_assignments\n  WHERE id = NEW.coder_assignment_a_id;\n\n  SELECT packet_id, slot, status\n  INTO assignment_b_packet, assignment_b_slot, assignment_b_status\n  FROM pulse_coding_assignments\n  WHERE id = NEW.coder_assignment_b_id;\n\n  IF assignment_a_packet IS DISTINCT FROM NEW.packet_id\n     OR assignment_b_packet IS DISTINCT FROM NEW.packet_id\n     OR assignment_a_slot <> 'coder_a'\n     OR assignment_b_slot <> 'coder_b'\n     OR assignment_a_status <> 'locked'\n     OR assignment_b_status <> 'locked' THEN\n    RAISE EXCEPTION 'Pulse coding comparison requires both locked coder assignments for one packet';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "civica_validate_pulse_decision_supersession",
@@ -8722,6 +9594,46 @@
         "definition": "CREATE TRIGGER pulse_candidate_outcomes_append_only BEFORE DELETE OR UPDATE ON pulse_candidate_outcomes FOR EACH ROW EXECUTE FUNCTION reject_pulse_candidate_outcome_mutation()"
       },
       {
+        "name": "pulse_coding_adjudication_terminal_guard",
+        "table": "pulse_coding_adjudications",
+        "definition": "CREATE TRIGGER pulse_coding_adjudication_terminal_guard BEFORE DELETE OR UPDATE ON pulse_coding_adjudications FOR EACH ROW EXECUTE FUNCTION civica_protect_terminal_pulse_coding_adjudication()"
+      },
+      {
+        "name": "pulse_coding_adjudicator_guard",
+        "table": "pulse_coding_adjudications",
+        "definition": "CREATE TRIGGER pulse_coding_adjudicator_guard BEFORE INSERT OR UPDATE OF comparison_id, adjudicator_assignment_id ON pulse_coding_adjudications FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_coding_adjudication()"
+      },
+      {
+        "name": "pulse_coding_assignment_lock_guard",
+        "table": "pulse_coding_assignments",
+        "definition": "CREATE TRIGGER pulse_coding_assignment_lock_guard BEFORE DELETE OR UPDATE ON pulse_coding_assignments FOR EACH ROW EXECUTE FUNCTION civica_protect_locked_pulse_coding_assignment()"
+      },
+      {
+        "name": "pulse_coding_assignment_role_guard",
+        "table": "pulse_coding_assignments",
+        "definition": "CREATE TRIGGER pulse_coding_assignment_role_guard BEFORE INSERT OR UPDATE OF packet_id, participant_id, slot ON pulse_coding_assignments FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_coding_assignment()"
+      },
+      {
+        "name": "pulse_coding_audit_append_only",
+        "table": "pulse_coding_audit_log",
+        "definition": "CREATE TRIGGER pulse_coding_audit_append_only BEFORE DELETE OR UPDATE ON pulse_coding_audit_log FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_coding_evidence_mutation()"
+      },
+      {
+        "name": "pulse_coding_comparison_assignment_guard",
+        "table": "pulse_coding_comparisons",
+        "definition": "CREATE TRIGGER pulse_coding_comparison_assignment_guard BEFORE INSERT ON pulse_coding_comparisons FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_coding_comparison()"
+      },
+      {
+        "name": "pulse_coding_comparisons_append_only",
+        "table": "pulse_coding_comparisons",
+        "definition": "CREATE TRIGGER pulse_coding_comparisons_append_only BEFORE DELETE OR UPDATE ON pulse_coding_comparisons FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_coding_evidence_mutation()"
+      },
+      {
+        "name": "pulse_coding_packets_append_only",
+        "table": "pulse_coding_packets",
+        "definition": "CREATE TRIGGER pulse_coding_packets_append_only BEFORE DELETE OR UPDATE ON pulse_coding_packets FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_coding_evidence_mutation()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "pulse_dimensional_deltas",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_dimensional_deltas FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -9026,6 +9938,41 @@
       {
         "kind": "r",
         "name": "pulse_changelog",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_adjudications",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_assignments",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_audit_log",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_comparisons",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_packets",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_participants",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_coding_studies",
         "definition": null
       },
       {
@@ -9922,6 +10869,222 @@
         "type": "p",
         "table": "pulse_changelog",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_adjudications_adjudicator_assignment_id_pulse_codi",
+        "type": "f",
+        "table": "pulse_coding_adjudications",
+        "definition": "FOREIGN KEY (adjudicator_assignment_id) REFERENCES pulse_coding_assignments(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_adjudications_blind_payload_check",
+        "type": "c",
+        "table": "pulse_coding_adjudications",
+        "definition": "CHECK (NOT civica_pulse_coding_has_forbidden_field(resolution))"
+      },
+      {
+        "name": "pulse_coding_adjudications_comparison_id_pulse_coding_compariso",
+        "type": "f",
+        "table": "pulse_coding_adjudications",
+        "definition": "FOREIGN KEY (comparison_id) REFERENCES pulse_coding_comparisons(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_adjudications_comparison_id_unique",
+        "type": "u",
+        "table": "pulse_coding_adjudications",
+        "definition": "UNIQUE (comparison_id)"
+      },
+      {
+        "name": "pulse_coding_adjudications_contract_check",
+        "type": "c",
+        "table": "pulse_coding_adjudications",
+        "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'resolved'::text, 'unresolved'::text])) AND (status = 'pending'::text AND resolution IS NULL AND resolution_sha256 IS NULL AND resolved_at IS NULL OR (status = ANY (ARRAY['resolved'::text, 'unresolved'::text])) AND resolution IS NOT NULL AND resolution_sha256 ~ '^[a-f0-9]{64}$'::text AND resolved_at IS NOT NULL AND cardinality(reason_codes) > 0))"
+      },
+      {
+        "name": "pulse_coding_adjudications_pkey",
+        "type": "p",
+        "table": "pulse_coding_adjudications",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_assignments_blind_payload_check",
+        "type": "c",
+        "table": "pulse_coding_assignments",
+        "definition": "CHECK (NOT civica_pulse_coding_has_forbidden_field(draft) AND NOT civica_pulse_coding_has_forbidden_field(submission))"
+      },
+      {
+        "name": "pulse_coding_assignments_contract_check",
+        "type": "c",
+        "table": "pulse_coding_assignments",
+        "definition": "CHECK ((slot = ANY (ARRAY['coder_a'::text, 'coder_b'::text, 'adjudicator'::text])) AND (status = ANY (ARRAY['assigned'::text, 'draft'::text, 'locked'::text])) AND (draft_sha256 IS NULL OR draft_sha256 ~ '^[a-f0-9]{64}$'::text) AND (submission_sha256 IS NULL OR submission_sha256 ~ '^[a-f0-9]{64}$'::text) AND (status = 'locked'::text AND submission IS NOT NULL AND submission_sha256 IS NOT NULL AND locked_at IS NOT NULL OR status <> 'locked'::text AND submission IS NULL AND submission_sha256 IS NULL AND locked_at IS NULL))"
+      },
+      {
+        "name": "pulse_coding_assignments_packet_id_pulse_coding_packets_id_fk",
+        "type": "f",
+        "table": "pulse_coding_assignments",
+        "definition": "FOREIGN KEY (packet_id) REFERENCES pulse_coding_packets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_assignments_participant_id_pulse_coding_participan",
+        "type": "f",
+        "table": "pulse_coding_assignments",
+        "definition": "FOREIGN KEY (participant_id) REFERENCES pulse_coding_participants(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_assignments_pkey",
+        "type": "p",
+        "table": "pulse_coding_assignments",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_audit_blind_payload_check",
+        "type": "c",
+        "table": "pulse_coding_audit_log",
+        "definition": "CHECK (NOT civica_pulse_coding_has_forbidden_field(details))"
+      },
+      {
+        "name": "pulse_coding_audit_contract_check",
+        "type": "c",
+        "table": "pulse_coding_audit_log",
+        "definition": "CHECK ((actor_role = ANY (ARRAY['coder'::text, 'adjudicator'::text, 'study_admin'::text, 'system'::text, 'anonymous'::text])) AND (action = ANY (ARRAY['study_created'::text, 'packet_imported'::text, 'participant_issued'::text, 'participant_revoked'::text, 'assignment_created'::text, 'draft_saved'::text, 'submission_locked'::text, 'comparison_generated'::text, 'adjudication_recorded'::text, 'export_generated'::text, 'access_granted'::text, 'access_denied'::text])) AND entity_type <> ''::text AND jsonb_typeof(details) = 'object'::text AND (before_sha256 IS NULL OR before_sha256 ~ '^[a-f0-9]{64}$'::text) AND (after_sha256 IS NULL OR after_sha256 ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "name": "pulse_coding_audit_log_packet_id_pulse_coding_packets_id_fk",
+        "type": "f",
+        "table": "pulse_coding_audit_log",
+        "definition": "FOREIGN KEY (packet_id) REFERENCES pulse_coding_packets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_audit_log_participant_id_pulse_coding_participants",
+        "type": "f",
+        "table": "pulse_coding_audit_log",
+        "definition": "FOREIGN KEY (participant_id) REFERENCES pulse_coding_participants(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_audit_log_pkey",
+        "type": "p",
+        "table": "pulse_coding_audit_log",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_audit_log_request_id_unique",
+        "type": "u",
+        "table": "pulse_coding_audit_log",
+        "definition": "UNIQUE (request_id)"
+      },
+      {
+        "name": "pulse_coding_audit_log_study_id_pulse_coding_studies_id_fk",
+        "type": "f",
+        "table": "pulse_coding_audit_log",
+        "definition": "FOREIGN KEY (study_id) REFERENCES pulse_coding_studies(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_comparisons_blind_payload_check",
+        "type": "c",
+        "table": "pulse_coding_comparisons",
+        "definition": "CHECK (NOT civica_pulse_coding_has_forbidden_field(comparison))"
+      },
+      {
+        "name": "pulse_coding_comparisons_coder_assignment_a_id_pulse_coding_ass",
+        "type": "f",
+        "table": "pulse_coding_comparisons",
+        "definition": "FOREIGN KEY (coder_assignment_a_id) REFERENCES pulse_coding_assignments(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_comparisons_coder_assignment_b_id_pulse_coding_ass",
+        "type": "f",
+        "table": "pulse_coding_comparisons",
+        "definition": "FOREIGN KEY (coder_assignment_b_id) REFERENCES pulse_coding_assignments(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_comparisons_contract_check",
+        "type": "c",
+        "table": "pulse_coding_comparisons",
+        "definition": "CHECK (coder_assignment_a_id <> coder_assignment_b_id AND comparison_sha256 ~ '^[a-f0-9]{64}$'::text AND jsonb_typeof(comparison) = 'object'::text)"
+      },
+      {
+        "name": "pulse_coding_comparisons_packet_id_pulse_coding_packets_id_fk",
+        "type": "f",
+        "table": "pulse_coding_comparisons",
+        "definition": "FOREIGN KEY (packet_id) REFERENCES pulse_coding_packets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_comparisons_packet_id_unique",
+        "type": "u",
+        "table": "pulse_coding_comparisons",
+        "definition": "UNIQUE (packet_id)"
+      },
+      {
+        "name": "pulse_coding_comparisons_pkey",
+        "type": "p",
+        "table": "pulse_coding_comparisons",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_packets_blind_payload_check",
+        "type": "c",
+        "table": "pulse_coding_packets",
+        "definition": "CHECK (NOT civica_pulse_coding_has_forbidden_field(packet_snapshot))"
+      },
+      {
+        "name": "pulse_coding_packets_contract_check",
+        "type": "c",
+        "table": "pulse_coding_packets",
+        "definition": "CHECK ((analysis_status = ANY (ARRAY['analysis_candidate'::text, 'reserve'::text, 'pilot'::text])) AND packet_snapshot_sha256 ~ '^[a-f0-9]{64}$'::text AND jsonb_typeof(packet_snapshot) = 'object'::text)"
+      },
+      {
+        "name": "pulse_coding_packets_pkey",
+        "type": "p",
+        "table": "pulse_coding_packets",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_packets_study_id_pulse_coding_studies_id_fk",
+        "type": "f",
+        "table": "pulse_coding_packets",
+        "definition": "FOREIGN KEY (study_id) REFERENCES pulse_coding_studies(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_participants_contract_check",
+        "type": "c",
+        "table": "pulse_coding_participants",
+        "definition": "CHECK ((role = ANY (ARRAY['coder'::text, 'adjudicator'::text, 'study_admin'::text])) AND (actor_type = ANY (ARRAY['qualified_human'::text, 'agent_dry_pilot'::text])) AND (use_status = ANY (ARRAY['evaluation_candidate'::text, 'dry_run_not_gold'::text])) AND (status = ANY (ARRAY['active'::text, 'revoked'::text])) AND credential_hash ~ '^[a-f0-9]{64}$'::text AND (actor_type <> 'agent_dry_pilot'::text OR use_status = 'dry_run_not_gold'::text))"
+      },
+      {
+        "name": "pulse_coding_participants_credential_hash_unique",
+        "type": "u",
+        "table": "pulse_coding_participants",
+        "definition": "UNIQUE (credential_hash)"
+      },
+      {
+        "name": "pulse_coding_participants_pkey",
+        "type": "p",
+        "table": "pulse_coding_participants",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_participants_study_id_pulse_coding_studies_id_fk",
+        "type": "f",
+        "table": "pulse_coding_participants",
+        "definition": "FOREIGN KEY (study_id) REFERENCES pulse_coding_studies(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_studies_contract_check",
+        "type": "c",
+        "table": "pulse_coding_studies",
+        "definition": "CHECK (schema_version = 'pulse-coding-workspace/v1'::text AND (purpose = ANY (ARRAY['instruction_pilot'::text, 'evaluation'::text])) AND (status = ANY (ARRAY['setup'::text, 'active'::text, 'closed'::text])) AND protocol_version <> ''::text AND codebook_version <> ''::text AND ontology_version <> ''::text AND dataset_version <> ''::text AND packet_set_sha256 ~ '^[a-f0-9]{64}$'::text AND (trace_set_sha256 IS NULL OR trace_set_sha256 ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "name": "pulse_coding_studies_pkey",
+        "type": "p",
+        "table": "pulse_coding_studies",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_coding_studies_slug_unique",
+        "type": "u",
+        "table": "pulse_coding_studies",
+        "definition": "UNIQUE (slug)"
       },
       {
         "name": "pulse_corrections_country_id_jurisdictions_id_fk",

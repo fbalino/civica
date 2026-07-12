@@ -144,7 +144,19 @@ export interface PulseCoderEvidence {
   text: string;
 }
 
-export interface PulseCoderPilotPacket {
+export interface PulseCoderPacket {
+  id: string;
+  date: string;
+  searchFamilies: string[];
+  telemetry: {
+    outage: boolean;
+    note: string;
+  };
+  informationEnvironment: "restricted_sourced" | "not_supplied";
+  evidence: PulseCoderEvidence[];
+}
+
+export interface PulseCoderPilotPacket extends PulseCoderPacket {
   id: string;
   split: "training" | "blind_pilot";
   synthetic: true;
@@ -179,15 +191,7 @@ export interface PulseCandidateEvent {
   ambiguityReason: string;
 }
 
-export interface PulseCoderSubmission {
-  schemaVersion: typeof PULSE_INDEPENDENT_CODING_VERSION;
-  pilotVersion: typeof PULSE_CODER_PILOT_VERSION;
-  packetId: string;
-  coderId: string;
-  coderType: "qualified_human" | "agent_dry_pilot";
-  useStatus: "evaluation_candidate" | "dry_run_not_gold";
-  submittedAt: string;
-  locked: true;
+export interface PulseCoderAnswer {
   packetOutcome: PulsePacketOutcome;
   observationState: PulseCoderObservationState;
   observationRationale: string;
@@ -197,15 +201,26 @@ export interface PulseCoderSubmission {
   coderNotes: string;
 }
 
+export interface PulseCoderSubmission extends PulseCoderAnswer {
+  schemaVersion: typeof PULSE_INDEPENDENT_CODING_VERSION;
+  pilotVersion: typeof PULSE_CODER_PILOT_VERSION;
+  packetId: string;
+  coderId: string;
+  coderType: "qualified_human" | "agent_dry_pilot";
+  useStatus: "evaluation_candidate" | "dry_run_not_gold";
+  submittedAt: string;
+  locked: true;
+}
+
 type JsonRecord = Record<string, unknown>;
 
-function hasForbiddenField(value: unknown): boolean {
-  if (Array.isArray(value)) return value.some(hasForbiddenField);
+export function containsPulseCoderForbiddenField(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(containsPulseCoderForbiddenField);
   if (!value || typeof value !== "object") return false;
   return Object.entries(value as JsonRecord).some(
     ([key, child]) =>
       (PULSE_CODER_FORBIDDEN_FIELDS as readonly string[]).includes(key) ||
-      hasForbiddenField(child),
+      containsPulseCoderForbiddenField(child),
   );
 }
 
@@ -244,7 +259,7 @@ export function pulseCoderPilotErrors(artifact: JsonRecord): string[] {
       errors.push(`${packet.id}: answer leaked into blind pilot`);
     if (packet.split === "training" && !packet.teachingAnswer)
       errors.push(`${packet.id}: training answer is missing`);
-    if (hasForbiddenField(packet))
+    if (containsPulseCoderForbiddenField(packet))
       errors.push(`${packet.id}: forbidden blind field leaked`);
   }
   const body = { ...artifact };
@@ -259,7 +274,7 @@ export function pulseCoderPilotErrors(artifact: JsonRecord): string[] {
 
 export function pulseCoderSubmissionErrors(
   submission: PulseCoderSubmission,
-  packet?: PulseCoderPilotPacket,
+  packet?: PulseCoderPacket,
 ): string[] {
   const errors: string[] = [];
   if (submission.schemaVersion !== PULSE_INDEPENDENT_CODING_VERSION)
@@ -276,7 +291,7 @@ export function pulseCoderSubmissionErrors(
     errors.push("unknown observation state");
   if (!submission.observationRationale.trim())
     errors.push("observation rationale is blank");
-  if (hasForbiddenField(submission)) errors.push("forbidden blind field leaked");
+  if (containsPulseCoderForbiddenField(submission)) errors.push("forbidden blind field leaked");
   if (packet && submission.packetId !== packet.id)
     errors.push("submission points to another packet");
   const packetEvidence = new Map(
