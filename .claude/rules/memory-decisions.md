@@ -929,3 +929,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - `/admin/pulse-coding` is structurally separate from production review. Coders never receive peer labels, including after lock.
 - Raw locks, comparisons, terminal adjudications, and substantive audit history are database-enforced; owner access remains status-only until a study is closed and disagreements are terminal.
 - Export timestamps and export-log rows do not affect the semantic hash. Agent and synthetic records stay non-gold. Durable record: APR-D125.
+
+## 2026-07-11 — Human coding budgets every initial assignment
+
+- The preparation baseline covers 1,456 initial packets and 2,912 blind assignments, including work that later proves unusable.
+- Four coders and two separate adjudicators are the working structure. All training, qualification, clarification, and adjudication time is paid hourly.
+- The $45,615 base plan is unapproved and must be replaced by a 30-packet human timing pilot. No contact before G4 or PUL-041. Durable record: APR-D126.

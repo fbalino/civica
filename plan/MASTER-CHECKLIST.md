@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 297
-- **Completed:** 108
+- **Total tasks:** 298
+- **Completed:** 109
 - **Remaining:** 189
-- **Progress:** 36.4%
-- **Priority mix:** P0 183 · P1 109 · P2 5
+- **Progress:** 36.6%
+- **Priority mix:** P0 184 · P1 109 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -161,8 +161,9 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [ ] **PUL-036** (P0) Derive ensemble agreement and publication eligibility only from stored independent runs. _Done when: no script/admin/subscription path can write a literal unsupported `two_of_three`/`all`, agreement is recomputed from provider/model/prompt-versioned runs, product-specific Pulse metadata replaces CI metadata in all APIs, and one-run auto-publication fixtures fail._
 - [ ] **PUL-037** (P0) Redesign decoupling/absorption as versioned evidence rather than destructive confidence mutation. _Done when: only comparable fixed-scale CI releases and an explicit linked event can support absorption, absorption is stored separately with method/as-of/reason, later corroboration cannot erase it, and reruns are stable with historical auditability._
 - [ ] **PUL-038** (P0) Make press/information-environment context immutable, complete, and noninvented. _Done when: a verified official dataset/version covers supported jurisdictions, each event pins the exact value/source/vintage at classification, unknown remains unknown rather than default 50, reruns cannot overwrite the pin, and sensitivity/observability use is documented._
-- [ ] **PUL-039** (P1) Prepare the independent-coder recruitment package before any human contact. _Done when: a role specification records required qualifications, blinding/independence and conflict rules, estimated packet workload and hours derived from the frozen evaluation sets, training and qualification steps, and compensation options with realistic cost ranges; candidate sourcing pools and draft outreach copy exist; the owner approval ask with a lead-time estimate is queued in `plan/MANUAL-CHECKS.md`; and no candidate has been contacted._
+- [x] **PUL-039** (P1) Prepare the independent-coder recruitment package before any human contact. _Done when: a role specification records required qualifications, blinding/independence and conflict rules, estimated packet workload and hours derived from the frozen evaluation sets, training and qualification steps, and compensation options with realistic cost ranges; candidate sourcing pools and draft outreach copy exist; the owner approval ask with a lead-time estimate is queued in `plan/MANUAL-CHECKS.md`; and no candidate has been contacted._
 - [ ] **PUL-040** (P1) Start the prospective shadow-period clock at the earliest protocol-valid date. _Done when: the preregistered protocol's start prerequisites are enumerated with current status, the earliest compliant start date is computed and recorded, pipeline and method versions for the window are frozen, window output retention is verified running before human labels exist, and the start decision is logged in evidence and `plan/PROGRESS.md`._
+- [ ] **PUL-041** (P0) Materialize the remaining coder-ready evaluation packet releases. _Done when: the 384-item event-candidate census and 536-item system-negative draw exist as rights-safe unlabeled frozen packets with exact evidence/search context, packet/codebook/ontology hashes, analysis/reserve status, zero production/model/owner answer fields, workspace import support, and validators proving their counts and linkage to `pulse-evaluation-sampling-frame/v1` before recruitment or PUL-018 runs._
 
 ## Area 06 — Atlas Content and Research Features
 

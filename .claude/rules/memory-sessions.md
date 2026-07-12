@@ -685,3 +685,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - A dedicated coder/adjudicator application now enforces separate sessions, blind raw labels, immutable locks, separate adjudication, and stable audit exports across routes and database triggers.
 - The live 12-packet dry pilot retains 24 locked submissions, 12 comparisons, and three unresolved disagreements; all temporary access is revoked.
 - Browser QA, the 23-migration live ledger, 823 tests, claims, TypeScript, and the production build pass. PUL-018 is next.
+
+## 2026-07-11 — PUL-039 coder recruitment preparation completed
+
+- Prepared role, independence, conflict, qualification, sourcing, outreach, timing, and compensation materials without contacting anyone.
+- Executable planning covers 1,456 initial packets and 2,912 assignments; the base budget is $45,615 pending owner approval and a paid timing pilot.
+- Spark's read-only audit exposed that two coder-ready packet releases are still missing. PUL-041 now owns them before recruitment or PUL-018.
