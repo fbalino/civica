@@ -728,3 +728,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Client/server validation, durable hashed rate limiting, honeypot handling, explicit storage failure, protected admin delivery, retention deadline, and confirmed deletion are executable.
 - New rows retain no applicant IP. The form and `/privacy#applications` publish the fields, purpose, access, processors, 18-month retention, deletion, security, and onscreen-only response terms.
 - While verifying GOV-007, the build exposed reference-header drift that shortened the required country-art disclosure; EXP-043 restored `Editorial engraving` and the licensing gate.
+
+## 2026-07-12 — EXP-005 engraving contract completed
+
+- Adopted the owner-approved Japan light reference and strength-60 dark grade as `civica-engraving-color/v1`.
+- Added exact asset hashes, measurable tone/saturation/warmth/contrast ranges, line/geometry and landmark invariants, delivery rules, and too-warm/too-cool/style/outlier examples.
+- Added a machine contract and validator, chained through the editorial-illustration build gate.
