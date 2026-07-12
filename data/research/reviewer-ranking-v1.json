@@ -1,0 +1,448 @@
+{
+  "schemaVersion": "civica-reviewer-ranking/v1",
+  "criteriaVersion": "civica-reviewer-selection/v1",
+  "longlistVersion": "civica-reviewer-longlist/v1",
+  "status": "draft_shortlist_owner_approval_required",
+  "contactStatus": "none",
+  "unknownPolicy": "Availability and communication burden remain zero-score unknowns until lawful post-GOV-016 contact; zero is not a negative finding.",
+  "rubric": {
+    "expertise": {
+      "weight": 25,
+      "scale": "0-5",
+      "evidence": "lane-specific methods record"
+    },
+    "exactTaskFit": {
+      "weight": 25,
+      "scale": "0-5",
+      "evidence": "fit to the bounded Civica packet/question"
+    },
+    "independence": {
+      "weight": 15,
+      "scale": "0-5",
+      "evidence": "distance from Civica and the judgment under review"
+    },
+    "conflictManageability": {
+      "weight": 10,
+      "scale": "0-5",
+      "evidence": "whether disclosure, pairing, or recusal can protect the judgment"
+    },
+    "perspectiveContribution": {
+      "weight": 15,
+      "scale": "0-5",
+      "evidence": "method/geographic/institutional contribution relative to the lane"
+    },
+    "availabilitySignal": {
+      "weight": 5,
+      "scale": "0-5",
+      "evidence": "only explicit public availability for this kind of review; unknown receives zero and is not guessed"
+    },
+    "communicationBurden": {
+      "weight": 5,
+      "scale": "0-5",
+      "evidence": "only public evidence that the exact scope/channel creates unusual burden; unknown receives zero and is not guessed"
+    },
+    "scoring": "sum(weight * score / 5); ties resolve by expertise, exact fit, independence, then stable candidate id"
+  },
+  "lanes": [
+    {
+      "lane": "governance_measurement",
+      "ranked": [
+        {
+          "candidateId": "gov-a-little",
+          "name": "Andrew T. Little",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 1,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-a-munck",
+          "name": "Gerardo L. Munck",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 2,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-a-claassen",
+          "name": "Christopher Claassen",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 82,
+          "rank": 3,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-a-meng",
+          "name": "Anne Meng",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 82,
+          "rank": 4,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-a-pemstein",
+          "name": "Daniel Pemstein",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 2,
+            "conflictManageability": 3,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 77,
+          "rank": 5,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-a-marquardt",
+          "name": "Kyle L. Marquardt",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 2,
+            "conflictManageability": 3,
+            "perspectiveContribution": 3,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 71,
+          "rank": 6,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-a-maerz",
+          "name": "Seraphine F. Maerz",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 2,
+            "conflictManageability": 3,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 67,
+          "rank": 7,
+          "disposition": "reserve"
+        },
+        {
+          "candidateId": "gov-a-boese",
+          "name": "Vanessa A. Boese-Schlosser",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 2,
+            "conflictManageability": 3,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 64,
+          "rank": 8,
+          "disposition": "reserve"
+        }
+      ]
+    },
+    {
+      "lane": "political_event_data",
+      "ranked": [
+        {
+          "candidateId": "gov-b-restrepo",
+          "name": "Jorge A. Restrepo",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 1,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-b-weidmann",
+          "name": "Nils B. Weidmann",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 2,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-b-brandt",
+          "name": "Patrick T. Brandt",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 4,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 87,
+          "rank": 3,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-b-osorio",
+          "name": "Javier Osorio",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 4,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 87,
+          "rank": 4,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-b-radford",
+          "name": "Benjamin J. Radford",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 85,
+          "rank": 5,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-b-dorazio",
+          "name": "Vito D'Orazio",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 4,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 84,
+          "rank": 6,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-b-nussio",
+          "name": "Enzo Nussio",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 80,
+          "rank": 7,
+          "disposition": "reserve"
+        },
+        {
+          "candidateId": "gov-b-pinckney",
+          "name": "Jonathan Pinckney",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 77,
+          "rank": 8,
+          "disposition": "reserve"
+        }
+      ]
+    },
+    {
+      "lane": "research_data_curation",
+      "ranked": [
+        {
+          "candidateId": "gov-c-karcher",
+          "name": "Sebastian Karcher",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 1,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-c-simons",
+          "name": "Natasha Simons",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 2,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-c-vilhuber",
+          "name": "Lars Vilhuber",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 90,
+          "rank": 3,
+          "disposition": "proposed_primary"
+        },
+        {
+          "candidateId": "gov-c-peer",
+          "name": "Limor Peer",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 87,
+          "rank": 4,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-c-zenk",
+          "name": "Wolfgang Zenk-Möltgen",
+          "scores": {
+            "expertise": 5,
+            "exactTaskFit": 5,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 87,
+          "rank": 5,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-c-owango",
+          "name": "Joy Owango",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 5,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 80,
+          "rank": 6,
+          "disposition": "alternate"
+        },
+        {
+          "candidateId": "gov-c-briney",
+          "name": "Kristin Briney",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 77,
+          "rank": 7,
+          "disposition": "reserve"
+        },
+        {
+          "candidateId": "gov-c-hoces",
+          "name": "Fernando Hoces de la Guardia",
+          "scores": {
+            "expertise": 4,
+            "exactTaskFit": 4,
+            "independence": 5,
+            "conflictManageability": 5,
+            "perspectiveContribution": 4,
+            "availabilitySignal": 0,
+            "communicationBurden": 0
+          },
+          "total": 77,
+          "rank": 8,
+          "disposition": "reserve"
+        }
+      ]
+    }
+  ],
+  "semanticSha256": "641abae9b21590b0eac24cba19a99214d4784ee90d6c4c3469e112f40996487d"
+}

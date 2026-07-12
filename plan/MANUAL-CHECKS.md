@@ -20,6 +20,7 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - Select one of three design-system-compliant Explore navigation concepts before new artwork or final implementation.
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
+- **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
 - Approve the final public disposition of each experimental measurement after its resolution and external review are complete.
 - **PUL-039 · Owner:** approve the independent-coder recruitment plan — candidate pool, compensation posture and budget ceiling, blinding/independence terms, and start timing — before any candidate is contacted. Allow six to eight weeks after contact authorization to recruit, screen, contract, train, and qualify the panel. PUL-041's packet prerequisite is complete; external contact remains blocked until G4 and this approval.
 
