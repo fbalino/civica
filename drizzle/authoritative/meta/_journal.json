@@ -162,6 +162,13 @@
       "when": 1783814096079,
       "tag": "0022_puzzling_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1783838792420,
+      "tag": "0023_wide_gorilla_man",
+      "breakpoints": true
     }
   ]
 }

@@ -139,4 +139,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "2ae084640c77328d440b7f7a059c395b6a62ba2e93e08b44c1fd4e4f9507cf02",
     baseline: false,
   },
+  {
+    id: "0023_wide_gorilla_man",
+    path: "drizzle/authoritative/0023_wide_gorilla_man.sql",
+    sha256: "3e561cffdaaeb6ed1a1c42527f97e8775012ba00a87c26d5e2b68ddfcf2efef8",
+    baseline: false,
+  },
 ] as const;

@@ -770,3 +770,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Split the noninteractive map preview, full-tile activation button, and provider attribution into sibling elements with independent accessible names.
 - Disabled MapLibre attribution injection for previews while retaining it in interactive maps; OpenStreetMap and Protomaps/OpenFreeMap remain separately linked beside the tile.
 - Pointer activation, focus restoration, Enter activation, zero nested controls, and two attribution links passed in the local browser.
+
+## 2026-07-12 — PUL-031 stable incident repair completed
+
+- Added stable Pulse incidents, append-only report assignments and resolution findings, current/superseded/quarantined event projections, and exact live invariants.
+- Applied the hash-pinned repair: five confirmed duplicate pairs, 474 review-only candidates, 380 current projections, and fresh corroboration and score runs.
+- Drained all 128 waiting reports after recovering one failed partial cluster run without deleting evidence. Claims, 883 tests, TypeScript, build, migration, retention, runtime, live invariants, and the Pulse methodology browser check passed.

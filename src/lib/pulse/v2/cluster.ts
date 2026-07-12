@@ -13,7 +13,7 @@
  * union-find is O(N²) within a capped run and date-window pruning keeps it bounded.
  */
 
-import { createHash, randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import { eq, isNull } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { rawEvents } from "@/lib/db/schema";
@@ -24,21 +24,33 @@ import {
   normalizeEventIdentity,
 } from "./event-identity";
 import {
+  PULSE_INCIDENT_RESOLUTION_VERSION,
+  planIncidentResolution,
+  selectCanonicalIncident,
+  type IncidentCandidate,
+} from "./incident-resolution";
+import {
+  PULSE_INCIDENT_ASSIGNMENT_ALGORITHM_VERSION,
+  PULSE_INCIDENT_ASSIGNMENT_SCHEMA_VERSION,
+  appendIncidentResolution,
+  assignRawReportToIncident,
+  attachAssignedEvidenceToCurrentEvent,
+  buildIncidentAssignmentKey,
+  buildIncidentResolutionKey,
+  insertNewIncident,
+  loadActiveIncidentCandidates,
+  type IncidentAssignmentPlan,
+  type IncidentResolutionRecordPlan,
+  type NewIncidentPlan,
+} from "./incident-store";
+import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
 
-// Jaccard threshold for the lexical fallback — a pair of stories sharing this
-// fraction of their significant tokens is treated as the same event. Higher
-// than the cosine threshold because token overlap is a coarser signal.
-export const LEXICAL_SIM_THRESHOLD = 0.42;
-
 type Db = NeonHttpDatabase<typeof schema>;
-
-/** Cosine-similarity threshold for grouping records into one cluster. */
-export const CLUSTER_SIM_THRESHOLD = 0.75;
 
 /** Date-window half-width in hours per spec §2.4. */
 export const CLUSTER_DATE_WINDOW_HOURS = 48;
@@ -52,6 +64,10 @@ export interface ClusterRunSummary {
   clustered: number;
   /** Distinct cluster ids written */
   clustersCreated: number;
+  /** New reports attached to an already stable incident. */
+  matchedPersistedIncidents: number;
+  /** Possible collisions retained for review rather than auto-merged. */
+  collisionCandidates: number;
   comparisonPairs: number;
   /** Clusters with more than one source id. */
   multiSourceClusters: number;
@@ -62,7 +78,12 @@ export interface ClusterRunSummary {
   /** Clusters whose members had different or missing provisional jurisdictions. */
   crossJurisdictionClusters: number;
   dryRun: boolean;
-  assignments: Array<{ clusterId: string; memberIds: string[] }>;
+  assignments: Array<{
+    clusterId: string;
+    incidentId: string;
+    memberIds: string[];
+    matchKind: "new" | "persisted_match";
+  }>;
 }
 
 export interface CandidateRow {
@@ -72,9 +93,29 @@ export interface CandidateRow {
   title: string;
   body: string | null;
   sourceId: string;
+  sourceType?: string;
+  sourceUrl?: string | null;
   sourceFamilyId: string;
   language: string;
   ingestRunId: string;
+  origin?: "new" | "persisted";
+  incidentId?: string;
+  eventId?: string | null;
+  clusterId?: string | null;
+  embedding?: number[] | null;
+}
+
+interface IncidentPersistence {
+  insertIncident: (db: Db, plan: NewIncidentPlan) => Promise<string>;
+  assignReport: (db: Db, plan: IncidentAssignmentPlan) => Promise<void>;
+  attachEvidence: (
+    db: Db,
+    plan: Parameters<typeof attachAssignedEvidenceToCurrentEvent>[1],
+  ) => Promise<void>;
+  appendResolution: (
+    db: Db,
+    plan: IncidentResolutionRecordPlan,
+  ) => Promise<void>;
 }
 
 export interface ClusterRunOptions {
@@ -82,11 +123,14 @@ export interface ClusterRunOptions {
   dryRun?: boolean;
   /** Fixture seam: bypasses the database candidate read. */
   candidates?: CandidateRow[];
+  /** Fixture seam for already persisted stable incidents. */
+  persistedIncidents?: IncidentCandidate[];
   /** Fixture seam: null forces lexical clustering; an array supplies vectors. */
   embeddingResult?: number[][] | null;
   now?: Date;
   clusterIdFactory?: (memberIds: readonly string[]) => string;
   runRef?: PulsePipelineRunRef;
+  incidentPersistence?: IncidentPersistence;
 }
 
 function deterministicFixtureClusterId(memberIds: readonly string[]): string {
@@ -131,7 +175,7 @@ export async function runClustering(
 
   // Pull every unclustered candidate. A provisional country must never prevent
   // two reports about the same event from meeting.
-  const candidates: CandidateRow[] =
+  const newCandidates: CandidateRow[] =
     opts.candidates ??
     (
       await db
@@ -142,6 +186,9 @@ export async function runClustering(
           title: rawEvents.title,
           body: rawEvents.body,
           sourceId: rawEvents.sourceId,
+          sourceType: rawEvents.sourceType,
+          sourceUrl: rawEvents.sourceUrl,
+          embedding: rawEvents.embedding,
           evidenceLanguage: rawEvents.evidenceLanguage,
           evidencePublisher: rawEvents.evidencePublisher,
           ingestRunId: rawEvents.ingestRunId,
@@ -156,24 +203,28 @@ export async function runClustering(
       title: row.title,
       body: row.body,
       sourceId: row.sourceId,
+      sourceType: row.sourceType,
+      sourceUrl: row.sourceUrl,
       sourceFamilyId: row.evidencePublisher.sourceFamilyId,
       language: row.evidenceLanguage,
       ingestRunId: row.ingestRunId,
+      embedding: row.embedding,
+      origin: "new" as const,
     }));
 
-  validateCandidates(candidates);
+  validateCandidates(newCandidates);
   const run =
     opts.runRef ??
     createPulsePipelineRunRef("cluster", {
-      sourceIds: candidates.length
-        ? candidates.map(({ sourceId }) => sourceId)
+      sourceIds: newCandidates.length
+        ? newCandidates.map(({ sourceId }) => sourceId)
         : undefined,
-      upstreamRunIds: candidates.map(({ ingestRunId }) => ingestRunId),
+      upstreamRunIds: newCandidates.map(({ ingestRunId }) => ingestRunId),
     });
   const persistRun = !opts.dryRun && !opts.candidates && !opts.runRef;
   if (persistRun) await startPulsePipelineRun(db, run);
 
-  if (candidates.length === 0) {
+  if (newCandidates.length === 0) {
     if (persistRun) {
       await finishPulsePipelineRun(db, run.id, {
         status: "completed",
@@ -186,6 +237,8 @@ export async function runClustering(
       candidates: 0,
       clustered: 0,
       clustersCreated: 0,
+      matchedPersistedIncidents: 0,
+      collisionCandidates: 0,
       comparisonPairs: 0,
       multiSourceClusters: 0,
       multiSourceFamilyClusters: 0,
@@ -196,12 +249,45 @@ export async function runClustering(
     };
   }
 
+  const dated = newCandidates
+    .map(({ eventDate }) => eventDate)
+    .filter((value): value is string => Boolean(value))
+    .sort();
+  const fallbackDate = (opts.now ?? new Date()).toISOString();
+  const persistedIncidents =
+    opts.persistedIncidents ??
+    (opts.candidates
+      ? []
+      : await loadActiveIncidentCandidates(db, {
+          windowStart: dated[0] ?? fallbackDate,
+          windowEnd: dated.at(-1) ?? fallbackDate,
+          comparisonWindowHours: CLUSTER_DATE_WINDOW_HOURS,
+        }));
+  const persistedCandidates: CandidateRow[] = persistedIncidents.map(
+    (candidate) => ({
+      id: `persisted:${candidate.incidentId}`,
+      jurisdictionId: candidate.jurisdictionId,
+      eventDate: candidate.eventDate,
+      title: candidate.headline,
+      body: candidate.body,
+      sourceId: `incident:${candidate.incidentId}`,
+      sourceType: "incident",
+      sourceUrl: null,
+      sourceFamilyId: `incident:${candidate.incidentId}`,
+      language: "und",
+      ingestRunId: run.id,
+      origin: "persisted",
+      incidentId: candidate.incidentId,
+      eventId: candidate.eventId,
+      clusterId: candidate.clusterId,
+      embedding: candidate.embedding,
+    }),
+  );
+  const candidates = [...newCandidates, ...persistedCandidates];
+
   // Batch-embed all candidates in one pass — much faster than per-row.
   const texts = candidates.map((c) =>
     [c.title, c.body ?? ""].filter(Boolean).join(" — ").slice(0, 1500),
-  );
-  const identities = candidates.map((candidate) =>
-    normalizeEventIdentity(candidate.title, candidate.body),
   );
   console.log(
     `[cluster] embedding ${candidates.length} candidates (this triggers model load on first run)…`,
@@ -213,6 +299,11 @@ export async function runClustering(
       ? (opts.embeddingResult ?? null)
       : await tryEmbedBatch(texts);
   const useEmbeddings = embeddings !== null;
+  if (useEmbeddings && embeddings.length !== candidates.length) {
+    throw new Error(
+      `Embedding result length ${embeddings.length} does not match ${candidates.length} incident candidates`,
+    );
+  }
   console.log(
     `[cluster] similarity mode: ${useEmbeddings ? "semantic embeddings" : "lexical (embedding model unavailable)"}`,
   );
@@ -223,9 +314,57 @@ export async function runClustering(
   let multiSourceFamilyClusters = 0;
   let multilingualClusters = 0;
   let crossJurisdictionClusters = 0;
-  let comparisonPairs = 0;
+  let matchedPersistedIncidents = 0;
   const now = opts.now ?? new Date();
   const assignments: ClusterRunSummary["assignments"] = [];
+  const persistedByIncident = new Map(
+    persistedIncidents.map((candidate) => [candidate.incidentId, candidate]),
+  );
+  const incidentCandidates: IncidentCandidate[] = candidates.map(
+    (candidate, index) => {
+      if (candidate.origin === "persisted" && candidate.incidentId) {
+        const persisted = persistedByIncident.get(candidate.incidentId);
+        if (!persisted) {
+          throw new Error(
+            `Persisted incident ${candidate.incidentId} is missing its candidate projection`,
+          );
+        }
+        return {
+          ...persisted,
+          embedding: useEmbeddings ? embeddings[index] : persisted.embedding,
+        };
+      }
+      return {
+        incidentId: `new:${candidate.id}`,
+        eventId: `raw:${candidate.id}`,
+        clusterId: candidate.clusterId ?? `new:${candidate.id}`,
+        origin: "new",
+        jurisdictionId: candidate.jurisdictionId,
+        eventDate: candidate.eventDate ?? now.toISOString(),
+        headline: candidate.title,
+        body: candidate.body,
+        sourceCount: 1,
+        publicationStatus: "unpublished",
+        reviewStatus: "unreviewed",
+        categoryId: null,
+        dimension: null,
+        direction: null,
+        severity: null,
+        createdAt: now.toISOString(),
+        embedding: useEmbeddings ? embeddings[index] : null,
+      };
+    },
+  );
+  const resolutionPlan = planIncidentResolution(incidentCandidates);
+  const incidentIndex = new Map(
+    incidentCandidates.map((candidate, index) => [candidate.incidentId, index]),
+  );
+  const comparisonPairs = resolutionPlan.findings.filter(
+    ({ candidateIds }) => candidateIds.length === 2,
+  ).length;
+  const collisionFindings = resolutionPlan.findings.filter(
+    ({ disposition }) => disposition === "candidate_merge",
+  );
 
   // Global union-find: jurisdiction is deliberately not a bucket.
   const indexes = candidates.map((_, index) => index);
@@ -249,35 +388,16 @@ export async function runClustering(
     if (ri !== rj) parent.set(ri, rj);
   };
 
-  for (let a = 0; a < indexes.length; a++) {
-    for (let b = a + 1; b < indexes.length; b++) {
-      const ia = indexes[a];
-      const ib = indexes[b];
-      if (
-        !withinDateWindow(candidates[ia].eventDate, candidates[ib].eventDate)
-      ) {
-        continue;
-      }
-      comparisonPairs++;
-      const identity = compareEventIdentities(identities[ia], identities[ib]);
-      const semanticSimilarity = useEmbeddings
-        ? cosineSimilarity(embeddings![ia], embeddings![ib])
-        : 0;
-      const similarityPass = useEmbeddings
-        ? semanticSimilarity >= CLUSTER_SIM_THRESHOLD ||
-          identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD
-        : identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD;
-      const sameProvisionalJurisdiction =
-        candidates[ia].jurisdictionId !== null &&
-        candidates[ia].jurisdictionId === candidates[ib].jurisdictionId;
-      const identityGuard =
-        identity.exactNormalizedMatch ||
-        identity.hasIdentityAnchor ||
-        (sameProvisionalJurisdiction && identity.tokenSimilarity >= 0.72);
-      if (similarityPass && identityGuard) {
-        union(ia, ib);
-      }
+  for (const finding of resolutionPlan.findings) {
+    if (
+      finding.disposition !== "confirmed_merge" ||
+      finding.candidateIds.length !== 2
+    ) {
+      continue;
     }
+    const left = incidentIndex.get(finding.candidateIds[0]);
+    const right = incidentIndex.get(finding.candidateIds[1]);
+    if (left !== undefined && right !== undefined) union(left, right);
   }
 
   // Collect groups.
@@ -289,23 +409,79 @@ export async function runClustering(
     groups.set(r, arr);
   }
 
-  // Assign cluster ids and write back
+  const persistence: IncidentPersistence =
+    opts.incidentPersistence ?? {
+      insertIncident: insertNewIncident,
+      assignReport: assignRawReportToIncident,
+      attachEvidence: attachAssignedEvidenceToCurrentEvent,
+      appendResolution: appendIncidentResolution,
+    };
+  const useIncidentStore = !opts.candidates || Boolean(opts.incidentPersistence);
+  const provisionalToIncident = new Map<string, string>(
+    persistedIncidents.map((candidate) => [candidate.incidentId, candidate.incidentId]),
+  );
+
+  // Assign stable incident ids and write back only the incoming reports.
   for (const [, members] of groups) {
-    const memberIds = members.map((idx) => candidates[idx].id).sort();
-    const clusterId =
-      opts.clusterIdFactory?.(memberIds) ??
-      (opts.dryRun ? deterministicFixtureClusterId(memberIds) : randomUUID());
-    assignments.push({ clusterId, memberIds });
-    const sourceIds = new Set(members.map((idx) => candidates[idx].sourceId));
+    const newMembers = members.filter(
+      (idx) => candidates[idx].origin !== "persisted",
+    );
+    if (!newMembers.length) continue;
+    const memberIds = newMembers.map((idx) => candidates[idx].id).sort();
+    const persistedMembers = members
+      .map((idx) => incidentCandidates[idx])
+      .filter((candidate) => candidate.origin === "persisted");
+    const selectedPersisted = persistedMembers.length
+      ? selectCanonicalIncident(persistedMembers)
+      : null;
+    let incidentId = selectedPersisted?.incidentId ?? null;
+    if (!incidentId) {
+      if (opts.dryRun || !useIncidentStore) {
+        incidentId =
+          opts.clusterIdFactory?.(memberIds) ??
+          deterministicFixtureClusterId(memberIds);
+      } else {
+        const representative = candidates[newMembers[0]];
+        const dates = newMembers
+          .map((idx) => candidates[idx].eventDate)
+          .filter((value): value is string => Boolean(value))
+          .sort();
+        incidentId = await persistence.insertIncident(db, {
+          representativeTitle: representative.title,
+          body: representative.body,
+          eventDateStart: dates[0] ?? null,
+          eventDateEnd: dates.at(-1) ?? null,
+          embedding: useEmbeddings ? embeddings![newMembers[0]] : null,
+          createdRunId: run.id,
+        });
+      }
+      clustersCreated++;
+    } else {
+      matchedPersistedIncidents += newMembers.length;
+    }
+    const matchKind: IncidentAssignmentPlan["matchKind"] = selectedPersisted
+      ? "persisted_match"
+      : "new";
+    assignments.push({
+      clusterId: incidentId,
+      incidentId,
+      memberIds,
+      matchKind,
+    });
+    for (const idx of newMembers) {
+      provisionalToIncident.set(incidentCandidates[idx].incidentId, incidentId);
+    }
+
+    const sourceIds = new Set(newMembers.map((idx) => candidates[idx].sourceId));
     if (sourceIds.size > 1) multiSourceClusters++;
     const sourceFamilyIds = new Set(
-      members.map((idx) => candidates[idx].sourceFamilyId),
+      newMembers.map((idx) => candidates[idx].sourceFamilyId),
     );
     if (sourceFamilyIds.size > 1) multiSourceFamilyClusters++;
-    const languages = new Set(members.map((idx) => candidates[idx].language));
+    const languages = new Set(newMembers.map((idx) => candidates[idx].language));
     if (languages.size > 1) multilingualClusters++;
     const provisionalJurisdictions = new Set(
-      members.map((idx) => candidates[idx].jurisdictionId ?? "unresolved"),
+      newMembers.map((idx) => candidates[idx].jurisdictionId ?? "unresolved"),
     );
     if (
       provisionalJurisdictions.size > 1 ||
@@ -314,31 +490,145 @@ export async function runClustering(
       crossJurisdictionClusters++;
     }
 
-    // Per-row update with the embedding + cluster_id stamped
-    for (const idx of members) {
+    const comparisonTarget = selectedPersisted
+      ? incidentCandidates[incidentIndex.get(selectedPersisted.incidentId)!]
+      : incidentCandidates[newMembers[0]];
+    for (const idx of newMembers) {
+      const identity = compareEventIdentities(
+        normalizeEventIdentity(candidates[idx].title, candidates[idx].body),
+        normalizeEventIdentity(comparisonTarget.headline, comparisonTarget.body),
+      );
+      const semantic = useEmbeddings
+        ? Math.max(
+            -1,
+            Math.min(
+              1,
+              cosineSimilarity(
+                embeddings![idx],
+                comparisonTarget.embedding ?? embeddings![idx],
+              ),
+            ),
+          )
+        : null;
       if (!opts.dryRun) {
-        await db
-          .update(rawEvents)
-          .set({
-            embedding: useEmbeddings ? embeddings![idx] : null,
-            clusterId,
-            clusteredAt: now,
-            clusterRunId: run.id,
-          })
-          .where(eq(rawEvents.id, candidates[idx].id));
+        if (useIncidentStore) {
+          const payload = {
+            incidentId,
+            rawEventId: candidates[idx].id,
+            rawClusterId: incidentId,
+            matchKind,
+            semanticSimilarity: semantic,
+            tokenSimilarity: identity.tokenSimilarity,
+            anchorOverlap: identity.anchorOverlap,
+            exactNormalizedMatch: identity.exactNormalizedMatch,
+            algorithmVersion: PULSE_INCIDENT_ASSIGNMENT_ALGORITHM_VERSION,
+            embeddingModel: useEmbeddings ? "stored-pulse-embedding" : null,
+            fallbackMode: useEmbeddings
+              ? ("semantic" as const)
+              : ("conservative_lexical" as const),
+            stageRunId: run.id,
+            actor: { type: "pipeline", stage: "cluster" },
+            rationale: selectedPersisted
+              ? "Exact normalized identity matched an active persisted incident inside the 48-hour window."
+              : "A new stable incident was created for this incoming report group.",
+            assignedAt: now.toISOString(),
+          };
+          const assignment: IncidentAssignmentPlan = {
+            schemaVersion: PULSE_INCIDENT_ASSIGNMENT_SCHEMA_VERSION,
+            assignmentKey: buildIncidentAssignmentKey(payload),
+            ...payload,
+          };
+          await persistence.assignReport(db, assignment);
+          if (useEmbeddings) {
+            await db
+              .update(rawEvents)
+              .set({ embedding: embeddings![idx] })
+              .where(eq(rawEvents.id, candidates[idx].id));
+          }
+          if (selectedPersisted?.eventId) {
+            await persistence.attachEvidence(db, {
+              eventId: selectedPersisted.eventId,
+              rawEventId: candidates[idx].id,
+              sourceId: candidates[idx].sourceId,
+              sourceType: candidates[idx].sourceType ?? "news",
+              sourceName: candidates[idx].sourceId,
+              sourceUrl: candidates[idx].sourceUrl ?? null,
+              stageRunId: run.id,
+              attachedAt: now.toISOString(),
+              rationale:
+                "PUL-031 attached later evidence to the existing current incident without reclassification.",
+            });
+          }
+        } else {
+          await db
+            .update(rawEvents)
+            .set({
+              embedding: useEmbeddings ? embeddings![idx] : null,
+              clusterId: incidentId,
+              incidentId,
+              clusteredAt: now,
+              clusterRunId: run.id,
+            })
+            .where(eq(rawEvents.id, candidates[idx].id));
+        }
       }
     }
-    clustered += members.length;
-    clustersCreated++;
+    clustered += newMembers.length;
+  }
+
+  const retainedCollisionPairs = new Set<string>();
+  for (const finding of collisionFindings) {
+    const leftIncidentId = provisionalToIncident.get(finding.candidateIds[0]);
+    const rightIncidentId = provisionalToIncident.get(finding.candidateIds[1]);
+    if (!leftIncidentId || !rightIncidentId || leftIncidentId === rightIncidentId) {
+      continue;
+    }
+    const pair = [leftIncidentId, rightIncidentId].sort();
+    const pairKey = pair.join(":");
+    if (retainedCollisionPairs.has(pairKey)) continue;
+    retainedCollisionPairs.add(pairKey);
+    const payload = {
+      leftIncidentId: pair[0],
+      rightIncidentId: pair[1],
+      outcome: "candidate" as const,
+      canonicalIncidentId: null,
+      signals: {
+        reasonCode: finding.reasonCode,
+        hoursApart: finding.hoursApart,
+        exactNormalizedMatch: finding.exactNormalizedMatch,
+        exactNormalizedHeadlineMatch: finding.exactNormalizedHeadlineMatch,
+        tokenSimilarity: finding.tokenSimilarity,
+        anchorOverlap: finding.anchorOverlap,
+        semanticSimilarity: finding.semanticSimilarity,
+        classificationCompatible: finding.classificationCompatible,
+      },
+      methodVersion: PULSE_INCIDENT_RESOLUTION_VERSION,
+      stageRunId: run.id,
+      actor: { type: "pipeline", stage: "post_cluster_collision" },
+      rationale:
+        "Identity evidence suggests a possible duplicate, but the automatic-merge threshold was not met.",
+      evidenceRefs: finding.candidateIds.map((id) => `incident-candidate:${id}`),
+      decidedAt: now.toISOString(),
+    };
+    const resolution: IncidentResolutionRecordPlan = {
+      schemaVersion: PULSE_INCIDENT_RESOLUTION_VERSION,
+      resolutionKey: buildIncidentResolutionKey(payload),
+      ...payload,
+    };
+    if (!opts.dryRun && useIncidentStore) {
+      await persistence.appendResolution(db, resolution);
+    }
   }
 
   if (persistRun) {
     await finishPulsePipelineRun(db, run.id, {
       status: useEmbeddings ? "completed" : "partial",
       counts: {
-        candidates: candidates.length,
+        candidates: newCandidates.length,
         clustered,
         clustersCreated,
+        matchedPersistedIncidents,
+        collisionCandidates: retainedCollisionPairs.size,
         multiSourceClusters,
         multiSourceFamilyClusters,
         multilingualClusters,
@@ -359,9 +649,11 @@ export async function runClustering(
   return {
     runId: run.id,
     versionKey: run.versionKey,
-    candidates: candidates.length,
+    candidates: newCandidates.length,
     clustered,
     clustersCreated,
+    matchedPersistedIncidents,
+    collisionCandidates: retainedCollisionPairs.size,
     comparisonPairs,
     multiSourceClusters,
     multiSourceFamilyClusters,
@@ -372,16 +664,4 @@ export async function runClustering(
       left.clusterId.localeCompare(right.clusterId),
     ),
   };
-}
-
-function withinDateWindow(a: string | null, b: string | null): boolean {
-  // Missing dates → treat as same day (worst case: they're in the same
-  // country and look textually similar; let the human reviewer split
-  // them later if needed).
-  if (!a || !b) return true;
-  const da = new Date(a).getTime();
-  const db = new Date(b).getTime();
-  if (Number.isNaN(da) || Number.isNaN(db)) return true;
-  const hours = Math.abs(da - db) / (1000 * 60 * 60);
-  return hours <= CLUSTER_DATE_WINDOW_HOURS;
 }

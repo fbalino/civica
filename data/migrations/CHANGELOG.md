@@ -48,6 +48,11 @@ ingest-time jurisdiction attribution, and a captured source-rights posture.
 Every event-source row must retain its raw-evidence link; public payload
 redistribution remains blocked independently of site access.
 
+`0023_wide_gorilla_man` adds stable Pulse incident identities, append-only
+report-assignment and collision-resolution evidence, one-current-projection
+enforcement, blank-headline quarantine, and the historical linkage needed for
+the controlled PUL-031 duplicate repair.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

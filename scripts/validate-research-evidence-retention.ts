@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
 import {
+  APPEND_ONLY_EVIDENCE_RELATIONS,
   DESTRUCTIVE_WRITE_PATHS,
   RETAINED_EVIDENCE_RELATIONS,
   RESEARCH_EVIDENCE_RETENTION_VERSION,
@@ -16,6 +17,14 @@ const migration = readFileSync(
 ) + readFileSync(resolve(root, "drizzle/authoritative/0003_mixed_mockingbird.sql"), "utf8");
 const exclusionMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0019_careless_avengers.sql"),
+  "utf8",
+);
+const decisionMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0016_loving_maggott.sql"),
+  "utf8",
+);
+const incidentMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0023_wide_gorilla_man.sql"),
   "utf8",
 );
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
@@ -46,8 +55,20 @@ function sourceFiles(directory: string): string[] {
 }
 
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
-  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`) && !exclusionMigration.includes(`ON ${relation}`)) {
+  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`) && !exclusionMigration.includes(`ON ${relation}`) && !incidentMigration.includes(`ON ${relation}`)) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
+  }
+}
+for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
+  const sources = [decisionMigration, exclusionMigration, incidentMigration];
+  const guarded = sources.some((source) =>
+    new RegExp(
+      `CREATE\\s+TRIGGER\\s+[a-z0-9_]+_append_only[\\s\\S]{0,160}BEFORE\\s+UPDATE\\s+OR\\s+DELETE\\s+ON\\s+"?${relation}"?[\\s\\S]{0,160}EXECUTE\\s+FUNCTION`,
+      "i",
+    ).test(source),
+  );
+  if (!guarded) {
+    fail(`append-only relation ${relation} is missing its mutation guard`);
   }
 }
 for (const required of [
@@ -135,7 +156,7 @@ async function main() {
   if (process.argv.includes("--live")) {
     if (!process.env.DATABASE_URL) fail("DATABASE_URL is required for --live");
     const sql = neon(process.env.DATABASE_URL);
-    const [objects, triggers, appendOnly, foreignKeys, invalidRaw, invalidHistory, historyRows, pulseRows, reconciliationRows] =
+    const [objects, triggers, appendOnly, appendOnlyEvidence, foreignKeys, invalidRaw, invalidHistory, historyRows, pulseRows, reconciliationRows] =
       await Promise.all([
       sql`SELECT
         to_regclass('research_evidence_history') IS NOT NULL AS history,
@@ -145,6 +166,15 @@ async function main() {
           WHERE tgname = 'dat_016_retain_mutation' AND NOT tgisinternal`,
       sql`SELECT count(*)::int AS n FROM pg_trigger
           WHERE tgname = 'research_evidence_history_append_only' AND NOT tgisinternal`,
+      sql`SELECT count(*)::int AS n
+          FROM pg_trigger t
+          JOIN pg_class c ON c.oid = t.tgrelid
+          WHERE NOT t.tgisinternal
+            AND (c.relname, t.tgname) IN (
+              ('pulse_event_decisions', 'pulse_event_decisions_append_only'),
+              ('pulse_incident_assignments', 'pulse_incident_assignments_append_only'),
+              ('pulse_incident_resolutions', 'pulse_incident_resolutions_append_only')
+            )`,
       sql`SELECT count(*)::int AS n FROM pg_constraint
           WHERE conname IN (
             'pulse_sources_event_id_pulse_events_v2_id_fk',
@@ -173,7 +203,12 @@ async function main() {
       );
     }
     if (Number(appendOnly[0]?.n) !== 1) {
-      fail("live append-only guard trigger is missing");
+      fail("live generic history append-only guard trigger is missing");
+    }
+    if (Number(appendOnlyEvidence[0]?.n) !== APPEND_ONLY_EVIDENCE_RELATIONS.length) {
+      fail(
+        `live append-only evidence trigger count ${appendOnlyEvidence[0]?.n} does not match ${APPEND_ONLY_EVIDENCE_RELATIONS.length}`,
+      );
     }
     if (Number(foreignKeys[0]?.n) !== 2) {
       fail("live Pulse evidence foreign keys are not both restrictive");

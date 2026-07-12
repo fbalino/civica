@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T23:59:48.987Z",
-  "sha256": "ddd2543e3165a9e68a2289d43235796ec93bf537b7de6b82bd28f5cde3f69527",
+  "generatedAt": "2026-07-12T07:11:31.545Z",
+  "sha256": "924e70bf4fbd6721becb65ec880fc3ea1f05d864639e983caface871c706fbc1",
   "schema": {
     "columns": [
       {
@@ -7016,6 +7016,24 @@
         "position": 27
       },
       {
+        "udt": "uuid",
+        "name": "incident_id",
+        "type": "uuid",
+        "table": "pulse_events_v2",
+        "default": null,
+        "nullable": "NO",
+        "position": 28
+      },
+      {
+        "udt": "text",
+        "name": "projection_status",
+        "type": "text",
+        "table": "pulse_events_v2",
+        "default": "'current'::text",
+        "nullable": "NO",
+        "position": 29
+      },
+      {
         "udt": "text",
         "name": "outcome_key",
         "type": "text",
@@ -7158,6 +7176,438 @@
         "default": null,
         "nullable": "YES",
         "position": 16
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_incident_assignments",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "assignment_key",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "incident_id",
+        "type": "uuid",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "raw_event_id",
+        "type": "uuid",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "uuid",
+        "name": "raw_cluster_id",
+        "type": "uuid",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "match_kind",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "float4",
+        "name": "semantic_similarity",
+        "type": "real",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "float4",
+        "name": "token_similarity",
+        "type": "real",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "float4",
+        "name": "anchor_overlap",
+        "type": "real",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "bool",
+        "name": "exact_normalized_match",
+        "type": "boolean",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "algorithm_version",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "embedding_model",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "fallback_mode",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "uuid",
+        "name": "stage_run_id",
+        "type": "uuid",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "jsonb",
+        "name": "actor",
+        "type": "jsonb",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "rationale",
+        "type": "text",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "timestamp",
+        "name": "assigned_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_incident_assignments",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_incident_assignments",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_incident_resolutions",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "resolution_key",
+        "type": "text",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "left_incident_id",
+        "type": "uuid",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "right_incident_id",
+        "type": "uuid",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "outcome",
+        "type": "text",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "uuid",
+        "name": "canonical_incident_id",
+        "type": "uuid",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "jsonb",
+        "name": "signals",
+        "type": "jsonb",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "uuid",
+        "name": "stage_run_id",
+        "type": "uuid",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "jsonb",
+        "name": "actor",
+        "type": "jsonb",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "rationale",
+        "type": "text",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "_text",
+        "name": "evidence_refs",
+        "type": "ARRAY",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "timestamp",
+        "name": "decided_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_incident_resolutions",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_incident_resolutions",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_incidents",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "merged_into_incident_id",
+        "type": "uuid",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "YES",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "representative_title",
+        "type": "text",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "date",
+        "name": "event_date_start",
+        "type": "date",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "date",
+        "name": "event_date_end",
+        "type": "date",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "identity_version",
+        "type": "text",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "identity_key",
+        "type": "text",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "_text",
+        "name": "identity_tokens",
+        "type": "ARRAY",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "_text",
+        "name": "identity_anchors",
+        "type": "ARRAY",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "_float4",
+        "name": "representative_embedding",
+        "type": "ARRAY",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "uuid",
+        "name": "created_run_id",
+        "type": "uuid",
+        "table": "pulse_incidents",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_incidents",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "timestamp",
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_incidents",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 14
       },
       {
         "udt": "uuid",
@@ -7689,6 +8139,15 @@
         "default": null,
         "nullable": "NO",
         "position": 30
+      },
+      {
+        "udt": "uuid",
+        "name": "incident_id",
+        "type": "uuid",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 31
       },
       {
         "udt": "text",
@@ -8940,9 +9399,19 @@
         "definition": "CREATE INDEX idx_pulse_v2_dimension ON public.pulse_events_v2 USING btree (dimension, event_date)"
       },
       {
+        "name": "idx_pulse_v2_incident",
+        "table": "pulse_events_v2",
+        "definition": "CREATE INDEX idx_pulse_v2_incident ON public.pulse_events_v2 USING btree (incident_id)"
+      },
+      {
         "name": "idx_pulse_v2_jurisdiction_date",
         "table": "pulse_events_v2",
         "definition": "CREATE INDEX idx_pulse_v2_jurisdiction_date ON public.pulse_events_v2 USING btree (jurisdiction_id, event_date)"
+      },
+      {
+        "name": "idx_pulse_v2_one_current_projection",
+        "table": "pulse_events_v2",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_v2_one_current_projection ON public.pulse_events_v2 USING btree (incident_id) WHERE (projection_status = 'current'::text)"
       },
       {
         "name": "idx_pulse_v2_publication_run",
@@ -8958,6 +9427,71 @@
         "name": "pulse_events_v2_pkey",
         "table": "pulse_events_v2",
         "definition": "CREATE UNIQUE INDEX pulse_events_v2_pkey ON public.pulse_events_v2 USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_incident_assignments_incident",
+        "table": "pulse_incident_assignments",
+        "definition": "CREATE INDEX idx_pulse_incident_assignments_incident ON public.pulse_incident_assignments USING btree (incident_id)"
+      },
+      {
+        "name": "idx_pulse_incident_assignments_key",
+        "table": "pulse_incident_assignments",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_incident_assignments_key ON public.pulse_incident_assignments USING btree (assignment_key)"
+      },
+      {
+        "name": "idx_pulse_incident_assignments_raw",
+        "table": "pulse_incident_assignments",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_incident_assignments_raw ON public.pulse_incident_assignments USING btree (raw_event_id)"
+      },
+      {
+        "name": "idx_pulse_incident_assignments_run",
+        "table": "pulse_incident_assignments",
+        "definition": "CREATE INDEX idx_pulse_incident_assignments_run ON public.pulse_incident_assignments USING btree (stage_run_id)"
+      },
+      {
+        "name": "pulse_incident_assignments_pkey",
+        "table": "pulse_incident_assignments",
+        "definition": "CREATE UNIQUE INDEX pulse_incident_assignments_pkey ON public.pulse_incident_assignments USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_incident_resolutions_key",
+        "table": "pulse_incident_resolutions",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_incident_resolutions_key ON public.pulse_incident_resolutions USING btree (resolution_key)"
+      },
+      {
+        "name": "idx_pulse_incident_resolutions_pair",
+        "table": "pulse_incident_resolutions",
+        "definition": "CREATE INDEX idx_pulse_incident_resolutions_pair ON public.pulse_incident_resolutions USING btree (left_incident_id, right_incident_id, decided_at)"
+      },
+      {
+        "name": "idx_pulse_incident_resolutions_run",
+        "table": "pulse_incident_resolutions",
+        "definition": "CREATE INDEX idx_pulse_incident_resolutions_run ON public.pulse_incident_resolutions USING btree (stage_run_id)"
+      },
+      {
+        "name": "pulse_incident_resolutions_pkey",
+        "table": "pulse_incident_resolutions",
+        "definition": "CREATE UNIQUE INDEX pulse_incident_resolutions_pkey ON public.pulse_incident_resolutions USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_incidents_created_run",
+        "table": "pulse_incidents",
+        "definition": "CREATE INDEX idx_pulse_incidents_created_run ON public.pulse_incidents USING btree (created_run_id)"
+      },
+      {
+        "name": "idx_pulse_incidents_identity",
+        "table": "pulse_incidents",
+        "definition": "CREATE INDEX idx_pulse_incidents_identity ON public.pulse_incidents USING btree (identity_key)"
+      },
+      {
+        "name": "idx_pulse_incidents_status_date",
+        "table": "pulse_incidents",
+        "definition": "CREATE INDEX idx_pulse_incidents_status_date ON public.pulse_incidents USING btree (status, event_date_start, event_date_end)"
+      },
+      {
+        "name": "pulse_incidents_pkey",
+        "table": "pulse_incidents",
+        "definition": "CREATE UNIQUE INDEX pulse_incidents_pkey ON public.pulse_incidents USING btree (id)"
       },
       {
         "name": "idx_pulse_pipeline_runs_stage_time",
@@ -9048,6 +9582,11 @@
         "name": "idx_raw_events_external",
         "table": "raw_events",
         "definition": "CREATE UNIQUE INDEX idx_raw_events_external ON public.raw_events USING btree (source_id, external_id) WHERE (external_id IS NOT NULL)"
+      },
+      {
+        "name": "idx_raw_events_incident",
+        "table": "raw_events",
+        "definition": "CREATE INDEX idx_raw_events_incident ON public.raw_events USING btree (incident_id)"
       },
       {
         "name": "idx_raw_events_ingest_run",
@@ -9177,6 +9716,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_coding_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse coding packets and audit rows are append-only';\nEND;\n$function$\n"
       },
       {
+        "name": "civica_reject_pulse_incident_evidence_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_incident_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_reject_research_evidence_history_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_research_evidence_history_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'research_evidence_history is append-only';\nEND;\n$function$\n"
@@ -9210,6 +9754,11 @@
         "name": "civica_validate_pulse_decision_supersession",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_decision_supersession()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  parent_kind text;\n  parent_cluster_id uuid;\n  parent_event_id uuid;\nBEGIN\n  IF NEW.supersedes_decision_key IS NULL THEN\n    RETURN NEW;\n  END IF;\n  SELECT kind, cluster_id, event_id\n  INTO parent_kind, parent_cluster_id, parent_event_id\n  FROM pulse_event_decisions\n  WHERE decision_key = NEW.supersedes_decision_key;\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'superseded Pulse decision does not exist';\n  END IF;\n  IF NEW.kind IS DISTINCT FROM parent_kind\n     OR NEW.cluster_id IS DISTINCT FROM parent_cluster_id\n     OR NEW.event_id IS DISTINCT FROM parent_event_id THEN\n    RAISE EXCEPTION 'Pulse decision supersession must stay on the same axis, cluster, and event';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_pulse_incident_merge",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_incident_merge()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  cycle_found boolean;\nBEGIN\n  IF NEW.status = 'merged' THEN\n    WITH RECURSIVE chain(id, merged_into_incident_id) AS (\n      SELECT i.id, i.merged_into_incident_id\n      FROM pulse_incidents i\n      WHERE i.id = NEW.merged_into_incident_id\n      UNION ALL\n      SELECT i.id, i.merged_into_incident_id\n      FROM pulse_incidents i\n      JOIN chain c ON i.id = c.merged_into_incident_id\n    )\n    SELECT EXISTS (SELECT 1 FROM chain WHERE id = NEW.id) INTO cycle_found;\n    IF cycle_found THEN\n      RAISE EXCEPTION 'pulse incident merge cycle detected for %', NEW.id;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "civica_validate_statement_subject",
@@ -9674,6 +10223,26 @@
         "definition": "CREATE TRIGGER pul_004_event_classification_lineage_immutable BEFORE UPDATE ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION pul_004_guard_event_classification_lineage()"
       },
       {
+        "name": "pulse_incident_assignments_append_only",
+        "table": "pulse_incident_assignments",
+        "definition": "CREATE TRIGGER pulse_incident_assignments_append_only BEFORE DELETE OR UPDATE ON pulse_incident_assignments FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_incident_evidence_mutation()"
+      },
+      {
+        "name": "pulse_incident_resolutions_append_only",
+        "table": "pulse_incident_resolutions",
+        "definition": "CREATE TRIGGER pulse_incident_resolutions_append_only BEFORE DELETE OR UPDATE ON pulse_incident_resolutions FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_incident_evidence_mutation()"
+      },
+      {
+        "name": "dat_016_retain_mutation",
+        "table": "pulse_incidents",
+        "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_incidents FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "pulse_incidents_validate_merge",
+        "table": "pulse_incidents",
+        "definition": "CREATE TRIGGER pulse_incidents_validate_merge BEFORE INSERT OR UPDATE ON pulse_incidents FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_incident_merge()"
+      },
+      {
         "name": "pul_004_pipeline_run_immutable",
         "table": "pulse_pipeline_runs",
         "definition": "CREATE TRIGGER pul_004_pipeline_run_immutable BEFORE DELETE OR UPDATE ON pulse_pipeline_runs FOR EACH ROW EXECUTE FUNCTION pul_004_guard_pipeline_run()"
@@ -10019,6 +10588,21 @@
         "kind": "v",
         "name": "pulse_exclusion_evaluation_candidates",
         "definition": " SELECT outcome_key,\n        CASE\n            WHEN outcome = ANY (ARRAY['rejected'::text, 'refuted'::text]) THEN 'false_positive_candidate'::text\n            ELSE 'false_negative_candidate'::text\n        END AS evaluation_stratum,\n    candidate_kind,\n    candidate_id,\n    canonical_candidate_id,\n    outcome,\n    reason_code,\n    reason,\n    actor,\n    method_version,\n    stage_run_id,\n    decision_key,\n    evidence_refs,\n    metadata,\n    occurred_at,\n    encode(digest(outcome_key, 'sha256'::text), 'hex'::text) AS stable_sample_key\n   FROM pulse_candidate_outcomes o;"
+      },
+      {
+        "kind": "r",
+        "name": "pulse_incident_assignments",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_incident_resolutions",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_incidents",
+        "definition": null
       },
       {
         "kind": "r",
@@ -11225,6 +11809,12 @@
         "definition": "FOREIGN KEY (corroboration_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
+        "name": "pulse_events_v2_incident_id_pulse_incidents_id_fk",
+        "type": "f",
+        "table": "pulse_events_v2",
+        "definition": "FOREIGN KEY (incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
         "name": "pulse_events_v2_jurisdiction_id_jurisdictions_id_fk",
         "type": "f",
         "table": "pulse_events_v2",
@@ -11237,10 +11827,106 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "pulse_events_v2_projection_check",
+        "type": "c",
+        "table": "pulse_events_v2",
+        "definition": "CHECK ((projection_status = ANY (ARRAY['current'::text, 'superseded_duplicate'::text, 'quarantined_invalid'::text])) AND (projection_status = 'quarantined_invalid'::text AND published = false OR projection_status <> 'quarantined_invalid'::text AND btrim(headline) <> ''::text) AND (projection_status = 'current'::text OR published = false))"
+      },
+      {
         "name": "pulse_events_v2_publication_run_id_pulse_pipeline_runs_id_fk",
         "type": "f",
         "table": "pulse_events_v2",
         "definition": "FOREIGN KEY (publication_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_assignments_contract_check",
+        "type": "c",
+        "table": "pulse_incident_assignments",
+        "definition": "CHECK (schema_version = 'pulse-incident-assignment/v1'::text AND assignment_key ~ '^pulse-incident-assignment/sha256:[a-f0-9]{64}$'::text AND (match_kind = ANY (ARRAY['new'::text, 'persisted_match'::text, 'post_classification_merge'::text, 'backfill'::text])) AND token_similarity >= 0::double precision AND token_similarity <= 1::double precision AND anchor_overlap >= 0::double precision AND anchor_overlap <= 1::double precision AND (semantic_similarity IS NULL OR semantic_similarity >= '-1'::integer::double precision AND semantic_similarity <= 1::double precision) AND algorithm_version <> ''::text AND (fallback_mode = ANY (ARRAY['semantic'::text, 'conservative_lexical'::text, 'historical_backfill'::text])) AND jsonb_typeof(actor) = 'object'::text AND btrim(rationale) <> ''::text)"
+      },
+      {
+        "name": "pulse_incident_assignments_incident_id_pulse_incidents_id_fk",
+        "type": "f",
+        "table": "pulse_incident_assignments",
+        "definition": "FOREIGN KEY (incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_assignments_pkey",
+        "type": "p",
+        "table": "pulse_incident_assignments",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_incident_assignments_raw_event_id_raw_events_id_fk",
+        "type": "f",
+        "table": "pulse_incident_assignments",
+        "definition": "FOREIGN KEY (raw_event_id) REFERENCES raw_events(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_assignments_stage_run_id_pulse_pipeline_runs_id_",
+        "type": "f",
+        "table": "pulse_incident_assignments",
+        "definition": "FOREIGN KEY (stage_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_resolutions_canonical_incident_id_pulse_incident",
+        "type": "f",
+        "table": "pulse_incident_resolutions",
+        "definition": "FOREIGN KEY (canonical_incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_resolutions_contract_check",
+        "type": "c",
+        "table": "pulse_incident_resolutions",
+        "definition": "CHECK (schema_version = 'pulse-incident-resolution/v1'::text AND resolution_key ~ '^pulse-incident-resolution/sha256:[a-f0-9]{64}$'::text AND left_incident_id <> right_incident_id AND (outcome = ANY (ARRAY['candidate'::text, 'confirmed_merge'::text, 'rejected'::text, 'unresolved'::text])) AND jsonb_typeof(signals) = 'object'::text AND jsonb_typeof(actor) = 'object'::text AND method_version <> ''::text AND btrim(rationale) <> ''::text AND cardinality(evidence_refs) > 0 AND (outcome = 'confirmed_merge'::text AND (canonical_incident_id = left_incident_id OR canonical_incident_id = right_incident_id) OR outcome <> 'confirmed_merge'::text AND canonical_incident_id IS NULL))"
+      },
+      {
+        "name": "pulse_incident_resolutions_left_incident_id_pulse_incidents_id_",
+        "type": "f",
+        "table": "pulse_incident_resolutions",
+        "definition": "FOREIGN KEY (left_incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_resolutions_pkey",
+        "type": "p",
+        "table": "pulse_incident_resolutions",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_incident_resolutions_right_incident_id_pulse_incidents_id",
+        "type": "f",
+        "table": "pulse_incident_resolutions",
+        "definition": "FOREIGN KEY (right_incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incident_resolutions_stage_run_id_pulse_pipeline_runs_id_",
+        "type": "f",
+        "table": "pulse_incident_resolutions",
+        "definition": "FOREIGN KEY (stage_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incidents_contract_check",
+        "type": "c",
+        "table": "pulse_incidents",
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'merged'::text])) AND btrim(representative_title) <> ''::text AND identity_version <> ''::text AND identity_key ~ '^pulse-incident-identity/sha256:[a-f0-9]{64}$'::text AND (status = 'active'::text AND merged_into_incident_id IS NULL OR status = 'merged'::text AND merged_into_incident_id IS NOT NULL AND merged_into_incident_id <> id))"
+      },
+      {
+        "name": "pulse_incidents_created_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_incidents",
+        "definition": "FOREIGN KEY (created_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incidents_merged_into_fk",
+        "type": "f",
+        "table": "pulse_incidents",
+        "definition": "FOREIGN KEY (merged_into_incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_incidents_pkey",
+        "type": "p",
+        "table": "pulse_incidents",
+        "definition": "PRIMARY KEY (id)"
       },
       {
         "name": "pulse_pipeline_runs_completion_check",
@@ -11343,6 +12029,12 @@
         "type": "c",
         "table": "raw_events",
         "definition": "CHECK (evidence_identity_key ~ '^pulse-evidence/sha256:[a-f0-9]{64}$'::text AND evidence_content_hash ~ '^[a-f0-9]{64}$'::text AND evidence_language <> ''::text AND (evidence_publisher ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_attribution ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_rights ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_retention ->> 'schemaVersion'::text) = 'pulse-raw-evidence/v1'::text AND (evidence_retention ->> 'publicPayloadDistribution'::text) = 'blocked'::text)"
+      },
+      {
+        "name": "raw_events_incident_id_pulse_incidents_id_fk",
+        "type": "f",
+        "table": "raw_events",
+        "definition": "FOREIGN KEY (incident_id) REFERENCES pulse_incidents(id) ON DELETE RESTRICT"
       },
       {
         "name": "raw_events_ingest_run_id_pulse_pipeline_runs_id_fk",

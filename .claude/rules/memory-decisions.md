@@ -935,3 +935,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The preparation baseline covers 1,456 initial packets and 2,912 blind assignments, including work that later proves unusable.
 - Four coders and two separate adjudicators are the working structure. All training, qualification, clarification, and adjudication time is paid hourly.
 - The $45,615 base plan is unapproved and must be replaced by a 30-packet human timing pilot. No contact before G4 or PUL-041. Durable record: APR-D126.
+
+## 2026-07-12 — Pulse events resolve through stable incidents
+
+- `pulse-incident-resolution/v1` gives raw reports and event projections a stable incident identity while retaining every prior source, decision, assignment, and projection.
+- Exact, label-compatible matches can merge inside 48 hours. Semantic and lexical matches remain review candidates and cannot change publication or scores by themselves.
+- Confirmed merges trigger fresh corroboration and incident-aware deltas. Blank headlines cannot publish. Durable record: APR-D146.

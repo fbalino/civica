@@ -774,3 +774,9 @@ This is the durable decision log for the active master plan. New entries append;
 **Decision:** A country masthead map preview is noninteractive and cannot inject MapLibre controls. One native button overlays the preview and opens the interactive map. OpenStreetMap and Protomaps/OpenFreeMap attribution links sit outside that button with their own accessible names and focus stops. Closing the map returns focus to the activation button; explicit Enter and Space handling preserves keyboard operation in browser and assistive-technology paths.
 
 **Why:** Putting MapLibre attribution links inside a full-tile button created invalid nested interaction and ambiguous focus behavior. Separating the three responsibilities keeps attribution usable without weakening the large activation target or hiding the map's data and provider credits.
+
+### APR-D146 — Pulse events resolve through stable incidents
+
+**Decision:** Adopt `pulse-incident-resolution/v1`. A stable incident owns raw-report assignments and can carry successive event projections without erasing any source, decision, or prior projection. Incoming reports compare with the current batch and recent persisted incidents inside 48 hours. Compatible exact normalized identities may merge automatically. Exact normalized headlines may also merge when resolved country, calendar date, and labels agree. Multilingual semantic matches and the lexical fallback create review candidates only. Blank headlines are quarantined. Confirmed merges select one current projection and trigger new corroboration and dimensional-score runs under an incident-aware algorithm version.
+
+**Why:** Run-local cluster IDs allowed later reports about the same occurrence to become separate scored events. A narrow automatic gate repairs exact duplicates without turning approximate similarity into an irreversible merge. The candidate ledger preserves uncertain matches for review and future error analysis.

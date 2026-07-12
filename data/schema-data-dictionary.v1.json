@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "4f28818bab5325a29a2a41e1462fecade93df8430c652cf195c6b6490b6f3b0a",
+  "schemaFingerprint": "ca97b014a30698270d8a6e1e8c303f2bb4da90578cd9f79ad7f0aa8ae1aa3c38",
   "summary": {
-    "tables": 66,
-    "columns": 871,
+    "tables": 69,
+    "columns": 922,
     "publicAtlasTables": 18,
-    "researchBetaTables": 18,
+    "researchBetaTables": 21,
     "supportTables": 11,
     "internalTables": 17,
     "privateTables": 2,
@@ -20591,6 +20591,36 @@
           }
         },
         {
+          "name": "incident_id",
+          "propertyName": "incidentId",
+          "definition": "Incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_pulse_v2_one_current_projection",
+              "idx_pulse_v2_incident"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_v2_one_current_projection"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "jurisdiction_id",
           "propertyName": "jurisdictionId",
           "definition": "Identifier of the jurisdiction represented by this row.",
@@ -20626,6 +20656,31 @@
           "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Multi-provider classification, verification, subject attribution, and human review over raw_events.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "projection_status",
+          "propertyName": "projectionStatus",
+          "definition": "Projection status recorded for the deduplicated event cluster about one subject jurisdiction.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
           "key": {
             "primary": false,
             "unique": false,
@@ -20844,6 +20899,1288 @@
           "cadence": "Daily pipeline with subsequent review/correction.",
           "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
           "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_incident_assignments",
+      "exportName": "pulseIncidentAssignments",
+      "definition": "Append-only evidence explaining why one retained Pulse report was assigned to a stable incident.",
+      "rowGrain": "One assignment of one raw_event to one incident.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+      "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+      "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+      "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "actor",
+          "propertyName": "actor",
+          "definition": "Actor recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "algorithm_version",
+          "propertyName": "algorithmVersion",
+          "definition": "Algorithm version recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "anchor_overlap",
+          "propertyName": "anchorOverlap",
+          "definition": "Anchor overlap recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "assigned_at",
+          "propertyName": "assignedAt",
+          "definition": "Assigned at recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "Assigned at follows this table contract. assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "assignment_key",
+          "propertyName": "assignmentKey",
+          "definition": "Assignment key recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incident_assignments_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_incident_assignments_key"
+            ]
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "embedding_model",
+          "propertyName": "embeddingModel",
+          "definition": "Embedding model recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "exact_normalized_match",
+          "propertyName": "exactNormalizedMatch",
+          "definition": "Exact normalized match recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "boolean",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "fallback_mode",
+          "propertyName": "fallbackMode",
+          "definition": "Fallback mode recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "incident_id",
+          "propertyName": "incidentId",
+          "definition": "Incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_pulse_incident_assignments_incident"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "match_kind",
+          "propertyName": "matchKind",
+          "definition": "Match kind recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rationale",
+          "propertyName": "rationale",
+          "definition": "Rationale recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "raw_cluster_id",
+          "propertyName": "rawClusterId",
+          "definition": "Raw cluster id recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "raw_event_id",
+          "propertyName": "rawEventId",
+          "definition": "Raw event id; relational link to raw_events.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": "raw_events.id",
+            "indexGroups": [
+              "idx_pulse_incident_assignments_raw"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_incident_assignments_raw"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing raw_events.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "semantic_similarity",
+          "propertyName": "semanticSimilarity",
+          "definition": "Semantic similarity recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "stage_run_id",
+          "propertyName": "stageRunId",
+          "definition": "Stage run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_incident_assignments_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "token_similarity",
+          "propertyName": "tokenSimilarity",
+          "definition": "Token similarity recorded for the assignment of one raw_event to one incident.",
+          "sqlType": "real",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+          "cadence": "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+          "vintageSemantics": "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+          "rights": "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_incident_resolutions",
+      "exportName": "pulseIncidentResolutions",
+      "definition": "Append-only candidate, confirmation, rejection, and unresolved decisions for possible duplicate Pulse incidents.",
+      "rowGrain": "One versioned decision about one ordered incident pair.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+      "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+      "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+      "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "actor",
+          "propertyName": "actor",
+          "definition": "Actor recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "canonical_incident_id",
+          "propertyName": "canonicalIncidentId",
+          "definition": "Canonical incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "decided_at",
+          "propertyName": "decidedAt",
+          "definition": "Decided at recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incident_resolutions_pair"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "Decided at follows this table contract. decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_refs",
+          "propertyName": "evidenceRefs",
+          "definition": "Evidence refs recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "left_incident_id",
+          "propertyName": "leftIncidentId",
+          "definition": "Left incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_pulse_incident_resolutions_pair"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "outcome",
+          "propertyName": "outcome",
+          "definition": "Outcome recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rationale",
+          "propertyName": "rationale",
+          "definition": "Rationale recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "resolution_key",
+          "propertyName": "resolutionKey",
+          "definition": "Resolution key recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incident_resolutions_key"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_incident_resolutions_key"
+            ]
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "right_incident_id",
+          "propertyName": "rightIncidentId",
+          "definition": "Right incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_pulse_incident_resolutions_pair"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "signals",
+          "propertyName": "signals",
+          "definition": "Signals recorded for the versioned decision about one ordered incident pair.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "stage_run_id",
+          "propertyName": "stageRunId",
+          "definition": "Stage run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_incident_resolutions_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only whenever collision detection or qualified review issues a new pair decision.",
+          "vintageSemantics": "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+          "rights": "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_incidents",
+      "exportName": "pulseIncidents",
+      "definition": "Stable real-world Pulse incident identities that survive later reports and retain confirmed merge lineage.",
+      "rowGrain": "One active or merged real-world incident identity.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+      "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+      "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+      "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_run_id",
+          "propertyName": "createdRunId",
+          "definition": "Created run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_incidents_created_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_date_end",
+          "propertyName": "eventDateEnd",
+          "definition": "Event date end recorded for the active or merged real-world incident identity.",
+          "sqlType": "date",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "ISO 8601 calendar date",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incidents_status_date"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "Event date end follows this table contract. event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_date_start",
+          "propertyName": "eventDateStart",
+          "definition": "Event date start recorded for the active or merged real-world incident identity.",
+          "sqlType": "date",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "ISO 8601 calendar date",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incidents_status_date"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "Event date start follows this table contract. event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "identity_anchors",
+          "propertyName": "identityAnchors",
+          "definition": "Identity anchors recorded for the active or merged real-world incident identity.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "identity_key",
+          "propertyName": "identityKey",
+          "definition": "Identity key recorded for the active or merged real-world incident identity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incidents_identity"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "identity_tokens",
+          "propertyName": "identityTokens",
+          "definition": "Identity tokens recorded for the active or merged real-world incident identity.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "identity_version",
+          "propertyName": "identityVersion",
+          "definition": "Identity version recorded for the active or merged real-world incident identity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "merged_into_incident_id",
+          "propertyName": "mergedIntoIncidentId",
+          "definition": "Merged into incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "representative_embedding",
+          "propertyName": "representativeEmbedding",
+          "definition": "Representative embedding recorded for the active or merged real-world incident identity.",
+          "sqlType": "real[]",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "representative_title",
+          "propertyName": "representativeTitle",
+          "definition": "Representative title recorded for the active or merged real-world incident identity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_incidents_status_date"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "updated_at",
+          "propertyName": "updatedAt",
+          "definition": "Timestamp when Civica last updated this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+          "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+          "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
+          "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
           "deprecation": {
             "status": "active"
           }
@@ -22213,6 +23550,33 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "incident_id",
+          "propertyName": "incidentId",
+          "definition": "Incident id; relational link to pulse_incidents.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_incidents.id",
+            "indexGroups": [
+              "idx_raw_events_incident"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_incidents.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
           "rights": "Publisher-specific. Payloads are private research evidence; public redistribution is blocked at capture even when access is free, and any later release requires a separate source-rights decision.",

@@ -50,6 +50,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
   shared("0024_research_evidence_retention", "drizzle/migrations/0024_research_evidence_retention.sql", "mixed", "journaled"),
   shared("0025_immutable_frozen_vintages", "drizzle/migrations/0025_immutable_frozen_vintages.sql", "mixed", "journaled"),
   shared("0026_temporal_metadata", "drizzle/migrations/0026_temporal_metadata.sql", "mixed", "journaled"),
+  shared("0023_wide_gorilla_man", "drizzle/authoritative/0023_wide_gorilla_man.sql", "mixed", "journaled"),
   ...[
     "backfill-cia-vintage", "backfill-election-results", "backfill-growth-methodology",
     "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels",

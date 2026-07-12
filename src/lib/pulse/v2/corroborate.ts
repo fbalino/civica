@@ -65,6 +65,7 @@ export interface CorroborateSummary {
 
 export interface EventRow {
   id: string;
+  incidentId?: string;
   clusterId: string;
   jurisdictionId: string;
   iso3: string | null;
@@ -318,6 +319,7 @@ async function loadEvents(
   const result = await db.execute(sql`
     SELECT
       p.id,
+      p.incident_id,
       p.cluster_id,
       p.jurisdiction_id,
       j.iso3,
@@ -329,10 +331,12 @@ async function loadEvents(
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
     WHERE ${where}
+      AND p.projection_status = 'current'
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>).map((r) => ({
     id: String(r.id),
+    incidentId: String(r.incident_id),
     clusterId: String(r.cluster_id),
     jurisdictionId: String(r.jurisdiction_id),
     iso3: r.iso3 ? String(r.iso3) : null,
@@ -348,30 +352,35 @@ async function loadSourceCounts(
   db: Db,
   eventId: string,
 ): Promise<SourceCounts> {
-  const rows = await db
-    .select({
-      sourceId: pulseSources.sourceId,
-      sourceType: pulseSources.sourceType,
-      rawEventId: pulseSources.rawEventId,
-      sourceUrl: pulseSources.sourceUrl,
-      title: rawEvents.title,
-      body: rawEvents.body,
-      evidencePublisher: rawEvents.evidencePublisher,
-    })
-    .from(pulseSources)
-    .innerJoin(rawEvents, eq(rawEvents.id, pulseSources.rawEventId))
-    .where(eq(pulseSources.eventId, eventId));
+  const result = await db.execute(sql`
+    SELECT
+      ps.source_id,
+      ps.source_type,
+      ps.raw_event_id,
+      ps.source_url,
+      r.title,
+      r.body,
+      r.evidence_publisher
+    FROM pulse_events_v2 current_event
+    JOIN pulse_events_v2 evidence_event
+      ON evidence_event.incident_id = current_event.incident_id
+    JOIN pulse_sources ps ON ps.event_id = evidence_event.id
+    JOIN raw_events r ON r.id = ps.raw_event_id
+    WHERE current_event.id = ${eventId}
+    ORDER BY ps.raw_event_id
+  `);
+  const rows = ((result as unknown as { rows?: unknown[] }).rows ?? result) as Array<Record<string, unknown>>;
 
   return sourceCountsFromEvidence(
     rows.map((row) => ({
-      rawEventId: row.rawEventId,
-      sourceId: row.sourceId,
-      sourceType: row.sourceType as "specialist" | "news",
-      sourceUrl: row.sourceUrl,
-      sourceFamilyId: row.evidencePublisher.sourceFamilyId,
-      itemPublisherHost: row.evidencePublisher.itemPublisherHost,
-      title: row.title,
-      body: row.body,
+      rawEventId: String(row.raw_event_id),
+      sourceId: String(row.source_id),
+      sourceType: row.source_type as "specialist" | "news",
+      sourceUrl: row.source_url ? String(row.source_url) : null,
+      sourceFamilyId: (row.evidence_publisher as { sourceFamilyId: string }).sourceFamilyId,
+      itemPublisherHost: (row.evidence_publisher as { itemPublisherHost: string }).itemPublisherHost,
+      title: String(row.title),
+      body: row.body ? String(row.body) : null,
     })),
   );
 }

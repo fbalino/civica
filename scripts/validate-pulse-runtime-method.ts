@@ -582,14 +582,18 @@ function validateClusteringAndScoring(
   snapshot: PulseRuntimeMethodSnapshot,
 ): void {
   const cluster = relative("src/lib/pulse/v2/cluster.ts");
+  const resolution = relative("src/lib/pulse/v2/incident-resolution.ts");
+  const incidentStore = relative("src/lib/pulse/v2/incident-store.ts");
   check(
     state,
-    cluster.includes(
-      `const LEXICAL_SIM_THRESHOLD = ${snapshot.clustering.lexicalFallback.threshold}`,
+    resolution.includes(
+      `PULSE_INCIDENT_SEMANTIC_CANDIDATE_THRESHOLD = ${snapshot.clustering.semantic.threshold}`,
     ) &&
-      cluster.includes(
-        `export const CLUSTER_SIM_THRESHOLD = ${snapshot.clustering.semantic.threshold}`,
+      resolution.includes(
+        `PULSE_INCIDENT_SEMANTIC_ONLY_CANDIDATE_THRESHOLD = ${snapshot.clustering.semantic.unanchoredThreshold}`,
       ) &&
+      resolution.includes("identity.tokenSimilarity >= 0.45") &&
+      resolution.includes("identity.anchorOverlap >= 0.8") &&
       cluster.includes(
         `export const CLUSTER_DATE_WINDOW_HOURS = ${snapshot.clustering.dateWindowHours}`,
       ),
@@ -600,13 +604,14 @@ function validateClusteringAndScoring(
     cluster.includes("? (opts.embeddingResult ?? null)") &&
       cluster.includes(": await tryEmbedBatch(texts)") &&
       cluster.includes("const useEmbeddings = embeddings !== null") &&
-      cluster.includes(
-        "compareEventIdentities(identities[ia], identities[ib])",
-      ) &&
-      cluster.includes("semanticSimilarity >= CLUSTER_SIM_THRESHOLD") &&
-      cluster.includes("identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD") &&
+      cluster.includes("loadActiveIncidentCandidates") &&
+      cluster.includes("planIncidentResolution(incidentCandidates)") &&
+      cluster.includes('finding.disposition !== "confirmed_merge"') &&
+      resolution.includes('disposition = "candidate_merge"') &&
+      resolution.includes("exact_normalized_within_window_classification_compatible") &&
+      incidentStore.includes('eq(pulseEventsV2.projectionStatus, "current")') &&
       snapshot.clustering.countryPartitioned === false,
-    "Clustering must retain multilingual semantic and normalized lexical paths without a country partition",
+    "Clustering must compare persisted stable incidents, auto-merge only exact identities, and retain semantic/lexical candidates without a country partition",
   );
 
   const score = relative("src/lib/pulse/v2/score.ts");

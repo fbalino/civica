@@ -157,6 +157,7 @@ export async function decoupleAbsorbedEvents(
           eq(pulseEventsV2.jurisdictionId, pair.jurisdictionId),
           eq(pulseEventsV2.dimension, pair.dimension),
           eq(pulseEventsV2.published, true),
+          eq(pulseEventsV2.projectionStatus, "current"),
           lt(pulseEventsV2.eventDate, cutoffDate),
           sql`${pulseEventsV2.corroborationConfidence} > 0`
         )
@@ -176,6 +177,7 @@ export async function decoupleAbsorbedEvents(
             eq(pulseEventsV2.jurisdictionId, pair.jurisdictionId),
             eq(pulseEventsV2.dimension, pair.dimension),
             eq(pulseEventsV2.published, true),
+            eq(pulseEventsV2.projectionStatus, "current"),
             lt(pulseEventsV2.eventDate, cutoffDate),
             sql`${pulseEventsV2.corroborationConfidence} > 0`
           )

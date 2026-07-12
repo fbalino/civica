@@ -201,7 +201,10 @@ export default async function PulseMethodologyPage() {
     clusterEmbeddingModel: method.clustering.semantic.model,
     clusterWindowHours: method.clustering.dateWindowHours,
     clusterSemanticThreshold: method.clustering.semantic.threshold,
+    clusterSemanticOnlyThreshold: method.clustering.semantic.unanchoredThreshold,
     clusterLexicalThreshold: method.clustering.lexicalFallback.threshold,
+    clusterLexicalAnchorThreshold:
+      method.clustering.lexicalFallback.anchorOverlapThreshold,
     sourceIndependenceVersion: method.corroboration.sourceIndependence.version,
     sourceIndependencePrecisionPct:
       method.corroboration.sourceIndependence.reviewedPairThresholds.precision *

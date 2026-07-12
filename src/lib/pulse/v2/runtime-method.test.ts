@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.8-beta");
+  assert.equal(method.version, "pulse-v2.9-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);

@@ -42,6 +42,8 @@
     "timezone": "UTC"
   },
   "clustering": {
+    "automaticMergeRule": "exact_full_identity_inside_window_or_exact_headline_same_resolved_country_and_date_with_compatible_labels",
+    "candidateLedger": "semantic_and_strong_anchor_matches_require_review",
     "countryPartitioned": false,
     "dateWindowHours": 48,
     "identityNormalization": {
@@ -50,18 +52,24 @@
       "version": "pulse-event-identity/multilingual-v1"
     },
     "lexicalFallback": {
+      "anchorOverlapThreshold": 0.8,
       "condition": "embedding_model_unavailable",
       "metric": "jaccard_token_similarity",
-      "threshold": 0.42
+      "result": "candidate_only",
+      "threshold": 0.45
     },
+    "persistedComparison": "incoming_against_recent_active_incidents",
+    "resolutionVersion": "pulse-incident-resolution/v1",
     "semantic": {
       "metric": "cosine_similarity",
       "model": "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
-      "threshold": 0.75
+      "result": "candidate_only",
+      "threshold": 0.84,
+      "unanchoredThreshold": 0.9
     },
-    "strategy": "semantic_or_lexical_fallback"
+    "strategy": "stable_incident_resolution"
   },
-  "contractHash": "13f501eef681b9561163869e8da7f889ff5a8542a23865f0660817912b1a2769",
+  "contractHash": "0b43f27403ab865809a99510d203ea231c03a04c36dfdf0739c37f235c1a0220",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -534,7 +542,7 @@
       }
     }
   },
-  "schemaVersion": "1.7.0",
+  "schemaVersion": "1.8.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -547,5 +555,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.8-beta"
+  "version": "pulse-v2.9-beta"
 }

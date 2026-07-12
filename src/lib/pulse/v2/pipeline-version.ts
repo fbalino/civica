@@ -15,6 +15,7 @@ import {
 import { PULSE_EVENT_ONTOLOGY_VERSION } from "./event-ontology";
 import { PULSE_EMBEDDING_MODEL } from "./embed";
 import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
+import { PULSE_INCIDENT_RESOLUTION_VERSION } from "./incident-resolution";
 import {
   PULSE_REVIEW_SUMMARY_MODEL,
   PULSE_REVIEW_SUMMARY_PROVIDER,
@@ -90,7 +91,7 @@ function stageAlgorithm(stage: PulsePipelineStage): VersionRef {
   if (stage === "ingest") return versioned("pulse-ingest/connectors-v2.1");
   if (stage === "cluster") {
     return versioned(
-      `pulse-cluster/normalized-global-union-find-v3+${PULSE_EVENT_IDENTITY_VERSION}`,
+      `pulse-cluster/stable-incidents-v4+${PULSE_EVENT_IDENTITY_VERSION}+${PULSE_INCIDENT_RESOLUTION_VERSION}`,
     );
   }
   if (stage === "classify")

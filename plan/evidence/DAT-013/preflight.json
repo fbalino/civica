@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T04:45:52.791Z",
+  "generatedAt": "2026-07-12T07:12:01.536Z",
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -37,7 +37,7 @@
         "offices": 5305,
         "persons": 4959,
         "sources": 56,
-        "statements": 7891,
+        "statements": 6768,
         "terms": 5475
       },
       "writesPerformed": 0
@@ -102,7 +102,7 @@
       "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bill_summary_cache": 6269,
+        "bill_summary_cache": 6322,
         "contact_submissions": 1,
         "country_metrics": 7449,
         "election_results": 1351,
@@ -168,7 +168,7 @@
       "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bills": 6940
+        "bills": 6993
       },
       "writesPerformed": 0
     },
@@ -208,7 +208,7 @@
       "invariantPlan": "npm run db:plan -- --id=0006_gigantic_quasimodo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "ci_composite_scores": 286
+        "ci_composite_scores": 1236
       },
       "writesPerformed": 0
     },
@@ -254,7 +254,7 @@
         "pulse_dimensional_deltas": 325,
         "pulse_events_v2": 384,
         "pulse_sources": 529,
-        "raw_events": 1122
+        "raw_events": 1507
       },
       "writesPerformed": 0
     },
@@ -518,9 +518,9 @@
       "invariantPlan": "npm run db:plan -- --id=0021_derivation_version_envelopes --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "ci_composite_scores": 286,
-        "ci_dimension_scores": 1142,
-        "country_fact_vintages": 17506,
+        "ci_composite_scores": 1236,
+        "ci_dimension_scores": 4867,
+        "country_fact_vintages": 35021,
         "government_taxonomies": 249,
         "pulse_dimensional_deltas": 325,
         "pulse_events_v2": 384
@@ -618,8 +618,8 @@
         "backtest_cases": 10,
         "backtest_events": 59,
         "backtest_runs": 52,
-        "ci_composite_scores": 286,
-        "ci_dimension_scores": 1142,
+        "ci_composite_scores": 1236,
+        "ci_dimension_scores": 4867,
         "civica_conditions_scores": 331,
         "constitution_topic_excerpts": 30537,
         "constitutions": 186,
@@ -641,9 +641,9 @@
         "pulse_events_v2": 384,
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
-        "raw_events": 1122,
-        "research_evidence_history": 424,
-        "statements": 7891,
+        "raw_events": 1507,
+        "research_evidence_history": 62329,
+        "statements": 6768,
         "terms": 5475
       },
       "writesPerformed": 0
@@ -664,8 +664,8 @@
       "invariantPlan": "npm run db:plan -- --id=0025_immutable_frozen_vintages --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "ci_composite_scores": 286,
-        "country_fact_vintages": 17506
+        "ci_composite_scores": 1236,
+        "country_fact_vintages": 35021
       },
       "writesPerformed": 0
     },
@@ -687,10 +687,43 @@
       "invariantPlan": "npm run db:plan -- --id=0026_temporal_metadata --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "country_fact_vintages": 17506,
+        "country_fact_vintages": 35021,
         "country_facts": 25827,
         "government_taxonomies": 249,
         "sources": 56
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0023_wide_gorilla_man",
+      "artifact": "drizzle/authoritative/0023_wide_gorilla_man.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "3e561cffdaaeb6ed1a1c42527f97e8775012ba00a87c26d5e2b68ddfcf2efef8",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "pulse_incident_assignments",
+        "pulse_incident_resolutions",
+        "pulse_incidents",
+        "pulse_pipeline_runs",
+        "pulse_sources",
+        "raw_events",
+        "research_evidence_history"
+      ],
+      "statementCount": 55,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0023_wide_gorilla_man-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0023_wide_gorilla_man --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "pulse_incident_assignments": "missing",
+        "pulse_incident_resolutions": "missing",
+        "pulse_incidents": "missing",
+        "pulse_pipeline_runs": 10,
+        "pulse_sources": 529,
+        "raw_events": 1507,
+        "research_evidence_history": 62329
       },
       "writesPerformed": 0
     },
@@ -873,7 +906,7 @@
       "invariantPlan": "npm run db:plan -- --id=data-create-rate-limits-table --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "rate_limits": 13
+        "rate_limits": 22
       },
       "writesPerformed": 0
     },

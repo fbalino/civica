@@ -667,6 +667,49 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
     deprecation: active,
   },
+  pulse_incidents: {
+    definition:
+      "Stable real-world Pulse incident identities that survive later reports and retain confirmed merge lineage.",
+    rowGrain: "One active or merged real-world incident identity.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+    cadence:
+      "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+    vintageSemantics:
+      "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+    rights:
+      "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+    deprecation: active,
+  },
+  pulse_incident_assignments: {
+    definition:
+      "Append-only evidence explaining why one retained Pulse report was assigned to a stable incident.",
+    rowGrain: "One assignment of one raw_event to one incident.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+    cadence: "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+    vintageSemantics:
+      "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+    rights:
+      "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+    deprecation: active,
+  },
+  pulse_incident_resolutions: {
+    definition:
+      "Append-only candidate, confirmation, rejection, and unresolved decisions for possible duplicate Pulse incidents.",
+    rowGrain: "One versioned decision about one ordered incident pair.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+    cadence: "Append-only whenever collision detection or qualified review issues a new pair decision.",
+    vintageSemantics:
+      "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+    rights:
+      "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+    deprecation: active,
+  },
   raw_events: {
     definition:
       "Deduplicated raw Pulse v2 inputs plus retained terminal classification dispositions.",

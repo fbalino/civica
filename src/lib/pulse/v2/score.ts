@@ -280,11 +280,13 @@ async function loadPublishedEvents(
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
-        WHERE ps.event_id = pulse_events_v2.id
+        JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
+        WHERE source_event.incident_id = pulse_events_v2.incident_id
         ORDER BY ps.source_id
       ) AS source_ids
     FROM pulse_events_v2
     WHERE published = true
+      AND projection_status = 'current'
       AND publication_run_id IS NOT NULL
       AND corroboration_run_id IS NOT NULL
       AND review_status IN ('approved', 'edited')

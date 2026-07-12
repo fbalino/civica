@@ -66,6 +66,7 @@ export async function getAdminCounts(): Promise<AdminCounts> {
             and(
               eq(pulseEventsV2.reviewStatus, "pending"),
               eq(pulseEventsV2.published, false),
+              eq(pulseEventsV2.projectionStatus, "current"),
             ),
           );
         return rows[0]?.n ?? 0;

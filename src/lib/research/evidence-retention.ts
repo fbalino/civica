@@ -32,12 +32,21 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "persons",
   "pulse_dimensional_deltas",
   "pulse_events_v2",
+  "pulse_incidents",
   "pulse_candidate_outcomes",
   "pulse_review_audit_log",
   "pulse_sources",
   "raw_events",
   "statements",
   "terms",
+] as const;
+
+/** Relations whose evidence rows reject UPDATE and DELETE outright rather
+ * than copying a mutable projection into the generic history ledger. */
+export const APPEND_ONLY_EVIDENCE_RELATIONS = [
+  "pulse_event_decisions",
+  "pulse_incident_assignments",
+  "pulse_incident_resolutions",
 ] as const;
 
 export type RetainedEvidenceRelation =

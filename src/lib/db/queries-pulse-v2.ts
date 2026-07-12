@@ -184,6 +184,7 @@ export async function getPulseV2ForCountry(
   const eventRows = await db
     .select({
       id: pulseEventsV2.id,
+      incidentId: pulseEventsV2.incidentId,
       dimension: pulseEventsV2.dimension,
       headline: pulseEventsV2.headline,
       eventDate: pulseEventsV2.eventDate,
@@ -196,6 +197,7 @@ export async function getPulseV2ForCountry(
       and(
         eq(pulseEventsV2.jurisdictionId, jurisdiction.id),
         eq(pulseEventsV2.published, true),
+        eq(pulseEventsV2.projectionStatus, "current"),
         sql`${pulseEventsV2.reviewStatus} IN ('approved', 'edited')`,
         sql`${pulseEventsV2.category} <> 'none'`,
         sql`${pulseEventsV2.eventDate} >= CURRENT_DATE - (${SCORE_WINDOW_DAYS} * INTERVAL '1 day')`,
@@ -208,17 +210,20 @@ export async function getPulseV2ForCountry(
   const eventIds = eventRows.map((e) => e.id);
   const sourceMap = new Map<string, string[]>();
   if (eventIds.length) {
-    const sourceRows = await db
-      .select({
-        eventId: pulseSources.eventId,
-        sourceId: pulseSources.sourceId,
-      })
-      .from(pulseSources)
-      .where(sql`${pulseSources.eventId} IN ${eventIds}`);
+    const sourceRows = resultRows(await db.execute(sql`
+      SELECT current_event.id AS event_id, ps.source_id
+      FROM pulse_events_v2 current_event
+      JOIN pulse_events_v2 evidence_event
+        ON evidence_event.incident_id = current_event.incident_id
+      JOIN pulse_sources ps ON ps.event_id = evidence_event.id
+      WHERE current_event.id IN ${eventIds}
+      ORDER BY current_event.id, ps.source_id
+    `));
     for (const row of sourceRows) {
-      const arr = sourceMap.get(row.eventId) ?? [];
-      arr.push(row.sourceId);
-      sourceMap.set(row.eventId, arr);
+      const eventId = String(row.event_id);
+      const arr = sourceMap.get(eventId) ?? [];
+      arr.push(String(row.source_id));
+      sourceMap.set(eventId, arr);
     }
   }
 
@@ -369,8 +374,10 @@ export async function getPulseV2EventsForCountry(slug: string) {
     })
     .from(pulseEventsV2)
     .where(sql`
-      ${pulseEventsV2.jurisdictionId} = ${jurisdiction.id}
-      OR EXISTS (
+      ${pulseEventsV2.projectionStatus} = 'current'
+      AND (
+        ${pulseEventsV2.jurisdictionId} = ${jurisdiction.id}
+        OR EXISTS (
         SELECT 1
         FROM pulse_event_jurisdictions pej
         JOIN pulse_event_decisions ped ON ped.decision_key = pej.decision_key
@@ -386,6 +393,7 @@ export async function getPulseV2EventsForCountry(slug: string) {
             ORDER BY latest.decided_at DESC, latest.created_at DESC
             LIMIT 1
           )
+        )
       )
     `)
     .orderBy(desc(pulseEventsV2.eventDate));
@@ -485,44 +493,52 @@ export async function getPulseV2EventsForCountry(slug: string) {
       attributionMap.set(eventId, current);
     }
 
-    const sourceRows = await db
-      .select({
-        eventId: pulseSources.eventId,
-        sourceId: pulseSources.sourceId,
-        sourceType: pulseSources.sourceType,
-        sourceName: pulseSources.sourceName,
-        sourceUrl: rawEvents.sourceUrl,
-        evidenceIdentityKey: rawEvents.evidenceIdentityKey,
-        evidenceContentHash: rawEvents.evidenceContentHash,
-        evidenceLanguage: rawEvents.evidenceLanguage,
-        retrievedAt: rawEvents.retrievedAt,
-        evidencePublisher: rawEvents.evidencePublisher,
-        evidenceAttribution: rawEvents.evidenceAttribution,
-        evidenceRights: rawEvents.evidenceRights,
-        evidenceRetention: rawEvents.evidenceRetention,
-      })
-      .from(pulseSources)
-      .innerJoin(rawEvents, eq(pulseSources.rawEventId, rawEvents.id))
-      .where(sql`${pulseSources.eventId} IN ${eventIds}`);
+    const sourceRows = resultRows(await db.execute(sql`
+      SELECT
+        current_event.id AS event_id,
+        ps.source_id,
+        ps.source_type,
+        ps.source_name,
+        re.source_url,
+        re.evidence_identity_key,
+        re.evidence_content_hash,
+        re.evidence_language,
+        re.retrieved_at,
+        re.evidence_publisher,
+        re.evidence_attribution,
+        re.evidence_rights,
+        re.evidence_retention
+      FROM pulse_events_v2 current_event
+      JOIN pulse_events_v2 evidence_event
+        ON evidence_event.incident_id = current_event.incident_id
+      JOIN pulse_sources ps ON ps.event_id = evidence_event.id
+      JOIN raw_events re ON re.id = ps.raw_event_id
+      WHERE current_event.id IN ${eventIds}
+      ORDER BY current_event.id, ps.source_type, ps.source_name, ps.raw_event_id
+    `));
     for (const row of sourceRows) {
-      const arr = sourceMap.get(row.eventId) ?? [];
+      const eventId = String(row.event_id);
+      const arr = sourceMap.get(eventId) ?? [];
       arr.push({
-        sourceId: row.sourceId,
-        sourceType: row.sourceType,
-        sourceName: row.sourceName,
-        sourceUrl: row.sourceUrl,
+        sourceId: String(row.source_id),
+        sourceType: String(row.source_type),
+        sourceName: String(row.source_name),
+        sourceUrl: String(row.source_url),
         evidenceIdentity: {
-          identityKey: row.evidenceIdentityKey,
-          contentHash: row.evidenceContentHash,
-          retrievedAt: row.retrievedAt.toISOString(),
-          language: row.evidenceLanguage,
-          publisher: row.evidencePublisher,
-          attribution: row.evidenceAttribution,
-          rights: row.evidenceRights,
-          retention: row.evidenceRetention,
+          identityKey: String(row.evidence_identity_key),
+          contentHash: String(row.evidence_content_hash),
+          retrievedAt:
+            row.retrieved_at instanceof Date
+              ? row.retrieved_at.toISOString()
+              : String(row.retrieved_at),
+          language: String(row.evidence_language),
+          publisher: row.evidence_publisher as PulseEvidenceIdentityDetail["publisher"],
+          attribution: row.evidence_attribution as PulseEvidenceIdentityDetail["attribution"],
+          rights: row.evidence_rights as PulseEvidenceIdentityDetail["rights"],
+          retention: row.evidence_retention as PulseEvidenceIdentityDetail["retention"],
         },
       });
-      sourceMap.set(row.eventId, arr);
+      sourceMap.set(eventId, arr);
     }
   }
 
@@ -695,7 +711,9 @@ export async function getPulseV2Changelog(
   const offset = Math.max(filters.offset ?? 0, 0);
 
   // Build a SQL WHERE list
-  const wheres: ReturnType<typeof sql>[] = [];
+  const wheres: ReturnType<typeof sql>[] = [
+    sql`p.projection_status = 'current'`,
+  ];
   if (filters.country) {
     wheres.push(sql`LOWER(j.slug) = ${filters.country.toLowerCase()}`);
   }
@@ -757,7 +775,8 @@ export async function getPulseV2Changelog(
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
-        WHERE ps.event_id = p.id
+        JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
+        WHERE source_event.incident_id = p.incident_id
       ) AS source_ids,
       COALESCE(
         (SELECT json_agg(
@@ -777,7 +796,11 @@ export async function getPulseV2Changelog(
               'retention', re.evidence_retention
             )
           ) ORDER BY ps.source_type, ps.source_name
-        ) FROM pulse_sources ps JOIN raw_events re ON re.id = ps.raw_event_id WHERE ps.event_id = p.id),
+        )
+          FROM pulse_sources ps
+          JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
+          JOIN raw_events re ON re.id = ps.raw_event_id
+          WHERE source_event.incident_id = p.incident_id),
         '[]'::json
       ) AS source_detail
     FROM pulse_events_v2 p

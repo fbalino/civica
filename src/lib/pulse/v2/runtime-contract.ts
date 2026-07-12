@@ -51,6 +51,12 @@ import {
 import { PULSE_EMBEDDING_MODEL } from "./embed";
 import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
 import {
+  PULSE_INCIDENT_COMPARISON_WINDOW_HOURS,
+  PULSE_INCIDENT_RESOLUTION_VERSION,
+  PULSE_INCIDENT_SEMANTIC_CANDIDATE_THRESHOLD,
+  PULSE_INCIDENT_SEMANTIC_ONLY_CANDIDATE_THRESHOLD,
+} from "./incident-resolution";
+import {
   PULSE_SOURCE_INDEPENDENCE_VERSION,
   SOURCE_INDEPENDENCE_MIN_PRECISION,
   SOURCE_INDEPENDENCE_MIN_RECALL,
@@ -72,8 +78,8 @@ import {
   type PulseDecisionKind,
 } from "./decision-ledger";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.7.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.8-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.8.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.9-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -133,7 +139,9 @@ export interface PulseRuntimeFacts {
     embeddingModel: string;
     dateWindowHours: number;
     semanticThreshold: number;
-    lexicalThreshold: number;
+    semanticOnlyThreshold: number;
+    lexicalTokenThreshold: number;
+    lexicalAnchorThreshold: number;
   }>;
 }
 
@@ -280,7 +288,11 @@ export interface PulseRuntimeMethodContract {
     }>;
   };
   clustering: {
-    strategy: "semantic_or_lexical_fallback";
+    strategy: "stable_incident_resolution";
+    resolutionVersion: string;
+    persistedComparison: "incoming_against_recent_active_incidents";
+    automaticMergeRule: "exact_full_identity_inside_window_or_exact_headline_same_resolved_country_and_date_with_compatible_labels";
+    candidateLedger: "semantic_and_strong_anchor_matches_require_review";
     countryPartitioned: boolean;
     identityNormalization: {
       version: string;
@@ -292,11 +304,15 @@ export interface PulseRuntimeMethodContract {
       metric: "cosine_similarity";
       model: string;
       threshold: number;
+      unanchoredThreshold: number;
+      result: "candidate_only";
     };
     lexicalFallback: {
       condition: "embedding_model_unavailable";
       metric: "jaccard_token_similarity";
       threshold: number;
+      anchorOverlapThreshold: number;
+      result: "candidate_only";
     };
   };
   corroboration: {
@@ -622,7 +638,12 @@ export function buildPulseRuntimeMethod(
       stages,
     },
     clustering: {
-      strategy: "semantic_or_lexical_fallback",
+      strategy: "stable_incident_resolution",
+      resolutionVersion: PULSE_INCIDENT_RESOLUTION_VERSION,
+      persistedComparison: "incoming_against_recent_active_incidents",
+      automaticMergeRule:
+        "exact_full_identity_inside_window_or_exact_headline_same_resolved_country_and_date_with_compatible_labels",
+      candidateLedger: "semantic_and_strong_anchor_matches_require_review",
       countryPartitioned: facts.clustering.countryPartitioned,
       identityNormalization: {
         version: facts.clustering.identityVersion,
@@ -634,11 +655,15 @@ export function buildPulseRuntimeMethod(
         metric: "cosine_similarity",
         model: facts.clustering.embeddingModel,
         threshold: facts.clustering.semanticThreshold,
+        unanchoredThreshold: facts.clustering.semanticOnlyThreshold,
+        result: "candidate_only",
       },
       lexicalFallback: {
         condition: "embedding_model_unavailable",
         metric: "jaccard_token_similarity",
-        threshold: facts.clustering.lexicalThreshold,
+        threshold: facts.clustering.lexicalTokenThreshold,
+        anchorOverlapThreshold: facts.clustering.lexicalAnchorThreshold,
+        result: "candidate_only",
       },
     },
     corroboration: {
@@ -974,9 +999,11 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
     countryPartitioned: false,
     identityVersion: PULSE_EVENT_IDENTITY_VERSION,
     embeddingModel: PULSE_EMBEDDING_MODEL,
-    dateWindowHours: 48,
-    semanticThreshold: 0.75,
-    lexicalThreshold: 0.42,
+    dateWindowHours: PULSE_INCIDENT_COMPARISON_WINDOW_HOURS,
+    semanticThreshold: PULSE_INCIDENT_SEMANTIC_CANDIDATE_THRESHOLD,
+    semanticOnlyThreshold: PULSE_INCIDENT_SEMANTIC_ONLY_CANDIDATE_THRESHOLD,
+    lexicalTokenThreshold: 0.45,
+    lexicalAnchorThreshold: 0.8,
   },
 };
 

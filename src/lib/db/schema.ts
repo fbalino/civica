@@ -1978,6 +1978,51 @@ export const pulsePipelineRuns = pgTable(
 );
 
 /**
+ * Stable real-world incident identity for Pulse. Raw clustering can change as
+ * new reports arrive; the incident UUID does not. A confirmed merge preserves
+ * the losing row and points it at the surviving incident.
+ */
+export const pulseIncidents = pgTable(
+  "pulse_incidents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    status: text("status").$type<"active" | "merged">().notNull(),
+    mergedIntoIncidentId: uuid("merged_into_incident_id"),
+    representativeTitle: text("representative_title").notNull(),
+    eventDateStart: date("event_date_start"),
+    eventDateEnd: date("event_date_end"),
+    identityVersion: text("identity_version").notNull(),
+    identityKey: text("identity_key").notNull(),
+    identityTokens: text("identity_tokens").array().notNull(),
+    identityAnchors: text("identity_anchors").array().notNull(),
+    representativeEmbedding: real("representative_embedding").array(),
+    createdRunId: uuid("created_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "pulse_incidents_merged_into_fk",
+      columns: [table.mergedIntoIncidentId],
+      foreignColumns: [table.id],
+    }).onDelete("restrict"),
+    index("idx_pulse_incidents_status_date").on(
+      table.status,
+      table.eventDateStart,
+      table.eventDateEnd,
+    ),
+    index("idx_pulse_incidents_identity").on(table.identityKey),
+    index("idx_pulse_incidents_created_run").on(table.createdRunId),
+    check(
+      "pulse_incidents_contract_check",
+      dsql`${table.status} IN ('active','merged') AND btrim(${table.representativeTitle}) <> '' AND ${table.identityVersion} <> '' AND ${table.identityKey} ~ '^pulse-incident-identity/sha256:[a-f0-9]{64}$' AND ((${table.status} = 'active' AND ${table.mergedIntoIncidentId} IS NULL) OR (${table.status} = 'merged' AND ${table.mergedIntoIncidentId} IS NOT NULL AND ${table.mergedIntoIncidentId} <> ${table.id}))`,
+    ),
+  ],
+);
+
+/**
  * Staging table for raw events ingested from specialist + news feeds.
  * One row per source-record. Drained by the clustering step which
  * groups near-duplicate records into governance-event clusters.
@@ -2031,6 +2076,10 @@ export const rawEvents = pgTable(
     embedding: real("embedding").array(),
     /** Set when row joins a cluster; null until then */
     clusterId: uuid("cluster_id"),
+    /** Stable real-world incident assigned by PUL-031 clustering. */
+    incidentId: uuid("incident_id").references(() => pulseIncidents.id, {
+      onDelete: "restrict",
+    }),
     clusteredAt: timestamp("clustered_at"),
     /** pending | event | non_governance | invalid. Rejected classifier input
      * remains queryable for prospective false-negative studies. */
@@ -2061,6 +2110,7 @@ export const rawEvents = pgTable(
     ),
     index("idx_raw_events_unclustered").on(table.clusteredAt),
     index("idx_raw_events_cluster").on(table.clusterId),
+    index("idx_raw_events_incident").on(table.incidentId),
     index("idx_raw_events_ingest_run").on(table.ingestRunId),
     index("idx_raw_events_cluster_run").on(table.clusterRunId),
     index("idx_raw_events_classification_run").on(table.classificationRunId),
@@ -2073,6 +2123,52 @@ export const rawEvents = pgTable(
     check(
       "raw_events_evidence_identity_check",
       dsql`${table.evidenceIdentityKey} ~ '^pulse-evidence/sha256:[a-f0-9]{64}$' AND ${table.evidenceContentHash} ~ '^[a-f0-9]{64}$' AND ${table.evidenceLanguage} <> '' AND ${table.evidencePublisher}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceAttribution}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRights}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRetention}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRetention}->>'publicPayloadDistribution' = 'blocked'`,
+    ),
+  ],
+);
+
+/** Append-only evidence for assigning one retained report to an incident. */
+export const pulseIncidentAssignments = pgTable(
+  "pulse_incident_assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    assignmentKey: text("assignment_key").notNull(),
+    incidentId: uuid("incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    rawEventId: uuid("raw_event_id")
+      .references(() => rawEvents.id, { onDelete: "restrict" })
+      .notNull(),
+    rawClusterId: uuid("raw_cluster_id").notNull(),
+    matchKind: text("match_kind")
+      .$type<
+        "new" | "persisted_match" | "post_classification_merge" | "backfill"
+      >()
+      .notNull(),
+    semanticSimilarity: real("semantic_similarity"),
+    tokenSimilarity: real("token_similarity").notNull(),
+    anchorOverlap: real("anchor_overlap").notNull(),
+    exactNormalizedMatch: boolean("exact_normalized_match").notNull(),
+    algorithmVersion: text("algorithm_version").notNull(),
+    embeddingModel: text("embedding_model"),
+    fallbackMode: text("fallback_mode").notNull(),
+    stageRunId: uuid("stage_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    actor: jsonb("actor").$type<Record<string, unknown>>().notNull(),
+    rationale: text("rationale").notNull(),
+    assignedAt: timestamp("assigned_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_incident_assignments_key").on(table.assignmentKey),
+    uniqueIndex("idx_pulse_incident_assignments_raw").on(table.rawEventId),
+    index("idx_pulse_incident_assignments_incident").on(table.incidentId),
+    index("idx_pulse_incident_assignments_run").on(table.stageRunId),
+    check(
+      "pulse_incident_assignments_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-incident-assignment/v1' AND ${table.assignmentKey} ~ '^pulse-incident-assignment/sha256:[a-f0-9]{64}$' AND ${table.matchKind} IN ('new','persisted_match','post_classification_merge','backfill') AND ${table.tokenSimilarity} BETWEEN 0 AND 1 AND ${table.anchorOverlap} BETWEEN 0 AND 1 AND (${table.semanticSimilarity} IS NULL OR ${table.semanticSimilarity} BETWEEN -1 AND 1) AND ${table.algorithmVersion} <> '' AND ${table.fallbackMode} IN ('semantic','conservative_lexical','historical_backfill') AND jsonb_typeof(${table.actor}) = 'object' AND btrim(${table.rationale}) <> ''`,
     ),
   ],
 );
@@ -2094,6 +2190,14 @@ export const pulseEventsV2 = pgTable(
     /** Stable idempotency key from raw_events.cluster_id. Legacy rows are
      * backfilled to their event id by migration 0022. */
     clusterId: uuid("cluster_id").notNull(),
+    /** Stable incident identity; unlike a raw cluster, it survives new reports. */
+    incidentId: uuid("incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    projectionStatus: text("projection_status")
+      .$type<"current" | "superseded_duplicate" | "quarantined_invalid">()
+      .notNull()
+      .default("current"),
     jurisdictionId: uuid("jurisdiction_id")
       .references(() => jurisdictions.id)
       .notNull(),
@@ -2177,6 +2281,60 @@ export const pulseEventsV2 = pgTable(
     index("idx_pulse_v2_publication_run").on(table.publicationRunId),
     index("idx_pulse_v2_corroboration_run").on(table.corroborationRunId),
     uniqueIndex("idx_pulse_v2_cluster_unique").on(table.clusterId),
+    uniqueIndex("idx_pulse_v2_one_current_projection")
+      .on(table.incidentId)
+      .where(dsql`${table.projectionStatus} = 'current'`),
+    index("idx_pulse_v2_incident").on(table.incidentId),
+    check(
+      "pulse_events_v2_projection_check",
+      dsql`${table.projectionStatus} IN ('current','superseded_duplicate','quarantined_invalid') AND ((${table.projectionStatus} = 'quarantined_invalid' AND ${table.published} = false) OR (${table.projectionStatus} <> 'quarantined_invalid' AND btrim(${table.headline}) <> '')) AND ((${table.projectionStatus} = 'current') OR (${table.published} = false))`,
+    ),
+  ],
+);
+
+/** Append-only candidate and confirmed resolution ledger for incident clashes. */
+export const pulseIncidentResolutions = pgTable(
+  "pulse_incident_resolutions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    resolutionKey: text("resolution_key").notNull(),
+    leftIncidentId: uuid("left_incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    rightIncidentId: uuid("right_incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    outcome: text("outcome")
+      .$type<"candidate" | "confirmed_merge" | "rejected" | "unresolved">()
+      .notNull(),
+    canonicalIncidentId: uuid("canonical_incident_id").references(
+      () => pulseIncidents.id,
+      { onDelete: "restrict" },
+    ),
+    signals: jsonb("signals").$type<Record<string, unknown>>().notNull(),
+    methodVersion: text("method_version").notNull(),
+    stageRunId: uuid("stage_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    actor: jsonb("actor").$type<Record<string, unknown>>().notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    decidedAt: timestamp("decided_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_incident_resolutions_key").on(table.resolutionKey),
+    index("idx_pulse_incident_resolutions_pair").on(
+      table.leftIncidentId,
+      table.rightIncidentId,
+      table.decidedAt,
+    ),
+    index("idx_pulse_incident_resolutions_run").on(table.stageRunId),
+    check(
+      "pulse_incident_resolutions_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-incident-resolution/v1' AND ${table.resolutionKey} ~ '^pulse-incident-resolution/sha256:[a-f0-9]{64}$' AND ${table.leftIncidentId} <> ${table.rightIncidentId} AND ${table.outcome} IN ('candidate','confirmed_merge','rejected','unresolved') AND jsonb_typeof(${table.signals}) = 'object' AND jsonb_typeof(${table.actor}) = 'object' AND ${table.methodVersion} <> '' AND btrim(${table.rationale}) <> '' AND cardinality(${table.evidenceRefs}) > 0 AND ((${table.outcome} = 'confirmed_merge' AND ${table.canonicalIncidentId} IN (${table.leftIncidentId}, ${table.rightIncidentId})) OR (${table.outcome} <> 'confirmed_merge' AND ${table.canonicalIncidentId} IS NULL))`,
+    ),
   ],
 );
 

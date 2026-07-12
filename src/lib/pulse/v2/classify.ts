@@ -152,6 +152,9 @@ const VERIFY_RUN_ORDINAL = 10;
 
 export interface ClusterToClassify {
   clusterId: string;
+  /** PUL-031 stable incident identity. Legacy/fixture callers may omit it
+   * during migration; their cluster id is the compatibility identity. */
+  incidentId?: string;
   jurisdictionId: string;
   eventDate: string;
   title: string;
@@ -1239,6 +1242,7 @@ export async function writeEvent(
     .insert(pulseEventsV2)
     .values({
       clusterId: cluster.clusterId,
+      incidentId: cluster.incidentId ?? cluster.clusterId,
       jurisdictionId: result.classified.jurisdictionId,
       eventDate: result.classified.eventDate,
       category: result.classified.category,

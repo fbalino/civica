@@ -10,7 +10,7 @@
  * then by event_date desc.
  */
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   jurisdictions,
@@ -53,6 +53,7 @@ export async function getPulseReviewQueue(opts: {
   const wheres: ReturnType<typeof sql>[] = [
     sql`p.review_status = 'pending'`,
     sql`p.published = false`,
+    sql`p.projection_status = 'current'`,
   ];
   if (opts.dimension) wheres.push(sql`p.dimension = ${opts.dimension}`);
   if (opts.severity) wheres.push(sql`p.severity_tier = ${opts.severity}`);
@@ -104,7 +105,8 @@ export async function getPulseReviewQueue(opts: {
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
-        WHERE ps.event_id = p.id
+        JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
+        WHERE source_event.incident_id = p.incident_id
       ) AS source_ids
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
@@ -147,7 +149,9 @@ export async function getPulseReviewQueue(opts: {
   const countResult = await db.execute(sql`
     SELECT COUNT(*)::int AS total
     FROM pulse_events_v2
-    WHERE review_status = 'pending' AND published = false
+    WHERE review_status = 'pending'
+      AND published = false
+      AND projection_status = 'current'
   `);
   const countRows =
     ((countResult as unknown as { rows?: unknown[] }).rows ??
@@ -229,9 +233,15 @@ export async function getPulseReviewEvent(
         pulseEventsV2.pressFreedomScoreAtClassification,
       createdAt: pulseEventsV2.createdAt,
       updatedAt: pulseEventsV2.updatedAt,
+      incidentId: pulseEventsV2.incidentId,
     })
     .from(pulseEventsV2)
-    .where(eq(pulseEventsV2.id, id))
+    .where(
+      and(
+        eq(pulseEventsV2.id, id),
+        eq(pulseEventsV2.projectionStatus, "current"),
+      ),
+    )
     .limit(1);
 
   const event = eventRows[0];
@@ -251,15 +261,20 @@ export async function getPulseReviewEvent(
   const jurisdiction = jurisdictionRows[0];
   if (!jurisdiction) return null;
 
-  const sourceRows = await db
-    .select({
-      sourceId: pulseSources.sourceId,
-      sourceType: pulseSources.sourceType,
-      sourceName: pulseSources.sourceName,
-      sourceUrl: pulseSources.sourceUrl,
-    })
-    .from(pulseSources)
-    .where(eq(pulseSources.eventId, event.id));
+  const sourceResult = await db.execute(sql`
+    SELECT DISTINCT
+      ps.source_id,
+      ps.source_type,
+      ps.source_name,
+      ps.source_url
+    FROM pulse_sources ps
+    JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
+    WHERE source_event.incident_id = ${event.incidentId}
+    ORDER BY ps.source_id, ps.source_url NULLS FIRST
+  `);
+  const sourceRows = (
+    (sourceResult as unknown as { rows?: unknown[] }).rows ?? sourceResult
+  ) as Array<Record<string, unknown>>;
 
   return {
     id: event.id,
@@ -288,7 +303,15 @@ export async function getPulseReviewEvent(
     pressFreedomScoreAtClassification: event.pressFreedomScoreAtClassification,
     createdAt: event.createdAt.toISOString(),
     updatedAt: event.updatedAt.toISOString(),
-    sources: sourceRows,
+    sources: sourceRows.map((source) => ({
+      sourceId: String(source.source_id),
+      sourceType: String(source.source_type),
+      sourceName: String(source.source_name),
+      sourceUrl:
+        source.source_url === null || source.source_url === undefined
+          ? null
+          : String(source.source_url),
+    })),
   };
 }
 
