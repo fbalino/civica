@@ -836,5 +836,79 @@ Per-lane "considered but not included" lists appear at the end of each lane sect
 
 ---
 
-*End of draft. Next steps per the master checklist: owner/Codex verification of every name and link; GOV-008 criteria adoption; GOV-010 rubric scoring. No contact of any kind until GOV-016/G4.*
+## 8. Addendum — additional verified batches delivered after assembly
+
+Parallel research workers delivered further fully verified batches that the
+assembler of Sections 2–6 did not see before finalizing. They are preserved
+verbatim in three supplement files and change several Section 7 conclusions:
+
+- `reviewer-longlist-supplement-lane-a-2026-07-11.md` — 25 further Lane A entries/backups across six batches.
+- `reviewer-longlist-supplement-lane-c-2026-07-11.md` — ~20 further Lane C entries across five batches (US, Europe, Africa, Latin America, Asia-Pacific).
+- `reviewer-longlist-supplement-lane-e-2026-07-11.md` — 13 further Lane E entries across four batches (US doctrine, EU policy, EU/Commonwealth academia, Global South).
+
+### 8.1 Corrections to "not verified this session" statements
+
+The following names, described in Sections 2.x/7.6 as not independently
+verified or not pinned down, **are fully verified in the supplements** with
+primary-source links: Svend-Erik Skaaning (Aarhus), Jan Teorell (Stockholm),
+Carl Henrik Knutsen (Oslo), Michael Coppedge (Notre Dame), Bastian Herre
+(Our World in Data/Oxford Martin), and Mercè Crosas (Director, CSSH Lab,
+Barcelona Supercomputing Center; sitting CODATA President 2023–2027, verified
+against CODATA's own officers page dated 2026-06-30). Their exclusion from the
+core lanes should be re-decided on conflict-balance grounds only, not
+verification grounds, during the GOV-010 pass.
+
+### 8.2 Late Lane A batch — Latin America / Africa (closes part of gap 7.5.2)
+
+#### 8.2.1 Carlos Gervasoni
+- **Role & affiliation:** Associate Research Professor, Political Science and International Studies, Universidad Torcuato Di Tella; V-Dem Regional Manager. Verification: https://kellogg.nd.edu/people/carlos-gervasoni
+- **Country/region:** Argentina
+- **Public professional page:** https://utdt.academia.edu/CarlosGervasoni
+- **Verification of current activity:** "La Confianza en el Gobierno Argentino: Operacionalización, Evolución y Correlatos (2001–2024)," Revista SAAP 19(1), May 2025 — https://revista.saap.org.ar/index.php/revista/article/view/574
+- **Recent relevant work:** the 2025 Revista SAAP index paper (above); "Economic dependence on the state and pro-authority attitudes," Acta Politica 59 (2024) — https://link.springer.com/article/10.1057/s41269-022-00282-3; "Hybrid Regimes within Democracies" (CUP 2018, builds both an expert-survey and an objective composite Subnational Democracy Index) — https://www.cambridge.org/core/books/abs/hybrid-regimes-within-democracies/subnational-democracy-index/D7D6D0EDB948DB2A92F62895EB9EB204
+- **Fit rationale:** has personally constructed expert-survey-based and objective composite democracy indices plus an original government-confidence index — a direct match for reviewing composite construction, aggregation, and validation choices.
+- **Conflicts/dependencies:** Tier 1–2 — V-Dem Regional Manager (Civica data source); disclose and pair on V-Dem-specific judgments.
+- **Diversity contribution:** Argentina institutional base; subnational-democracy measurement school.
+
+#### 8.2.2 Francisco Valdés-Ugalde
+- **Role & affiliation:** Senior Researcher (Investigador Titular C), Instituto de Investigaciones Sociales, UNAM; Professor, FLACSO México (former director 2010–2018). Verification: https://www.iis.unam.mx/investigacion/investigadores/investigadores-de-instituciones-politicas/dr-valdes-ugalde-francisco/
+- **Country/region:** Mexico
+- **Public professional page:** https://www.flacso.edu.mx/valdes-ugalde-francisco/
+- **Verification of current activity:** "Democracy in Latin America: The Failure of Inclusion and the Emergence of Autocratization" (De Gruyter, 2023) — https://www.degruyterbrill.com/document/doi/10.1515/9783110773675/html
+- **Recent relevant work:** the 2023 De Gruyter book (above); "La calidad de la democracia representativa. Propuesta de un índice de medición" (with Georgina Flores-Ivich — proposes and empirically tests a new representative-democracy-quality index, with a stated critique of V-Dem's coverage) — https://www.iis.unam.mx/blog/la-calidad-de-la-democracia-representativa-propuesta-de-un-indice-de-medicion/
+- **Fit rationale:** built and tested a composite index of representative-democracy quality and edited a methodology volume on measuring democracy/human rights in Latin America; independent (indeed critical) of the V-Dem tradition.
+- **Conflicts/dependencies:** none found against Civica sources.
+- **Diversity contribution:** Mexico public-national-university base; senior; political-theory-and-human-rights measurement school outside the Gothenburg tradition.
+
+#### 8.2.3 Alejandro Moreno
+- **Role & affiliation:** Professor of Political Science, ITAM; Treasurer, World Values Survey Association (2023–2027); Operative Director, Latinobarómetro. Verification: https://faculty.itam.mx/facultad/alejandro-moreno-alvarez
+- **Country/region:** Mexico
+- **Public professional page:** https://facultad.itam.mx/es/facultad/alejandro-moreno-alvarez
+- **Verification of current activity:** "La evolución cultural en México: cuatro décadas de cambio de valores, 1982–2023" (presented June 2024) — https://www.itam.mx/es/evento/la-evolucion-cultural-en-mexico
+- **Recent relevant work:** "La transformación mediática en México, 2006–2024," Revista Mexicana de Opinión Pública 38 (2025) — https://revistas.unam.mx/index.php/rmop/article/view/90089; "¿Qué miden las encuestas sobre corrupción en América Latina?" (on what corruption-perception items actually measure across countries) — https://dialnet.unirioja.es/servlet/articulo?codigo=4703155
+- **Fit rationale:** directs two major cross-national survey infrastructures (Latinobarómetro; WVS-Mexico) and has published on cross-country comparability of corruption-perception measures; stronger on survey-measurement infrastructure than composite aggregation.
+- **Conflicts/dependencies:** WVS Association Treasurer and Latinobarómetro director — adjacent measurement organizations, disclose; none against Civica sources.
+- **Diversity contribution:** Mexico private-university base; senior; mass-survey measurement tradition.
+
+#### 8.2.4 Cindy Steenekamp
+- **Role & affiliation:** Senior Lecturer, Political Science, Stellenbosch University; Co-PI, World Values Survey South Africa. Verification: https://polsci.sun.ac.za/people/dr-cindy-steenekamp/
+- **Country/region:** South Africa
+- **Public professional page:** https://scholar.google.com/citations?user=6Zalm6MAAAAJ&hl=en
+- **Verification of current activity:** Co-PI of the 9th wave of the South African Political Elite/Opinion-Leader Survey, fielded 2024/25 with the HSRC — https://polsci.sun.ac.za/the-south-african-elite-study/
+- **Recent relevant work:** "Tracking the pulse of the people" in The South African Response to COVID-19 (Routledge, 2023, OA) — https://www.taylorfrancis.com/chapters/oa-edit/10.4324/9781003294931-12/tracking-pulse-people-cindy-steenekamp; "Political Culture in Africa: A Comparative Analysis of Democratic Values in South Africa and Kenya" (Palgrave 2022, multilevel models from Afrobarometer/WVS items) — https://link.springer.com/chapter/10.1007/978-3-031-09123-0_6
+- **Fit rationale:** cross-national mass-survey measurement and multilevel modeling; the first Africa-based Lane A candidate to clear the verification bar — partially closes gap 7.5.2.
+- **Conflicts/dependencies:** WVS South Africa Co-PI — adjacent survey organization, disclose; none against Civica sources.
+- **Diversity contribution:** sub-Saharan Africa institutional base; mass-survey rather than expert-coded tradition.
+
+That batch's rejected names (with reasons) are preserved in the Lane A supplement, including a currency warning that several Afrobarometer-affiliated names checked there did not have measurement-methodology publication records.
+
+### 8.3 Gap-status updates
+
+- **Gap 7.5.2 (no Africa/Asia Lane A scholar):** partially closed — Steenekamp (South Africa) above; Yue Hu (Tsinghua), Tsung-han Tsai (Academia Sinica), Amnon Cavari (Reichman), and backup Byung-Deuk Woo (Incheon) are verified in the Lane A supplement, batch 6.
+- **Gap 7.5.4 (no Latin America/Asia Lane C practitioner):** substantially closed in the Lane C supplement — Bianca Amaro (IBICT, Brazil), Rene Faustino Gabriel Junior (UFRGS, Brazil), Sandra Gisela Martín (Argentina), Jiban K. Pal (ISI Kolkata), Kazuhiro Hayashi (NISTEP, Japan), plus an Africa batch (Woolfrey, Obileye, Salau, Lamptey, Chiparausha, Smith, Owango-adjacent leads).
+- **Gap 7.5.5 (Lane E lacks US-doctrine and Global South scholars):** substantially closed in the Lane E supplement — US doctrine: Michael W. Carroll (American University), Jerome H. Reichman (Duke, emeritus but active); Global South: Chijioke Okorie (Pretoria) and Melissa Omino (Strathmore/CC Board), designers of the NOODL tiered open-data license; Commonwealth: Teresa Scassa (Ottawa), Lucie Guibault (Dalhousie).
+
+---
+
+*End of draft. Next steps per the master checklist: owner/Codex verification of every name and link (including reconciling core-lane selections against the Section 8 supplements); GOV-008 criteria adoption; GOV-010 rubric scoring. No contact of any kind until GOV-016/G4.*
 
