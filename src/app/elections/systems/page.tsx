@@ -12,7 +12,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "How Electoral Systems Work — FPTP, PR, Mixed & More",
   description:
-    "How the world's legislatures turn votes into seats: First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems, with per-country data from IPU Parline.",
+    "How the legislatures classified in IPU Parline turn votes into seats: First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems.",
   alternates: { canonical: "https://civicaatlas.org/elections/systems" },
   openGraph: withOg({
     title: "How Electoral Systems Work — FPTP, PR, Mixed & More · Civica Atlas",
@@ -55,7 +55,7 @@ export default async function ElectoralSystemsPage() {
         title="How electoral systems work."
         description={
           <>
-            Every democracy has to turn votes into seats. The rule it uses
+            Elected legislatures need rules for turning votes into seats. The rule used
             shapes who governs — and Civica classifies each one from IPU
             Parline&rsquo;s own data.
           </>

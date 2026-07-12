@@ -1032,3 +1032,13 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   used; route or ISO presence never implies sovereignty.
 - Public status disclosures include the neutral note, review, countability,
   administering relationship, and sources. Durable record: APR-D160.
+
+## 2026-07-12 — Election rows require a qualification layer
+
+- Keep raw election storage separate from public qualification; weak rows stay
+  auditable but do not render as facts.
+- Date basis, temporal class, and lifecycle status are separate. A future date
+  does not prove that an event is officially scheduled.
+- Event and chamber-contest identity remain separate; calendar projections
+  collapse unnamed chamber estimates, while detailed named contests may remain
+  distinct. Durable record: APR-D161.

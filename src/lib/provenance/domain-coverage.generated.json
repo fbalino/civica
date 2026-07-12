@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-12T12:02:11.860Z",
+  "generatedAt": "2026-07-12T14:44:14.974Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -597,30 +597,44 @@
     {
       "id": "elections",
       "label": "Elections",
-      "recordLabel": "election records",
-      "recordCount": 909,
+      "recordLabel": "qualified conceptual election events",
+      "recordCount": 573,
       "jurisdictionsCovered": 193,
       "completeness": [
         {
-          "field": "election_date",
-          "label": "Election date",
+          "field": "audit_disposition",
+          "label": "Row-level audit disposition",
           "complete": 909,
           "total": 909,
           "percent": 100
         },
         {
-          "field": "election_type",
-          "label": "Election type",
-          "complete": 909,
+          "field": "event_provenance",
+          "label": "Authoritative event provenance",
+          "complete": 888,
           "total": 909,
-          "percent": 100
+          "percent": 97.7
         },
         {
-          "field": "turnout_percent",
-          "label": "Turnout",
-          "complete": 340,
+          "field": "date_semantics",
+          "label": "Usable date basis and precision",
+          "complete": 866,
           "total": 909,
-          "percent": 37.4
+          "percent": 95.3
+        },
+        {
+          "field": "jurisdiction_identity",
+          "label": "Matching publisher jurisdiction identity",
+          "complete": 888,
+          "total": 909,
+          "percent": 97.7
+        },
+        {
+          "field": "public_qualification",
+          "label": "Qualified event or contest row",
+          "complete": 598,
+          "total": 909,
+          "percent": 65.8
         }
       ],
       "sources": [
@@ -645,7 +659,10 @@
       ],
       "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
       "knownGaps": [
-        "Presidential, legislative, and turnout coverage have different publisher scopes; a jurisdiction count does not imply every election type or result field is present."
+        "The checked 915-row baseline contains 82 quarantined rows and 215 separately labelled term-length projection groups; neither is counted as a qualified event.",
+        "21 rows lack retained publisher jurisdiction identity and remain quarantined; no checked publisher jurisdiction mismatch is public.",
+        "Presidential history is uneven, indirect and subnational selections can leak through upstream ontology, and a jurisdiction count does not imply complete historical, presidential, turnout, or result coverage.",
+        "IPU Parline and International IDEA statement licenses are recorded as non-commercial, but their source-specific DAT-003 rights reviews remain pending and their rows stay out of the public bulk export."
       ],
       "threshold": {
         "countryCoverageWarnBelow": 80,
@@ -658,7 +675,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Elections: Turnout is 37.4% complete; alert threshold is 80%."
+          "message": "Elections: Qualified event or contest row is 65.8% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",

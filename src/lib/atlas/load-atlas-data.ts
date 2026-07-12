@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
-import { sql, desc, asc, and, eq } from "drizzle-orm";
+import { sql, desc, asc, and } from "drizzle-orm";
 import {
   jurisdictions,
   governmentBodies,
@@ -28,6 +28,13 @@ import {
   buildJurisdictionStatusPresentation,
   type JurisdictionStatusPresentation,
 } from "@/lib/jurisdictions/status-presentation";
+import {
+  ELECTION_CORPUS_AUDIT,
+  getElectionAuditRow,
+  isAuditedPublicElection,
+  isPrimaryElectionEvent,
+} from "@/lib/elections/corpus-audit-runtime";
+import { loadLiveElectionContentFingerprints } from "@/lib/elections/corpus-audit-live";
 
 export interface AtlasCountry {
   id: string;
@@ -79,7 +86,16 @@ const CONTINENT_TO_REGION: Record<string, string> = {
 };
 
 const TOP_COUNTRIES = new Set([
-  "USA", "CHN", "IND", "BRA", "GBR", "FRA", "DEU", "JPN", "RUS", "SAU",
+  "USA",
+  "CHN",
+  "IND",
+  "BRA",
+  "GBR",
+  "FRA",
+  "DEU",
+  "JPN",
+  "RUS",
+  "SAU",
 ]);
 
 function formatPop(n: number | null): string {
@@ -104,7 +120,8 @@ function formatArea(n: number | null): string | null {
 
 function formatMoneyDollars(n: number): string {
   const abs = Math.abs(n);
-  if (abs >= 1_000_000_000_000) return `$${(abs / 1_000_000_000_000).toFixed(1)}T`;
+  if (abs >= 1_000_000_000_000)
+    return `$${(abs / 1_000_000_000_000).toFixed(1)}T`;
   if (abs >= 1_000_000_000) return `$${(abs / 1_000_000_000).toFixed(1)}B`;
   if (abs >= 1_000_000) return `$${(abs / 1_000_000).toFixed(0)}M`;
   return `$${abs.toLocaleString()}`;
@@ -155,7 +172,10 @@ function extractText(value: unknown): string | null {
     return clean && clean !== "[object Object]" ? clean : null;
   }
   if (typeof value === "number") return value.toLocaleString();
-  if (typeof value === "object" && "text" in (value as Record<string, unknown>)) {
+  if (
+    typeof value === "object" &&
+    "text" in (value as Record<string, unknown>)
+  ) {
     return extractText((value as Record<string, unknown>).text);
   }
   return null;
@@ -167,7 +187,7 @@ function getNestedValue(data: unknown, ...keys: string[]): unknown {
     if (!current || typeof current !== "object") return undefined;
     const obj = current as Record<string, unknown>;
     const found = Object.keys(obj).find(
-      (candidate) => normalizeKey(candidate) === normalizeKey(key)
+      (candidate) => normalizeKey(candidate) === normalizeKey(key),
     );
     current = found ? obj[found] : undefined;
   }
@@ -188,7 +208,7 @@ function firstText(...values: unknown[]): string | null {
 
 function sourceWithValue(
   value: unknown,
-  source: CountryFactSource
+  source: CountryFactSource,
 ): CountryFactValue {
   const clean = extractText(value);
   if (!clean || clean === "—") return { value: null };
@@ -241,7 +261,7 @@ function formatCurrency(raw: string | null | undefined): string | null {
     .map((word) =>
       /^[A-Z]{2,}$/.test(word)
         ? word
-        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
+        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
     )
     .join(" ");
   return code ? `${titleName} (${code})` : titleName;
@@ -254,14 +274,17 @@ function formatGovernmentDetail(raw: string | null | undefined): string | null {
     .map((word) =>
       word.length <= 3 && word === word.toUpperCase()
         ? word
-        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
+        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
     )
     .join(" ");
 }
 
 function formatCommodityList(raw: string | null | undefined): string | null {
   if (!raw) return null;
-  const withoutYear = cleanText(raw).replace(/\s*\(\d{4}(?:\s+est\.)?\)\s*$/i, "");
+  const withoutYear = cleanText(raw).replace(
+    /\s*\(\d{4}(?:\s+est\.)?\)\s*$/i,
+    "",
+  );
   const items = withoutYear
     .split(",")
     .map((item) => item.trim())
@@ -286,7 +309,9 @@ function formatTimeZone(raw: string | null | undefined): string | null {
   return cleanText(raw).split("(")[0]?.trim() || null;
 }
 
-function formatElectionDate(value: string | Date | null | undefined): string | null {
+function formatElectionDate(
+  value: string | Date | null | undefined,
+): string | null {
   if (!value) return null;
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return null;
@@ -299,7 +324,9 @@ function isoTimestamp(value: Date | string | null | undefined): string | null {
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
-function sortMemberships(items: CountryMembershipChip[]): CountryMembershipChip[] {
+function sortMemberships(
+  items: CountryMembershipChip[],
+): CountryMembershipChip[] {
   const priority = new Map(
     [
       "united-nations",
@@ -312,7 +339,7 @@ function sortMemberships(items: CountryMembershipChip[]): CountryMembershipChip[
       "wto",
       "imf",
       "world-bank",
-    ].map((slug, index) => [slug, index])
+    ].map((slug, index) => [slug, index]),
   );
   return [...items].sort((a, b) => {
     const pa = priority.get(a.slug) ?? 100;
@@ -321,7 +348,6 @@ function sortMemberships(items: CountryMembershipChip[]): CountryMembershipChip[
     return a.name.localeCompare(b.name);
   });
 }
-
 
 // React `cache()` dedupes calls within a single render. Shell routes for
 // /atlas/[slug]/[tab] call this from the page AND from each parallel slot;
@@ -340,7 +366,7 @@ async function _loadAtlasData(): Promise<{
         AND ${jurisdictions.population} IS NOT NULL
         AND ${jurisdictions.population} > 0
         AND ${jurisdictions.iso3} IS NOT NULL
-        AND LOWER(${jurisdictions.name}) <> 'none'`
+        AND LOWER(${jurisdictions.name}) <> 'none'`,
     )
     .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
 
@@ -353,7 +379,7 @@ async function _loadAtlasData(): Promise<{
     sourceRows.map((s) => [
       s.id,
       { source: s.id, retrievedAt: isoTimestamp(s.lastSyncAt) },
-    ])
+    ]),
   );
   const ciaSource = sourceById.get("cia_factbook") ?? {
     source: "cia_factbook",
@@ -384,22 +410,23 @@ async function _loadAtlasData(): Promise<{
     "total_area",
   ];
 
-  const allCountryFacts = jurisdictionIds.length > 0
-    ? await db
-        .select({
-          jurisdictionId: countryFacts.jurisdictionId,
-          factKey: countryFacts.factKey,
-          factValue: countryFacts.factValue,
-          factValueNumeric: countryFacts.factValueNumeric,
-          factUnit: countryFacts.factUnit,
-          factYear: countryFacts.factYear,
-        })
-        .from(countryFacts)
-        .where(
-          sql`${countryFacts.jurisdictionId} IN ${jurisdictionIds}
-            AND ${countryFacts.factKey} IN ${mastheadFactKeys}`
-        )
-    : [];
+  const allCountryFacts =
+    jurisdictionIds.length > 0
+      ? await db
+          .select({
+            jurisdictionId: countryFacts.jurisdictionId,
+            factKey: countryFacts.factKey,
+            factValue: countryFacts.factValue,
+            factValueNumeric: countryFacts.factValueNumeric,
+            factUnit: countryFacts.factUnit,
+            factYear: countryFacts.factYear,
+          })
+          .from(countryFacts)
+          .where(
+            sql`${countryFacts.jurisdictionId} IN ${jurisdictionIds}
+            AND ${countryFacts.factKey} IN ${mastheadFactKeys}`,
+          )
+      : [];
 
   const factbookSectionNames = [
     "communications",
@@ -407,45 +434,54 @@ async function _loadAtlasData(): Promise<{
     "government",
     "people_and_society",
   ];
-  const mastheadSections = jurisdictionIds.length > 0
-    ? await db
-        .select({
-          jurisdictionId: countryFactbookSections.jurisdictionId,
-          sectionName: countryFactbookSections.sectionName,
-          sectionData: countryFactbookSections.sectionData,
-        })
-        .from(countryFactbookSections)
-        .where(
-          sql`${countryFactbookSections.jurisdictionId} IN ${jurisdictionIds}
-            AND ${countryFactbookSections.sectionName} IN ${factbookSectionNames}`
-        )
-    : [];
+  const mastheadSections =
+    jurisdictionIds.length > 0
+      ? await db
+          .select({
+            jurisdictionId: countryFactbookSections.jurisdictionId,
+            sectionName: countryFactbookSections.sectionName,
+            sectionData: countryFactbookSections.sectionData,
+          })
+          .from(countryFactbookSections)
+          .where(
+            sql`${countryFactbookSections.jurisdictionId} IN ${jurisdictionIds}
+            AND ${countryFactbookSections.sectionName} IN ${factbookSectionNames}`,
+          )
+      : [];
 
-  const allMemberships = jurisdictionIds.length > 0
-    ? await db
-        .select({
-          jurisdictionId: organizationMemberships.jurisdictionId,
-          orgSlug: organizations.slug,
-          orgName: organizations.name,
-        })
-        .from(organizationMemberships)
-        .innerJoin(organizations, sql`${organizationMemberships.orgId} = ${organizations.id}`)
-        .where(sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`)
-    : [];
+  const allMemberships =
+    jurisdictionIds.length > 0
+      ? await db
+          .select({
+            jurisdictionId: organizationMemberships.jurisdictionId,
+            orgSlug: organizations.slug,
+            orgName: organizations.name,
+          })
+          .from(organizationMemberships)
+          .innerJoin(
+            organizations,
+            sql`${organizationMemberships.orgId} = ${organizations.id}`,
+          )
+          .where(
+            sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`,
+          )
+      : [];
 
-  const pastElections = jurisdictionIds.length > 0
-    ? await db
-        .select({
-          jurisdictionId: elections.jurisdictionId,
-          electionDate: elections.electionDate,
-        })
-        .from(elections)
-        .where(
-          sql`${elections.jurisdictionId} IN ${jurisdictionIds}
-            AND ${elections.electionDate} <= CURRENT_DATE`
-        )
-        .orderBy(desc(elections.electionDate))
-    : [];
+  const pastElections =
+    jurisdictionIds.length > 0
+      ? await db
+          .select({
+            id: elections.id,
+            jurisdictionId: elections.jurisdictionId,
+            electionDate: elections.electionDate,
+          })
+          .from(elections)
+          .where(
+            sql`${elections.jurisdictionId} IN ${jurisdictionIds}
+            AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`,
+          )
+          .orderBy(desc(elections.electionDate))
+      : [];
 
   const factsByJurisdiction = new Map<
     string,
@@ -459,14 +495,16 @@ async function _loadAtlasData(): Promise<{
 
   const sectionsByJurisdiction = new Map<string, Map<string, unknown>>();
   for (const section of mastheadSections) {
-    const sections = sectionsByJurisdiction.get(section.jurisdictionId) ?? new Map();
+    const sections =
+      sectionsByJurisdiction.get(section.jurisdictionId) ?? new Map();
     sections.set(section.sectionName, section.sectionData);
     sectionsByJurisdiction.set(section.jurisdictionId, sections);
   }
 
   const membershipsByJurisdiction = new Map<string, CountryMembershipChip[]>();
   for (const membership of allMemberships) {
-    const memberships = membershipsByJurisdiction.get(membership.jurisdictionId) ?? [];
+    const memberships =
+      membershipsByJurisdiction.get(membership.jurisdictionId) ?? [];
     memberships.push({
       name: membership.orgName,
       slug: membership.orgSlug,
@@ -479,68 +517,95 @@ async function _loadAtlasData(): Promise<{
     string,
     (typeof pastElections)[number]
   >();
+  const liveElectionFingerprints = await loadLiveElectionContentFingerprints(
+    pastElections.map((row) => row.id),
+  );
   for (const election of pastElections) {
+    if (
+      !isAuditedPublicElection(
+        election.id,
+        liveElectionFingerprints.get(election.id),
+      ) ||
+      !isPrimaryElectionEvent(election.id)
+    )
+      continue;
     if (!latestElectionByJurisdiction.has(election.jurisdictionId)) {
       latestElectionByJurisdiction.set(election.jurisdictionId, election);
     }
   }
 
   // Batch: all legislative bodies
-  const allBodies = jurisdictionIds.length > 0
-    ? await db
-        .select()
-        .from(governmentBodies)
-        .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds} AND ${governmentBodies.branch} = 'legislative'`)
-        .orderBy(asc(governmentBodies.hierarchyLevel))
-    : [];
+  const allBodies =
+    jurisdictionIds.length > 0
+      ? await db
+          .select()
+          .from(governmentBodies)
+          .where(
+            sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds} AND ${governmentBodies.branch} = 'legislative'`,
+          )
+          .orderBy(asc(governmentBodies.hierarchyLevel))
+      : [];
 
   // Batch: all legislature parties
   const bodyIds = allBodies.map((b) => b.id);
-  const allParties = bodyIds.length > 0
-    ? await db
-        .select()
-        .from(legislatureParties)
-        .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
-        .orderBy(desc(legislatureParties.seatCount))
-    : [];
+  const allParties =
+    bodyIds.length > 0
+      ? await db
+          .select()
+          .from(legislatureParties)
+          .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+          .orderBy(desc(legislatureParties.seatCount))
+      : [];
 
   // Batch: all government bodies (for branch labels and executive leader lookup)
-  const allGovBodies = jurisdictionIds.length > 0
-    ? await db
-        .select()
-        .from(governmentBodies)
-        .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds}`)
-        .orderBy(asc(governmentBodies.hierarchyLevel))
-    : [];
+  const allGovBodies =
+    jurisdictionIds.length > 0
+      ? await db
+          .select()
+          .from(governmentBodies)
+          .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds}`)
+          .orderBy(asc(governmentBodies.hierarchyLevel))
+      : [];
   const execBodies = allGovBodies.filter((b) => b.branch === "executive");
   const execBodyIds = execBodies.map((b) => b.id);
 
-  const headOffices = execBodyIds.length > 0
-    ? await db
-        .select()
-        .from(offices)
-        .where(sql`${offices.bodyId} IN ${execBodyIds} AND ${offices.officeType} IN ('head_of_state', 'head_of_government')`)
-    : [];
+  const headOffices =
+    execBodyIds.length > 0
+      ? await db
+          .select()
+          .from(offices)
+          .where(
+            sql`${offices.bodyId} IN ${execBodyIds} AND ${offices.officeType} IN ('head_of_state', 'head_of_government')`,
+          )
+      : [];
   const headOfficeIds = headOffices.map((o) => o.id);
 
-  const currentHeads = headOfficeIds.length > 0
-    ? await db
-        .select({ term: terms, person: persons, officeId: terms.officeId })
-        .from(terms)
-        .innerJoin(persons, sql`${terms.personId} = ${persons.id}`)
-        .where(sql`${terms.officeId} IN ${headOfficeIds} AND ${terms.isCurrent} = true`)
-    : [];
+  const currentHeads =
+    headOfficeIds.length > 0
+      ? await db
+          .select({ term: terms, person: persons, officeId: terms.officeId })
+          .from(terms)
+          .innerJoin(persons, sql`${terms.personId} = ${persons.id}`)
+          .where(
+            sql`${terms.officeId} IN ${headOfficeIds} AND ${terms.isCurrent} = true`,
+          )
+      : [];
 
   // Build leader lookup: jurisdictionId -> leader name (head_of_state takes priority)
   const officeToBody = new Map(headOffices.map((o) => [o.id, o.bodyId]));
-  const bodyToJurisdiction = new Map([...allBodies, ...execBodies].map((b) => [b.id, b.jurisdictionId]));
+  const bodyToJurisdiction = new Map(
+    [...allBodies, ...execBodies].map((b) => [b.id, b.jurisdictionId]),
+  );
   const officeTypeMap = new Map(headOffices.map((o) => [o.id, o.officeType]));
 
   const headsByJurisdiction = new Map<
     string,
     { headOfState?: string; headOfGovernment?: string }
   >();
-  const leaderByJurisdiction = new Map<string, { name: string; isHeadOfState: boolean }>();
+  const leaderByJurisdiction = new Map<
+    string,
+    { name: string; isHeadOfState: boolean }
+  >();
   for (const h of currentHeads) {
     if (/^Q\d+$/.test(h.person.name)) continue;
     const bId = officeToBody.get(h.officeId);
@@ -567,7 +632,7 @@ async function _loadAtlasData(): Promise<{
   const countries: AtlasCountry[] = allJurisdictions.map((j) => {
     const government = formatGovernmentDisplay(
       j.governmentTypeDetail || j.governmentType,
-      j.name
+      j.name,
     );
     const facts = factsByJurisdiction.get(j.id) ?? new Map();
     const sections = sectionsByJurisdiction.get(j.id) ?? new Map();
@@ -595,72 +660,83 @@ async function _loadAtlasData(): Promise<{
     // with R.12's first sync run). Per
     // `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d.
     const exportsValue = facts.get(
-      "exports_goods_services_usd"
+      "exports_goods_services_usd",
     )?.factValueNumeric;
     const importsValue = facts.get(
-      "imports_goods_services_usd"
+      "imports_goods_services_usd",
     )?.factValueNumeric;
     const tradeBalance =
       typeof exportsValue === "number" && typeof importsValue === "number"
         ? `${exportsValue - importsValue >= 0 ? "+" : "-"}${formatMoneyDollars(
-            exportsValue - importsValue
+            exportsValue - importsValue,
           )}`
         : null;
     const latestElection = latestElectionByJurisdiction.get(j.id);
+    const latestElectionAudit = latestElection
+      ? getElectionAuditRow(latestElection.id)
+      : null;
+    const latestElectionSource = latestElectionAudit?.evidence.sourceId
+      ? {
+          source: latestElectionAudit.evidence.sourceId,
+          retrievedAt: latestElectionAudit.evidence.retrievedAt,
+        }
+      : curatedSource;
     const memberships = sortMemberships(
-      membershipsByJurisdiction.get(j.id) ?? []
+      membershipsByJurisdiction.get(j.id) ?? [],
     ).slice(0, 6);
 
     const masthead: CountryMastheadFacts = {
       gov: sourceWithValue(government.label, ciaSource),
       govDetail: sourceWithValue(
         formatGovernmentDetail(government.detail ?? j.governmentTypeDetail),
-        ciaSource
+        ciaSource,
       ),
       headOfState: sourceWithValue(heads.headOfState ?? null, wikidataSource),
       headOfGovernment: sourceWithValue(
         heads.headOfGovernment ?? null,
-        wikidataSource
+        wikidataSource,
       ),
       capital: sourceWithValue(cachedCapital, ciaSource),
       language: sourceWithValue(
         firstText(
           cachedLanguages,
           factText("languages"),
-          getNestedText(peopleSection, "Languages", "Languages")
+          getNestedText(peopleSection, "Languages", "Languages"),
         ),
-        ciaSource
+        ciaSource,
       ),
       currency: sourceWithValue(formatCurrency(cachedCurrency), ciaSource),
       region: sourceWithValue(
         CONTINENT_TO_REGION[j.continent || ""] || j.continent || null,
-        ciaSource
+        ciaSource,
       ),
       area: sourceWithValue(area, ciaSource),
       population: sourceWithValue(formatPop(cachedPopulation), ciaSource),
       gdpPpp: sourceWithValue(formatGdp(cachedGdpBillions), ciaSource),
       mainExport: sourceWithValue(
         formatCommodityList(factText("export_commodities")),
-        ciaSource
+        ciaSource,
       ),
       mainImport: sourceWithValue(
-        formatCommodityList(getNestedText(economySection, "Imports - commodities")),
-        ciaSource
+        formatCommodityList(
+          getNestedText(economySection, "Imports - commodities"),
+        ),
+        ciaSource,
       ),
       tradeBalance: sourceWithValue(tradeBalance, ciaSource),
       independence: sourceWithValue(
         getNestedText(governmentSection, "Independence"),
-        ciaSource
+        ciaSource,
       ),
       constitution: sourceWithValue(
         formatConstitution(
-          getNestedText(governmentSection, "Constitution", "history")
+          getNestedText(governmentSection, "Constitution", "history"),
         ),
-        ciaSource
+        ciaSource,
       ),
       lastElection: sourceWithValue(
         formatElectionDate(latestElection?.electionDate),
-        curatedSource
+        latestElectionSource,
       ),
       religion: sourceWithValue(factText("religions"), ciaSource),
       literacy: sourceWithValue(factText("literacy_rate"), ciaSource),
@@ -668,21 +744,23 @@ async function _loadAtlasData(): Promise<{
       callingCode: { value: null },
       tld: sourceWithValue(
         getNestedText(communicationsSection, "Internet country code"),
-        ciaSource
+        ciaSource,
       ),
       timeZone: sourceWithValue(
-        formatTimeZone(getNestedText(governmentSection, "Capital", "time difference")),
-        ciaSource
+        formatTimeZone(
+          getNestedText(governmentSection, "Capital", "time difference"),
+        ),
+        ciaSource,
       ),
       iso: sourceWithValue(j.iso3?.toUpperCase() ?? null, ciaSource),
       drivesOn: { value: null },
       anthem: sourceWithValue(
         getNestedText(governmentSection, "National anthem(s)", "title"),
-        ciaSource
+        ciaSource,
       ),
       nationalDay: sourceWithValue(
         getNestedText(governmentSection, "National holiday"),
-        ciaSource
+        ciaSource,
       ),
       memberships,
     };
@@ -729,7 +807,8 @@ async function _loadAtlasData(): Promise<{
     if (!jBodies || jBodies.length === 0) continue;
 
     const iso3 = j.iso3!.toLowerCase();
-    const lowerBody = jBodies.find((b) => b.chamberType === "lower") || jBodies[0];
+    const lowerBody =
+      jBodies.find((b) => b.chamberType === "lower") || jBodies[0];
     const upperBody = jBodies.find((b) => b.chamberType === "upper");
 
     function buildChamber(body: typeof lowerBody): AtlasChamber {
@@ -820,7 +899,9 @@ export interface AtlasLayerValues {
 
 export const loadAtlasLayerData = cache(_loadAtlasLayerData);
 
-async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> {
+async function _loadAtlasLayerData(): Promise<
+  Record<string, AtlasLayerValues>
+> {
   // jurisdiction id → lower-case iso3 (atlas Country.id space)
   const juris = await db
     .select({ id: jurisdictions.id, iso3: jurisdictions.iso3 })
@@ -852,8 +933,8 @@ async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> 
     .where(
       and(
         sql`${countryFacts.status} = 'active'`,
-        sql`${countryFacts.factKey} IN ('world_bank_income_group', 'vdem_row')`
-      )
+        sql`${countryFacts.factKey} IN ('world_bank_income_group', 'vdem_row')`,
+      ),
     );
 
   for (const row of factRows) {

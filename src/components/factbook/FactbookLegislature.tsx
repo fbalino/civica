@@ -96,9 +96,15 @@ export async function FactbookLegislature({
 
   if (facts?.nextElectionYear) {
     keyFactCells.push({
-      key: "Next election",
+      key:
+        facts.nextElectionBasis === "term_projection"
+          ? "Election due estimate"
+          : "Future election date",
       val: facts.nextElectionYear,
-      sub: "scheduled",
+      sub:
+        facts.nextElectionBasis === "term_projection"
+          ? "term-length projection"
+          : "source-dated; schedule not independently verified",
     });
   } else if (facts?.lastElectionYear) {
     keyFactCells.push({
@@ -131,6 +137,28 @@ export async function FactbookLegislature({
           <span className="legislature-keyfacts-source-label">
             Composition · IPU Parline
           </span>
+          {context?.electionEvidence && (
+            <>
+              <SourceDot
+                source={context.electionEvidence.sourceId}
+                retrievedAt={context.electionEvidence.retrievedAt}
+              />
+              <span className="legislature-keyfacts-source-label">
+                Election timing
+              </span>
+            </>
+          )}
+          {context?.turnoutEvidence && (
+            <>
+              <SourceDot
+                source={context.turnoutEvidence.sourceId}
+                retrievedAt={context.turnoutEvidence.retrievedAt}
+              />
+              <span className="legislature-keyfacts-source-label">
+                Turnout
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -179,7 +207,7 @@ export async function FactbookLegislature({
           {data.nextElection && (
             <div className="factbook-legislature-ribbon-cell">
               <div className="factbook-legislature-ribbon-key">
-                Next election
+                Election timing
               </div>
               <div className="factbook-legislature-ribbon-val">
                 {data.nextElection}

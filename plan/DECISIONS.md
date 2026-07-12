@@ -1005,3 +1005,22 @@ the closed sovereign-state class and other sourced identities use `Place`.
 reference atlas incomplete, while silently mixing them into sovereign-state
 denominators changes research meaning. Separate contracts let readers find
 every profile without turning catalog inclusion into a political claim.
+
+### APR-D161 — Election storage, qualification, and display are separate
+
+**Decision:** Preserve the 915-row election baseline and qualify each row through
+`election-corpus-audit/v1`. A date is source-dated, imprecise, or term-derived;
+it does not by itself prove that an event is scheduled or completed. Event
+identity and chamber-contest identity remain separate. Turnout and results fail
+closed without field-specific statement evidence. Publisher jurisdiction
+assignment must match Wikidata P17 or the IPU election/chamber country code;
+missing and mismatched identity evidence fail closed. The public calendar
+consolidates unnamed chamber-derived projections by jurisdiction and election
+type, while detailed surfaces may retain separate named chamber contests.
+Limited-recognition records remain outside sovereign totals, and pending source
+rights remain outside public bulk export.
+
+**Why:** Deleting weak rows would conceal the audit trail, while publishing every
+stored row would turn estimates, collisions, imprecise dates, and unsupported
+fields into apparent facts. A checked qualification layer keeps the evidence
+available for repair and gives readers a narrower, reproducible corpus.

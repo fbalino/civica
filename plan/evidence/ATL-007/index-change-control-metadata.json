@@ -1,0 +1,26 @@
+{
+  "id": "atlas-qualified-election-corpus",
+  "toVersion": "civica-index-atlas-qualified-election-corpus-v27",
+  "evidence": {
+    "documentation": [
+      "plan/evidence/ATL-007/README.md",
+      "plan/research/atlas-surface-data-matrix-v1.md"
+    ],
+    "registry": [
+      "src/lib/elections/corpus-audit.generated.json",
+      "src/lib/elections/jurisdiction-identity.generated.json",
+      "data/atlas-surface-data-matrix.v1.json"
+    ],
+    "release_note": ["plan/evidence/ATL-007/README.md"],
+    "migration_plan": ["plan/evidence/ATL-007/migration-plan.md"],
+    "golden_test": [
+      "src/lib/elections/corpus-audit.test.ts",
+      "src/lib/elections/corpus-audit-runtime.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-election-corpus-audit.ts",
+      "scripts/validate-election-jurisdiction-identity.ts",
+      "src/lib/elections/__tests__/writer-repeatability.test.ts"
+    ]
+  }
+}

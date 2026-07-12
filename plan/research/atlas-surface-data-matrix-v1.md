@@ -6,7 +6,7 @@
 
 **Machine-readable artifact:** `data/atlas-surface-data-matrix.v1.json`
 
-**Semantic SHA-256:** `99c0bf432ef019cebdcfc5532fdf624dc6e88f1e65ef1e2758238d58baff809b`
+**Semantic SHA-256:** `08b210beca427e8731196964648c7575235cf934905859a75f5cbfb792438b8c`
 
 ## Scope
 

@@ -20,6 +20,16 @@ import {
 } from "@/lib/government-taxonomy";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import {
+  ELECTION_CORPUS_AUDIT,
+  getElectionAuditRow,
+  isAuditedProjection,
+  isAuditedPublicElection,
+  isEligibleElectionField,
+  getElectionPublicFutureKey,
+  isPrimaryElectionEvent,
+} from "@/lib/elections/corpus-audit-runtime";
+import { loadLiveElectionContentFingerprints } from "@/lib/elections/corpus-audit-live";
+import {
   jurisdictions,
   countryFactbookSections,
   countryFacts,
@@ -756,15 +766,22 @@ export async function getLeaderTimeline(jurisdictionId: string) {
 }
 
 export async function getElectionsByJurisdiction(jurisdictionId: string) {
-  const rows = await db
+  const rawRows = await db
     .select()
     .from(elections)
     .where(eq(elections.jurisdictionId, jurisdictionId))
     .orderBy(desc(elections.electionDate));
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    rawRows.map((row) => row.id),
+  );
+  const rows = rawRows.filter(
+    (row) =>
+      isAuditedPublicElection(row.id, liveFingerprints.get(row.id)) ||
+      isAuditedProjection(row.id, liveFingerprints.get(row.id)),
+  );
 
   const electionIds = rows.map((e) => e.id);
-  if (electionIds.length === 0)
-    return rows.map((e) => ({ election: e, results: [] as typeof allResults }));
+  if (electionIds.length === 0) return [];
 
   const allResults = await db
     .select()
@@ -773,27 +790,79 @@ export async function getElectionsByJurisdiction(jurisdictionId: string) {
     .orderBy(desc(electionResults.votesPercent));
 
   return rows.map((election) => ({
-    election,
-    results: allResults.filter((r) => r.electionId === election.id),
+    election: {
+      ...election,
+      turnoutPercent: isEligibleElectionField(election.id, "turnout")
+        ? election.turnoutPercent
+        : null,
+    },
+    results: isEligibleElectionField(election.id, "results")
+      ? allResults.filter((r) => r.electionId === election.id)
+      : [],
+    audit: getElectionAuditRow(election.id),
   }));
 }
 
 export async function getUpcomingElections(limit = 20) {
-  return db
+  const rows = await db
     .select({
       election: elections,
       jurisdiction: {
         slug: jurisdictions.slug,
         name: jurisdictions.name,
         iso2: jurisdictions.iso2,
+        iso3: jurisdictions.iso3,
         continent: jurisdictions.continent,
+        type: jurisdictions.type,
+        statusSourceIds: jurisdictions.statusSourceIds,
+        statusReviewedAt: jurisdictions.statusReviewedAt,
+        statusNote: jurisdictions.statusNote,
+        administeringJurisdictionIso3:
+          jurisdictions.administeringJurisdictionIso3,
+        statusDisputed: jurisdictions.statusDisputed,
       },
     })
     .from(elections)
     .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
-    .where(sql`${elections.electionDate} >= CURRENT_DATE`)
-    .orderBy(asc(elections.electionDate))
-    .limit(limit);
+    .where(sql`${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`)
+    .orderBy(asc(elections.electionDate));
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    rows.map((row) => row.election.id),
+  );
+  const seenPublicEvents = new Set<string>();
+  return rows
+    .filter((row) => {
+      const audit = getElectionAuditRow(row.election.id);
+      const eligible = Boolean(
+        audit &&
+          isPrimaryElectionEvent(row.election.id) &&
+          (audit.temporalClass === "source_dated_upcoming" ||
+            audit.temporalClass === "projection_due") &&
+          (isAuditedPublicElection(
+            row.election.id,
+            liveFingerprints.get(row.election.id),
+          ) ||
+            isAuditedProjection(
+              row.election.id,
+              liveFingerprints.get(row.election.id),
+            )),
+      );
+      if (!eligible) return false;
+      const publicKey = getElectionPublicFutureKey(row.election.id);
+      if (!publicKey || seenPublicEvents.has(publicKey)) return false;
+      seenPublicEvents.add(publicKey);
+      return true;
+    })
+    .slice(0, limit)
+    .map((row) => ({
+      ...row,
+      jurisdiction: {
+        ...row.jurisdiction,
+        status: buildJurisdictionStatusPresentation(row.jurisdiction),
+      },
+      election: { ...row.election, turnoutPercent: null },
+      audit: getElectionAuditRow(row.election.id),
+    }));
 }
 
 export async function getRecentElectionsWithResults(limit = 60) {
@@ -804,7 +873,15 @@ export async function getRecentElectionsWithResults(limit = 60) {
         slug: jurisdictions.slug,
         name: jurisdictions.name,
         iso2: jurisdictions.iso2,
+        iso3: jurisdictions.iso3,
         continent: jurisdictions.continent,
+        type: jurisdictions.type,
+        statusSourceIds: jurisdictions.statusSourceIds,
+        statusReviewedAt: jurisdictions.statusReviewedAt,
+        statusNote: jurisdictions.statusNote,
+        administeringJurisdictionIso3:
+          jurisdictions.administeringJurisdictionIso3,
+        statusDisputed: jurisdictions.statusDisputed,
       },
     })
     .from(elections)
@@ -820,19 +897,32 @@ export async function getRecentElectionsWithResults(limit = 60) {
     // a Civica-computed "estimated" next date never has results and is excluded
     // here regardless. See plan/elections-data-sourcing-resolution-v1.md §6.
     .where(
-      sql`${elections.electionDate} < CURRENT_DATE
+      sql`${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}
         AND ${elections.dateConfidence} IS DISTINCT FROM 'estimated'
         AND EXISTS (
           SELECT 1 FROM ${electionResults}
           WHERE ${electionResults.electionId} = ${elections.id}
         )`,
     )
-    .orderBy(desc(elections.electionDate))
-    .limit(limit);
+    .orderBy(desc(elections.electionDate));
 
-  const electionIds = rows.map((r) => r.election.id);
-  if (electionIds.length === 0)
-    return rows.map((r) => ({ ...r, results: [] as typeof allResults }));
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    rows.map((row) => row.election.id),
+  );
+
+  const qualifiedRows = rows
+    .filter(
+      (row) =>
+        isAuditedPublicElection(
+          row.election.id,
+          liveFingerprints.get(row.election.id),
+        ) &&
+        isEligibleElectionField(row.election.id, "results"),
+    )
+    .slice(0, limit);
+
+  const electionIds = qualifiedRows.map((r) => r.election.id);
+  if (electionIds.length === 0) return [];
 
   const allResults = await db
     .select()
@@ -840,9 +930,20 @@ export async function getRecentElectionsWithResults(limit = 60) {
     .where(sql`${electionResults.electionId} IN ${electionIds}`)
     .orderBy(desc(electionResults.votesPercent));
 
-  return rows.map((r) => ({
+  return qualifiedRows.map((r) => ({
     ...r,
+    jurisdiction: {
+      ...r.jurisdiction,
+      status: buildJurisdictionStatusPresentation(r.jurisdiction),
+    },
+    election: {
+      ...r.election,
+      turnoutPercent: isEligibleElectionField(r.election.id, "turnout")
+        ? r.election.turnoutPercent
+        : null,
+    },
     results: allResults.filter((res) => res.electionId === r.election.id),
+    audit: getElectionAuditRow(r.election.id),
   }));
 }
 

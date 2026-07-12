@@ -4,6 +4,7 @@ import { PROVENANCE_COVERAGE_SUMMARY } from "./provenance-coverage";
 export const PUBLIC_CLAIM_SURFACES = [
   "home",
   "country",
+  "elections",
   "index",
   "pulse",
   "methodology",
@@ -986,6 +987,26 @@ export const PUBLIC_CLAIMS = [
       path: "content/methodology-pulse.md",
       fragment:
         "Pulse is being developed first as a versioned ledger of **documented governance-relevant event records**.",
+    },
+  },
+  {
+    id: "elections.qualified-corpus",
+    surface: "elections",
+    routeOrArtifact: "/elections",
+    exactClaim:
+      "Election records are published from a checked 915-row baseline only after deterministic row-level qualification; source-dated future records, projections, quarantined rows, and sovereign/limited-recognition scope are counted separately.",
+    tier: "source-reported-fact",
+    evidenceSources: [
+      "src/lib/elections/corpus-audit.generated.json",
+      "src/lib/elections/corpus-audit.ts",
+      "scripts/validate-election-corpus-audit.ts",
+    ],
+    implementationOwner: "Atlas elections",
+    methodologyVersion: "election-corpus-audit/v1",
+    gate: "G2",
+    source: {
+      path: "src/app/elections/ElectionsClient.tsx",
+      fragment: "National election records, audited row by row.",
     },
   },
   {

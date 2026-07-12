@@ -11,6 +11,8 @@ import {
   type DomainCoverageReport,
   type DomainSourceInput,
 } from "../src/lib/provenance/domain-coverage";
+import { ELECTION_CORPUS_AUDIT } from "../src/lib/elections/corpus-audit-runtime";
+import { assertLiveElectionCorpusFingerprint } from "../src/lib/elections/corpus-audit-live";
 
 const OUTPUT = resolve(
   process.cwd(),
@@ -49,7 +51,6 @@ async function collect(generatedAt: string) {
     bodyRows,
     legislatureRows,
     citationRows,
-    electionRows,
     constitutionRows,
     officeRows,
     peopleRows,
@@ -105,10 +106,6 @@ async function collect(generatedAt: string) {
                  COUNT(l.source_license)::int licenses, COUNT(l.retrieved_at)::int retrieved,
                  COUNT(l.source_hash)::int hashes
           FROM linked l JOIN jurisdictions j ON j.id=l.jurisdiction_id WHERE j.type='sovereign_state'`,
-    sql`SELECT COUNT(*)::int records, COUNT(DISTINCT e.jurisdiction_id)::int jurisdictions,
-               COUNT(e.election_date)::int dates, COUNT(e.election_type)::int types,
-               COUNT(e.turnout_percent)::int turnout
-        FROM elections e JOIN jurisdictions j ON j.id=e.jurisdiction_id WHERE j.type='sovereign_state'`,
     sql`SELECT COUNT(*)::int records, COUNT(DISTINCT c.jurisdiction_id)::int jurisdictions,
                COUNT(c.year)::int years, COUNT(c.full_text_html)::int texts,
                COUNT(c.structured_articles)::int structured
@@ -179,7 +176,6 @@ async function collect(generatedAt: string) {
   const body = one(bodyRows);
   const leg = one(legislatureRows);
   const citation = one(citationRows);
-  const e = one(electionRows);
   const c = one(constitutionRows);
   const o = one(officeRows);
   const p = one(peopleRows);
@@ -209,6 +205,19 @@ async function collect(generatedAt: string) {
     "wikidata",
     "international_idea",
   ]);
+  const sovereignElectionRows = ELECTION_CORPUS_AUDIT.rows.filter(
+    (row) => row.jurisdiction.status === "sovereign_state",
+  );
+  const qualifiedSovereignEvents = sovereignElectionRows.filter(
+    (row) => row.disposition === "qualified_event",
+  );
+  const qualifiedSovereignJurisdictions = new Set(
+    qualifiedSovereignEvents.map((row) => row.jurisdiction.id),
+  ).size;
+  const withoutIssue = (issue: string) =>
+    sovereignElectionRows.filter(
+      (row) => !row.issueCodes.includes(issue as never),
+    ).length;
   const jurisdictionSources: DomainSourceInput[] = [
     {
       id: "jurisdiction_status_catalog",
@@ -388,33 +397,58 @@ async function collect(generatedAt: string) {
     {
       id: "elections",
       label: "Elections",
-      recordLabel: "election records",
-      recordCount: n(e, "records"),
-      jurisdictionsCovered: n(e, "jurisdictions"),
+      recordLabel: "qualified conceptual election events",
+      recordCount: qualifiedSovereignEvents.length,
+      jurisdictionsCovered: qualifiedSovereignJurisdictions,
       completeness: [
         {
-          field: "election_date",
-          label: "Election date",
-          complete: n(e, "dates"),
-          total: n(e, "records"),
+          field: "audit_disposition",
+          label: "Row-level audit disposition",
+          complete: sovereignElectionRows.length,
+          total: sovereignElectionRows.length,
         },
         {
-          field: "election_type",
-          label: "Election type",
-          complete: n(e, "types"),
-          total: n(e, "records"),
+          field: "event_provenance",
+          label: "Authoritative event provenance",
+          complete: withoutIssue("MISSING_EVENT_PROVENANCE"),
+          total: sovereignElectionRows.length,
         },
         {
-          field: "turnout_percent",
-          label: "Turnout",
-          complete: n(e, "turnout"),
-          total: n(e, "records"),
+          field: "date_semantics",
+          label: "Usable date basis and precision",
+          complete: sovereignElectionRows.filter(
+            (row) =>
+              !row.issueCodes.includes("MISSING_DATE_CONFIDENCE") &&
+              !row.issueCodes.includes("IMPRECISE_SOURCE_DATE"),
+          ).length,
+          total: sovereignElectionRows.length,
+        },
+        {
+          field: "jurisdiction_identity",
+          label: "Matching publisher jurisdiction identity",
+          complete: sovereignElectionRows.filter(
+            (row) => row.jurisdictionIdentity?.status === "matched",
+          ).length,
+          total: sovereignElectionRows.length,
+        },
+        {
+          field: "public_qualification",
+          label: "Qualified event or contest row",
+          complete: sovereignElectionRows.filter(
+            (row) =>
+              row.disposition === "qualified_event" ||
+              row.disposition === "qualified_contest",
+          ).length,
+          total: sovereignElectionRows.length,
         },
       ],
       sources: electionSources,
       lastSuccessfulRun: sourceLast(electionSources),
       knownGaps: [
-        "Presidential, legislative, and turnout coverage have different publisher scopes; a jurisdiction count does not imply every election type or result field is present.",
+        `The checked ${ELECTION_CORPUS_AUDIT.raw.rows}-row baseline contains ${ELECTION_CORPUS_AUDIT.qualified.quarantinedRows} quarantined rows and ${ELECTION_CORPUS_AUDIT.qualified.projectionGroups} separately labelled term-length projection groups; neither is counted as a qualified event.`,
+        `${ELECTION_CORPUS_AUDIT.issueCounts.MISSING_JURISDICTION_IDENTITY_EVIDENCE ?? 0} rows lack retained publisher jurisdiction identity and remain quarantined; no checked publisher jurisdiction mismatch is public.`,
+        "Presidential history is uneven, indirect and subnational selections can leak through upstream ontology, and a jurisdiction count does not imply complete historical, presidential, turnout, or result coverage.",
+        "IPU Parline and International IDEA statement licenses are recorded as non-commercial, but their source-specific DAT-003 rights reviews remain pending and their rows stay out of the public bulk export.",
       ],
       threshold,
     },
@@ -755,6 +789,7 @@ async function collect(generatedAt: string) {
 
 async function main() {
   const check = process.argv.includes("--check");
+  if (check) await assertLiveElectionCorpusFingerprint();
   const checked = check
     ? (JSON.parse(readFileSync(OUTPUT, "utf8")) as DomainCoverageReport)
     : null;

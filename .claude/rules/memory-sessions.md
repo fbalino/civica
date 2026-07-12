@@ -106,6 +106,11 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   (amber); green is reserved for genuinely live feeds.
 - `sources.last_sync_at` is stamped ONLY via `markSourcesSynced()` (enforced by
   `validate:sync-freshness`). Never write it inline.
+- Public election qualification is content-bound, never UUID-only. Any change
+  to an election, result, statement, jurisdiction status/identity, or referenced
+  source makes the live row fail closed until the checked audit is regenerated.
+  Source-dated future rows remain tentative; term-derived projections use year
+  precision and never imply an official schedule.
 - **Robots-crawl-delay syncs can't use a single Vercel cron — shard by day-of-month.**
   The Wikidata syncs (`sync-officeholders`, `sync-wikidata`) finish in one monthly cron
   because SPARQL is a bulk endpoint. The CIA World Leaders cabinet sync
