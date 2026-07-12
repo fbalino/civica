@@ -1,0 +1,27 @@
+{
+  "id": "country-masthead-semantic-figure",
+  "toVersion": "civica-index-country-masthead-figure-v11",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/EXP-013/semantic-and-layout-contract.md"
+    ],
+    "registry": [
+      "src/lib/ci/index-change-control.ts"
+    ],
+    "release_note": [
+      "plan/evidence/EXP-013/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/EXP-013/migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/illustrations/__tests__/editorial-illustration-disclosure.test.ts",
+      "plan/evidence/EXP-013/geometry.json"
+    ],
+    "contract_test": [
+      "src/lib/illustrations/editorial-illustration-disclosure.ts",
+      "src/components/factbook/FactbookHeaderStrip.tsx"
+    ]
+  }
+}

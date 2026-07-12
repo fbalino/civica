@@ -58,6 +58,9 @@
   z-index: 0;
   will-change: transform;
 }
+.factbook-hero-art-figure {
+  display: contents;
+}
 .factbook-hero--art::after {
   content: "";
   position: absolute;

@@ -82,6 +82,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/ci/index-disposition.ts", category: "presentation" },
   { path: "src/lib/ci/misuse-audit.ts", category: "presentation" },
   { path: "src/components/governance-evidence/GovernanceEvidenceTable.tsx", category: "presentation" },
+  { path: "src/components/factbook/FactbookHeaderStrip.tsx", category: "presentation" },
   { path: "src/app/governance-evidence/page.tsx", category: "presentation" },
   { path: "src/app/api/governance-evidence/[slug]/route.ts", category: "presentation" },
   { path: "src/app/(reader)/civica-index/page.tsx", category: "presentation" },

@@ -260,44 +260,44 @@ export function FactbookHeaderStrip({
         className={`factbook-hero${engravingSrc ? " factbook-hero--art" : ""}`}
       >
         {engravingSrc && (
-          <ParallaxImage
-            className="factbook-hero-art-img"
-            src={engravingSrc}
-            darkSrc={engravingDarkSrc}
-            alt=""
-            aria-hidden="true"
-          />
-        )}
-        {engravingSrc && (
-          <figcaption className="factbook-hero-caption">
-            {reconciliationNotice ? (
-              <span className="factbook-reconciliation-notice">
-                {reconciliationNotice}
-              </span>
-            ) : null}
-            <span className="factbook-hero-caption-label">Editorial engraving</span>
-            {heroCaption ? (
-              engravingDarkSrc && heroDarkCaption ? (
-                <>
-                  <span className="factbook-hero-caption-text theme-engraving-light">
-                    {heroCaption}
-                  </span>
-                  <span className="factbook-hero-caption-text theme-engraving-dark">
-                    {heroDarkCaption}
-                  </span>
-                </>
-              ) : (
-                <span className="factbook-hero-caption-text">{heroCaption}</span>
-              )
-            ) : null}
-            <Link
-              href="/licensing#imagery"
-              className="factbook-hero-caption-link"
-              aria-label="AI-assisted illustration; non-documentary editorial art"
-            >
-              AI-assisted illustration
-            </Link>
-          </figcaption>
+          <figure className="factbook-hero-art-figure">
+            <ParallaxImage
+              className="factbook-hero-art-img"
+              src={engravingSrc}
+              darkSrc={engravingDarkSrc}
+              alt=""
+              aria-hidden="true"
+            />
+            <figcaption className="factbook-hero-caption">
+              {reconciliationNotice ? (
+                <span className="factbook-reconciliation-notice">
+                  {reconciliationNotice}
+                </span>
+              ) : null}
+              <span className="factbook-hero-caption-label">Editorial engraving</span>
+              {heroCaption ? (
+                engravingDarkSrc && heroDarkCaption ? (
+                  <>
+                    <span className="factbook-hero-caption-text theme-engraving-light">
+                      {heroCaption}
+                    </span>
+                    <span className="factbook-hero-caption-text theme-engraving-dark">
+                      {heroDarkCaption}
+                    </span>
+                  </>
+                ) : (
+                  <span className="factbook-hero-caption-text">{heroCaption}</span>
+                )
+              ) : null}
+              <Link
+                href="/licensing#imagery"
+                className="factbook-hero-caption-link"
+                aria-label="AI-assisted illustration; non-documentary editorial art"
+              >
+                AI-assisted illustration
+              </Link>
+            </figcaption>
+          </figure>
         )}
         <div className="factbook-hero-left">
           <div className="factbook-hero-title-row">

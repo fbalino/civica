@@ -86,15 +86,14 @@ More prose here.
 
 const PASSING_CAPTION_COMPONENT = `
         {engravingSrc && (
-          <ParallaxImage
-            className="factbook-hero-art-img"
-            src={engravingSrc}
-            darkSrc={engravingDarkSrc}
-            alt=""
-          />
-        )}
-        {engravingSrc && (
-          <figcaption className="factbook-hero-caption">
+          <figure className="factbook-hero-art-figure">
+            <ParallaxImage
+              className="factbook-hero-art-img"
+              src={engravingSrc}
+              darkSrc={engravingDarkSrc}
+              alt=""
+            />
+            <figcaption className="factbook-hero-caption">
             <span className="factbook-hero-caption-label">Editorial engraving</span>
             {heroCaption ? (
               <span className="factbook-hero-caption-text">{heroCaption}</span>
@@ -102,7 +101,8 @@ const PASSING_CAPTION_COMPONENT = `
             <Link href="/licensing#imagery" className="factbook-hero-caption-link" aria-label="AI-assisted illustration; non-documentary editorial art">
               AI-assisted illustration
             </Link>
-          </figcaption>
+            </figcaption>
+          </figure>
         )}
 `;
 
@@ -358,8 +358,8 @@ test("checkCountryCaptionDisclosure accepts the passing caption component", () =
 
 test("checkCountryCaptionDisclosure flags gating the disclosure on the landmark caption text", () => {
   const broken = PASSING_CAPTION_COMPONENT.replace(
-    "{engravingSrc && (\n          <figcaption",
-    "{engravingSrc && heroCaption && (\n          <figcaption",
+    "{engravingSrc && (\n          <figure",
+    "{engravingSrc && heroCaption && (\n          <figure",
   );
   const issues = checkCountryCaptionDisclosure(broken);
   assert.ok(issues.some((i) => i.ruleId === "caption-gated-on-landmark-name"), JSON.stringify(issues));
@@ -402,6 +402,12 @@ test("checkCountryCaptionDisclosure reports a missing figcaption as a single cle
   const issues = checkCountryCaptionDisclosure("export function FactbookHeaderStrip() { return null; }");
   assert.equal(issues.length, 1);
   assert.equal(issues[0].ruleId, "missing-caption-block");
+});
+
+test("checkCountryCaptionDisclosure rejects a figcaption outside figure", () => {
+  const broken = PASSING_CAPTION_COMPONENT.replace('<figure className="factbook-hero-art-figure">', "").replace("</figure>", "");
+  const issues = checkCountryCaptionDisclosure(broken);
+  assert.ok(issues.some((i) => i.ruleId === "invalid-figcaption-parent"), JSON.stringify(issues));
 });
 
 test("checkPageHeroDisclosure accepts visible policy copy and decorative background art", () => {

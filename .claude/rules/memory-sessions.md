@@ -758,3 +758,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Every engraved PageHero now carries a visible AI-assisted/non-documentary policy link; country/territory captions add the same classification to the accessible name.
 - Licensing links the complete 538-asset manifest while preserving the irrecoverable historical model/prompt/reference/seed limit and the incomplete human-review disclosure.
 - Representative About, Greenland, Japan, and licensing surfaces passed desktop/mobile/light/dark browser checks with no overflow or console errors.
+
+## 2026-07-12 — EXP-013 country caption structure completed
+
+- Moved engraving layers and figcaption under a semantic figure while preserving the caption's dedicated grid row through the shared display-contents composition.
+- Parallax now tracks the nearest section, so the semantic wrapper cannot become a boxless scroll target.
+- Exact 769px dark and 1440px light geometry passed with no content/media overlap, overflow, or console errors; the shared header entered Index presentation change control.

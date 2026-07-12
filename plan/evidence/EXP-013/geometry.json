@@ -1,0 +1,33 @@
+{
+  "route": "/country/japan",
+  "browserZoomCorrection": "The in-app browser was at 90%; requested window widths were adjusted until window.innerWidth reported the exact target CSS widths.",
+  "cases": [
+    {
+      "cssViewport": { "width": 769, "height": 889 },
+      "theme": "system-dark",
+      "figureTag": "FIGURE",
+      "hero": { "top": 56, "bottom": 568.59, "height": 512.59 },
+      "caption": { "top": 478.12, "bottom": 544.59, "height": 66.48 },
+      "contentBottom": 446.13,
+      "mediaControlsBottom": 446.13,
+      "overlapContent": false,
+      "overlapMediaControls": false,
+      "captionInsideHero": true,
+      "horizontalOverflowPx": 0
+    },
+    {
+      "cssViewport": { "width": 1440, "height": 1000 },
+      "theme": "light",
+      "figureTag": "FIGURE",
+      "hero": { "top": 56, "bottom": 856, "height": 800 },
+      "caption": { "top": 805.11, "bottom": 832.01, "height": 26.89 },
+      "contentBottom": 773.13,
+      "mediaControlsBottom": 773.13,
+      "overlapContent": false,
+      "overlapMediaControls": false,
+      "captionInsideHero": true,
+      "horizontalOverflowPx": 0
+    }
+  ],
+  "consoleWarningsOrErrors": []
+}

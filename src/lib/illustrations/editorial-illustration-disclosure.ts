@@ -432,7 +432,7 @@ export function checkAboutImageryPointer(paragraphText: string | null): Disclosu
  * /licensing#imagery) must render whenever an engraving image exists, even
  * when the landmark caption text is missing — never gated on the caption.
  */
-const GUARD_LOOKBACK_CHARS = 200;
+const GUARD_LOOKBACK_CHARS = 500;
 
 export function checkCountryCaptionDisclosure(componentSource: string): DisclosureIssue[] {
   const issues: DisclosureIssue[] = [];
@@ -479,6 +479,16 @@ export function checkCountryCaptionDisclosure(componentSource: string): Disclosu
     figcaptionEnd >= 0
       ? componentSource.slice(figcaptionIndex, figcaptionEnd + "</figcaption>".length)
       : componentSource.slice(figcaptionIndex);
+
+  const figureStart = componentSource.lastIndexOf("<figure", figcaptionIndex);
+  const figureEnd = componentSource.indexOf("</figure>", figcaptionIndex);
+  if (figureStart === -1 || figureEnd === -1 || figureEnd < figcaptionEnd) {
+    issues.push({
+      surface: "country-caption",
+      ruleId: "invalid-figcaption-parent",
+      description: "The engraving image and figcaption must share a semantic <figure> parent.",
+    });
+  }
 
   if (!/Editorial engraving/i.test(figcaptionSource)) {
     issues.push({
