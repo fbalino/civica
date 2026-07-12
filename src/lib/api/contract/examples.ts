@@ -67,6 +67,7 @@ import {
   CURRENT_CI_RELEASE_ID,
 } from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 const currentCiSeries = resolveCiRelease(CURRENT_CI_RELEASE_ID).series;
 
@@ -203,6 +204,29 @@ const exampleProvenanceEntry = {
  * /api/v1/countries
  * ──────────────────────────────────────────────────────────────── */
 
+const exampleSovereignStatus: JurisdictionStatusPresentation = {
+  version: "jurisdiction-status/v1" as const,
+  type: "sovereign_state" as const,
+  label: "UN member state",
+  note: "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+  reviewedAt: "2026-07-10",
+  administeringJurisdictionIso3: null,
+  disputed: false,
+  includeInSovereignStateCounts: true,
+  sources: [
+    {
+      id: "un_member_states",
+      label: "United Nations Member States",
+      url: "https://www.un.org/en/about-us/member-states",
+    },
+    {
+      id: "un_m49",
+      label: "UN Statistics M49 countries or areas",
+      url: "https://unstats.un.org/unsd/methodology/m49/",
+    },
+  ],
+};
+
 const countriesExampleResponse = zCountriesListResponse.strict().parse({
   data: [
     shapeCountryListItem({
@@ -219,10 +243,11 @@ const countriesExampleResponse = zCountriesListResponse.strict().parse({
       areaSqKm: 9833520,
       flagUrl: "https://civicaatlas.org/flags/us.svg",
       governmentClassification: usaClassification,
+      jurisdictionStatus: exampleSovereignStatus,
     }),
   ],
   meta: shapeCountriesListMeta({
-    total: 195,
+    total: 253,
     limit: 50,
     offset: 0,
     hasMore: true,
@@ -269,6 +294,7 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
     governmentType: "semi-presidential republic",
     governmentTypeDetail: "semi-presidential republic",
     governmentClassification: franceClassification,
+    jurisdictionStatus: exampleSovereignStatus,
     flagUrl: "https://civicaatlas.org/flags/fr.svg",
     constitution: { year: 1958, yearUpdated: 2008 },
     government: {
@@ -964,8 +990,7 @@ const pulseExampleVersionSet = {
 };
 
 const pulseExamplePromptVersion = "pulse-classifier-prompt/example";
-const pulseExampleConfigurationHash =
-  `pulse-classification-config/sha256:${"b".repeat(64)}`;
+const pulseExampleConfigurationHash = `pulse-classification-config/sha256:${"b".repeat(64)}`;
 
 function pulseUnanimousClassifierRuns() {
   const shared = {
@@ -1411,6 +1436,7 @@ const countryExportJsonExample = zCountryExportJson.parse({
     iso2: "FR",
     iso3: "FRA",
     status: "sovereign_state",
+    statusDetails: exampleSovereignStatus,
   },
   facts: [
     {
@@ -1511,7 +1537,7 @@ export function renderExample(id: ExampleId): string {
 }
 
 export function renderCountryExportCsvExample(): string {
-  return `${COUNTRY_EXPORT_CSV_HEADER}\ncountry-research-export/v1,example-france-id,france,France,FR,FRA,sovereign_state,population_total,canonical,…`;
+  return `${COUNTRY_EXPORT_CSV_HEADER}\ncountry-research-export/v1,…,example-france-id,france,France,FR,FRA,sovereign_state,UN member state,…,population_total,canonical,…`;
 }
 
 export { COUNTRY_EXPORT_CSV_HEADER };

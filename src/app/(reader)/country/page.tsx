@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { getAllJurisdictions, getAlmanacFilterFacts } from "@/lib/db/queries";
+import {
+  getAllReferenceJurisdictions,
+  getAlmanacFilterFacts,
+} from "@/lib/db/queries";
 import {
   FactbookAlmanac,
   type FactbookAlmanacCountry,
@@ -11,7 +14,7 @@ import {
 // `.factbook-landing-*` classes in factbook.css.
 
 export const metadata: Metadata = {
-  title: "Countries — Reference Dossier for Every Nation",
+  title: "Countries & Areas — Reference Dossiers",
   description:
     "Browse reference dossiers for every country and territory on Earth: government, geography, people, and economy from the CIA World Factbook with Civica governance overlays.",
   alternates: { canonical: "https://civicaatlas.org/country" },
@@ -24,7 +27,7 @@ export default async function CountryIndexPage() {
   let catalogAvailable = false;
   try {
     const [rows, filterFacts] = await Promise.all([
-      getAllJurisdictions(),
+      getAllReferenceJurisdictions(),
       getAlmanacFilterFacts(),
     ]);
     countries = rows.map((row) => {
@@ -42,6 +45,7 @@ export default async function CountryIndexPage() {
         region: facts?.region ?? null,
         incomeGroup: facts?.incomeGroup ?? null,
         regimeType: facts?.regimeType ?? null,
+        status: row.jurisdictionStatus,
       };
     });
     catalogAvailable = true;

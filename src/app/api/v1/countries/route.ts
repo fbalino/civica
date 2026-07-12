@@ -16,7 +16,12 @@
  * Plan: ~/civica/plan/structural-family-removal-implementation-plan.md §B-Phase 4
  */
 
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+} from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions } from "@/lib/db/schema";
@@ -26,11 +31,24 @@ import {
   cachedJurisdictionColumns,
   getCanonicalFactsForJurisdictions,
 } from "@/lib/factbook/reconcile/api";
+import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import {
-  withStructuralFamilyDeprecation,
-} from "@/lib/api/deprecation";
-import { shapeCountryListItem, shapeCountriesListMeta } from "@/lib/api/contract/shapes";
-import { getFrozenDisplayFactsForJurisdictions, getImmutableVintageMetadata, immutableVintageExists, metadataFromResolutions, parseAtlasReadSelection, type AtlasReadSelection } from "@/lib/factbook/read-selection";
+  shapeCountryListItem,
+  shapeCountriesListMeta,
+} from "@/lib/api/contract/shapes";
+import {
+  getFrozenDisplayFactsForJurisdictions,
+  getImmutableVintageMetadata,
+  immutableVintageExists,
+  metadataFromResolutions,
+  parseAtlasReadSelection,
+  type AtlasReadSelection,
+} from "@/lib/factbook/read-selection";
+import {
+  JURISDICTION_STATUS_TYPES,
+  type JurisdictionStatusType,
+} from "@/lib/jurisdictions/status-taxonomy";
+import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 /**
  * Resolver-canonical display facts the list serves. Mirrors the
@@ -61,23 +79,37 @@ interface ListDisplayRow {
 async function resolveListDisplayFacts(
   rows: ListDisplayRow[],
   selection: AtlasReadSelection,
-): Promise<{ values: Map<string, {
-  capital: string | null;
-  population: number | null;
-  gdpBillions: number | null;
-  areaSqKm: number | null;
-}>; metadata: ReturnType<typeof metadataFromResolutions> }> {
-  const out = new Map<string, {
-    capital: string | null;
-    population: number | null;
-    gdpBillions: number | null;
-    areaSqKm: number | null;
-  }>();
-  if (rows.length === 0) return { values: out, metadata: metadataFromResolutions(selection, {}) };
+): Promise<{
+  values: Map<
+    string,
+    {
+      capital: string | null;
+      population: number | null;
+      gdpBillions: number | null;
+      areaSqKm: number | null;
+    }
+  >;
+  metadata: ReturnType<typeof metadataFromResolutions>;
+}> {
+  const out = new Map<
+    string,
+    {
+      capital: string | null;
+      population: number | null;
+      gdpBillions: number | null;
+      areaSqKm: number | null;
+    }
+  >();
+  if (rows.length === 0)
+    return { values: out, metadata: metadataFromResolutions(selection, {}) };
 
   if (selection.mode === "vintage") {
     const [facts, frozenMetadata] = await Promise.all([
-      getFrozenDisplayFactsForJurisdictions(rows.map((row) => row.id), Object.values(LIST_FACT_FIELDS), selection.asOf),
+      getFrozenDisplayFactsForJurisdictions(
+        rows.map((row) => row.id),
+        Object.values(LIST_FACT_FIELDS),
+        selection.asOf,
+      ),
       getImmutableVintageMetadata(selection.asOf),
     ]);
     for (const row of rows) {
@@ -91,7 +123,10 @@ async function resolveListDisplayFacts(
         areaSqKm: area == null ? null : Math.round(area),
       });
     }
-    return { values: out, metadata: metadataFromResolutions(selection, {}, frozenMetadata) };
+    return {
+      values: out,
+      metadata: metadataFromResolutions(selection, {}, frozenMetadata),
+    };
   }
 
   let facts: Awaited<ReturnType<typeof getCanonicalFactsForJurisdictions>> = {};
@@ -120,17 +155,22 @@ async function resolveListDisplayFacts(
       areaSqKm: areaNum != null ? Math.round(areaNum) : row.areaSqKm,
     });
   }
-  const flatResolutions = Object.fromEntries(Object.entries(facts).flatMap(([jurisdictionId, byFact]) => Object.entries(byFact).map(([factKey, resolution]) => [`${jurisdictionId}:${factKey}`, resolution])));
-  return { values: out, metadata: metadataFromResolutions(selection, flatResolutions) };
+  const flatResolutions = Object.fromEntries(
+    Object.entries(facts).flatMap(([jurisdictionId, byFact]) =>
+      Object.entries(byFact).map(([factKey, resolution]) => [
+        `${jurisdictionId}:${factKey}`,
+        resolution,
+      ]),
+    ),
+  );
+  return {
+    values: out,
+    metadata: metadataFromResolutions(selection, flatResolutions),
+  };
 }
 
 type ExtendedTaxonomy =
-  | GovernmentTaxonomyLens
-  | "region"
-  | "income"
-  | "vdem"
-  | "cgv"
-  | "monarchy";
+  GovernmentTaxonomyLens | "region" | "income" | "vdem" | "cgv" | "monarchy";
 
 const PEER_LENS_FACT_KEY: Partial<Record<ExtendedTaxonomy, string>> = {
   region: "world_bank_region",
@@ -153,7 +193,8 @@ function buildPeerLensCondition(
   }
   const factKey = PEER_LENS_FACT_KEY[taxonomy];
   if (!factKey) return null;
-  if (selection.mode === "vintage") return sql`EXISTS (
+  if (selection.mode === "vintage")
+    return sql`EXISTS (
     SELECT 1 FROM country_fact_vintages v
     WHERE v.jurisdiction_id = ${jurisdictions.id}
       AND v.fact_key = ${factKey}
@@ -175,15 +216,35 @@ export async function GET(request: Request) {
 
   try {
     const url = new URL(request.url);
-    const parsedSelection = parseAtlasReadSelection(url.searchParams.get("as_of"));
-    if (!parsedSelection.selection) return withStructuralFamilyDeprecation(apiError(parsedSelection.error, 400));
+    const parsedSelection = parseAtlasReadSelection(
+      url.searchParams.get("as_of"),
+    );
+    if (!parsedSelection.selection)
+      return withStructuralFamilyDeprecation(
+        apiError(parsedSelection.error, 400),
+      );
     const selection = parsedSelection.selection;
-    if (selection.mode === "vintage" && !(await immutableVintageExists(selection.asOf))) return withStructuralFamilyDeprecation(apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400));
+    if (
+      selection.mode === "vintage" &&
+      !(await immutableVintageExists(selection.asOf))
+    )
+      return withStructuralFamilyDeprecation(
+        apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400),
+      );
     const continent = url.searchParams.get("continent");
     const governmentType = url.searchParams.get("government_type");
     const taxonomyParam = url.searchParams.get("taxonomy");
     const limitParam = url.searchParams.get("limit");
     const offsetParam = url.searchParams.get("offset");
+    const statusParam = url.searchParams.get("status");
+    if (
+      statusParam &&
+      !(JURISDICTION_STATUS_TYPES as readonly string[]).includes(statusParam)
+    ) {
+      return withStructuralFamilyDeprecation(
+        apiError(`Unsupported jurisdiction status: ${statusParam}`, 400),
+      );
+    }
 
     const ALLOWED_TAXONOMIES = new Set<ExtendedTaxonomy>([
       "raw",
@@ -201,20 +262,27 @@ export async function GET(request: Request) {
       ? (taxonomyParam as ExtendedTaxonomy)
       : "raw";
 
-    const limit = Math.min(Math.max(parseInt(limitParam ?? "50", 10) || 50, 1), 250);
+    const limit = Math.min(
+      Math.max(parseInt(limitParam ?? "50", 10) || 50, 1),
+      250,
+    );
     const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
 
-    const conditions = [
-      sql`${jurisdictions.type} = 'sovereign_state'`,
-      sql`LOWER(${jurisdictions.name}) <> 'none'`,
-    ];
+    const conditions = [sql`LOWER(${jurisdictions.name}) <> 'none'`];
+    if (statusParam) {
+      conditions.push(
+        sql`${jurisdictions.type} = ${statusParam as JurisdictionStatusType}`,
+      );
+    }
 
     if (continent) {
-      conditions.push(sql`LOWER(${jurisdictions.continent}) = ${continent.toLowerCase()}`);
+      conditions.push(
+        sql`LOWER(${jurisdictions.continent}) = ${continent.toLowerCase()}`,
+      );
     }
     if (governmentType && taxonomy === "raw") {
       conditions.push(
-        sql`(LOWER(${jurisdictions.governmentType}) LIKE ${`%${governmentType.toLowerCase()}%`} OR LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${governmentType.toLowerCase()}%`})`
+        sql`(LOWER(${jurisdictions.governmentType}) LIKE ${`%${governmentType.toLowerCase()}%`} OR LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${governmentType.toLowerCase()}%`})`,
       );
     }
 
@@ -257,12 +325,20 @@ export async function GET(request: Request) {
           gdpBillions: cachedJurisdictionColumns.gdpBillions,
           areaSqKm: cachedJurisdictionColumns.areaSqKm,
           flagUrl: jurisdictions.flagUrl,
+          type: jurisdictions.type,
+          statusSourceIds: jurisdictions.statusSourceIds,
+          statusReviewedAt: jurisdictions.statusReviewedAt,
+          statusNote: jurisdictions.statusNote,
+          administeringJurisdictionIso3:
+            jurisdictions.administeringJurisdictionIso3,
+          statusDisputed: jurisdictions.statusDisputed,
         })
         .from(jurisdictions)
         .where(where)
         .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
 
-      const classificationMap = await buildGovernmentClassificationMap(countries);
+      const classificationMap =
+        await buildGovernmentClassificationMap(countries);
       const filtered = countries
         .map((country) => ({
           ...country,
@@ -283,8 +359,27 @@ export async function GET(request: Request) {
       const displayFacts = display.values;
       const pagedResolved = paged.map(({ id, ...country }) => {
         const d = displayFacts.get(id);
+        const {
+          type,
+          statusSourceIds,
+          statusReviewedAt,
+          statusNote,
+          administeringJurisdictionIso3,
+          statusDisputed,
+          ...publicCountry
+        } = country;
         return shapeCountryListItem({
-          ...country,
+          ...publicCountry,
+          jurisdictionStatus: buildJurisdictionStatusPresentation({
+            slug: country.slug,
+            iso3: country.iso3,
+            type,
+            statusSourceIds,
+            statusReviewedAt,
+            statusNote,
+            administeringJurisdictionIso3,
+            statusDisputed,
+          }),
           capital: d?.capital ?? country.capital,
           population: d?.population ?? country.population,
           gdpBillions: d?.gdpBillions ?? country.gdpBillions,
@@ -322,6 +417,13 @@ export async function GET(request: Request) {
           gdpBillions: cachedJurisdictionColumns.gdpBillions,
           areaSqKm: cachedJurisdictionColumns.areaSqKm,
           flagUrl: jurisdictions.flagUrl,
+          type: jurisdictions.type,
+          statusSourceIds: jurisdictions.statusSourceIds,
+          statusReviewedAt: jurisdictions.statusReviewedAt,
+          statusNote: jurisdictions.statusNote,
+          administeringJurisdictionIso3:
+            jurisdictions.administeringJurisdictionIso3,
+          statusDisputed: jurisdictions.statusDisputed,
         })
         .from(jurisdictions)
         .where(where)
@@ -343,8 +445,27 @@ export async function GET(request: Request) {
       apiResponse({
         data: countries.map(({ id, ...country }) => {
           const d = displayFacts.get(id);
+          const {
+            type,
+            statusSourceIds,
+            statusReviewedAt,
+            statusNote,
+            administeringJurisdictionIso3,
+            statusDisputed,
+            ...publicCountry
+          } = country;
           return shapeCountryListItem({
-            ...country,
+            ...publicCountry,
+            jurisdictionStatus: buildJurisdictionStatusPresentation({
+              slug: country.slug,
+              iso3: country.iso3,
+              type,
+              statusSourceIds,
+              statusReviewedAt,
+              statusNote,
+              administeringJurisdictionIso3,
+              statusDisputed,
+            }),
             // Resolver-canonical display facts override the cache,
             // mirroring /api/v1/countries/[code].
             capital: d?.capital ?? country.capital,
@@ -366,7 +487,9 @@ export async function GET(request: Request) {
     );
   } catch (e) {
     console.error("API /v1/countries error:", e);
-    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
+    return withStructuralFamilyDeprecation(
+      apiError("Internal server error", 500),
+    );
   }
 }
 

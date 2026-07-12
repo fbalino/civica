@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllJurisdictions } from "@/lib/db/queries";
+import { getAllReferenceJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
 import { ORGANIZATIONS } from "@/lib/data/international-organizations";
 import { absoluteUrl, METADATA_CONTENT_RELEASE_DATE } from "@/lib/site";
@@ -74,7 +74,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
 // `scripts/validate-metadata.ts` rejects argument-less `new Date()` here.
 const FALLBACK_LAST_MODIFIED = new Date(METADATA_CONTENT_RELEASE_DATE);
 
-type JurisdictionRow = Awaited<ReturnType<typeof getAllJurisdictions>>[number];
+type JurisdictionRow = Awaited<ReturnType<typeof getAllReferenceJurisdictions>>[number];
 
 /** Most-recent stored timestamp for a jurisdiction row, falling back to the
  *  checked-in content-release date when neither column is populated. */
@@ -85,7 +85,7 @@ function jurisdictionLastModified(row: Pick<JurisdictionRow, "updatedAt" | "crea
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let countries: JurisdictionRow[] = [];
   try {
-    countries = await getAllJurisdictions();
+    countries = await getAllReferenceJurisdictions();
   } catch {
     // DB not available during build
   }

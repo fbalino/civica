@@ -40,12 +40,11 @@ import {
   type GovernmentClassificationShape,
 } from "./schemas";
 import type { z } from "zod";
-import {
-  STRUCTURAL_FAMILY_DEPRECATION_META,
-} from "@/lib/api/deprecation";
+import { STRUCTURAL_FAMILY_DEPRECATION_META } from "@/lib/api/deprecation";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
 import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries
@@ -65,6 +64,7 @@ export function shapeCountryListItem(input: {
   areaSqKm: number | null;
   flagUrl: string | null;
   governmentClassification: GovernmentClassificationShape | null;
+  jurisdictionStatus: JurisdictionStatusPresentation;
 }): z.infer<typeof zCountryListItem> {
   return zCountryListItem.parse(input);
 }
@@ -93,7 +93,9 @@ export function shapeCountryDetail(
   return zCountryDetail.parse(input);
 }
 
-export function shapeCountryDetailMeta(selection: AtlasSelectionMetadata): z.infer<typeof zCountryDetailMeta> {
+export function shapeCountryDetailMeta(
+  selection: AtlasSelectionMetadata,
+): z.infer<typeof zCountryDetailMeta> {
   return zCountryDetailMeta.parse({
     reconciliation: {
       status: FACTBOOK_RECONCILIATION_META.status,
@@ -262,7 +264,10 @@ export function shapePulseDimensionsData(
     dimensions: Object.fromEntries(
       Object.entries(input.dimensions).map(([dim, row]) => [
         dim,
-        { ...row, contributingEventIds: Array.from(new Set(row.contributingEventIds)) },
+        {
+          ...row,
+          contributingEventIds: Array.from(new Set(row.contributingEventIds)),
+        },
       ]),
     ),
   });

@@ -126,6 +126,7 @@ export interface Country {
   capital: string;
   featured?: boolean;
   masthead?: CountryMastheadFacts;
+  jurisdictionStatus?: import("@/lib/jurisdictions/status-presentation").JurisdictionStatusPresentation;
 }
 
 export const COUNTRIES: Country[] = [
@@ -381,4 +382,3 @@ export function getDefaultChamberData(countryId: string): ChamberData {
     bills: [],
   };
 }
-

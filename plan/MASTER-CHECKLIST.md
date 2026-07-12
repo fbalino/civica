@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 150
-- **Remaining:** 153
-- **Progress:** 49.5%
+- **Completed:** 151
+- **Remaining:** 152
+- **Progress:** 49.8%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -174,7 +174,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-003** (P0) Make source-native longitudinal indicator history a first-class country and comparison surface. _Done when: readers can plot documented native indicators across available years with source/vintage/units/breaks, choose series/time range, download underlying observations, and distinguish missing data from no change; browser and query performance tests pass._
 - [x] **ATL-004** (P1) Surface source agreement, disagreement, and resolver reasoning where multiple sources exist. _Done when: representative fact modules show the selected value, alternatives, vintages, source-family independence, and resolver rationale without implying every fact was reconciled; single-source facts are labelled plainly._
 - [x] **ATL-005** (P1) Add a neutral data-confidence/coverage view that does not grade country quality. _Done when: the view reports source coverage, freshness, agreement, and missingness as properties of Civica's evidence—not the country—and every component traces to DAT-005/006 metrics._
-- [ ] **ATL-006** (P0) Apply the sourced jurisdiction/status taxonomy consistently across country, territory, atlas, compare, search, API, sitemap, metadata, and exports. _Done when: DAT-004 fixtures pass on every surface, politically sensitive labels include sources/notes, and no hardcoded blanket status remains._
+- [x] **ATL-006** (P0) Apply the sourced jurisdiction/status taxonomy consistently across country, territory, atlas, compare, search, API, sitemap, metadata, and exports. _Done when: DAT-004 fixtures pass on every surface, politically sensitive labels include sources/notes, and no hardcoded blanket status remains._
 - [ ] **ATL-007** (P0) Audit and qualify the expanded elections corpus before calling it global. _Done when: all 915 baseline rows are checked for event type, date semantics, status, jurisdiction identity, source, license, duplication, historical/upcoming distinction, and freshness; coverage report and UI claims reflect the verified result._
 - [ ] **ATL-008** (P1) Complete election research utilities around verified data. _Done when: calendar/timeline/filter/export views use only qualified rows, time zones and tentative dates are explicit, electoral-system context is source-linked, and sparse/uncertain jurisdictions render an honest state._
 - [ ] **ATL-009** (P1) Add cross-corpus constitutional full-text search as a research feature. _Done when: query, language/translation context, jurisdiction/topic filters, highlighted passages, stable citations/anchors, source/license attribution, pagination, performance limits, and no-result/error states pass automated and browser tests._

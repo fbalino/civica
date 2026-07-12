@@ -1023,3 +1023,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   judgment is calculated.
 - Dated DAT-005 snapshot metrics remain visibly separate from the current
   DAT-006/DAT-007 resolver query. Durable record: APR-D159.
+
+## 2026-07-12 — Reference identity is broader than analytical scope
+
+- The 253-entry status catalog drives directory, search, Compare selection,
+  sitemap, profiles, and general country APIs.
+- Sovereign/map-eligible universes remain separate and must be named wherever
+  used; route or ISO presence never implies sovereignty.
+- Public status disclosures include the neutral note, review, countability,
+  administering relationship, and sources. Durable record: APR-D160.

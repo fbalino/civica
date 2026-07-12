@@ -6,6 +6,7 @@ import type {
 } from "@/lib/factbook/reconcile/types";
 import { SOURCE_PRECEDENCE_VERSION } from "@/lib/factbook/reconcile/resolver";
 import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 export const COUNTRY_RESEARCH_EXPORT_VERSION =
   "country-research-export/v1" as const;
@@ -24,6 +25,7 @@ export interface CountryExportJurisdiction {
   iso2: string | null;
   iso3: string | null;
   status: string;
+  statusDetails: JurisdictionStatusPresentation;
 }
 
 export type CountryObservationClass =
@@ -243,7 +245,11 @@ export const COUNTRY_RESEARCH_EXPORT_CSV_COLUMNS = [
   "schema_version", "generated_at", "selection_mode", "selection_as_of", "selection_vintage", "selection_cutoff_at", "selection_retrieved_through", "selection_methodology_versions_json", "rights_manifest", "rights_policy",
   "withheld_fact_keys_json", "withheld_observation_count", "withheld_reason",
   "jurisdiction_id", "jurisdiction_slug", "jurisdiction_name",
-  "iso2", "iso3", "jurisdiction_status", "fact_key", "record_class", "row_id",
+  "iso2", "iso3", "jurisdiction_status", "jurisdiction_status_label",
+  "jurisdiction_status_note", "jurisdiction_status_reviewed_at",
+  "administering_jurisdiction_iso3", "jurisdiction_status_disputed",
+  "include_in_sovereign_state_counts", "jurisdiction_status_sources_json",
+  "fact_key", "record_class", "row_id",
   "fact_group", "category", "value_text", "value_numeric", "value_structured_json",
   "unit", "value_status", "value_status_reason", "value_type", "source_id",
   "source_name", "source_url", "source_license", "source_terms_url", "source_last_synced_at",
@@ -274,7 +280,13 @@ export function countryResearchExportCsv(document: CountryResearchExport): strin
         JSON.stringify(document.withheld.factKeys), String(document.withheld.observationCount), document.withheld.reason,
         document.jurisdiction.id, document.jurisdiction.slug,
         document.jurisdiction.name, document.jurisdiction.iso2 ?? "", document.jurisdiction.iso3 ?? "",
-        document.jurisdiction.status, row.factKey, row.recordClass, row.rowId, row.factGroup,
+        document.jurisdiction.status, document.jurisdiction.statusDetails.label,
+        document.jurisdiction.statusDetails.note, document.jurisdiction.statusDetails.reviewedAt,
+        document.jurisdiction.statusDetails.administeringJurisdictionIso3 ?? "",
+        String(document.jurisdiction.statusDetails.disputed),
+        String(document.jurisdiction.statusDetails.includeInSovereignStateCounts),
+        JSON.stringify(document.jurisdiction.statusDetails.sources),
+        row.factKey, row.recordClass, row.rowId, row.factGroup,
         row.category, row.value.text ?? "", row.value.numeric == null ? "" : String(row.value.numeric),
         row.value.structured == null ? "" : JSON.stringify(row.value.structured), row.value.unit ?? "",
         row.value.status, row.value.statusReason ?? "", row.value.type, row.source.id, row.source.name,

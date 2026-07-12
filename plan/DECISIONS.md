@@ -989,3 +989,19 @@ Treating them as independent would overstate evidence. A reader also needs to
 distinguish genuine agreement from a rule-based selection among different
 values, while a single-source fact should remain useful without acquiring a
 false reconciliation claim.
+
+### APR-D160 — Reference identity and analytical scope are separate
+
+**Decision:** The full closed `jurisdiction-status/v1` catalog drives identity
+discovery: directory, search, Compare selection, sitemap, profile routes, and
+general country APIs. Research totals and map layers may retain a narrower
+sovereign or map-eligible universe only when the scope is stated. Every public
+identity carries its record-specific label, neutral note, review date,
+countability rule, administering relationship, and source links. A route or
+ISO code never manufactures sovereignty; schema.org `Country` is reserved for
+the closed sovereign-state class and other sourced identities use `Place`.
+
+**Why:** Hiding territories and disputed or associated identities makes the
+reference atlas incomplete, while silently mixing them into sovereign-state
+denominators changes research meaning. Separate contracts let readers find
+every profile without turning catalog inclusion into a political claim.

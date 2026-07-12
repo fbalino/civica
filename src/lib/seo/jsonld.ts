@@ -146,6 +146,32 @@ export function buildCountry(input: CountryNodeInput): JsonLdNode | null {
   });
 }
 
+export interface JurisdictionNodeInput extends CountryNodeInput {
+  sovereignState: boolean;
+  statusLabel: string;
+  statusNote: string;
+}
+
+/** A schema.org Country is emitted only for the closed sovereign-state class.
+ * Every other Atlas identity is a neutral Place with its sourced status note;
+ * a route or ISO code never manufactures a sovereignty claim. */
+export function buildJurisdiction(
+  input: JurisdictionNodeInput,
+): JsonLdNode | null {
+  if (!input.wikidataQid) return null;
+  return stripUndefined({
+    "@context": "https://schema.org",
+    "@type": input.sovereignState ? "Country" : "Place",
+    "@id": absoluteUrl(
+      `${input.path}#${input.sovereignState ? "country" : "jurisdiction"}`,
+    ),
+    name: input.name,
+    description: `${input.statusLabel}. ${input.statusNote}`,
+    url: absoluteUrl(input.path),
+    sameAs: [`https://www.wikidata.org/wiki/${input.wikidataQid}`],
+  });
+}
+
 export interface ArticleInput {
   headline: string;
   description?: string;

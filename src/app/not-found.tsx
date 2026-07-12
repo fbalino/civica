@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllJurisdictions } from "@/lib/db/queries";
+import { getAllReferenceJurisdictions } from "@/lib/db/queries";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
@@ -82,7 +82,7 @@ export default async function NotFound() {
     capital: string | null;
   }[] = [];
   try {
-    const all = await getAllJurisdictions();
+    const all = await getAllReferenceJurisdictions();
     countries = all.map((c) => ({
       slug: c.slug,
       name: c.name,
@@ -100,10 +100,7 @@ export default async function NotFound() {
         <CompassEngraving />
       </HeroRevealItem>
 
-      <HeroRevealItem
-        as="p"
-        className="editorial-eyebrow not-found__eyebrow"
-      >
+      <HeroRevealItem as="p" className="editorial-eyebrow not-found__eyebrow">
         Error 404 · Terra incognita
       </HeroRevealItem>
 
@@ -112,8 +109,8 @@ export default async function NotFound() {
       </HeroRevealItem>
 
       <HeroRevealItem as="p" className="not-found__dek">
-        This address isn&rsquo;t in the atlas. It may have moved when routes were
-        consolidated, or never existed.
+        This address isn&rsquo;t in the atlas. It may have moved when routes
+        were consolidated, or never existed.
       </HeroRevealItem>
 
       <HeroRevealItem className="not-found__search">
@@ -130,7 +127,10 @@ export default async function NotFound() {
         className="not-found__destinations"
         aria-labelledby="not-found-destinations"
       >
-        <h2 id="not-found-destinations" className="not-found__destinations-title">
+        <h2
+          id="not-found-destinations"
+          className="not-found__destinations-title"
+        >
           Places to pick up the trail
         </h2>
         <ul className="not-found__grid">
@@ -150,8 +150,7 @@ export default async function NotFound() {
       </HeroRevealItem>
 
       <HeroRevealItem as="p" className="not-found__note">
-        Convinced this page should exist?{" "}
-        <Link href="/contact">Tell us.</Link>
+        Convinced this page should exist? <Link href="/contact">Tell us.</Link>
       </HeroRevealItem>
     </HeroReveal>
   );

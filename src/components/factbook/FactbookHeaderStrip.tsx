@@ -12,6 +12,8 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import type { CountryBounds } from "@/lib/data/country-bounds";
+import { JurisdictionStatusDisclosure } from "@/components/jurisdiction/JurisdictionStatusDisclosure";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 function MetaPill({
   label,
@@ -117,6 +119,7 @@ interface FactbookHeaderStripProps {
   countryName: string;
   iso2: string | null;
   governmentTypeLabel: string;
+  jurisdictionStatus: JurisdictionStatusPresentation;
   population: number | null;
   gdp?: number | null;
   ciScore?: number | null;
@@ -191,6 +194,7 @@ export function FactbookHeaderStrip({
   countryName,
   iso2,
   governmentTypeLabel,
+  jurisdictionStatus,
   population,
   gdp,
   ciScore,
@@ -307,8 +311,8 @@ export function FactbookHeaderStrip({
             <h1 className="factbook-hero-name">{countryName}</h1>
           </div>
 
-          {governmentTypeLabel && (
-            <div className="factbook-government-type-row">
+          <div className="factbook-government-type-row">
+            {governmentTypeLabel ? (
               <MetaPill
                 value={governmentTypeDisplay.value}
                 note={governmentTypeDisplay.note}
@@ -316,8 +320,12 @@ export function FactbookHeaderStrip({
                   governmentTypeDisplay.value
                 )}`}
               />
-            </div>
-          )}
+            ) : null}
+            <JurisdictionStatusDisclosure
+              status={jurisdictionStatus}
+              placement="hero"
+            />
+          </div>
 
           <div className="factbook-hero-pills">
             {popStr ? (

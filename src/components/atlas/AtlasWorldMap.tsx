@@ -563,6 +563,10 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 </li>
               )}
             </ul>
+            <p className="atlas-indicator-scope">
+              Map scope: map-eligible sovereign-state entries under
+              jurisdiction-status/v1. <a href="/country">Browse the full reference catalog</a>.
+            </p>
           </div>
         </div>
 
@@ -653,6 +657,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               officialName={hoverCard.country.govDetail || hoverCard.country.gov}
               iso2={hoverCard.country.iso2 ?? hoverCard.country.id.slice(0, 2)}
               incomeGroup={layerData[hoverCard.country.id]?.incomeGroup ?? null}
+              statusLabel={hoverCard.country.jurisdictionStatus?.label ?? null}
               heroImageUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}.webp`}
               heroImageDarkUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}-dark.webp`}
               stats={[

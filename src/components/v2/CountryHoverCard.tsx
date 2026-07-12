@@ -21,6 +21,8 @@ export type CountryHoverCardProps = {
    * same component family. Omitted when the fact is unresolved.
    */
   incomeGroup?: string | null;
+  /** Sourced jurisdiction-status label from jurisdiction-status/v1. */
+  statusLabel?: string | null;
   /** Optional. When omitted, the card renders compactly without a hero band. */
   heroImageUrl?: string;
   heroImageDarkUrl?: string;
@@ -46,6 +48,7 @@ export function CountryHoverCard({
   officialName,
   iso2,
   incomeGroup,
+  statusLabel,
   heroImageUrl,
   heroImageDarkUrl,
   heroImageAlt,
@@ -53,9 +56,7 @@ export function CountryHoverCard({
 }: CountryHoverCardProps) {
   const [darkImageFailed, setDarkImageFailed] = useState(false);
   const hasDarkImage = Boolean(heroImageDarkUrl && !darkImageFailed);
-  const lightClassName = hasDarkImage
-    ? "theme-engraving-light"
-    : undefined;
+  const lightClassName = hasDarkImage ? "theme-engraving-light" : undefined;
 
   return (
     <article className="v2-country-card" aria-label={name}>
@@ -69,9 +70,10 @@ export function CountryHoverCard({
             {officialName ? (
               <p className="v2-country-card__native">{officialName}</p>
             ) : null}
-            {incomeGroup ? (
-              <span className="v2-country-card__chip">
-                <Chip variant="sage">{incomeGroup}</Chip>
+            {incomeGroup || statusLabel ? (
+              <span className="v2-country-card__chips">
+                {statusLabel ? <Chip variant="blue">{statusLabel}</Chip> : null}
+                {incomeGroup ? <Chip variant="sage">{incomeGroup}</Chip> : null}
               </span>
             ) : null}
           </div>

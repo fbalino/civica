@@ -130,12 +130,13 @@ export const PUBLIC_CLAIMS = [
     surface: "country",
     routeOrArtifact: "/country/{slug}",
     exactClaim:
-      "How {country} is governed … sourced from the CIA World Factbook with Civica governance overlays.",
+      "{Status label}: how {country} is governed, with source-linked status context.",
     tier: "reconciled-fact",
     evidenceSources: [
       "src/app/(reader)/country/[slug]/layout.tsx",
       "src/lib/factbook/reconcile/api.ts",
       "src/lib/factbook/reconcile/resolver.ts",
+      "src/lib/jurisdictions/status-taxonomy.ts",
     ],
     implementationOwner: "Atlas reconciliation",
     methodologyVersion: "reconciliation-v0.2-beta",
@@ -143,7 +144,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/country/[slug]/layout.tsx",
       fragment:
-        "sourced from the CIA World Factbook with Civica governance overlays.",
+        "with branches of power, geography, people, economy, and source-linked status context.",
     },
   },
   {

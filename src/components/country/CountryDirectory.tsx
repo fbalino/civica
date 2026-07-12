@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal } from "@/components/motion/Reveal";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 export interface CountryDirectoryEntry {
   id?: string | number;
@@ -8,6 +9,7 @@ export interface CountryDirectoryEntry {
   name: string;
   iso2: string | null;
   continent?: string | null;
+  status?: JurisdictionStatusPresentation;
 }
 
 interface CountryDirectoryProps {
@@ -72,9 +74,7 @@ export function CountryDirectory({
     if (bucket) bucket.push(country);
     else byLetter.set(letter, [country]);
   }
-  const groups = [...byLetter.entries()].sort(([a], [b]) =>
-    a.localeCompare(b),
-  );
+  const groups = [...byLetter.entries()].sort(([a], [b]) => a.localeCompare(b));
 
   const rows = groups.map(([letter, entries]) => (
     <section
@@ -98,7 +98,14 @@ export function CountryDirectory({
           <span className="country-directory__flag" aria-hidden="true">
             <CountryFlag iso2={country.iso2} size={21} />
           </span>
-          <span className="country-directory__name">{country.name}</span>
+          <span className="country-directory__name">
+            {country.name}
+            {country.status ? (
+              <span className="country-directory__status">
+                {country.status.label}
+              </span>
+            ) : null}
+          </span>
           <span
             className="country-directory__dot"
             style={{ background: regionDot(country.continent) }}

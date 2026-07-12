@@ -132,7 +132,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/countries/route.ts",
     versioned: true,
     summary:
-      "Paginated list of sovereign states with basic metadata. Filter by continent or by a typed peer lens: region, income, V-Dem regime, CGV regime, or monarchy status.",
+      "Paginated list of the sourced Atlas jurisdiction catalog, including status labels, notes, and sources. Filter by jurisdiction status, continent, or a typed peer lens.",
     params: [
       {
         name: "as_of",
@@ -140,6 +140,13 @@ export const API_ROUTES: RouteContract[] = [
         type: "string",
         description:
           'Required: "live" or a complete immutable Civica Atlas vintage label.',
+      },
+      {
+        name: "status",
+        in: "query",
+        type: "string",
+        description:
+          "Optional jurisdiction-status/v1 class: sovereign_state | associated_state | dependency_or_territory | disputed_or_limited_recognition | aggregate_or_special_area.",
       },
       {
         name: "continent",
@@ -189,14 +196,14 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/countries/[code]/route.ts",
     versioned: true,
     summary:
-      "Detailed government structure for a single country. Look up by slug, ISO 3166-1 alpha-2, or alpha-3 code.",
+      "Detailed government structure and sourced status for a single Atlas jurisdiction. Look up by slug or an available ISO alpha-2/alpha-3 code.",
     params: [
       {
         name: ":code",
         in: "path",
         type: "string",
         description:
-          'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states").',
+          'Jurisdiction slug, ISO-2, or ISO-3 code when assigned (e.g. "us", "USA", "united-states", "puerto-rico").',
       },
       {
         name: "as_of",

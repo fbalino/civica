@@ -868,3 +868,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   outage states without country grading.
 - Registered the ninth Civica Data module in the 39-row Atlas surface matrix;
   focused tests, browser QA, claims gates, and the production build passed.
+
+## 2026-07-12 — ATL-006 sourced jurisdiction status completed
+
+- Made the closed `jurisdiction-status/v1` record the shared public identity
+  contract while keeping sovereign-state analytical and map scopes separate.
+- The full 253-entry reference catalog now powers discovery; profile and
+  Compare disclosures carry neutral notes, sources, review dates, countability,
+  and administering relationships; APIs, exports, sitemap, Atlas scope, and
+  Country-versus-Place JSON-LD use the same contract.
+- Politically sensitive fixtures and desktop/mobile browser QA passed. Index
+  change-control v26, all 949 tests, and the 105-page production build passed.

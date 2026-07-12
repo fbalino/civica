@@ -74,7 +74,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     route: "/",
     renderer: "src/components/home/HomeGrid.tsx",
     dataAccess: [
-      { symbol: "getAllJurisdictions", file: "src/lib/db/queries.ts" },
+      { symbol: "getAllReferenceJurisdictions", file: "src/lib/db/queries.ts" },
       {
         symbol: "getCanonicalFactsForJurisdictions",
         file: "src/lib/factbook/reconcile/api.ts",
@@ -94,7 +94,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "Compact cards link to resolver-backed country pages; inline summaries expressly do not claim per-value provenance.",
     ],
     coverage: [
-      "All jurisdiction rows drive search and the displayed catalog count; Japan and Estonia are named featured-card selections.",
+      "The closed 253-entry reference catalog drives search and the displayed count; Japan and Estonia are named featured-card selections.",
     ],
     states: serverStates({
       empty:
@@ -144,12 +144,13 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "capital",
       "map-layer values",
       "institution summaries",
+      "jurisdiction status label and sources",
     ],
     provenance: [
-      "Resolver-backed masthead facts carry source identity; map-layer definitions name source, unit, vintage, and availability.",
+      "Resolver-backed masthead facts carry source identity; map-layer definitions name source, unit, vintage, and availability; hover cards carry jurisdiction-status/v1 labels.",
     ],
     coverage: [
-      "Supported map jurisdictions plus per-layer observed/missing coverage from loadAtlasLayerData.",
+      "The map explicitly limits itself to map-eligible sovereign_state entries; the scope note links to the full reference catalog. Per-layer coverage comes from loadAtlasLayerData.",
     ],
     states: serverStates({
       empty:
@@ -169,7 +170,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     route: "/country",
     renderer: "src/app/(reader)/country/page.tsx",
     dataAccess: [
-      { symbol: "getAllJurisdictions", file: "src/lib/db/queries.ts" },
+      { symbol: "getAllReferenceJurisdictions", file: "src/lib/db/queries.ts" },
       { symbol: "getAlmanacFilterFacts", file: "src/lib/db/queries.ts" },
     ],
     storage: ["jurisdictions", "country_facts"],
@@ -183,10 +184,10 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "vdem_regime_type",
     ],
     provenance: [
-      "Filter facts use active canonical country_facts; cards route to citation-bearing profiles.",
+      "Filter facts use active canonical country_facts; every directory row carries the sourced jurisdiction-status presentation and routes to a citation-bearing profile.",
     ],
     coverage: [
-      "Every stored jurisdiction is listed; catalogAvailable distinguishes an outage from zero rows.",
+      "All 253 closed-catalog identities are listed; catalogAvailable distinguishes an outage from zero rows.",
     ],
     states: serverStates({
       empty:
@@ -252,6 +253,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     route: "/compare",
     renderer: "src/app/compare/page.tsx",
     dataAccess: [
+      { symbol: "getAllReferenceJurisdictions", file: "src/lib/db/queries.ts" },
       { symbol: "getJurisdictionsBySlugs", file: "src/lib/db/queries.ts" },
       {
         symbol: "getCanonicalFactsForJurisdictions",
@@ -299,12 +301,13 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "memberships",
       "source-native governance observations",
       "source-native longitudinal observations and release lineage",
+      "jurisdiction status label, note, review date, and sources",
     ],
     provenance: [
-      "Resolver output supports per-fact source panels; governance evidence and longitudinal history remain on publisher-native scales with source, unit, release, and transformation lineage.",
+      "Resolver output supports per-fact source panels; governance evidence and longitudinal history remain on publisher-native scales with source, unit, release, and transformation lineage; selected identities expose sourced status notes.",
     ],
     coverage: [
-      "Two to four selected jurisdictions; each comparison section has an independent availability gate.",
+      "Two to four selections from the full 253-entry reference catalog; each comparison section has an independent availability gate.",
     ],
     states: serverStates({
       empty:
@@ -775,7 +778,7 @@ const countryRows: AtlasSurfaceMatrixRow[] = [
       "map/gallery/art captions",
     ],
     provenance: [
-      "Population/GDP resolver panels; government taxonomy; Wikimedia captions/licenses; AI-assisted illustration captions.",
+      "Population/GDP resolver panels; government taxonomy; sourced jurisdiction-status/v1 note and links; Wikimedia captions/licenses; AI-assisted illustration captions.",
     ],
     coverage: [
       "Every valid jurisdiction route; gallery, bounds, engraving, and individual facts are independently optional.",
@@ -789,6 +792,8 @@ const countryRows: AtlasSurfaceMatrixRow[] = [
     tests: [
       "src/components/factbook/CountryMapTile.test.ts",
       "src/lib/illustrations/country-engraving-validation.test.ts",
+      "src/lib/jurisdictions/status-presentation.test.ts",
+      "src/lib/seo/__tests__/jurisdiction-jsonld.test.ts",
     ],
     testGap: null,
     owner: "Country shell",

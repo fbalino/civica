@@ -160,6 +160,9 @@
 }
 .factbook-government-type-row {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
   justify-content: flex-start;
   margin-top: var(--space-3);
   margin-bottom: var(--space-4);

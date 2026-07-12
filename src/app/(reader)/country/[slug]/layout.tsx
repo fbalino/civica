@@ -17,7 +17,7 @@ import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import {
   buildBreadcrumbList,
-  buildCountry,
+  buildJurisdiction,
   type JsonLdNode,
 } from "@/lib/seo/jsonld";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
@@ -34,7 +34,8 @@ import { getCountryBounds } from "@/lib/data/country-bounds";
 export const revalidate = 3600;
 
 function galleryCaption(p: { caption: string; license?: string }): string {
-  const license = p.license && p.license !== "Wikimedia Commons" ? ` · ${p.license}` : "";
+  const license =
+    p.license && p.license !== "Wikimedia Commons" ? ` · ${p.license}` : "";
   return `${p.caption}${license} · Wikimedia Commons`;
 }
 
@@ -46,13 +47,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) return { title: "Country Not Found" };
-  const govLabel =
-    formatGovernmentType(
-      jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType
-    ) || "sovereign state";
+  const status = jurisdiction.jurisdictionStatus;
   const title = `${jurisdiction.name} — Government & Political System`;
   // PUBLIC_CLAIM: country.source-layer
-  const description = `How ${jurisdiction.name} is governed: its ${govLabel.toLowerCase()} system, branches of power, geography, people, and economy — sourced from the CIA World Factbook with Civica governance overlays.`;
+  const description = `${status.label}: how ${jurisdiction.name} is governed, with branches of power, geography, people, economy, and source-linked status context.`;
   const url = `https://civicaatlas.org/country/${slug}`;
   return {
     title,
@@ -91,15 +89,19 @@ export default async function CountryLayout({
     "population_total",
     "gdp_ppp_usd_billions",
   ]).catch(
-    () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>,
+    () =>
+      ({}) as Record<
+        string,
+        import("@/lib/factbook/reconcile/types").ResolverOutput
+      >,
   );
 
   const govLabel =
     formatGovernmentType(
-      jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType
+      jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType,
     ) ||
     classifyGovernment(
-      jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType
+      jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType,
     ).label;
 
   // Gallery: Wikimedia photos + map assets. Slug lookup covers media for
@@ -128,24 +130,36 @@ export default async function CountryLayout({
   const bounds = getCountryBounds(jurisdiction.iso3);
   const mapboxAvailable = Boolean(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
 
-  const engravingCode = jurisdiction.iso3 ? jurisdiction.iso3.toLowerCase() : null;
+  const engravingCode = jurisdiction.iso3
+    ? jurisdiction.iso3.toLowerCase()
+    : null;
   // Release art is WebP-only. Raw generation exports never enter a reader path.
   const engravingDir = join(process.cwd(), "public", "engravings", "countries");
-  const territoryEngravingDir = join(process.cwd(), "public", "engravings", "territories");
+  const territoryEngravingDir = join(
+    process.cwd(),
+    "public",
+    "engravings",
+    "territories",
+  );
   const iso3EngravingSrc = engravingCode
     ? existsSync(join(engravingDir, `${engravingCode}.webp`))
       ? `/engravings/countries/${engravingCode}.webp`
       : null
     : null;
-  const territoryEngravingSrc = existsSync(join(territoryEngravingDir, `${slug}.webp`))
+  const territoryEngravingSrc = existsSync(
+    join(territoryEngravingDir, `${slug}.webp`),
+  )
     ? `/engravings/territories/${slug}.webp`
     : null;
   const countryEngravingSrc = iso3EngravingSrc ?? territoryEngravingSrc;
   const iso3EngravingDarkSrc =
-    engravingCode && existsSync(join(engravingDir, `${engravingCode}-dark.webp`))
+    engravingCode &&
+    existsSync(join(engravingDir, `${engravingCode}-dark.webp`))
       ? `/engravings/countries/${engravingCode}-dark.webp`
       : null;
-  const territoryEngravingDarkSrc = existsSync(join(territoryEngravingDir, `${slug}-dark.webp`))
+  const territoryEngravingDarkSrc = existsSync(
+    join(territoryEngravingDir, `${slug}-dark.webp`),
+  )
     ? `/engravings/territories/${slug}-dark.webp`
     : null;
   const countryEngravingDarkSrc = iso3EngravingSrc
@@ -159,26 +173,29 @@ export default async function CountryLayout({
       ? territoryEngravingCaption(slug)
       : null;
   const heroDarkCaption = iso3EngravingDarkSrc
-    ? darkEngravingCaption(jurisdiction.iso3) ?? heroCaption
+    ? (darkEngravingCaption(jurisdiction.iso3) ?? heroCaption)
     : territoryEngravingDarkSrc
-      ? darkTerritoryEngravingCaption(slug) ?? heroCaption
-    : null;
+      ? (darkTerritoryEngravingCaption(slug) ?? heroCaption)
+      : null;
 
-  // Structured data: Home → Countries → {Name} breadcrumb, plus a Country node
-  // with a Wikidata `sameAs` when the already-fetched jurisdiction carries a
-  // QID (no extra DB query). buildCountry returns null when there's no QID.
+  // Structured data: Home → Countries & areas → {Name} breadcrumb, plus a
+  // Country node only for the closed sovereign-state class and a neutral Place
+  // for other sourced jurisdiction types. No extra DB query is required.
   const countryPath = `/country/${slug}`;
   const seoNodes: JsonLdNode[] = [
     buildBreadcrumbList([
       { name: "Home", url: "/" },
-      { name: "Countries", url: "/country" },
+      { name: "Countries & areas", url: "/country" },
       { name: jurisdiction.name },
     ]),
   ];
-  const countryNode = buildCountry({
+  const countryNode = buildJurisdiction({
     name: jurisdiction.name,
     path: countryPath,
     wikidataQid: jurisdiction.wikidataQid,
+    sovereignState: jurisdiction.type === "sovereign_state",
+    statusLabel: jurisdiction.jurisdictionStatus.label,
+    statusNote: jurisdiction.jurisdictionStatus.note,
   });
   if (countryNode) seoNodes.push(countryNode);
 
@@ -190,6 +207,7 @@ export default async function CountryLayout({
         countryName={jurisdiction.name}
         iso2={jurisdiction.iso2}
         governmentTypeLabel={govLabel}
+        jurisdictionStatus={jurisdiction.jurisdictionStatus}
         population={jurisdiction.population}
         gdp={
           jurisdiction.gdpBillions

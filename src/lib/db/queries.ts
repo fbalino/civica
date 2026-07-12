@@ -18,6 +18,7 @@ import {
   getGovernmentTaxonomyGroupingLabel,
   type GovernmentTaxonomyLens,
 } from "@/lib/government-taxonomy";
+import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import {
   jurisdictions,
   countryFactbookSections,
@@ -53,6 +54,7 @@ export async function getJurisdictionBySlug(slug: string) {
   ]);
   return {
     ...jurisdiction,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(jurisdiction),
     governmentClassification: classificationMap.get(jurisdiction.id) ?? null,
   };
 }
@@ -71,23 +73,54 @@ export async function getAllJurisdictions() {
   const classificationMap = await buildGovernmentClassificationMap(rows);
   return rows.map((row) => ({
     ...row,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(row),
+    governmentClassification: classificationMap.get(row.id) ?? null,
+  }));
+}
+
+/** The complete sourced 253-row Atlas identity catalog. Unlike the legacy
+ * `getAllJurisdictions()` sovereign-state universe, this includes associated
+ * states, dependencies/territories, disputed or limited-recognition entries,
+ * and aggregate/special areas with their canonical status presentation. */
+export async function getAllReferenceJurisdictions() {
+  const rows = await db
+    .select()
+    .from(jurisdictions)
+    .where(sql`LOWER(${jurisdictions.name}) <> 'none'`)
+    .orderBy(asc(jurisdictions.name));
+  const classificationMap = await buildGovernmentClassificationMap(rows);
+  return rows.map((row) => ({
+    ...row,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(row),
     governmentClassification: classificationMap.get(row.id) ?? null,
   }));
 }
 
 export async function getFactbookCountryOptions() {
-  return db
+  const rows = await db
     .select({
       slug: jurisdictions.slug,
       name: jurisdictions.name,
       iso2: jurisdictions.iso2,
       iso3: jurisdictions.iso3,
+      type: jurisdictions.type,
+      statusSourceIds: jurisdictions.statusSourceIds,
+      statusReviewedAt: jurisdictions.statusReviewedAt,
+      statusNote: jurisdictions.statusNote,
+      administeringJurisdictionIso3:
+        jurisdictions.administeringJurisdictionIso3,
+      statusDisputed: jurisdictions.statusDisputed,
     })
     .from(jurisdictions)
-    .where(
-      sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`,
-    )
+    .where(sql`LOWER(${jurisdictions.name}) <> 'none'`)
     .orderBy(asc(jurisdictions.name));
+  return rows.map((row) => ({
+    slug: row.slug,
+    name: row.name,
+    iso2: row.iso2,
+    iso3: row.iso3,
+    status: buildJurisdictionStatusPresentation(row),
+  }));
 }
 
 export async function getFactbookSections(jurisdictionId: string) {
@@ -457,6 +490,7 @@ export async function getJurisdictionsBySlugs(slugs: string[]) {
   const classificationMap = await buildGovernmentClassificationMap(rows);
   return rows.map((row) => ({
     ...row,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(row),
     governmentClassification: classificationMap.get(row.id) ?? null,
   }));
 }

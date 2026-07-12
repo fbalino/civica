@@ -24,6 +24,10 @@ import type {
   CountryMastheadFacts,
   CountryMembershipChip,
 } from "@/components/atlas/data";
+import {
+  buildJurisdictionStatusPresentation,
+  type JurisdictionStatusPresentation,
+} from "@/lib/jurisdictions/status-presentation";
 
 export interface AtlasCountry {
   id: string;
@@ -38,6 +42,7 @@ export interface AtlasCountry {
   gdp: string;
   capital: string;
   iso3: string;
+  jurisdictionStatus: JurisdictionStatusPresentation;
   featured?: boolean;
   masthead?: CountryMastheadFacts;
 }
@@ -695,6 +700,16 @@ async function _loadAtlasData(): Promise<{
       gdp: formatGdp(cachedGdpBillions),
       capital: cachedCapital || "—",
       iso3: j.iso3!,
+      jurisdictionStatus: buildJurisdictionStatusPresentation({
+        slug: j.slug,
+        iso3: j.iso3,
+        type: j.type,
+        statusSourceIds: j.statusSourceIds,
+        statusReviewedAt: j.statusReviewedAt,
+        statusNote: j.statusNote,
+        administeringJurisdictionIso3: j.administeringJurisdictionIso3,
+        statusDisputed: j.statusDisputed,
+      }),
       featured: TOP_COUNTRIES.has(j.iso3!.toUpperCase()),
       masthead,
     };

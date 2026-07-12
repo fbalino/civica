@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import {
-  getAllJurisdictions,
+  getAllReferenceJurisdictions,
   getJurisdictionsBySlugs,
   getGovernmentStructure,
   getLegislatureComposition,
@@ -112,9 +112,10 @@ export default async function ComparePage({
 
   // Phase 1 — country list for the selector (also gives us jurisdiction IDs
   // for anything selected, avoiding a second round-trip)
-  let allCountries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
+  let allCountries: Awaited<ReturnType<typeof getAllReferenceJurisdictions>> =
+    [];
   try {
-    allCountries = await getAllJurisdictions();
+    allCountries = await getAllReferenceJurisdictions();
   } catch {
     /* ignore — empty state will render */
   }
@@ -122,6 +123,7 @@ export default async function ComparePage({
     slug: c.slug,
     name: c.name,
     iso2: c.iso2,
+    status: c.jurisdictionStatus,
   }));
 
   // Resolve selected slugs → full jurisdiction rows (+ IDs) in requested order
@@ -227,6 +229,7 @@ export default async function ComparePage({
         slug: jurisdiction.slug,
         name: jurisdiction.name,
         iso2: jurisdiction.iso2 ?? null,
+        status: jurisdiction.jurisdictionStatus,
         governmentType: prettyGov,
         continent: jurisdiction.continent ?? null,
         populationLabel: popN != null && popN > 0 ? formatNumber(popN) : null,

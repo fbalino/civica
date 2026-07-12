@@ -4,17 +4,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { CountryFlag } from "@/components/CountryFlag";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { JurisdictionStatusDisclosure } from "@/components/jurisdiction/JurisdictionStatusDisclosure";
 
 interface Country {
   slug: string;
   name: string;
   iso2: string | null;
+  status: JurisdictionStatusPresentation;
 }
 
 export interface SelectedCountryCard {
   slug: string;
   name: string;
   iso2: string | null;
+  status: JurisdictionStatusPresentation;
   governmentType: string | null;
   continent: string | null;
   populationLabel: string | null;
@@ -39,10 +43,13 @@ function CountryPicker({
   slotLabel: string;
   seriesColor: string;
 }) {
-  const selectedCountry = selected ? countries.find((c) => c.slug === selected) : null;
+  const selectedCountry = selected
+    ? countries.find((c) => c.slug === selected)
+    : null;
 
   if (selectedCountry) {
     const meta = [
+      selectedCard?.status.label ?? null,
       selectedCard?.governmentType ?? null,
       selectedCard?.continent ?? null,
       selectedCard?.populationLabel ?? null,
@@ -51,13 +58,21 @@ function CountryPicker({
       .join(" · ");
 
     return (
-      <div className="ci-compare-picker-card" style={{ borderTopColor: seriesColor }}>
+      <div
+        className="ci-compare-picker-card"
+        style={{ borderTopColor: seriesColor }}
+      >
         <div className="ci-compare-picker-slot">{slotLabel}</div>
         <div className="ci-compare-picker-name">
           <CountryFlag iso2={selectedCountry.iso2} size={20} />
           <span>{selectedCountry.name}</span>
         </div>
-        <div className="ci-compare-picker-meta">{meta || "Profile data pending"}</div>
+        <div className="ci-compare-picker-meta">
+          {meta || "Profile data pending"}
+        </div>
+        {selectedCard ? (
+          <JurisdictionStatusDisclosure status={selectedCard.status} />
+        ) : null}
         <button
           onClick={onRemove}
           className="ci-compare-picker-remove"
@@ -102,10 +117,12 @@ export function CompareCountrySelector({
     (slugs: string[]) => {
       const params = new URLSearchParams();
       slugs.forEach((s) => params.append("c", s));
-      const nextUrl = params.toString() ? `/compare?${params.toString()}` : "/compare";
+      const nextUrl = params.toString()
+        ? `/compare?${params.toString()}`
+        : "/compare";
       router.replace(nextUrl, { scroll: false });
     },
-    [router]
+    [router],
   );
 
   const slots: Array<string | null> = [
@@ -125,7 +142,9 @@ export function CompareCountrySelector({
       {slots.map((slug, i) => (
         <CountryPicker
           key={i}
-          countries={countries.filter((c) => !current.includes(c.slug) || c.slug === slug)}
+          countries={countries.filter(
+            (c) => !current.includes(c.slug) || c.slug === slug,
+          )}
           selected={slug}
           selectedCard={selectedCards[i]}
           placeholder={

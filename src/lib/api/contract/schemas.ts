@@ -397,6 +397,30 @@ export const zApiErrorEnvelope = z.object({ error: z.string() }).strict();
  * /api/v1/countries
  * ──────────────────────────────────────────────────────────────── */
 
+export const zJurisdictionStatus = z
+  .object({
+    version: z.literal("jurisdiction-status/v1"),
+    type: z.enum([
+      "sovereign_state",
+      "associated_state",
+      "dependency_or_territory",
+      "disputed_or_limited_recognition",
+      "aggregate_or_special_area",
+    ]),
+    label: z.string(),
+    note: z.string(),
+    reviewedAt: z.string(),
+    administeringJurisdictionIso3: z.string().nullable(),
+    disputed: z.boolean(),
+    includeInSovereignStateCounts: z.boolean(),
+    sources: z.array(
+      z
+        .object({ id: z.string(), label: z.string(), url: z.string().url() })
+        .strict(),
+    ),
+  })
+  .strict();
+
 export const zCountryListItem = z
   .object({
     slug: z.string(),
@@ -412,6 +436,7 @@ export const zCountryListItem = z
     areaSqKm: z.number().nullable(),
     flagUrl: z.string().nullable(),
     governmentClassification: zGovernmentClassification.nullable(),
+    jurisdictionStatus: zJurisdictionStatus,
   })
   .strict();
 
@@ -513,6 +538,7 @@ export const zCountryDetail = z
     governmentType: z.string().nullable(),
     governmentTypeDetail: z.string().nullable(),
     governmentClassification: zGovernmentClassification.nullable(),
+    jurisdictionStatus: zJurisdictionStatus,
     flagUrl: z.string().nullable(),
     constitution: z
       .object({
@@ -1316,7 +1342,11 @@ export const zPulseCountryEvent = z
         entityCatalogVersion: z.string().nullable(),
         entityCatalogHash: z.string().nullable(),
         aliasVersion: z.string().nullable(),
-        requestedJurisdictionRole: z.enum(["primary", "affected", "unresolved"]),
+        requestedJurisdictionRole: z.enum([
+          "primary",
+          "affected",
+          "unresolved",
+        ]),
         primary: z
           .object({
             jurisdictionId: z.string(),
@@ -1729,6 +1759,7 @@ export const zCountryExportJson = z
         iso2: z.string().nullable(),
         iso3: z.string().nullable(),
         status: z.string(),
+        statusDetails: zJurisdictionStatus,
       })
       .strict(),
     facts: z.array(

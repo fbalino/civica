@@ -12,6 +12,7 @@ import {
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CountryFlag } from "@/components/CountryFlag";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 export interface CountrySearchOption {
   slug: string;
@@ -19,6 +20,7 @@ export interface CountrySearchOption {
   iso2: string | null;
   iso3?: string | null;
   capital?: string | null;
+  status?: JurisdictionStatusPresentation;
 }
 
 interface CountrySearchComboboxProps {
@@ -84,10 +86,7 @@ export function CountrySearchCombobox({
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
-      if (
-        rootRef.current &&
-        !rootRef.current.contains(event.target as Node)
-      ) {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
@@ -100,7 +99,10 @@ export function CountrySearchCombobox({
     if (!enableShortcut) return;
 
     function handleKeyDown(event: globalThis.KeyboardEvent) {
-      if (event.key.toLowerCase() !== "k" || (!event.metaKey && !event.ctrlKey)) {
+      if (
+        event.key.toLowerCase() !== "k" ||
+        (!event.metaKey && !event.ctrlKey)
+      ) {
         return;
       }
       event.preventDefault();
@@ -120,13 +122,15 @@ export function CountrySearchCombobox({
         onSelect(country);
         return;
       }
-      router.push(hrefForCountry
-        ? hrefForCountry(country)
-        : countryQueryParam
-          ? `${countryPathPrefix}?${new URLSearchParams({ [countryQueryParam]: country.slug })}`
-          : `${countryPathPrefix.replace(/\/$/, "")}/${country.slug}`);
+      router.push(
+        hrefForCountry
+          ? hrefForCountry(country)
+          : countryQueryParam
+            ? `${countryPathPrefix}?${new URLSearchParams({ [countryQueryParam]: country.slug })}`
+            : `${countryPathPrefix.replace(/\/$/, "")}/${country.slug}`,
+      );
     },
-    [countryPathPrefix, countryQueryParam, hrefForCountry, onSelect, router]
+    [countryPathPrefix, countryQueryParam, hrefForCountry, onSelect, router],
   );
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -183,7 +187,9 @@ export function CountrySearchCombobox({
           aria-label={ariaLabel}
           autoComplete="off"
         />
-        {showShortcut ? <kbd className="country-search__shortcut">⌘K</kbd> : null}
+        {showShortcut ? (
+          <kbd className="country-search__shortcut">⌘K</kbd>
+        ) : null}
         {showFilterIcon ? (
           <SlidersHorizontal
             className="country-search__filter-icon"
@@ -219,7 +225,9 @@ export function CountrySearchCombobox({
                   {country.name}
                 </span>
                 <span className="country-search__result-meta">
-                  {[country.capital, country.iso3].filter(Boolean).join(" · ")}
+                  {[country.status?.label, country.capital, country.iso3]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </span>
               </span>
             </button>

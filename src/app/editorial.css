@@ -4424,11 +4424,81 @@ a.constitution-xref-card-country:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.country-directory__status {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-11);
+  white-space: nowrap;
+}
 .country-directory__dot {
   width: var(--space-3);
   height: var(--space-3);
   border-radius: var(--radius-full);
   flex-shrink: 0;
+}
+
+/* Shared, sourced entity-status disclosure. Used wherever a route or card
+   could otherwise imply that every Atlas identity is a sovereign country. */
+.jurisdiction-status-disclosure {
+  position: relative;
+  font-family: var(--font-body);
+}
+.jurisdiction-status-disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  list-style: none;
+}
+.jurisdiction-status-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.jurisdiction-status-disclosure__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-12);
+}
+.jurisdiction-status-disclosure__panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  inset-inline-start: 0;
+  z-index: var(--z-popover);
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard-md);
+  color: var(--color-text-primary);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.jurisdiction-status-disclosure__panel p {
+  margin: 0 0 var(--space-3);
+}
+.jurisdiction-status-disclosure__panel p:last-child {
+  margin-bottom: 0;
+}
+.jurisdiction-status-disclosure__meta {
+  color: var(--color-text-muted);
+}
+.jurisdiction-status-disclosure__panel ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.jurisdiction-status-disclosure__panel a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-accent);
+}
+.jurisdiction-status-disclosure__panel svg {
+  width: var(--space-3);
+  height: var(--space-3);
 }
 @media (max-width: 1080px) {
   .country-directory { column-count: 3; }
@@ -4441,4 +4511,10 @@ a.constitution-xref-card-country:hover {
 }
 @media (max-width: 480px) {
   .country-directory { column-count: 1; }
+  .jurisdiction-status-disclosure__panel {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    width: calc(100vw - var(--space-8));
+    max-width: none;
+  }
 }
