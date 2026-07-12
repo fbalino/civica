@@ -32,7 +32,10 @@ config({ path: ".env.local", override: true });
 
 import assert from "node:assert/strict";
 import { eq, inArray } from "drizzle-orm";
-import { db } from "@/lib/db";
+import {
+  getLiveReadOnlyDb,
+  reportLiveTestEnvironment,
+} from "@/lib/db/live-readonly";
 import { jurisdictions } from "@/lib/db/schema";
 import { resolveFact } from "@/lib/factbook/reconcile/resolver";
 
@@ -232,7 +235,9 @@ interface JurisdictionRow {
 }
 
 async function loadJurisdictions(slugs: string[]): Promise<Map<string, JurisdictionRow>> {
-  const rows = await db
+  // Read-only client: refuses mutation and is only constructible under the
+  // opt-in test:db harness (QA-004).
+  const rows = await getLiveReadOnlyDb()
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -292,7 +297,9 @@ async function main(): Promise<void> {
     }
   }
 
-  console.log(`\nResolving ${WORKED_EXAMPLES.length} worked examples against live DATABASE_URL\n`);
+  console.log(
+    `\nResolving ${WORKED_EXAMPLES.length} worked examples against ${reportLiveTestEnvironment()}\n`,
+  );
 
   for (const example of WORKED_EXAMPLES) {
     if (example.disabled) {
