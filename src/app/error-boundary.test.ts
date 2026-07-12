@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { existsSync, readFileSync } from "node:fs";
-import { globSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+/** Recursively list files under `dir` whose name ends with one of `exts`.
+ *  Replaces `fs.globSync` (absent from the pinned @types/node). Paths are
+ *  returned cwd-relative with `/` separators, matching the old glob output. */
+function walkFiles(dir: string, exts: string[]): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkFiles(full, exts));
+    else if (exts.some((e) => entry.name.endsWith(e))) out.push(full);
+  }
+  return out;
+}
 
 /**
  * PLT-026 regression guard. A database/query failure during identity
@@ -27,7 +40,7 @@ const IDENTITY_RESOLVERS = [
 const EXCEPTED = new Set(["src/app/(reader)/country/[slug]/civica-data/page.tsx"]);
 
 test("identity resolvers do not swallow DB errors into a 404", () => {
-  const files = globSync("src/app/**/*.tsx").filter(
+  const files = walkFiles("src/app", [".tsx"]).filter(
     (file) => !EXCEPTED.has(file),
   );
   const offenders: string[] = [];

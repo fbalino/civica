@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 170
-- **Remaining:** 133
-- **Progress:** 56.1%
+- **Completed:** 171
+- **Remaining:** 132
+- **Progress:** 56.4%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -185,7 +185,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [ ] **ATL-014** (P1) Refocus Compare around source-native institutional and indicator evidence. _Done when: comparison works without an Index score, aligns units/vintages/definitions, exposes provenance and missingness per side, supports stable share URLs/exports, and never ranks incomparable values silently._
 - [ ] **ATL-015** (P1) Refocus Atlas map layers around explicit source-native variables and experimental-layer labels. _Done when: every layer has source/vintage/legend/missing-data behavior, map and tabular values match, experimental Index/Pulse layers are separately labelled or absent, share URLs restore state, and keyboard/table alternatives work._
 - [ ] **ATL-016** (P1) Preserve Civica Conditions as separate contextual indicators rather than a hidden composite. _Done when: every condition retains native source/definition/unit/time, no headline combined score exists, country and comparison surfaces disclose mismatched vintages, and methodology/API docs match fixtures._
-- [ ] **ATL-017** (P0) Verify government taxonomy and peer-lens outputs against adopted external classifications and current source vintages. _Done when: structural description, V-Dem RoW, BR/CGV, World Bank region/income, monarchy status, fallbacks, n-minimums, and noncoverage cases pass source-backed fixtures; retired `structural_family` cannot re-enter new paths._
+- [x] **ATL-017** (P0) Verify government taxonomy and peer-lens outputs against adopted external classifications and current source vintages. _Done when: structural description, V-Dem RoW, BR/CGV, World Bank region/income, monarchy status, fallbacks, n-minimums, and noncoverage cases pass source-backed fixtures; retired `structural_family` cannot re-enter new paths._
 - [ ] **ATL-018** (P0) Standardize loading, empty, error, partial, stale, disputed, and no-source states across all atlas modules. _Done when: ATL-001 lists and tests each applicable state, no module silently disappears on missing data, and desktop/mobile/light/dark browser fixtures cover representative states._
 - [ ] **ATL-019** (P1) Create stable fact, institution, office, person, election, constitution-passage, organization, and indicator identifiers/citations. _Done when: exported/stable URLs or IDs survive display-name changes, citations resolve to release/version/source, and identifier round-trip tests pass._
 - [ ] **ATL-020** (P1) Add release-to-release change and correction histories for primary atlas entities. _Done when: users can inspect what value/record changed, old/new source/vintage, reason, method/version, release, and correction status; ordinary refreshes and substantive revisions are distinguishable._

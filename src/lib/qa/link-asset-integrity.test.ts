@@ -1,8 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { existsSync, readdirSync, readFileSync, globSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { REDIRECTS } from "@/lib/routing/redirects";
+
+/** Recursively list files under `dir` whose name ends with one of `exts`.
+ *  Replaces `fs.globSync` (absent from the pinned @types/node). */
+function walkFiles(dir: string, exts: string[]): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkFiles(full, exts));
+    else if (exts.some((e) => entry.name.endsWith(e))) out.push(full);
+  }
+  return out;
+}
 
 /**
  * QA-015 — internal link / asset / redirect integrity.
@@ -30,8 +42,8 @@ test("required footer links survive (AGENTS invariant)", () => {
 
 test("literal local asset references resolve with exact case", () => {
   const files = [
-    ...globSync("src/app/**/*.{ts,tsx}"),
-    ...globSync("src/components/**/*.{ts,tsx}"),
+    ...walkFiles("src/app", [".ts", ".tsx"]),
+    ...walkFiles("src/components", [".ts", ".tsx"]),
   ];
   const assetRe =
     /["'`(](\/(?:engravings|blog|images|flags|assets|fonts|icons)\/[A-Za-z0-9._/-]+\.(?:webp|png|svg|jpe?g|gif|ico|woff2?|pmtiles))["'`)]/g;

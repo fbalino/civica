@@ -41,7 +41,8 @@ test("the report-only CSP locks defaults and allowlists only map origins", () =>
 });
 
 test("framing is locked everywhere except the embed widget", () => {
-  assert.match(config, /X-Frame-Options.*SAMEORIGIN/s);
+  // `[\s\S]` instead of `.` + the `s` (dotAll) flag, which needs es2018.
+  assert.match(config, /X-Frame-Options[\s\S]*SAMEORIGIN/);
   // The frame-protection block is applied via a negative-lookahead source that
   // excludes embed/ so /embed/[slug] stays cross-origin framable.
   assert.match(config, /\(\?!embed\/\)/);

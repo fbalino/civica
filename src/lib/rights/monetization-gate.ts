@@ -22,6 +22,9 @@ export function nonCommercialSources(
 export type MonetizationEnv = {
   CIVICA_COMMERCIAL_DEPLOYMENT?: string;
   CIVICA_FEE_BEARING_ACCESS?: string;
+  // Index signature so `process.env` (NodeJS.ProcessEnv) is assignable
+  // without the weak-type "no properties in common" check (TS2559).
+  [key: string]: string | undefined;
 };
 
 export function isCommercialPosture(env: MonetizationEnv): boolean {
