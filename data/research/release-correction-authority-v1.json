@@ -1,0 +1,224 @@
+{
+  "schemaVersion": "civica-release-correction-authority/v1",
+  "effectiveOn": "2026-07-11",
+  "approver": {
+    "name": "Fernando Balino",
+    "role": "Founder, publisher, and responsible human decision-maker",
+    "releaseAuthority": "Approve preview, frozen, DOI, superseding, retracted, rolled-back, and retired release states after applicable gates pass.",
+    "methodologyAuthority": "Approve methodology versions and claim standing after applicable validation and independent-review gates pass.",
+    "correctionAuthority": "Classify reports and approve correction, clarification, no-change, rejection, supersession, or retraction.",
+    "emergencyAuthority": "Temporarily suppress affected facts, routes, exports, jobs, credentials, or releases to contain credible ongoing harm."
+  },
+  "independenceBoundary": "The approver cannot rewrite an independent report, waive an unmanageable personal conflict, or restore a suspended surface without the recorded restoration evidence. An unmanageable owner conflict blocks the affected decision until a qualified independent decision-maker is appointed.",
+  "versionTriggers": {
+    "major": "Incompatible construct, unit, scale, dimension, taxonomy, normalization, or interpretation change; prior and new outputs are not directly comparable.",
+    "minor": "Comparable-method refinement, added source/category, threshold change, or computation correction that can change outputs.",
+    "patch": "Documentation, presentation, metadata, or implementation correction that does not change research outputs or their interpretation.",
+    "beta": "Validation standing only; it does not reduce the required major/minor/patch increment."
+  },
+  "emergency": {
+    "triggers": [
+      "credible material misinformation",
+      "active security compromise",
+      "privacy exposure",
+      "rights breach",
+      "unsafe automated output"
+    ],
+    "immediateActions": [
+      "stop propagation",
+      "preserve the minimum lawful evidence",
+      "record affected identities",
+      "open a dated incident/correction record",
+      "set restoration criteria"
+    ],
+    "reviewDeadlineHours": 72,
+    "restorationRule": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+  },
+  "historicalPreservation": {
+    "correction": "Publish the corrected value or statement prospectively and retain the prior value/version as superseded in history.",
+    "supersession": "Keep both versions addressable and link predecessor and successor in both directions.",
+    "retraction": "Keep a dated public tombstone, reason, scope, and audit copy; do not silently delete the research record.",
+    "securityException": "Restrict harmful payload bytes while retaining a lawful metadata/tombstone record and private incident evidence."
+  },
+  "doi": {
+    "mutableMetadataOnly": "A DOI's descriptive metadata may be corrected without changing the object only when the underlying release bytes and interpretation are unchanged.",
+    "correctedRelease": "A changed frozen release receives a new version and DOI; metadata links it as IsNewVersionOf the prior DOI and the prior DOI as IsPreviousVersionOf the successor.",
+    "retraction": "The original DOI continues to resolve to a retraction notice and preserved metadata. A withdrawal never reassigns the DOI to different bytes.",
+    "preRegistrationBoundary": "No DOI relationship is claimed until the repository accepts the corresponding frozen object and identifiers."
+  },
+  "noticeLocations": [
+    "/policies",
+    "/civica-index/corrections",
+    "affected artifact release notes or changelog",
+    "release/DOI landing page after DOI registration",
+    "affected API metadata or deprecation headers where applicable"
+  ],
+  "reportAndAppeal": {
+    "reportRoutes": [
+      "/civica-index/corrections",
+      "/contact"
+    ],
+    "appealRule": "A reporter or affected contributor may request one reconsideration with new evidence or a claimed process error. The appeal, response, and final disposition are retained.",
+    "conflictRule": "A material conflict held by the original decision-maker requires a named independent appeal decision-maker.",
+    "noRetaliation": "Critical reports, appeals, reviewer disagreement, and recommendations to retract or retire do not reduce payment, access to the response, or future eligibility."
+  },
+  "tableTops": [
+    {
+      "incident": {
+        "incidentId": "tabletop-material-error",
+        "detectedAt": "2026-07-11T12:00:00.000Z",
+        "kind": "material_error",
+        "artifactId": "atlas-release",
+        "fromVersion": "v1.0.0",
+        "fromDoi": "10.0000/civica.v1",
+        "summary": "A country identity was assigned to the wrong jurisdiction.",
+        "changedFrozenBytes": true,
+        "actor": "Fernando Balino",
+        "status": "contained_pending_disposition"
+      },
+      "emergencyAction": {
+        "action": "suppress_affected_claim_and_promotion",
+        "takenAt": "2026-07-11T12:00:00.000Z",
+        "reviewDueAt": "2026-07-14T12:00:00.000Z",
+        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+      },
+      "changelog": {
+        "incidentId": "tabletop-material-error",
+        "artifactId": "atlas-release",
+        "fromVersion": "v1.0.0",
+        "disposition": "correction_pending",
+        "summary": "A country identity was assigned to the wrong jurisdiction."
+      },
+      "releaseNote": {
+        "artifactId": "atlas-release",
+        "fromVersion": "v1.0.0",
+        "proposedVersion": "v1.1.0",
+        "status": "correction_pending"
+      },
+      "doiAction": {
+        "status": "new_doi_required",
+        "relation": {
+          "relationType": "IsNewVersionOf",
+          "relatedIdentifier": "10.0000/civica.v1"
+        }
+      },
+      "notices": [
+        "/policies",
+        "/civica-index/corrections",
+        "affected artifact release notes or changelog",
+        "release/DOI landing page after DOI registration",
+        "affected API metadata or deprecation headers where applicable"
+      ],
+      "appeal": {
+        "routes": [
+          "/civica-index/corrections",
+          "/contact"
+        ],
+        "rule": "A reporter or affected contributor may request one reconsideration with new evidence or a claimed process error. The appeal, response, and final disposition are retained."
+      }
+    },
+    {
+      "incident": {
+        "incidentId": "tabletop-method",
+        "detectedAt": "2026-07-11T12:00:00.000Z",
+        "kind": "methodology_failure",
+        "artifactId": "pulse",
+        "fromVersion": "v1.4.0-beta",
+        "fromDoi": null,
+        "summary": "The construct cannot support the published interpretation.",
+        "changedFrozenBytes": true,
+        "actor": "Fernando Balino",
+        "status": "contained_pending_disposition"
+      },
+      "emergencyAction": {
+        "action": "suppress_affected_claim_and_promotion",
+        "takenAt": "2026-07-11T12:00:00.000Z",
+        "reviewDueAt": "2026-07-14T12:00:00.000Z",
+        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+      },
+      "changelog": {
+        "incidentId": "tabletop-method",
+        "artifactId": "pulse",
+        "fromVersion": "v1.4.0-beta",
+        "disposition": "retraction_pending_replacement",
+        "summary": "The construct cannot support the published interpretation."
+      },
+      "releaseNote": {
+        "artifactId": "pulse",
+        "fromVersion": "v1.4.0-beta",
+        "proposedVersion": "v2.0.0",
+        "status": "retraction_pending_replacement"
+      },
+      "doiAction": {
+        "status": "no_registered_doi",
+        "relation": null
+      },
+      "notices": [
+        "/policies",
+        "/civica-index/corrections",
+        "affected artifact release notes or changelog",
+        "release/DOI landing page after DOI registration",
+        "affected API metadata or deprecation headers where applicable"
+      ],
+      "appeal": {
+        "routes": [
+          "/civica-index/corrections",
+          "/contact"
+        ],
+        "rule": "A reporter or affected contributor may request one reconsideration with new evidence or a claimed process error. The appeal, response, and final disposition are retained."
+      }
+    },
+    {
+      "incident": {
+        "incidentId": "tabletop-rights",
+        "detectedAt": "2026-07-11T12:00:00.000Z",
+        "kind": "security_or_rights",
+        "artifactId": "atlas-export",
+        "fromVersion": "v1.0.0",
+        "fromDoi": null,
+        "summary": "A restricted publisher payload entered a public export.",
+        "changedFrozenBytes": true,
+        "actor": "Fernando Balino",
+        "status": "contained_pending_disposition"
+      },
+      "emergencyAction": {
+        "action": "restrict_affected_payload_and_export",
+        "takenAt": "2026-07-11T12:00:00.000Z",
+        "reviewDueAt": "2026-07-14T12:00:00.000Z",
+        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+      },
+      "changelog": {
+        "incidentId": "tabletop-rights",
+        "artifactId": "atlas-export",
+        "fromVersion": "v1.0.0",
+        "disposition": "correction_pending",
+        "summary": "A restricted publisher payload entered a public export."
+      },
+      "releaseNote": {
+        "artifactId": "atlas-export",
+        "fromVersion": "v1.0.0",
+        "proposedVersion": "v1.1.0",
+        "status": "correction_pending"
+      },
+      "doiAction": {
+        "status": "no_registered_doi",
+        "relation": null
+      },
+      "notices": [
+        "/policies",
+        "/civica-index/corrections",
+        "affected artifact release notes or changelog",
+        "release/DOI landing page after DOI registration",
+        "affected API metadata or deprecation headers where applicable"
+      ],
+      "appeal": {
+        "routes": [
+          "/civica-index/corrections",
+          "/contact"
+        ],
+        "rule": "A reporter or affected contributor may request one reconsideration with new evidence or a claimed process error. The appeal, response, and final disposition are retained."
+      }
+    }
+  ],
+  "semanticSha256": "24137dc19405220a9d1b741f0a9ed7692b034516aee7179336ab98658167c5b0"
+}

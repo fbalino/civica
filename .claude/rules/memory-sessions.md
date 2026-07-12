@@ -709,3 +709,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Published eight distinct model/agent roles with exact production systems where known, controls, and limitations.
 - Internal audits and GPT-5.3 Spark coding pilots are explicitly non-peer-review and non-gold; Fernando retains publication responsibility.
 - Historical session and launch-image metadata gaps remain visible rather than inferred. GOV-005 is next while GOV-003 awaits owner facts.
+
+## 2026-07-11 — GOV-005 release authority completed
+
+- Named Fernando's gated release, methodology, correction, retraction, supersession, emergency, and restoration authority.
+- Frozen corrections use new versions/DOIs and bidirectional relations; retractions keep resolvable tombstones.
+- Three no-write tabletops prove material-error, methodology-failure, and rights/security paths. GOV-006 is next.

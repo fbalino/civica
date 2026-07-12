@@ -103,6 +103,30 @@ addressable. That limitation is stated again under [Data & API
 corrections](#data-api-corrections); the release-package gate must make this
 policy mechanically true before a frozen release is published.
 
+## Authority and emergency action {#authority}
+
+This section follows `civica-release-correction-authority/v1`. Fernando Balino is the approver for data and methodology releases, corrections, retractions, supersessions, emergency suppression, and restoration. A release still has to pass its applicable evidence and review gates; approval cannot turn a failed gate into a passing one. Fernando cannot rewrite an independent report or decide an appeal where he has an unmanageable conflict. That decision stays blocked until a qualified independent decision-maker is appointed and named.
+
+### Emergency action
+
+Fernando may temporarily suppress an affected fact, claim, route, export, job, credential, or release when there is credible material misinformation, an active security compromise, a privacy exposure, a rights breach, or unsafe automated output. The first actions are to stop propagation, preserve the minimum lawful evidence, record the affected release identities, open a dated incident or correction record, and state restoration criteria. The current emergency review window is recorded in the machine-readable authority contract; it is a best-effort governance target rather than a service guarantee.
+
+Restoration requires resolution of the trigger, applicable checks, required notices, and a recorded decision. Security-sensitive details may remain private while disclosure would create further risk. A lawful metadata record or public tombstone remains even when harmful payload bytes must be restricted.
+
+### DOI and frozen-release relationships
+
+A frozen release whose bytes or interpretation change receives a new version and DOI. The new DOI metadata names the old DOI with `IsNewVersionOf`; the old DOI names its successor with `IsPreviousVersionOf`. A retracted DOI continues to resolve to a dated retraction notice and preserved metadata. Civica never reassigns an existing DOI to different release bytes. A spelling or descriptive-metadata correction may update DOI metadata without a new object only when the frozen bytes and their interpretation are unchanged. These are publication rules, not a claim that a DOI has already been registered.
+
+### Notices, reports, and appeals
+
+Material actions are recorded on this policy page, the [public corrections log](/civica-index/corrections), the affected artifact's release notes or changelog, the release/DOI landing page after registration, and affected API metadata or deprecation headers where applicable. Reports may use the [corrections route](/civica-index/corrections) or [contact form](/contact).
+
+A reporter or affected contributor may request one reconsideration by supplying new evidence or identifying a process error. Civica retains the appeal, response, and final disposition. A material conflict held by the original decision-maker requires a named independent appeal decision-maker. Critical findings, appeals, reviewer disagreement, and recommendations to retract or retire do not reduce an agreed honorarium or access to the response.
+
+### Tabletop verification
+
+The machine-readable authority record runs three fixed incidents: a country assigned to the wrong jurisdiction after a frozen release, a methodology failure that invalidates an interpretation, and a restricted publisher payload entering a public export. Each produces containment, a dated incident, changelog and release-note objects, a version outcome, the applicable DOI action, notice locations, and an appeal route. The fixtures write nothing to production.
+
 ## Versioning {#versioning}
 
 Where a Civica artifact exposes a methodology version, it uses a
