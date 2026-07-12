@@ -927,3 +927,17 @@ sampling covers retained history; a future, label-blind window tests evidence
 that was unavailable when the method was locked. Keeping these purposes
 separate prevents a successful smoke test or high model agreement from being
 presented as external validity.
+
+### APR-D155 — Atlas surfaces have one machine-readable ownership matrix
+
+**Decision:** Adopt `civica-atlas-surface-data-matrix/v1` for every public
+data-bearing Atlas route and every module in the unified country reader. Each
+row binds the renderer to its query/loader, storage and fields, provenance,
+coverage, seven data/UI states, tests or a named test gap, owner, and exact
+relation to the frozen export. A route may display data that remains excluded
+from bulk release; redistribution follows row/source rights, never UI presence.
+
+**Why:** Route code alone cannot answer which table supplies a value, who owns
+its failure state, or whether the same data belongs in a frozen package. A
+checked matrix makes those boundaries reviewable and gives later coverage and
+state-repair tasks a stable inventory instead of another ad hoc audit.
