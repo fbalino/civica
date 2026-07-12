@@ -1,0 +1,479 @@
+{
+  "schemaVersion": "civica-reviewer-dossiers/v1",
+  "rankingVersion": "civica-reviewer-ranking/v1",
+  "status": "drafts_only_no_contact",
+  "honorariumPosture": "Amount and logistics remain pending GOV-012 owner approval. Any eventual offer is standardized for comparable scope, paid for time regardless of conclusion, and never contingent on a favorable review.",
+  "publicationPosture": "The original report, conflict disclosure, and author response are preserved. Public attribution or report publication requires the reviewer's explicit consent; unfavorable or unresolved findings are not suppressed.",
+  "contactGate": "These drafts must not be sent before GOV-016 passes and the owner approves identities, order, conflicts, honoraria, and exact copy.",
+  "dossiers": [
+    {
+      "candidateId": "gov-a-little",
+      "name": "Andrew T. Little",
+      "lane": "governance_measurement",
+      "shortlistStatus": "proposed_primary",
+      "rank": 1,
+      "whyThisPerson": "Formal critique of expert-coded backsliding measures using observable institutional indicators. Provides an adversarial test of whether composite governance measures add information beyond simpler facts.",
+      "exactQuestion": "Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?",
+      "packet": "GOV-014 Index tournament review packet",
+      "artifacts": [
+        "plan/research/index-tournament-preregistration-v3.md",
+        "plan/research/index-tournament-confirmatory-decision-v1.md",
+        "plan/research/index-disposition-resolution-v1.md",
+        "data/releases/civica-index-research-archive-2026-07-v1/manifest.v1.json"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.",
+      "conflictTerms": "No Civica-source leadership identified; a skeptical published position is a perspective, not a disqualifying conflict. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-014 Index tournament review packet",
+        "body": "Dear Andrew T. Little,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on formal theory and objective-indicator critique. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. No Civica-source leadership identified; a skeptical published position is a perspective, not a disqualifying conflict.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-a-munck",
+      "name": "Gerardo L. Munck",
+      "lane": "governance_measurement",
+      "shortlistStatus": "proposed_primary",
+      "rank": 2,
+      "whyThisPerson": "Canonical conceptualization-measurement-aggregation framework for evaluating democracy indices. Can judge whether the tournament's construct and aggregation tests support its disposition.",
+      "exactQuestion": "Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?",
+      "packet": "GOV-014 Index tournament review packet",
+      "artifacts": [
+        "plan/research/index-tournament-preregistration-v3.md",
+        "plan/research/index-tournament-confirmatory-decision-v1.md",
+        "plan/research/index-disposition-resolution-v1.md",
+        "data/releases/civica-index-research-archive-2026-07-v1/manifest.v1.json"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.",
+      "conflictTerms": "Published critic and former consultant to international organizations including the World Bank; disclose, with no current source leadership identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-014 Index tournament review packet",
+        "body": "Dear Gerardo L. Munck,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on conceptual validity, index evaluation, and latin american comparative politics. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Published critic and former consultant to international organizations including the World Bank; disclose, with no current source leadership identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-a-claassen",
+      "name": "Christopher Claassen",
+      "lane": "governance_measurement",
+      "shortlistStatus": "proposed_primary",
+      "rank": 3,
+      "whyThisPerson": "Latent measurement of democratic attitudes and downstream analysis with explicit measurement uncertainty. Offers a non-source-lead perspective on construct validity and uncertainty propagation.",
+      "exactQuestion": "Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?",
+      "packet": "GOV-014 Index tournament review packet",
+      "artifacts": [
+        "plan/research/index-tournament-preregistration-v3.md",
+        "plan/research/index-tournament-confirmatory-decision-v1.md",
+        "plan/research/index-disposition-resolution-v1.md",
+        "data/releases/civica-index-research-archive-2026-07-v1/manifest.v1.json"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.",
+      "conflictTerms": "Uses major democracy datasets in research; no current Civica-source leadership identified in public evidence. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-014 Index tournament review packet",
+        "body": "Dear Christopher Claassen,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on survey/latent-attitude measurement and uncertainty. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Uses major democracy datasets in research; no current Civica-source leadership identified in public evidence.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-a-meng",
+      "name": "Anne Meng",
+      "lane": "governance_measurement",
+      "shortlistStatus": "alternate",
+      "rank": 4,
+      "whyThisPerson": "Institutional-indicator measurement of executive constraints, term limits, succession, and backsliding. Can assess Civica's shift from a composite to auditable source-native institutional evidence.",
+      "exactQuestion": "Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?",
+      "packet": "GOV-014 Index tournament review packet",
+      "artifacts": [
+        "plan/research/index-tournament-preregistration-v3.md",
+        "plan/research/index-tournament-confirmatory-decision-v1.md",
+        "plan/research/index-disposition-resolution-v1.md",
+        "data/releases/civica-index-research-archive-2026-07-v1/manifest.v1.json"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.",
+      "conflictTerms": "No Civica-source leadership or direct product dependency identified in public evidence. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-014 Index tournament review packet",
+        "body": "Dear Anne Meng,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on comparative institutions and observable-indicator measurement. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. No Civica-source leadership or direct product dependency identified in public evidence.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-a-pemstein",
+      "name": "Daniel Pemstein",
+      "lane": "governance_measurement",
+      "shortlistStatus": "alternate",
+      "rank": 5,
+      "whyThisPerson": "Principal designer of V-Dem's Bayesian latent-variable measurement model for expert-coded cross-national data. Can test the Index tournament's treatment of expert disagreement, scale construction, and uncertainty.",
+      "exactQuestion": "Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?",
+      "packet": "GOV-014 Index tournament review packet",
+      "artifacts": [
+        "plan/research/index-tournament-preregistration-v3.md",
+        "plan/research/index-tournament-confirmatory-decision-v1.md",
+        "plan/research/index-disposition-resolution-v1.md",
+        "data/releases/civica-index-research-archive-2026-07-v1/manifest.v1.json"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.",
+      "conflictTerms": "Current V-Dem measurement leadership; V-Dem is a Civica input, so pair and recuse on judgments of his own model/source. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-014 Index tournament review packet",
+        "body": "Dear Daniel Pemstein,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on bayesian latent-variable and expert-coded measurement implementation. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Current V-Dem measurement leadership; V-Dem is a Civica input, so pair and recuse on judgments of his own model/source.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-a-marquardt",
+      "name": "Kyle L. Marquardt",
+      "lane": "governance_measurement",
+      "shortlistStatus": "alternate",
+      "rank": 6,
+      "whyThisPerson": "Operational stewardship of expert-coder aggregation, bridge coding, and uncertainty in V-Dem. Can inspect whether Civica propagated measurement uncertainty and coder disagreement faithfully.",
+      "exactQuestion": "Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?",
+      "packet": "GOV-014 Index tournament review packet",
+      "artifacts": [
+        "plan/research/index-tournament-preregistration-v3.md",
+        "plan/research/index-tournament-confirmatory-decision-v1.md",
+        "plan/research/index-disposition-resolution-v1.md",
+        "data/releases/civica-index-research-archive-2026-07-v1/manifest.v1.json"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.",
+      "conflictTerms": "Current V-Dem measurement role; disclose, pair, and recuse from deciding whether his own source treatment is adequate. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-014 Index tournament review packet",
+        "body": "Dear Kyle L. Marquardt,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on hands-on expert-coding measurement-system implementation. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Did the preregistered tournament fairly test originality, redundancy, stability, uncertainty, usefulness, and misuse, and does the no-winner/source-native disposition follow from the evidence?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A structured memo answering the frozen questions, ranking material findings, identifying supported/unsupported claims, and recording unresolved methodological disagreement.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Current V-Dem measurement role; disclose, pair, and recuse from deciding whether his own source treatment is adequate.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-b-restrepo",
+      "name": "Jorge A. Restrepo",
+      "lane": "political_event_data",
+      "shortlistStatus": "proposed_primary",
+      "rank": 1,
+      "whyThisPerson": "Country-specific conflict monitoring and evidence that global event datasets undercount relative to local microdata. Provides an original-language, non-US/EU audit of source reconciliation, coverage, and local-event loss.",
+      "exactQuestion": "Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?",
+      "packet": "GOV-015 Pulse review packet (after prospective evaluation)",
+      "artifacts": [
+        "plan/research/pulse-event-ontology-v3.md",
+        "plan/research/pulse-evaluation-sampling-preregistration-v1.md",
+        "plan/research/pulse-country-day-evaluation-set-v1.md",
+        "data/research/pulse-evaluation-packet-manifest-v1.json"
+      ],
+      "expectedTime": "12–16 hours over four weeks",
+      "deliverable": "A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.",
+      "conflictTerms": "Directs an adjacent independent conflict-data producer; disclose product overlap, with no Civica dependency identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-015 Pulse review packet (after prospective evaluation)",
+        "body": "Dear Jorge A. Restrepo,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on colombian microdata, local-source reconciliation, and policy verification. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?\n\nThe review would involve 12–16 hours over four weeks and the requested deliverable would be: A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Directs an adjacent independent conflict-data producer; disclose product overlap, with no Civica dependency identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-b-weidmann",
+      "name": "Nils B. Weidmann",
+      "lane": "political_event_data",
+      "shortlistStatus": "proposed_primary",
+      "rank": 2,
+      "whyThisPerson": "Foundational measurement of media reporting bias and accuracy in conflict event data. Can challenge Pulse's observability, no-event language, and source-coverage assumptions.",
+      "exactQuestion": "Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?",
+      "packet": "GOV-015 Pulse review packet (after prospective evaluation)",
+      "artifacts": [
+        "plan/research/pulse-event-ontology-v3.md",
+        "plan/research/pulse-evaluation-sampling-preregistration-v1.md",
+        "plan/research/pulse-country-day-evaluation-set-v1.md",
+        "data/research/pulse-evaluation-packet-manifest-v1.json"
+      ],
+      "expectedTime": "12–16 hours over four weeks",
+      "deliverable": "A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.",
+      "conflictTerms": "No Civica source or provider relationship identified; adjacent event-data scholarship only. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-015 Pulse review packet (after prospective evaluation)",
+        "body": "Dear Nils B. Weidmann,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on media-selection bias and report-level event analysis. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?\n\nThe review would involve 12–16 hours over four weeks and the requested deliverable would be: A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. No Civica source or provider relationship identified; adjacent event-data scholarship only.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-b-brandt",
+      "name": "Patrick T. Brandt",
+      "lane": "political_event_data",
+      "shortlistStatus": "proposed_primary",
+      "rank": 3,
+      "whyThisPerson": "Long-running political event-data and time-series methods plus current domain-adapted LLM classification infrastructure. Can review Pulse's ontology, model architecture, and full extraction/classification pipeline at implementation depth.",
+      "exactQuestion": "Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?",
+      "packet": "GOV-015 Pulse review packet (after prospective evaluation)",
+      "artifacts": [
+        "plan/research/pulse-event-ontology-v3.md",
+        "plan/research/pulse-evaluation-sampling-preregistration-v1.md",
+        "plan/research/pulse-country-day-evaluation-set-v1.md",
+        "data/research/pulse-evaluation-packet-manifest-v1.json"
+      ],
+      "expectedTime": "12–16 hours over four weeks",
+      "deliverable": "A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.",
+      "conflictTerms": "Leads adjacent event-data/LLM projects; no Civica source or provider relationship identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-015 Pulse review packet (after prospective evaluation)",
+        "body": "Dear Patrick T. Brandt,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on historical event-data infrastructure and modern conflict-language models. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?\n\nThe review would involve 12–16 hours over four weeks and the requested deliverable would be: A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Leads adjacent event-data/LLM projects; no Civica source or provider relationship identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-b-osorio",
+      "name": "Javier Osorio",
+      "lane": "political_event_data",
+      "shortlistStatus": "alternate",
+      "rank": 4,
+      "whyThisPerson": "Spanish-language supervised event coding, conflict NLP, and cross-lingual model evaluation. Can test Pulse's non-English evidence, translation, and Latin American event-attribution assumptions.",
+      "exactQuestion": "Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?",
+      "packet": "GOV-015 Pulse review packet (after prospective evaluation)",
+      "artifacts": [
+        "plan/research/pulse-event-ontology-v3.md",
+        "plan/research/pulse-evaluation-sampling-preregistration-v1.md",
+        "plan/research/pulse-country-day-evaluation-set-v1.md",
+        "data/research/pulse-evaluation-packet-manifest-v1.json"
+      ],
+      "expectedTime": "12–16 hours over four weeks",
+      "deliverable": "A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.",
+      "conflictTerms": "Adjacent ConfliBERT/Eventus work; no Civica source or provider relationship identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-015 Pulse review packet (after prospective evaluation)",
+        "body": "Dear Javier Osorio,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on cross-lingual nlp and latin american violence research. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?\n\nThe review would involve 12–16 hours over four weeks and the requested deliverable would be: A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Adjacent ConfliBERT/Eventus work; no Civica source or provider relationship identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-b-radford",
+      "name": "Benjamin J. Radford",
+      "lane": "political_event_data",
+      "shortlistStatus": "alternate",
+      "rank": 5,
+      "whyThisPerson": "Formal Bayesian measurement of conflict losses, missing reports, and reporting bias. Can test uncertainty and undercount assumptions without conflating reported severity with truth.",
+      "exactQuestion": "Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?",
+      "packet": "GOV-015 Pulse review packet (after prospective evaluation)",
+      "artifacts": [
+        "plan/research/pulse-event-ontology-v3.md",
+        "plan/research/pulse-evaluation-sampling-preregistration-v1.md",
+        "plan/research/pulse-country-day-evaluation-set-v1.md",
+        "data/research/pulse-evaluation-packet-manifest-v1.json"
+      ],
+      "expectedTime": "12–16 hours over four weeks",
+      "deliverable": "A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.",
+      "conflictTerms": "No Civica source or provider relationship identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-015 Pulse review packet (after prospective evaluation)",
+        "body": "Dear Benjamin J. Radford,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on bayesian measurement error and conflict forecasting. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?\n\nThe review would involve 12–16 hours over four weeks and the requested deliverable would be: A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. No Civica source or provider relationship identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-b-dorazio",
+      "name": "Vito D'Orazio",
+      "lane": "political_event_data",
+      "shortlistStatus": "alternate",
+      "rank": 6,
+      "whyThisPerson": "Production political event coding, ConfliBERT, and Spanish/Arabic political-text extraction. Can inspect multilingual extraction, ontology mapping, and production failure modes.",
+      "exactQuestion": "Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?",
+      "packet": "GOV-015 Pulse review packet (after prospective evaluation)",
+      "artifacts": [
+        "plan/research/pulse-event-ontology-v3.md",
+        "plan/research/pulse-evaluation-sampling-preregistration-v1.md",
+        "plan/research/pulse-country-day-evaluation-set-v1.md",
+        "data/research/pulse-evaluation-packet-manifest-v1.json"
+      ],
+      "expectedTime": "12–16 hours over four weeks",
+      "deliverable": "A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.",
+      "conflictTerms": "Co-leads adjacent automated event-data infrastructure; no direct Civica dependency identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-015 Pulse review packet (after prospective evaluation)",
+        "body": "Dear Vito D'Orazio,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on multilingual political nlp from a mathematical/data-science unit. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Are the ledger construct, ontology, retrieval boundaries, sampling frames, observability rules, blinded coding/adjudication, and full-pipeline evaluation appropriate for Pulse's proposed claims?\n\nThe review would involve 12–16 hours over four weeks and the requested deliverable would be: A structured memo covering construct, sampling, coding, observability, full-pipeline metrics, subgroup limits, error taxonomy, prospective protocol, and supportable/unsupported claims.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Co-leads adjacent automated event-data infrastructure; no direct Civica dependency identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-c-karcher",
+      "name": "Sebastian Karcher",
+      "lane": "research_data_curation",
+      "shortlistStatus": "proposed_primary",
+      "rank": 1,
+      "whyThisPerson": "Political-science repository curation, provenance, rights-sensitive access, and open research infrastructure. Can test the Atlas packet against domain-specific repository and sensitive-data practice.",
+      "exactQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "packet": "GOV-013 Atlas/data-curation review packet",
+      "artifacts": [
+        "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+        "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.",
+      "conflictTerms": "QDR is a potential repository model, not a Civica source; disclose any future deposit recommendation. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-013 Atlas/data-curation review packet",
+        "body": "Dear Sebastian Karcher,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on qualitative/mixed-method data curation and political-science infrastructure. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. QDR is a potential repository model, not a Civica source; disclose any future deposit recommendation.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-c-simons",
+      "name": "Natasha Simons",
+      "lane": "research_data_curation",
+      "shortlistStatus": "proposed_primary",
+      "rank": 2,
+      "whyThisPerson": "National research-data infrastructure, FAIR implementation, policy standardization, and persistent identifiers. Can assess Civica's DOI/versioning, machine-readable manifests, and international data-commons posture.",
+      "exactQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "packet": "GOV-013 Atlas/data-curation review packet",
+      "artifacts": [
+        "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+        "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.",
+      "conflictTerms": "National infrastructure and RDA roles; disclose any recommended service relationship. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-013 Atlas/data-curation review packet",
+        "body": "Dear Natasha Simons,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on national data-commons and international standards governance. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. National infrastructure and RDA roles; disclose any recommended service relationship.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-c-vilhuber",
+      "name": "Lars Vilhuber",
+      "lane": "research_data_curation",
+      "shortlistStatus": "proposed_primary",
+      "rank": 3,
+      "whyThisPerson": "Large-scale replication-package verification, data/code availability policy, and confidentiality-aware reproducibility. Can attempt Civica's clean-room build and distinguish readable documentation from actual reproduction.",
+      "exactQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "packet": "GOV-013 Atlas/data-curation review packet",
+      "artifacts": [
+        "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+        "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.",
+      "conflictTerms": "Journal/data-editor role; no Civica source dependency identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-013 Atlas/data-curation review packet",
+        "body": "Dear Lars Vilhuber,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on economics journal infrastructure and computational reproduction at scale. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. Journal/data-editor role; no Civica source dependency identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-c-peer",
+      "name": "Limor Peer",
+      "lane": "research_data_curation",
+      "shortlistStatus": "alternate",
+      "rank": 4,
+      "whyThisPerson": "Data Quality Review workflows combining curation, code review, preservation, and transparency. Can review Civica's evidence, code, and correction chain as one scholarly record.",
+      "exactQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "packet": "GOV-013 Atlas/data-curation review packet",
+      "artifacts": [
+        "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+        "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.",
+      "conflictTerms": "No Civica source or repository dependency identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-013 Atlas/data-curation review packet",
+        "body": "Dear Limor Peer,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on institutional social-science archive and code-review workflow. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. No Civica source or repository dependency identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-c-zenk",
+      "name": "Wolfgang Zenk-Möltgen",
+      "lane": "research_data_curation",
+      "shortlistStatus": "alternate",
+      "rank": 5,
+      "whyThisPerson": "Social-science archive metadata standards, interoperability, FAIR assessment, and disclosure-risk management. Can review Civica's codebook, metadata, archive structure, and machine interoperability from a European infrastructure perspective.",
+      "exactQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "packet": "GOV-013 Atlas/data-curation review packet",
+      "artifacts": [
+        "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+        "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.",
+      "conflictTerms": "No Civica source or repository dependency identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-013 Atlas/data-curation review packet",
+        "body": "Dear Wolfgang Zenk-Möltgen,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on european social-science archive metadata and interoperability. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. No Civica source or repository dependency identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    },
+    {
+      "candidateId": "gov-c-owango",
+      "name": "Joy Owango",
+      "lane": "research_data_curation",
+      "shortlistStatus": "alternate",
+      "rank": 6,
+      "whyThisPerson": "African open-science capacity, persistent identifiers, research visibility, and equitable infrastructure adoption. Can test whether Civica's citation and access model works for Global South research users.",
+      "exactQuestion": "Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?",
+      "packet": "GOV-013 Atlas/data-curation review packet",
+      "artifacts": [
+        "data/releases/atlas-2026-07-11/g2-rc1/bundle-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/REPRODUCE.md",
+        "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
+        "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md"
+      ],
+      "expectedTime": "8–12 hours over three weeks",
+      "deliverable": "A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.",
+      "conflictTerms": "TCC Africa has publisher/open-science partnerships; no Civica source dependency identified. Before access, request a direct disclosure and apply the GOV-008 recusal/pairing rule; withdrawal or recusal carries no penalty.",
+      "publicationTerms": "Civica will preserve the original report and answer findings in a versioned response. Public naming or report publication requires explicit consent. Review does not imply endorsement, authorship, advisory-board service, or validation of unrelated Civica claims.",
+      "honorariumTerms": "Honorarium amount pending GOV-012. Any offer will be consistent for comparable work, paid for time, and independent of the conclusion.",
+      "contactDraft": {
+        "subject": "Independent review request: GOV-013 Atlas/data-curation review packet",
+        "body": "Dear Joy Owango,\n\nI am preparing Civica Atlas, a provenance-first comparative reference to how countries are governed. I am writing because your work on african open-science capacity and equitable pid adoption. is unusually close to one bounded question we need examined independently.\n\nThe proposed question is: Does the frozen release provide adequate metadata, provenance, rights, preservation, versioning, citation, checksums, codebook, correction, and clean-room reconstruction for responsible reuse?\n\nThe review would involve 8–12 hours over three weeks and the requested deliverable would be: A completed artifact checklist, attempted clean-room reproduction and link/checksum report, and severity-ranked curation, preservation, citation, rights, and reuse findings.\n\nBefore sharing a version-pinned packet, I would ask you to confirm availability and any financial, institutional, source-project, collaborative, or competitive relationships relevant to this judgment. TCC Africa has publisher/open-science partnerships; no Civica source dependency identified.\n\nAn honorarium amount is still subject to owner approval under a policy that pays for time and never for a favorable conclusion. We preserve critical and unresolved findings; public attribution or publication of your report would occur only with your consent. The assignment would not imply endorsement, authorship, or advisory-board membership.\n\nIf the scope is outside your interests or capacity, a brief decline is completely sufficient and no explanation is needed. No materials or follow-up would be sent without your agreement.\n\nSincerely,\nFernando Balino\nCivica Atlas"
+      },
+      "contacted": false
+    }
+  ],
+  "semanticSha256": "10a1827b907383f924736405948afd784754b7cdab27b3f3e612be8f54db8ee6"
+}
