@@ -761,6 +761,48 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
     deprecation: active,
   },
+  pulse_information_environment_releases: {
+    definition:
+      "Immutable metadata for one exact official information-environment dataset capture adopted for classification-time context.",
+    rowGrain: "One source release and content hash.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+    cadence: "Append-only when a new official release is reviewed and adopted.",
+    vintageSemantics:
+      "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+    rights:
+      "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+    deprecation: active,
+  },
+  pulse_information_environment_values: {
+    definition:
+      "Complete observed-or-explicit-missing jurisdiction coverage for one immutable information-environment release.",
+    rowGrain: "One release and one supported jurisdiction.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+    cadence: "Append-only with its release.",
+    vintageSemantics:
+      "Inherits the release observation year, capture time, content hash, and adoption time.",
+    rights:
+      "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+    deprecation: active,
+  },
+  pulse_event_information_environment_pins: {
+    definition:
+      "Immutable snapshot of the exact information-environment value or missing state available when a Pulse event was classified.",
+    rowGrain: "One Pulse event projection and classification run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+    cadence: "Exactly once at event insertion.",
+    vintageSemantics:
+      "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+    rights:
+      "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+    deprecation: active,
+  },
   pulse_event_decisions: {
     definition:
       "Append-only, axis-specific Pulse decisions and refutations underlying the current event projection.",

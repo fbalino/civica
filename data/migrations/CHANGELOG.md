@@ -86,6 +86,15 @@ dimension scores, method, as-of date, rationale, and evidence references.
 Corroboration confidence remains unchanged; scoring reads the latest retained
 decision separately.
 
+`0029_whole_dazzler` replaces the mutable legacy press-context scalar with
+immutable release metadata, complete observed-or-explicit-missing coverage for
+every supported jurisdiction, and one classification-time context pin per
+Pulse event. Existing events are retained as historically unrecoverable rather
+than backfilled from a later release. New event inserts pin the then-adopted
+release automatically; release, value, and pin rows reject updates/deletes.
+The registered RSF 2026 context remains disabled for production weighting and
+observability while rights and validation are pending.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

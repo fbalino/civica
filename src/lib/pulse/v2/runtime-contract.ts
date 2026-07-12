@@ -73,6 +73,11 @@ import {
   RSF_2026_CANDIDATE_RELEASE,
 } from "./press-freedom";
 import {
+  PULSE_INFORMATION_ENVIRONMENT_PIN_METHOD,
+  PULSE_INFORMATION_ENVIRONMENT_PIN_VERSION,
+  PULSE_INFORMATION_ENVIRONMENT_RELEASE_VERSION,
+} from "./information-environment-evidence";
+import {
   PULSE_DECISION_KINDS,
   PULSE_DECISION_LEDGER_VERSION,
   type PulseDecisionKind,
@@ -94,8 +99,8 @@ import {
   PULSE_REVIEW_SLA_VERSION,
 } from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.13.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.14-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.14.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.15-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -369,7 +374,14 @@ export interface PulseRuntimeMethodContract {
     };
     informationEnvironment: {
       schemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_VERSION;
+      releaseSchemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_RELEASE_VERSION;
+      eventPinSchemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_PIN_VERSION;
+      eventPinMethodVersion: typeof PULSE_INFORMATION_ENVIRONMENT_PIN_METHOD;
       policyVersion: string;
+      coveragePolicy: "one_observed_or_missing_row_per_supported_jurisdiction";
+      historicalPinPolicy: "unrecoverable_remains_missing";
+      rerunPolicy: "classification_pin_is_append_only";
+      observabilityUse: "disabled_until_rights_and_validation_pass";
       productionUse: "disabled_pending_rights_and_validation";
       missingValuePolicy: "no_multiplier";
       validationStanding: "not_calibrated_bias_correction";
@@ -774,7 +786,15 @@ export function buildPulseRuntimeMethod(
       },
       informationEnvironment: {
         schemaVersion: PULSE_INFORMATION_ENVIRONMENT_VERSION,
+        releaseSchemaVersion: PULSE_INFORMATION_ENVIRONMENT_RELEASE_VERSION,
+        eventPinSchemaVersion: PULSE_INFORMATION_ENVIRONMENT_PIN_VERSION,
+        eventPinMethodVersion: PULSE_INFORMATION_ENVIRONMENT_PIN_METHOD,
         policyVersion: PULSE_INFORMATION_ENVIRONMENT_POLICY.version,
+        coveragePolicy:
+          "one_observed_or_missing_row_per_supported_jurisdiction",
+        historicalPinPolicy: "unrecoverable_remains_missing",
+        rerunPolicy: "classification_pin_is_append_only",
+        observabilityUse: "disabled_until_rights_and_validation_pass",
         productionUse: "disabled_pending_rights_and_validation",
         missingValuePolicy: "no_multiplier",
         validationStanding: "not_calibrated_bias_correction",

@@ -826,3 +826,15 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   corroboration confidence. Runtime `pulse-v2.14-beta`, 920 tests, TypeScript,
   live migration/retention/absorption invariants, browser QA, and the full
   production build passed.
+
+## 2026-07-12 — PUL-038 information context completed
+
+- Replaced the legacy mutable scalar path with immutable release metadata,
+  complete observed-or-missing jurisdiction coverage, and one event pin.
+- Applied migration 0029; production is at 30/30 migrations and 76 tables.
+  The official RSF capture yields 176 observed and 75 explicit missing rows
+  across 251 supported non-aggregate jurisdictions. All 384 historical events
+  remain marked unrecoverable rather than receiving a later value.
+- Production weighting and observability remain disabled. Runtime
+  `pulse-v2.15-beta`, the real scoring rerun, 924 tests, TypeScript, live
+  invariants, light/dark browser QA, and the full build passed.

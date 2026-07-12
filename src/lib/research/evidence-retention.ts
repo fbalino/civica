@@ -48,11 +48,14 @@ export const RETAINED_EVIDENCE_RELATIONS = [
 export const APPEND_ONLY_EVIDENCE_RELATIONS = [
   "pulse_dimensional_delta_history",
   "pulse_event_absorptions",
+  "pulse_event_information_environment_pins",
   "pulse_event_decisions",
   "pulse_incident_assignments",
   "pulse_incident_resolutions",
   "pulse_classification_attempts",
   "pulse_review_sla_events",
+  "pulse_information_environment_releases",
+  "pulse_information_environment_values",
 ] as const;
 
 export type RetainedEvidenceRelation =

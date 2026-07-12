@@ -57,8 +57,9 @@ export async function loadPulseCountryPeriodObservability(input: {
     feeds: coverage.feeds,
     sourceCounts,
     qualifyingEvents: input.qualifyingEvents,
-    // Production context stays absent until a complete, versioned source is
-    // both rights-cleared and validated for this use.
+    // Classification-time pins are retained internally, but production
+    // observability stays absent until the source rights and this specific use
+    // are both approved and validated.
     informationEnvironment: null,
   });
 }

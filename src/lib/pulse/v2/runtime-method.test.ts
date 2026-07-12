@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.14-beta");
+  assert.equal(method.version, "pulse-v2.15-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -98,6 +98,18 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.equal(
     method.corroboration.informationEnvironment.productionUse,
     "disabled_pending_rights_and_validation",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.coveragePolicy,
+    "one_observed_or_missing_row_per_supported_jurisdiction",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.rerunPolicy,
+    "classification_pin_is_append_only",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.observabilityUse,
+    "disabled_until_rights_and_validation_pass",
   );
   assert.equal(
     method.corroboration.informationEnvironment.missingValuePolicy,

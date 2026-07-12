@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T10:45:43.077Z",
-  "sha256": "fc08487405140b281d4f13055e12ae2edec78b6352f0a8c149c016aae7a4db31",
+  "generatedAt": "2026-07-12T11:15:07.748Z",
+  "sha256": "c9394bb5117cc317a599da21847fd11c0621c6f51fb30670b983ded61a5bffe7",
   "schema": {
     "columns": [
       {
@@ -7061,6 +7061,213 @@
         "position": 16
       },
       {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_event_information_environment_pins",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "context_schema_version",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "pin_key",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "event_id",
+        "type": "uuid",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "uuid",
+        "name": "classification_run_id",
+        "type": "uuid",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "value_status",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "float4",
+        "name": "score",
+        "type": "real",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "tier",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "int4",
+        "name": "observation_year",
+        "type": "integer",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "timestamp",
+        "name": "retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "content_sha256",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "rights_status",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "use_status",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "missing_reason",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "YES",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 21
+      },
+      {
+        "udt": "timestamp",
+        "name": "classified_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_information_environment_pins",
+        "default": null,
+        "nullable": "NO",
+        "position": 22
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_event_information_environment_pins",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 23
+      },
+      {
         "udt": "text",
         "name": "decision_key",
         "type": "text",
@@ -8157,6 +8364,240 @@
         "default": "now()",
         "nullable": "NO",
         "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "methodology_url",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "terms_url",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "int4",
+        "name": "observation_year",
+        "type": "integer",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "timestamp",
+        "name": "retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "content_sha256",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "int4",
+        "name": "publisher_rows",
+        "type": "integer",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "int4",
+        "name": "matched_jurisdictions",
+        "type": "integer",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "int4",
+        "name": "supported_jurisdictions",
+        "type": "integer",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "redistribution_posture",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "rights_status",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "use_status",
+        "type": "text",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "timestamp",
+        "name": "adopted_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_information_environment_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_information_environment_releases",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "iso3",
+        "type": "text",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "YES",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "value_status",
+        "type": "text",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "float4",
+        "name": "score",
+        "type": "real",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "tier",
+        "type": "text",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "missing_reason",
+        "type": "text",
+        "table": "pulse_information_environment_values",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_information_environment_values",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 8
       },
       {
         "udt": "uuid",
@@ -10226,6 +10667,31 @@
         "definition": "CREATE UNIQUE INDEX pulse_event_decisions_pkey ON public.pulse_event_decisions USING btree (id)"
       },
       {
+        "name": "idx_pulse_information_pins_jurisdiction_time",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CREATE INDEX idx_pulse_information_pins_jurisdiction_time ON public.pulse_event_information_environment_pins USING btree (jurisdiction_id, classified_at)"
+      },
+      {
+        "name": "idx_pulse_information_pins_release",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CREATE INDEX idx_pulse_information_pins_release ON public.pulse_event_information_environment_pins USING btree (release_id)"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_event_id_unique",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CREATE UNIQUE INDEX pulse_event_information_environment_pins_event_id_unique ON public.pulse_event_information_environment_pins USING btree (event_id)"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_pin_key_unique",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CREATE UNIQUE INDEX pulse_event_information_environment_pins_pin_key_unique ON public.pulse_event_information_environment_pins USING btree (pin_key)"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_pkey",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CREATE UNIQUE INDEX pulse_event_information_environment_pins_pkey ON public.pulse_event_information_environment_pins USING btree (id)"
+      },
+      {
         "name": "idx_pulse_event_jurisdictions_event_role",
         "table": "pulse_event_jurisdictions",
         "definition": "CREATE INDEX idx_pulse_event_jurisdictions_event_role ON public.pulse_event_jurisdictions USING btree (event_id, role)"
@@ -10384,6 +10850,26 @@
         "name": "pulse_incidents_pkey",
         "table": "pulse_incidents",
         "definition": "CREATE UNIQUE INDEX pulse_incidents_pkey ON public.pulse_incidents USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_information_release_hash",
+        "table": "pulse_information_environment_releases",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_information_release_hash ON public.pulse_information_environment_releases USING btree (content_sha256)"
+      },
+      {
+        "name": "pulse_information_environment_releases_pkey",
+        "table": "pulse_information_environment_releases",
+        "definition": "CREATE UNIQUE INDEX pulse_information_environment_releases_pkey ON public.pulse_information_environment_releases USING btree (release_id)"
+      },
+      {
+        "name": "idx_pulse_information_values_jurisdiction",
+        "table": "pulse_information_environment_values",
+        "definition": "CREATE INDEX idx_pulse_information_values_jurisdiction ON public.pulse_information_environment_values USING btree (jurisdiction_id)"
+      },
+      {
+        "name": "pulse_information_environment_values_pk",
+        "table": "pulse_information_environment_values",
+        "definition": "CREATE UNIQUE INDEX pulse_information_environment_values_pk ON public.pulse_information_environment_values USING btree (release_id, jurisdiction_id)"
       },
       {
         "name": "idx_pulse_pipeline_runs_stage_time",
@@ -10618,6 +11104,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
+        "name": "civica_pin_pulse_event_information_environment",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_pin_pulse_event_information_environment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  release_row pulse_information_environment_releases%ROWTYPE;\n  value_row pulse_information_environment_values%ROWTYPE;\n  classified_time timestamp := COALESCE(NEW.created_at, now());\n  identity text;\nBEGIN\n  SELECT * INTO release_row\n  FROM pulse_information_environment_releases\n  WHERE adopted_at <= classified_time\n  ORDER BY adopted_at DESC, retrieved_at DESC, release_id DESC\n  LIMIT 1;\n\n  IF release_row.release_id IS NOT NULL THEN\n    SELECT * INTO value_row\n    FROM pulse_information_environment_values\n    WHERE release_id = release_row.release_id\n      AND jurisdiction_id = NEW.jurisdiction_id;\n  END IF;\n\n  identity := concat_ws('|',\n    'pulse-information-environment-pin/v1', NEW.id::text,\n    NEW.jurisdiction_id::text, NEW.classification_run_id::text,\n    classified_time::text, release_row.release_id,\n    value_row.value_status, value_row.score::text, value_row.tier,\n    release_row.content_sha256\n  );\n\n  INSERT INTO pulse_event_information_environment_pins (\n    schema_version, context_schema_version, pin_key, event_id,\n    jurisdiction_id, classification_run_id, release_id, value_status,\n    score, tier, source_id, source_url, upstream_release, observation_year,\n    retrieved_at, content_sha256, rights_status, use_status, missing_reason,\n    method_version, classified_at\n  ) VALUES (\n    'pulse-information-environment-pin/v1',\n    'pulse-information-environment-context/v1',\n    'pulse-information-environment-pin/sha256:' || encode(digest(identity, 'sha256'), 'hex'),\n    NEW.id, NEW.jurisdiction_id, NEW.classification_run_id,\n    release_row.release_id,\n    COALESCE(value_row.value_status, 'missing'),\n    value_row.score,\n    value_row.tier,\n    release_row.source_id,\n    release_row.source_url,\n    release_row.upstream_release,\n    release_row.observation_year,\n    release_row.retrieved_at,\n    release_row.content_sha256,\n    COALESCE(release_row.rights_status, 'not_registered'),\n    COALESCE(release_row.use_status, 'not_available'),\n    CASE\n      WHEN value_row.value_status = 'observed' THEN NULL\n      WHEN value_row.missing_reason IS NOT NULL THEN value_row.missing_reason\n      WHEN release_row.release_id IS NULL THEN 'No adopted information-environment release existed at classification time.'\n      ELSE 'The adopted release has no jurisdiction coverage row; classification failed closed to missing.'\n    END,\n    'pulse-information-environment/classification-pin-v1',\n    classified_time\n  );\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_protect_locked_pulse_coding_assignment",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_locked_pulse_coding_assignment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'Pulse coding assignments cannot be deleted';\n  END IF;\n  IF OLD.status = 'locked' THEN\n    RAISE EXCEPTION 'Locked Pulse coding submissions are immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -10671,6 +11162,11 @@
         "name": "civica_reject_pulse_incident_evidence_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_incident_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_reject_pulse_information_environment_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_information_environment_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
       },
       {
         "name": "civica_reject_pulse_review_sla_event_mutation",
@@ -11200,6 +11696,11 @@
         "definition": "CREATE TRIGGER pulse_event_decisions_validate_supersession BEFORE INSERT ON pulse_event_decisions FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_decision_supersession()"
       },
       {
+        "name": "pulse_event_information_environment_pins_append_only",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CREATE TRIGGER pulse_event_information_environment_pins_append_only BEFORE DELETE OR UPDATE ON pulse_event_information_environment_pins FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_information_environment_mutation()"
+      },
+      {
         "name": "pulse_event_jurisdictions_append_only",
         "table": "pulse_event_jurisdictions",
         "definition": "CREATE TRIGGER pulse_event_jurisdictions_append_only BEFORE DELETE OR UPDATE ON pulse_event_jurisdictions FOR EACH ROW EXECUTE FUNCTION reject_pulse_event_jurisdiction_mutation()"
@@ -11213,6 +11714,11 @@
         "name": "pul_004_event_classification_lineage_immutable",
         "table": "pulse_events_v2",
         "definition": "CREATE TRIGGER pul_004_event_classification_lineage_immutable BEFORE UPDATE ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION pul_004_guard_event_classification_lineage()"
+      },
+      {
+        "name": "pulse_events_v2_pin_information_environment",
+        "table": "pulse_events_v2",
+        "definition": "CREATE TRIGGER pulse_events_v2_pin_information_environment AFTER INSERT ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION civica_pin_pulse_event_information_environment()"
       },
       {
         "name": "pulse_review_obligation_sync",
@@ -11238,6 +11744,16 @@
         "name": "pulse_incidents_validate_merge",
         "table": "pulse_incidents",
         "definition": "CREATE TRIGGER pulse_incidents_validate_merge BEFORE INSERT OR UPDATE ON pulse_incidents FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_incident_merge()"
+      },
+      {
+        "name": "pulse_information_environment_releases_append_only",
+        "table": "pulse_information_environment_releases",
+        "definition": "CREATE TRIGGER pulse_information_environment_releases_append_only BEFORE DELETE OR UPDATE ON pulse_information_environment_releases FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_information_environment_mutation()"
+      },
+      {
+        "name": "pulse_information_environment_values_append_only",
+        "table": "pulse_information_environment_values",
+        "definition": "CREATE TRIGGER pulse_information_environment_values_append_only BEFORE DELETE OR UPDATE ON pulse_information_environment_values FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_information_environment_mutation()"
       },
       {
         "name": "pul_004_pipeline_run_immutable",
@@ -11588,6 +12104,11 @@
       },
       {
         "kind": "r",
+        "name": "pulse_event_information_environment_pins",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "pulse_event_jurisdictions",
         "definition": null
       },
@@ -11619,6 +12140,16 @@
       {
         "kind": "r",
         "name": "pulse_incidents",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_information_environment_releases",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_information_environment_values",
         "definition": null
       },
       {
@@ -12896,6 +13427,54 @@
         "definition": "FOREIGN KEY (supersedes_decision_key) REFERENCES pulse_event_decisions(decision_key) ON DELETE RESTRICT"
       },
       {
+        "name": "pulse_event_information_environment_pins_classification_run_id_",
+        "type": "f",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "FOREIGN KEY (classification_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_contract_check",
+        "type": "c",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "CHECK (schema_version = 'pulse-information-environment-pin/v1'::text AND context_schema_version = 'pulse-information-environment-context/v1'::text AND pin_key ~ '^pulse-information-environment-pin/sha256:[a-f0-9]{64}$'::text AND method_version = 'pulse-information-environment/classification-pin-v1'::text AND (value_status = ANY (ARRAY['observed'::text, 'missing'::text])) AND (rights_status = ANY (ARRAY['verified'::text, 'pending'::text, 'not_registered'::text])) AND (use_status = ANY (ARRAY['active_unvalidated_heuristic'::text, 'disabled_pending_rights_and_validation'::text, 'not_available'::text])) AND (value_status = 'observed'::text AND release_id IS NOT NULL AND score >= 0::double precision AND score <= 100::double precision AND score <> 'NaN'::real AND (tier = ANY (ARRAY['free'::text, 'partial'::text, 'restricted'::text])) AND btrim(source_id) <> ''::text AND source_url ~ '^https://'::text AND btrim(upstream_release) <> ''::text AND observation_year >= 1900 AND retrieved_at IS NOT NULL AND content_sha256 ~ '^[a-f0-9]{64}$'::text AND missing_reason IS NULL OR value_status = 'missing'::text AND score IS NULL AND tier IS NULL AND btrim(missing_reason) <> ''::text))"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_event_id_pulse_events_",
+        "type": "f",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "FOREIGN KEY (event_id) REFERENCES pulse_events_v2(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_event_id_unique",
+        "type": "u",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "UNIQUE (event_id)"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_jurisdiction_id_jurisd",
+        "type": "f",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_pin_key_unique",
+        "type": "u",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "UNIQUE (pin_key)"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_pkey",
+        "type": "p",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_event_information_environment_pins_release_id_pulse_infor",
+        "type": "f",
+        "table": "pulse_event_information_environment_pins",
+        "definition": "FOREIGN KEY (release_id) REFERENCES pulse_information_environment_releases(release_id) ON DELETE RESTRICT"
+      },
+      {
         "name": "pulse_event_jurisdictions_contract_check",
         "type": "c",
         "table": "pulse_event_jurisdictions",
@@ -13074,6 +13653,42 @@
         "type": "p",
         "table": "pulse_incidents",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_information_environment_releases_contract_check",
+        "type": "c",
+        "table": "pulse_information_environment_releases",
+        "definition": "CHECK (schema_version = 'pulse-information-environment-release/v1'::text AND btrim(release_id) <> ''::text AND btrim(source_id) <> ''::text AND source_url ~ '^https://'::text AND methodology_url ~ '^https://'::text AND terms_url ~ '^https://'::text AND btrim(upstream_release) <> ''::text AND observation_year >= 1900 AND content_sha256 ~ '^[a-f0-9]{64}$'::text AND publisher_rows > 0 AND matched_jurisdictions >= 0 AND supported_jurisdictions > 0 AND matched_jurisdictions <= supported_jurisdictions AND matched_jurisdictions <= publisher_rows AND (rights_status = ANY (ARRAY['verified'::text, 'pending'::text])) AND (use_status = ANY (ARRAY['active_unvalidated_heuristic'::text, 'disabled_pending_rights_and_validation'::text])))"
+      },
+      {
+        "name": "pulse_information_environment_releases_pkey",
+        "type": "p",
+        "table": "pulse_information_environment_releases",
+        "definition": "PRIMARY KEY (release_id)"
+      },
+      {
+        "name": "pulse_information_environment_values_contract_check",
+        "type": "c",
+        "table": "pulse_information_environment_values",
+        "definition": "CHECK ((value_status = ANY (ARRAY['observed'::text, 'missing'::text])) AND (value_status = 'observed'::text AND score >= 0::double precision AND score <= 100::double precision AND score <> 'NaN'::real AND (tier = ANY (ARRAY['free'::text, 'partial'::text, 'restricted'::text])) AND missing_reason IS NULL OR value_status = 'missing'::text AND score IS NULL AND tier IS NULL AND btrim(missing_reason) <> ''::text))"
+      },
+      {
+        "name": "pulse_information_environment_values_jurisdiction_id_jurisdicti",
+        "type": "f",
+        "table": "pulse_information_environment_values",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_information_environment_values_pk",
+        "type": "p",
+        "table": "pulse_information_environment_values",
+        "definition": "PRIMARY KEY (release_id, jurisdiction_id)"
+      },
+      {
+        "name": "pulse_information_environment_values_release_id_pulse_informati",
+        "type": "f",
+        "table": "pulse_information_environment_values",
+        "definition": "FOREIGN KEY (release_id) REFERENCES pulse_information_environment_releases(release_id) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_pipeline_runs_completion_check",

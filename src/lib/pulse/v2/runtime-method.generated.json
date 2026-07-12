@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "1da4b090c4df21e2639f02b5dd124e744bd41f02c886289320b95708941c51f0",
+  "contractHash": "ddacc5691fe493732536605b726758f7fff85c45bb5f8b1438551421975264ad",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -86,9 +86,16 @@
         "termsUrl": "https://rsf.org/en/cgu",
         "upstreamRelease": "RSF World Press Freedom Index 2026"
       },
+      "coveragePolicy": "one_observed_or_missing_row_per_supported_jurisdiction",
+      "eventPinMethodVersion": "pulse-information-environment/classification-pin-v1",
+      "eventPinSchemaVersion": "pulse-information-environment-pin/v1",
+      "historicalPinPolicy": "unrecoverable_remains_missing",
       "missingValuePolicy": "no_multiplier",
+      "observabilityUse": "disabled_until_rights_and_validation_pass",
       "policyVersion": "pulse-information-environment-uncertainty/v1",
       "productionUse": "disabled_pending_rights_and_validation",
+      "releaseSchemaVersion": "pulse-information-environment-release/v1",
+      "rerunPolicy": "classification_pin_is_append_only",
       "schemaVersion": "pulse-information-environment-context/v1",
       "sensitivityOnly": {
         "partialAllEvents": 0.8,
@@ -635,7 +642,7 @@
     },
     "version": "pulse-review-sla/v1"
   },
-  "schemaVersion": "1.13.0",
+  "schemaVersion": "1.14.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -648,5 +655,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.14-beta"
+  "version": "pulse-v2.15-beta"
 }

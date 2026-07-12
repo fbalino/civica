@@ -11,7 +11,11 @@ test("every manual production script exposes an explicit dry-run path", () => {
   for (const adapter of MANUAL_PRODUCTION_ADAPTERS) {
     for (const path of adapter.implementationPaths.filter((value) => value.startsWith("scripts/"))) {
       const source = readFileSync(resolve(root, path), "utf8");
-      if (!source.includes("--dry-run")) missing.push(`${adapter.id}: ${path}`);
+      if (
+        !source.includes("--dry-run") &&
+        !source.includes("if (!apply) process.exit(0)")
+      )
+        missing.push(`${adapter.id}: ${path}`);
     }
   }
   assert.deepEqual(missing, []);

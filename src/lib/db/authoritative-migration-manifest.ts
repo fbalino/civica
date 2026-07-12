@@ -175,4 +175,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "fbef51106cc6765704a9dc6994c0c3ca6479ddd8e1667419bd1e7817f5541c1a",
     baseline: false,
   },
+  {
+    id: "0029_whole_dazzler",
+    path: "drizzle/authoritative/0029_whole_dazzler.sql",
+    sha256: "ed1bc1179ddec1fe7ed40cf91629c6f5fcd0498eee8f0df4376c468aa53591a0",
+    baseline: false,
+  },
 ] as const;

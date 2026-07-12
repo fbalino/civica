@@ -888,3 +888,24 @@ it. Separate evidence preserves both histories, prevents later corroboration
 from erasing an earlier decision, and makes reruns deterministic. Requiring a
 fixed-scale sequential comparison and an explicit event link prevents ordinary
 country-level score movement from being attributed to an event by inference.
+
+### APR-D153 — Information context is pinned evidence, not an imputation
+
+**Decision:** Adopt immutable release, jurisdiction-value, and event-pin
+contracts under `pulse-v2.15-beta`. The exact official RSF 2026 capture has one
+observed-or-explicit-missing row for every supported non-aggregate
+jurisdiction. A database trigger copies the value or missing state, release,
+source, vintage, retrieval time, content hash, rights/use standing, and
+classification lineage when a new event is inserted. Historical events remain
+explicitly unrecoverable because no contemporaneous versioned pin existed.
+Release, value, and pin rows reject updates and deletes. Restricted country
+values remain internal; production weighting and restricted-information
+observability are disabled pending separate rights and validation gates.
+
+**Why:** A mutable country scalar cannot show which publisher release a model
+saw, and a default midpoint converts absent evidence into a fabricated
+observation. Complete missingness rows close the supported universe without
+imputation. Classification-time pins prevent later dataset or corroboration
+runs from rewriting history. Keeping the data inactive preserves the
+distinction between auditable context, a sensitivity assumption, and a
+validated correction for reporting asymmetry.

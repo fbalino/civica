@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T10:52:38.288Z",
+  "generatedAt": "2026-07-12T11:20:00.000Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -29,7 +29,8 @@
     "0025_careful_the_professor",
     "0026_magenta_xavin",
     "0027_smart_tempest",
-    "0028_complex_carlie_cooper"
+    "0028_complex_carlie_cooper",
+    "0029_whole_dazzler"
   ],
   "plans": [
     {
@@ -881,6 +882,37 @@
         "ci_dimension_scores": 4867,
         "pulse_event_absorptions": 0,
         "pulse_events_v2": 384,
+        "research_evidence_history": 69319
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0029_whole_dazzler",
+      "artifact": "drizzle/authoritative/0029_whole_dazzler.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "ed1bc1179ddec1fe7ed40cf91629c6f5fcd0498eee8f0df4376c468aa53591a0",
+      "affectedRelations": [
+        "jurisdictions",
+        "pulse_event_information_environment_pins",
+        "pulse_events_v2",
+        "pulse_information_environment_releases",
+        "pulse_information_environment_values",
+        "pulse_pipeline_runs",
+        "research_evidence_history"
+      ],
+      "statementCount": 33,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0029_whole_dazzler-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0029_whole_dazzler --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253,
+        "pulse_event_information_environment_pins": 384,
+        "pulse_events_v2": 384,
+        "pulse_information_environment_releases": 1,
+        "pulse_information_environment_values": 251,
+        "pulse_pipeline_runs": 27,
         "research_evidence_history": 69319
       },
       "writesPerformed": 0

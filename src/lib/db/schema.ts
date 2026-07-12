@@ -2235,6 +2235,121 @@ export const pulseEventsV2 = pgTable(
   ],
 );
 
+/** Immutable metadata for one captured official information-environment release. */
+export const pulseInformationEnvironmentReleases = pgTable(
+  "pulse_information_environment_releases",
+  {
+    releaseId: text("release_id").primaryKey(),
+    schemaVersion: text("schema_version").notNull(),
+    sourceId: text("source_id").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    methodologyUrl: text("methodology_url").notNull(),
+    termsUrl: text("terms_url").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    observationYear: integer("observation_year").notNull(),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    contentSha256: text("content_sha256").notNull(),
+    publisherRows: integer("publisher_rows").notNull(),
+    matchedJurisdictions: integer("matched_jurisdictions").notNull(),
+    supportedJurisdictions: integer("supported_jurisdictions").notNull(),
+    redistributionPosture: text("redistribution_posture").notNull(),
+    rightsStatus: text("rights_status").notNull(),
+    useStatus: text("use_status").notNull(),
+    adoptedAt: timestamp("adopted_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_information_release_hash").on(table.contentSha256),
+    check(
+      "pulse_information_environment_releases_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-information-environment-release/v1' AND btrim(${table.releaseId}) <> '' AND btrim(${table.sourceId}) <> '' AND ${table.sourceUrl} ~ '^https://' AND ${table.methodologyUrl} ~ '^https://' AND ${table.termsUrl} ~ '^https://' AND btrim(${table.upstreamRelease}) <> '' AND ${table.observationYear} >= 1900 AND ${table.contentSha256} ~ '^[a-f0-9]{64}$' AND ${table.publisherRows} > 0 AND ${table.matchedJurisdictions} >= 0 AND ${table.supportedJurisdictions} > 0 AND ${table.matchedJurisdictions} <= ${table.supportedJurisdictions} AND ${table.matchedJurisdictions} <= ${table.publisherRows} AND ${table.rightsStatus} IN ('verified','pending') AND ${table.useStatus} IN ('active_unvalidated_heuristic','disabled_pending_rights_and_validation')`,
+    ),
+  ],
+);
+
+/** Complete observed-or-missing coverage for every supported jurisdiction in a release. */
+export const pulseInformationEnvironmentValues = pgTable(
+  "pulse_information_environment_values",
+  {
+    releaseId: text("release_id")
+      .references(() => pulseInformationEnvironmentReleases.releaseId, {
+        onDelete: "restrict",
+      })
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    iso3: text("iso3"),
+    valueStatus: text("value_status").$type<"observed" | "missing">().notNull(),
+    score: real("score"),
+    tier: text("tier").$type<"free" | "partial" | "restricted">(),
+    missingReason: text("missing_reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "pulse_information_environment_values_pk",
+      columns: [table.releaseId, table.jurisdictionId],
+    }),
+    index("idx_pulse_information_values_jurisdiction").on(table.jurisdictionId),
+    check(
+      "pulse_information_environment_values_contract_check",
+      dsql`${table.valueStatus} IN ('observed','missing') AND ((${table.valueStatus} = 'observed' AND ${table.score} BETWEEN 0 AND 100 AND ${table.score} <> 'NaN'::real AND ${table.tier} IN ('free','partial','restricted') AND ${table.missingReason} IS NULL) OR (${table.valueStatus} = 'missing' AND ${table.score} IS NULL AND ${table.tier} IS NULL AND btrim(${table.missingReason}) <> ''))`,
+    ),
+  ],
+);
+
+/** One immutable classification-time context pin per Pulse event projection. */
+export const pulseEventInformationEnvironmentPins = pgTable(
+  "pulse_event_information_environment_pins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    contextSchemaVersion: text("context_schema_version").notNull(),
+    pinKey: text("pin_key").notNull().unique(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    classificationRunId: uuid("classification_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    releaseId: text("release_id").references(
+      () => pulseInformationEnvironmentReleases.releaseId,
+      { onDelete: "restrict" },
+    ),
+    valueStatus: text("value_status").$type<"observed" | "missing">().notNull(),
+    score: real("score"),
+    tier: text("tier").$type<"free" | "partial" | "restricted">(),
+    sourceId: text("source_id"),
+    sourceUrl: text("source_url"),
+    upstreamRelease: text("upstream_release"),
+    observationYear: integer("observation_year"),
+    retrievedAt: timestamp("retrieved_at"),
+    contentSha256: text("content_sha256"),
+    rightsStatus: text("rights_status").notNull(),
+    useStatus: text("use_status").notNull(),
+    missingReason: text("missing_reason"),
+    methodVersion: text("method_version").notNull(),
+    classifiedAt: timestamp("classified_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_information_pins_jurisdiction_time").on(
+      table.jurisdictionId,
+      table.classifiedAt,
+    ),
+    index("idx_pulse_information_pins_release").on(table.releaseId),
+    check(
+      "pulse_event_information_environment_pins_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-information-environment-pin/v1' AND ${table.contextSchemaVersion} = 'pulse-information-environment-context/v1' AND ${table.pinKey} ~ '^pulse-information-environment-pin/sha256:[a-f0-9]{64}$' AND ${table.methodVersion} = 'pulse-information-environment/classification-pin-v1' AND ${table.valueStatus} IN ('observed','missing') AND ${table.rightsStatus} IN ('verified','pending','not_registered') AND ${table.useStatus} IN ('active_unvalidated_heuristic','disabled_pending_rights_and_validation','not_available') AND ((${table.valueStatus} = 'observed' AND ${table.releaseId} IS NOT NULL AND ${table.score} BETWEEN 0 AND 100 AND ${table.score} <> 'NaN'::real AND ${table.tier} IN ('free','partial','restricted') AND btrim(${table.sourceId}) <> '' AND ${table.sourceUrl} ~ '^https://' AND btrim(${table.upstreamRelease}) <> '' AND ${table.observationYear} >= 1900 AND ${table.retrievedAt} IS NOT NULL AND ${table.contentSha256} ~ '^[a-f0-9]{64}$' AND ${table.missingReason} IS NULL) OR (${table.valueStatus} = 'missing' AND ${table.score} IS NULL AND ${table.tier} IS NULL AND btrim(${table.missingReason}) <> ''))`,
+    ),
+  ],
+);
+
 /**
  * Current classifier state for one raw cluster under one stable classifier
  * configuration. The row is a mutable projection; research-evidence history
@@ -2412,9 +2527,7 @@ export const pulseEventAbsorptions = pgTable(
       .references(() => jurisdictions.id, { onDelete: "restrict" })
       .notNull(),
     dimension: text("dimension").notNull(),
-    outcome: text("outcome")
-      .$type<"absorbed" | "not_absorbed">()
-      .notNull(),
+    outcome: text("outcome").$type<"absorbed" | "not_absorbed">().notNull(),
     previousCiReleaseId: text("previous_ci_release_id").notNull(),
     currentCiReleaseId: text("current_ci_release_id").notNull(),
     previousScore: real("previous_score").notNull(),

@@ -985,3 +985,13 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The decision stores method, reason, evidence, actor, and as-of time without
   mutating corroboration confidence. The current same-period release set
   supports no absorption. Durable record: APR-D152.
+
+## 2026-07-12 — Information context is immutable and nonimputed
+
+- Official context releases have complete observed-or-missing jurisdiction
+  coverage; unknown never becomes a midpoint or inherited territorial value.
+- Each new event pins the then-adopted release at classification. Historical
+  events remain explicitly unrecoverable, and every release/value/pin row is
+  append-only.
+- RSF values remain internal and have no production weighting or observability
+  effect pending rights and method validation. Durable record: APR-D153.

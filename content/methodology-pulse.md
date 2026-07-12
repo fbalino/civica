@@ -296,11 +296,13 @@ Negative events do not receive the positive-event multipliers. There is currentl
 
 ## Information-environment context {#press-freedom-rule}
 
-Pulse does not use an approximate country lookup or substitute a value when context is missing. The country API returns a versioned context object. A missing observation contains no score, tier, source, vintage, or coverage estimate and has no effect on the corroboration weight.
+Pulse does not use an approximate country lookup or substitute a value when context is missing. Each official context release has an immutable metadata row and one observed-or-missing row for every supported jurisdiction. An unmatched jurisdiction keeps a null score and tier with a reason; no midpoint is supplied.
 
-Civica has registered the official [RSF World Press Freedom Index release](https://rsf.org/en/index) as a candidate input with its exact download URL, retrieval timestamp, content hash, publisher coverage, observation vintage, and terms posture. RSF's terms do not provide permission for Civica to republish the country data, so the candidate remains disabled pending a rights decision and method validation.
+Civica has registered the official [RSF World Press Freedom Index release](https://rsf.org/en/index) as a candidate input with its exact download URL, retrieval timestamp, content hash, publisher coverage, observation vintage, and terms posture. New event rows receive an append-only classification-time pin to the value or missing state in the release adopted at that moment. A later rerun cannot replace the pin. Events classified before this contract retain an explicit historically unrecoverable state; Civica does not attach a later value and present it as contemporaneous.
 
-The declared thresholds and multipliers are available only as a sensitivity scenario. They can show how much that design choice would change an event weight, but they are not production settings, calibrated probabilities, or a validated correction for reporting bias. The runtime-method contract records the exact scenario and candidate-release metadata.
+RSF's terms do not provide permission for Civica to republish the country data. Country values therefore remain internal, the country API continues to withhold production context, and both weighting and the `restricted_information_environment` observability state remain disabled pending a rights decision and method validation.
+
+The declared thresholds and multipliers are available only as a sensitivity scenario over pinned values. They can show how much that design choice would change an event weight, but they are not production settings, calibrated probabilities, or a validated correction for reporting bias. The runtime-method contract records the release, pin, missingness, rerun, weighting, and observability policies.
 
 ## Decay — different events fade at different rates {#decay}
 
@@ -352,7 +354,7 @@ The operational threshold for `sufficient_observation` currently requires retain
 
 `no_qualifying_event_observed` is available only when the observation state is sufficient. Low coverage, an outage, or a restricted information environment produces `not_assessable` when no event was found. In every state, an absent event has no numeric effect and cannot become a stability, good-governance, or country-quality judgment.
 
-The registered RSF candidate is not eligible to create `restricted_information_environment` while rights and validation remain unresolved. That state requires a usable, sourced, versioned context record with complete vintage and coverage. The API therefore leaves production context missing rather than guessing.
+The registered RSF candidate is not eligible to create `restricted_information_environment` while rights and validation remain unresolved. The immutable internal pin supports audit and future sensitivity analysis; it does not activate the observability label. That label requires a rights-cleared, validated policy over a sourced, versioned context record with complete vintage and coverage. The API therefore leaves production context missing rather than guessing.
 
 ## Known limitations {#known-limitations}
 

@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "5e56696fcedf3a02450c088b9313577691c4d100696d7736f9dd18d86c54c4d5",
+  "schemaFingerprint": "754901c406c6600f014f8a437126439a7788d8da852e500d3688958019a8497a",
   "summary": {
-    "tables": 73,
-    "columns": 1015,
+    "tables": 76,
+    "columns": 1064,
     "publicAtlasTables": 18,
-    "researchBetaTables": 23,
+    "researchBetaTables": 24,
     "supportTables": 11,
-    "internalTables": 19,
+    "internalTables": 21,
     "privateTables": 2,
     "legacyTables": 1
   },
@@ -20898,6 +20898,603 @@
       ]
     },
     {
+      "name": "pulse_event_information_environment_pins",
+      "exportName": "pulseEventInformationEnvironmentPins",
+      "definition": "Immutable snapshot of the exact information-environment value or missing state available when a Pulse event was classified.",
+      "rowGrain": "One Pulse event projection and classification run.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+      "cadence": "Exactly once at event insertion.",
+      "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+      "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "classification_run_id",
+          "propertyName": "classificationRunId",
+          "definition": "Immutable Pulse classification-stage run that produced or rejected this event candidate.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "classified_at",
+          "propertyName": "classifiedAt",
+          "definition": "Classified at recorded for the Pulse event projection and classification run.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_information_pins_jurisdiction_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "Classified at follows this table contract. classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "content_sha256",
+          "propertyName": "contentSha256",
+          "definition": "Content sha256 recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "context_schema_version",
+          "propertyName": "contextSchemaVersion",
+          "definition": "Context schema version recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "event_id",
+          "propertyName": "eventId",
+          "definition": "Event id; relational link to pulse_events_v2.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": "pulse_events_v2.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_events_v2.id; substantive provenance follows this table's source contract.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [
+              "idx_pulse_information_pins_jurisdiction_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "missing_reason",
+          "propertyName": "missingReason",
+          "definition": "Missing reason recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observation_year",
+          "propertyName": "observationYear",
+          "definition": "Observation year recorded for the Pulse event projection and classification run.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "Gregorian calendar year",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "Observation year follows this table contract. classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "pin_key",
+          "propertyName": "pinKey",
+          "definition": "Pin key recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to pulse_information_environment_releases.release_id.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_information_environment_releases.release_id",
+            "indexGroups": [
+              "idx_pulse_information_pins_release"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_information_environment_releases.release_id; substantive provenance follows this table's source contract.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "retrieved_at",
+          "propertyName": "retrievedAt",
+          "definition": "Timestamp when Civica retrieved the upstream material.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "Civica retrieval/processing time; distinct from source observation and release vintage.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rights_status",
+          "propertyName": "rightsStatus",
+          "definition": "Rights status recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "score",
+          "propertyName": "score",
+          "definition": "Score recorded for the Pulse event projection and classification run.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_url",
+          "propertyName": "sourceUrl",
+          "definition": "Direct upstream URL captured for this record when available.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "tier",
+          "propertyName": "tier",
+          "definition": "Tier recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "use_status",
+          "propertyName": "useStatus",
+          "definition": "Use status recorded for the Pulse event projection and classification run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "valueStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+          "cadence": "Exactly once at event insertion.",
+          "vintageSemantics": "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+          "rights": "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
       "name": "pulse_event_jurisdictions",
       "exportName": "pulseEventJurisdictions",
       "definition": "Append-only, queryable primary and affected jurisdiction roles derived from versioned subject-attribution decisions.",
@@ -23754,6 +24351,694 @@
           "cadence": "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
           "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
           "rights": "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_information_environment_releases",
+      "exportName": "pulseInformationEnvironmentReleases",
+      "definition": "Immutable metadata for one exact official information-environment dataset capture adopted for classification-time context.",
+      "rowGrain": "One source release and content hash.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+      "cadence": "Append-only when a new official release is reviewed and adopted.",
+      "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+      "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "adopted_at",
+          "propertyName": "adoptedAt",
+          "definition": "Adopted at recorded for the source release and content hash.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "Adopted at follows this table contract. observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "content_sha256",
+          "propertyName": "contentSha256",
+          "definition": "Content sha256 recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_information_release_hash"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_information_release_hash"
+            ]
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "matched_jurisdictions",
+          "propertyName": "matchedJurisdictions",
+          "definition": "Matched jurisdictions recorded for the source release and content hash.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_url",
+          "propertyName": "methodologyUrl",
+          "definition": "Methodology url recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observation_year",
+          "propertyName": "observationYear",
+          "definition": "Observation year recorded for the source release and content hash.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "Gregorian calendar year",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "Observation year follows this table contract. observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "publisher_rows",
+          "propertyName": "publisherRows",
+          "definition": "Publisher rows recorded for the source release and content hash.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "redistribution_posture",
+          "propertyName": "redistributionPosture",
+          "definition": "Redistribution posture recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "retrieved_at",
+          "propertyName": "retrievedAt",
+          "definition": "Timestamp when Civica retrieved the upstream material.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "Civica retrieval/processing time; distinct from source observation and release vintage.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rights_status",
+          "propertyName": "rightsStatus",
+          "definition": "Rights status recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_url",
+          "propertyName": "sourceUrl",
+          "definition": "Direct upstream URL captured for this record when available.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supported_jurisdictions",
+          "propertyName": "supportedJurisdictions",
+          "definition": "Supported jurisdictions recorded for the source release and content hash.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "terms_url",
+          "propertyName": "termsUrl",
+          "definition": "Terms url recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "use_status",
+          "propertyName": "useStatus",
+          "definition": "Use status recorded for the source release and content hash.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+          "cadence": "Append-only when a new official release is reviewed and adopted.",
+          "vintageSemantics": "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+          "rights": "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_information_environment_values",
+      "exportName": "pulseInformationEnvironmentValues",
+      "definition": "Complete observed-or-explicit-missing jurisdiction coverage for one immutable information-environment release.",
+      "rowGrain": "One release and one supported jurisdiction.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+      "cadence": "Append-only with its release.",
+      "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+      "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "iso3",
+          "propertyName": "iso3",
+          "definition": "ISO-style three-letter geographic code when assigned.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [
+              "idx_pulse_information_values_jurisdiction"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "missing_reason",
+          "propertyName": "missingReason",
+          "definition": "Missing reason recorded for the release and one supported jurisdiction.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to pulse_information_environment_releases.release_id.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_information_environment_releases.release_id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_information_environment_releases.release_id; substantive provenance follows this table's source contract.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "score",
+          "propertyName": "score",
+          "definition": "Score recorded for the release and one supported jurisdiction.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "tier",
+          "propertyName": "tier",
+          "definition": "Tier recorded for the release and one supported jurisdiction.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "valueStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+          "cadence": "Append-only with its release.",
+          "vintageSemantics": "Inherits the release observation year, capture time, content hash, and adoption time.",
+          "rights": "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
           "deprecation": {
             "status": "active"
           }

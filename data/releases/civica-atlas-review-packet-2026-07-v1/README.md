@@ -14,4 +14,4 @@ npm run validate:clean-room
 
 The manifest contains exact repository-relative paths, byte counts, and SHA-256 hashes. The frozen archive remains at `data/releases/atlas-2026-07-11-g2-rc1.zip`; restricted publisher payloads are not added to this wrapper.
 
-Semantic SHA-256: `ad974562de6e0109741118e9d3260d371938cd4d7dbb8b37c46add48b2e48c28`.
+Semantic SHA-256: `83e50a5145306a829cb8828e9bf7018bece54ac6582d0c8cc8ffbcbee9791b35`.
