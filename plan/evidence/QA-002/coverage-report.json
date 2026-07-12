@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "civica-module-coverage-report/v1",
+  "generatedAt": "2026-07-12T22:32:34.378Z",
+  "configSchemaVersion": "civica-module-coverage/v1",
+  "allPassed": true,
+  "modules": [
+    {
+      "name": "admin-session",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 92.89,
+        "branch": 90.48,
+        "functions": 79.17
+      },
+      "thresholds": {
+        "lines": 85,
+        "branch": 80,
+        "functions": 70
+      }
+    },
+    {
+      "name": "outcomes-reducer",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 100,
+        "branch": 85.71,
+        "functions": 100
+      },
+      "thresholds": {
+        "lines": 90,
+        "branch": 75,
+        "functions": 90
+      }
+    },
+    {
+      "name": "markdown-substitute",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 100,
+        "branch": 94.44,
+        "functions": 100
+      },
+      "thresholds": {
+        "lines": 90,
+        "branch": 85,
+        "functions": 90
+      }
+    },
+    {
+      "name": "peer-grouping",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 89.65,
+        "branch": 87,
+        "functions": 83.02
+      },
+      "thresholds": {
+        "lines": 80,
+        "branch": 75,
+        "functions": 70
+      }
+    },
+    {
+      "name": "ci-worked-examples",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 69.65,
+        "branch": 86.36,
+        "functions": 82.81
+      },
+      "thresholds": {
+        "lines": 60,
+        "branch": 75,
+        "functions": 70
+      }
+    },
+    {
+      "name": "rights-manifest",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 95.04,
+        "branch": 94.87,
+        "functions": 81.48
+      },
+      "thresholds": {
+        "lines": 85,
+        "branch": 85,
+        "functions": 70
+      }
+    },
+    {
+      "name": "data-value-state",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 100,
+        "branch": 87.1,
+        "functions": 100
+      },
+      "thresholds": {
+        "lines": 90,
+        "branch": 75,
+        "functions": 90
+      }
+    },
+    {
+      "name": "reconcile-resolver",
+      "passed": true,
+      "exitCode": 0,
+      "measured": {
+        "lines": 87.39,
+        "branch": 72.46,
+        "functions": 79.69
+      },
+      "thresholds": {
+        "lines": 80,
+        "branch": 65,
+        "functions": 70
+      }
+    }
+  ]
+}

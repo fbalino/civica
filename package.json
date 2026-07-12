@@ -336,6 +336,7 @@
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report output/playwright/report",
+    "validate:module-coverage": "tsx scripts/validate-module-coverage.ts",
     "validate:golden-tests": "node --import tsx --test src/lib/qa/golden-tests-registry.test.ts src/lib/ci/__tests__/worked-examples.test.ts src/lib/factbook/reconcile/__tests__/reconciliation-worked-examples.test.ts src/lib/conditions/__tests__/conditions-golden.test.ts src/lib/conditions/__tests__/ingest-repeatability.test.ts src/lib/peer-grouping/__tests__/atl-017-taxonomy-peer-lens.test.ts src/lib/peer-grouping/__tests__/vdem-row-tier.test.ts src/lib/ci/tournament-candidates-golden.test.ts src/lib/ci/sensitivity-analysis.test.ts src/lib/pulse/v2/score-golden.test.ts && tsx scripts/validate-golden-tests.ts",
     "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",

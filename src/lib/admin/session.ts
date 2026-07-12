@@ -91,6 +91,54 @@ export function sanitizeReviewerName(
   );
 }
 
+/**
+ * Result of verifying a raw session-cookie value against a server secret.
+ * `valid: false` covers every rejection path (missing, malformed, or a
+ * signature that doesn't match) — callers only need `reviewerId` when
+ * `valid` is `true`.
+ */
+export interface SessionCookieVerification {
+  valid: boolean;
+  reviewerId: string | null;
+}
+
+/**
+ * Pure cookie-parse + HMAC-verify logic, extracted from `getAdminSession()`
+ * so it's unit-testable without Next.js request context (`cookies()` only
+ * works inside a request). Given the raw `<nonce>.<hmac>` cookie value and
+ * the server secret, recomputes the expected HMAC and constant-time
+ * compares it against the presented one.
+ *
+ * Behavior-preserving extraction (QA-002): every branch below is byte-for-
+ * byte the same logic `getAdminSession()` used to run inline. On success,
+ * the reviewer identity is derived the same way as before — from the
+ * environment via `adminReviewerName()`, NEVER from the unsigned
+ * `civica_admin_reviewer` cookie, which a client could edit to forge
+ * audit-row identity (PLT-027).
+ */
+export function verifySessionCookie(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+): SessionCookieVerification {
+  if (!secret) return { valid: false, reviewerId: null };
+  if (!cookieValue) return { valid: false, reviewerId: null };
+
+  // Cookie is `<nonce>.<hmac>`. Recompute the expected HMAC from the
+  // nonce + server secret and constant-time compare.
+  const dot = cookieValue.indexOf(".");
+  if (dot <= 0 || dot === cookieValue.length - 1) {
+    return { valid: false, reviewerId: null };
+  }
+  const nonce = cookieValue.slice(0, dot);
+  const presentedMac = cookieValue.slice(dot + 1);
+  const expectedMac = signNonce(secret, nonce);
+  if (!safeEqual(presentedMac, expectedMac)) {
+    return { valid: false, reviewerId: null };
+  }
+
+  return { valid: true, reviewerId: adminReviewerName() };
+}
+
 /** Read + validate the admin session cookie. Returns null when the
  *  cookie is missing, invalid, or the server isn't configured with
  *  ADMIN_SESSION_SECRET. */
@@ -100,21 +148,11 @@ export async function getAdminSession(): Promise<AdminSession | null> {
 
   const cookieJar = await cookies();
   const session = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
-  if (!session) return null;
 
-  // Cookie is `<nonce>.<hmac>`. Recompute the expected HMAC from the
-  // nonce + server secret and constant-time compare.
-  const dot = session.indexOf(".");
-  if (dot <= 0 || dot === session.length - 1) return null;
-  const nonce = session.slice(0, dot);
-  const presentedMac = session.slice(dot + 1);
-  const expectedMac = signNonce(secret, nonce);
-  if (!safeEqual(presentedMac, expectedMac)) return null;
+  const result = verifySessionCookie(session, secret);
+  if (!result.valid || !result.reviewerId) return null;
 
-  // The audit actor is derived server-side from the environment for this
-  // single-owner account — NEVER from the unsigned `civica_admin_reviewer`
-  // cookie, which a client could edit to forge audit-row identity (PLT-027).
-  return { reviewerId: adminReviewerName() };
+  return { reviewerId: result.reviewerId };
 }
 
 /** Set both cookies on a Response. Mints a fresh per-session nonce and
