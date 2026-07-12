@@ -9,6 +9,7 @@ import {
   getBillsForJurisdiction,
   getInternationalMembershipsBySlugs,
   getFactbookCountryOptions,
+  getIndicatorHistoryForCountry,
 } from "@/lib/db/queries";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
@@ -31,6 +32,7 @@ import { CountryJumpSearch } from "@/components/country/CountryJumpSearch";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
+import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
 import { withOg } from "@/lib/og";
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
@@ -91,6 +93,7 @@ export async function generateMetadata({
 
 type SectionId =
   | "governance-evidence"
+  | "longitudinal"
   | "government"
   | "legislature"
   | "leaders"
@@ -102,6 +105,7 @@ type SectionPlan = { id: SectionId; label: string };
 
 const SECTION_PLAN: SectionPlan[] = [
   { id: "governance-evidence", label: "Governance Evidence" },
+  { id: "longitudinal", label: "Indicator History" },
   { id: "government", label: "Government" },
   { id: "legislature", label: "Legislature" },
   { id: "leaders", label: "Leaders" },
@@ -130,7 +134,10 @@ function SourcesStrip({ sources }: { sources: SectionSource[] }) {
       <span className="civica-data-sources-label">Sources</span>
       <ul className="civica-data-sources-list">
         {sources.map((src) => (
-          <li key={`${src.sourceId}-${src.name}`} className="civica-data-source">
+          <li
+            key={`${src.sourceId}-${src.name}`}
+            className="civica-data-source"
+          >
             <span className="civica-data-source-name">
               {src.name}
               <SourceDot source={src.sourceId} retrievedAt={src.date} />
@@ -161,6 +168,7 @@ export default async function CountryCivicaDataTab({
   // 500-ing the whole tab.
   const [
     governanceEvidence,
+    indicatorHistory,
     govStructure,
     leadersRows,
     legislatureData,
@@ -172,10 +180,12 @@ export default async function CountryCivicaDataTab({
     countryOptions,
   ] = await Promise.all([
     getGovernanceEvidence(slug).catch(() => null),
+    getIndicatorHistoryForCountry(slug).catch(() => null),
     getGovernmentStructure(jurisdiction.id).catch(
-      () => ({ bodies: [], offices: [], currentTerms: [] }) as Awaited<
-        ReturnType<typeof getGovernmentStructure>
-      >
+      () =>
+        ({ bodies: [], offices: [], currentTerms: [] }) as Awaited<
+          ReturnType<typeof getGovernmentStructure>
+        >,
     ),
     getLeaderTimeline(jurisdiction.id).catch(() => []),
     getLegislatureForJurisdiction(jurisdiction.id).catch(() => null),
@@ -187,12 +197,12 @@ export default async function CountryCivicaDataTab({
     // Sources strips. Soft-fails to [] so a Neon hiccup just drops the
     // dates, never the page.
     getAllSources().catch(
-      () => [] as Awaited<ReturnType<typeof getAllSources>>
+      () => [] as Awaited<ReturnType<typeof getAllSources>>,
     ),
     // Country list for the "Jump to country…" search at the top of the
     // section nav. Soft-fails to [] so a Neon hiccup just hides the search.
     getFactbookCountryOptions().catch(
-      () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>
+      () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
     ),
   ]);
 
@@ -200,7 +210,7 @@ export default async function CountryCivicaDataTab({
   const orgChart = buildOrgChartFromGovernmentStructure(
     govStructure.bodies,
     govStructure.offices,
-    govStructure.currentTerms
+    govStructure.currentTerms,
   );
 
   // Per-section visibility flags.
@@ -216,6 +226,8 @@ export default async function CountryCivicaDataTab({
     switch (id) {
       case "governance-evidence":
         return hasGovernanceEvidence;
+      case "longitudinal":
+        return true;
       case "government":
         return hasGovernment;
       case "legislature":
@@ -286,9 +298,7 @@ export default async function CountryCivicaDataTab({
   // Rankings rows carry established source-native measures only. The former
   // Civica composite is preserved research and is not returned here.
   const rankingsSources: SectionSource[] = hasRankings
-    ? dedup(scoresRows.map((r) => r.source)).map((id) =>
-        sourceEntry(id)
-      )
+    ? dedup(scoresRows.map((r) => r.source)).map((id) => sourceEntry(id))
     : [];
 
   const wikidataRetrievedAt = wikidataSource?.lastSyncAt
@@ -306,7 +316,10 @@ export default async function CountryCivicaDataTab({
             Civica governance data for {jurisdiction.name} has not been compiled
             yet. See the <Link href={`/country/${slug}`}>Factbook tab</Link> for
             the source reference, or browse the{" "}
-            <Link href="/governance-evidence">Governance Evidence Dashboard</Link>.
+            <Link href="/governance-evidence">
+              Governance Evidence Dashboard
+            </Link>
+            .
           </p>
         </section>
       </div>
@@ -331,6 +344,14 @@ export default async function CountryCivicaDataTab({
         <SourcesStrip sources={governanceEvidenceSources} />
       </>
     ) : null,
+    longitudinal: (
+      <CountryTrendSection
+        slug={slug}
+        embedded
+        initialSeries={indicatorHistory}
+        initialSources={allSources}
+      />
+    ),
     government: orgChart ? (
       <>
         <div className="civica-data-gov-structure">
@@ -414,19 +435,24 @@ export default async function CountryCivicaDataTab({
   // "Cite this page" box for the Civica Data tab. The data's vintage is the
   // source-native evidence reference year. Source names are deduped across every visible section's
   // provenance so the citation lists exactly what the page renders.
-  const citeDataVintage = governanceEvidence ? `${governanceEvidence.year}-12-31` : null;
+  const citeDataVintage = governanceEvidence
+    ? `${governanceEvidence.year}-12-31`
+    : null;
   const citeSourceNames = Array.from(
     new Set(
       [
         ...governanceEvidenceSources,
+        ...(indicatorHistory ?? []).map((series) =>
+          sourceEntry(series.sourceId),
+        ),
         ...governmentSources,
         ...legislatureSources,
         ...leadersSources,
         ...billsSources,
         ...organizationsSources,
         ...rankingsSources,
-      ].map((s) => s.name)
-    )
+      ].map((s) => s.name),
+    ),
   );
 
   // Sidebar entries mirror the visible sections plus the same citation anchor

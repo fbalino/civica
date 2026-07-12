@@ -838,3 +838,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Production weighting and observability remain disabled. Runtime
   `pulse-v2.15-beta`, the real scoring rerun, 924 tests, TypeScript, live
   invariants, light/dark browser QA, and the full build passed.
+
+## 2026-07-12 — ATL-003 longitudinal history completed
+
+- Added first-class publisher-native history to country Civica Data and
+  Compare with explicit gaps/value states, source lineage, time/series controls,
+  and rights-filtered downloads.
+- Added the country-history API, five-series catalog, query/export tests, and a
+  checked Atlas surface-matrix row; live Japan query execution was 0.725 ms.
+- Refreshed the additive rights manifest through G2 and reviewer packet
+  inventories. Browser QA, all 936 tests, claims gates, and the 105-page build
+  passed.

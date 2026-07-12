@@ -957,3 +957,20 @@ concealing the exact gaps readers need to judge. A shared floor makes drift
 visible across very different datasets without pretending the threshold is a
 scientific validity result. Export rights and experimental-product gates remain
 separate decisions.
+
+### APR-D157 — Longitudinal history stays publisher-native and rights-filtered
+
+**Decision:** Make the five retained publisher series a first-class country and
+comparison surface without combining them into a Civica score. Charts and
+downloads preserve native units, observed years, explicit absence states,
+source freshness, captured release, artifact, transformation, and method
+lineage. Missing years never imply zero or no change. Public downloads are
+filtered per source through the rights manifest; a visible chart does not imply
+redistribution permission. The present history is identified as a current
+captured release's historical series, not historical as-published vintages.
+
+**Why:** Native longitudinal evidence is useful even when an original composite
+has not earned publication. Keeping series separate avoids manufacturing a new
+construct, while visible gaps and lineage let readers judge comparability.
+Rights filtering preserves the distinction between reading a value on Civica
+and receiving a reusable bulk copy of it.

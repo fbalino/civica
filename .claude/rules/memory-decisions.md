@@ -995,3 +995,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   append-only.
 - RSF values remain internal and have no production weighting or observability
   effect pending rights and method validation. Durable record: APR-D153.
+
+## 2026-07-12 — Longitudinal history remains publisher-native
+
+- Country and Compare history use five separate publisher series, never a new
+  Civica composite, grade, or change verdict.
+- Missing years remain missing; every series names native units, captured
+  release, artifact, transformation, method, and comparability limits.
+- Downloads are filtered per source through the rights manifest; visible data
+  does not imply redistribution permission. Durable record: APR-D157.

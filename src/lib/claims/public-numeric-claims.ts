@@ -1028,4 +1028,18 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       '{catalogCount ?? "—"} Countries &amp; territories',
       "runtime getAllJurisdictions catalog length with nonnumeric fallback",
     ),
+    runtimeClaim(
+      "country-history.observation-count",
+      "src/components/ci/CountryTrendSection.tsx",
+      "component:ci/CountryTrendSection",
+      "${Math.min(...years)}–${Math.max(...years)} · ${years.length} observations",
+      "getIndicatorHistoryForCountry observed-value years for the selected country and source series",
+    ),
+    runtimeClaim(
+      "compare-history.observation-count",
+      "src/components/compare/CompareIndicatorHistory.tsx",
+      "component:compare/CompareIndicatorHistory",
+      "{Math.min(...years)} – {Math.max(...years)} · {years.length} observations {runtime}",
+      "getIndicatorHistoryForCountry observed-value years for each selected country and source series",
+    ),
   ];

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 /* ============================================================
    Civica Design System — almanac / antique-atlas language
    Fonts: Source Serif 4 (display) + Inter (UI/body)
@@ -11,8 +10,12 @@
 @theme inline {
   /* --- Typography families --- */
   --font-heading: var(--font-source-serif), "Georgia", "Times New Roman", serif;
-  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  --font-body-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-body:
+    var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-body-sans:
+    var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --font-serif: var(--font-heading);
   --font-sans: var(--font-body);
   /* Mono is retired sitewide (owner decision #1): --font-mono now resolves to
@@ -21,7 +24,9 @@
      and stay, so small-caps "eyebrow" labels keep their look — just in Inter.
      Real monospace is restored ONLY on genuine code/API surfaces via --font-code.
      (Atlas is owner-protected and keeps its own --atlas-* mono.) */
-  --font-mono: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-mono:
+    var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --font-code: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* --- Typography scale (readability-first — 12px floor; names == px) --- */
@@ -46,11 +51,13 @@
   --text-64: 64px;
 
   /* --- Font weight --- */
-  --font-weight-regular:  400;
-  --font-weight-medium:   500;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
   --font-weight-semibold: 600;
-  --font-weight-bold:     700;
-  --font-weight-mono: var(--font-weight-medium); /* alias: monospace UI labels */
+  --font-weight-bold: 700;
+  --font-weight-mono: var(
+    --font-weight-medium
+  ); /* alias: monospace UI labels */
 
   /* --- Leading --- */
   --leading-none: 1;
@@ -71,33 +78,33 @@
   --tracking-widest: 0.2em;
 
   /* --- Source provenance dots --- */
-  --color-source-live: #2E7D55;
-  --color-source-frozen: #C08F3E;
+  --color-source-live: #2e7d55;
+  --color-source-frozen: #c08f3e;
 
   /* --- Government type colors (almanac foundation, DS-3 §02/§04) --- */
-  --color-gov-presidential: #B7512B;        /* Terracotta */
-  --color-gov-parliamentary: #1C5BC3;       /* Azure */
-  --color-gov-semi-presidential: #6749AB;   /* Violet */
-  --color-gov-theocratic: #418460;          /* Leaf */
-  --color-gov-absolute: #C08F3E;            /* Gold */
-  --color-gov-other: #6A7688;               /* Steel */
+  --color-gov-presidential: #b7512b; /* Terracotta */
+  --color-gov-parliamentary: #1c5bc3; /* Azure */
+  --color-gov-semi-presidential: #6749ab; /* Violet */
+  --color-gov-theocratic: #418460; /* Leaf */
+  --color-gov-absolute: #c08f3e; /* Gold */
+  --color-gov-other: #6a7688; /* Steel */
 
   /* Short aliases used by /civica-index/government-types */
-  --gov-parl: #1C5BC3;   /* Azure */
-  --gov-pres: #B7512B;   /* Terracotta */
-  --gov-semi: #6749AB;   /* Violet */
-  --gov-mon:  #C08F3E;   /* Gold */
-  --gov-abs:  #B93D67;   /* Rose */
-  --gov-theo: #418460;   /* Leaf */
-  --gov-one:  #4D4C71;   /* Indigo */
-  --gov-mil:  #2A3648;   /* Slate */
-  --gov-other:#6A7688;   /* Steel */
+  --gov-parl: #1c5bc3; /* Azure */
+  --gov-pres: #b7512b; /* Terracotta */
+  --gov-semi: #6749ab; /* Violet */
+  --gov-mon: #c08f3e; /* Gold */
+  --gov-abs: #b93d67; /* Rose */
+  --gov-theo: #418460; /* Leaf */
+  --gov-one: #4d4c71; /* Indigo */
+  --gov-mil: #2a3648; /* Slate */
+  --gov-other: #6a7688; /* Steel */
 
   /* --- Government branch colors --- */
-  --color-branch-executive: #B7512B;     /* Terracotta */
-  --color-branch-legislative: #1C5BC3;   /* Azure */
-  --color-branch-judicial: #686F5F;      /* Sage */
-  --color-branch-monarchy: #6749AB;      /* Violet */
+  --color-branch-executive: #b7512b; /* Terracotta */
+  --color-branch-legislative: #1c5bc3; /* Azure */
+  --color-branch-judicial: #686f5f; /* Sage */
+  --color-branch-monarchy: #6749ab; /* Violet */
 
   /* --- Peer-grouping lens tokens (peer-grouping-resolution-v1) ---
      Material lenses (World Bank region + income) get their own
@@ -106,17 +113,17 @@
      existing --tier-* ramp via lens-metadata.ts so readers
      associate the same palette with governance quality across CI
      scoring and peer-grouping presentation. */
-  --peer-region-eap:  #2D6CDF;   /* Azure */
-  --peer-region-eca:  #6086A8;   /* mid steel from indicator ramp */
-  --peer-region-lac:  #C25D3A;   /* Terracotta */
-  --peer-region-mena: #C9A24B;   /* Gold */
-  --peer-region-na:   #4FA3D9;   /* Sky */
-  --peer-region-sa:   #7C59C9;   /* Violet */
-  --peer-region-ssa:  #4C9F6E;   /* Leaf */
-  --peer-income-low:        #C25D3A;   /* Terracotta */
-  --peer-income-lower-mid:  #C9A24B;   /* Gold */
-  --peer-income-upper-mid:  #6B7566;   /* Sage */
-  --peer-income-high:       #1A4970;   /* deep ramp navy */
+  --peer-region-eap: #2d6cdf; /* Azure */
+  --peer-region-eca: #6086a8; /* mid steel from indicator ramp */
+  --peer-region-lac: #c25d3a; /* Terracotta */
+  --peer-region-mena: #c9a24b; /* Gold */
+  --peer-region-na: #4fa3d9; /* Sky */
+  --peer-region-sa: #7c59c9; /* Violet */
+  --peer-region-ssa: #4c9f6e; /* Leaf */
+  --peer-income-low: #c25d3a; /* Terracotta */
+  --peer-income-lower-mid: #c9a24b; /* Gold */
+  --peer-income-upper-mid: #6b7566; /* Sage */
+  --peer-income-high: #1a4970; /* deep ramp navy */
 
   /* --- Layout --- */
   --max-w-content: 1200px;
@@ -153,32 +160,41 @@
   --radius-search: var(--radius-full);
 
   /* --- Surface palette (almanac light) --- */
-  --color-bg: #FAF7F2;                 /* Ivory paper */
-  --color-bg-nav: color-mix(in oklab, #FAF7F2 92%, transparent);
-  --color-surface-elevated: #FFFFFF;   /* Elevated card */
-  --color-select-bg: #F3EFE6;          /* Well / alt surface */
+  --color-bg: #faf7f2; /* Ivory paper */
+  --color-bg-nav: color-mix(in oklab, #faf7f2 92%, transparent);
+  --color-surface-elevated: #ffffff; /* Elevated card */
+  --color-select-bg: #f3efe6; /* Well / alt surface */
 
-  --color-text-primary: #0B1B2D;       /* Ink navy */
+  --color-text-primary: #0b1b2d; /* Ink navy */
   --color-text-85: rgba(11, 27, 45, 0.88);
-  --color-text-60: #2A3648;            /* Slate */
-  --color-text-50: #44505F;
-  --color-text-40: #6A7688;            /* Steel */
-  --color-text-30: #5C6B7A;            /* Mist — darkened for WCAG AA on ivory (contrast ≥4.5:1) */
-  --color-text-25: rgba(11, 27, 45, 0.60); /* darkened alpha for WCAG AA on ivory */
+  --color-text-60: #2a3648; /* Slate */
+  --color-text-50: #44505f;
+  --color-text-40: #6a7688; /* Steel */
+  --color-text-30: #5c6b7a; /* Mist — darkened for WCAG AA on ivory (contrast ≥4.5:1) */
+  --color-text-25: rgba(
+    11,
+    27,
+    45,
+    0.6
+  ); /* darkened alpha for WCAG AA on ivory */
   --color-text-20: rgba(11, 27, 45, 0.32);
 
-  --color-accent: #B7512B;             /* Terracotta — editorial signal */
+  --color-accent: #b7512b; /* Terracotta — editorial signal */
 
-  --color-card-bg: #FFFFFF;
-  --color-card-border: #E4E1DC;
-  --color-card-hover-bg: #F6F2EA;
-  --color-card-hover-border: #D2CEC5;
-  --color-divider: #E4E1DC;
-  --color-scrim: color-mix(in oklab, #0B1B2D 50%, transparent); /* modal backdrop */
+  --color-card-bg: #ffffff;
+  --color-card-border: #e4e1dc;
+  --color-card-hover-bg: #f6f2ea;
+  --color-card-hover-border: #d2cec5;
+  --color-divider: #e4e1dc;
+  --color-scrim: color-mix(
+    in oklab,
+    #0b1b2d 50%,
+    transparent
+  ); /* modal backdrop */
   /* Atlas map labels sit on choropleth DATA fills (never on theme paper), so
      they are theme-independent: white caps with a dark halo — the standard
      cartographic combo that reads on any fill in light AND dark. */
-  --map-label-fg: #FFFFFF;
+  --map-label-fg: #ffffff;
   --map-label-halo: rgba(11, 27, 45, 0.85);
   /* Fullscreen media-overlay (lightbox) chrome. Theme-independent: the
      lightbox renders on a near-black scrim in both light and dark, so these
@@ -188,7 +204,7 @@
   --color-overlay-caption-bg: color-mix(in oklab, #000 60%, transparent);
   --color-overlay-border: color-mix(in oklab, #fff 20%, transparent);
   --color-branch-border-alpha: 44;
-  --color-stat-border: #EDE9E2;
+  --color-stat-border: #ede9e2;
   --color-selection: rgba(183, 81, 43, 0.16);
   --color-surface-primary: var(--color-bg);
   --color-surface-secondary: var(--color-surface-elevated);
@@ -199,58 +215,58 @@
   --color-border-strong: var(--color-text-primary);
   --color-page-bg: var(--color-bg);
 
-  --color-grid-bg: #FFFFFF;
-  --color-grid-cell: #FAF7F2;
-  --color-grid-cell-hover: #F3EFE6;
-  --color-grid-row-hover: #F6F2EA;
+  --color-grid-bg: #ffffff;
+  --color-grid-cell: #faf7f2;
+  --color-grid-cell-hover: #f3efe6;
+  --color-grid-row-hover: #f6f2ea;
 
-  --color-tooltip-bg: #FFFFFF;
-  --color-tooltip-text: #2A3648;
-  --color-tooltip-border: #E4E1DC;
+  --color-tooltip-bg: #ffffff;
+  --color-tooltip-text: #2a3648;
+  --color-tooltip-border: #e4e1dc;
 
   --color-hemi-seat-text: rgba(11, 27, 45, 0.32);
 
   /* --- Signal colors (almanac, DS-3 §06) --- */
-  --color-success: #2E7D55;
-  --color-warn:    #C08F3E;
-  --color-danger:  #B71413;
-  --color-info:    #1C5BC3;
+  --color-success: #2e7d55;
+  --color-warn: #c08f3e;
+  --color-danger: #b71413;
+  --color-info: #1c5bc3;
   /* Darkened warn tone for small beta-pill text/border on the light
      surface — pushes 12px label past the WCAG AA 4.5:1 floor where the
      default --color-warn lands ~3.5:1. Light-theme only; dark uses --color-warn. */
   --color-beta-pill-fg: oklch(50% 0.14 75);
   --color-status-success: var(--color-success);
   --color-status-warning: var(--color-warn);
-  --color-status-danger:  var(--color-danger);
-  --color-status-info:    var(--color-info);
+  --color-status-danger: var(--color-danger);
+  --color-status-info: var(--color-info);
 
   /* --- StatusDot role tokens --- */
-  --color-status-active: #2E7D55;     /* same green as --color-success / source-live */
-  --color-status-idle:   #A7AFBC;     /* Mist */
-  --color-status-warn:   #C08F3E;     /* Gold */
-  --color-status-down:   #B71413;     /* same as --color-danger */
-  --color-on-warning: #0B1B2D;
-  --color-on-accent:  #FFFFFF;
+  --color-status-active: #2e7d55; /* same green as --color-success / source-live */
+  --color-status-idle: #a7afbc; /* Mist */
+  --color-status-warn: #c08f3e; /* Gold */
+  --color-status-down: #b71413; /* same as --color-danger */
+  --color-on-warning: #0b1b2d;
+  --color-on-accent: #ffffff;
 
   /* --- Legacy/non-country status tokens. Never map country scores to these. --- */
-  --tier-exceptional: #0B4250;   /* Deep Teal */
-  --tier-strong:      #2E7D55;   /* Green */
-  --tier-mixed:       #C08F3E;   /* Gold */
-  --tier-weak:        #BD7A4A;   /* Ochre */
-  --tier-failed:      #B7512B;   /* Terracotta */
+  --tier-exceptional: #0b4250; /* Deep Teal */
+  --tier-strong: #2e7d55; /* Green */
+  --tier-mixed: #c08f3e; /* Gold */
+  --tier-weak: #bd7a4a; /* Ochre */
+  --tier-failed: #b7512b; /* Terracotta */
 
   /* --- Comparison series colors (used on /civica-index/compare) --- */
-  --series-a: #BE5830;   /* Terracotta */
-  --series-b: #2468CD;   /* Azure */
-  --series-c: #458A65;   /* Green */
+  --series-a: #be5830; /* Terracotta */
+  --series-b: #2468cd; /* Azure */
+  --series-c: #458a65; /* Green */
 
   /* --- Indicator ramp (choropleth — light blue → deep navy, DS-3 §07) --- */
-  --ramp-indicator-1: #D3E0F0;
-  --ramp-indicator-2: #B0CAE3;
-  --ramp-indicator-3: #6686A0;
-  --ramp-indicator-4: #41688A;
-  --ramp-indicator-5: #1C4A75;
-  --ramp-no-data:     #E6DED4;
+  --ramp-indicator-1: #d3e0f0;
+  --ramp-indicator-2: #b0cae3;
+  --ramp-indicator-3: #6686a0;
+  --ramp-indicator-4: #41688a;
+  --ramp-indicator-5: #1c4a75;
+  --ramp-no-data: #e6ded4;
 
   /* --- Branch backgrounds (alpha, almanac hues) --- */
   --color-branch-executive-bg: rgba(183, 81, 43, 0.12);
@@ -258,59 +274,70 @@
   --color-branch-monarchy-bg: rgba(103, 73, 171, 0.12);
 
   /* --- Badge colors --- */
-  --color-badge-get:  #2E7D55;
-  --color-badge-post: #1C5BC3;
-  --color-badge-text: #FFFFFF;
+  --color-badge-get: #2e7d55;
+  --color-badge-post: #1c5bc3;
+  --color-badge-text: #ffffff;
 
   /* --- Shadows (almanac — soft & subtle, navy-tinted; DS-4 §07).
          Names retain `hard` for now to avoid touching ~all consumers;
          rename to --shadow-subtle/raised in the full rollout. --- */
-  --shadow-hard:    0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-hard: 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-hard-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
   --shadow-hard-md: 0 2px 6px rgba(15, 23, 42, 0.08);
-  --shadow-hard-lg: 0 4px 12px rgba(15, 23, 42, 0.10);
-  --shadow-dark:    0 4px 16px rgba(15, 23, 42, 0.16);
+  --shadow-hard-lg: 0 4px 12px rgba(15, 23, 42, 0.1);
+  --shadow-dark: 0 4px 16px rgba(15, 23, 42, 0.16);
+
+  /* --- Rules --- */
+  --border-hairline: 1px;
 
   /* --- Stacking order --- */
-  --z-base:    1;
-  --z-rule:    5;
-  --z-sticky:  20;
+  --z-base: 1;
+  --z-rule: 5;
+  --z-sticky: 20;
   --z-popover: 40;
   --z-overlay: 60;
-  --z-modal:   100;
-  --z-toast:   200;
+  --z-modal: 100;
+  --z-toast: 200;
 
   /* --- Motion --- */
   --motion-instant: 0ms;
-  --motion-fast:    120ms;
-  --motion-base:    180ms;
-  --motion-slow:    300ms;
-  --motion-slower:  500ms;
-  --motion-ease:        cubic-bezier(0.22, 1, 0.36, 1);
-  --motion-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 300ms;
+  --motion-slower: 500ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --motion-linear:      linear;
+  --motion-linear: linear;
 
   /* --- Breakpoints (reference only — @media cannot read CSS custom properties)
          These are the canonical breakpoint values for Civica.
          When writing @media rules, copy the raw px value from here.
          When a breakpoint needs to change, update this token and all @media uses. --- */
-  --bp-sm:  480px;
-  --bp-md:  768px;
-  --bp-lg:  960px;
-  --bp-xl:  1200px;
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 960px;
+  --bp-xl: 1200px;
   --bp-2xl: 1280px;
 
   /* --- Logo tokens (dark mode defaults) --- */
-  --logo-fg: var(--color-text-primary);  /* cream on dark */
-  --logo-bg: var(--color-bg);            /* dark field */
+  --logo-fg: var(--color-text-primary); /* cream on dark */
+  --logo-bg: var(--color-bg); /* dark field */
 
   /* --- Scrollbar defaults --- */
   --scrollbar-size: var(--space-3);
   --scrollbar-radius: var(--radius-md);
   --scrollbar-track: transparent;
-  --scrollbar-thumb: color-mix(in oklab, var(--color-text-muted) 50%, transparent);
-  --scrollbar-thumb-hover: color-mix(in oklab, var(--color-text-secondary) 65%, transparent);
+  --scrollbar-thumb: color-mix(
+    in oklab,
+    var(--color-text-muted) 50%,
+    transparent
+  );
+  --scrollbar-thumb-hover: color-mix(
+    in oklab,
+    var(--color-text-secondary) 65%,
+    transparent
+  );
 }
 
 html:root {
@@ -335,18 +362,32 @@ html:root {
   --color-text-60: #c4bdae;
   --color-text-50: rgba(235, 230, 214, 0.64);
   --color-text-40: #8a8370;
-  --color-text-30: rgba(235, 230, 214, 0.55); /* bumped alpha for WCAG AA on dark bg */
-  --color-text-25: rgba(235, 230, 214, 0.52); /* bumped alpha for WCAG AA on dark bg */
-  --color-text-20: rgba(235, 230, 214, 0.40);
+  --color-text-30: rgba(
+    235,
+    230,
+    214,
+    0.55
+  ); /* bumped alpha for WCAG AA on dark bg */
+  --color-text-25: rgba(
+    235,
+    230,
+    214,
+    0.52
+  ); /* bumped alpha for WCAG AA on dark bg */
+  --color-text-20: rgba(235, 230, 214, 0.4);
 
-  --color-accent: oklch(67% 0.13 45);   /* Terracotta, lightened for dark */
+  --color-accent: oklch(67% 0.13 45); /* Terracotta, lightened for dark */
 
   --color-card-bg: #221e16;
   --color-card-border: #3d382d;
   --color-card-hover-bg: #2b2619;
   --color-card-hover-border: #8a8370;
   --color-divider: #3d382d;
-  --color-scrim: color-mix(in oklab, #000000 62%, transparent); /* modal backdrop */
+  --color-scrim: color-mix(
+    in oklab,
+    #000000 62%,
+    transparent
+  ); /* modal backdrop */
   --color-stat-border: #3d382d;
   --color-selection: oklch(34% 0.07 45);
   --color-surface-primary: var(--color-bg);
@@ -372,28 +413,28 @@ html:root {
   --color-success: oklch(68% 0.14 145);
   --color-warn: oklch(75% 0.14 75);
   --color-danger: oklch(65% 0.18 25);
-  --color-info: oklch(68% 0.10 240);
+  --color-info: oklch(68% 0.1 240);
   --color-status-success: var(--color-success);
   --color-status-warning: var(--color-warn);
   --color-status-danger: var(--color-danger);
   --color-status-info: var(--color-info);
 
-  --color-status-active: #5CAA6E;
+  --color-status-active: #5caa6e;
   --color-status-idle: #c4bdae;
   --color-status-warn: #d4a04a;
   --color-status-down: #b94328;
   --color-on-warning: #1a1a1a;
   --color-on-accent: #ffffff;
 
-  --tier-exceptional: oklch(66% 0.09 215);  /* Deep Teal */
-  --tier-strong: oklch(64% 0.11 155);       /* Green */
-  --tier-mixed: oklch(77% 0.12 78);         /* Gold */
-  --tier-weak: oklch(66% 0.10 55);          /* Ochre */
-  --tier-failed: oklch(62% 0.14 40);        /* Terracotta */
+  --tier-exceptional: oklch(66% 0.09 215); /* Deep Teal */
+  --tier-strong: oklch(64% 0.11 155); /* Green */
+  --tier-mixed: oklch(77% 0.12 78); /* Gold */
+  --tier-weak: oklch(66% 0.1 55); /* Ochre */
+  --tier-failed: oklch(62% 0.14 40); /* Terracotta */
 
-  --series-a: oklch(70% 0.13 45);   /* Terracotta */
-  --series-b: oklch(68% 0.12 245);  /* Azure */
-  --series-c: oklch(66% 0.11 155);  /* Green */
+  --series-a: oklch(70% 0.13 45); /* Terracotta */
+  --series-b: oklch(68% 0.12 245); /* Azure */
+  --series-c: oklch(66% 0.11 155); /* Green */
 
   /* Choropleth ramp — deep navy → light blue (reads on the dark field) */
   --ramp-indicator-1: #1c2733;
@@ -408,7 +449,7 @@ html:root {
   --color-branch-monarchy-bg: rgba(180, 139, 255, 0.15);
 
   --color-badge-get: oklch(55% 0.12 145);
-  --color-badge-post: oklch(52% 0.10 240);
+  --color-badge-post: oklch(52% 0.1 240);
   --color-badge-text: #ebe6d6;
 
   /* Soft elevation (matches the light-theme style); pure black at higher
@@ -416,8 +457,10 @@ html:root {
      legacy — the style is intentionally soft in both themes. */
   --shadow-hard: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(0, 0, 0, 0.5);
   --shadow-hard-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-hard-md: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.45);
-  --shadow-hard-lg: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.55);
+  --shadow-hard-md:
+    0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.45);
+  --shadow-hard-lg:
+    0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.55);
   --shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.55);
 
   --logo-fg: var(--color-text-primary);
@@ -449,7 +492,9 @@ body {
   font-family: var(--font-body);
   line-height: var(--leading-normal);
   margin: 0;
-  transition: background-color 0.3s ease, color 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.2s ease;
   overflow-x: clip;
 }
 
@@ -485,7 +530,9 @@ body {
   display: block !important;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -516,7 +563,12 @@ body {
   background: var(--scrollbar-track);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: 400;
   color: var(--color-text-primary);
@@ -757,11 +809,23 @@ a {
   color: var(--color-text-primary);
 }
 .btn--secondary:hover {
-  background: color-mix(in oklab, var(--color-text-primary) 6%, var(--color-page-bg));
-  border-color: color-mix(in oklab, var(--color-text-primary) 24%, var(--color-card-border));
+  background: color-mix(
+    in oklab,
+    var(--color-text-primary) 6%,
+    var(--color-page-bg)
+  );
+  border-color: color-mix(
+    in oklab,
+    var(--color-text-primary) 24%,
+    var(--color-card-border)
+  );
 }
 .btn--secondary:active {
-  background: color-mix(in oklab, var(--color-text-primary) 10%, var(--color-page-bg));
+  background: color-mix(
+    in oklab,
+    var(--color-text-primary) 10%,
+    var(--color-page-bg)
+  );
 }
 
 /* Tertiary — borderless, muted label. */
@@ -770,11 +834,19 @@ a {
   color: var(--color-text-60);
 }
 .btn--tertiary:hover {
-  background: color-mix(in oklab, var(--color-text-primary) 5%, var(--color-page-bg));
+  background: color-mix(
+    in oklab,
+    var(--color-text-primary) 5%,
+    var(--color-page-bg)
+  );
   color: var(--color-text-primary);
 }
 .btn--tertiary:active {
-  background: color-mix(in oklab, var(--color-text-primary) 9%, var(--color-page-bg));
+  background: color-mix(
+    in oklab,
+    var(--color-text-primary) 9%,
+    var(--color-page-bg)
+  );
 }
 
 /* Text — link-style CTA (the "Explore Factbook →" homepage feature link). */
@@ -891,7 +963,9 @@ a {
   gap: var(--space-1);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
   z-index: 120;
 }
 
@@ -1055,7 +1129,11 @@ a {
 .explore-item:hover,
 .explore-item:focus-visible {
   background: color-mix(in oklab, var(--color-accent) 6%, var(--color-card-bg));
-  border-color: color-mix(in oklab, var(--color-accent) 28%, var(--color-card-border));
+  border-color: color-mix(
+    in oklab,
+    var(--color-accent) 28%,
+    var(--color-card-border)
+  );
   outline: none;
 }
 
@@ -1065,7 +1143,11 @@ a {
 }
 
 .explore-item--active {
-  border-color: color-mix(in oklab, var(--color-accent) 28%, var(--color-card-border));
+  border-color: color-mix(
+    in oklab,
+    var(--color-accent) 28%,
+    var(--color-card-border)
+  );
 }
 
 .explore-item--active .explore-item__name {
@@ -1427,7 +1509,9 @@ a {
 /* ── Responsive ─────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .site-footer__trust { background-position: 18% center; }
+  .site-footer__trust {
+    background-position: 18% center;
+  }
 
   .site-footer__trust-inner {
     grid-template-columns: 1fr;
@@ -1490,7 +1574,9 @@ a {
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);
   padding: 20px 24px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .cv-card--interactive {
@@ -1793,8 +1879,13 @@ a {
    ============================================================ */
 
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.15; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.15;
+  }
 }
 
 .skeleton {
@@ -2002,7 +2093,10 @@ a {
   background: var(--color-card-bg);
   color: var(--color-text-40);
   border: 1px solid var(--color-card-border);
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .index-continent-chip:hover {
@@ -2656,7 +2750,9 @@ a {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-hard-md);
   text-decoration: none;
-  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 }
 
 .record-lead-cover:hover {
@@ -2795,7 +2891,9 @@ a {
   background: var(--color-surface-elevated);
   box-shadow: var(--shadow-hard);
   overflow: hidden;
-  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 }
 
 .record-story:hover {
@@ -3297,7 +3395,9 @@ a {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .post-share-btn:hover {
@@ -3734,7 +3834,9 @@ a {
   background: var(--color-surface-elevated);
   box-shadow: var(--shadow-hard);
   overflow: hidden;
-  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 }
 
 .post-more-card:hover {
@@ -4002,7 +4104,9 @@ a {
   font-size: var(--text-16);
   line-height: var(--leading-normal);
 }
-.mobile-menu__search { margin-top: var(--space-6); }
+.mobile-menu__search {
+  margin-top: var(--space-6);
+}
 .mobile-menu__explore-groups {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4026,7 +4130,8 @@ a {
   gap: var(--space-4);
   min-height: var(--space-9);
   padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border-default) 64%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border-default) 64%, transparent);
   color: var(--color-text-primary);
   text-decoration: none;
   transition:
@@ -4188,7 +4293,8 @@ a {
   height: var(--space-3);
   border-radius: var(--radius-full);
   background: var(--color-source-live);
-  box-shadow: 0 0 0 var(--space-2) color-mix(in oklab, var(--color-source-live) 16%, transparent);
+  box-shadow: 0 0 0 var(--space-2)
+    color-mix(in oklab, var(--color-source-live) 16%, transparent);
 }
 .mobile-menu__utility {
   display: flex;
@@ -4212,8 +4318,12 @@ a {
 .mobile-menu__reveal {
   animation: civ-menu-rise var(--motion-slow) var(--motion-ease-out) both;
 }
-.mobile-menu__search { animation-delay: var(--motion-fast); }
-.mobile-menu__explore-groups { animation-delay: var(--motion-base); }
+.mobile-menu__search {
+  animation-delay: var(--motion-fast);
+}
+.mobile-menu__explore-groups {
+  animation-delay: var(--motion-base);
+}
 .mobile-menu__reading-room .mobile-menu__link-group:nth-child(2) {
   animation-delay: var(--motion-fast);
 }
@@ -4303,21 +4413,46 @@ a {
 }
 
 @keyframes civ-menu-enter {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes civ-menu-art-enter {
-  from { opacity: 0; transform: scale(1.04); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes civ-menu-rise {
-  from { opacity: 0; transform: translateY(var(--space-5)); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-5));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes civ-pulse {
-  0% { transform: scale(0.6); opacity: 0.6; }
-  70% { transform: scale(1.9); opacity: 0; }
-  100% { transform: scale(0.6); opacity: 0; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
 }
 
 /* ============================================================
@@ -4382,8 +4517,13 @@ a {
   position: relative;
 }
 
-.ghc-canvas::-webkit-scrollbar { height: 10px; }
-.ghc-canvas::-webkit-scrollbar-thumb { background: var(--color-card-hover-border); border-radius: 4px; }
+.ghc-canvas::-webkit-scrollbar {
+  height: 10px;
+}
+.ghc-canvas::-webkit-scrollbar-thumb {
+  background: var(--color-card-hover-border);
+  border-radius: 4px;
+}
 
 .ghc-branches {
   display: grid;
@@ -4419,10 +4559,18 @@ a {
   height: 3px;
 }
 
-.ghc-branch[data-branch="executive"] .ghc-branch-head::before { background: var(--color-branch-executive); }
-.ghc-branch[data-branch="legislative"] .ghc-branch-head::before { background: var(--color-branch-legislative); }
-.ghc-branch[data-branch="judicial"] .ghc-branch-head::before { background: var(--color-branch-judicial); }
-.ghc-branch[data-branch="monarchy"] .ghc-branch-head::before { background: var(--color-branch-monarchy); }
+.ghc-branch[data-branch="executive"] .ghc-branch-head::before {
+  background: var(--color-branch-executive);
+}
+.ghc-branch[data-branch="legislative"] .ghc-branch-head::before {
+  background: var(--color-branch-legislative);
+}
+.ghc-branch[data-branch="judicial"] .ghc-branch-head::before {
+  background: var(--color-branch-judicial);
+}
+.ghc-branch[data-branch="monarchy"] .ghc-branch-head::before {
+  background: var(--color-branch-monarchy);
+}
 
 .ghc-branch-title {
   font-family: var(--font-mono);
@@ -4433,10 +4581,18 @@ a {
   font-weight: 600;
 }
 
-.ghc-branch[data-branch="executive"] .ghc-branch-title { color: var(--color-branch-executive); }
-.ghc-branch[data-branch="legislative"] .ghc-branch-title { color: var(--color-branch-legislative); }
-.ghc-branch[data-branch="judicial"] .ghc-branch-title { color: var(--color-branch-judicial); }
-.ghc-branch[data-branch="monarchy"] .ghc-branch-title { color: var(--color-branch-monarchy); }
+.ghc-branch[data-branch="executive"] .ghc-branch-title {
+  color: var(--color-branch-executive);
+}
+.ghc-branch[data-branch="legislative"] .ghc-branch-title {
+  color: var(--color-branch-legislative);
+}
+.ghc-branch[data-branch="judicial"] .ghc-branch-title {
+  color: var(--color-branch-judicial);
+}
+.ghc-branch[data-branch="monarchy"] .ghc-branch-title {
+  color: var(--color-branch-monarchy);
+}
 
 .ghc-branch-count {
   font-family: var(--font-mono);
@@ -4500,11 +4656,19 @@ a {
 
 .ghc-branch[data-branch="executive"] .ghc-tree li::before,
 .ghc-branch[data-branch="executive"] .ghc-tree li::after {
-  background: color-mix(in srgb, var(--color-branch-executive) 35%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-branch-executive) 35%,
+    transparent
+  );
 }
 .ghc-branch[data-branch="legislative"] .ghc-tree li::before,
 .ghc-branch[data-branch="legislative"] .ghc-tree li::after {
-  background: color-mix(in srgb, var(--color-branch-legislative) 35%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-branch-legislative) 35%,
+    transparent
+  );
 }
 .ghc-branch[data-branch="judicial"] .ghc-tree li::before,
 .ghc-branch[data-branch="judicial"] .ghc-tree li::after {
@@ -4528,7 +4692,9 @@ a {
   border-radius: 8px;
   position: relative;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .ghc-node:hover {
@@ -4619,8 +4785,12 @@ a {
 }
 
 /* Collapsed state */
-.collapsed > ul { display: none; }
-.collapsed .ghc-node-toggle { transform: rotate(-90deg); }
+.collapsed > ul {
+  display: none;
+}
+.collapsed .ghc-node-toggle {
+  transform: rotate(-90deg);
+}
 
 /* ---------- Chamber variant ---------- */
 
@@ -4782,16 +4952,36 @@ a {
    Civica Index — tier color utility classes
    Map a 0–100 score tier to foreground + background colors.
    ============================================================ */
-.tier-90    { color: var(--tier-exceptional); }
-.tier-75    { color: var(--tier-strong); }
-.tier-50    { color: var(--tier-mixed); }
-.tier-25    { color: var(--tier-weak); }
-.tier-0     { color: var(--tier-failed); }
-.tier-90-bg { background: var(--tier-exceptional); }
-.tier-75-bg { background: var(--tier-strong); }
-.tier-50-bg { background: var(--tier-mixed); }
-.tier-25-bg { background: var(--tier-weak); }
-.tier-0-bg  { background: var(--tier-failed); }
+.tier-90 {
+  color: var(--tier-exceptional);
+}
+.tier-75 {
+  color: var(--tier-strong);
+}
+.tier-50 {
+  color: var(--tier-mixed);
+}
+.tier-25 {
+  color: var(--tier-weak);
+}
+.tier-0 {
+  color: var(--tier-failed);
+}
+.tier-90-bg {
+  background: var(--tier-exceptional);
+}
+.tier-75-bg {
+  background: var(--tier-strong);
+}
+.tier-50-bg {
+  background: var(--tier-mixed);
+}
+.tier-25-bg {
+  background: var(--tier-weak);
+}
+.tier-0-bg {
+  background: var(--tier-failed);
+}
 
 /* ============================================================
    Provenance dots — frozen (static amber) + live (pulsing green)
@@ -4799,20 +4989,30 @@ a {
    ============================================================ */
 .dot {
   display: inline-block;
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.dot.frozen { background: var(--color-source-frozen); }
+.dot.frozen {
+  background: var(--color-source-frozen);
+}
 .dot.live {
   background: var(--color-source-live);
   box-shadow: 0 0 0 0 var(--color-source-live);
   animation: civica-pulse 2s infinite;
 }
 @keyframes civica-pulse {
-  0%   { box-shadow: 0 0 0 0   color-mix(in oklab, var(--color-source-live) 60%, transparent); }
-  70%  { box-shadow: 0 0 0 10px transparent; }
-  100% { box-shadow: 0 0 0 0   transparent; }
+  0% {
+    box-shadow: 0 0 0 0
+      color-mix(in oklab, var(--color-source-live) 60%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
 
 /* ============================================================

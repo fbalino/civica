@@ -43,7 +43,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -90,7 +90,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -140,7 +140,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -187,7 +187,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -235,7 +235,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -247,6 +247,60 @@
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_restricted_source",
       "releaseReason": "IPU-derived rows are excluded from public bulk export."
+    },
+    {
+      "id": "country.civica-data.longitudinal",
+      "kind": "country_module",
+      "route": "/country/[slug]/civica-data",
+      "renderer": "src/components/ci/CountryTrendSection.tsx",
+      "dataAccess": [
+        {
+          "symbol": "getIndicatorHistoryForCountry",
+          "file": "src/lib/db/queries.ts"
+        },
+        {
+          "symbol": "getAllSources",
+          "file": "src/lib/db/queries.ts"
+        }
+      ],
+      "storage": [
+        "indicator_history",
+        "dataset_releases",
+        "dataset_artifacts",
+        "transformation_registry",
+        "sources"
+      ],
+      "fields": [
+        "native observation",
+        "value state",
+        "year",
+        "unit and native scale",
+        "source freshness",
+        "captured release and artifact hash",
+        "transformation and method version"
+      ],
+      "provenance": [
+        "Each series exposes source, license, freshness, native unit/scale, captured release, artifact hash, transformation id, and method version."
+      ],
+      "coverage": [
+        "The section is always present and reports every available documented series; an empty result remains visible as an availability state."
+      ],
+      "states": {
+        "loading": "No route-level loading state; the server response waits for the query.",
+        "empty": "A named no-observations state remains visible; missing years are never rendered as zero or no change.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
+        "partial": "Independent modules may render when this row has no usable data.",
+        "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
+        "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
+        "noSource": "The module omits provenance only where the current renderer lacks source metadata."
+      },
+      "tests": [
+        "src/lib/indicators/history-catalog.test.ts"
+      ],
+      "testGap": null,
+      "owner": "Country Civica Data",
+      "releaseRelation": "mixed_row_level_rights",
+      "releaseReason": "The country download includes only source rows permitted by the rights manifest and names withheld series without redistributing their observations."
     },
     {
       "id": "country.civica-data.organizations",
@@ -281,7 +335,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -332,7 +386,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -1241,6 +1295,10 @@
         {
           "symbol": "getGovernanceEvidence",
           "file": "src/lib/db/queries-governance-evidence.ts"
+        },
+        {
+          "symbol": "getIndicatorHistoryForCountry",
+          "file": "src/lib/db/queries.ts"
         }
       ],
       "storage": [
@@ -1254,7 +1312,12 @@
         "elections",
         "organizations",
         "organization_memberships",
-        "ci_research_panel_rows"
+        "ci_research_panel_rows",
+        "indicator_history",
+        "dataset_releases",
+        "dataset_artifacts",
+        "transformation_registry",
+        "sources"
       ],
       "fields": [
         "canonical profile facts",
@@ -1262,10 +1325,11 @@
         "chambers",
         "elections",
         "memberships",
-        "source-native governance observations"
+        "source-native governance observations",
+        "source-native longitudinal observations and release lineage"
       ],
       "provenance": [
-        "Resolver output supports per-fact source panels; governance evidence remains on publisher-native scales."
+        "Resolver output supports per-fact source panels; governance evidence and longitudinal history remain on publisher-native scales with source, unit, release, and transformation lineage."
       ],
       "coverage": [
         "Two to four selected jurisdictions; each comparison section has an independent availability gate."
@@ -1899,5 +1963,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "d77500cdc573ed0348667fd90fad35544eb192a7321fc86d34bcb74c0cc9d67d"
+  "semanticSha256": "5e1ddbcaf8840adf7704e52b5a3c9e1560645cf3b21bfeef7599495ecddb4550"
 }

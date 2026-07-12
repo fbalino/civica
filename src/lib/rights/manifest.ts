@@ -248,6 +248,26 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
     requiresDerivationVersions: true,
   },
   {
+    productId: "indicator-history-country-export",
+    routeOrArtifact: "/api/countries/{slug}/indicator-history?format=json|csv",
+    publicBulkExport: "allowed",
+    fields: [
+      {
+        fieldPattern: "series[].observations",
+        lineage: "source-row",
+        exportRule: "source-permission",
+      },
+      {
+        fieldPattern: "series[].lineage|withheld|jurisdiction",
+        lineage: "civica-derived",
+        exportRule: "source-permission",
+      },
+    ],
+    reason:
+      "Country indicator-history downloads include observation rows only when the source-specific rights record permits public export. Other visible series remain on the reader page but are named in the export's withheld manifest without their values.",
+    requiresDerivationVersions: true,
+  },
+  {
     productId: "index-bulk-release",
     routeOrArtifact: "future frozen Civica Index data package",
     publicBulkExport: "blocked",
@@ -289,9 +309,15 @@ const CI_BETA_RELEASE_SOURCE_IDS = [
 
 const CI_BETA_RELEASE_DERIVATION_VERSIONS = buildDerivationVersionEnvelope({
   methodology: versioned("ci-beta-2024-Q4/source-input-manifest-v1"),
-  algorithm: notApplicable("This release artifact contains captured-input metadata and hashes, not calculated scores."),
-  prompt: notApplicable("The release artifact is generated deterministically without a model prompt."),
-  taxonomy: notApplicable("The release artifact does not classify observations into a research taxonomy."),
+  algorithm: notApplicable(
+    "This release artifact contains captured-input metadata and hashes, not calculated scores.",
+  ),
+  prompt: notApplicable(
+    "The release artifact is generated deterministically without a model prompt.",
+  ),
+  taxonomy: notApplicable(
+    "The release artifact does not classify observations into a research taxonomy.",
+  ),
   sourceIds: CI_BETA_RELEASE_SOURCE_IDS,
 });
 
@@ -313,7 +339,9 @@ export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
     derivationVersions: buildDerivationVersionEnvelope({
       methodology: versioned("civica-atlas-export/v3"),
       algorithm: versioned("atlas-export-generator/v1"),
-      prompt: notApplicable("The export is generated deterministically without a model prompt."),
+      prompt: notApplicable(
+        "The export is generated deterministically without a model prompt.",
+      ),
       taxonomy: versioned("jurisdiction-status/v1"),
       sourceIds: ["cia_factbook", "wikidata", "world_bank"],
     }),

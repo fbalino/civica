@@ -268,6 +268,10 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
         symbol: "getGovernanceEvidence",
         file: "src/lib/db/queries-governance-evidence.ts",
       },
+      {
+        symbol: "getIndicatorHistoryForCountry",
+        file: "src/lib/db/queries.ts",
+      },
     ],
     storage: [
       "jurisdictions",
@@ -281,6 +285,11 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "organizations",
       "organization_memberships",
       "ci_research_panel_rows",
+      "indicator_history",
+      "dataset_releases",
+      "dataset_artifacts",
+      "transformation_registry",
+      "sources",
     ],
     fields: [
       "canonical profile facts",
@@ -289,9 +298,10 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "elections",
       "memberships",
       "source-native governance observations",
+      "source-native longitudinal observations and release lineage",
     ],
     provenance: [
-      "Resolver output supports per-fact source panels; governance evidence remains on publisher-native scales.",
+      "Resolver output supports per-fact source panels; governance evidence and longitudinal history remain on publisher-native scales with source, unit, release, and transformation lineage.",
     ],
     coverage: [
       "Two to four selected jurisdictions; each comparison section has an independent availability gate.",
@@ -851,6 +861,35 @@ const civicaModules: Array<{
       "Research-panel observations are outside the Atlas canonical-fact export.",
   },
   {
+    id: "longitudinal",
+    renderer: "src/components/ci/CountryTrendSection.tsx",
+    access: {
+      symbol: "getIndicatorHistoryForCountry",
+      file: "src/lib/db/queries.ts",
+    },
+    storage: [
+      "indicator_history",
+      "dataset_releases",
+      "dataset_artifacts",
+      "transformation_registry",
+      "sources",
+    ],
+    fields: [
+      "native observation",
+      "value state",
+      "year",
+      "unit and native scale",
+      "source freshness",
+      "captured release and artifact hash",
+      "transformation and method version",
+    ],
+    source:
+      "Each series exposes source, license, freshness, native unit/scale, captured release, artifact hash, transformation id, and method version.",
+    relation: "mixed_row_level_rights",
+    reason:
+      "The country download includes only source rows permitted by the rights manifest and names withheld series without redistributing their observations.",
+  },
+  {
     id: "government",
     renderer: "src/components/factbook/FactbookGovOrgChart.tsx",
     access: { symbol: "getGovernmentStructure", file: "src/lib/db/queries.ts" },
@@ -962,20 +1001,28 @@ countryRows.push(
       fields: module.fields,
       provenance: [module.source],
       coverage: [
-        "The section appears only when its prefetch returns a usable row set.",
+        module.id === "longitudinal"
+          ? "The section is always present and reports every available documented series; an empty result remains visible as an availability state."
+          : "The section appears only when its prefetch returns a usable row set.",
       ],
       states: serverStates({
         empty:
-          "The section is omitted when unavailable; if all seven are absent the page renders a named Civica Data empty card.",
+          module.id === "longitudinal"
+            ? "A named no-observations state remains visible; missing years are never rendered as zero or no change."
+            : "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         error:
-          "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+          module.id === "longitudinal"
+            ? "A named temporarily-unavailable state remains visible while the rest of the tab continues to render."
+            : "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
       }),
       tests:
         module.id === "governance-evidence"
           ? ["src/lib/ci/governance-evidence.test.ts"]
-          : [],
+          : module.id === "longitudinal"
+            ? ["src/lib/indicators/history-catalog.test.ts"]
+            : [],
       testGap:
-        module.id === "governance-evidence"
+        module.id === "governance-evidence" || module.id === "longitudinal"
           ? null
           : `No dedicated ${module.id} country-module route test exists.`,
       owner: "Country Civica Data",

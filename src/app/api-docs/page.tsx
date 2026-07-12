@@ -534,6 +534,19 @@ for country in resp.json()["data"]:
           measurements, projections, and rejected rows are separate records.
         </p>
 
+        <h3 className="api-example-heading">
+          Longitudinal indicator observations
+        </h3>
+        <p className="api-info-card__body">
+          <code>/api/countries/:slug/indicator-history?format=json|csv</code>{" "}
+          returns source-native country-year observations with units, captured
+          release lineage, value states, source terms, and a withheld-series
+          manifest. Add <code>&amp;indicator=rl.est</code> to request one
+          indicator. Observation rows are emitted only when the checked
+          source-rights record permits public export; visible series with
+          pending terms keep their values out of the download.
+        </p>
+
         <Banner variant="info">
           Every observation carries its source URL, license, dates, value type,
           lifecycle status, method, selection trace, and dispute state. Rows
@@ -586,8 +599,8 @@ for country in resp.json()["data"]:
           The legacy <code>/embed/:slug</code> widget is retired. Every request,
           including requests with <code>include=ci</code> or{" "}
           <code>include=cp</code>, returns <code>410 Gone</code> and is never
-          cached. Existing iframes show a short retirement notice with a link
-          to the <Link href="/governance-evidence">Governance Evidence</Link>{" "}
+          cached. Existing iframes show a short retirement notice with a link to
+          the <Link href="/governance-evidence">Governance Evidence</Link>{" "}
           successor. Civica does not provide a replacement scalar Pulse score,
           rank, or live score widget. Named experimental Pulse deltas remain
           available by country from{" "}

@@ -743,6 +743,25 @@
       "requiresDerivationVersions": true
     },
     {
+      "productId": "indicator-history-country-export",
+      "routeOrArtifact": "/api/countries/{slug}/indicator-history?format=json|csv",
+      "publicBulkExport": "allowed",
+      "fields": [
+        {
+          "fieldPattern": "series[].observations",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "series[].lineage|withheld|jurisdiction",
+          "lineage": "civica-derived",
+          "exportRule": "source-permission"
+        }
+      ],
+      "reason": "Country indicator-history downloads include observation rows only when the source-specific rights record permits public export. Other visible series remain on the reader page but are named in the export's withheld manifest without their values.",
+      "requiresDerivationVersions": true
+    },
+    {
       "productId": "index-bulk-release",
       "routeOrArtifact": "future frozen Civica Index data package",
       "publicBulkExport": "blocked",

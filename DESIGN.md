@@ -30,6 +30,8 @@ tokens:
   elevation:
     hard: var(--shadow-hard)
     dark: var(--shadow-dark)
+  border:
+    hairline: var(--border-hairline)
 ---
 
 # Civica Design System
@@ -79,6 +81,9 @@ Use the standard container widths:
 Every `<PageHero>` with engraving art visibly renders the canonical `Editorial illustration · AI-assisted, non-documentary` policy link. Country and territory mastheads use their landmark caption plus the equivalent accessible policy disclosure. Background art remains `alt=""` and `aria-hidden="true"` because the adjacent disclosure/caption carries the meaning once. Do not remove, rename, or page-localize these disclosures.
 
 Use `var(--space-*)` for new spacing decisions unless an existing component contract requires a fixed dimension.
+
+Hairline rules use `var(--border-hairline)`. New components must not repeat a
+raw pixel border width.
 
 ## Elevation
 
@@ -133,14 +138,14 @@ Reader-style pages (methodology, replication, corrections, changelog, etc.) comp
 
 Page type drives the layout, not the prose length. **Do not default to `width="narrow"` because the prose is long.** The narrow column is for short-form editorial content (blog posts, single-topic essays). Methodology pages, regardless of how long the prose is, use the methodology layout with a sidebar.
 
-| Page type | Class / prop | Width | Sidebar? | Examples |
-|---|---|---|---|---|
-| Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
-| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/privacy`, `/terms` |
-| Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/pulse-changelog` |
-| Standard product/editorial page | `<EditorialPage width="full">` | 1200px | No | Atlas-scale layouts |
-| Multi-pane reference surface | `<EditorialPage width="reference">` | 1280px content + gutters | Optional | `/constitution`, `/country/[slug]` tabs |
-| Short-form editorial / blog | `<EditorialPage>` (default `width="narrow"`) | 760px | No | Single-topic blog posts, short essays |
+| Page type                                        | Class / prop                                                         | Width                    | Sidebar?                            | Examples                                                                                                                                                                                  |
+| ------------------------------------------------ | -------------------------------------------------------------------- | ------------------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Methodology page or methodology subpage          | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px                   | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
+| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px                   | Yes (left, sticky, section anchors) | `/privacy`, `/terms`                                                                                                                                                                      |
+| Filterable list / changelog                      | `<EditorialPage width="wide">`                                       | 960px                    | No                                  | `/civica-index/pulse-changelog`                                                                                                                                                           |
+| Standard product/editorial page                  | `<EditorialPage width="full">`                                       | 1200px                   | No                                  | Atlas-scale layouts                                                                                                                                                                       |
+| Multi-pane reference surface                     | `<EditorialPage width="reference">`                                  | 1280px content + gutters | Optional                            | `/constitution`, `/country/[slug]` tabs                                                                                                                                                   |
+| Short-form editorial / blog                      | `<EditorialPage>` (default `width="narrow"`)                         | 760px                    | No                                  | Single-topic blog posts, short essays                                                                                                                                                     |
 
 **Default disambiguation rule**: if the URL is under `/methodology`, `/*/methodology`, or otherwise documents a methodology decision, use `methodology-layout`. Reaching for `width="narrow"` on a methodology page is wrong even if the prose feels short — methodology pages share a sidebar convention readers expect to find.
 
@@ -148,11 +153,11 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 
 **The page hero is orthogonal to the container.** A browse/landing page opens with the canonical `<PageHero>` full-bleed band (see the Hero subsection below), then drops its body into one of the container rows above. Never hand-roll a hero, and never give one a one-off width — the government-types-vs-pulse-changelog width mismatch that this replaced is exactly the drift to avoid.
 
-The `<EditorialPage>` component's prop docstring describes what each width prop *technically* does. This document describes which one to *pick*. When they conflict, this document wins.
+The `<EditorialPage>` component's prop docstring describes what each width prop _technically_ does. This document describes which one to _pick_. When they conflict, this document wins.
 
 ### Page hero — `<PageHero>` (the one canonical hero)
 
-**Every browse/landing page opens with `<PageHero>` (`src/components/PageHero.tsx`) — there is exactly one hero shell, and it never varies.** Same full-bleed band, same shared `var(--hero-height)`, same 1200px inner column, same eyebrow → serif H1 → dek type scale, same optional engraving + scrim, same on-mount stagger. Only the *content* changes per page. Given the same content it renders pixel-for-pixel identical to the home, `/country`, and `/about` heroes. Demoed live on `/design-system` (section 05).
+**Every browse/landing page opens with `<PageHero>` (`src/components/PageHero.tsx`) — there is exactly one hero shell, and it never varies.** Same full-bleed band, same shared `var(--hero-height)`, same 1200px inner column, same eyebrow → serif H1 → dek type scale, same optional engraving + scrim, same on-mount stagger. Only the _content_ changes per page. Given the same content it renders pixel-for-pixel identical to the home, `/country`, and `/about` heroes. Demoed live on `/design-system` (section 05).
 
 Props:
 

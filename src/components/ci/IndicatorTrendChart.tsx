@@ -42,12 +42,15 @@
 import { useMemo, useState } from "react";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
 import { Tooltip } from "@/components/editorial/Tooltip";
-import {
-  dimensionColorVar,
-  dimensionLabel,
-} from "@/lib/ci/dimension-colors";
+import { dimensionColorVar, dimensionLabel } from "@/lib/ci/dimension-colors";
 
 export interface TrendSeriesInput {
+  /** Stable identity. Required when the same indicator appears more than once. */
+  seriesKey?: string;
+  /** Reader-facing legend label. Defaults to the Civica dimension label. */
+  label?: string;
+  /** Optional country/compare color; country charts keep the dimension color. */
+  colorVar?: string;
   dimension: string;
   indicator: string;
   sourceId: string;
@@ -106,12 +109,19 @@ const Y_TICKS = [0, 25, 50, 75, 100];
 /** Round to 2 decimals — SSR (Node) and browser must serialise identically. */
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
+const trendSeriesKey = (series: TrendSeriesInput) =>
+  series.seriesKey ?? `${series.sourceId}:${series.indicator}`;
+const trendSeriesLabel = (series: TrendSeriesInput) =>
+  series.label ?? dimensionLabel(series.dimension);
+const trendSeriesColor = (series: TrendSeriesInput) =>
+  series.colorVar ?? dimensionColorVar(series.dimension);
+
 /** Native value → 0–100 "higher is better" display index. */
 function toDisplayIndex(
   value: number,
   min: number,
   max: number,
-  isInverted: boolean
+  isInverted: boolean,
 ): number {
   const span = max - min || 1;
   let pct = ((value - min) / span) * 100;
@@ -134,20 +144,20 @@ export function IndicatorTrendChart({
   // Stable, defensive default: only series with ≥2 points are drawable.
   const drawable = useMemo(
     () => series.filter((s) => s.points.length >= 2),
-    [series]
+    [series],
   );
 
   // Default state: all drawable series on, widest range that isn't "max"
   // for a legible SSR default (50y), or max when data is shorter.
   const [enabled, setEnabled] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(drawable.map((s) => [s.indicator, true]))
+    Object.fromEntries(drawable.map((s) => [trendSeriesKey(s), true])),
   );
   const [range, setRange] = useState<RangeKey>("50y");
   const [hoverYear, setHoverYear] = useState<number | null>(null);
 
   const activeSeries = useMemo(
-    () => drawable.filter((s) => enabled[s.indicator] !== false),
-    [drawable, enabled]
+    () => drawable.filter((s) => enabled[trendSeriesKey(s)] !== false),
+    [drawable, enabled],
   );
 
   // Full year span across ALL drawable series (for "Max" + range clamping).
@@ -191,7 +201,7 @@ export function IndicatorTrendChart({
   // All distinct years in-window, sorted — hover columns + x-ticks index this.
   const windowYears = useMemo(
     () => activeYears.filter((y) => y >= windowMin && y <= windowMax),
-    [activeYears, windowMin, windowMax]
+    [activeYears, windowMin, windowMax],
   );
 
   // Soft-fail: nothing drawable at all → render nothing (no empty frame).
@@ -214,7 +224,7 @@ export function IndicatorTrendChart({
       .map((p, i) => {
         const x = xAt(p.year);
         const y = yAt(
-          toDisplayIndex(p.value, s.nativeMin, s.nativeMax, s.isInverted)
+          toDisplayIndex(p.value, s.nativeMin, s.nativeMax, s.isInverted),
         );
         const breakBefore =
           i === 0 || p.year - pts[i - 1].year > GAP_BREAK_YEARS;
@@ -251,13 +261,15 @@ export function IndicatorTrendChart({
         const p = s.points.find((pt) => pt.year === year);
         if (!p) return null;
         return {
-          label: dimensionLabel(s.dimension),
-          color: dimensionColorVar(s.dimension),
+          id: trendSeriesKey(s),
+          label: trendSeriesLabel(s),
+          color: trendSeriesColor(s),
           native: formatNative(p.value, s.nativeMin, s.nativeMax),
           sourceLabel: s.sourceLabel ?? s.sourceId,
         };
       })
       .filter(Boolean) as Array<{
+      id: string;
       label: string;
       color: string;
       native: string;
@@ -267,13 +279,16 @@ export function IndicatorTrendChart({
       <div className="indicator-trend-tip">
         <div className="indicator-trend-tip-year">{year}</div>
         {rows.map((row) => (
-          <div key={row.label} className="indicator-trend-tip-row">
+          <div key={row.id} className="indicator-trend-tip-row">
             <span
               className="indicator-trend-tip-swatch"
               style={{ background: row.color }}
               aria-hidden
             />
-            <span className="indicator-trend-tip-label">{row.label}</span>
+            <span className="indicator-trend-tip-label">
+              <span>{row.label}</span>
+              <small>{row.sourceLabel}</small>
+            </span>
             <span className="indicator-trend-tip-value">{row.native}</span>
           </div>
         ))}
@@ -293,10 +308,11 @@ export function IndicatorTrendChart({
           aria-label="Toggle indicator series"
         >
           {drawable.map((s) => {
-            const on = enabled[s.indicator] !== false;
+            const key = trendSeriesKey(s);
+            const on = enabled[key] !== false;
             return (
               <button
-                key={s.indicator}
+                key={key}
                 type="button"
                 className={`editorial-chip indicator-trend-chip${
                   on ? " is-on" : " is-off"
@@ -305,16 +321,16 @@ export function IndicatorTrendChart({
                 onClick={() =>
                   setEnabled((prev) => ({
                     ...prev,
-                    [s.indicator]: !(prev[s.indicator] !== false),
+                    [key]: !(prev[key] !== false),
                   }))
                 }
               >
                 <span
                   className="indicator-trend-chip-swatch"
-                  style={{ background: dimensionColorVar(s.dimension) }}
+                  style={{ background: trendSeriesColor(s) }}
                   aria-hidden
                 />
-                {dimensionLabel(s.dimension)}
+                {trendSeriesLabel(s)}
               </button>
             );
           })}
@@ -392,10 +408,10 @@ export function IndicatorTrendChart({
           {/* One line per active series, in its dimension color. */}
           {seriesPaths.map(({ series: s, d }) => (
             <path
-              key={s.indicator}
+              key={trendSeriesKey(s)}
               d={d}
               fill="none"
-              stroke={dimensionColorVar(s.dimension)}
+              stroke={trendSeriesColor(s)}
               strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -406,15 +422,20 @@ export function IndicatorTrendChart({
           {seriesPaths.map(({ series: s, isolated }) =>
             isolated.map((p) => (
               <circle
-                key={`iso-${s.indicator}-${p.year}`}
+                key={`iso-${trendSeriesKey(s)}-${p.year}`}
                 cx={xAt(p.year)}
                 cy={yAt(
-                  toDisplayIndex(p.value, s.nativeMin, s.nativeMax, s.isInverted)
+                  toDisplayIndex(
+                    p.value,
+                    s.nativeMin,
+                    s.nativeMax,
+                    s.isInverted,
+                  ),
                 )}
                 r={2.5}
-                fill={dimensionColorVar(s.dimension)}
+                fill={trendSeriesColor(s)}
               />
-            ))
+            )),
           )}
 
           {/* Emphasised marker dots for the hovered year. */}
@@ -424,19 +445,19 @@ export function IndicatorTrendChart({
                 if (!p) return null;
                 return (
                   <circle
-                    key={`hp-${s.indicator}`}
+                    key={`hp-${trendSeriesKey(s)}`}
                     cx={xAt(p.year)}
                     cy={yAt(
                       toDisplayIndex(
                         p.value,
                         s.nativeMin,
                         s.nativeMax,
-                        s.isInverted
-                      )
+                        s.isInverted,
+                      ),
                     )}
                     r={3.5}
                     fill="var(--color-bg)"
-                    stroke={dimensionColorVar(s.dimension)}
+                    stroke={trendSeriesColor(s)}
                     strokeWidth={2}
                   />
                 );
@@ -509,9 +530,9 @@ export function IndicatorTrendChart({
       </div>
 
       <p className="indicator-trend-axis-note">
-        Each series is rescaled to a 0–100 index (higher is better) so
-        different source scales share one axis; hover a year for the original
-        published values. {windowMin}–{windowMax}.
+        Each series is rescaled to a 0–100 index (higher is better) so different
+        source scales share one axis; hover a year for the original published
+        values. {windowMin}–{windowMax}.
       </p>
     </div>
   );
