@@ -328,6 +328,8 @@
     "crawl:metadata": "tsx scripts/crawl-public-metadata.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report output/playwright/report",
     "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
@@ -410,6 +412,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/adm-zip": "^0.5.8",
     "@types/mapbox-gl": "^3.4.1",

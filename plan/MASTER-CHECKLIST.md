@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 174
-- **Remaining:** 129
-- **Progress:** 57.4%
+- **Completed:** 175
+- **Remaining:** 128
+- **Progress:** 57.8%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -296,7 +296,7 @@ Source: `plan/09-testing-qa-and-release.md`
 - [ ] **QA-006** (P0) Add ingestion/sync contract fixtures for every released source. _Done when: normal, empty, malformed, upstream-schema-change, partial, retry, dry-run, duplicate, and rights-blocked cases are tested; row counts/freshness/provenance/version outcomes match policy._
 - [ ] **QA-007** (P0) Add deterministic golden tests for every published calculation and example. _Done when: normalization, reconciliation, conditions, taxonomy/peer lenses, all Index candidates, uncertainty/sensitivity, Pulse decay/classification metrics, and methodology worked examples reproduce versioned expected artifacts from fixtures._
 - [ ] **QA-008** (P0) Add statistical-analysis reproducibility tests. _Done when: fixed seeds/environments/input hashes recreate all tables/figures/threshold decisions within declared tolerances, randomized procedures log seeds, and a changed input/version cannot silently reuse old results._
-- [ ] **QA-009** (P0) Establish the canonical Playwright/browser test harness and command. _Done when: one command starts/uses the real app predictably, captures console/network failures, supports theme/viewport/auth fixtures, cleans tabs/processes, saves evidence, and fails on a seeded route or asset error._
+- [x] **QA-009** (P0) Establish the canonical Playwright/browser test harness and command. _Done when: one command starts/uses the real app predictably, captures console/network failures, supports theme/viewport/auth fixtures, cleans tabs/processes, saves evidence, and fails on a seeded route or asset error._
 - [ ] **QA-010** (P0) Cover critical reader journeys end to end. _Done when: home/search→country tabs, source/provenance, atlas, compare, indicator history, constitution/search, elections, organizations, Record, methodology/citation, API docs, download/export, licensing/contact/advisory, 404/error, and embed journeys pass at required viewports/themes._
 - [ ] **QA-011** (P0) Cover admin/reviewer and scheduled-data journeys end to end in isolated fixtures. _Done when: login/session, queues, double coding/adjudication, disputes/corrections, safe mutation, audit logs, cron auth/idempotency, alerts, and failure recovery pass without production writes or paid external calls._
 - [ ] **QA-012** (P1) Add automated accessibility testing plus scripted keyboard journeys. _Done when: axe or equivalent covers canonical routes/states/themes, keyboard scripts exercise all control classes, focus/labels/semantics/contrast results are archived, and violations block relevant changes._
