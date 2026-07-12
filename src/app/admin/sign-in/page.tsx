@@ -1,3 +1,4 @@
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { CivicaLogo } from "@/components/CivicaLogo";
@@ -42,10 +43,10 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
 
   const error = params.error === "1";
   const googleError = params.error === "google";
-  const redirectAfter =
-    params.redirect && params.redirect.startsWith("/")
-      ? params.redirect
-      : "/admin/pulse-review";
+  const redirectAfter = safeInternalPathOr(
+    params.redirect,
+    "/admin/pulse-review",
+  );
   const googleConfigured = isGoogleSignInConfigured();
 
   return (

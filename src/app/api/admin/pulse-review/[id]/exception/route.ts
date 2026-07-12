@@ -1,3 +1,4 @@
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin/session";
 import {
@@ -7,9 +8,7 @@ import {
 } from "@/lib/pulse/v2/review-sla-store";
 
 function safeRedirect(value: string | null, eventId: string): string {
-  return value?.startsWith("/") && !value.startsWith("//")
-    ? value
-    : `/admin/pulse-review/${eventId}`;
+  return safeInternalPathOr(value, `/admin/pulse-review/${eventId}`);
 }
 
 function utcDate(value: string): Date {

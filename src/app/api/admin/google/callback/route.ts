@@ -9,6 +9,7 @@
  * config, or malformed callback fails closed to /admin/sign-in?error=google.
  */
 
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
@@ -38,10 +39,7 @@ export async function GET(request: NextRequest) {
   const cookieJar = await cookies();
   const expectedState = cookieJar.get(GOOGLE_STATE_COOKIE)?.value;
   const rawRedirect = cookieJar.get(GOOGLE_REDIRECT_COOKIE)?.value;
-  const redirectPath =
-    rawRedirect && decodeURIComponent(rawRedirect).startsWith("/")
-      ? decodeURIComponent(rawRedirect)
-      : "/admin/pulse-review";
+  const redirectPath = safeInternalPathOr(rawRedirect, "/admin/pulse-review");
 
   const code = request.nextUrl.searchParams.get("code");
   const state = request.nextUrl.searchParams.get("state");

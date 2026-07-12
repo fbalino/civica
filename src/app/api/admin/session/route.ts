@@ -18,6 +18,7 @@
  * owner account.
  */
 
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import { NextRequest, NextResponse } from "next/server";
 import {
   buildAdminCookieHeaders,
@@ -77,10 +78,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(failUrl, 303);
   }
 
-  // Sanitise redirect to a same-origin pathname.
-  const redirectPath = redirect.startsWith("/")
-    ? redirect
-    : "/admin/pulse-review";
+  // Sanitise redirect to a same-origin pathname (PLT-027).
+  const redirectPath = safeInternalPathOr(redirect, "/admin/pulse-review");
 
   const res = NextResponse.redirect(new URL(redirectPath, request.url), 303);
   for (const [name, value] of buildAdminCookieHeaders(adminReviewerName())) {

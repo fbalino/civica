@@ -111,10 +111,10 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const expectedMac = signNonce(secret, nonce);
   if (!safeEqual(presentedMac, expectedMac)) return null;
 
-  const reviewerId =
-    cookieJar.get(ADMIN_REVIEWER_COOKIE)?.value?.trim() ||
-    adminReviewerName();
-  return { reviewerId };
+  // The audit actor is derived server-side from the environment for this
+  // single-owner account — NEVER from the unsigned `civica_admin_reviewer`
+  // cookie, which a client could edit to forge audit-row identity (PLT-027).
+  return { reviewerId: adminReviewerName() };
 }
 
 /** Set both cookies on a Response. Mints a fresh per-session nonce and
