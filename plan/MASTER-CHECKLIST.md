@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 130
-- **Remaining:** 173
-- **Progress:** 42.9%
+- **Completed:** 131
+- **Remaining:** 172
+- **Progress:** 43.2%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -212,7 +212,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [ ] **EXP-004** (P1) Eliminate page-local reader styling where canonical editorial compositions already exist. _Done when: live reader-style pages use shared primitives/editorial classes, no new per-page style block duplicates layout/typography/filter/card patterns, and visual-regression evidence shows no unintended drift._
 - [x] **EXP-005** (P0) Define a measurable canonical engraving color and rendering contract using approved reference art. _Done when: the contract specifies light/dark tone curves, cool-shadow/gold-highlight targets, saturation/chroma/warmth ranges, contrast, line preservation, dimensions, format/quality, landmark fidelity, and representative pass/fail examples._
 - [x] **EXP-006** (P0) Produce a non-destructive engraving-grade pilot for Japan and 10–12 representative country/session outliers. _Done when: original files remain recoverable, deterministic settings and metrics are recorded, all pilot outputs pass automated format/color/line checks, side-by-side desktop/mobile/light/dark previews exist, and owner approval is queued in `MANUAL-CHECKS.md`._
-- [ ] **EXP-007** (P1) Implement a deterministic adaptive split-tone grading tool for existing dark engravings. _Done when: the tool accepts one asset/manifest, preserves dimensions/aspect/metadata policy, writes reproducible preview/final outputs, records transformation parameters/hashes, avoids double-processing, and passes golden-image metric tests._
+- [x] **EXP-007** (P1) Implement a deterministic adaptive split-tone grading tool for existing dark engravings. _Done when: the tool accepts one asset/manifest, preserves dimensions/aspect/metadata policy, writes reproducible preview/final outputs, records transformation parameters/hashes, avoids double-processing, and passes golden-image metric tests._
 - [x] **EXP-008** (P1) Grade the approved country dark-image scope without unnecessary regeneration. _Done when: only owner-approved corpus/outliers are transformed, every output meets EXP-005 thresholds, a generated before/after metric report flags exceptions, browser sampling covers all generation batches, and originals/manifest remain available._
 - [ ] **EXP-009** (P2) Regenerate only semantically or compositionally failed illustrations after grading. _Done when: each regeneration has a documented failure reason, reference contract, complete prompt/tool/version/seed where available, landmark fact-check, light/dark relation, human approval, and no color-only regeneration._
 - [ ] **EXP-010** (P0) Restore or reconstruct a complete country/page/territory illustration manifest. _Done when: all assets map to entity/route, depicted subject, caption, light/dark relationship, generation/edit history, model/tool, prompt or best available provenance, dimensions, hashes, rights/disclosure, QA status, and any irrecoverable provenance gap._

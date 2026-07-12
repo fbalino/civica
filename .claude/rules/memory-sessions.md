@@ -734,3 +734,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Adopted the owner-approved Japan light reference and strength-60 dark grade as `civica-engraving-color/v1`.
 - Added exact asset hashes, measurable tone/saturation/warmth/contrast ranges, line/geometry and landmark invariants, delivery rules, and too-warm/too-cool/style/outlier examples.
 - Added a machine contract and validator, chained through the editorial-illustration build gate.
+
+## 2026-07-12 — EXP-007 engraving grader completed
+
+- Productionized the approved grade as `civica-engraving-grade/1.0.0` with single-file and manifest CLI modes.
+- Every preview/final output receives a parameter/hash/geometry/metric sidecar; exact reruns are no-writes and graded inputs are rejected.
+- Golden hash/metric, geometry, repeatability, manifest, and double-processing tests run in the editorial-illustration build gate.
