@@ -12,7 +12,10 @@ import {
   type DomainSourceInput,
 } from "../src/lib/provenance/domain-coverage";
 
-const OUTPUT = resolve(process.cwd(), "src/lib/provenance/domain-coverage.generated.json");
+const OUTPUT = resolve(
+  process.cwd(),
+  "src/lib/provenance/domain-coverage.generated.json",
+);
 const threshold = {
   countryCoverageWarnBelow: 80,
   fieldCompletenessWarnBelow: 80,
@@ -30,14 +33,78 @@ const iso = (value: string | null) => {
   return new Date(normalized).toISOString();
 };
 const latest = (values: Array<string | null>) =>
-  values.filter((value): value is string => Boolean(value)).sort().at(-1) ?? null;
+  values
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? null;
 
 async function collect(generatedAt: string) {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
   const sql = neon(process.env.DATABASE_URL);
-  const [eligibleRows, sourceRows, electionRows, constitutionRows, officeRows, peopleRows, partyRows, organizationRows, billRows, indicatorRows, portraitRows, sovereignRows] = await Promise.all([
+  const [
+    eligibleRows,
+    sourceRows,
+    jurisdictionRows,
+    factRows,
+    bodyRows,
+    legislatureRows,
+    citationRows,
+    electionRows,
+    constitutionRows,
+    officeRows,
+    peopleRows,
+    partyRows,
+    organizationRows,
+    billRows,
+    indicatorRows,
+    portraitRows,
+    sovereignRows,
+  ] = await Promise.all([
     sql`SELECT COUNT(*)::int AS count FROM jurisdictions WHERE type = 'sovereign_state'`,
     sql`SELECT id, name, last_sync_at::text AS "lastSuccessfulRun" FROM sources ORDER BY id`,
+    sql`SELECT COUNT(*)::int records, COUNT(*)::int jurisdictions,
+               COUNT(status_source_ids)::int status_sources, COUNT(status_reviewed_at)::int status_reviewed,
+               COUNT(status_note)::int status_notes, COUNT(slug)::int slugs,
+               MAX(status_reviewed_at)::text AS status_last_reviewed
+        FROM jurisdictions WHERE type='sovereign_state'`,
+    sql`SELECT COUNT(*)::int records, COUNT(DISTINCT cf.jurisdiction_id)::int jurisdictions,
+               COUNT(cf.source_id)::int source_ids,
+               COUNT(*) FILTER (WHERE cf.value_status <> 'observed' OR cf.fact_value IS NOT NULL OR cf.fact_value_numeric IS NOT NULL OR cf.value_json IS NOT NULL)::int states,
+               COUNT(cf.as_of)::int as_of_dates
+        FROM country_facts cf JOIN jurisdictions j ON j.id=cf.jurisdiction_id
+        WHERE j.type='sovereign_state' AND cf.status='active'`,
+    sql`SELECT COUNT(*)::int records, COUNT(DISTINCT b.jurisdiction_id)::int jurisdictions,
+               COUNT(b.name)::int names, COUNT(b.body_type)::int types,
+               COUNT(b.branch)::int branches, COUNT(b.hierarchy_level)::int hierarchy
+        FROM government_bodies b JOIN jurisdictions j ON j.id=b.jurisdiction_id
+        WHERE j.type='sovereign_state'`,
+    sql`SELECT COUNT(*)::int records, COUNT(DISTINCT b.jurisdiction_id)::int jurisdictions,
+               COUNT(b.name)::int names, COUNT(b.chamber_type)::int chamber_types,
+               COUNT(b.total_seats)::int total_seats,
+               COUNT(b.electoral_system_family)::int electoral_systems
+        FROM government_bodies b JOIN jurisdictions j ON j.id=b.jurisdiction_id
+        WHERE j.type='sovereign_state' AND b.branch='legislative'`,
+    sql`WITH linked AS (
+          SELECT s.id, s.source_id, s.source_url, s.source_license, s.retrieved_at, s.source_hash, j.id jurisdiction_id
+          FROM statements s JOIN jurisdictions j ON s.subject_table='jurisdictions' AND s.subject_id=j.id
+          UNION ALL
+          SELECT s.id, s.source_id, s.source_url, s.source_license, s.retrieved_at, s.source_hash, b.jurisdiction_id
+          FROM statements s JOIN government_bodies b ON s.subject_table='government_bodies' AND s.subject_id=b.id
+          UNION ALL
+          SELECT s.id, s.source_id, s.source_url, s.source_license, s.retrieved_at, s.source_hash, e.jurisdiction_id
+          FROM statements s JOIN elections e ON s.subject_table='elections' AND s.subject_id=e.id
+          UNION ALL
+          SELECT s.id, s.source_id, s.source_url, s.source_license, s.retrieved_at, s.source_hash, c.jurisdiction_id
+          FROM statements s JOIN constitutions c ON s.subject_table='constitutions' AND s.subject_id=c.id
+          UNION ALL
+          SELECT s.id, s.source_id, s.source_url, s.source_license, s.retrieved_at, s.source_hash, b.jurisdiction_id
+          FROM statements s JOIN terms t ON s.subject_table='terms' AND s.subject_id=t.id
+          JOIN offices o ON o.id=t.office_id JOIN government_bodies b ON b.id=o.body_id
+        ) SELECT COUNT(*)::int records, COUNT(DISTINCT l.jurisdiction_id)::int jurisdictions,
+                 COUNT(l.source_id)::int source_ids, COUNT(l.source_url)::int urls,
+                 COUNT(l.source_license)::int licenses, COUNT(l.retrieved_at)::int retrieved,
+                 COUNT(l.source_hash)::int hashes
+          FROM linked l JOIN jurisdictions j ON j.id=l.jurisdiction_id WHERE j.type='sovereign_state'`,
     sql`SELECT COUNT(*)::int records, COUNT(DISTINCT e.jurisdiction_id)::int jurisdictions,
                COUNT(e.election_date)::int dates, COUNT(e.election_type)::int types,
                COUNT(e.turnout_percent)::int turnout
@@ -94,76 +161,611 @@ async function collect(generatedAt: string) {
     lastSuccessfulRun: iso(row.lastSuccessfulRun),
   }));
   const sourceMap = new Map(sources.map((row) => [row.id, row]));
-  const source = (ids: string[]): DomainSourceInput[] => ids.map((id) => {
-    const row = sourceMap.get(id);
-    return { id, label: row?.name ?? id, family: id, lastSuccessfulRun: row?.lastSuccessfulRun ?? null };
-  });
-  const sourceLast = (rows: DomainSourceInput[]) => latest(rows.map((row) => row.lastSuccessfulRun));
+  const source = (ids: string[]): DomainSourceInput[] =>
+    ids.map((id) => {
+      const row = sourceMap.get(id);
+      return {
+        id,
+        label: row?.name ?? id,
+        family: id,
+        lastSuccessfulRun: row?.lastSuccessfulRun ?? null,
+      };
+    });
+  const sourceLast = (rows: DomainSourceInput[]) =>
+    latest(rows.map((row) => row.lastSuccessfulRun));
   const one = (rows: unknown[]) => (rows[0] ?? {}) as CountRow;
-  const e = one(electionRows); const c = one(constitutionRows); const o = one(officeRows);
-  const p = one(peopleRows); const pa = one(partyRows); const org = one(organizationRows);
-  const b = one(billRows); const i = one(indicatorRows); const portrait = one(portraitRows);
+  const jur = one(jurisdictionRows);
+  const f = one(factRows);
+  const body = one(bodyRows);
+  const leg = one(legislatureRows);
+  const citation = one(citationRows);
+  const e = one(electionRows);
+  const c = one(constitutionRows);
+  const o = one(officeRows);
+  const p = one(peopleRows);
+  const pa = one(partyRows);
+  const org = one(organizationRows);
+  const b = one(billRows);
+  const i = one(indicatorRows);
+  const portrait = one(portraitRows);
 
-  const sovereignIso3 = new Set((sovereignRows as Array<{ iso3: string }>).map((row) => row.iso3));
-  const galleryRows = Object.entries(galleries.galleries).filter(([iso3]) => sovereignIso3.has(iso3));
+  const sovereignIso3 = new Set(
+    (sovereignRows as Array<{ iso3: string }>).map((row) => row.iso3),
+  );
+  const galleryRows = Object.entries(galleries.galleries).filter(([iso3]) =>
+    sovereignIso3.has(iso3),
+  );
   const galleryPhotos = galleryRows.flatMap(([, gallery]) => gallery.photos);
-  const galleryJurisdictions = galleryRows.filter(([, gallery]) => gallery.photos.length > 0).length;
-  const galleryAttributed = galleryPhotos.filter((photo) => photo.license).length;
+  const galleryJurisdictions = galleryRows.filter(
+    ([, gallery]) => gallery.photos.length > 0,
+  ).length;
+  const galleryAttributed = galleryPhotos.filter(
+    (photo) => photo.license,
+  ).length;
   const galleryRun = iso(galleries._meta.fetchedAt);
 
-  const electionSources = source(["ipu_parline", "wikidata", "international_idea"]);
+  const electionSources = source([
+    "ipu_parline",
+    "wikidata",
+    "international_idea",
+  ]);
+  const jurisdictionSources: DomainSourceInput[] = [
+    {
+      id: "jurisdiction_status_catalog",
+      label: "Civica jurisdiction-status catalog",
+      family: "reviewed_curation",
+      lastSuccessfulRun: iso(
+        jur.status_last_reviewed == null
+          ? null
+          : String(jur.status_last_reviewed),
+      ),
+    },
+  ];
+  const bodySources = source(["cia_world_leaders", "wikidata", "ipu_parline"]);
+  const legislatureSources = source(["ipu_parline", "wikidata"]);
   const constitutionSources = source(["constitute_project"]);
-  const officeSources = source(["cia_world_leaders", "wikidata", "ipu_parline"]);
-  const peopleSources = source(["cia_world_leaders", "wikidata", "ipu_parline"]);
+  const officeSources = source([
+    "cia_world_leaders",
+    "wikidata",
+    "ipu_parline",
+  ]);
+  const peopleSources = source([
+    "cia_world_leaders",
+    "wikidata",
+    "ipu_parline",
+  ]);
   const partySources = source(["ipu_parline", "wikidata", "vparty"]);
-  const billSourceIds = (await sql`SELECT DISTINCT b.source_id AS id FROM bills b JOIN jurisdictions j ON j.id=b.jurisdiction_id WHERE j.type='sovereign_state' ORDER BY b.source_id`) as Array<{ id: string }>;
+  const billSourceIds =
+    (await sql`SELECT DISTINCT b.source_id AS id FROM bills b JOIN jurisdictions j ON j.id=b.jurisdiction_id WHERE j.type='sovereign_state' ORDER BY b.source_id`) as Array<{
+      id: string;
+    }>;
   const billSources = source(billSourceIds.map((row) => row.id));
-  const indicatorSourceIds = (await sql`SELECT DISTINCT source_id AS id FROM (SELECT cm.source_id FROM country_metrics cm JOIN jurisdictions j ON j.id=cm.jurisdiction_id WHERE j.type='sovereign_state' UNION SELECT ih.source_id FROM indicator_history ih JOIN jurisdictions j ON j.id=ih.jurisdiction_id WHERE j.type='sovereign_state') x ORDER BY id`) as Array<{ id: string }>;
+  const indicatorSourceIds =
+    (await sql`SELECT DISTINCT source_id AS id FROM (SELECT cm.source_id FROM country_metrics cm JOIN jurisdictions j ON j.id=cm.jurisdiction_id WHERE j.type='sovereign_state' UNION SELECT ih.source_id FROM indicator_history ih JOIN jurisdictions j ON j.id=ih.jurisdiction_id WHERE j.type='sovereign_state') x ORDER BY id`) as Array<{
+      id: string;
+    }>;
   const indicatorSources = source(indicatorSourceIds.map((row) => row.id));
+  const factSourceIds =
+    (await sql`SELECT DISTINCT cf.source_id AS id FROM country_facts cf JOIN jurisdictions j ON j.id=cf.jurisdiction_id WHERE j.type='sovereign_state' AND cf.status='active' ORDER BY cf.source_id`) as Array<{
+      id: string;
+    }>;
+  const factSources = source(factSourceIds.map((row) => row.id));
+  const citationSourceIds =
+    (await sql`SELECT DISTINCT source_id AS id FROM statements ORDER BY source_id`) as Array<{
+      id: string;
+    }>;
+  const citationSources = source(citationSourceIds.map((row) => row.id));
   const imageSources: DomainSourceInput[] = [
-    { id: "wikimedia_commons_galleries", label: "Wikimedia Commons country galleries", family: "wikimedia_commons", lastSuccessfulRun: galleryRun },
+    {
+      id: "wikimedia_commons_galleries",
+      label: "Wikimedia Commons country galleries",
+      family: "wikimedia_commons",
+      lastSuccessfulRun: galleryRun,
+    },
     ...source(["wikidata"]),
   ];
-  const organizationsSources: DomainSourceInput[] = [{ id: "civica_curated_organizations", label: "Civica curated organization seed", family: "manual_curation", lastSuccessfulRun: null }];
+  const organizationsSources: DomainSourceInput[] = [
+    {
+      id: "civica_curated_organizations",
+      label: "Civica curated organization seed",
+      family: "manual_curation",
+      lastSuccessfulRun: null,
+    },
+  ];
 
   const domains: DomainCoverageInput[] = [
-    { id: "elections", label: "Elections", recordLabel: "election records", recordCount: n(e,"records"), jurisdictionsCovered: n(e,"jurisdictions"), completeness: [
-      { field:"election_date",label:"Election date",complete:n(e,"dates"),total:n(e,"records") }, { field:"election_type",label:"Election type",complete:n(e,"types"),total:n(e,"records") }, { field:"turnout_percent",label:"Turnout",complete:n(e,"turnout"),total:n(e,"records") },
-    ], sources:electionSources,lastSuccessfulRun:sourceLast(electionSources),knownGaps:["Presidential, legislative, and turnout coverage have different publisher scopes; a jurisdiction count does not imply every election type or result field is present."],threshold },
-    { id:"constitutions",label:"Constitutions",recordLabel:"constitution records",recordCount:n(c,"records"),jurisdictionsCovered:n(c,"jurisdictions"),completeness:[
-      {field:"year",label:"Adoption year",complete:n(c,"years"),total:n(c,"records")},{field:"full_text_html",label:"Full text",complete:n(c,"texts"),total:n(c,"records")},{field:"structured_articles",label:"Structured articles",complete:n(c,"structured"),total:n(c,"records")},
-    ],sources:constitutionSources,lastSuccessfulRun:latest([sourceLast(constitutionSources), ...((constitutionRows as CountRow[]).map(()=>null))]),knownGaps:["Constitute coverage and reuse terms limit the corpus; structured topic extraction is available only where parsable source HTML was retained."],threshold},
-    { id:"offices",label:"Offices",recordLabel:"office records",recordCount:n(o,"records"),jurisdictionsCovered:n(o,"jurisdictions"),completeness:[
-      {field:"name",label:"Office name",complete:n(o,"names"),total:n(o,"records")},{field:"office_type",label:"Office type",complete:n(o,"types"),total:n(o,"records")},{field:"wikidata_qid",label:"Wikidata identifier",complete:n(o,"qids"),total:n(o,"records")},
-    ],sources:officeSources,lastSuccessfulRun:sourceLast(officeSources),knownGaps:["Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office."],threshold},
-    { id:"people",label:"People",recordLabel:"person records",recordCount:n(p,"records"),jurisdictionsCovered:n(p,"jurisdictions"),completeness:[
-      {field:"wikidata_qid",label:"Wikidata identifier",complete:n(p,"qids"),total:n(p,"records")},{field:"date_of_birth",label:"Date of birth",complete:n(p,"births"),total:n(p,"records")},
-    ],sources:peopleSources,lastSuccessfulRun:sourceLast(peopleSources),knownGaps:["The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent."],threshold},
-    { id:"parties",label:"Parties",recordLabel:"legislature-party records",recordCount:n(pa,"records"),jurisdictionsCovered:n(pa,"jurisdictions"),completeness:[
-      {field:"seat_count",label:"Seat count",complete:n(pa,"seats"),total:n(pa,"records")},{field:"wikidata_qid",label:"Wikidata identifier",complete:n(pa,"qids"),total:n(pa,"records")},
-    ],sources:partySources,lastSuccessfulRun:sourceLast(partySources),knownGaps:["Party rows are legislature snapshots rather than a global party registry; V-Party positions cover only confidently matched parties in its frozen vintage."],threshold},
-    { id:"organizations",label:"Organizations",recordLabel:"organization records",recordCount:n(org,"records"),jurisdictionsCovered:n(org,"jurisdictions"),completeness:[
-      {field:"wikidata_qid",label:"Wikidata identifier",complete:n(org,"qids"),total:n(org,"records")},{field:"founded_year",label:"Founded year",complete:n(org,"founded"),total:n(org,"records")},{field:"member_count",label:"Member count",complete:n(org,"member_counts"),total:n(org,"records")},
-    ],sources:organizationsSources,lastSuccessfulRun:null,knownGaps:["Organization memberships are a manually curated seed without a registered successful-run timestamp or complete source-level provenance; the alert remains open until that pipeline is replaced."],threshold},
-    { id:"bills",label:"Bills",recordLabel:"bill records",recordCount:n(b,"records"),jurisdictionsCovered:n(b,"jurisdictions"),completeness:[
-      {field:"url",label:"Source URL",complete:n(b,"urls"),total:n(b,"records")},{field:"raw_status",label:"Publisher status",complete:n(b,"statuses"),total:n(b,"records")},{field:"introduced_date",label:"Introduction date",complete:n(b,"introduced"),total:n(b,"records")},
-    ],sources:billSources,lastSuccessfulRun:sourceLast(billSources),knownGaps:["Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers."],threshold},
-    { id:"indicators",label:"Indicators",recordLabel:"indicator observations",recordCount:n(i,"records"),jurisdictionsCovered:n(i,"jurisdictions"),completeness:[
-      {field:"source_id",label:"Source identifier",complete:n(i,"sources"),total:n(i,"records")},{field:"value_state",label:"Valid value or absence state",complete:n(i,"states"),total:n(i,"records")},
-    ],sources:indicatorSources,lastSuccessfulRun:sourceLast(indicatorSources),knownGaps:["This combines Atlas country metrics and research indicator history; source vintages and product eligibility differ, and presence does not imply inclusion in the Civica Index."],threshold},
-    { id:"images",label:"Images",recordLabel:"country photos and person portraits",recordCount:galleryPhotos.length+n(portrait,"portraits"),jurisdictionsCovered:galleryJurisdictions,completeness:[
-      {field:"country_photo_license",label:"Country photo license metadata",complete:galleryAttributed,total:galleryPhotos.length},{field:"portrait_attribution",label:"Portrait license and credit",complete:n(portrait,"attributed"),total:n(portrait,"portraits")},
-    ],sources:imageSources,lastSuccessfulRun:sourceLast(imageSources),knownGaps:["Country coverage counts jurisdictions with at least one gallery photo; person portraits are reported as a separate completeness metric and do not expand the country-photo denominator."],threshold},
+    {
+      id: "jurisdictions",
+      label: "Countries and entities",
+      recordLabel: "sovereign-state jurisdiction records",
+      recordCount: n(jur, "records"),
+      jurisdictionsCovered: n(jur, "jurisdictions"),
+      completeness: [
+        {
+          field: "slug",
+          label: "Stable slug",
+          complete: n(jur, "slugs"),
+          total: n(jur, "records"),
+        },
+        {
+          field: "status_source_ids",
+          label: "Status source ids",
+          complete: n(jur, "status_sources"),
+          total: n(jur, "records"),
+        },
+        {
+          field: "status_reviewed_at",
+          label: "Status reviewed date",
+          complete: n(jur, "status_reviewed"),
+          total: n(jur, "records"),
+        },
+        {
+          field: "status_note",
+          label: "Status note",
+          complete: n(jur, "status_notes"),
+          total: n(jur, "records"),
+        },
+      ],
+      sources: jurisdictionSources,
+      lastSuccessfulRun: sourceLast(jurisdictionSources),
+      knownGaps: [
+        "The headline denominator is the closed sovereign_state class; dependencies, territories, associated states, limited-recognition entities, disputed areas, special entities, and aggregates remain in the full 253-row identity catalog but outside this coverage rate.",
+      ],
+      threshold,
+    },
+    {
+      id: "facts",
+      label: "Canonical facts",
+      recordLabel: "active source-fact observations",
+      recordCount: n(f, "records"),
+      jurisdictionsCovered: n(f, "jurisdictions"),
+      completeness: [
+        {
+          field: "source_id",
+          label: "Source identifier",
+          complete: n(f, "source_ids"),
+          total: n(f, "records"),
+        },
+        {
+          field: "value_state",
+          label: "Valid value or absence state",
+          complete: n(f, "states"),
+          total: n(f, "records"),
+        },
+        {
+          field: "as_of",
+          label: "Observation/reference date",
+          complete: n(f, "as_of_dates"),
+          total: n(f, "records"),
+        },
+      ],
+      sources: factSources,
+      lastSuccessfulRun: sourceLast(factSources),
+      knownGaps: [
+        "Record presence is not equivalent to canonical selection or independent corroboration; the separate fact-provenance report measures resolver support, source depth, disputes, and staleness by fact key.",
+      ],
+      threshold,
+    },
+    {
+      id: "government_bodies",
+      label: "Government bodies",
+      recordLabel: "government-body records",
+      recordCount: n(body, "records"),
+      jurisdictionsCovered: n(body, "jurisdictions"),
+      completeness: [
+        {
+          field: "name",
+          label: "Body name",
+          complete: n(body, "names"),
+          total: n(body, "records"),
+        },
+        {
+          field: "body_type",
+          label: "Body type",
+          complete: n(body, "types"),
+          total: n(body, "records"),
+        },
+        {
+          field: "branch",
+          label: "Government branch",
+          complete: n(body, "branches"),
+          total: n(body, "records"),
+        },
+        {
+          field: "hierarchy_level",
+          label: "Hierarchy level",
+          complete: n(body, "hierarchy"),
+          total: n(body, "records"),
+        },
+      ],
+      sources: bodySources,
+      lastSuccessfulRun: sourceLast(bodySources),
+      knownGaps: [
+        "Coverage counts any stored body and does not establish that every constitutional branch, subnational body, or reporting relationship is complete.",
+      ],
+      threshold,
+    },
+    {
+      id: "elections",
+      label: "Elections",
+      recordLabel: "election records",
+      recordCount: n(e, "records"),
+      jurisdictionsCovered: n(e, "jurisdictions"),
+      completeness: [
+        {
+          field: "election_date",
+          label: "Election date",
+          complete: n(e, "dates"),
+          total: n(e, "records"),
+        },
+        {
+          field: "election_type",
+          label: "Election type",
+          complete: n(e, "types"),
+          total: n(e, "records"),
+        },
+        {
+          field: "turnout_percent",
+          label: "Turnout",
+          complete: n(e, "turnout"),
+          total: n(e, "records"),
+        },
+      ],
+      sources: electionSources,
+      lastSuccessfulRun: sourceLast(electionSources),
+      knownGaps: [
+        "Presidential, legislative, and turnout coverage have different publisher scopes; a jurisdiction count does not imply every election type or result field is present.",
+      ],
+      threshold,
+    },
+    {
+      id: "constitutions",
+      label: "Constitutions",
+      recordLabel: "constitution records",
+      recordCount: n(c, "records"),
+      jurisdictionsCovered: n(c, "jurisdictions"),
+      completeness: [
+        {
+          field: "year",
+          label: "Adoption year",
+          complete: n(c, "years"),
+          total: n(c, "records"),
+        },
+        {
+          field: "full_text_html",
+          label: "Full text",
+          complete: n(c, "texts"),
+          total: n(c, "records"),
+        },
+        {
+          field: "structured_articles",
+          label: "Structured articles",
+          complete: n(c, "structured"),
+          total: n(c, "records"),
+        },
+      ],
+      sources: constitutionSources,
+      lastSuccessfulRun: latest([
+        sourceLast(constitutionSources),
+        ...(constitutionRows as CountRow[]).map(() => null),
+      ]),
+      knownGaps: [
+        "Constitute coverage and reuse terms limit the corpus; structured topic extraction is available only where parsable source HTML was retained.",
+      ],
+      threshold,
+    },
+    {
+      id: "offices",
+      label: "Offices",
+      recordLabel: "office records",
+      recordCount: n(o, "records"),
+      jurisdictionsCovered: n(o, "jurisdictions"),
+      completeness: [
+        {
+          field: "name",
+          label: "Office name",
+          complete: n(o, "names"),
+          total: n(o, "records"),
+        },
+        {
+          field: "office_type",
+          label: "Office type",
+          complete: n(o, "types"),
+          total: n(o, "records"),
+        },
+        {
+          field: "wikidata_qid",
+          label: "Wikidata identifier",
+          complete: n(o, "qids"),
+          total: n(o, "records"),
+        },
+      ],
+      sources: officeSources,
+      lastSuccessfulRun: sourceLast(officeSources),
+      knownGaps: [
+        "Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office.",
+      ],
+      threshold,
+    },
+    {
+      id: "people",
+      label: "People",
+      recordLabel: "person records",
+      recordCount: n(p, "records"),
+      jurisdictionsCovered: n(p, "jurisdictions"),
+      completeness: [
+        {
+          field: "wikidata_qid",
+          label: "Wikidata identifier",
+          complete: n(p, "qids"),
+          total: n(p, "records"),
+        },
+        {
+          field: "date_of_birth",
+          label: "Date of birth",
+          complete: n(p, "births"),
+          total: n(p, "records"),
+        },
+      ],
+      sources: peopleSources,
+      lastSuccessfulRun: sourceLast(peopleSources),
+      knownGaps: [
+        "The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent.",
+      ],
+      threshold,
+    },
+    {
+      id: "legislatures",
+      label: "Legislatures",
+      recordLabel: "legislative-body records",
+      recordCount: n(leg, "records"),
+      jurisdictionsCovered: n(leg, "jurisdictions"),
+      completeness: [
+        {
+          field: "name",
+          label: "Chamber name",
+          complete: n(leg, "names"),
+          total: n(leg, "records"),
+        },
+        {
+          field: "chamber_type",
+          label: "Chamber type",
+          complete: n(leg, "chamber_types"),
+          total: n(leg, "records"),
+        },
+        {
+          field: "total_seats",
+          label: "Total seats",
+          complete: n(leg, "total_seats"),
+          total: n(leg, "records"),
+        },
+        {
+          field: "electoral_system_family",
+          label: "Electoral-system family",
+          complete: n(leg, "electoral_systems"),
+          total: n(leg, "records"),
+        },
+      ],
+      sources: legislatureSources,
+      lastSuccessfulRun: sourceLast(legislatureSources),
+      knownGaps: [
+        "A stored legislative body does not guarantee current party composition, electoral-system detail, upper-chamber coverage, or an independently verified total-seat count.",
+      ],
+      threshold,
+    },
+    {
+      id: "parties",
+      label: "Parties",
+      recordLabel: "legislature-party records",
+      recordCount: n(pa, "records"),
+      jurisdictionsCovered: n(pa, "jurisdictions"),
+      completeness: [
+        {
+          field: "seat_count",
+          label: "Seat count",
+          complete: n(pa, "seats"),
+          total: n(pa, "records"),
+        },
+        {
+          field: "wikidata_qid",
+          label: "Wikidata identifier",
+          complete: n(pa, "qids"),
+          total: n(pa, "records"),
+        },
+      ],
+      sources: partySources,
+      lastSuccessfulRun: sourceLast(partySources),
+      knownGaps: [
+        "Party rows are legislature snapshots rather than a global party registry; V-Party positions cover only confidently matched parties in its frozen vintage.",
+      ],
+      threshold,
+    },
+    {
+      id: "organizations",
+      label: "Organizations",
+      recordLabel: "organization records",
+      recordCount: n(org, "records"),
+      jurisdictionsCovered: n(org, "jurisdictions"),
+      completeness: [
+        {
+          field: "wikidata_qid",
+          label: "Wikidata identifier",
+          complete: n(org, "qids"),
+          total: n(org, "records"),
+        },
+        {
+          field: "founded_year",
+          label: "Founded year",
+          complete: n(org, "founded"),
+          total: n(org, "records"),
+        },
+        {
+          field: "member_count",
+          label: "Member count",
+          complete: n(org, "member_counts"),
+          total: n(org, "records"),
+        },
+      ],
+      sources: organizationsSources,
+      lastSuccessfulRun: null,
+      knownGaps: [
+        "Organization memberships are a manually curated seed without a registered successful-run timestamp or complete source-level provenance; the alert remains open until that pipeline is replaced.",
+      ],
+      threshold,
+    },
+    {
+      id: "bills",
+      label: "Bills",
+      recordLabel: "bill records",
+      recordCount: n(b, "records"),
+      jurisdictionsCovered: n(b, "jurisdictions"),
+      completeness: [
+        {
+          field: "url",
+          label: "Source URL",
+          complete: n(b, "urls"),
+          total: n(b, "records"),
+        },
+        {
+          field: "raw_status",
+          label: "Publisher status",
+          complete: n(b, "statuses"),
+          total: n(b, "records"),
+        },
+        {
+          field: "introduced_date",
+          label: "Introduction date",
+          complete: n(b, "introduced"),
+          total: n(b, "records"),
+        },
+      ],
+      sources: billSources,
+      lastSuccessfulRun: sourceLast(billSources),
+      knownGaps: [
+        "Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers.",
+      ],
+      threshold,
+    },
+    {
+      id: "indicators",
+      label: "Indicators",
+      recordLabel: "indicator observations",
+      recordCount: n(i, "records"),
+      jurisdictionsCovered: n(i, "jurisdictions"),
+      completeness: [
+        {
+          field: "source_id",
+          label: "Source identifier",
+          complete: n(i, "sources"),
+          total: n(i, "records"),
+        },
+        {
+          field: "value_state",
+          label: "Valid value or absence state",
+          complete: n(i, "states"),
+          total: n(i, "records"),
+        },
+      ],
+      sources: indicatorSources,
+      lastSuccessfulRun: sourceLast(indicatorSources),
+      knownGaps: [
+        "This combines Atlas country metrics and research indicator history; source vintages and product eligibility differ, and presence does not imply inclusion in the Civica Index.",
+      ],
+      threshold,
+    },
+    {
+      id: "images",
+      label: "Images",
+      recordLabel: "country photos and person portraits",
+      recordCount: galleryPhotos.length + n(portrait, "portraits"),
+      jurisdictionsCovered: galleryJurisdictions,
+      completeness: [
+        {
+          field: "country_photo_license",
+          label: "Country photo license metadata",
+          complete: galleryAttributed,
+          total: galleryPhotos.length,
+        },
+        {
+          field: "portrait_attribution",
+          label: "Portrait license and credit",
+          complete: n(portrait, "attributed"),
+          total: n(portrait, "portraits"),
+        },
+      ],
+      sources: imageSources,
+      lastSuccessfulRun: sourceLast(imageSources),
+      knownGaps: [
+        "Country coverage counts jurisdictions with at least one gallery photo; person portraits are reported as a separate completeness metric and do not expand the country-photo denominator.",
+      ],
+      threshold,
+    },
+    {
+      id: "citations",
+      label: "Statement citations",
+      recordLabel: "statement-level provenance records",
+      recordCount: n(citation, "records"),
+      jurisdictionsCovered: n(citation, "jurisdictions"),
+      completeness: [
+        {
+          field: "source_id",
+          label: "Source identifier",
+          complete: n(citation, "source_ids"),
+          total: n(citation, "records"),
+        },
+        {
+          field: "source_url",
+          label: "Source URL",
+          complete: n(citation, "urls"),
+          total: n(citation, "records"),
+        },
+        {
+          field: "source_license",
+          label: "Captured source license",
+          complete: n(citation, "licenses"),
+          total: n(citation, "records"),
+        },
+        {
+          field: "retrieved_at",
+          label: "Retrieval time",
+          complete: n(citation, "retrieved"),
+          total: n(citation, "records"),
+        },
+        {
+          field: "source_hash",
+          label: "Source hash",
+          complete: n(citation, "hashes"),
+          total: n(citation, "records"),
+        },
+      ],
+      sources: citationSources,
+      lastSuccessfulRun: sourceLast(citationSources),
+      knownGaps: [
+        "Statement rows currently cover the closed polymorphic subject set only; canonical country facts use their own row-level provenance and are measured separately rather than being double-counted here.",
+      ],
+      threshold,
+    },
   ];
-  return buildDomainCoverageReport({ generatedAt, eligibleJurisdictions: eligible, domains });
+  return buildDomainCoverageReport({
+    generatedAt,
+    eligibleJurisdictions: eligible,
+    domains,
+  });
 }
 
 async function main() {
   const check = process.argv.includes("--check");
-  const checked = check ? JSON.parse(readFileSync(OUTPUT, "utf8")) as DomainCoverageReport : null;
-  const report = await collect(checked?.generatedAt ?? new Date().toISOString());
+  const checked = check
+    ? (JSON.parse(readFileSync(OUTPUT, "utf8")) as DomainCoverageReport)
+    : null;
+  const report = await collect(
+    checked?.generatedAt ?? new Date().toISOString(),
+  );
   if (check) {
-    if (JSON.stringify(report) !== JSON.stringify(checked)) throw new Error("live domain coverage differs from the checked report; regenerate and review it");
+    if (JSON.stringify(report) !== JSON.stringify(checked))
+      throw new Error(
+        "live domain coverage differs from the checked report; regenerate and review it",
+      );
     console.log("PASS — live domain coverage matches the checked report.");
     return;
   }
@@ -172,4 +774,7 @@ async function main() {
   console.log(JSON.stringify(report.summary));
 }
 
-main().catch((error) => { console.error(error); process.exit(1); });
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

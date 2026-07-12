@@ -941,3 +941,19 @@ from bulk release; redistribution follows row/source rights, never UI presence.
 its failure state, or whether the same data belongs in a frozen package. A
 checked matrix makes those boundaries reviewable and gives later coverage and
 state-repair tasks a stable inventory instead of another ad hoc audit.
+
+### APR-D156 — Atlas domain minimums disclose rather than erase weak coverage
+
+**Decision:** Expand `atlas-domain-coverage/v1` to 14 closed domains and apply
+one auditable operational floor: warn below 80 percent jurisdiction coverage,
+below 80 percent completeness for any measured field, after 180 days without a
+successful run, or when a domain/source run time is unknown. Every row derives
+a minimums standing and the public behavior
+`publish_with_coverage_status_and_known_gaps`. Below-threshold records may
+remain available subject to rights, but the domain cannot be called complete.
+
+**Why:** Removing sparse domains would make the report look healthier while
+concealing the exact gaps readers need to judge. A shared floor makes drift
+visible across very different datasets without pretending the threshold is a
+scientific validity result. Export rights and experimental-product gates remain
+separate decisions.

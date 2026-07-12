@@ -1866,7 +1866,7 @@
         }
       ],
       "storage": [
-        "generated nine-domain operational coverage artifact"
+        "generated fourteen-domain operational coverage artifact"
       ],
       "fields": [
         "domain",
@@ -1879,7 +1879,7 @@
         "The checked report binds source and freshness evidence for each operational domain."
       ],
       "coverage": [
-        "Elections, constitutions, offices, people, parties, organizations, bills, indicators, and images."
+        "Countries/entities, canonical facts, government bodies, offices, people, legislatures, parties, elections, constitutions, organizations, bills, indicators, images, and statement citations."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
@@ -1899,5 +1899,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "6e9292210f6d6981e2dd9144b9ff12732a7fc1b20c1c708a365be33b1acd2a7f"
+  "semanticSha256": "d77500cdc573ed0348667fd90fad35544eb192a7321fc86d34bcb74c0cc9d67d"
 }

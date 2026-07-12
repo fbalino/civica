@@ -643,7 +643,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
         file: "src/lib/provenance/domain-coverage.generated.json",
       },
     ],
-    storage: ["generated nine-domain operational coverage artifact"],
+    storage: ["generated fourteen-domain operational coverage artifact"],
     fields: [
       "domain",
       "covered jurisdictions",
@@ -655,7 +655,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "The checked report binds source and freshness evidence for each operational domain.",
     ],
     coverage: [
-      "Elections, constitutions, offices, people, parties, organizations, bills, indicators, and images.",
+      "Countries/entities, canonical facts, government bodies, offices, people, legislatures, parties, elections, constitutions, organizations, bills, indicators, images, and statement citations.",
     ],
     states: serverStates({
       empty:

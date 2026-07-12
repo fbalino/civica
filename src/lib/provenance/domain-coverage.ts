@@ -1,15 +1,20 @@
 export const DOMAIN_COVERAGE_VERSION = "atlas-domain-coverage/v1" as const;
 
 export const DOMAIN_IDS = [
-  "elections",
-  "constitutions",
+  "jurisdictions",
+  "facts",
+  "government_bodies",
   "offices",
   "people",
+  "legislatures",
   "parties",
+  "elections",
+  "constitutions",
   "organizations",
   "bills",
   "indicators",
   "images",
+  "citations",
 ] as const;
 
 export type DomainId = (typeof DOMAIN_IDS)[number];
@@ -48,15 +53,25 @@ export type DomainCoverageInput = {
 export type DomainCoverageRow = Omit<DomainCoverageInput, "completeness"> & {
   eligibleJurisdictions: number;
   countryCoveragePercent: number;
-  completeness: Array<DomainCoverageInput["completeness"][number] & {
-    percent: number;
-  }>;
+  completeness: Array<
+    DomainCoverageInput["completeness"][number] & {
+      percent: number;
+    }
+  >;
   alerts: Array<{
-    code: "country_coverage" | "field_completeness" | "stale" | "run_unknown" | "source_stale" | "source_run_unknown";
+    code:
+      | "country_coverage"
+      | "field_completeness"
+      | "stale"
+      | "run_unknown"
+      | "source_stale"
+      | "source_run_unknown";
     severity: "warning";
     message: string;
   }>;
   status: "current" | "attention";
+  releaseReadiness: "meets_declared_minimums" | "below_declared_minimums";
+  publicBehavior: "publish_with_coverage_status_and_known_gaps";
 };
 
 export type DomainCoverageReport = {
@@ -93,7 +108,10 @@ export function buildDomainCoverageReport(input: {
   if (!Number.isFinite(new Date(input.generatedAt).getTime())) {
     throw new Error("generatedAt must be an ISO date");
   }
-  if (!Number.isInteger(input.eligibleJurisdictions) || input.eligibleJurisdictions <= 0) {
+  if (
+    !Number.isInteger(input.eligibleJurisdictions) ||
+    input.eligibleJurisdictions <= 0
+  ) {
     throw new Error("eligibleJurisdictions must be a positive integer");
   }
   const ids = input.domains.map((row) => row.id);
@@ -102,83 +120,103 @@ export function buildDomainCoverageReport(input: {
     new Set(ids).size !== DOMAIN_IDS.length ||
     DOMAIN_IDS.some((id) => !ids.includes(id))
   ) {
-    throw new Error("coverage input must contain each required domain exactly once");
+    throw new Error(
+      "coverage input must contain each required domain exactly once",
+    );
   }
 
-  const domains = DOMAIN_IDS.map((id) => input.domains.find((row) => row.id === id)!)
-    .map((row): DomainCoverageRow => {
+  const domains = DOMAIN_IDS.map((id) =>
+    input.domains.find((row) => row.id === id)!,
+  ).map((row): DomainCoverageRow => {
+    if (
+      row.recordCount < 0 ||
+      row.jurisdictionsCovered < 0 ||
+      row.jurisdictionsCovered > input.eligibleJurisdictions
+    ) {
+      throw new Error(`${row.id} has invalid counts`);
+    }
+    if (!row.knownGaps.length)
+      throw new Error(`${row.id} must disclose known gaps`);
+    const completeness = row.completeness.map((metric) => {
       if (
-        row.recordCount < 0 ||
-        row.jurisdictionsCovered < 0 ||
-        row.jurisdictionsCovered > input.eligibleJurisdictions
+        metric.total < 0 ||
+        metric.complete < 0 ||
+        metric.complete > metric.total
       ) {
-        throw new Error(`${row.id} has invalid counts`);
+        throw new Error(
+          `${row.id}.${metric.field} has invalid completeness counts`,
+        );
       }
-      if (!row.knownGaps.length) throw new Error(`${row.id} must disclose known gaps`);
-      const completeness = row.completeness.map((metric) => {
-        if (metric.total < 0 || metric.complete < 0 || metric.complete > metric.total) {
-          throw new Error(`${row.id}.${metric.field} has invalid completeness counts`);
-        }
-        return { ...metric, percent: percent(metric.complete, metric.total) };
-      });
-      const countryCoveragePercent = percent(
-        row.jurisdictionsCovered,
-        input.eligibleJurisdictions,
-      );
-      const alerts: DomainCoverageRow["alerts"] = [];
-      if (countryCoveragePercent < row.threshold.countryCoverageWarnBelow) {
-        alerts.push({
-          code: "country_coverage",
-          severity: "warning",
-          message: `${row.label} covers ${countryCoveragePercent}% of eligible jurisdictions; alert threshold is ${row.threshold.countryCoverageWarnBelow}%.`,
-        });
-      }
-      for (const metric of completeness) {
-        if (metric.percent < row.threshold.fieldCompletenessWarnBelow) {
-          alerts.push({
-            code: "field_completeness",
-            severity: "warning",
-            message: `${row.label}: ${metric.label} is ${metric.percent}% complete; alert threshold is ${row.threshold.fieldCompletenessWarnBelow}%.`,
-          });
-        }
-      }
-      if (!row.lastSuccessfulRun) {
-        alerts.push({
-          code: "run_unknown",
-          severity: "warning",
-          message: `${row.label} has no recorded successful-run timestamp.`,
-        });
-      } else if (ageDays(row.lastSuccessfulRun, input.generatedAt) > row.threshold.staleAfterDays) {
-        alerts.push({
-          code: "stale",
-          severity: "warning",
-          message: `${row.label}'s last successful run is older than ${row.threshold.staleAfterDays} days.`,
-        });
-      }
-      for (const source of row.sources) {
-        if (!source.lastSuccessfulRun) {
-          alerts.push({
-            code: "source_run_unknown",
-            severity: "warning",
-            message: `${row.label}: ${source.label} has no recorded successful-run timestamp.`,
-          });
-        } else if (ageDays(source.lastSuccessfulRun, input.generatedAt) > row.threshold.staleAfterDays) {
-          alerts.push({
-            code: "source_stale",
-            severity: "warning",
-            message: `${row.label}: ${source.label} is older than ${row.threshold.staleAfterDays} days.`,
-          });
-        }
-      }
-      return {
-        ...row,
-        eligibleJurisdictions: input.eligibleJurisdictions,
-        countryCoveragePercent,
-        completeness,
-        alerts,
-        status: alerts.length ? "attention" : "current",
-      };
+      return { ...metric, percent: percent(metric.complete, metric.total) };
     });
+    const countryCoveragePercent = percent(
+      row.jurisdictionsCovered,
+      input.eligibleJurisdictions,
+    );
+    const alerts: DomainCoverageRow["alerts"] = [];
+    if (countryCoveragePercent < row.threshold.countryCoverageWarnBelow) {
+      alerts.push({
+        code: "country_coverage",
+        severity: "warning",
+        message: `${row.label} covers ${countryCoveragePercent}% of eligible jurisdictions; alert threshold is ${row.threshold.countryCoverageWarnBelow}%.`,
+      });
+    }
+    for (const metric of completeness) {
+      if (metric.percent < row.threshold.fieldCompletenessWarnBelow) {
+        alerts.push({
+          code: "field_completeness",
+          severity: "warning",
+          message: `${row.label}: ${metric.label} is ${metric.percent}% complete; alert threshold is ${row.threshold.fieldCompletenessWarnBelow}%.`,
+        });
+      }
+    }
+    if (!row.lastSuccessfulRun) {
+      alerts.push({
+        code: "run_unknown",
+        severity: "warning",
+        message: `${row.label} has no recorded successful-run timestamp.`,
+      });
+    } else if (
+      ageDays(row.lastSuccessfulRun, input.generatedAt) >
+      row.threshold.staleAfterDays
+    ) {
+      alerts.push({
+        code: "stale",
+        severity: "warning",
+        message: `${row.label}'s last successful run is older than ${row.threshold.staleAfterDays} days.`,
+      });
+    }
+    for (const source of row.sources) {
+      if (!source.lastSuccessfulRun) {
+        alerts.push({
+          code: "source_run_unknown",
+          severity: "warning",
+          message: `${row.label}: ${source.label} has no recorded successful-run timestamp.`,
+        });
+      } else if (
+        ageDays(source.lastSuccessfulRun, input.generatedAt) >
+        row.threshold.staleAfterDays
+      ) {
+        alerts.push({
+          code: "source_stale",
+          severity: "warning",
+          message: `${row.label}: ${source.label} is older than ${row.threshold.staleAfterDays} days.`,
+        });
+      }
+    }
+    return {
+      ...row,
+      eligibleJurisdictions: input.eligibleJurisdictions,
+      countryCoveragePercent,
+      completeness,
+      alerts,
+      status: alerts.length ? "attention" : "current",
+      releaseReadiness: alerts.length
+        ? "below_declared_minimums"
+        : "meets_declared_minimums",
+      publicBehavior: "publish_with_coverage_status_and_known_gaps",
+    };
+  });
 
   return {
     schemaVersion: DOMAIN_COVERAGE_VERSION,
@@ -222,6 +260,8 @@ export function validateDomainCoverageReport(report: DomainCoverageReport) {
     })),
   });
   if (JSON.stringify(rebuilt) !== JSON.stringify(report)) {
-    throw new Error("checked domain coverage report differs from its source counts or alert policy");
+    throw new Error(
+      "checked domain coverage report differs from its source counts or alert policy",
+    );
   }
 }
