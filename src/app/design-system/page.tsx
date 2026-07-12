@@ -484,6 +484,44 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp ds-comp--wide">
+              <h4>Index grid</h4>
+              <p
+                style={{
+                  margin: "0 0 var(--space-4)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-13)",
+                  color: "var(--color-text-muted)",
+                  maxWidth: "48ch",
+                }}
+              >
+                Compact auto-fill directory of links for &ldquo;browse
+                everything&rdquo; sections on landing surfaces (canonical use:
+                the /governance-evidence country index). Link-only by design —
+                never place buttons inside.
+              </p>
+              <ul className="editorial-index-grid">
+                <li>
+                  <a href="#">Andorra</a>
+                </li>
+                <li>
+                  <a href="#">Barbados</a>
+                </li>
+                <li>
+                  <a href="#">Denmark</a>
+                </li>
+                <li>
+                  <a href="#">Guyana</a>
+                </li>
+                <li>
+                  <a href="#">Japan</a>
+                </li>
+                <li>
+                  <a href="#">Vatican City</a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
               <h4>Hemicycle (canonical FactbookLegislatureChart)</h4>
               <FactbookLegislatureChart
                 chamber={SAMPLE_CHAMBER}

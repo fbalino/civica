@@ -4280,3 +4280,38 @@ a.constitution-xref-card-country:hover {
     gap: var(--space-3);
   }
 }
+
+/* ============================================================
+   Index grid — compact multi-column directory of links
+   ------------------------------------------------------------
+   For "browse everything" sections on landing surfaces (the
+   /governance-evidence country index is the canonical use). A plain
+   auto-fill grid of flag+name links; cells are link-only, so the
+   prose-anchor button guard does not apply here by design (see
+   src/lib/design/editorial-button-guard.test.ts allowlist).
+   ============================================================ */
+.editorial-index-grid {
+  list-style: none;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-1) var(--space-6);
+}
+.editorial-index-grid a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+.editorial-index-grid a:hover,
+.editorial-index-grid a:focus-visible {
+  background: var(--color-card-bg);
+  color: var(--color-accent);
+}

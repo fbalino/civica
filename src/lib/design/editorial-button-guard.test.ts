@@ -32,7 +32,7 @@ test("no other shared editorial scope colors bare anchors", () => {
   // inside them. A new scope must either carry :not(.btn) or be consciously
   // added here.
   const LINK_ONLY_SCOPES =
-    /breadcrumbs|pagination|warning|empty|caption-link|footer-nav/;
+    /breadcrumbs|pagination|warning|empty|caption-link|footer-nav|index-grid/;
   const offenders = (
     css.match(/\.(editorial|methodology)[\w-]* a(?![\w-])[^{,]*(?=[,{])/g) ?? []
   ).filter(
