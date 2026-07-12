@@ -20,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) return { title: "Country Not Found" };
   const title = `${jurisdiction.name} — Constitution, Full Text`;
   const description = `The full constitutional text of ${jurisdiction.name}, indexed article by article from the Constitute Project with topic cross-references and provenance.`;
@@ -53,7 +53,7 @@ export default async function CountryConstitutionTab({
 }) {
   const { slug } = await params;
 
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
   // getConstitutionWithArticles already soft-fails (try/catch → null) and

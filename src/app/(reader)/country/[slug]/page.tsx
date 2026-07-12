@@ -69,7 +69,7 @@ export default async function CountryFactbookTab({
 }) {
   const { slug } = await params;
 
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
   const [sections, countryOptions, headerFacts, citeSources, allSources] =

@@ -45,7 +45,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) return { title: "Country Not Found" };
   const status = jurisdiction.jurisdictionStatus;
   const title = `${jurisdiction.name} — Government & Political System`;
@@ -78,10 +78,10 @@ export default async function CountryLayout({
 }) {
   const { slug } = await params;
 
-  // .catch(() => null) collapses both "not found" and DB-down cases to a
-  // 404. Don't swallow other errors silently — let them bubble to the
-  // Next.js error boundary so they appear in logs.
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  // A DB/query failure must bubble to the error boundary (500, non-indexable),
+  // NOT be swallowed into a 404 (indexable, would de-index a real country).
+  // getJurisdictionBySlug returns null only for a genuinely absent slug. (PLT-026)
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
   // Resolver batch for the two masthead pills (Pop + GDP).
