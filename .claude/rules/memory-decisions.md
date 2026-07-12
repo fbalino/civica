@@ -1013,3 +1013,13 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   compilations, and unknown lineage cannot manufacture corroboration.
 - Selected values, alternatives, vintages, and the deterministic trace appear
   together. Durable record: APR-D158.
+
+## 2026-07-12 — Evidence confidence remains faceted
+
+- Country evidence coverage reports held and missing groups, linkage,
+  producing-family depth, freshness, disputes, and eligible multi-source
+  resolver agreement as separate properties of Civica's evidence.
+- No composite confidence score, letter grade, traffic light, or country-quality
+  judgment is calculated.
+- Dated DAT-005 snapshot metrics remain visibly separate from the current
+  DAT-006/DAT-007 resolver query. Durable record: APR-D159.

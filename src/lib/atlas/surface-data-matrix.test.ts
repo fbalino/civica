@@ -67,6 +67,7 @@ test("every declared country module and core data route is registered", () => {
   ])
     assert.ok(ids.has(`country.factbook.${id}`), id);
   for (const id of [
+    "evidence-coverage",
     "governance-evidence",
     "longitudinal",
     "government",

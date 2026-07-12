@@ -57,6 +57,58 @@
       "releaseReason": "The current export excludes bill rows."
     },
     {
+      "id": "country.civica-data.evidence-coverage",
+      "kind": "country_module",
+      "route": "/country/[slug]/civica-data",
+      "renderer": "src/components/provenance/CountryEvidenceCoverage.tsx",
+      "dataAccess": [
+        {
+          "symbol": "getCanonicalFactsForJurisdiction",
+          "file": "src/lib/factbook/reconcile/api.ts"
+        },
+        {
+          "symbol": "getAllSources",
+          "file": "src/lib/db/queries.ts"
+        }
+      ],
+      "storage": [
+        "country_facts",
+        "data_disputes",
+        "fact-coverage.generated.json",
+        "reconciliation-audit.generated.json"
+      ],
+      "fields": [
+        "held and missing supported fact groups",
+        "source linkage",
+        "producing-family depth",
+        "source freshness",
+        "unresolved disputes",
+        "current resolver agreement and selected differences"
+      ],
+      "provenance": [
+        "DAT-005 checked coverage snapshot plus the current DAT-006/DAT-007 resolver output; the view publishes no combined score or country judgment."
+      ],
+      "coverage": [
+        "The section is always present. The checked DAT-005 country row supplies coverage and missingness; an absent row and a resolver outage remain explicit states."
+      ],
+      "states": {
+        "loading": "No route-level loading state; the server response waits for the query.",
+        "empty": "A missing checked country row is named explicitly and never becomes zero coverage or a country-quality judgment.",
+        "error": "The checked snapshot remains visible while current resolver counts render an explicit unavailable state.",
+        "partial": "Independent modules may render when this row has no usable data.",
+        "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
+        "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
+        "noSource": "The module omits provenance only where the current renderer lacks source metadata."
+      },
+      "tests": [
+        "src/lib/provenance/country-evidence-coverage.test.ts"
+      ],
+      "testGap": null,
+      "owner": "Country Civica Data",
+      "releaseRelation": "excluded_surface_only",
+      "releaseReason": "Evidence-audit metadata describes the reader surface and remains outside the frozen observation export."
+    },
+    {
       "id": "country.civica-data.governance-evidence",
       "kind": "country_module",
       "route": "/country/[slug]/civica-data",
@@ -1963,5 +2015,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "5e1ddbcaf8840adf7704e52b5a3c9e1560645cf3b21bfeef7599495ecddb4550"
+  "semanticSha256": "26106507207b96af1d68a2ba7600bd2abff0b1bae3ed01559660a877417097a1"
 }

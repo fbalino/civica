@@ -33,6 +33,11 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
 import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
+import {
+  CountryEvidenceCoverage,
+  COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+} from "@/components/provenance/CountryEvidenceCoverage";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import { withOg } from "@/lib/og";
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
@@ -53,7 +58,7 @@ export async function generateMetadata({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) return { title: "Country Not Found" };
   const title = `${jurisdiction.name} — Governance Evidence & Country Data`;
-  const description = `Source-native governance evidence, government structure, legislature, leaders, bills, and international memberships for ${jurisdiction.name}, with source context on supported sections.`;
+  const description = `Evidence coverage, source-native governance observations, indicator history, government structure, legislature, leaders, bills, and international memberships for ${jurisdiction.name}.`;
   const url = `https://civicaatlas.org/country/${slug}/civica-data`;
   return {
     title,
@@ -71,17 +76,19 @@ export async function generateMetadata({
 // Civica Data tab of the unified /country/[slug] page. This is the Civica
 // value-add layer — the governance sections that overlay (rather than
 // reproduce) the CIA Factbook prose:
-//   1. Governance evidence — source-native publisher observations.
-//   2. Government      — the "How power is organised" org chart.
-//   3. Legislature     — chamber / hemicycle.
-//   4. Leaders         — current officeholder timeline.
-//   5. Bills           — recent legislative actions.
-//   6. Organizations   — international memberships footprint.
-//   7. Rankings        — curated scores & rankings.
+//   1. Evidence coverage — properties of Civica's evidence, never the country.
+//   2. Governance evidence — source-native publisher observations.
+//   3. Indicator history — longitudinal publisher-native observations.
+//   4. Government      — the "How power is organised" org chart.
+//   5. Legislature     — chamber / hemicycle.
+//   6. Leaders         — current officeholder timeline.
+//   7. Bills           — recent legislative actions.
+//   8. Organizations   — international memberships footprint.
+//   9. Rankings        — curated source-native measures.
 //
 // LAYOUT: a factbook-style stacked scroll (<CivicaDataSections>). Every visible
 // section renders one after another in a single scroll column — nothing hidden,
-// all of it in the DOM and on screen. A sticky left nav (numbered 01–07) is
+// all of it in the DOM and on screen. A sticky left nav is
 // scroll-spy anchor navigation: the active entry follows the scroll, and a click
 // smooth-scrolls to that section. Each section opens with a numbered chapter
 // header, then its body, then a compact "Sources" provenance strip. Every
@@ -92,6 +99,7 @@ export async function generateMetadata({
 // so the sticky bar never shows alongside it.
 
 type SectionId =
+  | "evidence-coverage"
   | "governance-evidence"
   | "longitudinal"
   | "government"
@@ -104,6 +112,7 @@ type SectionId =
 type SectionPlan = { id: SectionId; label: string };
 
 const SECTION_PLAN: SectionPlan[] = [
+  { id: "evidence-coverage", label: "Evidence Coverage" },
   { id: "governance-evidence", label: "Governance Evidence" },
   { id: "longitudinal", label: "Indicator History" },
   { id: "government", label: "Government" },
@@ -168,6 +177,7 @@ export default async function CountryCivicaDataTab({
   // 500-ing the whole tab.
   const [
     governanceEvidence,
+    resolverFacts,
     indicatorHistory,
     govStructure,
     leadersRows,
@@ -180,6 +190,10 @@ export default async function CountryCivicaDataTab({
     countryOptions,
   ] = await Promise.all([
     getGovernanceEvidence(slug).catch(() => null),
+    getCanonicalFactsForJurisdiction(
+      jurisdiction.id,
+      COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+    ).catch(() => null),
     getIndicatorHistoryForCountry(slug).catch(() => null),
     getGovernmentStructure(jurisdiction.id).catch(
       () =>
@@ -224,6 +238,8 @@ export default async function CountryCivicaDataTab({
 
   const isVisible = (id: SectionId): boolean => {
     switch (id) {
+      case "evidence-coverage":
+        return true;
       case "governance-evidence":
         return hasGovernanceEvidence;
       case "longitudinal":
@@ -330,6 +346,13 @@ export default async function CountryCivicaDataTab({
   // switcher as props. The client component renders exactly these nodes — it
   // never re-fetches.
   const contentById: Record<SectionId, React.ReactNode> = {
+    "evidence-coverage": (
+      <CountryEvidenceCoverage
+        slug={slug}
+        countryName={jurisdiction.name}
+        resolverFacts={resolverFacts}
+      />
+    ),
     "governance-evidence": governanceEvidence ? (
       <>
         <Banner variant="info">
@@ -421,12 +444,12 @@ export default async function CountryCivicaDataTab({
   }));
 
   // Default to the deep-linked section when it names a visible section, else
-  // Governance evidence. SSR
+  // Evidence coverage. SSR
   // paints this section's body.
   const requestedDefault =
     sectionParam && visibleSections.some((s) => s.id === sectionParam)
       ? sectionParam
-      : "governance-evidence";
+      : "evidence-coverage";
   const defaultId = visibleSections.some((s) => s.id === requestedDefault)
     ? requestedDefault
     : visibleSections[0].id;

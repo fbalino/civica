@@ -858,3 +858,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   while CIA/Wikidata remain non-independent compilations and IMF projection
   stays visible without corroborating measurements.
 - Desktop/mobile light/dark browser QA and all 939 claims tests passed.
+
+## 2026-07-12 — ATL-005 neutral evidence coverage completed
+
+- Added an always-visible country Evidence Coverage section backed by the
+  checked DAT-005 snapshot and current DAT-006/DAT-007 resolver output.
+- Kept nine evidence properties separate, used an eligible multi-source
+  denominator for agreement, and added explicit missing-report and resolver-
+  outage states without country grading.
+- Registered the ninth Civica Data module in the 39-row Atlas surface matrix;
+  focused tests, browser QA, claims gates, and the production build passed.

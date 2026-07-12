@@ -6,7 +6,7 @@
 
 **Machine-readable artifact:** `data/atlas-surface-data-matrix.v1.json`
 
-**Semantic SHA-256:** `5e1ddbcaf8840adf7704e52b5a3c9e1560645cf3b21bfeef7599495ecddb4550`
+**Semantic SHA-256:** `26106507207b96af1d68a2ba7600bd2abff0b1bae3ed01559660a877417097a1`
 
 ## Scope
 
@@ -16,13 +16,13 @@ tables and fields, provenance path, coverage rule, loading/empty/error/partial/
 stale/disputed/no-source behavior, existing tests or a named test gap, owner,
 and relation to the frozen Atlas export.
 
-The current artifact contains 38 rows:
+The current artifact contains 39 rows:
 
 - 14 top-level data routes;
 - the shared country masthead;
 - 13 Factbook sections;
 - the Factbook source and citation module;
-- eight Civica Data modules;
+- nine Civica Data modules;
 - the country constitution reader.
 
 Static policy, methodology, marketing, account, coding, and admin pages are not
@@ -61,8 +61,9 @@ acceptable. Four gaps require later repair:
    down the Factbook tab.
 3. Most Civica Data modules turn query errors into empty arrays and disappear,
    making “not available” indistinguishable from “temporarily unavailable.”
-   The longitudinal-history module now implements the target explicit-state
-   behavior; ATL-018 still owns the shared repair for the remaining modules.
+   The evidence-coverage and longitudinal-history modules now implement the
+   target explicit-state behavior; ATL-018 still owns the shared repair for the
+   remaining modules.
 4. The country constitution tab uses one empty card for a genuinely unindexed
    constitution and a database failure.
 

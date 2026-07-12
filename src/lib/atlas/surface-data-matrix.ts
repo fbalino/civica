@@ -841,6 +841,33 @@ const civicaModules: Array<{
   reason: string;
 }> = [
   {
+    id: "evidence-coverage",
+    renderer: "src/components/provenance/CountryEvidenceCoverage.tsx",
+    access: {
+      symbol: "getCanonicalFactsForJurisdiction",
+      file: "src/lib/factbook/reconcile/api.ts",
+    },
+    storage: [
+      "country_facts",
+      "data_disputes",
+      "fact-coverage.generated.json",
+      "reconciliation-audit.generated.json",
+    ],
+    fields: [
+      "held and missing supported fact groups",
+      "source linkage",
+      "producing-family depth",
+      "source freshness",
+      "unresolved disputes",
+      "current resolver agreement and selected differences",
+    ],
+    source:
+      "DAT-005 checked coverage snapshot plus the current DAT-006/DAT-007 resolver output; the view publishes no combined score or country judgment.",
+    relation: "excluded_surface_only",
+    reason:
+      "Evidence-audit metadata describes the reader surface and remains outside the frozen observation export.",
+  },
+  {
     id: "governance-evidence",
     renderer: "src/components/governance-evidence/GovernanceEvidenceTable.tsx",
     access: {
@@ -1001,28 +1028,38 @@ countryRows.push(
       fields: module.fields,
       provenance: [module.source],
       coverage: [
-        module.id === "longitudinal"
-          ? "The section is always present and reports every available documented series; an empty result remains visible as an availability state."
-          : "The section appears only when its prefetch returns a usable row set.",
+        module.id === "evidence-coverage"
+          ? "The section is always present. The checked DAT-005 country row supplies coverage and missingness; an absent row and a resolver outage remain explicit states."
+          : module.id === "longitudinal"
+            ? "The section is always present and reports every available documented series; an empty result remains visible as an availability state."
+            : "The section appears only when its prefetch returns a usable row set.",
       ],
       states: serverStates({
         empty:
-          module.id === "longitudinal"
-            ? "A named no-observations state remains visible; missing years are never rendered as zero or no change."
-            : "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
+          module.id === "evidence-coverage"
+            ? "A missing checked country row is named explicitly and never becomes zero coverage or a country-quality judgment."
+            : module.id === "longitudinal"
+              ? "A named no-observations state remains visible; missing years are never rendered as zero or no change."
+              : "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
         error:
-          module.id === "longitudinal"
-            ? "A named temporarily-unavailable state remains visible while the rest of the tab continues to render."
-            : "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+          module.id === "evidence-coverage"
+            ? "The checked snapshot remains visible while current resolver counts render an explicit unavailable state."
+            : module.id === "longitudinal"
+              ? "A named temporarily-unavailable state remains visible while the rest of the tab continues to render."
+              : "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
       }),
       tests:
-        module.id === "governance-evidence"
-          ? ["src/lib/ci/governance-evidence.test.ts"]
-          : module.id === "longitudinal"
-            ? ["src/lib/indicators/history-catalog.test.ts"]
-            : [],
+        module.id === "evidence-coverage"
+          ? ["src/lib/provenance/country-evidence-coverage.test.ts"]
+          : module.id === "governance-evidence"
+            ? ["src/lib/ci/governance-evidence.test.ts"]
+            : module.id === "longitudinal"
+              ? ["src/lib/indicators/history-catalog.test.ts"]
+              : [],
       testGap:
-        module.id === "governance-evidence" || module.id === "longitudinal"
+        module.id === "evidence-coverage" ||
+        module.id === "governance-evidence" ||
+        module.id === "longitudinal"
           ? null
           : `No dedicated ${module.id} country-module route test exists.`,
       owner: "Country Civica Data",

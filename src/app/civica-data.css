@@ -73,6 +73,28 @@
   color: var(--color-text-primary);
 }
 
+.country-evidence-coverage {
+  display: grid;
+  gap: var(--space-5);
+}
+.country-evidence-coverage-dek,
+.country-evidence-coverage-links {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-60);
+}
+.country-evidence-coverage-links a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.country-evidence-coverage-table td:first-child {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
 /* ----------------------------------------------------------------
  * Embedded Civica Index panel
  * The shared `.ci-country-detail-container` carries a 1200px max-width and
@@ -265,7 +287,8 @@
 .civica-data-empty-copy a {
   color: var(--color-accent);
   text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-accent) 40%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-accent) 40%, transparent);
 }
 
 /* ----------------------------------------------------------------
