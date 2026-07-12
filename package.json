@@ -374,7 +374,8 @@
     "validate:reviewer-dossiers": "node --import tsx --test src/lib/research/reviewer-dossiers.test.ts && tsx scripts/generate-reviewer-dossiers.ts && tsx scripts/validate-reviewer-dossiers.ts",
     "generate:atlas-review-packet": "tsx scripts/generate-atlas-review-packet.ts --write",
     "validate:atlas-review-packet": "node --import tsx --test src/lib/research/atlas-review-packet.test.ts && tsx scripts/generate-atlas-review-packet.ts && tsx scripts/validate-atlas-review-packet.ts",
-    "validate:index-review-packet": "npm run validate:governance-evidence-review-packet && tsx scripts/validate-index-review-packet.ts"
+    "validate:index-review-packet": "npm run validate:governance-evidence-review-packet && tsx scripts/validate-index-review-packet.ts",
+    "validate:lint": "tsx scripts/validate-lint.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
