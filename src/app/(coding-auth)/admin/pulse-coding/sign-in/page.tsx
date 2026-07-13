@@ -33,8 +33,12 @@ export default async function PulseCodingSignInPage({ searchParams }: PageProps)
           adjudicator role. This workspace never exposes production labels,
           model votes, owner decisions, or another coder&apos;s submission.
         </p>
+        {/* EXP-034: tabIndex + autoFocus move focus to the error banner on
+            load (server-rendered POST-and-reload form, so the native
+            `autofocus` HTML attribute does the work, not JS) — same pattern
+            as src/app/admin/sign-in/page.tsx. */}
         {error ? (
-          <div role="alert" id="coding-signin-error">
+          <div role="alert" id="coding-signin-error" tabIndex={-1} autoFocus>
             <Banner variant="danger" className="admin-signin-error">
               The access code is invalid, expired, or revoked.
             </Banner>

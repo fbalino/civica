@@ -64,8 +64,14 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
           messages.
         </p>
 
+        {/* EXP-034: tabIndex + autoFocus move focus to the error banner on
+            load — this is a server-rendered POST-and-reload form, so the
+            native `autofocus` HTML attribute (not JS) is what actually moves
+            focus, giving keyboard/AT users an immediate landing point on the
+            problem instead of leaving focus stranded at the top of the
+            document. */}
         {error ? (
-          <div role="alert" id="signin-error">
+          <div role="alert" id="signin-error" tabIndex={-1} autoFocus>
             <Banner variant="danger" className="admin-signin-error">
               That username or password did not match. Check your credentials and
               try again.
@@ -74,7 +80,7 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
         ) : null}
 
         {googleError ? (
-          <div role="alert" id="signin-google-error">
+          <div role="alert" id="signin-google-error" tabIndex={-1} autoFocus>
             <Banner variant="danger" className="admin-signin-error">
               That Google account isn&rsquo;t authorized for admin access.
             </Banner>

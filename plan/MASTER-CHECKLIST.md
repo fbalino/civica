@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 190
-- **Remaining:** 113
-- **Progress:** 62.7%
+- **Completed:** 191
+- **Remaining:** 112
+- **Progress:** 63%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -239,7 +239,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [ ] **EXP-031** (P0) Make embed design and provenance derive from visible fields. _Done when: embed styling uses canonical versioned tokens/components or a generated embed token contract, every visible score/taxonomy/Pulse/fact field contributes its actual source/method/vintage/rights citation, hidden facts do not appear in attribution, and contract/browser tests match._
 - [x] **EXP-032** (P0) Restore the country Constitution route to the canonical three-tab shell and heading hierarchy. _Done when: Factbook/Civica Data/Constitution share required country search/sidebar/body geometry, each document has exactly one H1 with logical subsequent headings, and desktop/mobile/light/dark comparisons pass without duplicating the country name._
 - [ ] **EXP-033** (P0) Make Atlas selection/compare behavior accessible and truthful on pointer, keyboard, and touch. _Done when: the map has a page H1 and synchronized accessible country list or focusable controls, selection/state are announced, keyboard activation works, touch has an explicit two-country compare flow or no impossible instruction, and map/list values remain synchronized._
-- [ ] **EXP-034** (P1) Repair document landmarks, headings, labels, sticky offsets, and form error semantics across live routes. _Done when: pages have one main and logical H1–Hn order, header/nav/dialogs are labelled and nonnested, Ask Civica and all form controls have accessible names, invalid fields link errors and receive focus, sticky UI clears the header, and automated/keyboard fixtures cover every identified class._
+- [x] **EXP-034** (P1) Repair document landmarks, headings, labels, sticky offsets, and form error semantics across live routes. _Done when: pages have one main and logical H1–Hn order, header/nav/dialogs are labelled and nonnested, Ask Civica and all form controls have accessible names, invalid fields link errors and receive focus, sticky UI clears the header, and automated/keyboard fixtures cover every identified class._
 - [ ] **EXP-035** (P1) Make provenance controls precise and accessible. _Done when: `SourceDot` and related disclosures expose source, exact as-of/last-sync timestamp when available, upstream vintage, rights, live/frozen/experimental state and accessible name; month-only display cannot hide a materially stale value; fixtures cover missing/unknown times._
 - [x] **EXP-036** (P1) Align Record/article metadata and image rendering with visible content. _Done when: Open Graph/social images use the same resolved cover as the page, article/index contain one main landmark, inline images declare stable dimensions/responsive sizes/alt semantics and meet byte budgets, and layout-shift/social-card tests pass._
 - [x] **EXP-037** (P0) Remove nested interactive elements from country map/media tiles. _Done when: map activation and OpenStreetMap/Protomaps attribution are sibling controls with independent names/focus behavior, no link/button/control is nested inside another interactive element, HTML/accessibility tests pass, and tile click/keyboard behavior remains correct._

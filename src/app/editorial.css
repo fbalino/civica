@@ -3436,7 +3436,12 @@ a.constitution-xref-card-country:hover {
 
 .compare-section-nav {
   position: sticky;
-  top: 0;
+  /* EXP-034: was `top: 0`, which docked this bar at the same viewport
+     position as the sticky global header (#site-header, height
+     var(--header-height), z-index 100). Since the header's z-index beats
+     this bar's, the bar rendered completely hidden underneath the header on
+     scroll instead of appearing below it. */
+  top: var(--header-height);
   z-index: 40;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-card-border);
@@ -3480,7 +3485,11 @@ a.constitution-xref-card-country:hover {
 }
 
 .compare-section {
-  scroll-margin-top: calc(56px + var(--space-5)); /* 56px — sticky header offset literal */
+  /* EXP-034: clears both sticky bars now stacked above section content — the
+     global header (var(--header-height)) plus the now-correctly-positioned
+     .compare-section-nav bar, whose rendered height is close to another
+     header-height (~56px), plus breathing room. */
+  scroll-margin-top: calc(var(--header-height) * 2 + var(--space-5));
   padding: var(--space-7) 0;
 }
 .compare-section-eyebrow {

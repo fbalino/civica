@@ -151,3 +151,221 @@ npm run validate:alt-text-policy                     # 3 baselined legacy violat
 suggested `validate:landmarks` line above). `plan/MASTER-CHECKLIST.md`,
 `plan/PROGRESS.md`, and `src/lib/ci/claims-docs-gate.ts` were not touched. No
 commit was made.
+
+---
+
+## Follow-up pass — focus management, sticky-header audit, keyboard fixture
+
+This second pass closes the three items the scoped pass above explicitly left
+open ("Remaining EXP-034 scope"), building on top of the shipped core
+(commit `792d66f7`) without reverting or re-doing any of it. Nothing in the
+core pass's findings table, baseline files, or `validate-landmarks.ts` was
+touched.
+
+### 1. Invalid fields receive focus on submit
+
+**`/contact` (`src/app/contact/ContactClient.tsx`, client-validated).** Added
+five refs (`summaryRef`, `firstChipRef`, `nameRef`, `emailRef`, `messageRef`)
+and a `focusFirstInvalid(fieldErrors)` helper that walks the form's visual
+order — category chips → Name → Email → Message — and calls `.focus()` on
+the first ref whose field is invalid, falling back to the `role="alert"`
+validation-summary banner (now `tabIndex={-1}` + given a ref) if none of the
+known fields are invalid. Called from both failure paths: the synchronous
+client-side `validate()` branch in `submit()`, and the server-side 422 branch
+after `res.json()`. The category chip group has no single native input, so
+the ref is attached to the *first* chip button (`SUBJECTS[0]`), which is
+inside the `role="group"` container whose `aria-describedby` already points
+at `contact-subject-error` (shipped in the core pass) — focusing an actual
+interactive descendant of the described group, not a non-interactive
+container.
+
+**`/admin/sign-in` and `/admin/pulse-coding/sign-in`** are server-rendered
+POST-and-reload forms with no client JS on the page (the sign-in page has no
+`"use client"` directive), so there is no submit handler to hook. Both
+already had a `role="alert"` error banner from the core pass
+(`#signin-error` / `#signin-google-error` / `#coding-signin-error`); this
+pass adds `tabIndex={-1} autoFocus` to each. Because these are React Server
+Components, `autoFocus` compiles to the plain HTML `autofocus` attribute in
+the server-rendered markup — the browser honors it at parse time with **no
+client JavaScript required**, which is the correct primitive for a page that
+intentionally ships without a client bundle for its form logic.
+
+Live verification (Playwright, real browser — see §3; the Chrome-preview MCP
+tab used for the rest of this pass's browser checks does not reliably honor
+`autofocus` in its automation context, so this specific behavior was proven
+via the e2e harness instead of the MCP tab):
+
+- `/contact`, empty submit → focus lands on the first category chip
+  ("Data correction"), `role="alert"` summary visible with real text.
+- `/contact`, category+name+email valid but Message empty → focus lands on
+  the `<textarea>`, `aria-invalid="true"`, `aria-describedby` resolves to a
+  real "Required" element.
+- `/contact`, Message present but < 10 chars → focus lands on the
+  `<textarea>` with the length-specific error text.
+- `/admin/sign-in?error=1` → `#signin-error` is focused on load, contains
+  "did not match".
+- `/admin/pulse-coding/sign-in?error=1` → `#coding-signin-error` is focused
+  on load, contains "invalid, expired, or revoked".
+
+### 2. Sticky UI clears the header
+
+**Header geometry.** `#site-header` (`src/components/SiteHeader.tsx`) is
+`position: sticky; top: 0; z-index: 100; height: 56px` — matches the
+`--header-height: 56px` token (`src/app/globals.css:130`).
+
+**Method.** Every `position: sticky` rule in `src/app/*.css` and
+`src/components/**/*.module.css` was enumerated (`grep -rn "position:\s*sticky"`),
+then each was either read for its `top` value against `--header-height`, or
+measured live via `getBoundingClientRect()` in the browser (desktop 1280×900
+and mobile 375×812) when the CSS alone didn't settle the question (grid
+containing-block sizing, media-query overrides). Two representative pages
+named in the brief were live-checked at both viewports:
+`/civica-index/methodology` (ReaderSidebar) and `/country/japan/constitution`
+(country-tab constitution outline, which reuses `FactbookSidebar`/
+`.factbook-sidebar`, not the standalone `.constitution-reader-nav`). The
+country tab bar (`.country-tabbar`, `src/components/country/CountryTabBar.tsx`)
+was also checked directly.
+
+**Bug found and fixed: `.compare-section-nav` (`/compare`).**
+`src/app/editorial.css` had `position: sticky; top: 0; z-index: 40;` — the
+*same* viewport position as `#site-header` (`top: 0`), but a *lower*
+z-index (40 vs 100). Live measurement confirmed the bar was rendering
+**completely hidden underneath the header** on scroll, not below it
+(`getBoundingClientRect()` at `scrollY: 1200` before the fix:
+`headerRect.bottom: 56`, `navRect.top: 0`, `navRect.bottom: 56.45` — 100%
+overlap with the higher-stacked header). Fixed to
+`top: var(--header-height)`; re-measured after the fix at the same scroll
+position: `headerBottom: 56`, `navTop: 56`, `gap: 0` (flush below, zero
+overlap). Confirmed visually with a real (non-JS-scroll) screenshot at
+375×812 showing "Overview · Evidence · History · Chambers · Elections ·
+International" fully visible directly under the header, both near the top
+of the page and deep into the "Evidence" section.
+
+Fixing the bar's position also exposed a second-order issue: `.compare-section`
+had `scroll-margin-top: calc(56px + var(--space-5));` (a hardcoded `56px`
+literal, commented "sticky header offset literal") — sized to clear the
+header *alone*, from when the nav bar was (bug notwithstanding) invisible.
+With the nav bar now correctly visible and occupying its own ~56.4px of
+vertical space below the header, an in-page anchor jump (clicking a
+"Chambers"/"Elections"/etc. link) would have scrolled the target heading to
+land right under the now-visible nav bar. Updated to
+`scroll-margin-top: calc(var(--header-height) * 2 + var(--space-5));`
+(128px — replaces the hardcoded literal with the token, and accounts for
+both stacked bars). Live-verified: clicking the "Chambers" nav link scrolls
+`#chambers` to `top: 127.75px`, which is `>= navRect.bottom` (112.45px) and
+`>= headerRect.bottom` (56px) — clears both bars.
+
+**Already clearing correctly — measured, no change needed:**
+
+| Element | File | `top` | Header bottom | Live gap | Notes |
+|---|---|---|---|---|---|
+| `.methodology-sidebar` (ReaderSidebar via `MethodologyLayout`) | `editorial.css` | `80px` | 56px | **24px** | Measured live on `/civica-index/methodology` at 1280×900. Already-tokenized-equivalent (80 = header-height(56) + space-6(24), noted in an existing code comment); becomes `position: static` under `max-width: 900px` (mobile), so no sticky-clearance question applies on mobile — confirmed via source (`editorial.css:669`) and not further changed (functionally correct; the hardcoded-vs-token cosmetic gap is pre-existing baselined drift, not a clearance bug, so left as-is per the brief's "if it already clears, document — no change needed"). |
+| `.factbook-sidebar` / `.factbook-rail` (FactbookSidebar / ReaderSidebar; country-tab Factbook, Civica Data, and Constitution-with-`--no-outline` tabs) | `factbook.css` | `calc(var(--header-height) + var(--space-9) + var(--space-5))` = 136px | 56px | **80px** | Already uses the token. Live-measured on `/country/japan/constitution`. Becomes `position: static` under `max-width: 768px` (mobile) — confirmed via source (`factbook.css:757`), no clearance question on mobile. |
+| `.factbook-sticky-country-search` (reveal-on-scroll country search bar, desktop `>= 769px`) | `factbook.css` | `var(--header-height)` | 56px | **0px (flush, not overlapping)** | Already uses the token; docks exactly at the header's bottom edge. |
+| `.constitution-explorer-right` / `.constitution-reader-nav` (standalone `/constitution` explorer, not the country-tab variant) | `editorial.css` | `72px` | 56px | **16px** | Confirmed via source read (not live-browsed, since the country-tab route was the one named in the brief and already covers the sticky-outline pattern). Both become `position: static` under `max-width: 1100px` / `720px` respectively — no mobile clearance question. |
+| `.org-standalone__sidebar` (`/organizations`) | `atlas.css` | `var(--header-height)` | 56px | **0px (flush)** | Already uses the token. |
+| `.admin-nav`, `.coding-sticky-form` (internal admin/coding portals, not public reader surfaces) | `admin.css` | `calc(var(--header-height) + var(--space-5))` = 72px | 56px | **16px** | Already uses the token. Noted for completeness; not a public reader page. |
+| `.glossary-azbar` (A–Z index strip, `/glossary`) | `glossary.css` | `var(--header-height, 0px)` | 56px | **0px (flush)** | Already uses the token. |
+| `.post-rail-stuck` (blog article side rail, `/blog/[slug]`) | `globals.css` | `80px` | 56px | **24px** | Same 80px pattern as `.methodology-sidebar`; `display: none` under `max-width: 1000px` — no mobile question. Not named in the brief's representative list; found during the full-repo sticky sweep and included for completeness. Not changed (already clears). |
+| `.country-tabbar` (Factbook / Civica Data / Constitution tab strip) | `factbook.css` | — | — | n/a | **Not sticky at all** (no `position: sticky` rule) — scrolls away with the masthead, so header-clearance doesn't apply. Confirmed via source (no match in `factbook.css` for a sticky rule on this selector). |
+| `CountryOutcomeBars.module.css` `.cob__groupHeader` | component-scoped CSS module | `0px` | n/a | n/a | Sticky relative to its own scrollable list container (an internal component scroll region), not the page/site header — different sticky context entirely, out of scope for this audit. |
+
+**Other pre-existing hardcoded `56px`/`80px`/`88px` literals found during the
+sweep** (`civica-data.css:122`, `organizations-section.css:18`,
+`factbook.css:863`, `globals.css:3488`, `editorial.css:2497`) are
+`scroll-margin-top` values that already numerically clear their respective
+sticky bars (each ≥ 56px + buffer); they are cosmetic hardcoded-vs-token
+drift already covered by the 209-violation `validate:design-tokens`
+baseline, not sticky-clearance bugs. Left untouched — fixing them is a
+separate, broader design-token cleanup pass, not part of this scoped
+header-clearance fix, and `validate:design-tokens` confirms no *new* drift
+was introduced.
+
+### 3. Keyboard / automated fixture
+
+Added `e2e/exp-034-forms-keyboard.spec.ts` on the QA-009 harness
+(`e2e/harness/fixtures.ts`), reusing the already-running dev server on
+`:3000` (no new server spawned). Six tests:
+
+1. Keyboard reachability — focus the first category chip, `Tab` five times,
+   land on the Name field with no trap (chips → Name → Email → Message,
+   confirmed via an ad hoc debug trace during authoring, then asserted
+   directly).
+2. Empty submit — `role="alert"` summary visible with real text; the
+   category group's `aria-describedby` resolves to a real, non-empty error
+   element; focus lands on the first invalid field (first chip button).
+3. Only Message invalid — focus lands on the `<textarea>`,
+   `aria-invalid="true"`, `aria-describedby` resolves to "Required".
+4. Message present but too short — focus lands on the `<textarea>` with the
+   length-specific error text.
+5–6. `/admin/sign-in?error=1` and `/admin/pulse-coding/sign-in?error=1` —
+   the respective `#signin-error` / `#coding-signin-error` alert is focused
+   on load (proves the `autofocus` HTML attribute actually works in a real
+   browser, since the MCP preview tab used elsewhere in this pass could not
+   reliably confirm it).
+
+One authoring correction worth recording: `page.getByRole("alert")` is
+ambiguous on every page in this app — Next.js's own
+`#__next-route-announcer__` also carries `role="alert"` (hidden, always
+present) — so all alert assertions in this spec scope by a stable
+class/id (`.contact-validation-summary`, `#signin-error`,
+`#coding-signin-error`) rather than an unscoped role query.
+
+```
+npm run test:e2e -- exp-034-forms-keyboard   # 6/6 pass
+```
+
+### Index-change-control deferrals
+
+None. Files touched in this pass: `src/app/contact/ContactClient.tsx`,
+`src/app/admin/sign-in/page.tsx`,
+`src/app/(coding-auth)/admin/pulse-coding/sign-in/page.tsx`,
+`src/app/editorial.css`, and the new `e2e/exp-034-forms-keyboard.spec.ts`.
+None appear in `INDEX_PROTECTED_FILES` in
+`src/lib/ci/index-change-control.ts` (checked directly — that list only
+covers `src/lib/ci/*`, `src/lib/db/queries*.ts`, `src/lib/pulse/v2/*`, and a
+handful of named data/script files, none of which overlap this pass).
+
+### Verification run (this pass)
+
+```
+npx tsc --noEmit                                              # clean
+npm run validate:design-tokens                                # 209 baselined legacy violations, no new drift
+npx tsx scripts/validate-landmarks.ts                          # 8 baselined legacy violations, no new drift
+node --import tsx --test scripts/validate-landmarks.test.ts    # 19/19 pass (unchanged core check, re-run for regression safety)
+npm test                                                        # 1342 passed, 3 skipped (pre-existing), 0 failed
+npm run test:e2e -- exp-034-forms-keyboard                     # 6/6 pass
+npm run test:e2e -- qa-005-route-authorization                 # 17/17 pass (regression check — /contact, admin routes)
+npm run test:e2e -- responsive-matrix                          # 29/30 pass; the 1 "failure" (atlas route timeout under
+                                                                 # 6-worker parallel contention) is a pre-existing flake
+                                                                 # unrelated to this pass — re-ran in isolation
+                                                                 # (--workers=1) and it passed in 37.9s. Not touched by
+                                                                 # any file in this pass (atlas.css, AtlasWorldMap, and
+                                                                 # the /atlas route were not edited).
+```
+
+Browser-verified live (Chrome preview MCP + Playwright, desktop 1280×900 and
+mobile 375×812): `/contact` focus-on-submit behavior (three scenarios above),
+`/compare` sticky-nav fix (before/after geometry + visual screenshot at
+375×812), `/civica-index/methodology` ReaderSidebar clearance (24px gap),
+`/country/japan/constitution` FactbookSidebar clearance (80px gap, and its
+mobile static fallback confirmed via source). Admin sign-in `autofocus`
+behavior was proven via the Playwright e2e suite rather than the MCP preview
+tab, which does not reliably honor the native `autofocus` attribute in its
+automation context (a documented limitation of that tool, not of the
+implementation — separately confirmed the `autofocus=""` attribute *is*
+present in the server-rendered HTML via `outerHTML` inspection even when the
+MCP tab's `document.activeElement` didn't reflect it).
+
+The committed core (commit `792d66f7`) was not reverted, re-touched, or
+re-scoped: no changes were made to `scripts/validate-landmarks.ts`,
+`scripts/landmark-policy-baseline.json`, `src/app/error.tsx`,
+`src/app/(coding-auth)/admin/pulse-coding/sign-in/page.tsx`'s existing
+`role="alert"`/`aria-describedby` wiring (only additive `tabIndex`/
+`autoFocus` were added), `src/app/(coding)/admin/pulse-coding/layout.tsx`,
+`src/app/design-system/page.tsx`, `src/components/PageHero.tsx`,
+`src/components/factbook/CivicaAIDrawer.tsx`,
+`src/components/atlas/AtlasWorldMap.tsx`, or any of the other core-pass
+findings. `package.json`, `plan/MASTER-CHECKLIST.md`, `plan/PROGRESS.md`,
+`src/lib/ci/claims-docs-gate.ts`, and the EXP-034 checkbox were not touched.
+No commit was made.
