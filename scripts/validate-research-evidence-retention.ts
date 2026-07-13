@@ -56,6 +56,10 @@ const constitutionPassageMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0030_cute_namora.sql"),
   "utf8",
 );
+const partyIdentityMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0031_hot_saracen.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -96,7 +100,8 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !informationEnvironmentMigration.includes(`ON ${relation}`) &&
     !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
       constitutionPassageMigration,
-    )
+    ) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(partyIdentityMigration)
   ) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
@@ -111,6 +116,7 @@ for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
     deltaHistoryMigration,
     absorptionMigration,
     informationEnvironmentMigration,
+    partyIdentityMigration,
   ];
   const guarded = sources.some((source) =>
     new RegExp(
@@ -250,6 +256,8 @@ async function main() {
           JOIN pg_class c ON c.oid = t.tgrelid
           WHERE NOT t.tgisinternal
             AND (c.relname, t.tgname) IN (
+              ('party_composition_runs', 'party_composition_runs_append_only'),
+              ('party_identity_events', 'party_identity_events_append_only'),
               ('pulse_event_decisions', 'pulse_event_decisions_append_only'),
               ('pulse_incident_assignments', 'pulse_incident_assignments_append_only'),
               ('pulse_incident_resolutions', 'pulse_incident_resolutions_append_only'),

@@ -106,6 +106,18 @@ and verify exactly 96,126 current non-empty passages with
 resolvable. Recovery uses the isolated pre-change backup or a reviewed forward
 compensation; do not drop retained passage/history rows as an ordinary rollback.
 
+`0031_hot_saracen` replaces destructive legislature-party reseating with a
+stable, source-keyed identity model. It adds `political_parties`, immutable
+`party_composition_runs`, and append-only `party_identity_events`; backfills
+one explicitly provisional identity per legacy chamber row; preserves every
+existing `legislature_parties.id` and `party_positions` foreign key; and adds
+current/retired state so later syncs update or soft-retire rows instead of
+deleting them. Split, merge, and succession edges require a named source,
+license, retrieval time, and explicit predecessor/successor IDs. The adoption
+does not infer cross-chamber continuity from party names. Recovery uses the
+isolated pre-change backup or a reviewed forward compensation; do not delete
+the new append-only evidence ledgers as an ordinary rollback.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

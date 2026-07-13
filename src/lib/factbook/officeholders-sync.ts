@@ -778,7 +778,10 @@ export async function computeEnrichmentPlan(
       governmentBodies,
       eq(legislatureParties.bodyId, governmentBodies.id)
     )
-    .where(sql`${legislatureParties.partyColor} IS NOT NULL`);
+    .where(
+      sql`${legislatureParties.partyColor} IS NOT NULL
+        AND ${legislatureParties.isCurrent} = true`,
+    );
   const legColor = new Map<string, string>();
   for (const r of legColorRows) {
     if (r.partyColor) {

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-12T16:11:06.727Z",
-  "sha256": "e71419b97a4585fb5c993645ce732240271a5f73d29da32c252c644e21b5e7a4",
+  "generatedAt": "2026-07-13T03:36:20.445Z",
+  "sha256": "2cfee24652103889f6d08939a39d59ae6408ec7c3f63b5f14871ba8e56e3babc",
   "schema": {
     "columns": [
       {
@@ -4838,6 +4838,69 @@
         "position": 7
       },
       {
+        "udt": "uuid",
+        "name": "party_id",
+        "type": "uuid",
+        "table": "legislature_parties",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "composition_run_id",
+        "type": "uuid",
+        "table": "legislature_parties",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "identity_key",
+        "type": "text",
+        "table": "legislature_parties",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "bool",
+        "name": "is_current",
+        "type": "boolean",
+        "table": "legislature_parties",
+        "default": "true",
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "first_recorded_at",
+        "type": "timestamp without time zone",
+        "table": "legislature_parties",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "timestamp",
+        "name": "last_recorded_at",
+        "type": "timestamp without time zone",
+        "table": "legislature_parties",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "timestamp",
+        "name": "retired_at",
+        "type": "timestamp without time zone",
+        "table": "legislature_parties",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
         "udt": "text",
         "name": "id",
         "type": "text",
@@ -5156,6 +5219,258 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "party_composition_runs",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "run_key",
+        "type": "text",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "uuid",
+        "name": "body_id",
+        "type": "uuid",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "source_license",
+        "type": "text",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "timestamp",
+        "name": "source_retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "payload_sha256",
+        "type": "text",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "int4",
+        "name": "party_count",
+        "type": "integer",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "writer_version",
+        "type": "text",
+        "table": "party_composition_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "recorded_at",
+        "type": "timestamp without time zone",
+        "table": "party_composition_runs",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "party_identity_events",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "event_key",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "event_group_key",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "event_type",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "predecessor_party_id",
+        "type": "uuid",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "uuid",
+        "name": "successor_party_id",
+        "type": "uuid",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "uuid",
+        "name": "legislature_party_id",
+        "type": "uuid",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "previous_name",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "current_name",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "date",
+        "name": "effective_date",
+        "type": "date",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "evidence_status",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "source_license",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "timestamp",
+        "name": "source_retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "party_identity_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "timestamp",
+        "name": "recorded_at",
+        "type": "timestamp without time zone",
+        "table": "party_identity_events",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "party_positions",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -5340,6 +5655,105 @@
         "default": null,
         "nullable": "YES",
         "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "political_parties",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "canonical_name",
+        "type": "text",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "identity_status",
+        "type": "text",
+        "table": "political_parties",
+        "default": "'provisional_legacy'::text",
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "identity_source_id",
+        "type": "text",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "identity_external_id",
+        "type": "text",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "identity_source_url",
+        "type": "text",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "identity_source_license",
+        "type": "text",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "timestamp",
+        "name": "identity_retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "political_parties",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "political_parties",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "table": "political_parties",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 11
       },
       {
         "udt": "uuid",
@@ -10561,6 +10975,21 @@
         "definition": "CREATE UNIQUE INDEX jurisdictions_slug_unique ON public.jurisdictions USING btree (slug)"
       },
       {
+        "name": "legislature_parties_body_identity_idx",
+        "table": "legislature_parties",
+        "definition": "CREATE UNIQUE INDEX legislature_parties_body_identity_idx ON public.legislature_parties USING btree (body_id, identity_key)"
+      },
+      {
+        "name": "legislature_parties_current_body_idx",
+        "table": "legislature_parties",
+        "definition": "CREATE INDEX legislature_parties_current_body_idx ON public.legislature_parties USING btree (body_id, is_current)"
+      },
+      {
+        "name": "legislature_parties_party_idx",
+        "table": "legislature_parties",
+        "definition": "CREATE INDEX legislature_parties_party_idx ON public.legislature_parties USING btree (party_id)"
+      },
+      {
         "name": "legislature_parties_pkey",
         "table": "legislature_parties",
         "definition": "CREATE UNIQUE INDEX legislature_parties_pkey ON public.legislature_parties USING btree (id)"
@@ -10606,6 +11035,46 @@
         "definition": "CREATE UNIQUE INDEX organizations_slug_unique ON public.organizations USING btree (slug)"
       },
       {
+        "name": "party_composition_runs_body_recorded_idx",
+        "table": "party_composition_runs",
+        "definition": "CREATE INDEX party_composition_runs_body_recorded_idx ON public.party_composition_runs USING btree (body_id, recorded_at)"
+      },
+      {
+        "name": "party_composition_runs_pkey",
+        "table": "party_composition_runs",
+        "definition": "CREATE UNIQUE INDEX party_composition_runs_pkey ON public.party_composition_runs USING btree (id)"
+      },
+      {
+        "name": "party_composition_runs_run_key_unique",
+        "table": "party_composition_runs",
+        "definition": "CREATE UNIQUE INDEX party_composition_runs_run_key_unique ON public.party_composition_runs USING btree (run_key)"
+      },
+      {
+        "name": "party_identity_events_event_key_unique",
+        "table": "party_identity_events",
+        "definition": "CREATE UNIQUE INDEX party_identity_events_event_key_unique ON public.party_identity_events USING btree (event_key)"
+      },
+      {
+        "name": "party_identity_events_group_idx",
+        "table": "party_identity_events",
+        "definition": "CREATE INDEX party_identity_events_group_idx ON public.party_identity_events USING btree (event_group_key)"
+      },
+      {
+        "name": "party_identity_events_pkey",
+        "table": "party_identity_events",
+        "definition": "CREATE UNIQUE INDEX party_identity_events_pkey ON public.party_identity_events USING btree (id)"
+      },
+      {
+        "name": "party_identity_events_predecessor_idx",
+        "table": "party_identity_events",
+        "definition": "CREATE INDEX party_identity_events_predecessor_idx ON public.party_identity_events USING btree (predecessor_party_id)"
+      },
+      {
+        "name": "party_identity_events_successor_idx",
+        "table": "party_identity_events",
+        "definition": "CREATE INDEX party_identity_events_successor_idx ON public.party_identity_events USING btree (successor_party_id)"
+      },
+      {
         "name": "idx_party_positions_legislature_party",
         "table": "party_positions",
         "definition": "CREATE UNIQUE INDEX idx_party_positions_legislature_party ON public.party_positions USING btree (legislature_party_id)"
@@ -10624,6 +11093,21 @@
         "name": "persons_pkey",
         "table": "persons",
         "definition": "CREATE UNIQUE INDEX persons_pkey ON public.persons USING btree (id)"
+      },
+      {
+        "name": "political_parties_jurisdiction_idx",
+        "table": "political_parties",
+        "definition": "CREATE INDEX political_parties_jurisdiction_idx ON public.political_parties USING btree (jurisdiction_id)"
+      },
+      {
+        "name": "political_parties_pkey",
+        "table": "political_parties",
+        "definition": "CREATE UNIQUE INDEX political_parties_pkey ON public.political_parties USING btree (id)"
+      },
+      {
+        "name": "political_parties_source_external_idx",
+        "table": "political_parties",
+        "definition": "CREATE UNIQUE INDEX political_parties_source_external_idx ON public.political_parties USING btree (identity_source_id, identity_external_id)"
       },
       {
         "name": "idx_pulse_candidate_outcomes_candidate",
@@ -11865,9 +12349,24 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON organization_memberships FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "party_composition_runs_append_only",
+        "table": "party_composition_runs",
+        "definition": "CREATE TRIGGER party_composition_runs_append_only BEFORE DELETE OR UPDATE ON party_composition_runs FOR EACH ROW EXECUTE FUNCTION civica_reject_research_evidence_history_mutation()"
+      },
+      {
+        "name": "party_identity_events_append_only",
+        "table": "party_identity_events",
+        "definition": "CREATE TRIGGER party_identity_events_append_only BEFORE DELETE OR UPDATE ON party_identity_events FOR EACH ROW EXECUTE FUNCTION civica_reject_research_evidence_history_mutation()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "persons",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON persons FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "political_parties_research_evidence_history",
+        "table": "political_parties",
+        "definition": "CREATE TRIGGER political_parties_research_evidence_history BEFORE DELETE OR UPDATE ON political_parties FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -12293,12 +12792,27 @@
       },
       {
         "kind": "r",
+        "name": "party_composition_runs",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "party_identity_events",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "party_positions",
         "definition": null
       },
       {
         "kind": "r",
         "name": "persons",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "political_parties",
         "definition": null
       },
       {
@@ -13196,6 +13710,24 @@
         "definition": "FOREIGN KEY (body_id) REFERENCES government_bodies(id)"
       },
       {
+        "name": "legislature_parties_composition_run_id_party_composition_runs_i",
+        "type": "f",
+        "table": "legislature_parties",
+        "definition": "FOREIGN KEY (composition_run_id) REFERENCES party_composition_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "legislature_parties_current_retired_check",
+        "type": "c",
+        "table": "legislature_parties",
+        "definition": "CHECK (is_current = true AND retired_at IS NULL OR is_current = false AND retired_at IS NOT NULL)"
+      },
+      {
+        "name": "legislature_parties_party_id_political_parties_id_fk",
+        "type": "f",
+        "table": "legislature_parties",
+        "definition": "FOREIGN KEY (party_id) REFERENCES political_parties(id) ON DELETE RESTRICT"
+      },
+      {
         "name": "legislature_parties_pkey",
         "type": "p",
         "table": "legislature_parties",
@@ -13256,6 +13788,96 @@
         "definition": "UNIQUE (slug)"
       },
       {
+        "name": "party_composition_runs_body_id_government_bodies_id_fk",
+        "type": "f",
+        "table": "party_composition_runs",
+        "definition": "FOREIGN KEY (body_id) REFERENCES government_bodies(id)"
+      },
+      {
+        "name": "party_composition_runs_party_count_check",
+        "type": "c",
+        "table": "party_composition_runs",
+        "definition": "CHECK (party_count > 0)"
+      },
+      {
+        "name": "party_composition_runs_payload_sha256_check",
+        "type": "c",
+        "table": "party_composition_runs",
+        "definition": "CHECK (payload_sha256 ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "party_composition_runs_pkey",
+        "type": "p",
+        "table": "party_composition_runs",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "party_composition_runs_run_key_unique",
+        "type": "u",
+        "table": "party_composition_runs",
+        "definition": "UNIQUE (run_key)"
+      },
+      {
+        "name": "party_composition_runs_source_id_sources_id_fk",
+        "type": "f",
+        "table": "party_composition_runs",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "party_identity_events_event_key_unique",
+        "type": "u",
+        "table": "party_identity_events",
+        "definition": "UNIQUE (event_key)"
+      },
+      {
+        "name": "party_identity_events_evidence_status_check",
+        "type": "c",
+        "table": "party_identity_events",
+        "definition": "CHECK (evidence_status = ANY (ARRAY['verified'::text, 'provisional'::text, 'disputed'::text]))"
+      },
+      {
+        "name": "party_identity_events_legislature_party_id_legislature_parties_",
+        "type": "f",
+        "table": "party_identity_events",
+        "definition": "FOREIGN KEY (legislature_party_id) REFERENCES legislature_parties(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "party_identity_events_participant_check",
+        "type": "c",
+        "table": "party_identity_events",
+        "definition": "CHECK (predecessor_party_id IS NOT NULL OR successor_party_id IS NOT NULL)"
+      },
+      {
+        "name": "party_identity_events_pkey",
+        "type": "p",
+        "table": "party_identity_events",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "party_identity_events_predecessor_party_id_political_parties_id",
+        "type": "f",
+        "table": "party_identity_events",
+        "definition": "FOREIGN KEY (predecessor_party_id) REFERENCES political_parties(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "party_identity_events_source_id_sources_id_fk",
+        "type": "f",
+        "table": "party_identity_events",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "party_identity_events_successor_party_id_political_parties_id_f",
+        "type": "f",
+        "table": "party_identity_events",
+        "definition": "FOREIGN KEY (successor_party_id) REFERENCES political_parties(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "party_identity_events_type_check",
+        "type": "c",
+        "table": "party_identity_events",
+        "definition": "CHECK (event_type = ANY (ARRAY['identity_adopted'::text, 'identity_created'::text, 'identity_upgraded'::text, 'name_change_observed'::text, 'retired_from_chamber'::text, 'reactivated_in_chamber'::text, 'split_into'::text, 'merged_into'::text, 'succeeded_by'::text]))"
+      },
+      {
         "name": "party_positions_legislature_party_id_legislature_parties_id_fk",
         "type": "f",
         "table": "party_positions",
@@ -13278,6 +13900,36 @@
         "type": "p",
         "table": "persons",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "political_parties_identity_source_id_sources_id_fk",
+        "type": "f",
+        "table": "political_parties",
+        "definition": "FOREIGN KEY (identity_source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "political_parties_identity_status_check",
+        "type": "c",
+        "table": "political_parties",
+        "definition": "CHECK (identity_status = ANY (ARRAY['source_verified'::text, 'provisional_legacy'::text, 'disputed'::text]))"
+      },
+      {
+        "name": "political_parties_jurisdiction_id_jurisdictions_id_fk",
+        "type": "f",
+        "table": "political_parties",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "political_parties_pkey",
+        "type": "p",
+        "table": "political_parties",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "political_parties_source_identity_pair_check",
+        "type": "c",
+        "table": "political_parties",
+        "definition": "CHECK (identity_source_id IS NULL AND identity_external_id IS NULL OR identity_source_id IS NOT NULL AND identity_external_id IS NOT NULL)"
       },
       {
         "name": "pulse_candidate_outcomes_contract_check",

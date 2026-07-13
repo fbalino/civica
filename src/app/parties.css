@@ -263,6 +263,28 @@
   justify-content: flex-end;
 }
 
+.parties-source-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+
+.parties-source-entry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+  white-space: nowrap;
+}
+
+.parties-source-entry a {
+  color: var(--color-accent);
+}
+
 .parties-cell-ideology {
   display: inline-flex;
   align-items: center;

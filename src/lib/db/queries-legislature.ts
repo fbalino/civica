@@ -157,7 +157,8 @@ export async function getLegislatureContext(
       .from(legislatureParties)
       .where(
         sql`${legislatureParties.bodyId} IN ${bodyIds}
-          AND ${legislatureParties.isRulingCoalition} = true`,
+          AND ${legislatureParties.isRulingCoalition} = true
+          AND ${legislatureParties.isCurrent} = true`,
       );
 
     const byBody = new Map<string, ChamberCoalition>();

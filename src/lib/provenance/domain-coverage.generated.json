@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-12T14:44:14.974Z",
+  "generatedAt": "2026-07-13T03:37:23.024Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -282,7 +282,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-12T01:02:30.912Z"
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
         },
         {
           "id": "wikidata",
@@ -297,7 +297,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-12T01:02:30.912Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
         "Coverage counts any stored body and does not establish that every constitutional branch, subnational body, or reporting relationship is complete."
       ],
@@ -347,7 +347,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-12T01:02:30.912Z"
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
         },
         {
           "id": "wikidata",
@@ -362,7 +362,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-12T01:02:30.912Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
         "Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office."
       ],
@@ -411,7 +411,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-12T01:02:30.912Z"
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
         },
         {
           "id": "wikidata",
@@ -426,7 +426,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-12T01:02:30.912Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
         "The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent."
       ],
@@ -598,7 +598,7 @@
       "id": "elections",
       "label": "Elections",
       "recordLabel": "qualified conceptual election events",
-      "recordCount": 573,
+      "recordCount": 567,
       "jurisdictionsCovered": 193,
       "completeness": [
         {
@@ -625,16 +625,16 @@
         {
           "field": "jurisdiction_identity",
           "label": "Matching publisher jurisdiction identity",
-          "complete": 888,
+          "complete": 871,
           "total": 909,
-          "percent": 97.7
+          "percent": 95.8
         },
         {
           "field": "public_qualification",
           "label": "Qualified event or contest row",
-          "complete": 598,
+          "complete": 592,
           "total": 909,
-          "percent": 65.8
+          "percent": 65.1
         }
       ],
       "sources": [
@@ -659,7 +659,7 @@
       ],
       "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
       "knownGaps": [
-        "The checked 915-row baseline contains 82 quarantined rows and 215 separately labelled term-length projection groups; neither is counted as a qualified event.",
+        "The checked 915-row baseline contains 88 quarantined rows and 215 separately labelled term-length projection groups; neither is counted as a qualified event.",
         "21 rows lack retained publisher jurisdiction identity and remain quarantined; no checked publisher jurisdiction mismatch is public.",
         "Presidential history is uneven, indirect and subnational selections can leak through upstream ontology, and a jurisdiction count does not imply complete historical, presidential, turnout, or result coverage.",
         "IPU Parline and International IDEA statement licenses are recorded as non-commercial, but their source-specific DAT-003 rights reviews remain pending and their rows stay out of the public bulk export."
@@ -675,7 +675,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Elections: Qualified event or contest row is 65.8% complete; alert threshold is 80%."
+          "message": "Elections: Qualified event or contest row is 65.1% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -803,29 +803,29 @@
       "id": "bills",
       "label": "Bills",
       "recordLabel": "bill records",
-      "recordCount": 6993,
+      "recordCount": 7032,
       "jurisdictionsCovered": 6,
       "completeness": [
         {
           "field": "url",
           "label": "Source URL",
-          "complete": 6993,
-          "total": 6993,
+          "complete": 7032,
+          "total": 7032,
           "percent": 100
         },
         {
           "field": "raw_status",
           "label": "Publisher status",
-          "complete": 5096,
-          "total": 6993,
-          "percent": 72.9
+          "complete": 5135,
+          "total": 7032,
+          "percent": 73
         },
         {
           "field": "introduced_date",
           "label": "Introduction date",
           "complete": 537,
-          "total": 6993,
-          "percent": 7.7
+          "total": 7032,
+          "percent": 7.6
         }
       ],
       "sources": [
@@ -845,7 +845,7 @@
           "id": "congress_gov",
           "label": "Congress.gov",
           "family": "congress_gov",
-          "lastSuccessfulRun": "2026-07-12T03:00:42.172Z"
+          "lastSuccessfulRun": "2026-07-13T03:01:27.228Z"
         },
         {
           "id": "data_assemblee_fr",
@@ -878,7 +878,7 @@
           "lastSuccessfulRun": "2026-07-12T03:30:38.614Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-12T04:30:14.848Z",
+      "lastSuccessfulRun": "2026-07-13T03:01:27.228Z",
       "knownGaps": [
         "Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers."
       ],
@@ -898,12 +898,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Publisher status is 72.9% complete; alert threshold is 80%."
+          "message": "Bills: Publisher status is 73% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Introduction date is 7.7% complete; alert threshold is 80%."
+          "message": "Bills: Introduction date is 7.6% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -1042,42 +1042,42 @@
       "id": "citations",
       "label": "Statement citations",
       "recordLabel": "statement-level provenance records",
-      "recordCount": 6612,
+      "recordCount": 6669,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "source_id",
           "label": "Source identifier",
-          "complete": 6612,
-          "total": 6612,
+          "complete": 6669,
+          "total": 6669,
           "percent": 100
         },
         {
           "field": "source_url",
           "label": "Source URL",
-          "complete": 6421,
-          "total": 6612,
+          "complete": 6478,
+          "total": 6669,
           "percent": 97.1
         },
         {
           "field": "source_license",
           "label": "Captured source license",
-          "complete": 6612,
-          "total": 6612,
+          "complete": 6669,
+          "total": 6669,
           "percent": 100
         },
         {
           "field": "retrieved_at",
           "label": "Retrieval time",
-          "complete": 6612,
-          "total": 6612,
+          "complete": 6669,
+          "total": 6669,
           "percent": 100
         },
         {
           "field": "source_hash",
           "label": "Source hash",
           "complete": 0,
-          "total": 6612,
+          "total": 6669,
           "percent": 0
         }
       ],
@@ -1092,7 +1092,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-12T01:02:30.912Z"
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
         },
         {
           "id": "constitute_project",
@@ -1119,7 +1119,7 @@
           "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-12T01:02:30.912Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
         "Statement rows currently cover the closed polymorphic subject set only; canonical country facts use their own row-level provenance and are measured separately rather than being double-counted here."
       ],

@@ -1,12 +1,12 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
   legislatureParties,
   governmentBodies,
   jurisdictions,
+  partyCompositionRuns,
   partyPositions,
   sources,
-  statements,
 } from "./schema";
 
 // ---------------------------------------------------------------------------
@@ -54,6 +54,12 @@ export interface PartyPosition {
   codedYear: number;
   /** How the Civica row was matched: 'exact' | 'abbrev' | 'token'. */
   matchMethod: string;
+  source: {
+    id: string;
+    retrievedAt: string;
+    license: string;
+    url: string;
+  };
 }
 
 /**
@@ -83,6 +89,10 @@ export interface RawPositionRow {
   populism: number | string | null;
   codedYear: number | string | null;
   matchMethod: string | null;
+  positionSourceId: string | null;
+  positionSourceRetrievedAt: string | Date | null;
+  positionSourceLicense: string | null;
+  positionSourceUrl: string | null;
 }
 
 /**
@@ -101,7 +111,11 @@ export function resolvePartyPosition(row: RawPositionRow): PartyPosition | null 
     row.matchConfidence !== DISPLAYABLE_CONFIDENCE ||
     row.economicLR == null ||
     row.antiPlural == null ||
-    row.codedYear == null
+    row.codedYear == null ||
+    row.positionSourceId == null ||
+    row.positionSourceRetrievedAt == null ||
+    row.positionSourceLicense == null ||
+    row.positionSourceUrl == null
   ) {
     return null;
   }
@@ -112,6 +126,12 @@ export function resolvePartyPosition(row: RawPositionRow): PartyPosition | null 
     populism: row.populism != null ? Number(row.populism) : null,
     codedYear: Number(row.codedYear),
     matchMethod: row.matchMethod ?? "exact",
+    source: {
+      id: row.positionSourceId,
+      retrievedAt: new Date(row.positionSourceRetrievedAt).toISOString(),
+      license: row.positionSourceLicense,
+      url: row.positionSourceUrl,
+    },
   };
 }
 
@@ -122,22 +142,32 @@ export function resolvePartyPosition(row: RawPositionRow): PartyPosition | null 
 export interface RawSeatsSourceRow {
   seatsSourceId: string | null;
   seatsSourceRetrievedAt: string | Date | null;
+  seatsSourceLicense: string | null;
+  seatsSourceUrl: string | null;
 }
 
 /**
  * Resolves a joined row to the chamber's real `SeatsSource`, or `null` when
- * no `statements` provenance row exists for that chamber. Never defaults to
+ * no complete immutable composition-run provenance exists for that chamber.
+ * Never defaults to
  * `ipu_parline` (or any other fixed id) — a chamber with no recorded source
  * (legacy pre-provenance seed data) must render an honest "source not
  * recorded" state instead of a fabricated attribution.
  */
 export function resolveSeatsSource(row: RawSeatsSourceRow): SeatsSource | null {
-  if (row.seatsSourceId == null || row.seatsSourceRetrievedAt == null) {
+  if (
+    row.seatsSourceId == null ||
+    row.seatsSourceRetrievedAt == null ||
+    row.seatsSourceLicense == null ||
+    row.seatsSourceUrl == null
+  ) {
     return null;
   }
   return {
     id: row.seatsSourceId,
     retrievedAt: new Date(row.seatsSourceRetrievedAt).toISOString(),
+    license: row.seatsSourceLicense,
+    url: row.seatsSourceUrl,
   };
 }
 
@@ -151,9 +181,8 @@ export interface PartyCountry {
 }
 
 /**
- * The REAL provenance of a party's seat/coalition data, read from the
- * `statements` row `writeLegislatureComposition` writes for the party's
- * chamber (`subject_table='government_bodies', predicate='seats_per_parties'`).
+ * The provenance of a party's seat/coalition data, read from the immutable
+ * `party_composition_runs` record linked to that chamber participation.
  *
  * Civica's two composition writers (`scripts/sync-ipu-parline.ts` → source
  * `ipu_parline`, CC-BY-NC-SA-4.0; `scripts/sync-wikidata-parties.ts` → source
@@ -161,21 +190,25 @@ export interface PartyCountry {
  * NOT be assumed for every row — measured live, ~44% of party rows are
  * actually Wikidata-sourced, and a small legacy set (pre-provenance manual
  * seed chambers such as the UK House of Lords or China's National People's
- * Congress) carries no `statements` row at all. `null` here means exactly
- * that: no recorded source, surfaced honestly rather than defaulted to
- * either sync's id.
+ * Congress) was adopted from legacy data without a complete source tuple.
+ * `null` here means exactly that: no complete source, vintage, license, and
+ * URL tuple is recorded, so the browser does not invent one.
  */
 export interface SeatsSource {
   /** `sources.id` of whichever composition sync last wrote this chamber. */
   id: string;
-  /** ISO timestamp of that write (`statements.retrieved_at`). */
+  /** ISO timestamp of the immutable source retrieval. */
   retrievedAt: string;
+  license: string;
+  url: string;
 }
 
 /** One legislature party, enriched for the browser + compass. */
 export interface BrowserParty {
-  /** `legislature_parties.id` (stable key for the row). */
+  /** Stable chamber-participation UUID retained across composition refreshes. */
   id: string;
+  /** Stable cross-chamber party identity. */
+  partyId: string;
   partyName: string;
   /** Party brand colour hex from the source data, if recorded. Null → neutral. */
   color: string | null;
@@ -196,8 +229,8 @@ export interface BrowserParty {
   position: PartyPosition | null;
   /**
    * The real source of this party's seat/coalition data, or null when the
-   * chamber has no recorded `statements` provenance row (legacy seed data —
-   * see `SeatsSource`). Never assume `ipu_parline`.
+   * chamber's retained row has no complete composition-run provenance (legacy
+   * seed data; see `SeatsSource`). Never assume `ipu_parline`.
    */
   seatsSource: SeatsSource | null;
 }
@@ -220,40 +253,14 @@ export async function getPartiesForBrowser(): Promise<BrowserParty[]> {
         ),
       })
       .from(legislatureParties)
+      .where(eq(legislatureParties.isCurrent, true))
       .groupBy(legislatureParties.bodyId)
       .as("body_totals");
-
-    // The REAL per-chamber seat/coalition provenance. `writeLegislatureComposition`
-    // (`src/lib/legislatures/composition-writer.ts`) writes ONE `statements` row
-    // per (body, source) every time a composition sync runs for that chamber —
-    // `ipu_parline` and `wikidata` populate different, non-overlapping chambers
-    // in the common case, but a handful of chambers were synced by both at
-    // different times (an earlier Wikidata write later superseded by an IPU
-    // resync, or vice versa), so a body can carry more than one source row.
-    // DISTINCT ON + `retrievedAt DESC` picks whichever source most recently
-    // wrote `legislature_parties` for that body — the row that's actually
-    // still live. A chamber with NO row here (pre-provenance manual seed data,
-    // e.g. the UK House of Lords or China's National People's Congress) must
-    // render as "source not recorded", never default to either sync's id.
-    const bodySeatsSource = db
-      .selectDistinctOn([statements.subjectId], {
-        bodyId: statements.subjectId,
-        sourceId: statements.sourceId,
-        retrievedAt: statements.retrievedAt,
-      })
-      .from(statements)
-      .where(
-        and(
-          eq(statements.subjectTable, "government_bodies"),
-          eq(statements.predicate, "seats_per_parties"),
-        ),
-      )
-      .orderBy(statements.subjectId, desc(statements.retrievedAt))
-      .as("body_seats_source");
 
     const rows = await db
       .select({
         id: legislatureParties.id,
+        partyId: legislatureParties.partyId,
         partyName: legislatureParties.partyName,
         color: legislatureParties.partyColor,
         seatCount: legislatureParties.seatCount,
@@ -272,8 +279,14 @@ export async function getPartiesForBrowser(): Promise<BrowserParty[]> {
         codedYear: partyPositions.codedYear,
         matchMethod: partyPositions.matchMethod,
         matchConfidence: partyPositions.matchConfidence,
-        seatsSourceId: bodySeatsSource.sourceId,
-        seatsSourceRetrievedAt: bodySeatsSource.retrievedAt,
+        positionSourceId: sources.id,
+        positionSourceRetrievedAt: sources.lastSyncAt,
+        positionSourceLicense: sources.license,
+        positionSourceUrl: sources.baseUrl,
+        seatsSourceId: partyCompositionRuns.sourceId,
+        seatsSourceRetrievedAt: partyCompositionRuns.sourceRetrievedAt,
+        seatsSourceLicense: partyCompositionRuns.sourceLicense,
+        seatsSourceUrl: partyCompositionRuns.sourceUrl,
       })
       .from(legislatureParties)
       .innerJoin(
@@ -290,9 +303,11 @@ export async function getPartiesForBrowser(): Promise<BrowserParty[]> {
         eq(partyPositions.legislaturePartyId, legislatureParties.id),
       )
       .leftJoin(
-        bodySeatsSource,
-        eq(bodySeatsSource.bodyId, legislatureParties.bodyId),
+        partyCompositionRuns,
+        eq(partyCompositionRuns.id, legislatureParties.compositionRunId),
       )
+      .leftJoin(sources, eq(sources.id, partyPositions.sourceId))
+      .where(eq(legislatureParties.isCurrent, true))
       .orderBy(jurisdictions.name, sql`${legislatureParties.seatCount} DESC`);
 
     return rows.map((r) => {
@@ -306,13 +321,14 @@ export async function getPartiesForBrowser(): Promise<BrowserParty[]> {
       // a fabricated competitive dot. The raw rows remain in the table.
       const position = resolvePartyPosition(r);
 
-      // Never fabricate seat provenance: a chamber with no `statements` row
+      // Never fabricate seat provenance: a chamber with no complete source run
       // resolves to seatsSource:null, rendered as an honest "source not
       // recorded" chip instead of a SourceDot (see SeatsSource doc comment).
       const seatsSource = resolveSeatsSource(r);
 
       return {
         id: r.id,
+        partyId: r.partyId,
         partyName: r.partyName,
         color: r.color,
         seatCount,
@@ -385,6 +401,7 @@ export async function getPartyBrowserFacets(): Promise<PartyBrowserFacets> {
         jurisdictions,
         eq(governmentBodies.jurisdictionId, jurisdictions.id),
       )
+      .where(eq(legislatureParties.isCurrent, true))
       .orderBy(jurisdictions.name);
 
     const regions = Array.from(
@@ -410,7 +427,8 @@ export async function getPartyBrowserFacets(): Promise<PartyBrowserFacets> {
       .leftJoin(
         partyPositions,
         sql`${partyPositions.legislaturePartyId} = ${legislatureParties.id} and ${partyPositions.matchConfidence} = ${DISPLAYABLE_CONFIDENCE}`,
-      );
+      )
+      .where(eq(legislatureParties.isCurrent, true));
 
     const t = totalsRows[0];
 

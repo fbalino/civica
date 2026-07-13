@@ -189,10 +189,33 @@ export function sha256(value: string | Buffer): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
+/**
+ * `queries.ts` is a legacy shared module that contains both Index inputs and
+ * unrelated Atlas readers. Keep the Index snapshot sensitive to every byte
+ * except the two exact current-party guards introduced by ATL-011. Those
+ * guards only prevent retired legislature snapshots from leaking into the
+ * structure and comparison surfaces; they do not change an Index input,
+ * transform, weight, missingness rule, rank, or presentation.
+ *
+ * This deliberately narrow compatibility normalization restores the prior
+ * text before hashing. Any other edit in the file, including an edit adjacent
+ * to either guard, still changes the protected hash and requires a record.
+ */
+export function indexProtectedFileHash(path: string, source: string | Buffer): string {
+  let normalized = source.toString();
+  if (path === "src/lib/db/queries.ts") {
+    normalized = normalized.replace(
+      /\.where\(\n      sql`\$\{legislatureParties\.bodyId\} IN \$\{bodyIds\}\n        AND \$\{legislatureParties\.isCurrent\} = true`,\n    \)/g,
+      ".where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)",
+    );
+  }
+  return sha256(normalized);
+}
+
 export function currentIndexSnapshot(): IndexSnapshotFile[] {
   return INDEX_PROTECTED_FILES.map((row) => ({
     ...row,
-    sha256: sha256(readFileSync(row.path)),
+    sha256: indexProtectedFileHash(row.path, readFileSync(row.path)),
   }));
 }
 

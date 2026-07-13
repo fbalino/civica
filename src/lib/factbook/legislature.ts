@@ -78,7 +78,10 @@ export async function getLegislatureForJurisdiction(
   const allParties = await db
     .select()
     .from(legislatureParties)
-    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .where(
+      sql`${legislatureParties.bodyId} IN ${bodyIds}
+        AND ${legislatureParties.isCurrent} = true`,
+    )
     .orderBy(desc(legislatureParties.seatCount));
 
   function buildChamber(

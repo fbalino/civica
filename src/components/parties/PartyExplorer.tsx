@@ -15,11 +15,11 @@
  * "Ideology not recorded" chip and is never plotted on the compass. Nothing is
  * fabricated. Per-metric SourceDots mark seats and positions (V-Party)
  * distinctly. The seats SourceDot reads each party's REAL recorded source
- * (`party.seatsSource`, resolved server-side from the `statements` row
- * `writeLegislatureComposition` writes per chamber) — IPU Parline and the
+ * (`party.seatsSource`, resolved server-side from the immutable composition
+ * run linked to each row) — IPU Parline and the
  * Wikidata fallback sync populate different, non-overlapping chambers, so the
  * source is never assumed to be a single fixed id. A chamber with no recorded
- * `statements` row (legacy pre-provenance seed data) renders an honest
+ * complete source tuple (legacy pre-provenance seed data) renders an honest
  * "Source not recorded" chip instead of a SourceDot — never a fabricated one.
  *
  * Controls reuse the SAME primitives as the conditions / government-type pages:
@@ -42,6 +42,7 @@ import { Chip } from "@/components/editorial/Pill";
 import { Button } from "@/components/editorial/Button";
 import { CountryFlag } from "@/components/CountryFlag";
 import { SourceDot } from "@/components/SourceDot";
+import { sourceLabel } from "@/lib/data/sources";
 import { ideologyLabelForEconLR } from "@/lib/parties/ideology-labels";
 import type { BrowserParty } from "@/lib/db/queries-parties";
 
@@ -56,13 +57,6 @@ interface PartyExplorerProps {
     totalSeats: number;
     seatsWithPosition: number;
   };
-  /**
-   * `sources.last_sync_at` (ISO) for V-Party (`vparty`), the single ideology
-   * source. Seats have no equivalent single-source prop — each row carries its
-   * own real `seatsSource` (see `BrowserParty`), because IPU Parline and the
-   * Wikidata fallback sync populate different chambers.
-   */
-  positionsSyncedAt: string | null;
 }
 
 const ALL = "__all__";
@@ -109,26 +103,68 @@ function IdeologyCell({ party }: { party: BrowserParty }) {
 
 /**
  * Seats/coalition provenance for one party row. Reads the REAL per-chamber
- * source recorded in `statements` (`party.seatsSource` — resolved by
+ * source recorded in `party_composition_runs` (`party.seatsSource`, resolved by
  * `getPartiesForBrowser`), never a hardcoded sync id: IPU Parline and the
  * Wikidata fallback sync populate different chambers, so assuming one source
  * for every row would misattribute roughly half of them. A chamber with no
- * recorded `statements` row (legacy pre-provenance seed data) renders an
+ * complete source tuple (legacy pre-provenance seed data) renders an
  * honest "Source not recorded" chip — never a fabricated SourceDot.
  */
-function SeatsSourceCell({ party }: { party: BrowserParty }) {
+function AttributeSource({
+  label,
+  source,
+  detail,
+}: {
+  label: string;
+  source: { id: string; retrievedAt: string; license: string; url: string };
+  detail?: string;
+}) {
+  const retrieved = new Date(source.retrievedAt).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+  return (
+    <span className="parties-source-entry">
+      <span>{label}:</span>
+      <a href={source.url} target="_blank" rel="noopener noreferrer">
+        {sourceLabel(source.id)}
+      </a>
+      {detail ? <span>· {detail}</span> : null}
+      <time dateTime={source.retrievedAt}>· retrieved {retrieved}</time>
+      <span>· {source.license}</span>
+      <SourceDot source={source.id} retrievedAt={source.retrievedAt} />
+    </span>
+  );
+}
+
+function PartySourcesCell({ party }: { party: BrowserParty }) {
   if (!party.seatsSource) {
     return (
-      <Chip variant="neutral" size="sm">
-        Source not recorded
-      </Chip>
+      <span className="parties-source-stack">
+        <Chip variant="neutral" size="sm">
+          Composition source not recorded
+        </Chip>
+        {party.position ? (
+          <AttributeSource
+            label="Ideology"
+            source={party.position.source}
+            detail={`coded ${party.position.codedYear}`}
+          />
+        ) : null}
+      </span>
     );
   }
   return (
-    <SourceDot
-      source={party.seatsSource.id}
-      retrievedAt={party.seatsSource.retrievedAt}
-    />
+    <span className="parties-source-stack">
+      <AttributeSource label="Composition" source={party.seatsSource} />
+      {party.position ? (
+        <AttributeSource
+          label="Ideology"
+          source={party.position.source}
+          detail={`coded ${party.position.codedYear}`}
+        />
+      ) : null}
+    </span>
   );
 }
 
@@ -139,7 +175,6 @@ export function PartyExplorer({
   countries,
   regions,
   coverage,
-  positionsSyncedAt,
 }: PartyExplorerProps) {
   const [region, setRegion] = useState<string>(ALL);
   const [countrySlug, setCountrySlug] = useState<string>(ALL);
@@ -320,15 +355,12 @@ export function PartyExplorer({
         label: "Source",
         render: (p) => (
           <span className="parties-cell-provenance">
-            <SeatsSourceCell party={p} />
-            {p.position ? (
-              <SourceDot source="vparty" retrievedAt={positionsSyncedAt} />
-            ) : null}
+            <PartySourcesCell party={p} />
           </span>
         ),
       },
     ],
-    [positionsSyncedAt],
+    [],
   );
 
   return (

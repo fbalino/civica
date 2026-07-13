@@ -459,7 +459,10 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
   const rawParties = await db
     .select()
     .from(legislatureParties)
-    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .where(
+      sql`${legislatureParties.bodyId} IN ${bodyIds}
+        AND ${legislatureParties.isCurrent} = true`,
+    )
     .orderBy(desc(legislatureParties.seatCount));
 
   // Mirror the load-atlas-data normalisation: when the IPU/Wikidata
@@ -600,7 +603,10 @@ export async function getLegislatureComposition(jurisdictionId: string) {
   const parties = await db
     .select()
     .from(legislatureParties)
-    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .where(
+      sql`${legislatureParties.bodyId} IN ${bodyIds}
+        AND ${legislatureParties.isCurrent} = true`,
+    )
     .orderBy(desc(legislatureParties.seatCount));
 
   return bodies.map((body) => ({

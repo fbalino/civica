@@ -31,6 +31,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "offices",
   "organization_memberships",
   "persons",
+  "political_parties",
   "pulse_dimensional_deltas",
   "pulse_events_v2",
   "pulse_incidents",
@@ -47,6 +48,8 @@ export const RETAINED_EVIDENCE_RELATIONS = [
 /** Relations whose evidence rows reject UPDATE and DELETE outright rather
  * than copying a mutable projection into the generic history ledger. */
 export const APPEND_ONLY_EVIDENCE_RELATIONS = [
+  "party_composition_runs",
+  "party_identity_events",
   "pulse_dimensional_delta_history",
   "pulse_event_absorptions",
   "pulse_event_information_environment_pins",
@@ -82,10 +85,6 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     relations: ["constitution_topic_excerpts"],
   },
   { path: "src/lib/elections/writer.ts", relations: ["election_results"] },
-  {
-    path: "src/lib/legislatures/composition-writer.ts",
-    relations: ["legislature_parties"],
-  },
   {
     path: "src/lib/api/rate-limit.ts",
     relations: ["rate_limits"],

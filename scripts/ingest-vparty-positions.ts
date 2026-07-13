@@ -471,7 +471,7 @@ async function loadCivicaParties(): Promise<CivicaParty[]> {
     FROM legislature_parties lp
     JOIN government_bodies gb ON lp.body_id = gb.id
     JOIN jurisdictions j ON gb.jurisdiction_id = j.id
-    WHERE j.iso3 IS NOT NULL
+    WHERE j.iso3 IS NOT NULL AND lp.is_current = true
     ORDER BY j.name, lp.seat_count DESC
   `;
   return (rows as Array<Record<string, unknown>>).map((r) => ({

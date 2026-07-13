@@ -16,11 +16,12 @@
  *      numeric axis values (a fuzzy token match, or any party in a one-party
  *      / non-competitive legislature) and must STILL resolve to `null`.
  *   2. Every displayed seats/coalition attribute carries REAL, non-fabricated
- *      provenance — a chamber with no recorded `statements` row must resolve
- *      to `seatsSource: null` (rendered as "Source not recorded"), never
+ *      provenance — a chamber with no complete composition-run source tuple
+ *      must resolve to `seatsSource: null` (rendered as "Source not recorded"), never
  *      default to a fixed sync id such as `ipu_parline`.
- *   3. Party identity is a stable surrogate key (`legislature_parties.id`),
- *      never derived from the mutable, non-unique `party_name` display field.
+ *   3. Canonical party identity is `political_parties.id`; the separately
+ *      retained chamber-participation UUID is never derived from mutable,
+ *      non-unique `party_name` display text.
  *
  * The first two are exercised as pure, DB-free fixture tests against the
  * exported resolver functions (`resolvePartyPosition`, `resolveSeatsSource`)
@@ -47,14 +48,22 @@ import {
   governmentBodies,
   jurisdictions,
   legislatureParties,
+  partyCompositionRuns,
   partyPositions,
-  statements,
+  politicalParties,
 } from "@/lib/db/schema";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
 /** A fully-formed, high-confidence V-Party match — the only shape that should
  *  ever resolve to a displayable position. */
+const POSITION_SOURCE = {
+  positionSourceId: "vparty",
+  positionSourceRetrievedAt: "2026-07-06T00:00:00.000Z",
+  positionSourceLicense: "CC-BY-SA",
+  positionSourceUrl: "https://v-dem.net/data/the-v-party-dataset/",
+} as const;
+
 const HIGH_CONFIDENCE_ROW: RawPositionRow = {
   matchConfidence: "high",
   economicLR: -1.42,
@@ -63,6 +72,7 @@ const HIGH_CONFIDENCE_ROW: RawPositionRow = {
   populism: 0.31,
   codedYear: 2019,
   matchMethod: "exact",
+  ...POSITION_SOURCE,
 };
 
 // ─── 1. Ideology: never Civica-inferred, never below-trust-bar ─────────────
@@ -99,6 +109,7 @@ test("a non-competitive-legislature match (review confidence) never displays", (
     populism: 0.2,
     codedYear: 2018,
     matchMethod: "exact",
+    ...POSITION_SOURCE,
   };
   assert.equal(resolvePartyPosition(oneParty), null);
 });
@@ -112,6 +123,10 @@ test("no match at all (the common case) resolves to null, not a default/zero pos
     populism: null,
     codedYear: null,
     matchMethod: null,
+    positionSourceId: null,
+    positionSourceRetrievedAt: null,
+    positionSourceLicense: null,
+    positionSourceUrl: null,
   };
   assert.equal(resolvePartyPosition(noMatch), null);
 });
@@ -144,6 +159,7 @@ test("numeric axis values persisted as SQL strings still resolve correctly", () 
     populism: "0.31",
     codedYear: "2019",
     matchMethod: "abbrev",
+    ...POSITION_SOURCE,
   };
   const position = resolvePartyPosition(stringy);
   assert.equal(position?.economicLR, -1.42);
@@ -152,20 +168,29 @@ test("numeric axis values persisted as SQL strings still resolve correctly", () 
 
 // ─── 2. Seats/coalition: real provenance, never fabricated ─────────────────
 
-test("a chamber with a recorded statements row resolves to its real source", () => {
+test("a chamber with a complete composition run resolves to its real source", () => {
   const row: RawSeatsSourceRow = {
     seatsSourceId: "wikidata",
     seatsSourceRetrievedAt: "2026-04-19T00:28:43.831Z",
+    seatsSourceLicense: "CC0",
+    seatsSourceUrl: "https://www.wikidata.org/wiki/Q1",
   };
   const source = resolveSeatsSource(row);
   assert.deepEqual(source, {
     id: "wikidata",
     retrievedAt: "2026-04-19T00:28:43.831Z",
+    license: "CC0",
+    url: "https://www.wikidata.org/wiki/Q1",
   });
 });
 
-test("a chamber with NO recorded statements row resolves to null — never defaults to ipu_parline", () => {
-  const row: RawSeatsSourceRow = { seatsSourceId: null, seatsSourceRetrievedAt: null };
+test("a chamber with NO complete composition source resolves to null — never defaults to ipu_parline", () => {
+  const row: RawSeatsSourceRow = {
+    seatsSourceId: null,
+    seatsSourceRetrievedAt: null,
+    seatsSourceLicense: null,
+    seatsSourceUrl: null,
+  };
   assert.equal(resolveSeatsSource(row), null);
   // The two real composition-sync source ids in production today. Neither may
   // ever appear as a fallback default for an unsourced chamber.
@@ -176,16 +201,26 @@ test("a chamber with NO recorded statements row resolves to null — never defau
 
 test("a partial row (id without a timestamp, or vice versa) resolves to null, not a half-fabricated source", () => {
   assert.equal(
-    resolveSeatsSource({ seatsSourceId: "ipu_parline", seatsSourceRetrievedAt: null }),
+    resolveSeatsSource({
+      seatsSourceId: "ipu_parline",
+      seatsSourceRetrievedAt: null,
+      seatsSourceLicense: "CC-BY-NC-SA-4.0",
+      seatsSourceUrl: "https://data.ipu.org",
+    }),
     null,
   );
   assert.equal(
-    resolveSeatsSource({ seatsSourceId: null, seatsSourceRetrievedAt: "2026-07-05T00:00:00.000Z" }),
+    resolveSeatsSource({
+      seatsSourceId: null,
+      seatsSourceRetrievedAt: "2026-07-05T00:00:00.000Z",
+      seatsSourceLicense: null,
+      seatsSourceUrl: null,
+    }),
     null,
   );
 });
 
-// ─── 3. Identity is a stable surrogate key, not the display name ───────────
+// ─── 3. Canonical identity is stable and distinct from display text ────────
 
 test("the position/source resolver contracts never reference partyName", () => {
   // Structural proof, not just a convention: RawPositionRow and
@@ -193,8 +228,8 @@ test("the position/source resolver contracts never reference partyName", () => {
   // resolvers for every row — do not carry a partyName field at all, so a
   // rename or a duplicate display name across two chambers can never change
   // which ideology/source resolves for a given row. Identity flows through
-  // `legislature_parties.id` (selected directly as `BrowserParty.id` in
-  // getPartiesForBrowser), not through the mutable name.
+  // `political_parties.id` (selected as `BrowserParty.partyId`) and the
+  // retained chamber-participation UUID, not through the mutable name.
   const positionRowKeys: (keyof RawPositionRow)[] = [
     "matchConfidence",
     "economicLR",
@@ -203,10 +238,16 @@ test("the position/source resolver contracts never reference partyName", () => {
     "populism",
     "codedYear",
     "matchMethod",
+    "positionSourceId",
+    "positionSourceRetrievedAt",
+    "positionSourceLicense",
+    "positionSourceUrl",
   ];
   const seatsSourceRowKeys: (keyof RawSeatsSourceRow)[] = [
     "seatsSourceId",
     "seatsSourceRetrievedAt",
+    "seatsSourceLicense",
+    "seatsSourceUrl",
   ];
   assert.ok(!positionRowKeys.includes("partyName" as keyof RawPositionRow));
   assert.ok(!seatsSourceRowKeys.includes("partyName" as keyof RawSeatsSourceRow));
@@ -255,7 +296,13 @@ test(
     // matters, not the count.
     for (const row of rows) {
       assert.equal(
-        resolvePartyPosition(row),
+        resolvePartyPosition({
+          ...row,
+          positionSourceId: null,
+          positionSourceRetrievedAt: null,
+          positionSourceLicense: null,
+          positionSourceUrl: null,
+        }),
         null,
         `a 'review'-confidence party_positions row resolved to a displayable position: ${JSON.stringify(row)}`,
       );
@@ -270,21 +317,27 @@ test(
     const ro = getLiveReadOnlyDb();
     const rows = await ro
       .select({
-        seatsSourceId: statements.sourceId,
-        seatsSourceRetrievedAt: statements.retrievedAt,
+        seatsSourceId: partyCompositionRuns.sourceId,
+        seatsSourceRetrievedAt: partyCompositionRuns.sourceRetrievedAt,
+        seatsSourceLicense: partyCompositionRuns.sourceLicense,
+        seatsSourceUrl: partyCompositionRuns.sourceUrl,
       })
-      .from(governmentBodies)
+      .from(legislatureParties)
+      .innerJoin(
+        governmentBodies,
+        eq(legislatureParties.bodyId, governmentBodies.id),
+      )
       .innerJoin(jurisdictions, eq(governmentBodies.jurisdictionId, jurisdictions.id))
       .leftJoin(
-        statements,
-        and(
-          eq(statements.subjectTable, "government_bodies"),
-          eq(statements.subjectId, governmentBodies.id),
-          eq(statements.predicate, "seats_per_parties"),
-        ),
+        partyCompositionRuns,
+        eq(partyCompositionRuns.id, legislatureParties.compositionRunId),
       )
       .where(
-        and(eq(jurisdictions.name, "United Kingdom"), eq(governmentBodies.name, "House of Lords")),
+        and(
+          eq(jurisdictions.name, "United Kingdom"),
+          eq(governmentBodies.name, "House of Lords"),
+          eq(legislatureParties.isCurrent, true),
+        ),
       );
 
     assert.ok(rows.length > 0, "expected the UK House of Lords chamber to exist");
@@ -299,19 +352,31 @@ test(
 );
 
 test(
-  "live: a real party row keeps a stable legislature_parties.id distinct from its display name",
+  "live: canonical and chamber identities are UUIDs distinct from display text",
   { skip: liveSkip },
   async () => {
     const ro = getLiveReadOnlyDb();
     const rows = await ro
-      .select({ id: legislatureParties.id, partyName: legislatureParties.partyName })
+      .select({
+        rowId: legislatureParties.id,
+        partyId: legislatureParties.partyId,
+        canonicalId: politicalParties.id,
+        partyName: legislatureParties.partyName,
+      })
       .from(legislatureParties)
+      .innerJoin(
+        politicalParties,
+        eq(legislatureParties.partyId, politicalParties.id),
+      )
+      .where(eq(legislatureParties.isCurrent, true))
       .limit(5);
     assert.ok(rows.length > 0, "expected at least one legislature_parties row");
     for (const row of rows) {
-      // UUID primary key — never equal to (or derived from) the mutable name.
-      assert.match(row.id, /^[0-9a-f-]{36}$/i);
-      assert.notEqual(row.id, row.partyName);
+      assert.match(row.rowId, /^[0-9a-f-]{36}$/i);
+      assert.match(row.partyId, /^[0-9a-f-]{36}$/i);
+      assert.equal(row.partyId, row.canonicalId);
+      assert.notEqual(row.rowId, row.partyName);
+      assert.notEqual(row.partyId, row.partyName);
     }
   },
 );

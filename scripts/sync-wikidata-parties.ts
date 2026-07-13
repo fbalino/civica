@@ -61,7 +61,9 @@ async function main() {
     FROM government_bodies gb
     JOIN jurisdictions j ON gb.jurisdiction_id = j.id
     WHERE gb.branch = 'legislative'
-      AND gb.id NOT IN (SELECT DISTINCT body_id FROM legislature_parties)
+      AND gb.id NOT IN (
+        SELECT DISTINCT body_id FROM legislature_parties WHERE is_current = true
+      )
     ORDER BY j.population DESC NULLS LAST
   `);
 
@@ -168,9 +170,16 @@ SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
 
         if (seats <= 0 || /^Q\d+$/.test(partyName)) continue;
 
-        proposed.push({ partyName, partyColor: color, seatCount: seats });
+        const partyQid = extractQid(b.party.value);
+        proposed.push({
+          sourcePartyId: partyQid,
+          partyName,
+          partyColor: color,
+          seatCount: seats,
+          wikidataQid: partyQid,
+        });
       }
-      await writeLegislatureComposition(db as never, { bodyId: body.id, parties: proposed, sourceId: "wikidata", sourceUrl: `https://www.wikidata.org/wiki/${body.wikidata_qid}`, sourceLicense: "CC0", rawPayload: bindings.map((b) => ({ party: b.partyLabel?.value, seats: b.seats?.value })) }, { dryRun: DRY_RUN, stampFreshness: false });
+      await writeLegislatureComposition(db as never, { bodyId: body.id, jurisdictionId: body.jurisdiction_id, parties: proposed, sourceId: "wikidata", sourceUrl: `https://www.wikidata.org/wiki/${body.wikidata_qid}`, sourceLicense: "CC0", rawPayload: bindings.map((b) => ({ partyId: extractQid(b.party.value), party: b.partyLabel?.value, seats: b.seats?.value })) }, { dryRun: DRY_RUN, stampFreshness: false });
 
       synced++;
       console.log(`    Added ${bindings.length} parties`);

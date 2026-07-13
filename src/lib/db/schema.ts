@@ -183,17 +183,184 @@ export const terms = pgTable("terms", {
   isCurrent: boolean("is_current").default(true),
 });
 
-export const legislatureParties = pgTable("legislature_parties", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  bodyId: uuid("body_id")
-    .references(() => governmentBodies.id)
-    .notNull(),
-  partyName: text("party_name").notNull(),
-  partyColor: text("party_color"),
-  seatCount: integer("seat_count").notNull(),
-  isRulingCoalition: boolean("is_ruling_coalition").default(false),
-  wikidataQid: text("wikidata_qid"),
-});
+/**
+ * Stable party identity, separate from a party's current seat holding in one
+ * chamber. Source identifiers are adopted only when a publisher supplies one;
+ * legacy name-only rows remain explicitly provisional instead of being merged
+ * across chambers by a guessed name match.
+ */
+export const politicalParties = pgTable(
+  "political_parties",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    canonicalName: text("canonical_name").notNull(),
+    identityStatus: text("identity_status")
+      .notNull()
+      .default("provisional_legacy"),
+    identitySourceId: text("identity_source_id").references(() => sources.id),
+    identityExternalId: text("identity_external_id"),
+    identitySourceUrl: text("identity_source_url"),
+    identitySourceLicense: text("identity_source_license"),
+    identityRetrievedAt: timestamp("identity_retrieved_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("political_parties_source_external_idx").on(
+      table.identitySourceId,
+      table.identityExternalId,
+    ),
+    index("political_parties_jurisdiction_idx").on(table.jurisdictionId),
+    check(
+      "political_parties_identity_status_check",
+      dsql`${table.identityStatus} in ('source_verified', 'provisional_legacy', 'disputed')`,
+    ),
+    check(
+      "political_parties_source_identity_pair_check",
+      dsql`(${table.identitySourceId} is null and ${table.identityExternalId} is null) or (${table.identitySourceId} is not null and ${table.identityExternalId} is not null)`,
+    ),
+  ],
+);
+
+/** One immutable source retrieval that established a chamber composition. */
+export const partyCompositionRuns = pgTable(
+  "party_composition_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    runKey: text("run_key").notNull().unique(),
+    bodyId: uuid("body_id")
+      .references(() => governmentBodies.id)
+      .notNull(),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    payloadSha256: text("payload_sha256").notNull(),
+    partyCount: integer("party_count").notNull(),
+    writerVersion: text("writer_version").notNull(),
+    recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("party_composition_runs_body_recorded_idx").on(
+      table.bodyId,
+      table.recordedAt,
+    ),
+    check(
+      "party_composition_runs_payload_sha256_check",
+      dsql`${table.payloadSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "party_composition_runs_party_count_check",
+      dsql`${table.partyCount} > 0`,
+    ),
+  ],
+);
+
+/**
+ * Current or retained chamber participation for one stable party identity.
+ * Rows are updated/soft-retired, never delete-and-reinserted during a resync,
+ * so `party_positions.legislature_party_id` remains valid across reseats.
+ */
+export const legislatureParties = pgTable(
+  "legislature_parties",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bodyId: uuid("body_id")
+      .references(() => governmentBodies.id)
+      .notNull(),
+    partyId: uuid("party_id")
+      .references(() => politicalParties.id, { onDelete: "restrict" })
+      .notNull(),
+    compositionRunId: uuid("composition_run_id")
+      .references(() => partyCompositionRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    /** Source-scoped composition identity; never a display-name primary key. */
+    identityKey: text("identity_key").notNull(),
+    partyName: text("party_name").notNull(),
+    partyColor: text("party_color"),
+    seatCount: integer("seat_count").notNull(),
+    isRulingCoalition: boolean("is_ruling_coalition").default(false),
+    wikidataQid: text("wikidata_qid"),
+    isCurrent: boolean("is_current").default(true).notNull(),
+    firstRecordedAt: timestamp("first_recorded_at").defaultNow().notNull(),
+    lastRecordedAt: timestamp("last_recorded_at").defaultNow().notNull(),
+    retiredAt: timestamp("retired_at"),
+  },
+  (table) => [
+    uniqueIndex("legislature_parties_body_identity_idx").on(
+      table.bodyId,
+      table.identityKey,
+    ),
+    index("legislature_parties_party_idx").on(table.partyId),
+    index("legislature_parties_current_body_idx").on(
+      table.bodyId,
+      table.isCurrent,
+    ),
+    check(
+      "legislature_parties_current_retired_check",
+      dsql`(${table.isCurrent} = true and ${table.retiredAt} is null) or (${table.isCurrent} = false and ${table.retiredAt} is not null)`,
+    ),
+  ],
+);
+
+/**
+ * Append-only, source-bound party identity event edges. A split or merge is
+ * represented by multiple edges sharing `event_group_key`; composition syncs
+ * never infer those relationships from disappearing names.
+ */
+export const partyIdentityEvents = pgTable(
+  "party_identity_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventKey: text("event_key").notNull().unique(),
+    eventGroupKey: text("event_group_key").notNull(),
+    eventType: text("event_type").notNull(),
+    predecessorPartyId: uuid("predecessor_party_id").references(
+      () => politicalParties.id,
+      { onDelete: "restrict" },
+    ),
+    successorPartyId: uuid("successor_party_id").references(
+      () => politicalParties.id,
+      { onDelete: "restrict" },
+    ),
+    legislaturePartyId: uuid("legislature_party_id").references(
+      () => legislatureParties.id,
+      { onDelete: "restrict" },
+    ),
+    previousName: text("previous_name"),
+    currentName: text("current_name"),
+    effectiveDate: date("effective_date"),
+    evidenceStatus: text("evidence_status").notNull(),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    methodVersion: text("method_version").notNull(),
+    recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("party_identity_events_group_idx").on(table.eventGroupKey),
+    index("party_identity_events_predecessor_idx").on(
+      table.predecessorPartyId,
+    ),
+    index("party_identity_events_successor_idx").on(table.successorPartyId),
+    check(
+      "party_identity_events_type_check",
+      dsql`${table.eventType} in ('identity_adopted', 'identity_created', 'identity_upgraded', 'name_change_observed', 'retired_from_chamber', 'reactivated_in_chamber', 'split_into', 'merged_into', 'succeeded_by')`,
+    ),
+    check(
+      "party_identity_events_evidence_status_check",
+      dsql`${table.evidenceStatus} in ('verified', 'provisional', 'disputed')`,
+    ),
+    check(
+      "party_identity_events_participant_check",
+      dsql`${table.predecessorPartyId} is not null or ${table.successorPartyId} is not null`,
+    ),
+  ],
+);
 
 /**
  * Expert-coded ideology positions for the cross-country party browser +
@@ -201,11 +368,12 @@ export const legislatureParties = pgTable("legislature_parties", {
  * `vparty`). See `plan/party-ideology-sourcing-resolution-v1.md` (§4) — the
  * adopted contract for this table.
  *
- * Keyed 1:1 to a specific Civica `legislature_parties` row (unique on
- * `legislature_party_id`) so the ideology attaches to that party and travels
- * with it. A separate table (not columns on `legislature_parties`) because:
- * (a) `legislature_parties` is a seat-snapshot refreshed by legislature syncs,
- * a different vintage + cadence from the frozen 2022 V-Party release;
+ * Keyed 1:1 to a retained Civica `legislature_parties` chamber-participation
+ * row (unique on `legislature_party_id`) so the ideology attachment survives
+ * composition refreshes and renames. A separate table (not columns on
+ * `legislature_parties`) because:
+ * (a) chamber composition has a different vintage + cadence from the frozen
+ * 2022 V-Party release;
  * (b) it lets us carry the match provenance (which V-Party party, what year,
  * what method) and swap in a future V-Party vintage without touching seats.
  *

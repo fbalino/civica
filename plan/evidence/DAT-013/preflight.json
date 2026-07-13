@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T11:20:00.000Z",
+  "generatedAt": "2026-07-13T03:42:43.845Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -30,7 +30,9 @@
     "0026_magenta_xavin",
     "0027_smart_tempest",
     "0028_complex_carlie_cooper",
-    "0029_whole_dazzler"
+    "0029_whole_dazzler",
+    "0030_cute_namora",
+    "0031_hot_saracen"
   ],
   "plans": [
     {
@@ -69,7 +71,7 @@
         "offices": 5305,
         "persons": 4959,
         "sources": 56,
-        "statements": 6768,
+        "statements": 6826,
         "terms": 5475
       },
       "writesPerformed": 0
@@ -134,7 +136,7 @@
       "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bill_summary_cache": 6322,
+        "bill_summary_cache": 6354,
         "contact_submissions": 1,
         "country_metrics": 7449,
         "election_results": 1351,
@@ -200,7 +202,7 @@
       "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bills": 6993
+        "bills": 7032
       },
       "writesPerformed": 0
     },
@@ -674,8 +676,8 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 69319,
-        "statements": 6768,
+        "research_evidence_history": 72151,
+        "statements": 6826,
         "terms": 5475
       },
       "writesPerformed": 0
@@ -752,10 +754,10 @@
         "pulse_incident_assignments": 1507,
         "pulse_incident_resolutions": 479,
         "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 27,
+        "pulse_pipeline_runs": 29,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 69319
+        "research_evidence_history": 72151
       },
       "writesPerformed": 0
     },
@@ -782,11 +784,11 @@
       "liveRowCounts": {
         "pulse_classification_attempts": 385,
         "pulse_cluster_classification_states": 385,
-        "pulse_event_decisions": 4307,
+        "pulse_event_decisions": 4687,
         "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 27,
+        "pulse_pipeline_runs": 29,
         "raw_events": 1507,
-        "research_evidence_history": 69319
+        "research_evidence_history": 72151
       },
       "writesPerformed": 0
     },
@@ -813,7 +815,7 @@
         "pulse_incidents": 1224,
         "pulse_review_obligations": 175,
         "pulse_review_sla_events": 175,
-        "research_evidence_history": 69319
+        "research_evidence_history": 72151
       },
       "writesPerformed": 0
     },
@@ -855,9 +857,9 @@
       "invariantPlan": "npm run db:plan -- --id=0027_smart_tempest --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_dimensional_delta_history": 1300,
+        "pulse_dimensional_delta_history": 1625,
         "pulse_dimensional_deltas": 325,
-        "research_evidence_history": 69319
+        "research_evidence_history": 72151
       },
       "writesPerformed": 0
     },
@@ -882,7 +884,7 @@
         "ci_dimension_scores": 4867,
         "pulse_event_absorptions": 0,
         "pulse_events_v2": 384,
-        "research_evidence_history": 69319
+        "research_evidence_history": 72151
       },
       "writesPerformed": 0
     },
@@ -912,8 +914,62 @@
         "pulse_events_v2": 384,
         "pulse_information_environment_releases": 1,
         "pulse_information_environment_values": 251,
-        "pulse_pipeline_runs": 27,
-        "research_evidence_history": 69319
+        "pulse_pipeline_runs": 29,
+        "research_evidence_history": 72151
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0030_cute_namora",
+      "artifact": "drizzle/authoritative/0030_cute_namora.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "e46264cd7c4925b38adab616703c59e3a82fa458d42536fc73f72a8e2257ee13",
+      "affectedRelations": [
+        "constitution_passages"
+      ],
+      "statementCount": 20,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0030_cute_namora-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0030_cute_namora --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "constitution_passages": 96126
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0031_hot_saracen",
+      "artifact": "drizzle/authoritative/0031_hot_saracen.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "2b0bad9dfb6b7a7693a44cc2b29c8329d9e0b24566ac762acbde7156517700c4",
+      "affectedRelations": [
+        "government_bodies",
+        "jurisdictions",
+        "legislature_parties",
+        "party_composition_runs",
+        "party_identity_events",
+        "political_parties",
+        "research_evidence_history",
+        "sources",
+        "statements"
+      ],
+      "statementCount": 40,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0031_hot_saracen-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0031_hot_saracen --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "government_bodies": 483,
+        "jurisdictions": 253,
+        "legislature_parties": 1548,
+        "party_composition_runs": 194,
+        "party_identity_events": 1548,
+        "political_parties": 1548,
+        "research_evidence_history": 72151,
+        "sources": 56,
+        "statements": 6826
       },
       "writesPerformed": 0
     },
@@ -1096,7 +1152,7 @@
       "invariantPlan": "npm run db:plan -- --id=data-create-rate-limits-table --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "rate_limits": 22
+        "rate_limits": 184
       },
       "writesPerformed": 0
     },
@@ -1117,7 +1173,7 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384,
-        "research_evidence_history": 69319
+        "research_evidence_history": 72151
       },
       "writesPerformed": 0
     },
@@ -1164,25 +1220,6 @@
       "liveRowCounts": {
         "jurisdictions": 253,
         "sources": 56
-      },
-      "writesPerformed": 0
-    },
-    {
-      "id": "0030_cute_namora",
-      "artifact": "drizzle/authoritative/0030_cute_namora.sql",
-      "kind": "schema",
-      "historyStatus": "journaled",
-      "sha256": "e46264cd7c4925b38adab616703c59e3a82fa458d42536fc73f72a8e2257ee13",
-      "affectedRelations": [
-        "constitution_passages"
-      ],
-      "statementCount": 20,
-      "destructiveStatementCount": 0,
-      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0030_cute_namora-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run db:plan -- --id=0030_cute_namora --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
-      "releaseNote": "data/migrations/CHANGELOG.md",
-      "liveRowCounts": {
-        "constitution_passages": "missing"
       },
       "writesPerformed": 0
     }

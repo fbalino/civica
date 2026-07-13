@@ -114,7 +114,8 @@ async function collect(generatedAt: string) {
                COUNT(o.name)::int names, COUNT(o.office_type)::int types,
                COUNT(o.wikidata_qid)::int qids
         FROM offices o JOIN government_bodies b ON b.id=o.body_id
-        JOIN jurisdictions j ON j.id=b.jurisdiction_id WHERE j.type='sovereign_state'`,
+        JOIN jurisdictions j ON j.id=b.jurisdiction_id
+        WHERE j.type='sovereign_state'`,
     sql`SELECT COUNT(DISTINCT p.id)::int records, COUNT(DISTINCT b.jurisdiction_id)::int jurisdictions,
                COUNT(DISTINCT p.id) FILTER (WHERE p.wikidata_qid IS NOT NULL)::int qids,
                COUNT(DISTINCT p.id) FILTER (WHERE p.date_of_birth IS NOT NULL)::int births
@@ -124,7 +125,8 @@ async function collect(generatedAt: string) {
     sql`SELECT COUNT(*)::int records, COUNT(DISTINCT b.jurisdiction_id)::int jurisdictions,
                COUNT(lp.seat_count)::int seats, COUNT(lp.wikidata_qid)::int qids
         FROM legislature_parties lp JOIN government_bodies b ON b.id=lp.body_id
-        JOIN jurisdictions j ON j.id=b.jurisdiction_id WHERE j.type='sovereign_state'`,
+        JOIN jurisdictions j ON j.id=b.jurisdiction_id
+        WHERE j.type='sovereign_state' AND lp.is_current = true`,
     sql`SELECT (SELECT COUNT(*) FROM organizations)::int records,
                COUNT(DISTINCT om.jurisdiction_id)::int jurisdictions,
                (SELECT COUNT(*) FROM organizations WHERE wikidata_qid IS NOT NULL)::int qids,

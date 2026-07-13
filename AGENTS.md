@@ -64,7 +64,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 
 ## Database
 
-- Schema: `src/lib/db/schema.ts` — **77 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **80 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -76,6 +76,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - The G2 Atlas release candidate is `data/releases/atlas-2026-07-11/g2-rc1/` with archival ZIP `data/releases/atlas-2026-07-11-g2-rc1.zip`. Regenerate with `npm run package:g2-atlas`; verify with `npm run validate:g2-atlas` and credential-free `npm run reproduce:g2-atlas`. Its input manifest covers normalized released observations, not unretained upstream publisher bytes; preserve that limitation.
 - `npm run validate:release-quality` is the strict live release gate. It writes `data/release-quality-report.v1.json` and fails on identifier, coverage, range, unit/vintage, provenance-orphan, canonical-duplicate, required-field, row-delta, or source-age anomalies. `npm run validate:release-quality-report` is the DB-free checked-report integrity gate used by builds.
 - `src/lib/data/value-state.ts` owns the closed data-availability contract. Country facts, indicator history, and country metrics store `value_status` plus `value_status_reason`; observed/disputed rows carry values and every absence state carries no value plus a reason. Run `npm run validate:data-value-states` after DB/API/UI/export changes and `npm run validate:data-value-states:live` after applying its migration.
+- Party identity is separate from chamber participation: `political_parties` is the canonical entity, `legislature_parties` rows are retained and soft-retired, and immutable composition runs plus sourced identity events preserve the evidence trail. Composition syncs must supply publisher party identifiers and must never infer split/merge lineage from names. Run `npm run validate:party-identity` after party schema/writer/query/UI changes and `npm run validate:party-identity:live` after applying a party migration.
 
 ## Design System (authoritative)
 

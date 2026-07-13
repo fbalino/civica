@@ -106,16 +106,58 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     deprecation: active,
   },
   legislature_parties: {
-    definition: "Party seat holdings for a legislative body.",
-    rowGrain: "One party in one legislature seat snapshot.",
+    definition:
+      "Current or retained party seat holdings for a legislative body, linked to a stable political-party identity and immutable composition run.",
+    rowGrain: "One stable party participation row in one legislature.",
     releaseScope: "atlas_public",
     sourceOrDerivation:
       "IPU Parline with Wikidata fallback and Civica normalization.",
     cadence: "Scheduled legislature sync and post-election correction.",
     vintageSemantics:
-      "Current seat snapshot; the table does not yet carry a complete row-level observation vintage.",
+      "composition_run_id identifies the exact source retrieval; is_current and retired_at preserve superseded chamber participation without deleting identity or ideology links.",
     rights:
       "Mixed; IPU-derived records remain subject to non-commercial share-alike terms.",
+    deprecation: active,
+  },
+  political_parties: {
+    definition:
+      "Stable political-party identities independent of a seat snapshot or mutable display name.",
+    rowGrain: "One political-party identity within one jurisdiction.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Source-native IPU or Wikidata identifiers when available; legacy rows remain explicitly provisional until a source identifier is observed.",
+    cadence: "Updated when a legislature composition source is retrieved.",
+    vintageSemantics:
+      "identity_retrieved_at dates the source identifier observation; provisional_legacy identities make no historical continuity claim.",
+    rights:
+      "Identity provenance retains the source URL and license; source-specific reuse restrictions continue to apply.",
+    deprecation: active,
+  },
+  party_composition_runs: {
+    definition:
+      "Immutable source retrievals that established a legislature composition.",
+    rowGrain: "One body, source, payload, and writer-version run.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "IPU Parline or Wikidata payload hash plus exact source URL, license, and retrieval time; legacy adoption runs may have unavailable source fields.",
+    cadence: "One row for each materially new composition retrieval.",
+    vintageSemantics:
+      "source_retrieved_at is publisher retrieval time; recorded_at is the Civica ledger insertion time.",
+    rights: "Inherited from the named source and recorded per run.",
+    deprecation: active,
+  },
+  party_identity_events: {
+    definition:
+      "Append-only, source-bound party identity changes and lineage edges.",
+    rowGrain:
+      "One observed rename/retirement/reactivation or one sourced predecessor-successor edge within a grouped split, merge, or succession event.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Composition writers record observed identity lifecycle changes; split, merge, and succession edges require explicit source evidence and are never inferred from names.",
+    cadence: "Event-driven.",
+    vintageSemantics:
+      "effective_date is the political event date when sourced; source_retrieved_at and recorded_at remain separate.",
+    rights: "Inherited from the source recorded on each event.",
     deprecation: active,
   },
   party_positions: {

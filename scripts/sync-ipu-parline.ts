@@ -318,14 +318,22 @@ async function main() {
 
           if (seats <= 0) continue;
 
-          proposed.push({ partyName, seatCount: seats });
+          proposed.push({
+            sourcePartyId: partyCode,
+            partyName,
+            seatCount: seats,
+          });
         }
         if (proposed.length > 0) {
-          await writeLegislatureComposition(db as never, { bodyId, parties: proposed, sourceId: SOURCE_ID, sourceUrl: `${IPU_BASE}/elections/${electionId}`, sourceLicense: "CC-BY-NC-SA-4.0", rawPayload: partyResults }, { dryRun: DRY_RUN, stampFreshness: false });
+          await writeLegislatureComposition(db as never, { bodyId, jurisdictionId: jurisdiction.id, parties: proposed, sourceId: SOURCE_ID, sourceUrl: `${IPU_BASE}/elections/${electionId}`, sourceLicense: "CC-BY-NC-SA-4.0", rawPayload: partyResults }, { dryRun: DRY_RUN, stampFreshness: false });
           partiesInserted += proposed.length;
         }
       }
-    } catch {
+    } catch (error) {
+      console.error(
+        `  Party composition failed for ${jurisdiction.slug} ${chamberName}:`,
+        error,
+      );
       electionsFailed++;
     }
 

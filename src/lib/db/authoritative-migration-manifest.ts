@@ -187,4 +187,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "e46264cd7c4925b38adab616703c59e3a82fa458d42536fc73f72a8e2257ee13",
     baseline: false,
   },
+  {
+    id: "0031_hot_saracen",
+    path: "drizzle/authoritative/0031_hot_saracen.sql",
+    sha256: "2b0bad9dfb6b7a7693a44cc2b29c8329d9e0b24566ac762acbde7156517700c4",
+    baseline: false,
+  },
 ] as const;
