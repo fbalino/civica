@@ -30,16 +30,14 @@ for (const [source, value, label] of [
   ],
   [sync, "replaceCurrentConstitutionPassages", "sync writer"],
   [query, "websearch_to_tsquery", "English websearch query"],
-  [query, "db.batch", "Neon HTTP atomic batch"],
+  [query, "query.transaction", "Neon HTTP atomic transaction"],
   [rights, "CC-BY-NC-3.0", "verified Constitute license"],
   [rights, "https://www.constituteproject.org/content/terms", "official terms"],
 ] as const)
   requireText(source, value, label);
 
-if (/\.transaction\s*\(/.test(sync) || /\.transaction\s*\(/.test(query)) {
-  throw new Error(
-    "ATL-009 cannot use unsupported neon-http callback transactions",
-  );
+if (/\.transaction\s*\(/.test(sync)) {
+  throw new Error("ATL-009 sync cannot use unsupported drizzle transactions");
 }
 if (/fullTextHtml\s*:/.test(oldApi)) {
   throw new Error("Legacy country constitution API still emits fullTextHtml");

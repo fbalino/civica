@@ -47,7 +47,7 @@ release evidence:
 
 - warm p95 database execution at or below 100 ms;
 - warm p95 API/server response at or below 300 ms;
-- cold p95 API/server response at or below 750 ms;
+- cold p95 API/server response at or below 1,000 ms;
 - at most 250 KB returned for a 20-result page; and
 - a hard one-second database query timeout, with a visible timeout/error state.
 

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CONSTITUTION_SEARCH_INDEX_VERSION } from "./passage-index";
+import { CONSTITUTION_SEARCH_INDEX_VERSION } from "./passage-contract";
 
 export const CONSTITUTION_SEARCH_SCHEMA_VERSION =
   "constitution-search/v1" as const;

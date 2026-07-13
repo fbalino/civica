@@ -1,13 +1,11 @@
-import { createHash } from "node:crypto";
-import { sql } from "drizzle-orm";
-import { db } from "./index";
-import { isKnownTopic } from "@/lib/constitute/topics";
+import { neon } from "@neondatabase/serverless";
+import { isKnownConstitutionTopic } from "@/lib/constitute/topic-keys";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import {
   CONSTITUTION_SEARCH_INDEX_VERSION,
   CONSTITUTION_PASSAGE_LANGUAGE_BASIS,
   CONSTITUTION_PASSAGE_TRANSLATION_STATUS,
-} from "@/lib/constitution/passage-index";
+} from "@/lib/constitution/passage-contract";
 import {
   CONSTITUTION_SEARCH_RANKING_METHOD,
   CONSTITUTION_SEARCH_SCHEMA_VERSION,
@@ -21,16 +19,16 @@ import {
   type ConstitutionSearchResult,
 } from "@/lib/constitution/search-contract";
 import {
-  evaluateInteractiveDisplay,
-  sourceRights,
-} from "@/lib/rights/manifest";
+  CONSTITUTION_DISPLAY_RIGHTS,
+  evaluateConstitutionInteractiveDisplay,
+} from "@/lib/rights/constitution-display";
 
-const PRODUCT_ID = "constitution-search-display-v1";
-const SOURCE_ID = "constitute_project";
-const TERMS_URL = "https://www.constituteproject.org/content/terms";
+const PRODUCT_ID = CONSTITUTION_DISPLAY_RIGHTS.productId;
+const SOURCE_ID = CONSTITUTION_DISPLAY_RIGHTS.sourceId;
+const TERMS_URL = CONSTITUTION_DISPLAY_RIGHTS.termsUrl;
 const HIGHLIGHT_START = "__CIVICA_HIGHLIGHT_START__";
 const HIGHLIGHT_STOP = "__CIVICA_HIGHLIGHT_STOP__";
-const HEADLINE_OPTIONS = `StartSel=${HIGHLIGHT_START}, StopSel=${HIGHLIGHT_STOP}, MaxFragments=2, MinWords=12, MaxWords=32, FragmentDelimiter=" … "`;
+const HEADLINE_OPTIONS = `StartSel=${HIGHLIGHT_START}, StopSel=${HIGHLIGHT_STOP}, MaxFragments=1, MinWords=12, MaxWords=32, FragmentDelimiter=" … "`;
 
 export class ConstitutionSearchQueryError extends Error {
   constructor(
@@ -51,26 +49,97 @@ type SearchCursor = {
   passageId: string;
 };
 
-function fingerprint(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+type SearchRateLimitOptions = {
+  scope: string;
+  key: string;
+  limit: number;
+  windowMs: number;
+};
+
+type SearchRateLimitWindow = {
+  bucketKey: string;
+  expiresAtIso: string;
+};
+
+let searchSql: ReturnType<typeof neon> | null = null;
+
+function getSearchSql(): ReturnType<typeof neon> {
+  if (!searchSql) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL is not set");
+    }
+    searchSql = neon(process.env.DATABASE_URL);
+  }
+  return searchSql;
+}
+
+function getSearchRateLimitWindow({
+  scope,
+  key,
+  windowMs,
+}: SearchRateLimitOptions): SearchRateLimitWindow {
+  const now = Date.now();
+  const windowStart = Math.floor(now / windowMs) * windowMs;
+  return {
+    bucketKey: `${scope}:${key}:${windowStart}`,
+    expiresAtIso: new Date(windowStart + windowMs).toISOString(),
+  };
+}
+
+async function incrementSearchRateLimit(
+  window: SearchRateLimitWindow,
+): Promise<void> {
+  const query = getSearchSql();
+  await query`
+    INSERT INTO rate_limits (key, count, expires_at)
+    VALUES (${window.bucketKey}, 1, ${window.expiresAtIso}::timestamptz)
+    ON CONFLICT (key) DO UPDATE SET count = rate_limits.count + 1
+  `;
+}
+
+async function fingerprint(value: unknown): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(JSON.stringify(value)),
+  );
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+function toBase64Url(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function fromBase64Url(value: string): string {
+  const padded = value
+    .replace(/-/g, "+")
+    .replace(/_/g, "/")
+    .padEnd(Math.ceil(value.length / 4) * 4, "=");
+  const binary = atob(padded);
+  return new TextDecoder().decode(
+    Uint8Array.from(binary, (character) => character.charCodeAt(0)),
+  );
 }
 
 function encodeCursor(cursor: SearchCursor): string {
-  return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
+  return toBase64Url(JSON.stringify(cursor));
 }
 
-function decodeCursor(
-  raw: string | null,
-  expected: string,
-): SearchCursor | null {
+function decodeCursor(raw: string | null): SearchCursor | null {
   if (!raw) return null;
   try {
-    const parsed = JSON.parse(
-      Buffer.from(raw, "base64url").toString("utf8"),
-    ) as Partial<SearchCursor>;
+    const parsed = JSON.parse(fromBase64Url(raw)) as Partial<SearchCursor>;
     if (
       parsed.version !== 1 ||
-      parsed.fingerprint !== expected ||
+      typeof parsed.fingerprint !== "string" ||
+      !/^[a-f0-9]{64}$/.test(parsed.fingerprint) ||
       typeof parsed.rank !== "number" ||
       !Number.isFinite(parsed.rank) ||
       typeof parsed.passageId !== "string" ||
@@ -129,7 +198,7 @@ function iso(value: unknown): string | null {
 }
 
 function deploymentRights() {
-  return evaluateInteractiveDisplay(PRODUCT_ID, SOURCE_ID, {
+  return evaluateConstitutionInteractiveDisplay(PRODUCT_ID, SOURCE_ID, {
     commercial: process.env.CIVICA_COMMERCIAL_DEPLOYMENT === "true",
     feeBearing: process.env.CIVICA_FEE_BEARING_ACCESS === "true",
   });
@@ -150,7 +219,7 @@ async function withSearchTimeout<T>(promise: Promise<T>): Promise<T> {
                 504,
               ),
             ),
-          1_000,
+          2_000,
         );
       }),
     ]);
@@ -165,6 +234,7 @@ async function withSearchTimeout<T>(promise: Promise<T>): Promise<T> {
  */
 export async function searchConstitutionPassages(
   rawInput: ConstitutionSearchInput,
+  rateLimit: SearchRateLimitOptions,
 ): Promise<ConstitutionSearchResponse> {
   const parsed = constitutionSearchInputSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -176,7 +246,9 @@ export async function searchConstitutionPassages(
   }
   const input = parsed.data;
   const normalized = normalizeConstitutionSearchQuery(input.query);
-  const invalidTopic = input.topics.find((topic) => !isKnownTopic(topic));
+  const invalidTopic = input.topics.find(
+    (topic) => !isKnownConstitutionTopic(topic),
+  );
   if (invalidTopic) {
     throw new ConstitutionSearchQueryError(
       "invalid_request",
@@ -194,110 +266,58 @@ export async function searchConstitutionPassages(
   }
 
   try {
-    const sourceResult = await withSearchTimeout(
-      db.execute(sql`SELECT last_sync_at FROM sources WHERE id = ${SOURCE_ID}`),
-    );
-    const sourceLastSyncedAt = iso(rows(sourceResult)[0]?.last_sync_at);
-    if (!sourceLastSyncedAt) {
-      throw new ConstitutionSearchQueryError(
-        "data_unavailable",
-        "The constitution corpus has no successful source synchronization timestamp.",
-        503,
-      );
-    }
-    if (input.jurisdictions.length > 0) {
-      const requested = sql.join(
-        input.jurisdictions.map((slug) => sql`${slug}`),
-        sql`,`,
-      );
-      const foundResult = await withSearchTimeout(
-        db.execute(sql`SELECT j.slug,
-          EXISTS (
-            SELECT 1 FROM constitution_passages p
-            WHERE p.jurisdiction_id = j.id AND p.is_current = true
-          ) AS covered
-        FROM jurisdictions j WHERE j.slug IN (${requested})`),
-      );
-      const found = new Set(rows(foundResult).map((row) => String(row.slug)));
-      const unknown = input.jurisdictions.find((slug) => !found.has(slug));
-      if (unknown) {
-        throw new ConstitutionSearchQueryError(
-          "invalid_request",
-          `Unknown jurisdiction: ${unknown}`,
-          400,
-        );
-      }
-      const uncovered = rows(foundResult)
-        .filter((row) => !Boolean(row.covered))
-        .map((row) => String(row.slug))
-        .sort();
-      if (uncovered.length > 0) {
-        throw new ConstitutionSearchQueryError(
-          "jurisdiction_not_covered",
-          `No indexed constitution is available for: ${uncovered.join(", ")}.`,
-          422,
-          { uncoveredJurisdictions: uncovered },
-        );
-      }
-    }
+    const cursor = decodeCursor(input.cursor);
+    const rateWindow = getSearchRateLimitWindow(rateLimit);
+    const query = getSearchSql();
 
-    const cursorFingerprint = fingerprint({
-      normalized,
-      jurisdictions: input.jurisdictions,
-      topics: input.topics,
-      language: input.language,
-      indexVersion: CONSTITUTION_SEARCH_INDEX_VERSION,
-      sourceLastSyncedAt,
-    });
-    const cursor = decodeCursor(input.cursor, cursorFingerprint);
+    const [, rateResult, metadataResult, result] = await withSearchTimeout(
+      query.transaction((txn) => {
+        const jurisdictionCondition =
+          input.jurisdictions.length === 0
+            ? txn`TRUE`
+            : txn`j.slug = ANY(${input.jurisdictions}::text[])`;
+        const topicCondition =
+          input.topics.length === 0
+            ? txn`TRUE`
+            : txn`p.topic_keys ?| ${input.topics}::text[]`;
+        const cursorCondition = cursor
+          ? txn`(rank < ${cursor.rank} OR (rank = ${cursor.rank} AND passage_id > ${cursor.passageId}))`
+          : txn`TRUE`;
 
-    const queryCheckResult = await withSearchTimeout(
-      db.execute(sql`
-        SELECT
-          numnode(websearch_to_tsquery('english'::regconfig, ${normalized})) AS nodes,
-          querytree(websearch_to_tsquery('english'::regconfig, ${normalized})) AS tree
-      `),
-    );
-    const queryCheck = rows(queryCheckResult)[0];
-    const nodes = Number(queryCheck?.nodes ?? 0);
-    const tree = String(queryCheck?.tree ?? "");
-    if (nodes === 0 || !tree || tree === "T") {
-      throw new ConstitutionSearchQueryError(
-        "query_not_searchable",
-        "The query contains no searchable English terms.",
-        400,
-      );
-    }
-    if (nodes > 24) {
-      throw new ConstitutionSearchQueryError(
-        "invalid_request",
-        "The query contains too many search terms or operators.",
-        400,
-      );
-    }
-
-    const jurisdictionCondition =
-      input.jurisdictions.length === 0
-        ? sql`TRUE`
-        : sql`j.slug IN (${sql.join(
-            input.jurisdictions.map((slug) => sql`${slug}`),
-            sql`,`,
-          )})`;
-    const topicCondition =
-      input.topics.length === 0
-        ? sql`TRUE`
-        : sql`p.topic_keys ?| ARRAY[${sql.join(
-            input.topics.map((topic) => sql`${topic}`),
-            sql`,`,
-          )}]::text[]`;
-    const cursorCondition = cursor
-      ? sql`(rank < ${cursor.rank} OR (rank = ${cursor.rank} AND passage_id > ${cursor.passageId}))`
-      : sql`TRUE`;
-
-    const [, result] = await withSearchTimeout(
-      db.batch([
-        db.execute(sql`SET LOCAL statement_timeout = '1000ms'`),
-        db.execute(sql`
+        return [
+          txn`SET LOCAL statement_timeout = '1000ms'`,
+          txn`
+            INSERT INTO rate_limits (key, count, expires_at)
+            VALUES (${rateWindow.bucketKey}, 1, ${rateWindow.expiresAtIso}::timestamptz)
+            ON CONFLICT (key) DO UPDATE SET count = rate_limits.count + 1
+            RETURNING count
+          `,
+          txn`
+          SELECT
+            (SELECT last_sync_at FROM sources WHERE id = ${SOURCE_ID}) AS last_sync_at,
+            numnode(websearch_to_tsquery('english'::regconfig, ${normalized})) AS nodes,
+            querytree(websearch_to_tsquery('english'::regconfig, ${normalized})) AS tree,
+            COALESCE(
+              (
+                SELECT jsonb_agg(
+                  jsonb_build_object(
+                    'slug', requested.slug,
+                    'exists', j.id IS NOT NULL,
+                    'covered', CASE WHEN j.id IS NULL THEN false ELSE EXISTS (
+                      SELECT 1 FROM constitution_passages coverage
+                      WHERE coverage.jurisdiction_id = j.id
+                        AND coverage.is_current = true
+                    ) END
+                  )
+                  ORDER BY requested.slug
+                )
+                FROM unnest(${input.jurisdictions}::text[]) requested(slug)
+                LEFT JOIN jurisdictions j ON j.slug = requested.slug
+              ),
+              '[]'::jsonb
+            ) AS jurisdiction_checks
+          `,
+          txn`
         WITH q AS (
           SELECT websearch_to_tsquery('english'::regconfig, ${normalized}) AS query
         ), ranked AS (
@@ -309,7 +329,6 @@ export async function searchConstitutionPassages(
             p.anchor_id,
             p.heading_label,
             p.topic_keys,
-            p.plain_text,
             p.content_sha256,
             p.source_url,
             p.retrieval_url,
@@ -335,6 +354,11 @@ export async function searchConstitutionPassages(
           CROSS JOIN q
           WHERE p.is_current = true
             AND p.search_vector @@ q.query
+            AND (
+              SELECT count <= ${rateLimit.limit}
+              FROM rate_limits
+              WHERE key = ${rateWindow.bucketKey}
+            )
             AND ${jurisdictionCondition}
             AND ${topicCondition}
         ), page AS (
@@ -345,15 +369,96 @@ export async function searchConstitutionPassages(
         SELECT page.*,
           ts_headline(
             'english'::regconfig,
-            page.plain_text,
+            passage_text.plain_text,
             page.query,
             ${HEADLINE_OPTIONS}
           ) AS headline
         FROM page
-        ORDER BY rank DESC, passage_id ASC
-          `),
-      ]),
+        JOIN constitution_passages passage_text
+          ON passage_text.passage_id = page.passage_id
+        ORDER BY page.rank DESC, page.passage_id ASC
+          `,
+        ];
+      }),
     );
+
+    const rateCount = Number(rows(rateResult)[0]?.count ?? rateLimit.limit + 1);
+    if (rateCount > rateLimit.limit) {
+      throw new ConstitutionSearchQueryError(
+        "rate_limited",
+        "Rate limit exceeded. Try again shortly.",
+        429,
+      );
+    }
+
+    const metadata = rows(metadataResult)[0];
+    const sourceLastSyncedAt = iso(metadata?.last_sync_at);
+    if (!sourceLastSyncedAt) {
+      throw new ConstitutionSearchQueryError(
+        "data_unavailable",
+        "The constitution corpus has no successful source synchronization timestamp.",
+        503,
+      );
+    }
+
+    const jurisdictionChecks = (metadata?.jurisdiction_checks ?? []) as Array<{
+      slug: string;
+      exists: boolean;
+      covered: boolean;
+    }>;
+    const unknown = jurisdictionChecks.find((check) => !check.exists)?.slug;
+    if (unknown) {
+      throw new ConstitutionSearchQueryError(
+        "invalid_request",
+        `Unknown jurisdiction: ${unknown}`,
+        400,
+      );
+    }
+    const uncovered = jurisdictionChecks
+      .filter((check) => !check.covered)
+      .map((check) => check.slug)
+      .sort();
+    if (uncovered.length > 0) {
+      throw new ConstitutionSearchQueryError(
+        "jurisdiction_not_covered",
+        `No indexed constitution is available for: ${uncovered.join(", ")}.`,
+        422,
+        { uncoveredJurisdictions: uncovered },
+      );
+    }
+
+    const nodes = Number(metadata?.nodes ?? 0);
+    const tree = String(metadata?.tree ?? "");
+    if (nodes === 0 || !tree || tree === "T") {
+      throw new ConstitutionSearchQueryError(
+        "query_not_searchable",
+        "The query contains no searchable English terms.",
+        400,
+      );
+    }
+    if (nodes > 24) {
+      throw new ConstitutionSearchQueryError(
+        "invalid_request",
+        "The query contains too many search terms or operators.",
+        400,
+      );
+    }
+
+    const cursorFingerprint = await fingerprint({
+      normalized,
+      jurisdictions: input.jurisdictions,
+      topics: input.topics,
+      language: input.language,
+      indexVersion: CONSTITUTION_SEARCH_INDEX_VERSION,
+      sourceLastSyncedAt,
+    });
+    if (cursor && cursor.fingerprint !== cursorFingerprint) {
+      throw new ConstitutionSearchQueryError(
+        "cursor_stale",
+        "The search cursor is invalid or belongs to a different query or corpus version.",
+        409,
+      );
+    }
 
     const allRows = rows(result);
     const hasMore = allRows.length > input.limit;
@@ -474,16 +579,25 @@ export async function searchConstitutionPassages(
         access: "interactive-noncommercial-display-only",
         bulkExport: "blocked",
         licenseId: "CC-BY-NC-3.0",
-        termsUrl: sourceRights(SOURCE_ID)?.termsUrl ?? TERMS_URL,
+        termsUrl: TERMS_URL,
       },
     };
   } catch (error) {
-    if (error instanceof ConstitutionSearchQueryError) throw error;
+    if (error instanceof ConstitutionSearchQueryError) {
+      if (error.code === "query_timeout") {
+        await incrementSearchRateLimit(getSearchRateLimitWindow(rateLimit));
+      }
+      throw error;
+    }
     const dbError = error as { code?: string; message?: string };
     if (
       dbError.code === "57014" ||
       /statement timeout/i.test(dbError.message ?? "")
     ) {
+      // The batched transaction rolls its rate-limit increment back when the
+      // search statement times out. Persist one replacement increment before
+      // returning so deliberately expensive requests cannot evade throttling.
+      await incrementSearchRateLimit(getSearchRateLimitWindow(rateLimit));
       throw new ConstitutionSearchQueryError(
         "query_timeout",
         "The constitution search exceeded its one-second database limit.",

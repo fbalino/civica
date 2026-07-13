@@ -7,9 +7,10 @@ import {
   CONSTITUTION_SEARCH_SCHEMA_VERSION,
   type ConstitutionSearchErrorResponse,
 } from "@/lib/constitution/search-contract";
-import { checkDurableRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import { getRequestIp } from "@/lib/api/request-ip";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 function errorResponse(
   error: ConstitutionSearchErrorResponse["error"],
@@ -30,38 +31,27 @@ function errorResponse(
 }
 
 export async function GET(request: Request) {
-  const limited = await checkDurableRateLimit({
-    scope: "constitution-search",
-    key: getRequestIp(request),
-    limit: 30,
-    windowMs: 60_000,
-  });
-  if (!limited.allowed) {
-    return errorResponse(
-      "rate_limited",
-      "Rate limit exceeded. Try again shortly.",
-      429,
-      {
-        "Retry-After": String(
-          Math.max(1, Math.ceil(limited.retryAfterMs / 1000)),
-        ),
-      },
-    );
-  }
-
   const url = new URL(request.url);
   const rawLimit = url.searchParams.get("limit");
   const limit =
     rawLimit == null ? CONSTITUTION_SEARCH_DEFAULT_LIMIT : Number(rawLimit);
   try {
-    const response = await searchConstitutionPassages({
-      query: url.searchParams.get("q") ?? "",
-      jurisdictions: url.searchParams.getAll("jurisdiction"),
-      topics: url.searchParams.getAll("topic"),
-      language: (url.searchParams.get("language") ?? "en") as "en",
-      limit,
-      cursor: url.searchParams.get("cursor"),
-    });
+    const response = await searchConstitutionPassages(
+      {
+        query: url.searchParams.get("q") ?? "",
+        jurisdictions: url.searchParams.getAll("jurisdiction"),
+        topics: url.searchParams.getAll("topic"),
+        language: (url.searchParams.get("language") ?? "en") as "en",
+        limit,
+        cursor: url.searchParams.get("cursor"),
+      },
+      {
+        scope: "constitution-search",
+        key: getRequestIp(request),
+        limit: 30,
+        windowMs: 60_000,
+      },
+    );
     return Response.json(response, {
       headers: {
         "Cache-Control": "no-store",
@@ -74,7 +64,7 @@ export async function GET(request: Request) {
         error.code,
         error.message,
         error.status,
-        undefined,
+        error.code === "rate_limited" ? { "Retry-After": "60" } : undefined,
         error.details,
       );
     }

@@ -18,10 +18,7 @@ import {
   type ConstitutionSearchResponse,
 } from "@/lib/constitution/search-contract";
 import { withOg } from "@/lib/og";
-import {
-  checkDurableRateLimit,
-  getRequestIp,
-} from "@/lib/api/rate-limit";
+import { getRequestIp } from "@/lib/api/request-ip";
 
 export const metadata: Metadata = {
   title: "Search constitutional text",
@@ -74,32 +71,23 @@ export default async function ConstitutionSearchPage({
     const request = new Request("https://civicaatlas.org/constitution/search", {
       headers: requestHeaders,
     });
-    const rateLimit = await checkDurableRateLimit({
-      scope: "constitution-search",
-      key: getRequestIp(request),
-      limit: 30,
-      windowMs: 60_000,
-    });
-    if (!rateLimit.allowed) {
+    try {
+      response = await searchConstitutionPassages(input, {
+        scope: "constitution-search",
+        key: getRequestIp(request),
+        limit: 30,
+        windowMs: 60_000,
+      });
+    } catch (caught) {
+      const known =
+        caught instanceof ConstitutionSearchQueryError ? caught : null;
       error = {
         schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
-        error: "rate_limited",
-        message: "Rate limit exceeded. Try again shortly.",
+        error: known?.code ?? "data_unavailable",
+        message:
+          known?.message ??
+          "The constitution search index could not be reached. Please try again later.",
       };
-    } else {
-      try {
-        response = await searchConstitutionPassages(input);
-      } catch (caught) {
-        const known =
-          caught instanceof ConstitutionSearchQueryError ? caught : null;
-        error = {
-          schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
-          error: known?.code ?? "data_unavailable",
-          message:
-            known?.message ??
-            "The constitution search index could not be reached. Please try again later.",
-        };
-      }
     }
   }
 

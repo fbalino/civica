@@ -1,16 +1,18 @@
 import { createHash } from "node:crypto";
 import { parse } from "node-html-parser";
 import { constitutionSectionDomId } from "./article-nav";
+import {
+  CONSTITUTION_PASSAGE_LANGUAGE,
+  CONSTITUTION_PASSAGE_SCHEMA_VERSION,
+} from "./passage-contract";
 
-export const CONSTITUTION_PASSAGE_SCHEMA_VERSION =
-  "constitution-passage/v1" as const;
-export const CONSTITUTION_SEARCH_INDEX_VERSION =
-  "constitution-search-index/english-v1" as const;
-export const CONSTITUTION_PASSAGE_LANGUAGE = "en" as const;
-export const CONSTITUTION_PASSAGE_LANGUAGE_BASIS =
-  "constitute-service-lang-parameter" as const;
-export const CONSTITUTION_PASSAGE_TRANSLATION_STATUS =
-  "publisher-supplied-language-version-translation-status-unknown" as const;
+export {
+  CONSTITUTION_PASSAGE_LANGUAGE,
+  CONSTITUTION_PASSAGE_LANGUAGE_BASIS,
+  CONSTITUTION_PASSAGE_SCHEMA_VERSION,
+  CONSTITUTION_PASSAGE_TRANSLATION_STATUS,
+  CONSTITUTION_SEARCH_INDEX_VERSION,
+} from "./passage-contract";
 
 export interface ConstitutionPassageSourceArticle {
   sectionId: string;

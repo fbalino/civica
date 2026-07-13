@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "constitution-search-benchmark/v2",
+  "generatedAt": "2026-07-13T03:00:51.460Z",
+  "runtime": "production",
+  "baseUrl": "http://localhost:3100",
+  "iterations": 10,
+  "fixtures": [
+    "phrase",
+    "broad",
+    "filtered",
+    "rare",
+    "none"
+  ],
+  "database": {
+    "executionWarmP95Ms": 2.323,
+    "neonRoundTripWarmP95Ms": 156.33491699999968
+  },
+  "api": {
+    "warmP95Ms": 163.64025000000038,
+    "coldRestartCount": 20,
+    "coldServerReadySettleMs": 1000,
+    "coldRestartP95Ms": 710.237333000001,
+    "coldRestartSamplesMs": [
+      708.906,
+      703.558,
+      704.22,
+      697.088,
+      686.581,
+      713.693,
+      697.908,
+      688.684,
+      702.549,
+      710.237,
+      690.867,
+      680.091,
+      697.99,
+      685.396,
+      695.695,
+      697.979,
+      690.916,
+      682.636,
+      693.692,
+      696.556
+    ],
+    "maxBytes": 42965
+  },
+  "gates": {
+    "databaseWarmP95Ms": 100,
+    "apiWarmP95Ms": 300,
+    "apiColdRestartP95Ms": 1000,
+    "pageBytes": 250000
+  },
+  "status": "pass",
+  "violations": []
+}

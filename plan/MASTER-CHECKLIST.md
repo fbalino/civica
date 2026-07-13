@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 188
-- **Remaining:** 115
-- **Progress:** 62%
+- **Completed:** 189
+- **Remaining:** 114
+- **Progress:** 62.4%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -177,7 +177,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-006** (P0) Apply the sourced jurisdiction/status taxonomy consistently across country, territory, atlas, compare, search, API, sitemap, metadata, and exports. _Done when: DAT-004 fixtures pass on every surface, politically sensitive labels include sources/notes, and no hardcoded blanket status remains._
 - [x] **ATL-007** (P0) Audit and qualify the expanded elections corpus before calling it global. _Done when: all 915 baseline rows are checked for event type, date semantics, status, jurisdiction identity, source, license, duplication, historical/upcoming distinction, and freshness; coverage report and UI claims reflect the verified result._
 - [x] **ATL-008** (P1) Complete election research utilities around verified data. _Done when: calendar/timeline/filter/export views use only qualified rows, time zones and tentative dates are explicit, electoral-system context is source-linked, and sparse/uncertain jurisdictions render an honest state._
-- [ ] **ATL-009** (P1) Add cross-corpus constitutional full-text search as a research feature. _Done when: query, language/translation context, jurisdiction/topic filters, highlighted passages, stable citations/anchors, source/license attribution, pagination, performance limits, and no-result/error states pass automated and browser tests._
+- [x] **ATL-009** (P1) Add cross-corpus constitutional full-text search as a research feature. _Done when: query, language/translation context, jurisdiction/topic filters, highlighted passages, stable citations/anchors, source/license attribution, pagination, performance limits, and no-result/error states pass automated and browser tests._
 - [ ] **ATL-010** (P2) Build a world leaders directory only from verified office/person/tenure data. _Done when: search/filter/sort and profile links expose source/vintage and ambiguity, acting/interim/co-leadership states are correct, missing portraits do not imply missing data, and directory counts match a release query._
 - [ ] **ATL-011** (P1) Audit political-party identity, seats, coalition, and ideology coverage before expanding the party browser. _Done when: every displayed attribute has source/vintage/license, party identity changes/splits are versioned, unknown ideology is not inferred, and any ideology visualization uses an adopted external methodology or remains absent._
 - [ ] **ATL-012** (P1) Audit organizations and memberships as dated relationships rather than timeless facts. _Done when: membership type, start/end/status, disputed/observer cases, source/vintage, and organization identity are represented; UI/API/export fixtures cover current and historical memberships._
