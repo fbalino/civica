@@ -7,17 +7,18 @@ import { usePathname } from "next/navigation";
 import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
 import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 import { EXPLORE_NAV_GROUPS } from "@/components/exploreNavItems";
+import { EDITORIAL_NAV_ITEMS } from "@/components/editorialNavItems";
+import {
+  isExploreGroupActive,
+  isGovernanceEvidenceGroupActive,
+  isMethodologyGroupActive,
+} from "@/components/navActiveState";
 
 /** All hrefs that live under the "Explore" megamenu — used to light the
  * trigger active when the reader is on any of the eight browse surfaces. */
 const EXPLORE_HREFS = EXPLORE_NAV_GROUPS.flatMap((g) =>
   g.items.map((i) => i.href),
 );
-
-const TRAILING_LINKS = [
-  { href: "/blog", label: "The Record" },
-  { href: "/about", label: "About" },
-];
 
 /** A spot engraving with its dark-mode counterpart; the site-wide
  * `theme-engraving-*` classes swap them by theme. */
@@ -50,24 +51,16 @@ export function NavLinks() {
       ? pathname === "/"
       : pathname === href || pathname.startsWith(href + "/");
 
-  const indexActive =
-    pathname === "/governance-evidence" || pathname === "/civica-index" || pathname.startsWith("/civica-index/");
+  const indexActive = isGovernanceEvidenceGroupActive(pathname);
 
-  const methodologyActive =
-    pathname === "/methodology" ||
-    pathname.startsWith("/methodology/") ||
-    // Methodology pages physically live under /civica-index/methodology
-    // and /country/methodology — treat them as Methodology-active too.
-    pathname.startsWith("/civica-index/methodology") ||
-    pathname.startsWith("/country/methodology");
+  const methodologyActive = isMethodologyGroupActive(pathname);
 
   // Exclude the Methodology surfaces: they physically live under
   // `/country/methodology`, whose `/country` prefix would otherwise light
   // BOTH the Explore trigger and the Methodology trigger on the same page.
   // Methodology wins that overlap — the reader is reading methodology, not
   // browsing a country.
-  const exploreActive =
-    !methodologyActive && EXPLORE_HREFS.some((href) => isActiveHref(href));
+  const exploreActive = isExploreGroupActive(pathname, EXPLORE_HREFS);
 
   // Track the Explore panel's open state so `aria-expanded` stays truthful and
   // Escape closes it. The CSS `:hover`/`:focus-within` reveal is the visual
@@ -223,7 +216,7 @@ export function NavLinks() {
         </div>
       </div>
 
-      {TRAILING_LINKS.map(({ href, label }) => (
+      {EDITORIAL_NAV_ITEMS.map(({ href, label }) => (
         <Link
           key={href}
           href={href}

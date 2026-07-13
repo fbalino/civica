@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 303
-- **Completed:** 189
-- **Remaining:** 114
-- **Progress:** 62.4%
+- **Completed:** 190
+- **Remaining:** 113
+- **Progress:** 62.7%
 - **Priority mix:** P0 187 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -223,7 +223,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [ ] **EXP-015** (P0) Select and canonize one Explore concept. _Done when: owner decision is recorded, `DESIGN.md`, `/design-system`, shared component contract, tokens/assets, and acceptance screenshots are updated before the production navigation consumes the pattern._
 - [ ] **EXP-016** (P1) Implement the selected Explore navigation with semantically distinct destination identity. _Done when: hierarchy communicates “start here” and research tools, all eight destinations are unambiguous, desktop/mobile share one data/identity model, focus/Escape/hover/touch behavior passes, and no decorative art substitutes for meaning._
 - [ ] **EXP-017** (P1) Enforce a navigation/hero asset loading budget. _Done when: unopened menu assets and inactive theme variants do not incur the current full transfer cost, displayed 40px art is appropriately sized/compressed or sprite-based, active hero strategy is measured, and route-level image bytes meet the declared budget._
-- [ ] **EXP-018** (P1) Synchronize desktop and mobile navigation semantics, ordering, labels, icons/art, current-route state, and external-link behavior. _Done when: a shared fixture drives both, automated comparisons find zero identity drift, screen-reader names match, and status/external links use correct semantics/security attributes._
+- [x] **EXP-018** (P1) Synchronize desktop and mobile navigation semantics, ordering, labels, icons/art, current-route state, and external-link behavior. _Done when: a shared fixture drives both, automated comparisons find zero identity drift, screen-reader names match, and status/external links use correct semantics/security attributes._
 - [x] **EXP-019** (P0) Test every canonical layout and primary route at a declared responsive matrix. _Done when: automated/browser evidence covers small mobile, large mobile, tablet boundary, laptop, desktop, and wide desktop; no horizontal overflow, clipping, caption/control collision, unreadable sticky layer, or hidden required content remains._
 - [ ] **EXP-020** (P0) Complete keyboard and focus behavior for navigation, filters, drawers, lightboxes, maps, charts, tables, search, segmented controls, accordions, and forms. _Done when: automated accessibility plus a scripted keyboard path reaches/operates/closes each control, focus order/restore is correct, and no clickable non-semantic element remains on live surfaces._
 - [ ] **EXP-021** (P1) Verify contrast and non-color communication in both themes. _Done when: text, focus rings, status/source dots, charts, maps, tier/experimental states, overlays, disabled/hover states, and data warnings meet the adopted WCAG target or have documented justified exceptions; seeded low-contrast tokens fail tests._
