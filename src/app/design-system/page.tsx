@@ -354,7 +354,13 @@ export default function DesignSystemPage() {
         <span className="ds-grow" />
       </header>
 
-      <main className="ds-main">
+      {/* Not a <main>: the root layout already provides the page's single
+          main landmark (src/app/layout.tsx). */}
+      <div className="ds-main">
+        {/* Visually hidden — the visible "Civica Atlas." wordmark above is
+            site chrome, not a page title, so this page had no accessible h1.
+            Matches the <title>/metadata above without changing any pixel. */}
+        <h1 className="sr-only">Design System</h1>
         <div className="ds-directive">
           <strong>This page is the canonical reference.</strong> Every swatch
           and component below renders live from the design tokens in{" "}
@@ -986,10 +992,14 @@ export default function DesignSystemPage() {
             </span>
           </div>
           {/* Real PageHero, rendered live. It is 100vw full-bleed by design, so
-              it breaks out of this container exactly as it does on real pages. */}
+              it breaks out of this container exactly as it does on real pages.
+              titleAs="p": this is a component SWATCH, not this page's actual
+              title (that's the sr-only <h1> above) — a real page passes no
+              titleAs and gets the default <h1>. */}
           <PageHero
             eyebrow="Section · Page"
             titleId="ds-page-hero-title"
+            titleAs="p"
             title="Every page opens the same way."
             description="Eyebrow, serif headline, and a one-line standfirst on a full-bleed engraving band. Pages add a search field or filter chips through slots; the frame never changes."
             engraving={{
@@ -1103,7 +1113,7 @@ export default function DesignSystemPage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
 
       <footer className="ds-foot">
         <span>Civica Design System · v0.2</span>

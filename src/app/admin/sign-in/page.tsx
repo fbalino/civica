@@ -65,16 +65,20 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
         </p>
 
         {error ? (
-          <Banner variant="danger" className="admin-signin-error">
-            That username or password did not match. Check your credentials and
-            try again.
-          </Banner>
+          <div role="alert" id="signin-error">
+            <Banner variant="danger" className="admin-signin-error">
+              That username or password did not match. Check your credentials and
+              try again.
+            </Banner>
+          </div>
         ) : null}
 
         {googleError ? (
-          <Banner variant="danger" className="admin-signin-error">
-            That Google account isn&rsquo;t authorized for admin access.
-          </Banner>
+          <div role="alert" id="signin-google-error">
+            <Banner variant="danger" className="admin-signin-error">
+              That Google account isn&rsquo;t authorized for admin access.
+            </Banner>
+          </div>
         ) : null}
 
         <form
@@ -98,6 +102,8 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
               autoCorrect="off"
               spellCheck={false}
               required
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "signin-error" : undefined}
             />
           </div>
 
@@ -112,6 +118,8 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
               name="password"
               autoComplete="current-password"
               required
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "signin-error" : undefined}
             />
           </div>
 
@@ -132,6 +140,7 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
             <a
               href={`/api/admin/google/start?redirect=${encodeURIComponent(redirectAfter)}`}
               className="btn btn--secondary admin-signin-google"
+              aria-describedby={googleError ? "signin-google-error" : undefined}
             >
               <span>Sign in with Google</span>
             </a>

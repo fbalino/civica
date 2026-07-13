@@ -74,6 +74,15 @@ export interface PageHeroProps {
    * labelled landmark or needs a stable anchor id.
    */
   titleId?: string;
+  /**
+   * Element the title renders as. Defaults to "h1" — every real page hero
+   * IS that page's single h1. The ONE sanctioned exception is `/design-system`,
+   * which renders a live PageHero instance purely as a component swatch (the
+   * page's actual h1 is its own page title); that call site passes a
+   * non-heading tag so the swatch doesn't introduce a second h1. Do not pass
+   * anything other than "h1" from a real page.
+   */
+  titleAs?: "h1" | "p" | "div";
   /** Extra className on the outer <section> (rare — layout escape hatch). */
   className?: string;
 }
@@ -87,6 +96,7 @@ export function PageHero({
   chips,
   children,
   titleId = "page-hero-title",
+  titleAs = "h1",
   className,
 }: PageHeroProps) {
   const sectionClass = ["factbook-landing-hero", className]
@@ -115,7 +125,7 @@ export function PageHero({
           </HeroRevealItem>
         ) : null}
 
-        <HeroRevealItem as="h1" id={titleId} className="factbook-hero-title">
+        <HeroRevealItem as={titleAs} id={titleId} className="factbook-hero-title">
           {title}
         </HeroRevealItem>
 

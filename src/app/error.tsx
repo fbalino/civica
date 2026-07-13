@@ -26,7 +26,10 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="editorial-page">
+    // Not a <main>: the root layout already provides the page's single main
+    // landmark (src/app/layout.tsx), so this route-segment error boundary is
+    // a <div>.
+    <div className="editorial-page">
       <section className="editorial-section" aria-labelledby="error-title">
         <span className="editorial-eyebrow">Temporary problem</span>
         <h1 id="error-title" className="page-heading">
@@ -42,6 +45,6 @@ export default function Error({
           <Link href="/">Return home</Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

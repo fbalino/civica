@@ -621,11 +621,17 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             </div>
           </div>
           <div className="atlas-zoombar">
-            <button onClick={() => zoomAround(MAP_W / 2, MAP_H / 2, 1.3)}>
-              +
+            <button
+              aria-label="Zoom in"
+              onClick={() => zoomAround(MAP_W / 2, MAP_H / 2, 1.3)}
+            >
+              <span aria-hidden="true">+</span>
             </button>
-            <button onClick={() => zoomAround(MAP_W / 2, MAP_H / 2, 1 / 1.3)}>
-              &minus;
+            <button
+              aria-label="Zoom out"
+              onClick={() => zoomAround(MAP_W / 2, MAP_H / 2, 1 / 1.3)}
+            >
+              <span aria-hidden="true">&minus;</span>
             </button>
             <Tooltip className="atlas-zoombar-reset-tip" content="Reset view">
               <button aria-label="Reset view" onClick={() => animateTo(0, 0, 1)}>

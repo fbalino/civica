@@ -16,7 +16,10 @@ interface PageProps {
 export default async function PulseCodingSignInPage({ searchParams }: PageProps) {
   const { error } = await searchParams;
   return (
-    <main className="admin-signin-wrap">
+    // Not a <main>: the root layout already provides the page's single main
+    // landmark (src/app/layout.tsx), so this sign-in page is a <div> — same
+    // pattern as the owner sign-in page (src/app/admin/sign-in/page.tsx).
+    <div className="admin-signin-wrap">
       <section className="admin-signin-card" aria-labelledby="coding-signin-title">
         <div className="admin-signin-brand">
           <CivicaLogo size={36} />
@@ -31,9 +34,11 @@ export default async function PulseCodingSignInPage({ searchParams }: PageProps)
           model votes, owner decisions, or another coder&apos;s submission.
         </p>
         {error ? (
-          <Banner variant="danger" className="admin-signin-error">
-            The access code is invalid, expired, or revoked.
-          </Banner>
+          <div role="alert" id="coding-signin-error">
+            <Banner variant="danger" className="admin-signin-error">
+              The access code is invalid, expired, or revoked.
+            </Banner>
+          </div>
         ) : null}
         <form action="/api/pulse-coding/session" method="post" className="admin-signin-form">
           <div className="admin-field">
@@ -47,6 +52,8 @@ export default async function PulseCodingSignInPage({ searchParams }: PageProps)
               type="password"
               autoComplete="one-time-code"
               required
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "coding-signin-error" : undefined}
             />
           </div>
           <button type="submit" className="btn btn--primary">
@@ -57,6 +64,6 @@ export default async function PulseCodingSignInPage({ searchParams }: PageProps)
           Site administrators can use the separate <Link href="/admin/sign-in">owner sign-in</Link>.
         </p>
       </section>
-    </main>
+    </div>
   );
 }

@@ -209,6 +209,12 @@ export default function ContactClient() {
                 />
               </label>
             </div>
+            {Object.keys(errors).length > 0 ? (
+              <div role="alert" className="contact-validation-summary">
+                <Banner variant="danger">Review the highlighted fields before submitting.</Banner>
+              </div>
+            ) : null}
+
             <div className="contact-field">
               <span className="contact-label" id="contact-category-label">
                 Category
@@ -217,6 +223,7 @@ export default function ContactClient() {
                 className="contact-chip-group"
                 role="group"
                 aria-labelledby="contact-category-label"
+                aria-describedby={errors.subject ? "contact-subject-error" : undefined}
               >
                 {SUBJECTS.map((s) => {
                   const active = values.subject === s.value;
@@ -233,7 +240,9 @@ export default function ContactClient() {
                   );
                 })}
               </div>
-              {errors.subject && <div className="contact-error">{errors.subject}</div>}
+              {errors.subject && (
+                <div className="contact-error" id="contact-subject-error">{errors.subject}</div>
+              )}
             </div>
 
             <div className="contact-field contact-row">
@@ -248,8 +257,9 @@ export default function ContactClient() {
                   onChange={handleChange("name")}
                   className="contact-input"
                   aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? `${nameId}-error` : undefined}
                 />
-                {errors.name && <div className="contact-error">{errors.name}</div>}
+                {errors.name && <div className="contact-error" id={`${nameId}-error`}>{errors.name}</div>}
               </div>
               <div>
                 <FieldLabel htmlFor={emailId} required>
@@ -262,8 +272,9 @@ export default function ContactClient() {
                   onChange={handleChange("email")}
                   className="contact-input"
                   aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? `${emailId}-error` : undefined}
                 />
-                {errors.email && <div className="contact-error">{errors.email}</div>}
+                {errors.email && <div className="contact-error" id={`${emailId}-error`}>{errors.email}</div>}
               </div>
             </div>
 
@@ -277,8 +288,11 @@ export default function ContactClient() {
                 onChange={handleChange("message")}
                 className="contact-textarea"
                 aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? `${messageId}-error` : undefined}
               />
-              {errors.message && <div className="contact-error">{errors.message}</div>}
+              {errors.message && (
+                <div className="contact-error" id={`${messageId}-error`}>{errors.message}</div>
+              )}
             </div>
 
             {state === "error" && serverError && (
