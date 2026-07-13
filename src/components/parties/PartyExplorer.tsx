@@ -13,8 +13,14 @@
  * V-Party position — none recorded, a fuzzy 'review' match, or a party in a
  * one-party / non-competitive legislature — is shown in the table with an honest
  * "Ideology not recorded" chip and is never plotted on the compass. Nothing is
- * fabricated. Per-metric SourceDots mark seats (IPU Parline / Wikidata) and
- * positions (V-Party) distinctly.
+ * fabricated. Per-metric SourceDots mark seats and positions (V-Party)
+ * distinctly. The seats SourceDot reads each party's REAL recorded source
+ * (`party.seatsSource`, resolved server-side from the `statements` row
+ * `writeLegislatureComposition` writes per chamber) — IPU Parline and the
+ * Wikidata fallback sync populate different, non-overlapping chambers, so the
+ * source is never assumed to be a single fixed id. A chamber with no recorded
+ * `statements` row (legacy pre-provenance seed data) renders an honest
+ * "Source not recorded" chip instead of a SourceDot — never a fabricated one.
  *
  * Controls reuse the SAME primitives as the conditions / government-type pages:
  * the shared canonical `SingleSelectMenu`, the canonical SortableDataTable,
@@ -50,8 +56,12 @@ interface PartyExplorerProps {
     totalSeats: number;
     seatsWithPosition: number;
   };
-  /** last_sync_at for the two provenance sources (ISO strings), if known. */
-  seatsSyncedAt: string | null;
+  /**
+   * `sources.last_sync_at` (ISO) for V-Party (`vparty`), the single ideology
+   * source. Seats have no equivalent single-source prop — each row carries its
+   * own real `seatsSource` (see `BrowserParty`), because IPU Parline and the
+   * Wikidata fallback sync populate different chambers.
+   */
   positionsSyncedAt: string | null;
 }
 
@@ -97,6 +107,31 @@ function IdeologyCell({ party }: { party: BrowserParty }) {
   );
 }
 
+/**
+ * Seats/coalition provenance for one party row. Reads the REAL per-chamber
+ * source recorded in `statements` (`party.seatsSource` — resolved by
+ * `getPartiesForBrowser`), never a hardcoded sync id: IPU Parline and the
+ * Wikidata fallback sync populate different chambers, so assuming one source
+ * for every row would misattribute roughly half of them. A chamber with no
+ * recorded `statements` row (legacy pre-provenance seed data) renders an
+ * honest "Source not recorded" chip — never a fabricated SourceDot.
+ */
+function SeatsSourceCell({ party }: { party: BrowserParty }) {
+  if (!party.seatsSource) {
+    return (
+      <Chip variant="neutral" size="sm">
+        Source not recorded
+      </Chip>
+    );
+  }
+  return (
+    <SourceDot
+      source={party.seatsSource.id}
+      retrievedAt={party.seatsSource.retrievedAt}
+    />
+  );
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 export function PartyExplorer({
@@ -104,7 +139,6 @@ export function PartyExplorer({
   countries,
   regions,
   coverage,
-  seatsSyncedAt,
   positionsSyncedAt,
 }: PartyExplorerProps) {
   const [region, setRegion] = useState<string>(ALL);
@@ -286,7 +320,7 @@ export function PartyExplorer({
         label: "Source",
         render: (p) => (
           <span className="parties-cell-provenance">
-            <SourceDot source="ipu_parline" retrievedAt={seatsSyncedAt} />
+            <SeatsSourceCell party={p} />
             {p.position ? (
               <SourceDot source="vparty" retrievedAt={positionsSyncedAt} />
             ) : null}
@@ -294,7 +328,7 @@ export function PartyExplorer({
         ),
       },
     ],
-    [seatsSyncedAt, positionsSyncedAt],
+    [positionsSyncedAt],
   );
 
   return (

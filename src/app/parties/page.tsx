@@ -43,7 +43,6 @@ export default async function PartiesPage() {
     seatsWithPosition: 0,
   };
   let freshness: PartySourceFreshness = {
-    seatsSyncedAt: null,
     positionsSyncedAt: null,
   };
 
@@ -96,7 +95,6 @@ export default async function PartiesPage() {
             totalSeats: facets.totalSeats,
             seatsWithPosition: facets.seatsWithPosition,
           }}
-          seatsSyncedAt={freshness.seatsSyncedAt}
           positionsSyncedAt={freshness.positionsSyncedAt}
         />
       ) : (
