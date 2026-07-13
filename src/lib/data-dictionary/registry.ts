@@ -609,12 +609,13 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "International and regional organization identities and descriptors.",
     rowGrain: "One organization.",
     releaseScope: "atlas_public",
-    sourceOrDerivation: "Wikidata and curated official-organization metadata.",
-    cadence: "Periodic source sync and manual correction.",
+    sourceOrDerivation:
+      "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+    cadence: "Versioned official-roster compilation and reviewed correction.",
     vintageSemantics:
-      "Current reference record; founded/dissolved years describe the organization.",
+      "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
     rights:
-      "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+      "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
     deprecation: active,
   },
   organization_memberships: {
@@ -622,11 +623,12 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rowGrain: "One jurisdiction-organization membership.",
     releaseScope: "atlas_public",
     sourceOrDerivation:
-      "Wikidata and official organization membership sources.",
-    cadence: "Periodic source sync and event-driven correction.",
+      "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+    cadence: "Versioned roster release and event-driven correction.",
     vintageSemantics:
-      "joined/left dates describe membership validity; record timestamps describe ingestion.",
-    rights: "Inherited from membership source lineage.",
+      "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+    rights:
+      "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
     deprecation: active,
   },
   civica_conditions_scores: {

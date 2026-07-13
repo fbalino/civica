@@ -193,4 +193,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "2b0bad9dfb6b7a7693a44cc2b29c8329d9e0b24566ac762acbde7156517700c4",
     baseline: false,
   },
+  {
+    id: "0032_sparkling_genesis",
+    path: "drizzle/authoritative/0032_sparkling_genesis.sql",
+    sha256: "8792a833ae6b38470f6f6bc18566f4998ec87822aaa1aec726592467a5bfb8db",
+    baseline: false,
+  },
 ] as const;

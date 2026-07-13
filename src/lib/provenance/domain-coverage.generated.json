@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-13T03:37:23.024Z",
+  "generatedAt": "2026-07-13T04:24:30.570Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -739,42 +739,42 @@
       "id": "organizations",
       "label": "Organizations",
       "recordLabel": "organization records",
-      "recordCount": 19,
-      "jurisdictionsCovered": 191,
+      "recordCount": 23,
+      "jurisdictionsCovered": 163,
       "completeness": [
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
-          "complete": 19,
-          "total": 19,
-          "percent": 100
+          "complete": 18,
+          "total": 23,
+          "percent": 78.3
         },
         {
           "field": "founded_year",
           "label": "Founded year",
-          "complete": 19,
-          "total": 19,
+          "complete": 23,
+          "total": 23,
           "percent": 100
         },
         {
           "field": "member_count",
           "label": "Member count",
-          "complete": 19,
-          "total": 19,
+          "complete": 23,
+          "total": 23,
           "percent": 100
         }
       ],
       "sources": [
         {
-          "id": "civica_curated_organizations",
-          "label": "Civica curated organization seed",
-          "family": "manual_curation",
-          "lastSuccessfulRun": null
+          "id": "civica_organization_roster_v1",
+          "label": "Civica organization roster v1",
+          "family": "civica_organization_roster_v1",
+          "lastSuccessfulRun": "2026-07-11T21:00:00.000Z"
         }
       ],
-      "lastSuccessfulRun": null,
+      "lastSuccessfulRun": "2026-07-11T21:00:00.000Z",
       "knownGaps": [
-        "Organization memberships are a manually curated seed without a registered successful-run timestamp or complete source-level provenance; the alert remains open until that pipeline is replaced."
+        "Nine rosters are complete and fourteen are selected checked subsets; absence from a selected roster is never treated as non-membership. Organization Wikidata identifiers remain incomplete."
       ],
       "threshold": {
         "countryCoverageWarnBelow": 80,
@@ -782,17 +782,12 @@
         "staleAfterDays": 180
       },
       "eligibleJurisdictions": 194,
-      "countryCoveragePercent": 98.5,
+      "countryCoveragePercent": 84,
       "alerts": [
         {
-          "code": "run_unknown",
+          "code": "field_completeness",
           "severity": "warning",
-          "message": "Organizations has no recorded successful-run timestamp."
-        },
-        {
-          "code": "source_run_unknown",
-          "severity": "warning",
-          "message": "Organizations: Civica curated organization seed has no recorded successful-run timestamp."
+          "message": "Organizations: Wikidata identifier is 78.3% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -1146,6 +1141,6 @@
     "domains": 14,
     "current": 5,
     "attention": 9,
-    "alerts": 14
+    "alerts": 13
   }
 }

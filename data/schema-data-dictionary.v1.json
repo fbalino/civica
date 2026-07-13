@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "a2383e759f2f077a9f3936184f35d969523afb8dcb791a08bc2157fd821730d4",
+  "schemaFingerprint": "e694364526ee378f16ca54770b1cfc089e55693683da55773cc893e270c1cfe1",
   "summary": {
     "tables": 80,
-    "columns": 1136,
+    "columns": 1153,
     "publicAtlasTables": 22,
     "researchBetaTables": 24,
     "supportTables": 11,
@@ -14992,10 +14992,10 @@
       "definition": "Jurisdiction membership intervals in organizations.",
       "rowGrain": "One jurisdiction-organization membership.",
       "releaseScope": "atlas_public",
-      "sourceOrDerivation": "Wikidata and official organization membership sources.",
-      "cadence": "Periodic source sync and event-driven correction.",
-      "vintageSemantics": "joined/left dates describe membership validity; record timestamps describe ingestion.",
-      "rights": "Inherited from membership source lineage.",
+      "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+      "cadence": "Versioned roster release and event-driven correction.",
+      "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+      "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
       "deprecation": {
         "status": "active"
       },
@@ -15017,10 +15017,85 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Wikidata and official organization membership sources.",
-          "cadence": "Periodic source sync and event-driven correction.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
           "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
-          "rights": "Inherited from membership source lineage.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "disputed",
+          "propertyName": "disputed",
+          "definition": "Disputed recorded for the jurisdiction-organization membership.",
+          "sqlType": "boolean",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "end_date",
+          "propertyName": "endDate",
+          "definition": "End date recorded for the jurisdiction-organization membership.",
+          "sqlType": "date",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "ISO 8601 calendar date",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "End date follows this table contract. join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "end_date_precision",
+          "propertyName": "endDatePrecision",
+          "definition": "End date precision recorded for the jurisdiction-organization membership.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "End date precision follows this table contract. join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15043,9 +15118,9 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
-          "cadence": "Periodic source sync and event-driven correction.",
-          "vintageSemantics": "joined/left dates describe membership validity; record timestamps describe ingestion.",
-          "rights": "Inherited from membership source lineage.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15067,10 +15142,35 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and official organization membership sources.",
-          "cadence": "Periodic source sync and event-driven correction.",
-          "vintageSemantics": "Join date follows this table contract. joined/left dates describe membership validity; record timestamps describe ingestion.",
-          "rights": "Inherited from membership source lineage.",
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "Join date follows this table contract. join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "join_date_precision",
+          "propertyName": "joinDatePrecision",
+          "definition": "Join date precision recorded for the jurisdiction-organization membership.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "Join date precision follows this table contract. join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15091,16 +15191,17 @@
             "foreignKey": "jurisdictions.id",
             "indexGroups": [
               "idx_org_memberships_unique",
-              "idx_org_memberships_jurisdiction"
+              "idx_org_memberships_jurisdiction",
+              "idx_org_memberships_public"
             ],
             "uniqueGroups": [
               "idx_org_memberships_unique"
             ]
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
-          "cadence": "Periodic source sync and event-driven correction.",
-          "vintageSemantics": "joined/left dates describe membership validity; record timestamps describe ingestion.",
-          "rights": "Inherited from membership source lineage.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15128,9 +15229,9 @@
             ]
           },
           "sourceOrDerivation": "Relational identifier referencing organizations.id; substantive provenance follows this table's source contract.",
-          "cadence": "Periodic source sync and event-driven correction.",
-          "vintageSemantics": "joined/left dates describe membership validity; record timestamps describe ingestion.",
-          "rights": "Inherited from membership source lineage.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15152,10 +15253,212 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and official organization membership sources.",
-          "cadence": "Periodic source sync and event-driven correction.",
-          "vintageSemantics": "joined/left dates describe membership validity; record timestamps describe ingestion.",
-          "rights": "Inherited from membership source lineage.",
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "sources.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_license",
+          "propertyName": "sourceLicense",
+          "definition": "Source license recorded for the jurisdiction-organization membership.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_retrieved_at",
+          "propertyName": "sourceRetrievedAt",
+          "definition": "Source retrieved at recorded for the jurisdiction-organization membership.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "Source retrieved at follows this table contract. join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_url",
+          "propertyName": "sourceUrl",
+          "definition": "Direct upstream URL captured for this record when available.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_org_memberships_public"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status_note",
+          "propertyName": "statusNote",
+          "definition": "Status note recorded for the jurisdiction-organization membership.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "updated_at",
+          "propertyName": "updatedAt",
+          "definition": "Timestamp when Civica last updated this row.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_vintage",
+          "propertyName": "upstreamVintage",
+          "definition": "Upstream vintage recorded for the jurisdiction-organization membership.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+          "cadence": "Versioned roster release and event-driven correction.",
+          "vintageSemantics": "Upstream vintage follows this table contract. join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+          "rights": "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15168,10 +15471,10 @@
       "definition": "International and regional organization identities and descriptors.",
       "rowGrain": "One organization.",
       "releaseScope": "atlas_public",
-      "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-      "cadence": "Periodic source sync and manual correction.",
-      "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-      "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+      "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+      "cadence": "Versioned official-roster compilation and reviewed correction.",
+      "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+      "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
       "deprecation": {
         "status": "active"
       },
@@ -15193,10 +15496,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
           "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15218,10 +15521,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15243,10 +15546,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Founded year follows this table contract. Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "Founded year follows this table contract. source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15268,10 +15571,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15293,10 +15596,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15319,9 +15622,9 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15343,10 +15646,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15368,10 +15671,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15393,10 +15696,110 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "sources.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_license",
+          "propertyName": "sourceLicense",
+          "definition": "Source license recorded for the organization.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_retrieved_at",
+          "propertyName": "sourceRetrievedAt",
+          "definition": "Source retrieved at recorded for the organization.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "Source retrieved at follows this table contract. source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_url",
+          "propertyName": "sourceUrl",
+          "definition": "Direct upstream URL captured for this record when available.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15418,10 +15821,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15443,10 +15846,35 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
           "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_vintage",
+          "propertyName": "upstreamVintage",
+          "definition": "Upstream vintage recorded for the organization.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "Upstream vintage follows this table contract. source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }
@@ -15468,10 +15896,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Captured source-lineage metadata. Wikidata and curated official-organization metadata.",
-          "cadence": "Periodic source sync and manual correction.",
-          "vintageSemantics": "Current reference record; founded/dissolved years describe the organization.",
-          "rights": "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+          "sourceOrDerivation": "Captured source-lineage metadata. Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+          "cadence": "Versioned official-roster compilation and reviewed correction.",
+          "vintageSemantics": "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
+          "rights": "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
           "deprecation": {
             "status": "active"
           }

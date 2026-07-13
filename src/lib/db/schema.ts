@@ -343,9 +343,7 @@ export const partyIdentityEvents = pgTable(
   },
   (table) => [
     index("party_identity_events_group_idx").on(table.eventGroupKey),
-    index("party_identity_events_predecessor_idx").on(
-      table.predecessorPartyId,
-    ),
+    index("party_identity_events_predecessor_idx").on(table.predecessorPartyId),
     index("party_identity_events_successor_idx").on(table.successorPartyId),
     check(
       "party_identity_events_type_check",
@@ -1920,20 +1918,34 @@ export const pulseEvents = pgTable(
 
 // --- International organizations (CIV-163) ---
 
-export const organizations = pgTable("organizations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  slug: text("slug").unique().notNull(),
-  name: text("name").notNull(),
-  fullName: text("full_name").notNull(),
-  type: text("type").notNull(),
-  foundedYear: integer("founded_year"),
-  hqCountry: text("hq_country"),
-  memberCount: integer("member_count"),
-  wikidataQid: text("wikidata_qid"),
-  extra: jsonb("extra"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").unique().notNull(),
+    name: text("name").notNull(),
+    fullName: text("full_name").notNull(),
+    type: text("type").notNull(),
+    foundedYear: integer("founded_year"),
+    hqCountry: text("hq_country"),
+    memberCount: integer("member_count"),
+    wikidataQid: text("wikidata_qid"),
+    extra: jsonb("extra"),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    upstreamVintage: text("upstream_vintage"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    check(
+      "organizations_source_bundle_check",
+      dsql`(${table.sourceId} is null and ${table.sourceUrl} is null and ${table.sourceLicense} is null and ${table.sourceRetrievedAt} is null and ${table.upstreamVintage} is null) or (${table.sourceId} is not null and ${table.sourceUrl} is not null and ${table.sourceLicense} is not null and ${table.sourceRetrievedAt} is not null and ${table.upstreamVintage} is not null)`,
+    ),
+  ],
+);
 
 export const organizationMemberships = pgTable(
   "organization_memberships",
@@ -1946,8 +1958,20 @@ export const organizationMemberships = pgTable(
       .references(() => jurisdictions.id)
       .notNull(),
     joinDate: date("join_date"),
+    joinDatePrecision: text("join_date_precision").notNull().default("unknown"),
+    endDate: date("end_date"),
+    endDatePrecision: text("end_date_precision").notNull().default("unknown"),
     role: text("role"),
+    status: text("status").notNull().default("unverified_legacy"),
+    statusNote: text("status_note"),
+    disputed: boolean("disputed").notNull().default(false),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    upstreamVintage: text("upstream_vintage"),
     createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => [
     uniqueIndex("idx_org_memberships_unique").on(
@@ -1956,6 +1980,31 @@ export const organizationMemberships = pgTable(
     ),
     index("idx_org_memberships_jurisdiction").on(table.jurisdictionId),
     index("idx_org_memberships_org").on(table.orgId),
+    index("idx_org_memberships_public").on(table.status, table.jurisdictionId),
+    check(
+      "organization_memberships_status_check",
+      dsql`${table.status} in ('current', 'former', 'withdrawn', 'suspended', 'unverified_legacy')`,
+    ),
+    check(
+      "organization_memberships_join_precision_check",
+      dsql`${table.joinDatePrecision} in ('day', 'year', 'unknown')`,
+    ),
+    check(
+      "organization_memberships_end_precision_check",
+      dsql`${table.endDatePrecision} in ('day', 'year', 'unknown')`,
+    ),
+    check(
+      "organization_memberships_interval_check",
+      dsql`${table.endDate} is null or ${table.joinDate} is null or ${table.endDate} >= ${table.joinDate}`,
+    ),
+    check(
+      "organization_memberships_terminal_date_check",
+      dsql`${table.status} not in ('former', 'withdrawn') or ${table.endDate} is not null`,
+    ),
+    check(
+      "organization_memberships_source_bundle_check",
+      dsql`${table.status} = 'unverified_legacy' or (${table.sourceId} is not null and ${table.sourceUrl} is not null and ${table.sourceLicense} is not null and ${table.sourceRetrievedAt} is not null and ${table.upstreamVintage} is not null)`,
+    ),
   ],
 );
 

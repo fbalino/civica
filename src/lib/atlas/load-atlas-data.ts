@@ -463,7 +463,8 @@ async function _loadAtlasData(): Promise<{
             sql`${organizationMemberships.orgId} = ${organizations.id}`,
           )
           .where(
-            sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`,
+            sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}
+            AND ${organizationMemberships.status} = 'current'`,
           )
       : [];
 

@@ -9,7 +9,7 @@ import {
 test("documents every current Drizzle table and column", () => {
   const dictionary = buildSchemaDataDictionary();
   assert.equal(dictionary.summary.tables, 80);
-  assert.equal(dictionary.summary.columns, 1136);
+  assert.equal(dictionary.summary.columns, 1153);
   assert.deepEqual(dictionaryValidationErrors(dictionary), []);
 });
 

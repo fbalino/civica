@@ -168,6 +168,21 @@ a.org-row-name:hover {
   line-height: 1.5;
   color: var(--color-text-60);
 }
+.org-row-source {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: 1.5;
+  color: var(--color-text-50);
+}
+.org-row-source a {
+  color: inherit;
+  text-decoration-color: var(--color-border-strong);
+  text-underline-offset: var(--space-1);
+}
+.org-row--historical {
+  background: var(--color-surface-tertiary);
+}
 .org-row-chip {
   align-self: center;
   justify-self: start;

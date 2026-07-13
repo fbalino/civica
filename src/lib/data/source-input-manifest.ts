@@ -136,6 +136,16 @@ export const SOURCE_INPUT_SPECS: readonly SourceInputSpec[] = [
     "public-domain",
   ),
   spec(
+    "civica_organization_roster_v1",
+    "https://www.civicaatlas.org/methodology/source-coverage",
+    "derived-database",
+    "database-rows",
+    "organization-membership-release/2026-07-v1",
+    "official organization pages retrieved 2026-07-12",
+    "23 organization identities and 446 retained relationships; nine complete rosters and fourteen selected checked subsets",
+    "restricted-no-redistribution",
+  ),
+  spec(
     "civicus_monitor",
     "https://monitor.civicus.org/RSSFeed.xml",
     "rss",

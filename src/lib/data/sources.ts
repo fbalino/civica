@@ -47,6 +47,7 @@ export const SOURCE_NAMES: Record<string, string> = {
   world_happiness: "World Happiness Report",
   unodc: "UNODC",
   civica_curated: "Civica curated data",
+  civica_organization_roster_v1: "Civica organization roster v1",
   // Phase 5.5 — Pulse Beta sources
   acled: "ACLED",
   civicus_monitor: "CIVICUS Monitor",
@@ -86,6 +87,7 @@ export const FROZEN_SOURCES = new Set<string>([
   "constitute_project",
   "unodc",
   "civica_curated",
+  "civica_organization_roster_v1",
   // International IDEA turnout is a periodically-updated bulk vintage (a sync
   // run of a downloadable dataset, not a live feed) → amber, per the elections
   // resolution's SourceDot posture (plan/elections-data-sourcing-resolution-v1.md §3).

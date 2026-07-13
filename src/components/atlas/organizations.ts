@@ -50,6 +50,13 @@ export interface OrgDetail {
     extra: Record<string, unknown> | null;
   };
   members: OrgMember[];
+  membershipSource: {
+    label: string;
+    url: string;
+    license: string;
+    retrievedAt: string;
+    coverage: "complete" | "selected";
+  };
 }
 
 export const ORG_TYPE_LABEL: Record<OrgType, string> = {

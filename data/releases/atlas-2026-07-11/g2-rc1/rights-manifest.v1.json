@@ -101,6 +101,22 @@
       ]
     },
     {
+      "sourceId": "civica_organization_roster_v1",
+      "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+      "termsUrl": "https://www.civicaatlas.org/methodology/source-coverage",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "blocked",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
       "sourceId": "civicus_monitor",
       "licenseId": "PUBLISHER-TERMS-PENDING:open-share-alike",
       "termsUrl": "https://monitor.civicus.org/RSSFeed.xml",

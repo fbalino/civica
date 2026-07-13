@@ -57,14 +57,14 @@ const ORG_DESCRIPTIONS: Record<string, string> = {
   nato: "Transatlantic military alliance founded on collective defence.",
   "european-union":
     "Political and economic union of European states with a single market.",
-  eurozone: "The bloc of EU states that have adopted the euro as their currency.",
+  eurozone:
+    "The bloc of EU states that have adopted the euro as their currency.",
   "council-of-europe":
     "Pan-European body upholding human rights, democracy, and the rule of law.",
-  asean:
-    "Political and economic union of Southeast Asian states.",
-  "african-union": "Continental union of African states for political and economic integration.",
-  ecowas:
-    "Regional economic and political bloc of West African states.",
+  asean: "Political and economic union of Southeast Asian states.",
+  "african-union":
+    "Continental union of African states for political and economic integration.",
+  ecowas: "Regional economic and political bloc of West African states.",
   gcc: "Regional union of Arab states bordering the Persian Gulf.",
   wto: "Global body that regulates and facilitates international trade.",
   imf: "International organisation that promotes monetary cooperation and financial stability.",
@@ -98,21 +98,21 @@ function membershipYear(joinDate: string | null): number | null {
 export async function FactbookOrganizations({
   jurisdictionId,
   countryName,
-  retrievedAt = null,
 }: FactbookOrganizationsProps) {
   const empty: CountryOrganizationsData = {
     memberships: [],
     coMembership: {},
     hostsOrgs: [],
   };
-  const { memberships, hostsOrgs } =
-    await getCountryOrganizationsData(jurisdictionId).catch(() => empty);
+  const { memberships, hostsOrgs } = await getCountryOrganizationsData(
+    jurisdictionId,
+  ).catch(() => empty);
 
   if (memberships.length === 0) {
     return (
       <p className="org-section-empty">
-        No international-organization memberships have been compiled for{" "}
-        {countryName} yet.
+        No source-backed international-organization memberships have been
+        compiled for {countryName} yet. This is not a non-membership claim.
       </p>
     );
   }
@@ -126,12 +126,16 @@ export async function FactbookOrganizations({
     byType.set(type, list);
   }
 
-  const accessionYears = memberships
+  const currentMemberships = memberships.filter((m) => m.status === "current");
+  const historicalMemberships = memberships.filter(
+    (m) => m.status !== "current",
+  );
+  const accessionYears = currentMemberships
     .map((m) => membershipYear(m.joinDate))
     .filter((y): y is number => y != null);
   const earliestAccession =
     accessionYears.length > 0 ? Math.min(...accessionYears) : null;
-  const foundingCount = memberships.filter(
+  const foundingCount = currentMemberships.filter(
     (m) => (m.role ?? "").toLowerCase() === "founding",
   ).length;
 
@@ -140,9 +144,15 @@ export async function FactbookOrganizations({
       {/* Summary band */}
       <div id="organizations--summary" className="org-stats">
         <div className="org-stat">
-          <div className="org-stat-k">Memberships</div>
-          <div className="org-stat-v">{memberships.length}</div>
+          <div className="org-stat-k">Current memberships</div>
+          <div className="org-stat-v">{currentMemberships.length}</div>
         </div>
+        {historicalMemberships.length > 0 && (
+          <div className="org-stat">
+            <div className="org-stat-k">Historical relationships</div>
+            <div className="org-stat-v">{historicalMemberships.length}</div>
+          </div>
+        )}
         <div className="org-stat">
           <div className="org-stat-k">Founding member of</div>
           <div className="org-stat-v">{foundingCount}</div>
@@ -198,9 +208,19 @@ export async function FactbookOrganizations({
                     ? (ROLE_CHIP_CLASS[m.role.toLowerCase()] ?? "")
                     : "";
                   const desc = ORG_DESCRIPTIONS[m.orgSlug] ?? null;
+                  const endYear = membershipYear(m.endDate);
+                  const statusLabel =
+                    m.status === "current"
+                      ? rLabel
+                      : m.status.charAt(0).toUpperCase() + m.status.slice(1);
+                  const statusClass =
+                    m.status === "current" ? rClass : "editorial-chip--sand";
 
                   return (
-                    <li key={m.orgId} className="org-row">
+                    <li
+                      key={m.orgId}
+                      className={`org-row${m.status === "current" ? "" : " org-row--historical"}`}
+                    >
                       <span
                         className="org-row-dot"
                         style={{ background: color }}
@@ -225,16 +245,36 @@ export async function FactbookOrganizations({
                           )}
                         </div>
                         {desc && <p className="org-row-desc">{desc}</p>}
+                        <p className="org-row-source">
+                          {m.disputed && "Disputed · "}
+                          {m.role &&
+                            m.status !== "current" &&
+                            `${roleLabel(m.orgType, m.role)} · `}
+                          <a
+                            href={m.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Source
+                          </a>
+                          {` · ${m.upstreamVintage}`}
+                        </p>
                       </div>
-                      {rLabel ? (
-                        <span className={`editorial-chip ${rClass} org-row-chip`}>
-                          {rLabel}
+                      {statusLabel ? (
+                        <span
+                          className={`editorial-chip ${statusClass} org-row-chip`}
+                        >
+                          {statusLabel}
                         </span>
                       ) : (
                         <span aria-hidden className="org-row-chip" />
                       )}
                       <span className="org-row-year">
-                        {year != null ? year : "—"}
+                        {year != null && endYear != null
+                          ? `${year}–${endYear}`
+                          : year != null
+                            ? year
+                            : "—"}
                       </span>
                     </li>
                   );
@@ -246,9 +286,13 @@ export async function FactbookOrganizations({
       </div>
 
       <div className="org-section-source">
-        <SourceDot source="wikidata" retrievedAt={retrievedAt} />
+        <SourceDot
+          source="civica_organization_roster_v1"
+          retrievedAt={memberships[0]?.sourceRetrievedAt ?? null}
+        />
         <span>
-          Memberships, accession years, and roles compiled from Wikidata.
+          Only source-backed relationships are shown. Some organization rosters
+          are intentionally partial; absence is not evidence of non-membership.
         </span>
       </div>
     </>

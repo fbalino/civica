@@ -9,12 +9,22 @@ interface Membership {
   orgType: string;
   foundedYear: number | null;
   joinDate: string | Date | null;
+  endDate: string | Date | null;
   role: string | null;
+  status: string;
+  disputed: boolean;
+  sourceUrl: string | null;
+  upstreamVintage: string | null;
 }
 
 export interface CompareInternationalProps {
   countries: Array<{
-    jurisdiction: { id: string; slug: string; name: string; iso2: string | null };
+    jurisdiction: {
+      id: string;
+      slug: string;
+      name: string;
+      iso2: string | null;
+    };
     seriesColor: string;
   }>;
   memberships: Membership[];
@@ -29,13 +39,26 @@ const ORG_TYPE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-const ORG_TYPE_ORDER = ["un", "security", "regional", "trade", "cultural", "other"];
+const ORG_TYPE_ORDER = [
+  "un",
+  "security",
+  "regional",
+  "trade",
+  "cultural",
+  "other",
+];
 
 function joinYear(m: Membership): number | null {
   if (!m.joinDate) return null;
   const d = typeof m.joinDate === "string" ? new Date(m.joinDate) : m.joinDate;
   if (Number.isNaN(d.getTime())) return null;
-  return d.getFullYear();
+  return d.getUTCFullYear();
+}
+
+function endYear(m: Membership): number | null {
+  if (!m.endDate) return null;
+  const d = typeof m.endDate === "string" ? new Date(m.endDate) : m.endDate;
+  return Number.isNaN(d.getTime()) ? null : d.getUTCFullYear();
 }
 
 export function CompareInternational({
@@ -70,7 +93,10 @@ export function CompareInternational({
   }
 
   // Group orgs by type in canonical order
-  const byType = new Map<string, typeof orgIndex extends Map<string, infer V> ? V[] : never>();
+  const byType = new Map<
+    string,
+    typeof orgIndex extends Map<string, infer V> ? V[] : never
+  >();
   for (const type of ORG_TYPE_ORDER) byType.set(type, []);
   for (const org of orgIndex.values()) {
     const bucket = byType.get(org.orgType) ?? byType.get("other")!;
@@ -130,7 +156,9 @@ export function CompareInternational({
               {ORG_TYPE_LABELS[type] ?? type}
             </div>,
             ...orgs.flatMap((org) => {
-              const shared = countryIds.every((id) => org.byCountry.has(id));
+              const shared = countryIds.every(
+                (id) => org.byCountry.get(id)?.status === "current",
+              );
               const rowCells: React.ReactNode[] = [
                 <div
                   key={`${org.orgId}-name`}
@@ -150,6 +178,7 @@ export function CompareInternational({
               for (const c of countries) {
                 const m = org.byCountry.get(c.jurisdiction.id);
                 const year = m ? joinYear(m) : null;
+                const ended = m ? endYear(m) : null;
                 rowCells.push(
                   <div
                     key={`${org.orgId}-${c.jurisdiction.slug}`}
@@ -162,12 +191,30 @@ export function CompareInternational({
                   >
                     {m ? (
                       <span className="compare-intl-member">
-                        Member{year ? ` · ${year}` : ""}
+                        {m.status === "current"
+                          ? "Member"
+                          : m.status.charAt(0).toUpperCase() +
+                            m.status.slice(1)}
+                        {year ? ` · ${year}${ended ? `–${ended}` : ""}` : ""}
+                        {m.disputed ? " · disputed" : ""}
+                        {m.sourceUrl && (
+                          <>
+                            {" · "}
+                            <a
+                              href={m.sourceUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={m.upstreamVintage ?? undefined}
+                            >
+                              Source
+                            </a>
+                          </>
+                        )}
                       </span>
                     ) : (
                       <span className="compare-intl-nonmember">—</span>
                     )}
-                  </div>
+                  </div>,
                 );
               }
               return rowCells;

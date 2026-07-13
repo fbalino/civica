@@ -1926,14 +1926,27 @@ export async function getInternationalMembershipsBySlugs(
       orgType: organizations.type,
       foundedYear: organizations.foundedYear,
       joinDate: organizationMemberships.joinDate,
+      joinDatePrecision: organizationMemberships.joinDatePrecision,
+      endDate: organizationMemberships.endDate,
+      endDatePrecision: organizationMemberships.endDatePrecision,
       role: organizationMemberships.role,
+      status: organizationMemberships.status,
+      disputed: organizationMemberships.disputed,
+      sourceId: organizationMemberships.sourceId,
+      sourceUrl: organizationMemberships.sourceUrl,
+      sourceLicense: organizationMemberships.sourceLicense,
+      sourceRetrievedAt: organizationMemberships.sourceRetrievedAt,
+      upstreamVintage: organizationMemberships.upstreamVintage,
     })
     .from(organizationMemberships)
     .innerJoin(
       organizations,
       eq(organizationMemberships.orgId, organizations.id),
     )
-    .where(sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`)
+    .where(
+      sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}
+      AND ${organizationMemberships.status} <> 'unverified_legacy'`,
+    )
     .orderBy(asc(organizations.type), asc(organizations.name));
   return rows;
 }

@@ -8,8 +8,8 @@
       "id": "frozen_release",
       "path": "data/releases/atlas-2026-07-11-g2-rc1.zip",
       "role": "Frozen G2 release candidate archive",
-      "bytes": 1869724,
-      "sha256": "978476a32355767eac6e73e792cd31580f850d9b498d576b4926fa4e10c9e53d"
+      "bytes": 1869782,
+      "sha256": "decc2d31fbdb7b7ef4dd0341d78ed7d5e9be1a950c223e1f3687fd9f778e0fbf"
     },
     {
       "id": "bundle_manifest",
@@ -23,7 +23,7 @@
       "path": "data/releases/atlas-2026-07-11/g2-rc1/SHA256SUMS",
       "role": "Release checksums",
       "bytes": 1302,
-      "sha256": "4dcaf61c5e5149ef5990bef40cefcadc767639a1feff91ea2807eff7d0e1e1e6"
+      "sha256": "ce47f55fd6b620b327af272916f500ba11e6d833acdbbcc45ee7b484e9b70edd"
     },
     {
       "id": "codebook",
@@ -36,15 +36,15 @@
       "id": "data_dictionary",
       "path": "data/schema-data-dictionary.v1.json",
       "role": "Complete schema data dictionary",
-      "bytes": 1498419,
-      "sha256": "8c4a6898434639c5be2567b5938dbe280f7c612fc1aa12ab94e61cd145849d9a"
+      "bytes": 1527577,
+      "sha256": "ea7f74c76d910f409ce685b6fc39da68390b2943ba0af3083f4355391e83c00f"
     },
     {
       "id": "rights_manifest",
       "path": "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
       "role": "Source, field, product, and release rights",
-      "bytes": 35063,
-      "sha256": "5e412b951636af46dee8a75694270755adcea5754197cec0a0455ceecf07691d"
+      "bytes": 35675,
+      "sha256": "68d43cd65e58b470e720fb9c1f3defac6f2831319c6b955da55efdcdb916355f"
     },
     {
       "id": "source_input_manifest",
@@ -122,5 +122,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "8a95fd8709428bc9d5ada3da3bd1cd4afaca17d6e6eb08b84e16403fb0e68489"
+  "semanticSha256": "dbf2816e64ccab5e0d93e2316dfd35a763c6c7731ca3bf9598a2a036c38a3f70"
 }

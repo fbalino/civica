@@ -118,6 +118,17 @@ does not infer cross-chamber continuity from party names. Recovery uses the
 isolated pre-change backup or a reviewed forward compensation; do not delete
 the new append-only evidence ledgers as an ordinary rollback.
 
+`0032_sparkling_genesis` adds membership interval, precision, status,
+dispute, source, rights, retrieval, and upstream-vintage fields to
+organization relationships, plus the same source bundle for organization
+identities. Existing blanket-seeded rows default to `unverified_legacy` and
+remain available to the research-evidence history trigger while public read
+boundaries exclude them. The migration does not declare any legacy row
+current; after application, the versioned organization-membership sync
+activates only the checked release and preserves ECOWAS withdrawals as dated
+history. Recovery uses an isolated pre-change backup or reviewed forward
+compensation rather than deleting retained rows.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

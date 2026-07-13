@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-13T03:36:20.445Z",
-  "sha256": "2cfee24652103889f6d08939a39d59ae6408ec7c3f63b5f14871ba8e56e3babc",
+  "generatedAt": "2026-07-13T04:21:33.828Z",
+  "sha256": "7253b6ca45e88d1c358d62a832c359c9066a25775e43db1e911de8501a6b6c4f",
   "schema": {
     "columns": [
       {
@@ -5108,6 +5108,114 @@
         "position": 6
       },
       {
+        "udt": "text",
+        "name": "join_date_precision",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": "'unknown'::text",
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "date",
+        "name": "end_date",
+        "type": "date",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "end_date_precision",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": "'unknown'::text",
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": "'unverified_legacy'::text",
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "status_note",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "bool",
+        "name": "disputed",
+        "type": "boolean",
+        "table": "organization_memberships",
+        "default": "false",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "source_license",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "timestamp",
+        "name": "source_retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "upstream_vintage",
+        "type": "text",
+        "table": "organization_memberships",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "timestamp",
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "table": "organization_memberships",
+        "default": "now()",
+        "nullable": "YES",
+        "position": 18
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -5214,6 +5322,51 @@
         "default": "now()",
         "nullable": "YES",
         "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "organizations",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "organizations",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "source_license",
+        "type": "text",
+        "table": "organizations",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "timestamp",
+        "name": "source_retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "organizations",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "upstream_vintage",
+        "type": "text",
+        "table": "organizations",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
       },
       {
         "udt": "uuid",
@@ -11015,6 +11168,11 @@
         "definition": "CREATE INDEX idx_org_memberships_org ON public.organization_memberships USING btree (org_id)"
       },
       {
+        "name": "idx_org_memberships_public",
+        "table": "organization_memberships",
+        "definition": "CREATE INDEX idx_org_memberships_public ON public.organization_memberships USING btree (status, jurisdiction_id)"
+      },
+      {
         "name": "idx_org_memberships_unique",
         "table": "organization_memberships",
         "definition": "CREATE UNIQUE INDEX idx_org_memberships_unique ON public.organization_memberships USING btree (org_id, jurisdiction_id)"
@@ -13758,6 +13916,24 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "organization_memberships_end_precision_check",
+        "type": "c",
+        "table": "organization_memberships",
+        "definition": "CHECK (end_date_precision = ANY (ARRAY['day'::text, 'year'::text, 'unknown'::text]))"
+      },
+      {
+        "name": "organization_memberships_interval_check",
+        "type": "c",
+        "table": "organization_memberships",
+        "definition": "CHECK (end_date IS NULL OR join_date IS NULL OR end_date >= join_date)"
+      },
+      {
+        "name": "organization_memberships_join_precision_check",
+        "type": "c",
+        "table": "organization_memberships",
+        "definition": "CHECK (join_date_precision = ANY (ARRAY['day'::text, 'year'::text, 'unknown'::text]))"
+      },
+      {
         "name": "organization_memberships_jurisdiction_id_jurisdictions_id_fk",
         "type": "f",
         "table": "organization_memberships",
@@ -13776,6 +13952,30 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "organization_memberships_source_bundle_check",
+        "type": "c",
+        "table": "organization_memberships",
+        "definition": "CHECK (status = 'unverified_legacy'::text OR source_id IS NOT NULL AND source_url IS NOT NULL AND source_license IS NOT NULL AND source_retrieved_at IS NOT NULL AND upstream_vintage IS NOT NULL)"
+      },
+      {
+        "name": "organization_memberships_source_id_sources_id_fk",
+        "type": "f",
+        "table": "organization_memberships",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "organization_memberships_status_check",
+        "type": "c",
+        "table": "organization_memberships",
+        "definition": "CHECK (status = ANY (ARRAY['current'::text, 'former'::text, 'withdrawn'::text, 'suspended'::text, 'unverified_legacy'::text]))"
+      },
+      {
+        "name": "organization_memberships_terminal_date_check",
+        "type": "c",
+        "table": "organization_memberships",
+        "definition": "CHECK ((status <> ALL (ARRAY['former'::text, 'withdrawn'::text])) OR end_date IS NOT NULL)"
+      },
+      {
         "name": "organizations_pkey",
         "type": "p",
         "table": "organizations",
@@ -13786,6 +13986,18 @@
         "type": "u",
         "table": "organizations",
         "definition": "UNIQUE (slug)"
+      },
+      {
+        "name": "organizations_source_bundle_check",
+        "type": "c",
+        "table": "organizations",
+        "definition": "CHECK (source_id IS NULL AND source_url IS NULL AND source_license IS NULL AND source_retrieved_at IS NULL AND upstream_vintage IS NULL OR source_id IS NOT NULL AND source_url IS NOT NULL AND source_license IS NOT NULL AND source_retrieved_at IS NOT NULL AND upstream_vintage IS NOT NULL)"
+      },
+      {
+        "name": "organizations_source_id_sources_id_fk",
+        "type": "f",
+        "table": "organizations",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
       },
       {
         "name": "party_composition_runs_body_id_government_bodies_id_fk",

@@ -304,6 +304,16 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       implementationPaths: ["scripts/seed-from-factbook.ts"],
     },
     {
+      id: "atlas.organization-memberships",
+      product: "atlas",
+      sources: ["civica_organization_roster_v1"],
+      entrypoint: "scripts/sync-organization-memberships.ts",
+      implementationPaths: [
+        "scripts/sync-organization-memberships.ts",
+        "src/lib/organizations/membership-release.ts",
+      ],
+    },
+    {
       id: "atlas.constitutions",
       product: "atlas",
       sources: ["constitute_project"],

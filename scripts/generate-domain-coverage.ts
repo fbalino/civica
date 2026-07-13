@@ -127,12 +127,15 @@ async function collect(generatedAt: string) {
         FROM legislature_parties lp JOIN government_bodies b ON b.id=lp.body_id
         JOIN jurisdictions j ON j.id=b.jurisdiction_id
         WHERE j.type='sovereign_state' AND lp.is_current = true`,
-    sql`SELECT (SELECT COUNT(*) FROM organizations)::int records,
+    sql`SELECT (SELECT COUNT(*) FROM organizations WHERE source_id='civica_organization_roster_v1')::int records,
                COUNT(DISTINCT om.jurisdiction_id)::int jurisdictions,
-               (SELECT COUNT(*) FROM organizations WHERE wikidata_qid IS NOT NULL)::int qids,
-               (SELECT COUNT(*) FROM organizations WHERE founded_year IS NOT NULL)::int founded,
-               (SELECT COUNT(*) FROM organizations WHERE member_count IS NOT NULL)::int member_counts
-        FROM organization_memberships om JOIN jurisdictions j ON j.id=om.jurisdiction_id WHERE j.type='sovereign_state'`,
+               (SELECT COUNT(*) FROM organizations WHERE source_id='civica_organization_roster_v1' AND wikidata_qid IS NOT NULL)::int qids,
+               (SELECT COUNT(*) FROM organizations WHERE source_id='civica_organization_roster_v1' AND founded_year IS NOT NULL)::int founded,
+               (SELECT COUNT(*) FROM organizations WHERE source_id='civica_organization_roster_v1' AND member_count IS NOT NULL)::int member_counts
+        FROM organization_memberships om
+        JOIN jurisdictions j ON j.id=om.jurisdiction_id
+        WHERE j.type='sovereign_state' AND om.status='current'
+          AND om.source_id='civica_organization_roster_v1'`,
     sql`SELECT COUNT(*)::int records, COUNT(DISTINCT b.jurisdiction_id)::int jurisdictions,
                COUNT(b.url)::int urls, COUNT(b.raw_status)::int statuses,
                COUNT(b.introduced_date)::int introduced
@@ -275,14 +278,7 @@ async function collect(generatedAt: string) {
     },
     ...source(["wikidata"]),
   ];
-  const organizationsSources: DomainSourceInput[] = [
-    {
-      id: "civica_curated_organizations",
-      label: "Civica curated organization seed",
-      family: "manual_curation",
-      lastSuccessfulRun: null,
-    },
-  ];
+  const organizationsSources = source(["civica_organization_roster_v1"]);
 
   const domains: DomainCoverageInput[] = [
     {
@@ -643,9 +639,9 @@ async function collect(generatedAt: string) {
         },
       ],
       sources: organizationsSources,
-      lastSuccessfulRun: null,
+      lastSuccessfulRun: sourceLast(organizationsSources),
       knownGaps: [
-        "Organization memberships are a manually curated seed without a registered successful-run timestamp or complete source-level provenance; the alert remains open until that pipeline is replaced.",
+        "Nine rosters are complete and fourteen are selected checked subsets; absence from a selected roster is never treated as non-membership. Organization Wikidata identifiers remain incomplete.",
       ],
       threshold,
     },

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-13T03:42:43.845Z",
+  "generatedAt": "2026-07-13T04:36:59.056Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -32,7 +32,8 @@
     "0028_complex_carlie_cooper",
     "0029_whole_dazzler",
     "0030_cute_namora",
-    "0031_hot_saracen"
+    "0031_hot_saracen",
+    "0032_sparkling_genesis"
   ],
   "plans": [
     {
@@ -70,7 +71,7 @@
         "legislature_parties": 1548,
         "offices": 5305,
         "persons": 4959,
-        "sources": 56,
+        "sources": 57,
         "statements": 6826,
         "terms": 5475
       },
@@ -163,8 +164,8 @@
       "invariantPlan": "npm run db:plan -- --id=0003_international_organizations --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "organization_memberships": 1713,
-        "organizations": 19
+        "organization_memberships": 1880,
+        "organizations": 24
       },
       "writesPerformed": 0
     },
@@ -448,7 +449,7 @@
       "liveRowCounts": {
         "indicator_history": 46215,
         "jurisdictions": 253,
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -471,7 +472,7 @@
       "liveRowCounts": {
         "legislature_parties": 1548,
         "party_positions": 656,
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -669,14 +670,14 @@
         "indicator_history": 46215,
         "legislature_parties": 1548,
         "offices": 5305,
-        "organization_memberships": 1713,
+        "organization_memberships": 1880,
         "persons": 4959,
         "pulse_dimensional_deltas": 325,
         "pulse_events_v2": 384,
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 72151,
+        "research_evidence_history": 74124,
         "statements": 6826,
         "terms": 5475
       },
@@ -724,7 +725,7 @@
         "country_fact_vintages": 35021,
         "country_facts": 25827,
         "government_taxonomies": 249,
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -757,7 +758,7 @@
         "pulse_pipeline_runs": 29,
         "pulse_sources": 529,
         "raw_events": 1507,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -788,7 +789,7 @@
         "pulse_events_v2": 384,
         "pulse_pipeline_runs": 29,
         "raw_events": 1507,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -815,7 +816,7 @@
         "pulse_incidents": 1224,
         "pulse_review_obligations": 175,
         "pulse_review_sla_events": 175,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -859,7 +860,7 @@
       "liveRowCounts": {
         "pulse_dimensional_delta_history": 1625,
         "pulse_dimensional_deltas": 325,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -884,7 +885,7 @@
         "ci_dimension_scores": 4867,
         "pulse_event_absorptions": 0,
         "pulse_events_v2": 384,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -915,7 +916,7 @@
         "pulse_information_environment_releases": 1,
         "pulse_information_environment_values": 251,
         "pulse_pipeline_runs": 29,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -967,9 +968,36 @@
         "party_composition_runs": 194,
         "party_identity_events": 1548,
         "political_parties": 1548,
-        "research_evidence_history": 72151,
-        "sources": 56,
+        "research_evidence_history": 74124,
+        "sources": 57,
         "statements": 6826
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0032_sparkling_genesis",
+      "artifact": "drizzle/authoritative/0032_sparkling_genesis.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "8792a833ae6b38470f6f6bc18566f4998ec87822aaa1aec726592467a5bfb8db",
+      "affectedRelations": [
+        "jurisdictions",
+        "organization_memberships",
+        "organizations",
+        "research_evidence_history",
+        "sources"
+      ],
+      "statementCount": 27,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0032_sparkling_genesis-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0032_sparkling_genesis --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253,
+        "organization_memberships": 1880,
+        "organizations": 24,
+        "research_evidence_history": 74124,
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -988,7 +1016,7 @@
       "invariantPlan": "npm run db:plan -- --id=data-backfill-cia-vintage --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -1030,7 +1058,7 @@
       "invariantPlan": "npm run db:plan -- --id=data-backfill-growth-methodology --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -1110,7 +1138,7 @@
       "liveRowCounts": {
         "country_facts": 25827,
         "jurisdictions": 253,
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     },
@@ -1173,7 +1201,7 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384,
-        "research_evidence_history": 72151
+        "research_evidence_history": 74124
       },
       "writesPerformed": 0
     },
@@ -1219,7 +1247,7 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "jurisdictions": 253,
-        "sources": 56
+        "sources": 57
       },
       "writesPerformed": 0
     }

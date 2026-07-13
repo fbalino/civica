@@ -82,7 +82,7 @@ test("release artifacts name included and excluded publisher payloads", () => {
 test("machine-readable manifest contains source, product, field, and release levels", () => {
   const manifest = buildRightsManifest();
   assert.equal(manifest.schemaVersion, RIGHTS_MANIFEST_VERSION);
-  assert.equal(manifest.sources.length, 43);
+  assert.equal(manifest.sources.length, 44);
   assert.equal(manifest.products, PRODUCT_RIGHTS);
   assert.equal(manifest.releaseArtifacts, RELEASE_ARTIFACT_RIGHTS);
   assert.ok(manifest.products.every((product) => product.fields.length > 0));

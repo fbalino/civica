@@ -75,10 +75,6 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     relations: ["government_bodies", "offices", "persons", "terms"],
   },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },
-  {
-    path: "scripts/seed-organizations.ts",
-    relations: ["organization_memberships"],
-  },
   { path: "scripts/sync-elections-ipu.ts", relations: ["elections"] },
   {
     path: "src/lib/constitute/sync-constitutions.ts",
