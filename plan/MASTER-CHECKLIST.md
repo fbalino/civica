@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 304
-- **Completed:** 192
-- **Remaining:** 112
-- **Progress:** 63.2%
+- **Completed:** 193
+- **Remaining:** 111
+- **Progress:** 63.5%
 - **Priority mix:** P0 188 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -350,7 +350,7 @@ Source: `plan/11-brand-legal-and-licensing.md`
 - [ ] **BRD-001** (P1) Conduct a neutral brand-confusion landscape review for “Civica Atlas,” “Civica,” and close variants. _Done when: dated evidence covers active organizations/products, jurisdictions, sectors/audiences, marks/domains/social/search results, similarity, overlap, and actual confusion indicators without disparaging competitors; findings are separated from legal conclusions._
 - [ ] **BRD-002** (P1) Search relevant official trademark/company/domain registries with professional-review notes. _Done when: target jurisdictions/classes and search strings are documented, official result records are archived with dates, limitations are explicit, and questions requiring counsel are queued rather than guessed._
 - [ ] **BRD-003** (P0) Obtain professional legal review of name/confusion risk before broad launch. _Done when: counsel reviews BRD-001/002, intended geography/services/noncommercial posture, visual/verbal marks, domains, and migration cost; written advice or a privileged decision summary is recorded in the manual queue and owner disposition is documented._
-- [ ] **BRD-004** (P1) Adopt objective keep/rename decision criteria. _Done when: criteria cover legal/confusion risk, distinctiveness, mission fit, pronunciation/searchability, domains/handles, international meaning, transition cost, and owner preference; the decision cannot be based solely on personal dislike of another project._
+- [x] **BRD-004** (P1) Adopt objective keep/rename decision criteria. _Done when: criteria cover legal/confusion risk, distinctiveness, mission fit, pronunciation/searchability, domains/handles, international meaning, transition cost, and owner preference; the decision cannot be based solely on personal dislike of another project._
 - [ ] **BRD-005** (P2) Generate and test replacement names only if BRD-003/004 warrant it. _Done when: at least three strategic naming territories and screened candidates are evaluated against the criteria, obvious registry/domain conflicts are removed, audience comprehension is tested, and no candidate is adopted before professional clearance._
 - [ ] **BRD-006** (P1) Prepare a reversible brand/domain migration plan if renaming remains possible. _Done when: inventory covers code, DB, emails, domains, redirects, canonicals, DOI/citations, package/repo, social, assets, legal pages, search, status page, API/embed compatibility, deprecation window, and rollback; zero-change path is equally documented._
 - [ ] **BRD-007** (P0) Add an explicit source-code license or documented non-open posture consistent with repository/public claims. _Done when: root license and notices identify copyright holder/year/permissions, dependency and generated-code obligations are compatible, README/CFF/licensing page agree, and counsel/manual review is queued where needed._

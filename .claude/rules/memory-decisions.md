@@ -1042,3 +1042,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Event and chamber-contest identity remain separate; calendar projections
   collapse unnamed chamber estimates, while detailed named contests may remain
   distinct. Durable record: APR-D161.
+
+## 2026-07-13 — Brand preference follows evidence and clearance
+
+- `brand-name-decision-criteria/v1` is the adopted rubric for the current name
+  and any professionally screened replacement.
+- Missing, stale, jurisdiction-incomplete, or professionally uncleared evidence
+  records no decision. Owner preference is capped at five percent and cannot
+  clear a veto, replace evidence, or trigger a rename by itself.
+- The rubric records no conclusion about Civica Atlas or any alternative;
+  BRD-001 through BRD-003 still own research and professional review. Durable
+  record: APR-D162.

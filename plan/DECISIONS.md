@@ -1024,3 +1024,22 @@ rights remain outside public bulk export.
 stored row would turn estimates, collisions, imprecise dates, and unsupported
 fields into apparent facts. A checked qualification layer keeps the evidence
 available for repair and gives readers a narrower, reproducible corpus.
+
+### APR-D162 — Brand preference follows evidence and clearance
+
+**Decision:** Adopt `brand-name-decision-criteria/v1` before assessing the
+current name or any replacement. The rubric applies one scoring scale and
+evidence standard to legal/confusion risk, domain and handle availability,
+pronunciation/searchability, mission fit, geographic and cultural neutrality,
+distinctiveness, migration cost, evidence quality, and owner preference.
+Owner preference is capped at five percent and cannot clear a veto, replace
+evidence, or supply the evidence-based advantage required for a rename.
+Unknown, stale, scope-incomplete, or professionally uncleared evidence records
+no decision.
+
+**Why:** Naming can carry legal, continuity, international-meaning, and reader-
+confusion consequences that personal taste does not measure. Precommitting the
+criteria prevents a disliked comparison, a convenient available domain, or an
+unsupported impression from deciding the outcome after candidates are seen.
+The contract does not assess or clear Civica Atlas or any alternative; BRD-001
+through BRD-003 remain the evidence and professional-review gates.
