@@ -25,50 +25,37 @@ async function handler(request: Request) {
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
-  try {
-    const summary = await refreshJurisdictionCache(db, {
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-      dryRun,
-    });
+  const summary = await refreshJurisdictionCache(db, {
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+    dryRun,
+  });
 
-    if (summary.errors.length > 0 || summary.jurisdictionsRefreshed === 0) {
-      return NextResponse.json(
-        {
-          ok: false,
-          step: "factbook.refresh-cache",
-          dryRun,
-          errors: summary.errors.length
-            ? summary.errors
-            : ["No jurisdictions refreshed"],
-        },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.refresh-cache",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsRefreshed: summary.jurisdictionsRefreshed,
-      fieldsWritten: summary.fieldsWritten,
-      errorCount: summary.errors.length,
-      dryRun,
-    });
-  } catch (err) {
-    console.error("[cron factbook.refresh-cache] failed:", err);
+  if (summary.errors.length > 0 || summary.jurisdictionsRefreshed === 0) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: summary.errors.length > 0 ? "partial" : "empty_result",
         step: "factbook.refresh-cache",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: Math.max(1, summary.errors.length),
       },
       { status: 500 },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.refresh-cache",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsRefreshed: summary.jurisdictionsRefreshed,
+    fieldsWritten: summary.fieldsWritten,
+    errorCount: summary.errors.length,
+    dryRun,
+  });
 }
 
 const cronHandler = withCronJob("factbook.refresh-cache", handler);

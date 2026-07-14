@@ -50,42 +50,30 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncWtoStats(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all WTO indicators.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.wto-stats", summary);
+  const summary = await syncWtoStats(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all WTO indicators.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.wto-stats", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.wto-stats.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      vintageLabel: summary.vintageLabel,
-      archiveBytes: summary.archiveBytes,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      legacyMigration: summary.legacyMigration,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.wto-stats.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.wto-stats.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.wto-stats.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    vintageLabel: summary.vintageLabel,
+    archiveBytes: summary.archiveBytes,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    legacyMigration: summary.legacyMigration,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.wto-stats", handler);

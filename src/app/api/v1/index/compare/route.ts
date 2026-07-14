@@ -4,48 +4,42 @@ import {
   corsOptions,
   withRateLimit,
   CI_METHODOLOGY_META,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
 import {
   displayCiReleaseDimensionScore,
   resolveCiRelease,
 } from "@/lib/ci/release-selection";
-import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
   STRUCTURAL_FAMILY_DEPRECATION_META,
+  STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexCompareResult } from "@/lib/api/contract/shapes";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 export async function GET(request: Request) {
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const query = parseQueryContract(request, "v1-index-compare-query/v1", {
+    errorHeaders: {
+      ...CORS_HEADERS,
+      ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+      ...STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+    },
+  });
+  if (!query.ok) return query.response;
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const url = new URL(request.url);
-    const slugsParam = url.searchParams.getAll("slug");
-    const quarter = url.searchParams.get("quarter") ?? undefined;
-    const release = resolveCiRelease(
-      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
-    );
-
-    if (slugsParam.length === 0) {
-      return withIndexDispositionDeprecation(
-        apiError("At least one `slug` query parameter is required", 400),
-      );
-    }
-    if (slugsParam.length > 10) {
-      return withIndexDispositionDeprecation(
-        apiError("Maximum 10 countries per comparison", 400),
-      );
-    }
-
-    const slugs = slugsParam.map((s) => s.toLowerCase());
+    const { slug: slugs, quarter } = query.data;
+    const release = resolveCiRelease(query.data.release);
     const rows = await compareCICountries(slugs, quarter, release.releaseId);
 
     // Curate a public response shape rather than spreading the raw DB rows.
@@ -118,7 +112,7 @@ export async function GET(request: Request) {
             count: results.length,
             methodology: CI_METHODOLOGY_META,
             series: release.series,
-            ...STRUCTURAL_FAMILY_DEPRECATION_META,
+            deprecations: STRUCTURAL_FAMILY_DEPRECATION_META.deprecations,
           },
         }),
       ),

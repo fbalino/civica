@@ -36,72 +36,60 @@ export const maxDuration = 180;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
-    const freshness = createDeferredSourceFreshness();
-    const wb = await syncWorldBankClassifications(db, {
-      dryRun,
-      markSynced: freshness.capture,
-    });
-    const vdem = await syncVdemRow(db, {
-      dryRun,
-      markSynced: freshness.capture,
-    });
-    const monarchy = await syncMonarchyAndGovernmentForm(db, {
-      dryRun,
-      markSynced: freshness.capture,
-    });
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+  const freshness = createDeferredSourceFreshness();
+  const wb = await syncWorldBankClassifications(db, {
+    dryRun,
+    markSynced: freshness.capture,
+  });
+  const vdem = await syncVdemRow(db, {
+    dryRun,
+    markSynced: freshness.capture,
+  });
+  const monarchy = await syncMonarchyAndGovernmentForm(db, {
+    dryRun,
+    markSynced: freshness.capture,
+  });
 
-    await finalizeClassificationFreshness(
-      () => {
-        assertRequiredClassificationOutputs({
-          worldBank: wb,
-          vdem,
-          cia: monarchy,
-          dryRun,
-        });
-      },
-      () => freshness.flush({ executor: db }),
-    );
+  await finalizeClassificationFreshness(
+    () => {
+      assertRequiredClassificationOutputs({
+        worldBank: wb,
+        vdem,
+        cia: monarchy,
+        dryRun,
+      });
+    },
+    () => freshness.flush({ executor: db }),
+  );
 
-    const totalErrors = [...wb.errors, ...vdem.errors, ...monarchy.errors];
+  const totalErrors = [...wb.errors, ...vdem.errors, ...monarchy.errors];
 
-    return NextResponse.json({
-      ok: totalErrors.length === 0,
-      step: "factbook.sync-classifications",
-      started: startedAt,
-      finished: new Date().toISOString(),
-      worldBank: {
-        regionRows: wb.regionRowsWritten,
-        incomeRows: wb.incomeRowsWritten,
-        durationSec: Math.round(wb.durationMs / 1000),
-        errors: wb.errors.length,
-      },
-      vdem: {
-        rows: vdem.rowsWritten,
-        durationSec: Math.round(vdem.durationMs / 1000),
-        errors: vdem.errors.length,
-      },
-      monarchy: {
-        monarchyRows: monarchy.monarchyRowsWritten,
-        formRows: monarchy.formDescriptionRowsWritten,
-        buckets: monarchy.monarchyBuckets,
-        durationSec: Math.round(monarchy.durationMs / 1000),
-        errors: monarchy.errors.length,
-      },
-      totalErrors: totalErrors.length,
-    });
-  } catch (err) {
-    console.error("[cron factbook.sync-classifications] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.sync-classifications",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: totalErrors.length === 0,
+    step: "factbook.sync-classifications",
+    started: startedAt,
+    finished: new Date().toISOString(),
+    worldBank: {
+      regionRows: wb.regionRowsWritten,
+      incomeRows: wb.incomeRowsWritten,
+      durationSec: Math.round(wb.durationMs / 1000),
+      errors: wb.errors.length,
+    },
+    vdem: {
+      rows: vdem.rowsWritten,
+      durationSec: Math.round(vdem.durationMs / 1000),
+      errors: vdem.errors.length,
+    },
+    monarchy: {
+      monarchyRows: monarchy.monarchyRowsWritten,
+      formRows: monarchy.formDescriptionRowsWritten,
+      buckets: monarchy.monarchyBuckets,
+      durationSec: Math.round(monarchy.durationMs / 1000),
+      errors: monarchy.errors.length,
+    },
+    totalErrors: totalErrors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.classifications", handler);

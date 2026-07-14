@@ -35,9 +35,16 @@ const productionDependencies: AdminLogoutDependencies = {
   logError: console.error,
 };
 
-function errorResponse(message: string, status: number): Response {
+type AdminLogoutProblemCode =
+  "ADMIN_AUDIT_UNAVAILABLE" | "ADMIN_LOGOUT_UNAVAILABLE";
+
+function errorResponse(
+  code: AdminLogoutProblemCode,
+  message: string,
+  status: 503,
+): Response {
   return Response.json(
-    { error: message },
+    { error: message, code },
     { status, headers: { "Cache-Control": "no-store" } },
   );
 }
@@ -71,7 +78,11 @@ export async function runAdminLogout(
     session = await dependencies.getSession();
   } catch (error) {
     dependencies.logError("[admin-logout] cookie verification failed", error);
-    return errorResponse("Admin logout is temporarily unavailable", 503);
+    return errorResponse(
+      "ADMIN_LOGOUT_UNAVAILABLE",
+      "Admin logout is temporarily unavailable",
+      503,
+    );
   }
 
   if (!session) {
@@ -109,7 +120,11 @@ export async function runAdminLogout(
         "[admin-logout] denied-request audit failed",
         error,
       );
-      return errorResponse("Admin audit is temporarily unavailable", 503);
+      return errorResponse(
+        "ADMIN_AUDIT_UNAVAILABLE",
+        "Admin audit is temporarily unavailable",
+        503,
+      );
     }
     return guard.response;
   }
@@ -127,7 +142,11 @@ export async function runAdminLogout(
     );
   } catch (error) {
     dependencies.logError("[admin-logout] attempt audit failed", error);
-    return errorResponse("Admin audit is temporarily unavailable", 503);
+    return errorResponse(
+      "ADMIN_AUDIT_UNAVAILABLE",
+      "Admin audit is temporarily unavailable",
+      503,
+    );
   }
 
   try {
@@ -152,7 +171,11 @@ export async function runAdminLogout(
     } catch (auditError) {
       dependencies.logError("[admin-logout] failure audit failed", auditError);
     }
-    return errorResponse("Admin logout is temporarily unavailable", 503);
+    return errorResponse(
+      "ADMIN_LOGOUT_UNAVAILABLE",
+      "Admin logout is temporarily unavailable",
+      503,
+    );
   }
 
   try {
@@ -168,7 +191,11 @@ export async function runAdminLogout(
     );
   } catch (error) {
     dependencies.logError("[admin-logout] outcome audit failed", error);
-    return errorResponse("Admin audit is temporarily unavailable", 503);
+    return errorResponse(
+      "ADMIN_AUDIT_UNAVAILABLE",
+      "Admin audit is temporarily unavailable",
+      503,
+    );
   }
 
   return clearedRedirect(request);

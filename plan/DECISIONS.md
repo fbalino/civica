@@ -1141,3 +1141,24 @@ under concurrency, while distinct limited/unavailable responses avoid both
 silent overuse and misleading availability. The platform rule adds useful
 outer protection without pretending a regional WAF counter supplies exact
 application quotas.
+
+### APR-D168 — Route data crosses closed, versioned trust boundaries
+
+**Decision:** Adopt `route-io-policy/v1` as the exact request, response, error,
+and active-content contract for every registered route-method. Read request
+bodies through byte-capped JSON or form parsers and strict schemas; reject
+unknown or duplicate query/path input through named contracts before database
+or expensive work. Project sensitive and research exports through closed
+versioned output shapes instead of whole-row selection or response spreading.
+Return only fixed, noncacheable problem families for unknown failures. Treat
+stored constitution markup as untrusted until it passes the server-only
+`constitution-html/v1` allowlist. Treat provider article URLs as public-network
+inputs: validate and pin public DNS addresses, revalidate bounded manual
+redirects, and cap the decoded body before allocation. Neutralize spreadsheet
+formula prefixes in every CSV export while retaining genuine numeric values.
+
+**Why:** TypeScript types and database schemas do not constrain hostile bytes,
+future table columns, stored HTML, provider redirects, or exception text at
+runtime. Closed boundaries make those trust transitions reviewable and turn a
+new route, field, parser bypass, HTML sink, or response spread into a failing
+build instead of a silent expansion of the public contract.

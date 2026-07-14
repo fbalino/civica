@@ -9,6 +9,7 @@ const exactTests = [
   "src/lib/api/__tests__/route-authorization.test.ts",
   "src/lib/api/cron-effective-inputs.test.ts",
   "src/lib/api/cron-execution-postgres.test.ts",
+  "src/lib/api/cron-input.test.ts",
   "src/lib/api/cron-job.test.ts",
   "src/lib/api/cron-routes-integration.test.ts",
   "src/lib/api/cron-schedule.test.ts",

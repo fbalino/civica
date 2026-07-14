@@ -303,8 +303,11 @@ export function sha256(value: string | Buffer): string {
  * missingness rule, rank, or Index presentation.
  *
  * This deliberately narrow compatibility normalization restores the prior
- * text before hashing. Any other edit in the file, including an edit adjacent
- * to either guard, still changes the protected hash and requires a record.
+ * text before hashing. PLT-012's closed projection for the Atlas-only country
+ * democracy endpoint is likewise restored to its prior whole-row query; that
+ * function has no Index caller. Any other edit in the file, including an edit
+ * adjacent to an excluded block, still changes the protected hash and requires
+ * a record.
  */
 export function indexProtectedFileHash(
   path: string,
@@ -328,6 +331,36 @@ export function indexProtectedFileHash(
       .replace(
         /\.where\(\n      sql`\$\{organizationMemberships\.jurisdictionId\} IN \$\{jurisdictionIds\}\n      AND \$\{organizationMemberships\.status\} <> 'unverified_legacy'`,\n    \)/g,
         ".where(sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`)",
+      )
+      .replace(
+        `    .select({
+      factKey: countryFacts.factKey,
+      category: countryFacts.category,
+      sourceId: countryFacts.sourceId,
+      sourceUrl: countryFacts.sourceUrl,
+      factValue: countryFacts.factValue,
+      factValueNumeric: countryFacts.factValueNumeric,
+      factUnit: countryFacts.factUnit,
+      factYear: countryFacts.factYear,
+      valueJson: countryFacts.valueJson,
+      valueStatus: countryFacts.valueStatus,
+      valueStatusReason: countryFacts.valueStatusReason,
+      asOf: countryFacts.asOf,
+      retrievedAt: countryFacts.retrievedAt,
+      upstreamVintageLabel: countryFacts.upstreamVintageLabel,
+      valueType: countryFacts.valueType,
+    })
+    .from(countryFacts)
+    .where(
+      sql\`\${countryFacts.jurisdictionId} = \${jurisdictionId}
+        AND \${countryFacts.factKey} LIKE 'freedom_house%'
+        AND \${countryFacts.status} = 'active'\`,
+    );`,
+        `    .select()
+    .from(countryFacts)
+    .where(
+      sql\`\${countryFacts.jurisdictionId} = \${jurisdictionId} AND \${countryFacts.factKey} LIKE 'freedom_house%'\`,
+    );`,
       );
   }
   if (path === "src/lib/data/source-input-manifest.ts") {

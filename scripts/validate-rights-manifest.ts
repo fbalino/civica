@@ -48,13 +48,21 @@ for (const artifact of RELEASE_ARTIFACT_RIGHTS) {
 
 const exportRoutePath = "src/app/api/countries/[slug]/export/route.ts";
 const exportRoute = readFileSync(exportRoutePath, "utf8");
-if (!exportRoute.includes('evaluatePublicExport("country-export-json-csv"')) {
+if (
+  !/evaluatePublicExport\(\s*["']country-export-json-csv["']/.test(exportRoute)
+) {
   problems.push("country export route does not call the rights gate");
 }
-if (!exportRoute.includes("buildCountryResearchExport")) problems.push("country export does not use the DAT-027 research export builder");
-if (!exportRoute.includes("countryResearchExportCsv")) problems.push("country export JSON/CSV implementations are not shared");
-if (!evaluatePublicExport("country-export-json-csv", ["wikidata"]).allowed) problems.push("country export unexpectedly blocks a verified source");
-if (evaluatePublicExport("country-export-json-csv", ["vdem"]).allowed) problems.push("country export unexpectedly permits a pending source");
+if (!exportRoute.includes("buildCountryResearchExport"))
+  problems.push(
+    "country export does not use the DAT-027 research export builder",
+  );
+if (!exportRoute.includes("countryResearchExportCsv"))
+  problems.push("country export JSON/CSV implementations are not shared");
+if (!evaluatePublicExport("country-export-json-csv", ["wikidata"]).allowed)
+  problems.push("country export unexpectedly blocks a verified source");
+if (evaluatePublicExport("country-export-json-csv", ["vdem"]).allowed)
+  problems.push("country export unexpectedly permits a pending source");
 
 const machineRoute = readFileSync(
   "src/app/api/rights-manifest/route.ts",

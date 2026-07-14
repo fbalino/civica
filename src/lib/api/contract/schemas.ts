@@ -391,7 +391,21 @@ export const zPaginationMeta = z
   })
   .strict();
 
-export const zApiErrorEnvelope = z.object({ error: z.string() }).strict();
+export const zApiErrorEnvelope = z
+  .object({
+    error: z.string(),
+    code: z.enum([
+      "BAD_REQUEST",
+      "UNAUTHORIZED",
+      "FORBIDDEN",
+      "NOT_FOUND",
+      "CONFLICT",
+      "RATE_LIMITED",
+      "INTERNAL_ERROR",
+      "SERVICE_UNAVAILABLE",
+    ]),
+  })
+  .strict();
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries
@@ -1925,7 +1939,10 @@ export const zElectionResearchExport = z
     meta: z
       .object({
         auditedRowsMatchingFilters: z.number().int().nonnegative(),
-        qualifiedEventOrContestRowsMatchingFilters: z.number().int().nonnegative(),
+        qualifiedEventOrContestRowsMatchingFilters: z
+          .number()
+          .int()
+          .nonnegative(),
         projectionRowsMatchingFilters: z.number().int().nonnegative(),
         emittedRows: z.number().int().nonnegative(),
       })

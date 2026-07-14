@@ -39,7 +39,7 @@ import {
   disputeLoserId,
   OPEN_DISPUTE_STATUSES,
 } from "@/lib/factbook/reconcile/dispute-resolution";
-import { withAdminMutation } from "@/lib/admin/mutation";
+import { adminMutationProblem, withAdminMutation } from "@/lib/admin/mutation";
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import type { AdminSession } from "@/lib/admin/session";
 import {
@@ -47,6 +47,19 @@ import {
   writeDisputeAuditLog,
   type DisputeAuditAction,
 } from "@/lib/factbook/reconcile/dispute-audit-log";
+import {
+  FORM_MEDIA_TYPE,
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  adminDataDisputeBodySchema,
+  adminDataDisputeFormSchema,
+  REQUEST_BODY_LIMITS,
+  requestUuidSchema,
+  type AdminDataDisputeBody,
+} from "@/lib/api/request-body-schemas";
 
 type Action = "resolve_a" | "resolve_b" | "hold" | "reject" | "reopen";
 
@@ -65,42 +78,28 @@ const ACTION_TO_STATUS: Record<Exclude<Action, "reopen">, string> = {
   reject: "rejected_invalid",
 };
 
-interface ResolveBody {
-  action: Action;
-  notes?: string;
-  redirect?: string;
-}
-
-async function readBody(
-  request: NextRequest,
-): Promise<{ body: ResolveBody; isForm: boolean }> {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const form = await request.formData();
-    return {
-      isForm: true,
-      body: {
-        action: String(form.get("action") ?? "") as Action,
-        notes: form.get("notes") ? String(form.get("notes")) : undefined,
-        redirect: form.get("redirect")
-          ? String(form.get("redirect"))
-          : undefined,
-      },
-    };
-  }
-  const json = (await request.json()) as ResolveBody;
-  return { isForm: false, body: json };
-}
-
 async function mutateDataDispute(
   request: NextRequest,
   id: string,
   auth: AdminSession,
 ) {
-  const { body, isForm } = await readBody(request);
+  const parsedId = requestUuidSchema.safeParse(id);
+  if (!parsedId.success) return requestInputErrorResponse("INVALID_REQUEST");
+
+  const parsed = await parseBoundedRequestBody<AdminDataDisputeBody>(request, {
+    maxBytes: REQUEST_BODY_LIMITS.adminDataDispute,
+    media: [
+      { mediaType: JSON_MEDIA_TYPE, schema: adminDataDisputeBodySchema },
+      { mediaType: FORM_MEDIA_TYPE, schema: adminDataDisputeFormSchema },
+    ],
+  });
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+  const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
+  id = parsedId.data;
 
   if (!VALID_ACTIONS.has(body.action)) {
-    return NextResponse.json({ error: "invalid action" }, { status: 400 });
+    return adminMutationProblem("INVALID_ACTION", "invalid action", 400);
   }
 
   const existingRows = await db
@@ -110,7 +109,7 @@ async function mutateDataDispute(
     .limit(1);
   const existing = existingRows[0];
   if (!existing) {
-    return NextResponse.json({ error: "dispute not found" }, { status: 404 });
+    return adminMutationProblem("DISPUTE_NOT_FOUND", "dispute not found", 404);
   }
 
   const beforeSnap = snapshotDispute(existing);
@@ -124,9 +123,12 @@ async function mutateDataDispute(
       existing.status.startsWith("resolved_") ||
       existing.status === "rejected_invalid";
     if (!isResolved) {
-      return NextResponse.json(
-        { ok: true, action: "reopen", status: existing.status, noop: true },
-      );
+      return NextResponse.json({
+        ok: true,
+        action: "reopen",
+        status: existing.status,
+        noop: true,
+      });
     }
 
     await db
@@ -195,24 +197,19 @@ async function mutateDataDispute(
     // (flipping resolve_a↔resolve_b leaves BOTH parties demoted, pointing the
     // dispute at two dead rows). Require an explicit reopen first.
     if (!OPEN_DISPUTE_STATUSES.has(existing.status)) {
-      return NextResponse.json(
-        {
-          error: `dispute is already ${existing.status}; reopen it before re-resolving`,
-        },
-        { status: 409 },
+      return adminMutationProblem(
+        "DISPUTE_STATE_CONFLICT",
+        "dispute must be reopened before re-resolving",
+        409,
       );
     }
     const winnerId =
       body.action === "resolve_a" ? existing.factIdA : existing.factIdB;
     if (!winnerId) {
-      return NextResponse.json(
-        {
-          error:
-            body.action === "resolve_a"
-              ? "cannot resolve in favour of A: dispute has no fact_id_a"
-              : "cannot resolve in favour of B: dispute has no fact_id_b",
-        },
-        { status: 400 },
+      return adminMutationProblem(
+        "WINNING_FACT_NOT_FOUND",
+        "selected winning fact is unavailable",
+        400,
       );
     }
     const loserId = disputeLoserId(

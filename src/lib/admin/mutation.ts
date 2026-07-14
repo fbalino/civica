@@ -9,6 +9,7 @@ import {
 import { getAdminSession, type AdminSession } from "@/lib/admin/session";
 import { adminSessionKey } from "@/lib/admin/session-revocation-store";
 import { guardAdminMutationRequest } from "@/lib/api/admin-mutation-request-guard";
+import { unstable_rethrow } from "next/navigation";
 
 export interface AdminMutationDependencies {
   getSession(): Promise<AdminSession | null>;
@@ -24,11 +25,52 @@ const productionDependencies: AdminMutationDependencies = {
   logError: console.error,
 };
 
-function jsonError(message: string, status: number): Response {
+export type AdminMutationProblemCode =
+  | "ADMIN_AUTH_UNAVAILABLE"
+  | "ADMIN_AUDIT_UNAVAILABLE"
+  | "ADMIN_MUTATION_FAILED"
+  | "UNAUTHORIZED"
+  | "DELETION_CONFIRMATION_REQUIRED"
+  | "APPLICATION_NOT_FOUND"
+  | "INVALID_STATUS"
+  | "INVALID_ACTION"
+  | "DISPUTE_NOT_FOUND"
+  | "DISPUTE_STATE_CONFLICT"
+  | "WINNING_FACT_NOT_FOUND"
+  | "MESSAGE_NOT_FOUND"
+  | "EVENT_NOT_FOUND"
+  | "EVENT_NOT_CURRENT"
+  | "EVENT_NOT_PENDING"
+  | "INVALID_CLASSIFICATION"
+  | "INVALID_EXPIRY"
+  | "INVALID_NOTE"
+  | "CONFLICT"
+  | "INVALID_PARTICIPANT_REQUEST"
+  | "AGENT_USE_STATUS_INVALID"
+  | "STUDY_NOT_FOUND"
+  | "STUDY_EMPTY";
+
+export function adminMutationProblem(
+  code: AdminMutationProblemCode,
+  message: string,
+  status: number,
+): Response {
   return Response.json(
-    { error: message },
+    { error: message, code },
     { status, headers: { "Cache-Control": "no-store" } },
   );
+}
+
+function nonCacheableHandlerError(response: Response): Response {
+  if (response.status < 400) return response;
+
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "no-store");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 function resultForStatus(
@@ -58,9 +100,14 @@ export async function runAdminMutation(
     session = await dependencies.getSession();
   } catch (error) {
     dependencies.logError("[admin-mutation] session store unavailable", error);
-    return jsonError("Admin authorization is temporarily unavailable", 503);
+    return adminMutationProblem(
+      "ADMIN_AUTH_UNAVAILABLE",
+      "Admin authorization is temporarily unavailable",
+      503,
+    );
   }
-  if (!session) return jsonError("Unauthorized", 401);
+  if (!session)
+    return adminMutationProblem("UNAUTHORIZED", "Unauthorized", 401);
 
   const requestId = dependencies.requestId();
   const auditBase = {
@@ -89,7 +136,11 @@ export async function runAdminMutation(
         "[admin-mutation] denied-request audit failed",
         error,
       );
-      return jsonError("Admin audit is temporarily unavailable", 503);
+      return adminMutationProblem(
+        "ADMIN_AUDIT_UNAVAILABLE",
+        "Admin audit is temporarily unavailable",
+        503,
+      );
     }
     return guard.response;
   }
@@ -107,13 +158,18 @@ export async function runAdminMutation(
     );
   } catch (error) {
     dependencies.logError("[admin-mutation] attempt audit failed", error);
-    return jsonError("Admin audit is temporarily unavailable", 503);
+    return adminMutationProblem(
+      "ADMIN_AUDIT_UNAVAILABLE",
+      "Admin audit is temporarily unavailable",
+      503,
+    );
   }
 
   let response: Response;
   try {
     response = await handler(session);
   } catch (error) {
+    unstable_rethrow(error);
     dependencies.logError("[admin-mutation] handler failed", error);
     try {
       await writeAdminAuditEvent(
@@ -132,7 +188,11 @@ export async function runAdminMutation(
         auditError,
       );
     }
-    return jsonError("Admin mutation failed", 500);
+    return adminMutationProblem(
+      "ADMIN_MUTATION_FAILED",
+      "Admin mutation failed",
+      500,
+    );
   }
 
   try {
@@ -151,7 +211,7 @@ export async function runAdminMutation(
     // audit lifecycle. Do not obscure a mutation that already completed.
     dependencies.logError("[admin-mutation] outcome audit failed", error);
   }
-  return response;
+  return nonCacheableHandlerError(response);
 }
 
 export async function withAdminMutation(

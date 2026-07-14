@@ -31,21 +31,28 @@ async function main() {
     ["country detail", countryRoute],
     ["country export", exportRoute],
   ] as const) {
-    for (const token of [
-      "parseAtlasReadSelection",
-      "metadataFromResolutions",
-      "UNSUPPORTED",
-    ])
-      if (
-        !source.includes(token) &&
-        !(
-          token === "UNSUPPORTED" &&
-          source.includes("Unsupported immutable vintage")
-        )
-      )
-        errors.push(`${path} missing ${token}`);
+    for (const token of ["parseAtlasReadSelection", "metadataFromResolutions"])
+      if (!source.includes(token)) errors.push(`${path} missing ${token}`);
     if (!/getFrozen(?:Facts|DisplayFacts)ForJurisdiction/.test(source))
       errors.push(`${path} lacks a frozen-row loader`);
+  }
+  for (const [path, source, guard] of [
+    [
+      "country list",
+      countriesRoute,
+      /immutableVintageExists\(selection\.asOf\)/,
+    ],
+    ["country detail", countryRoute, /frozen\s*&&\s*!frozen\.exists/],
+    ["country export", exportRoute, /frozen\s*&&\s*!frozen\.exists/],
+  ] as const) {
+    if (!guard.test(source))
+      errors.push(`${path} lacks an unsupported-vintage guard`);
+    if (
+      !/(?:requested immutable vintage is unavailable|Unsupported immutable vintage)/i.test(
+        source,
+      )
+    )
+      errors.push(`${path} lacks an unsupported-vintage response`);
   }
   if (
     !/liveFallback\s*\?\s*country\b/.test(countryRoute) ||

@@ -123,6 +123,14 @@ test("stable citation routes use a slash-safe digest segment", () => {
     "src/app/api/constitution/passages/[digest]/route.ts",
     "utf8",
   );
+  const requestContracts = readFileSync(
+    "src/lib/api/request-contract.ts",
+    "utf8",
+  );
   assert.match(query, /passageId\.slice\("constitution-passage\/"\.length\)/);
-  assert.match(resolver, /\^sha256:\(\[a-f0-9\]\{64\}\)\$/);
+  assert.match(
+    resolver,
+    /parsePathContract\([\s\S]*"constitution-passage-params\/v1"/,
+  );
+  assert.match(requestContracts, /\^sha256:\[a-f0-9\]\{64\}\$/);
 });

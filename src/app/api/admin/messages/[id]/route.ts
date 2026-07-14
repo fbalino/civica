@@ -21,9 +21,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
-import { withAdminMutation } from "@/lib/admin/mutation";
+import { adminMutationProblem, withAdminMutation } from "@/lib/admin/mutation";
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import type { AdminSession } from "@/lib/admin/session";
+import {
+  FORM_MEDIA_TYPE,
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  adminMessageStatusFormSchema,
+  adminMessageStatusBodySchema,
+  REQUEST_BODY_LIMITS,
+  requestUuidSchema,
+  type AdminMessageStatusBody,
+} from "@/lib/api/request-body-schemas";
 
 const VALID_STATUSES = ["new", "read", "archived"] as const;
 type Status = (typeof VALID_STATUSES)[number];
@@ -35,40 +48,31 @@ function isStatus(value: unknown): value is Status {
   );
 }
 
-interface StatusBody {
-  status?: string;
-  redirect?: string;
-}
-
-async function readBody(
-  request: NextRequest
-): Promise<{ body: StatusBody; isForm: boolean }> {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const form = await request.formData();
-    return {
-      isForm: true,
-      body: {
-        status: form.get("status") ? String(form.get("status")) : undefined,
-        redirect: form.get("redirect")
-          ? String(form.get("redirect"))
-          : undefined,
-      },
-    };
-  }
-  const json = (await request.json()) as StatusBody;
-  return { isForm: false, body: json };
-}
-
 async function mutateMessage(
   request: NextRequest,
   id: string,
   auth: AdminSession,
 ) {
-  const { body, isForm } = await readBody(request);
+  const parsedId = requestUuidSchema.safeParse(id);
+  if (!parsedId.success) return requestInputErrorResponse("INVALID_REQUEST");
+
+  const parsed = await parseBoundedRequestBody<AdminMessageStatusBody>(
+    request,
+    {
+      maxBytes: REQUEST_BODY_LIMITS.adminMessageStatus,
+      media: [
+        { mediaType: JSON_MEDIA_TYPE, schema: adminMessageStatusBodySchema },
+        { mediaType: FORM_MEDIA_TYPE, schema: adminMessageStatusFormSchema },
+      ],
+    },
+  );
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+  const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
+  id = parsedId.data;
 
   if (!isStatus(body.status)) {
-    return NextResponse.json({ error: "invalid status" }, { status: 400 });
+    return adminMutationProblem("INVALID_STATUS", "invalid status", 400);
   }
 
   const updated = await db
@@ -78,7 +82,7 @@ async function mutateMessage(
     .returning({ id: contactSubmissions.id });
 
   if (updated.length === 0) {
-    return NextResponse.json({ error: "message not found" }, { status: 404 });
+    return adminMutationProblem("MESSAGE_NOT_FOUND", "message not found", 404);
   }
 
   if (isForm) {

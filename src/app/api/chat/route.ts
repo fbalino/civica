@@ -5,6 +5,16 @@ import {
   rateLimitResponse,
 } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import {
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  chatBodySchema,
+  REQUEST_BODY_LIMITS,
+  type ChatBody,
+} from "@/lib/api/request-body-schemas";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 
@@ -29,13 +39,6 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 const CHAT_BURST_POLICY = getRequestRateLimitPolicy("chat-burst");
 const CHAT_SUSTAINED_POLICY = getRequestRateLimitPolicy("chat-sustained");
 
-// Input bounds — reject oversized / malformed payloads before any model call.
-const MAX_BODY_CHARS = 16_384; // raw request body ceiling (~360 party rows)
-const MAX_MESSAGE_LEN = 4_000; // user message characters
-const MAX_CONTEXT_STR_LEN = 200; // country / tab / coalition / nextElection
-const MAX_PARTIES = 60; // legislatures rarely list this many parties
-const MAX_PARTY_NAME_LEN = 120;
-
 // Output cap on the Anthropic completion. Bounds per-call token spend.
 const MAX_OUTPUT_TOKENS = 1024;
 
@@ -49,20 +52,6 @@ const TAB_LABELS: Record<string, string> = {
   constitution: "Constitution",
   factbook: "Country factbook",
 };
-
-function jsonError(
-  message: string,
-  status: number,
-  extraHeaders?: Record<string, string>,
-) {
-  return new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      ...extraHeaders,
-    },
-  });
-}
 
 export async function POST(req: NextRequest) {
   // 1) Shared limits run BEFORE parsing or any model call. The response helper
@@ -81,78 +70,27 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 2) Read and size-cap the raw body before parsing JSON.
-  let raw: string;
-  try {
-    raw = await req.text();
-  } catch {
-    return jsonError("Invalid request body.", 400);
-  }
-  if (raw.length > MAX_BODY_CHARS) {
-    return jsonError("Request body too large.", 413);
-  }
+  // 2) Byte-limit and structurally validate the body before any model work.
+  const parsed = await parseBoundedRequestBody<ChatBody>(req, {
+    maxBytes: REQUEST_BODY_LIMITS.chat,
+    media: [{ mediaType: JSON_MEDIA_TYPE, schema: chatBodySchema }],
+  });
+  if (!parsed.ok) return parsed.response;
+  const { message, context = {} } = parsed.data;
 
-  // 3) Parse JSON defensively — malformed payloads are rejected, not 500'd.
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return jsonError("Malformed JSON body.", 400);
-  }
-  if (typeof parsed !== "object" || parsed === null) {
-    return jsonError("Invalid request body.", 400);
-  }
-
-  const { message, context } = parsed as {
-    message?: unknown;
-    context?: unknown;
-  };
-
-  // 4) Validate + bound the user message.
-  if (typeof message !== "string" || message.trim().length === 0) {
-    return jsonError("Empty message", 400);
-  }
-  if (message.length > MAX_MESSAGE_LEN) {
-    return jsonError(
-      `Message must be ${MAX_MESSAGE_LEN} characters or fewer.`,
-      413,
-    );
+  // 3) Keep the semantic blank-message check separate from structure.
+  if (message.trim().length === 0) {
+    return requestInputErrorResponse("INVALID_REQUEST_BODY");
   }
   const userMessage = message.trim();
 
-  // 5) Normalise + bound the client-supplied context. All of `context` is
-  //    untrusted (audit Security #11): clamp every string, coerce types, and
-  //    cap the parties array so an attacker cannot inflate the system prompt.
-  //    This bounds prompt size; it is not an integrity guarantee.
-  const ctx = (
-    typeof context === "object" && context !== null ? context : {}
-  ) as Record<string, unknown>;
-  const clampStr = (v: unknown, max = MAX_CONTEXT_STR_LEN) =>
-    typeof v === "string" ? v.slice(0, max) : "";
-
-  const countryName = clampStr(ctx.country) || "the selected country";
-  const tabRaw = clampStr(ctx.tab);
-  const house =
-    ctx.house === "upper" || ctx.house === "lower" ? ctx.house : undefined;
-  const coalition = clampStr(ctx.coalition);
-  const nextElection = clampStr(ctx.nextElection);
-
-  let parties: { name: string; seats: number }[] = [];
-  if (Array.isArray(ctx.parties)) {
-    parties = ctx.parties
-      .slice(0, MAX_PARTIES)
-      .map((p) => {
-        const party = (typeof p === "object" && p !== null ? p : {}) as Record<
-          string,
-          unknown
-        >;
-        const name = clampStr(party.name, MAX_PARTY_NAME_LEN);
-        const seatsNum = Number(party.seats);
-        const seats = Number.isFinite(seatsNum) ? Math.trunc(seatsNum) : 0;
-        return { name, seats };
-      })
-      .filter((p) => p.name.length > 0);
-  }
+  // 4) The strict schema bounds every untrusted context field and collection.
+  const countryName = context.country || "the selected country";
+  const tabRaw = context.tab ?? "";
+  const house = context.house;
+  const coalition = context.coalition ?? "";
+  const nextElection = context.nextElection ?? "";
+  const parties = context.parties ?? [];
 
   const tabLabel = TAB_LABELS[tabRaw] ?? (tabRaw || "Country");
   // House is only meaningful on chamber/bills tabs (per memory-decisions.md).

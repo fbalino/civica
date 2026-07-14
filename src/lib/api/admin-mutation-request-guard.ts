@@ -53,7 +53,7 @@ function forbidden(
     ok: false,
     reason,
     response: Response.json(
-      { error: "Forbidden" },
+      { error: "Forbidden", code: "FORBIDDEN" },
       {
         status: 403,
         headers: {

@@ -3,6 +3,8 @@ import { getJurisdictionBySlug } from "@/lib/db/queries";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { parsePathContract } from "@/lib/api/request-contract";
+import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
 
 /**
  * P1.1 — Scores & Rankings feed for the atlas Scores tab.
@@ -17,20 +19,24 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = await enforceRequestRateLimit(
-    req,
-    getRequestRateLimitPolicy("public-dynamic-read"),
-  );
-  if (limited) return limited;
+  return withSafeJsonErrors("api/countries/[slug]/scores", async () => {
+    const limited = await enforceRequestRateLimit(
+      req,
+      getRequestRateLimitPolicy("public-dynamic-read"),
+    );
+    if (limited) return limited;
 
-  const { slug } = await params;
-  const jurisdiction = await getJurisdictionBySlug(slug);
-  if (!jurisdiction) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-  const rows = await getScoresForJurisdiction(jurisdiction.id);
-  return NextResponse.json({
-    country: jurisdiction.name,
-    rows,
+    const path = await parsePathContract(params, "jurisdiction-slug-params/v1");
+    if (!path.ok) return path.response;
+    const { slug } = path.data;
+    const jurisdiction = await getJurisdictionBySlug(slug);
+    if (!jurisdiction) {
+      return apiProblem("NOT_FOUND");
+    }
+    const rows = await getScoresForJurisdiction(jurisdiction.id);
+    return NextResponse.json({
+      country: jurisdiction.name,
+      rows,
+    });
   });
 }

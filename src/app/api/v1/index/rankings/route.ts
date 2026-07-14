@@ -3,6 +3,7 @@ import {
   apiError,
   corsOptions,
   withRateLimit,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
@@ -10,11 +11,12 @@ import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
 import { eq, sql, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
+  STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
-import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
@@ -22,6 +24,7 @@ import {
   shapeIndexRankingsMeta,
 } from "@/lib/api/contract/shapes";
 import { retiredPulseScalarResponse } from "@/lib/api/pulse-scalar-retirement";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 type ExtendedTaxonomy =
   GovernmentTaxonomyLens | "region" | "income" | "vdem" | "cgv" | "monarchy";
@@ -53,64 +56,34 @@ function buildPeerLensCondition(taxonomy: ExtendedTaxonomy, value: string) {
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const requestedSort = url.searchParams.get("sort");
-  if (requestedSort?.trim().toLowerCase() === "cp") {
-    return retiredPulseScalarResponse();
-  }
-  const sort = requestedSort ?? "ci";
-  if (sort !== "ci") {
-    return withIndexDispositionDeprecation(
-      apiError(
-        "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
-        400,
-      ),
-    );
-  }
-
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const query = parseQueryContract(request, "v1-index-rankings-query/v1", {
+    errorHeaders: {
+      ...CORS_HEADERS,
+      ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+      ...STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+    },
+  });
+  if (!query.ok) return query.response;
+  if (query.data.sort === "cp") return retiredPulseScalarResponse();
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const quarterParam = url.searchParams.get("quarter");
-    const continent = url.searchParams.get("continent");
-    const governmentType = url.searchParams.get("government_type");
-    const taxonomyParam = url.searchParams.get("taxonomy");
-    const limitParam = url.searchParams.get("limit");
-    const offsetParam = url.searchParams.get("offset");
-    const ALLOWED_TAXONOMIES = new Set<ExtendedTaxonomy>([
-      "raw",
-      "structural",
-      "regime",
-      "region",
-      "income",
-      "vdem",
-      "cgv",
-      "monarchy",
-    ]);
-    const taxonomy: ExtendedTaxonomy = ALLOWED_TAXONOMIES.has(
-      taxonomyParam as ExtendedTaxonomy,
-    )
-      ? (taxonomyParam as ExtendedTaxonomy)
-      : "raw";
-
-    const limit = Math.min(
-      Math.max(parseInt(limitParam ?? "50", 10) || 50, 1),
-      250,
-    );
-    const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
-    const release = resolveCiRelease(
-      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
-    );
+    const {
+      quarter: quarterParam,
+      continent,
+      government_type: governmentType,
+      taxonomy,
+      limit,
+      offset,
+    } = query.data;
+    const release = resolveCiRelease(query.data.release);
     const methodologyVersion = release.methodologyVersion;
     if (quarterParam && quarterParam !== release.quarter) {
       return withIndexDispositionDeprecation(
-        apiError(
-          `${release.releaseId} does not contain quarter ${quarterParam}`,
-          400,
-        ),
+        apiError("The requested quarter is unavailable for this release.", 400),
       );
     }
     const quarter = release.quarter;

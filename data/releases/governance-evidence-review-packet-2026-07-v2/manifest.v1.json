@@ -427,8 +427,8 @@
     {
       "artifactId": "package-lock",
       "role": "environment",
-      "bytes": 409244,
-      "sha256": "343069d93193a39029aa5d7145f9e54b4de28fccf8f4bb8062bf3357878c6e2a",
+      "bytes": 416947,
+      "sha256": "217c697c942270365fcd2c6ed9efe7df3ba6bd6486a2c94202012f8432e5a3bc",
       "path": "package-lock.json"
     },
     {
@@ -483,8 +483,8 @@
     {
       "artifactId": "selected-product-code-5",
       "role": "selected-product-code",
-      "bytes": 2007,
-      "sha256": "6a765ec5257c15d1a42e6bec7b4cebe5a55e8c9c5ed8dc4297358cea9b91bfde",
+      "bytes": 2791,
+      "sha256": "049d499d97a432dfaf1012891b962920ad6bb9712e93f74aa4a1d467182dd87e",
       "path": "src/app/api/governance-evidence/[slug]/route.ts"
     },
     {
@@ -518,8 +518,8 @@
     {
       "artifactId": "selected-product-code-1",
       "role": "selected-product-code",
-      "bytes": 5593,
-      "sha256": "de469f2c7465b7bc3effac5dd006b06f2dcb7b1f46a1b0d182e0ff9fca1624e7",
+      "bytes": 7365,
+      "sha256": "51ebcfb59fd26fca2b3f5835354d0c2eee9e6c8afc1fc3b04ea0feedd65e193c",
       "path": "src/lib/ci/governance-evidence.ts"
     },
     {
@@ -544,5 +544,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "4a9f2f74039bc3989666eef964ec3a2f52079a8ba9014300e2bda07747db1580"
+  "bundleSemanticSha256": "d50e3e46020d7529318dea261b6fc8d57c159703512283aac002682b0fa55a94"
 }

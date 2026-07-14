@@ -4,15 +4,20 @@ import {
   corsOptions,
   withRateLimit,
   CI_METHODOLOGY_META,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { getCICountryHistory } from "@/lib/db/queries";
 import { shapeIndexHistoryItem } from "@/lib/api/contract/shapes";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
 } from "@/lib/api/deprecation";
-import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  parsePathContract,
+  parseQueryContract,
+} from "@/lib/api/request-contract";
 
 export async function GET(
   request: Request,
@@ -20,14 +25,24 @@ export async function GET(
 ) {
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const errorHeaders = {
+    ...CORS_HEADERS,
+    ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+  };
+  const path = await parsePathContract(params, "jurisdiction-slug-params/v1", {
+    errorHeaders,
+  });
+  if (!path.ok) return path.response;
+  const query = parseQueryContract(request, "v1-index-history-query/v1", {
+    errorHeaders,
+  });
+  if (!query.ok) return query.response;
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const { country_slug } = await params;
-    const release = resolveCiRelease(
-      new URL(request.url).searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
-    );
+    const country_slug = path.data.slug;
+    const release = resolveCiRelease(query.data.release);
 
     const history = await getCICountryHistory(
       country_slug.toLowerCase(),

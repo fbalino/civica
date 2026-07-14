@@ -21,6 +21,7 @@ import {
   apiError,
   corsOptions,
   withRateLimit,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
@@ -31,7 +32,10 @@ import {
   cachedJurisdictionColumns,
   getCanonicalFactsForJurisdictions,
 } from "@/lib/factbook/reconcile/api";
-import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
+import {
+  STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 import {
   shapeCountryListItem,
   shapeCountriesListMeta,
@@ -44,11 +48,9 @@ import {
   parseAtlasReadSelection,
   type AtlasReadSelection,
 } from "@/lib/factbook/read-selection";
-import {
-  JURISDICTION_STATUS_TYPES,
-  type JurisdictionStatusType,
-} from "@/lib/jurisdictions/status-taxonomy";
+import { type JurisdictionStatusType } from "@/lib/jurisdictions/status-taxonomy";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 /**
  * Resolver-canonical display facts the list serves. Mirrors the
@@ -214,11 +216,16 @@ export async function GET(request: Request) {
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
+  const query = parseQueryContract(request, "v1-countries-query/v1", {
+    errorHeaders: {
+      ...CORS_HEADERS,
+      ...STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+    },
+  });
+  if (!query.ok) return query.response;
+
   try {
-    const url = new URL(request.url);
-    const parsedSelection = parseAtlasReadSelection(
-      url.searchParams.get("as_of"),
-    );
+    const parsedSelection = parseAtlasReadSelection(query.data.as_of);
     if (!parsedSelection.selection)
       return withStructuralFamilyDeprecation(
         apiError(parsedSelection.error, 400),
@@ -229,44 +236,16 @@ export async function GET(request: Request) {
       !(await immutableVintageExists(selection.asOf))
     )
       return withStructuralFamilyDeprecation(
-        apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400),
+        apiError("The requested immutable vintage is unavailable.", 400),
       );
-    const continent = url.searchParams.get("continent");
-    const governmentType = url.searchParams.get("government_type");
-    const taxonomyParam = url.searchParams.get("taxonomy");
-    const limitParam = url.searchParams.get("limit");
-    const offsetParam = url.searchParams.get("offset");
-    const statusParam = url.searchParams.get("status");
-    if (
-      statusParam &&
-      !(JURISDICTION_STATUS_TYPES as readonly string[]).includes(statusParam)
-    ) {
-      return withStructuralFamilyDeprecation(
-        apiError(`Unsupported jurisdiction status: ${statusParam}`, 400),
-      );
-    }
-
-    const ALLOWED_TAXONOMIES = new Set<ExtendedTaxonomy>([
-      "raw",
-      "structural",
-      "regime",
-      "region",
-      "income",
-      "vdem",
-      "cgv",
-      "monarchy",
-    ]);
-    const taxonomy: ExtendedTaxonomy = ALLOWED_TAXONOMIES.has(
-      taxonomyParam as ExtendedTaxonomy,
-    )
-      ? (taxonomyParam as ExtendedTaxonomy)
-      : "raw";
-
-    const limit = Math.min(
-      Math.max(parseInt(limitParam ?? "50", 10) || 50, 1),
-      250,
-    );
-    const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
+    const {
+      continent,
+      government_type: governmentType,
+      taxonomy,
+      limit,
+      offset,
+      status: statusParam,
+    } = query.data;
 
     const conditions = [sql`LOWER(${jurisdictions.name}) <> 'none'`];
     if (statusParam) {

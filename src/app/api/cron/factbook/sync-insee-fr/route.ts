@@ -45,40 +45,28 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncInseeFr(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all INSEE indicators in scope.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.insee-fr", summary);
+  const summary = await syncInseeFr(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all INSEE indicators in scope.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.insee-fr", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.insee-fr.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      vintageLabel: summary.vintageLabel,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.insee-fr.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.insee-fr.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.insee-fr.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    vintageLabel: summary.vintageLabel,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.insee-fr", handler);

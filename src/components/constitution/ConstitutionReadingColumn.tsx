@@ -8,7 +8,6 @@ import {
   buildArticleNav,
   type RenderableSection,
 } from "@/lib/constitution/article-nav";
-import { sanitizeConstitutionHtml } from "@/lib/constitution/sanitize-html";
 import type { ConstitutionDetail } from "@/lib/db/queries-constitution";
 
 interface ConstitutionReadingColumnProps {
@@ -54,15 +53,6 @@ export function ConstitutionReadingColumn({
     () => buildArticleNav(constitution.articles),
     [constitution.articles],
   );
-
-  // Sanitize each section's Constitute HTML once (allowlist — preserves ids,
-  // classes and data-* the reader depends on; drops scripts/handlers). Keyed
-  // by DOM id so scroll-spy stays aligned.
-  const sanitizedByDomId = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const s of sections) m.set(s.domId, sanitizeConstitutionHtml(s.html));
-    return m;
-  }, [sections]);
 
   // Scroll-spy across every section DOM id (parts + articles).
   const sectionIds = useMemo(() => sections.map((s) => s.domId), [sections]);
@@ -132,7 +122,10 @@ export function ConstitutionReadingColumn({
       <div className="constitution-reader-header">
         <div className="constitution-reader-meta">
           <span>{yearLine(constitution.year, constitution.yearUpdated)}</span>
-          <SourceDot source="constitute_project" retrievedAt={sourceRetrievedAt} />
+          <SourceDot
+            source="constitute_project"
+            retrievedAt={sourceRetrievedAt}
+          />
         </div>
         <div className="constitution-reader-attribution-row">
           <p className="constitution-reader-attribution">
@@ -153,7 +146,9 @@ export function ConstitutionReadingColumn({
           {explorerHref ? (
             <Link className="btn btn--secondary btn--sm" href={explorerHref}>
               Open in the Constitution Explorer
-              <span className="btn__arrow" aria-hidden="true">→</span>
+              <span className="btn__arrow" aria-hidden="true">
+                →
+              </span>
             </Link>
           ) : null}
         </div>
@@ -168,82 +163,82 @@ export function ConstitutionReadingColumn({
             Suppressed on the country tab, where the outline lives in the
             shared <FactbookSidebar> left rail instead. */}
         {showOutline ? (
-        <nav
-          className="constitution-reader-nav"
-          aria-label={`${constitution.name} constitution outline`}
-        >
-          <div className="constitution-reader-nav-title">Outline</div>
-          <button
-            type="button"
-            className="constitution-reader-nav-toggle"
-            aria-expanded={outlineOpen}
-            aria-controls={outlineId}
-            onClick={() => setOutlineOpen((value) => !value)}
+          <nav
+            className="constitution-reader-nav"
+            aria-label={`${constitution.name} constitution outline`}
           >
-            <span>Outline</span>
-            <span className="constitution-reader-nav-current">
-              {activeLabel}
-            </span>
-            <span className="constitution-reader-nav-toggle-icon" aria-hidden>
-              ↓
-            </span>
-          </button>
-          <ol
-            id={outlineId}
-            className="constitution-reader-nav-list"
-            data-mobile-open={outlineOpen ? "true" : "false"}
-          >
-            {groups.map((group) => {
-              const isSingleGroup = groups.length === 1;
-              const expanded = isSingleGroup || openGroups.has(group.id);
-              const groupActive = group.entries.some((e) => e.id === active);
-              return (
-                <li key={group.id} className="constitution-reader-nav-group">
-                  <button
-                    type="button"
-                    className={`constitution-reader-nav-part${
-                      active === group.id || groupActive ? " is-active" : ""
-                    }`}
-                    aria-expanded={expanded}
-                    aria-controls={`${outlineId}-${group.id}`}
-                    onClick={() => {
-                      if (isSingleGroup) {
-                        scrollTo(group.entries[0]?.id ?? group.id);
-                      } else {
-                        toggleGroup(group.id);
-                      }
-                    }}
-                  >
-                    {group.label}
-                  </button>
-                  {expanded && group.entries.length > 0 ? (
-                    <ol
-                      id={`${outlineId}-${group.id}`}
-                      className="constitution-reader-nav-articles"
+            <div className="constitution-reader-nav-title">Outline</div>
+            <button
+              type="button"
+              className="constitution-reader-nav-toggle"
+              aria-expanded={outlineOpen}
+              aria-controls={outlineId}
+              onClick={() => setOutlineOpen((value) => !value)}
+            >
+              <span>Outline</span>
+              <span className="constitution-reader-nav-current">
+                {activeLabel}
+              </span>
+              <span className="constitution-reader-nav-toggle-icon" aria-hidden>
+                ↓
+              </span>
+            </button>
+            <ol
+              id={outlineId}
+              className="constitution-reader-nav-list"
+              data-mobile-open={outlineOpen ? "true" : "false"}
+            >
+              {groups.map((group) => {
+                const isSingleGroup = groups.length === 1;
+                const expanded = isSingleGroup || openGroups.has(group.id);
+                const groupActive = group.entries.some((e) => e.id === active);
+                return (
+                  <li key={group.id} className="constitution-reader-nav-group">
+                    <button
+                      type="button"
+                      className={`constitution-reader-nav-part${
+                        active === group.id || groupActive ? " is-active" : ""
+                      }`}
+                      aria-expanded={expanded}
+                      aria-controls={`${outlineId}-${group.id}`}
+                      onClick={() => {
+                        if (isSingleGroup) {
+                          scrollTo(group.entries[0]?.id ?? group.id);
+                        } else {
+                          toggleGroup(group.id);
+                        }
+                      }}
                     >
-                      {group.entries.map((entry) => (
-                        <li key={entry.id}>
-                          <a
-                            href={`#${entry.id}`}
-                            className={`constitution-reader-nav-article${
-                              entry.id === active ? " is-active" : ""
-                            }`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              scrollTo(entry.id);
-                            }}
-                          >
-                            {entry.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ol>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+                      {group.label}
+                    </button>
+                    {expanded && group.entries.length > 0 ? (
+                      <ol
+                        id={`${outlineId}-${group.id}`}
+                        className="constitution-reader-nav-articles"
+                      >
+                        {group.entries.map((entry) => (
+                          <li key={entry.id}>
+                            <a
+                              href={`#${entry.id}`}
+                              className={`constitution-reader-nav-article${
+                                entry.id === active ? " is-active" : ""
+                              }`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                scrollTo(entry.id);
+                              }}
+                            >
+                              {entry.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
         ) : null}
 
         {/* The reading column. */}
@@ -256,12 +251,12 @@ export function ConstitutionReadingColumn({
               className={`constitution-section${
                 section.partId ? " constitution-section--part" : ""
               }`}
-              // Section HTML is Constitute-derived (parsed at ingest), passed
-              // through an allowlist sanitizer at this render seam as a
-              // defense-in-depth measure against stored HTML that could later
-              // carry markup we don't trust.
+              // `html` crossed the server-side constitution-html/v1 boundary
+              // before this client component received it. DOM ids used for
+              // navigation live on this trusted outer section, not in the
+              // stored fragment.
               dangerouslySetInnerHTML={{
-                __html: sanitizedByDomId.get(section.domId) ?? "",
+                __html: section.html,
               }}
             />
           ))}

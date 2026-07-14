@@ -9,6 +9,8 @@ import {
 import { getBillsForJurisdiction } from "@/lib/db/queries";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { parsePathContract } from "@/lib/api/request-contract";
+import { apiProblem } from "@/lib/api/problem-response";
 import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
@@ -44,15 +46,16 @@ export async function GET(
   );
   if (limited) return limited;
 
-  const { slug } = await params;
+  const path = await parsePathContract(params, "jurisdiction-slug-params/v1");
+  if (!path.ok) return path.response;
+  const { slug } = path.data;
   let result;
   try {
     result = await getBillsForJurisdiction(slug, 10);
   } catch {
-    return NextResponse.json({ error: "DB unavailable" }, { status: 503 });
+    return apiProblem("DATA_UNAVAILABLE");
   }
-  if (!result)
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!result) return apiProblem("NOT_FOUND");
 
   // Look up sources.last_sync_at once for the distinct sources in
   // the result so each bill row carries its own provenance dot.

@@ -403,6 +403,59 @@ test("negative fixture: a param the handler reads but the registry never declare
   );
 });
 
+test("registry-backed query contracts contribute their exact schema keys", () => {
+  const source = `
+    export async function GET(request: Request) {
+      const query = parseQueryContract(request, "v1-countries-query/v1");
+      return apiResponse({ data: query });
+    }
+  `;
+  const exact = [
+    "as_of",
+    "continent",
+    "government_type",
+    "taxonomy",
+    "limit",
+    "offset",
+    "status",
+  ].map((name) => ({ in: "query" as const, name }));
+  assert.deepEqual(diffParams("countries", "fake/route.ts", exact, source), []);
+
+  const missing = diffParams(
+    "countries",
+    "fake/route.ts",
+    exact.filter(({ name }) => name !== "status"),
+    source,
+  );
+  assert.equal(missing.length, 1);
+  assert.match(missing[0], /reads query param "status".*not declared/);
+});
+
+test("an unknown query-contract id cannot bypass param drift", () => {
+  const source = `
+    export async function GET(request: Request) {
+      return parseQueryContract(request, "not-registered/v1");
+    }
+  `;
+  const errors = diffParams("broken", "fake/route.ts", [], source);
+  assert.equal(errors.length, 1);
+  assert.match(
+    errors[0],
+    /invokes unknown query contract "not-registered\/v1"/,
+  );
+});
+
+test("query param drift ignores parser and searchParams text in comments", () => {
+  const source = `
+    export async function GET() {
+      // parseQueryContract(request, "not-registered/v1");
+      // request.nextUrl.searchParams.get("undocumented_debug_flag");
+      return apiResponse({ data: [] });
+    }
+  `;
+  assert.deepEqual(diffParams("comments", "fake/route.ts", [], source), []);
+});
+
 test("the real registry has zero param drift for every route", async () => {
   const { readFile } = await import("node:fs/promises");
   const path = await import("node:path");

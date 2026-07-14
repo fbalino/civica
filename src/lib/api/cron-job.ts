@@ -2,8 +2,10 @@ import { createHash } from "node:crypto";
 import { AsyncLocalStorage } from "node:async_hooks";
 
 import { NextResponse } from "next/server";
+import { unstable_rethrow } from "next/navigation";
 
 import { requireCronAuth } from "./cron-auth";
+import { validateCronInput } from "./cron-input";
 import {
   MAX_CRON_ATTEMPTS,
   type CronExecutionStore,
@@ -57,7 +59,11 @@ function safeJsonResponse(
   status: number,
   headers?: HeadersInit,
 ): NextResponse {
-  return NextResponse.json(payload, { status, headers });
+  const responseHeaders = new Headers(headers);
+  if (!responseHeaders.has("Cache-Control")) {
+    responseHeaders.set("Cache-Control", "no-store");
+  }
+  return NextResponse.json(payload, { status, headers: responseHeaders });
 }
 
 async function invokeHandler(
@@ -68,6 +74,7 @@ async function invokeHandler(
   try {
     return await handler(request);
   } catch (error) {
+    unstable_rethrow(error);
     console.error(`[cron ${jobId}] unhandled failure`, error);
     return safeJsonResponse(
       { ok: false, jobId, outcome: "handler_exception" },
@@ -101,7 +108,10 @@ async function normalizeHandlerResponse(response: Response): Promise<{
   }
   if (!response.ok && payload?.ok === true) {
     return {
-      response: safeJsonResponse({ ...payload, ok: false }, response.status),
+      response: safeJsonResponse(
+        { ok: false, outcome: "invalid_handler_response" },
+        response.status,
+      ),
       succeeded: false,
     };
   }
@@ -153,9 +163,7 @@ function withInternalExecutionKey(
   return new Request(request, { headers });
 }
 
-function readIdempotencyScope(
-  request: Request,
-):
+function readIdempotencyScope(request: Request):
   | {
       ok: true;
       triggerKind: "scheduled" | "manual";
@@ -233,6 +241,20 @@ export function withCronJob(
       return safeJsonResponse(
         { ok: false, jobId, outcome: "route_registry_mismatch" },
         500,
+      );
+    }
+
+    const input = validateCronInput(jobId, request);
+    if (!input.ok) {
+      return safeJsonResponse(
+        {
+          ok: false,
+          jobId,
+          outcome: "invalid_request",
+          code: input.problem,
+        },
+        400,
+        { "Cache-Control": "no-store" },
       );
     }
 

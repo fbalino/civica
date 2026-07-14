@@ -3,28 +3,53 @@ import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { getAdminSession } from "@/lib/admin/session";
+import { shapeAdminContactFeed } from "@/lib/api/admin-feed-shapes";
+import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 // Gated on the admin session cookie set by /api/admin/session. Sign in
 // at /admin/sign-in with the ADMIN_USERNAME / ADMIN_PASSWORD_HASH
 // credentials; there is no bearer/API-key path.
 export async function GET(req: NextRequest) {
-  if (!(await getAdminSession())) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+  return withSafeJsonErrors("api/admin/contact", async () => {
+    if (!(await getAdminSession())) {
+      return apiProblem("UNAUTHORIZED");
+    }
 
-  const url = new URL(req.url);
-  const limit = Math.min(
-    Math.max(parseInt(url.searchParams.get("limit") ?? "50", 10) || 50, 1),
-    200,
-  );
-  const offset = Math.max(parseInt(url.searchParams.get("offset") ?? "0", 10) || 0, 0);
+    const query = parseQueryContract(req, "admin-contact-queue-query/v1");
+    if (!query.ok) return query.response;
+    const { limit, offset } = query.data;
 
-  const rows = await db
-    .select()
-    .from(contactSubmissions)
-    .orderBy(desc(contactSubmissions.createdAt))
-    .limit(limit)
-    .offset(offset);
+    try {
+      const rows = await db
+        .select({
+          id: contactSubmissions.id,
+          name: contactSubmissions.name,
+          email: contactSubmissions.email,
+          subject: contactSubmissions.subject,
+          message: contactSubmissions.message,
+          ipAddress: contactSubmissions.ipAddress,
+          status: contactSubmissions.status,
+          createdAt: contactSubmissions.createdAt,
+        })
+        .from(contactSubmissions)
+        .orderBy(desc(contactSubmissions.createdAt))
+        .limit(limit)
+        .offset(offset);
 
-  return NextResponse.json({ submissions: rows, limit, offset });
+      return NextResponse.json(
+        shapeAdminContactFeed({ submissions: rows, limit, offset }),
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    } catch (error) {
+      console.error("[admin/contact] feed unavailable", error);
+      return NextResponse.json(
+        {
+          error: "Admin feed is temporarily unavailable.",
+          code: "DATA_UNAVAILABLE",
+        },
+        { status: 503, headers: { "Cache-Control": "no-store" } },
+      );
+    }
+  });
 }

@@ -73,45 +73,33 @@ async function handler(request: Request) {
   const verbose = url.searchParams.get("verbose") === "1";
   const metricId = url.searchParams.get("metric") ?? undefined;
 
-  try {
-    const report = await runVerificationSuite(db, { verbose, metricId });
+  const report = await runVerificationSuite(db, { verbose, metricId });
 
-    // Always log the full plain-text report so operators can grep
-    // Vercel logs without parsing JSON. The report header includes
-    // overallStatus + pass/warn/fail counts in one block.
-    console.log(formatReport(report));
+  // Always log the full plain-text report so operators can grep
+  // Vercel logs without parsing JSON. The report header includes
+  // overallStatus + pass/warn/fail counts in one block.
+  console.log(formatReport(report));
 
-    // Alert path: anything other than `pass` → notify. Skip on dryRun.
-    if (report.overallStatus !== "pass" && !dryRun) {
-      notifyAdmin(report);
-    }
-
-    const outcome = reconciliationVerificationCronOutcome(report);
-
-    return NextResponse.json(
-      {
-        ok: outcome.ok,
-        outcome: outcome.outcome,
-        healthOk: outcome.healthOk,
-        step: "factbook.verify-reconciliation",
-        started: startedAt,
-        finished: new Date().toISOString(),
-        dryRun,
-        report,
-      },
-      { status: outcome.httpStatus },
-    );
-  } catch (err) {
-    console.error("[cron factbook.verify-reconciliation] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.verify-reconciliation",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
+  // Alert path: anything other than `pass` → notify. Skip on dryRun.
+  if (report.overallStatus !== "pass" && !dryRun) {
+    notifyAdmin(report);
   }
+
+  const outcome = reconciliationVerificationCronOutcome(report);
+
+  return NextResponse.json(
+    {
+      ok: outcome.ok,
+      outcome: outcome.outcome,
+      healthOk: outcome.healthOk,
+      step: "factbook.verify-reconciliation",
+      started: startedAt,
+      finished: new Date().toISOString(),
+      dryRun,
+      report,
+    },
+    { status: outcome.httpStatus },
+  );
 }
 
 const cronHandler = withCronJob("factbook.verify-reconciliation", handler);

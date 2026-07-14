@@ -14,6 +14,7 @@ import {
   rateLimitResponse,
 } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { parseQueryContract } from "@/lib/api/request-contract";
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import {
@@ -22,56 +23,58 @@ import {
   GOOGLE_STATE_COOKIE,
   GOOGLE_REDIRECT_COOKIE,
 } from "@/lib/admin/google-oauth";
+import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
 
 const ADMIN_OAUTH_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
   "admin-oauth-bootstrap",
 );
 
 export async function GET(request: NextRequest) {
-  if (!isGoogleSignInConfigured()) {
-    return new NextResponse("Google sign-in is not configured", {
-      status: 500,
+  return withSafeJsonErrors("api/admin/google/start", async () => {
+    if (!isGoogleSignInConfigured()) return apiProblem("INTERNAL_ERROR");
+
+    const rateLimit = await checkRequestRateLimit(
+      request,
+      ADMIN_OAUTH_RATE_LIMIT_POLICY,
+    );
+    if (rateLimit.status !== "allowed") {
+      return rateLimitResponse(rateLimit, ADMIN_OAUTH_RATE_LIMIT_POLICY, {
+        limitedMessage:
+          "Too many sign-in attempts. Please wait before trying again.",
+      });
+    }
+
+    const query = parseQueryContract(request, "oauth-start-query/v1");
+    if (!query.ok) return query.response;
+
+    const redirectPath = safeInternalPathOr(
+      query.data.redirect,
+      "/admin/pulse-review",
+    );
+
+    const state = randomBytes(24).toString("hex");
+    const callbackUrl = new URL(
+      "/api/admin/google/callback",
+      request.nextUrl.origin,
+    );
+    const authorizeUrl = buildGoogleAuthorizeUrl({
+      redirectUri: callbackUrl.toString(),
+      state,
     });
-  }
 
-  const rateLimit = await checkRequestRateLimit(
-    request,
-    ADMIN_OAUTH_RATE_LIMIT_POLICY,
-  );
-  if (rateLimit.status !== "allowed") {
-    return rateLimitResponse(rateLimit, ADMIN_OAUTH_RATE_LIMIT_POLICY, {
-      limitedMessage:
-        "Too many sign-in attempts. Please wait before trying again.",
-    });
-  }
-
-  const redirectPath = safeInternalPathOr(
-    request.nextUrl.searchParams.get("redirect"),
-    "/admin/pulse-review",
-  );
-
-  const state = randomBytes(24).toString("hex");
-  const callbackUrl = new URL(
-    "/api/admin/google/callback",
-    request.nextUrl.origin,
-  );
-  const authorizeUrl = buildGoogleAuthorizeUrl({
-    redirectUri: callbackUrl.toString(),
-    state,
+    const res = NextResponse.redirect(authorizeUrl, 303);
+    // SameSite=Lax (not Strict) because these cookies must survive the
+    // top-level cross-site redirect back from accounts.google.com.
+    const common = "Path=/; HttpOnly; SameSite=Lax; Max-Age=600";
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.headers.append(
+      "Set-Cookie",
+      `${GOOGLE_STATE_COOKIE}=${state}; ${common}${secure}`,
+    );
+    res.headers.append(
+      "Set-Cookie",
+      `${GOOGLE_REDIRECT_COOKIE}=${encodeURIComponent(redirectPath)}; ${common}${secure}`,
+    );
+    return res;
   });
-
-  const res = NextResponse.redirect(authorizeUrl, 303);
-  // SameSite=Lax (not Strict) because these cookies must survive the
-  // top-level cross-site redirect back from accounts.google.com.
-  const common = "Path=/; HttpOnly; SameSite=Lax; Max-Age=600";
-  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  res.headers.append(
-    "Set-Cookie",
-    `${GOOGLE_STATE_COOKIE}=${state}; ${common}${secure}`,
-  );
-  res.headers.append(
-    "Set-Cookie",
-    `${GOOGLE_REDIRECT_COOKIE}=${encodeURIComponent(redirectPath)}; ${common}${secure}`,
-  );
-  return res;
 }

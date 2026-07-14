@@ -7,6 +7,7 @@ import type {
 import { SOURCE_PRECEDENCE_VERSION } from "@/lib/factbook/reconcile/resolver";
 import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { spreadsheetSafeCsvCell } from "@/lib/exports/csv";
 
 export const COUNTRY_RESEARCH_EXPORT_VERSION =
   "country-research-export/v1" as const;
@@ -29,10 +30,7 @@ export interface CountryExportJurisdiction {
 }
 
 export type CountryObservationClass =
-  | "canonical"
-  | "alternate"
-  | "projection"
-  | "rejected";
+  "canonical" | "alternate" | "projection" | "rejected";
 
 export interface CountryExportObservation {
   recordClass: CountryObservationClass;
@@ -163,9 +161,10 @@ function observation(
   };
 }
 
-const stableRows = (rows: FactRow[]) => [...rows].sort(
-  (a, b) => a.sourceId.localeCompare(b.sourceId) || a.id.localeCompare(b.id),
-);
+const stableRows = (rows: FactRow[]) =>
+  [...rows].sort(
+    (a, b) => a.sourceId.localeCompare(b.sourceId) || a.id.localeCompare(b.id),
+  );
 
 export function buildCountryResearchExport(input: {
   generatedAt: string;
@@ -201,20 +200,28 @@ export function buildCountryResearchExport(input: {
       const source = input.sources.get(row.sourceId);
       const rights = input.rights.get(row.sourceId);
       if (!source || !rights || rights.publicExport !== "allowed") {
-        throw new Error(`Allowed export row lacks source/rights metadata: ${row.id}`);
+        throw new Error(
+          `Allowed export row lacks source/rights metadata: ${row.id}`,
+        );
       }
       return observation(row, recordClass, resolution, source, rights);
     };
 
-    const otherRows = stableRows(allowed.filter((row) => row.id !== canonical.id));
+    const otherRows = stableRows(
+      allowed.filter((row) => row.id !== canonical.id),
+    );
     facts.push({
       factKey,
       canonical: toObservation(canonical, "canonical"),
       alternates: otherRows
-        .filter((row) => row.status === "active" && row.valueType !== "projected")
+        .filter(
+          (row) => row.status === "active" && row.valueType !== "projected",
+        )
         .map((row) => toObservation(row, "alternate")),
       projections: otherRows
-        .filter((row) => row.status === "active" && row.valueType === "projected")
+        .filter(
+          (row) => row.status === "active" && row.valueType === "projected",
+        )
         .map((row) => toObservation(row, "projection")),
       rejected: otherRows
         .filter((row) => row.status !== "active")
@@ -242,29 +249,69 @@ export function buildCountryResearchExport(input: {
 }
 
 export const COUNTRY_RESEARCH_EXPORT_CSV_COLUMNS = [
-  "schema_version", "generated_at", "selection_mode", "selection_as_of", "selection_vintage", "selection_cutoff_at", "selection_retrieved_through", "selection_methodology_versions_json", "rights_manifest", "rights_policy",
-  "withheld_fact_keys_json", "withheld_observation_count", "withheld_reason",
-  "jurisdiction_id", "jurisdiction_slug", "jurisdiction_name",
-  "iso2", "iso3", "jurisdiction_status", "jurisdiction_status_label",
-  "jurisdiction_status_note", "jurisdiction_status_reviewed_at",
-  "administering_jurisdiction_iso3", "jurisdiction_status_disputed",
-  "include_in_sovereign_state_counts", "jurisdiction_status_sources_json",
-  "fact_key", "record_class", "row_id",
-  "fact_group", "category", "value_text", "value_numeric", "value_structured_json",
-  "unit", "value_status", "value_status_reason", "value_type", "source_id",
-  "source_name", "source_url", "source_license", "source_terms_url", "source_last_synced_at",
-  "as_of", "observation_year", "data_vintage_year", "retrieved_at", "upstream_vintage",
-  "lifecycle_status", "lifecycle_reason", "row_methodology_version", "reconciliation_version",
-  "growth_methodology", "decision_reason", "decision_trace_json", "dispute_open_or_in_review",
+  "schema_version",
+  "generated_at",
+  "selection_mode",
+  "selection_as_of",
+  "selection_vintage",
+  "selection_cutoff_at",
+  "selection_retrieved_through",
+  "selection_methodology_versions_json",
+  "rights_manifest",
+  "rights_policy",
+  "withheld_fact_keys_json",
+  "withheld_observation_count",
+  "withheld_reason",
+  "jurisdiction_id",
+  "jurisdiction_slug",
+  "jurisdiction_name",
+  "iso2",
+  "iso3",
+  "jurisdiction_status",
+  "jurisdiction_status_label",
+  "jurisdiction_status_note",
+  "jurisdiction_status_reviewed_at",
+  "administering_jurisdiction_iso3",
+  "jurisdiction_status_disputed",
+  "include_in_sovereign_state_counts",
+  "jurisdiction_status_sources_json",
+  "fact_key",
+  "record_class",
+  "row_id",
+  "fact_group",
+  "category",
+  "value_text",
+  "value_numeric",
+  "value_structured_json",
+  "unit",
+  "value_status",
+  "value_status_reason",
+  "value_type",
+  "source_id",
+  "source_name",
+  "source_url",
+  "source_license",
+  "source_terms_url",
+  "source_last_synced_at",
+  "as_of",
+  "observation_year",
+  "data_vintage_year",
+  "retrieved_at",
+  "upstream_vintage",
+  "lifecycle_status",
+  "lifecycle_reason",
+  "row_methodology_version",
+  "reconciliation_version",
+  "growth_methodology",
+  "decision_reason",
+  "decision_trace_json",
+  "dispute_open_or_in_review",
 ] as const;
 
-function csvCell(value: unknown): string {
-  const text = value == null ? "" : typeof value === "string" ? value : JSON.stringify(value);
-  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
-export function countryResearchExportCsv(document: CountryResearchExport): string {
-  const rows: string[][] = [];
+export function countryResearchExportCsv(
+  document: CountryResearchExport,
+): string {
+  const rows: unknown[][] = [];
   for (const fact of document.facts) {
     const observations = [
       fact.canonical,
@@ -274,33 +321,80 @@ export function countryResearchExportCsv(document: CountryResearchExport): strin
     ];
     for (const row of observations) {
       rows.push([
-        document.schemaVersion, document.generatedAt, document.selection.mode, document.selection.asOf,
-        document.selection.vintage ?? "", document.selection.cutoffAt ?? "", document.selection.retrievedThrough ?? "",
-        JSON.stringify(document.selection.methodologyVersions), document.rights.manifest, document.rights.policy,
-        JSON.stringify(document.withheld.factKeys), String(document.withheld.observationCount), document.withheld.reason,
-        document.jurisdiction.id, document.jurisdiction.slug,
-        document.jurisdiction.name, document.jurisdiction.iso2 ?? "", document.jurisdiction.iso3 ?? "",
-        document.jurisdiction.status, document.jurisdiction.statusDetails.label,
-        document.jurisdiction.statusDetails.note, document.jurisdiction.statusDetails.reviewedAt,
+        document.schemaVersion,
+        document.generatedAt,
+        document.selection.mode,
+        document.selection.asOf,
+        document.selection.vintage ?? "",
+        document.selection.cutoffAt ?? "",
+        document.selection.retrievedThrough ?? "",
+        JSON.stringify(document.selection.methodologyVersions),
+        document.rights.manifest,
+        document.rights.policy,
+        JSON.stringify(document.withheld.factKeys),
+        String(document.withheld.observationCount),
+        document.withheld.reason,
+        document.jurisdiction.id,
+        document.jurisdiction.slug,
+        document.jurisdiction.name,
+        document.jurisdiction.iso2 ?? "",
+        document.jurisdiction.iso3 ?? "",
+        document.jurisdiction.status,
+        document.jurisdiction.statusDetails.label,
+        document.jurisdiction.statusDetails.note,
+        document.jurisdiction.statusDetails.reviewedAt,
         document.jurisdiction.statusDetails.administeringJurisdictionIso3 ?? "",
         String(document.jurisdiction.statusDetails.disputed),
-        String(document.jurisdiction.statusDetails.includeInSovereignStateCounts),
+        String(
+          document.jurisdiction.statusDetails.includeInSovereignStateCounts,
+        ),
         JSON.stringify(document.jurisdiction.statusDetails.sources),
-        row.factKey, row.recordClass, row.rowId, row.factGroup,
-        row.category, row.value.text ?? "", row.value.numeric == null ? "" : String(row.value.numeric),
-        row.value.structured == null ? "" : JSON.stringify(row.value.structured), row.value.unit ?? "",
-        row.value.status, row.value.statusReason ?? "", row.value.type, row.source.id, row.source.name,
-        row.source.url, row.source.license, row.source.termsUrl, row.source.lastSyncedAt ?? "",
-        row.freshness.asOf ?? "", row.freshness.observationYear == null ? "" : String(row.freshness.observationYear),
-        row.freshness.dataVintageYear == null ? "" : String(row.freshness.dataVintageYear),
-        row.freshness.retrievedAt, row.freshness.upstreamVintage ?? "", row.lifecycle.status,
-        row.lifecycle.reason ?? "", row.method.rowMethodologyVersion, row.method.reconciliationVersion,
-        row.method.growthMethodology ?? "", row.decision.reason, JSON.stringify(row.decision.trace),
+        row.factKey,
+        row.recordClass,
+        row.rowId,
+        row.factGroup,
+        row.category,
+        row.value.text ?? "",
+        row.value.numeric ?? "",
+        row.value.structured == null
+          ? ""
+          : JSON.stringify(row.value.structured),
+        row.value.unit ?? "",
+        row.value.status,
+        row.value.statusReason ?? "",
+        row.value.type,
+        row.source.id,
+        row.source.name,
+        row.source.url,
+        row.source.license,
+        row.source.termsUrl,
+        row.source.lastSyncedAt ?? "",
+        row.freshness.asOf ?? "",
+        row.freshness.observationYear == null
+          ? ""
+          : String(row.freshness.observationYear),
+        row.freshness.dataVintageYear == null
+          ? ""
+          : String(row.freshness.dataVintageYear),
+        row.freshness.retrievedAt,
+        row.freshness.upstreamVintage ?? "",
+        row.lifecycle.status,
+        row.lifecycle.reason ?? "",
+        row.method.rowMethodologyVersion,
+        row.method.reconciliationVersion,
+        row.method.growthMethodology ?? "",
+        row.decision.reason,
+        JSON.stringify(row.decision.trace),
         String(row.dispute.openOrInReview),
       ]);
     }
   }
-  return [COUNTRY_RESEARCH_EXPORT_CSV_COLUMNS.join(","), ...rows.map((row) => row.map(csvCell).join(","))].join("\n") + "\n";
+  return (
+    [
+      COUNTRY_RESEARCH_EXPORT_CSV_COLUMNS.join(","),
+      ...rows.map((row) => row.map(spreadsheetSafeCsvCell).join(",")),
+    ].join("\n") + "\n"
+  );
 }
 
 export function flattenCountryResearchExport(document: CountryResearchExport) {

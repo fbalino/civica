@@ -18,9 +18,10 @@
 import { getJurisdictionsBySlugs } from "@/lib/db/queries";
 import { getTopicExcerpts } from "@/lib/db/queries-constitution";
 import { getTopicLabel, isKnownTopic } from "@/lib/constitute/topics";
-import { parseCountrySlugs } from "@/lib/constitution/slugs";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { apiProblem } from "@/lib/api/problem-response";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 export const revalidate = 3600;
 
@@ -31,24 +32,14 @@ export async function GET(request: Request) {
   );
   if (limited) return limited;
 
-  const url = new URL(request.url);
-  const topicKey = (url.searchParams.get("topic") ?? "").trim();
-  const slugs = parseCountrySlugs(url.searchParams.getAll("c"));
-
-  if (!topicKey) {
-    return Response.json(
-      { error: "Missing required `topic` query parameter." },
-      { status: 400 },
-    );
-  }
+  const query = parseQueryContract(request, "constitution-excerpts-query/v1");
+  if (!query.ok) return query.response;
+  const { topic: topicKey, c: slugs } = query.data;
 
   // Reject unknown topic keys up front — a bogus key would otherwise return
   // 200 + an empty set, masking client bugs and inviting cache pollution.
   if (!isKnownTopic(topicKey)) {
-    return Response.json(
-      { error: `Unknown constitutional topic \`${topicKey}\`.` },
-      { status: 400 },
-    );
+    return apiProblem("INVALID_QUERY");
   }
 
   if (slugs.length === 0) {
@@ -67,7 +58,9 @@ export async function GET(request: Request) {
       .map((s) => bySlug.get(s)?.id)
       .filter((id): id is string => typeof id === "string");
 
-    const countries = await getTopicExcerpts(topicKey, orderedIds);
+    const countries = await getTopicExcerpts(topicKey, orderedIds, {
+      throwOnError: true,
+    });
 
     return Response.json({
       topicKey,
@@ -77,8 +70,12 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error("[/api/constitution/excerpts]", err);
     return Response.json(
-      { error: "Failed to load constitution excerpts." },
-      { status: 500 },
+      {
+        error: "data_unavailable",
+        code: "DATA_UNAVAILABLE",
+        message: "Constitution excerpts are temporarily unavailable.",
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
 }

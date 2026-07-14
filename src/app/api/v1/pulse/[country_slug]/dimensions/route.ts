@@ -13,9 +13,11 @@ import {
   corsOptions,
   withRateLimit,
   PULSE_METHODOLOGY_META,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { shapePulseDimensionsData } from "@/lib/api/contract/shapes";
+import { parsePathContract } from "@/lib/api/request-contract";
 
 export async function GET(
   request: Request,
@@ -23,9 +25,13 @@ export async function GET(
 ) {
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
+  const path = await parsePathContract(params, "pulse-country-slug-params/v1", {
+    errorHeaders: CORS_HEADERS,
+  });
+  if (!path.ok) return path.response;
 
   try {
-    const { country_slug } = await params;
+    const { country_slug } = path.data;
     // PUBLIC_CLAIM: pulse.country-period-observability
     const data = await getPulseV2ForCountry(country_slug);
 

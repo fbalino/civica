@@ -44,39 +44,27 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncStatCanCa(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all StatCan indicators in scope.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.statcan-ca", summary);
+  const summary = await syncStatCanCa(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all StatCan indicators in scope.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.statcan-ca", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.statcan-ca.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.statcan-ca.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.statcan-ca.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.statcan-ca.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.statcan-ca", handler);

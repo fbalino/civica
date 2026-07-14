@@ -639,10 +639,28 @@ export async function getDemocracyScores(jurisdictionId: string) {
     .limit(1);
 
   const freedomHouseFacts = await db
-    .select()
+    .select({
+      factKey: countryFacts.factKey,
+      category: countryFacts.category,
+      sourceId: countryFacts.sourceId,
+      sourceUrl: countryFacts.sourceUrl,
+      factValue: countryFacts.factValue,
+      factValueNumeric: countryFacts.factValueNumeric,
+      factUnit: countryFacts.factUnit,
+      factYear: countryFacts.factYear,
+      valueJson: countryFacts.valueJson,
+      valueStatus: countryFacts.valueStatus,
+      valueStatusReason: countryFacts.valueStatusReason,
+      asOf: countryFacts.asOf,
+      retrievedAt: countryFacts.retrievedAt,
+      upstreamVintageLabel: countryFacts.upstreamVintageLabel,
+      valueType: countryFacts.valueType,
+    })
     .from(countryFacts)
     .where(
-      sql`${countryFacts.jurisdictionId} = ${jurisdictionId} AND ${countryFacts.factKey} LIKE 'freedom_house%'`,
+      sql`${countryFacts.jurisdictionId} = ${jurisdictionId}
+        AND ${countryFacts.factKey} LIKE 'freedom_house%'
+        AND ${countryFacts.status} = 'active'`,
     );
 
   return {

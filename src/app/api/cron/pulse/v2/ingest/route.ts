@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  cronExecutionKeyFromRequest,
-  withCronJob,
-} from "@/lib/api/cron-job";
+import { cronExecutionKeyFromRequest, withCronJob } from "@/lib/api/cron-job";
+import { summarizeCronReports } from "@/lib/api/cron-output";
 import { createDb, ingestPulseV2 } from "@/lib/pulse/v2/ingest";
 import { pulseV2IngestCronOutcome } from "@/lib/pulse/v2/cron-outcomes";
 
@@ -15,33 +13,26 @@ async function handler(request: Request) {
   const started = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
   const cronExecutionKey = cronExecutionKeyFromRequest(request);
-  try {
-    const db = createDb();
-    const summary = await ingestPulseV2(db, { dryRun, cronExecutionKey });
-    const { httpStatus, ...outcome } = pulseV2IngestCronOutcome(summary);
-    return NextResponse.json(
-      {
-        ...outcome,
-        step: "pulse.v2.ingest",
-        dryRun,
-        started,
-        finished: new Date().toISOString(),
-        summary,
-      },
-      { status: httpStatus },
-    );
-  } catch (err) {
-    console.error("[cron pulse.v2.ingest] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "pulse.v2.ingest",
-        dryRun,
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  const db = createDb();
+  const summary = await ingestPulseV2(db, { dryRun, cronExecutionKey });
+  const outcome = pulseV2IngestCronOutcome(summary);
+  const safeSummary = {
+    ...summary,
+    reports: summarizeCronReports(summary.reports),
+  };
+  return NextResponse.json(
+    {
+      ok: outcome.ok,
+      outcome: outcome.outcome,
+      failedConnectors: outcome.failedConnectors,
+      step: "pulse.v2.ingest",
+      dryRun,
+      started,
+      finished: new Date().toISOString(),
+      summary: safeSummary,
+    },
+    { status: outcome.httpStatus },
+  );
 }
 
 const cronHandler = withCronJob("pulse.v2.ingest", handler);

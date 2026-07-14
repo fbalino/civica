@@ -16,38 +16,26 @@ async function handler(request: Request) {
   const started = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
   const cronExecutionKey = cronExecutionKeyFromRequest(request);
-  try {
-    const sqlClient = neon(process.env.DATABASE_URL!);
-    const db = drizzle({ client: sqlClient, schema });
-    const summary = await runClustering(db, {
-      limit: 1000,
+  const sqlClient = neon(process.env.DATABASE_URL!);
+  const db = drizzle({ client: sqlClient, schema });
+  const summary = await runClustering(db, {
+    limit: 1000,
+    dryRun,
+    cronExecutionKey,
+  });
+  const outcome = pulseV2ClusterCronOutcome(summary);
+  return NextResponse.json(
+    {
+      ok: outcome.ok,
+      outcome: outcome.outcome,
+      step: "pulse.v2.cluster",
       dryRun,
-      cronExecutionKey,
-    });
-    const { httpStatus, ...outcome } = pulseV2ClusterCronOutcome(summary);
-    return NextResponse.json(
-      {
-        ...outcome,
-        step: "pulse.v2.cluster",
-        dryRun,
-        started,
-        finished: new Date().toISOString(),
-        summary,
-      },
-      { status: httpStatus },
-    );
-  } catch (err) {
-    console.error("[cron pulse.v2.cluster] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "pulse.v2.cluster",
-        dryRun,
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+      started,
+      finished: new Date().toISOString(),
+      summary,
+    },
+    { status: outcome.httpStatus },
+  );
 }
 
 const cronHandler = withCronJob("pulse.v2.cluster", handler);

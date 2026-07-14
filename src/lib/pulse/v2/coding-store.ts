@@ -25,6 +25,12 @@ import {
   type PulseCodingSubmissionEnvelope,
 } from "./coding-workspace";
 import type { PulseCoderAnswer } from "./coder-protocol";
+import {
+  parsePulseCodingExport,
+  projectPulseCodingExportBody,
+  type PulseCodingExport,
+} from "./coding-export";
+import { PulseCodingStoreError } from "./coding-errors";
 import type { PulseCodingSession } from "./coding-session";
 
 export interface PulseCodingDraftInput {
@@ -73,12 +79,33 @@ export interface PulseCodingAdminDashboard {
 }
 
 export type PulseCodingDashboard =
-  | PulseCodingParticipantDashboard
-  | PulseCodingAdminDashboard;
+  PulseCodingParticipantDashboard | PulseCodingAdminDashboard;
 
-function studyContract(row: typeof pulseCodingStudies.$inferSelect): PulseCodingStudyContract {
+const PULSE_CODING_STUDY_CONTRACT_SELECTION = {
+  schemaVersion: pulseCodingStudies.schemaVersion,
+  id: pulseCodingStudies.id,
+  title: pulseCodingStudies.title,
+  purpose: pulseCodingStudies.purpose,
+  protocolVersion: pulseCodingStudies.protocolVersion,
+  codebookVersion: pulseCodingStudies.codebookVersion,
+  ontologyVersion: pulseCodingStudies.ontologyVersion,
+  datasetVersion: pulseCodingStudies.datasetVersion,
+  packetSetSha256: pulseCodingStudies.packetSetSha256,
+  traceSetSha256: pulseCodingStudies.traceSetSha256,
+  status: pulseCodingStudies.status,
+} as const;
+
+type PulseCodingStudyContractRow = Pick<
+  typeof pulseCodingStudies.$inferSelect,
+  keyof typeof PULSE_CODING_STUDY_CONTRACT_SELECTION
+>;
+
+function studyContract(
+  row: PulseCodingStudyContractRow,
+): PulseCodingStudyContract {
   return {
-    schemaVersion: row.schemaVersion as PulseCodingStudyContract["schemaVersion"],
+    schemaVersion:
+      row.schemaVersion as PulseCodingStudyContract["schemaVersion"],
     id: row.id,
     title: row.title,
     purpose: row.purpose as PulseCodingStudyContract["purpose"],
@@ -150,7 +177,7 @@ export async function getPulseCodingDashboard(
 
   const [studyRows, assignmentRows] = await Promise.all([
     db
-      .select()
+      .select(PULSE_CODING_STUDY_CONTRACT_SELECTION)
       .from(pulseCodingStudies)
       .where(eq(pulseCodingStudies.id, session.studyId))
       .limit(1),
@@ -235,10 +262,17 @@ export async function getPulseCodingWorkspace(
   if (session.kind !== "participant") return null;
   const rows = await db
     .select({
-      assignment: pulseCodingAssignments,
+      assignment: {
+        id: pulseCodingAssignments.id,
+        slot: pulseCodingAssignments.slot,
+        status: pulseCodingAssignments.status,
+        draft: pulseCodingAssignments.draft,
+        submission: pulseCodingAssignments.submission,
+        lockedAt: pulseCodingAssignments.lockedAt,
+      },
       packetRecordId: pulseCodingPackets.id,
       packet: pulseCodingPackets.packetSnapshot,
-      study: pulseCodingStudies,
+      study: PULSE_CODING_STUDY_CONTRACT_SELECTION,
     })
     .from(pulseCodingAssignments)
     .innerJoin(
@@ -265,7 +299,12 @@ export async function getPulseCodingWorkspace(
   let adjudication: PulseCodingAdjudicationInput | null = null;
   if (session.role === "adjudicator") {
     const comparisonRows = await db
-      .select()
+      .select({
+        id: pulseCodingComparisons.id,
+        comparison: pulseCodingComparisons.comparison,
+        comparisonSha256: pulseCodingComparisons.comparisonSha256,
+        disagreementAxes: pulseCodingComparisons.disagreementAxes,
+      })
       .from(pulseCodingComparisons)
       .where(eq(pulseCodingComparisons.packetId, row.packetRecordId))
       .limit(1);
@@ -288,7 +327,10 @@ export async function getPulseCodingWorkspace(
           ),
         )
         .orderBy(asc(pulseCodingAssignments.slot));
-      if (coderRows.length === 2 && coderRows.every(({ submission }) => submission))
+      if (
+        coderRows.length === 2 &&
+        coderRows.every(({ submission }) => submission)
+      )
         peerSubmissions = coderRows.map(
           ({ submission }) => submission as PulseCodingSubmissionEnvelope,
         );
@@ -298,8 +340,8 @@ export async function getPulseCodingWorkspace(
         .where(eq(pulseCodingAdjudications.comparisonId, found.id))
         .limit(1);
       adjudication =
-        (adjudicationRows[0]?.resolution as PulseCodingAdjudicationInput | null) ??
-        null;
+        (adjudicationRows[0]
+          ?.resolution as PulseCodingAdjudicationInput | null) ?? null;
     }
   }
 
@@ -312,8 +354,8 @@ export async function getPulseCodingWorkspace(
       slot: row.assignment.slot,
       status: row.assignment.status,
       draft: row.assignment.draft as PulseCodingSubmissionEnvelope | null,
-      submission:
-        row.assignment.submission as PulseCodingSubmissionEnvelope | null,
+      submission: row.assignment
+        .submission as PulseCodingSubmissionEnvelope | null,
       lockedAt: row.assignment.lockedAt?.toISOString() ?? null,
     },
     comparison,
@@ -355,10 +397,13 @@ async function loadOwnedCoderAssignment(
 ) {
   const rows = await db
     .select({
-      assignment: pulseCodingAssignments,
+      assignment: {
+        status: pulseCodingAssignments.status,
+        draftSha256: pulseCodingAssignments.draftSha256,
+      },
       packetRecordId: pulseCodingPackets.id,
       packet: pulseCodingPackets.packetSnapshot,
-      study: pulseCodingStudies,
+      study: PULSE_CODING_STUDY_CONTRACT_SELECTION,
     })
     .from(pulseCodingAssignments)
     .innerJoin(
@@ -388,14 +433,24 @@ export async function savePulseCodingDraft(input: {
   draft: PulseCodingDraftInput;
 }): Promise<{ sha256: string }> {
   if (input.session.kind !== "participant" || input.session.role !== "coder")
-    throw new Error("Only an assigned coder can save this draft");
+    throw new PulseCodingStoreError(
+      "FORBIDDEN",
+      "Only an assigned coder can save this draft",
+    );
   const row = await loadOwnedCoderAssignment(
     input.session.participantId,
     input.assignmentId,
   );
-  if (!row) throw new Error("Pulse coding assignment not found");
+  if (!row)
+    throw new PulseCodingStoreError(
+      "NOT_FOUND",
+      "Pulse coding assignment not found",
+    );
   if (row.assignment.status === "locked")
-    throw new Error("Locked Pulse coding submissions are immutable");
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Locked Pulse coding submissions are immutable",
+    );
   const study = studyContract(row.study);
   const packet = row.packet as PulseCodingPacketSnapshot;
   const draft = buildSubmission(
@@ -410,7 +465,7 @@ export async function savePulseCodingDraft(input: {
     (error) => error !== "submission is not locked",
   );
   if (errors.some((error) => error.includes("forbidden blind field")))
-    throw new Error(errors.join("; "));
+    throw new PulseCodingStoreError("INVALID_REQUEST_BODY", errors.join("; "));
   const sha256 = pulseCodingHash(draft);
   const result = await db.execute(sql`
     WITH updated AS (
@@ -444,8 +499,13 @@ export async function savePulseCodingDraft(input: {
     FROM updated
     RETURNING id
   `);
-  const changed = ((result as unknown as { rows?: unknown[] }).rows ?? result) as unknown[];
-  if (changed.length !== 1) throw new Error("Draft save lost the lock race");
+  const changed = ((result as unknown as { rows?: unknown[] }).rows ??
+    result) as unknown[];
+  if (changed.length !== 1)
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Draft save lost the lock race",
+    );
   return { sha256 };
 }
 
@@ -456,14 +516,24 @@ export async function lockPulseCodingSubmission(input: {
   draft: PulseCodingDraftInput;
 }): Promise<{ submissionSha256: string; comparisonSha256: string | null }> {
   if (input.session.kind !== "participant" || input.session.role !== "coder")
-    throw new Error("Only an assigned coder can lock this submission");
+    throw new PulseCodingStoreError(
+      "FORBIDDEN",
+      "Only an assigned coder can lock this submission",
+    );
   const row = await loadOwnedCoderAssignment(
     input.session.participantId,
     input.assignmentId,
   );
-  if (!row) throw new Error("Pulse coding assignment not found");
+  if (!row)
+    throw new PulseCodingStoreError(
+      "NOT_FOUND",
+      "Pulse coding assignment not found",
+    );
   if (row.assignment.status === "locked")
-    throw new Error("Locked Pulse coding submissions are immutable");
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Locked Pulse coding submissions are immutable",
+    );
   const study = studyContract(row.study);
   const packet = row.packet as PulseCodingPacketSnapshot;
   const submittedAt = new Date().toISOString();
@@ -476,7 +546,8 @@ export async function lockPulseCodingSubmission(input: {
     submittedAt,
   );
   const errors = pulseCodingSubmissionErrors(submission, packet, study);
-  if (errors.length) throw new Error(errors.join("; "));
+  if (errors.length)
+    throw new PulseCodingStoreError("INVALID_REQUEST_BODY", errors.join("; "));
   const submissionSha256 = pulseCodingHash(submission);
   let comparisonSha256: string | null = null;
 
@@ -517,7 +588,11 @@ export async function lockPulseCodingSubmission(input: {
   `);
   const locked = ((lockResult as unknown as { rows?: unknown[] }).rows ??
     lockResult) as unknown[];
-  if (locked.length !== 1) throw new Error("Submission lock lost the race");
+  if (locked.length !== 1)
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Submission lock lost the race",
+    );
 
   comparisonSha256 = await ensurePulseCodingComparison(
     row.packetRecordId,
@@ -592,8 +667,9 @@ export async function ensurePulseCodingComparison(
     FROM inserted
     RETURNING id
   `);
-  const comparisonInserted = ((comparisonResult as unknown as { rows?: unknown[] })
-    .rows ?? comparisonResult) as unknown[];
+  const comparisonInserted = ((
+    comparisonResult as unknown as { rows?: unknown[] }
+  ).rows ?? comparisonResult) as unknown[];
   if (comparisonInserted.length === 0) {
     const existing = await db
       .select({ sha256: pulseCodingComparisons.comparisonSha256 })
@@ -601,7 +677,10 @@ export async function ensurePulseCodingComparison(
       .where(eq(pulseCodingComparisons.packetId, packetRecordId))
       .limit(1);
     if (existing[0]?.sha256 !== generated.sha256)
-      throw new Error("Existing comparison hash differs from the locked pair");
+      throw new PulseCodingStoreError(
+        "CONFLICT",
+        "Existing comparison hash differs from the locked pair",
+      );
   }
   return generated.sha256;
 }
@@ -619,15 +698,24 @@ export async function recordPulseCodingAdjudication(input: {
     input.session.kind !== "participant" ||
     input.session.role !== "adjudicator"
   )
-    throw new Error("Only the assigned adjudicator can decide this packet");
+    throw new PulseCodingStoreError(
+      "FORBIDDEN",
+      "Only the assigned adjudicator can decide this packet",
+    );
   const workspace = await getPulseCodingWorkspace(
     input.session,
     input.assignmentId,
   );
   if (!workspace?.comparison || !workspace.peerSubmissions)
-    throw new Error("Both independent submissions must lock before adjudication");
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Both independent submissions must lock before adjudication",
+    );
   if (workspace.adjudication)
-    throw new Error("Terminal adjudication is immutable");
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Terminal adjudication is immutable",
+    );
   const assignmentIds = await db
     .select({ participantId: pulseCodingAssignments.participantId })
     .from(pulseCodingAssignments)
@@ -646,19 +734,22 @@ export async function recordPulseCodingAdjudication(input: {
   const context = {
     participantId: input.session.participantId,
     role: input.session.role,
-    assignedCoderIds: assignmentIds.map(({ participantId }) => participantId) as [
-      string,
-      string,
-    ],
+    assignedCoderIds: assignmentIds.map(
+      ({ participantId }) => participantId,
+    ) as [string, string],
     assignedAdjudicatorId: input.session.participantId,
     ownSubmissionLocked: false,
     bothSubmissionsLocked: true,
     adjudicationTerminal: false,
   };
   const errors = pulseCodingAdjudicationErrors(adjudication, context);
-  if (errors.length) throw new Error(errors.join("; "));
+  if (errors.length)
+    throw new PulseCodingStoreError("INVALID_REQUEST_BODY", errors.join("; "));
   if (adjudication.comparisonSha256 !== workspace.comparison.sha256)
-    throw new Error("Adjudication points to another comparison");
+    throw new PulseCodingStoreError(
+      "CONFLICT",
+      "Adjudication points to another comparison",
+    );
   const resolutionSha256 = pulseCodingHash(adjudication);
   const status = adjudication.status;
 
@@ -724,9 +815,16 @@ export async function issuePulseCodingParticipant(input: {
   useStatus: "evaluation_candidate" | "dry_run_not_gold";
   expiresAt: Date | null;
   requestId: string;
-}): Promise<{ participantId: string; accessCode: string; assignments: number }> {
+}): Promise<{
+  participantId: string;
+  accessCode: string;
+  assignments: number;
+}> {
   const role = input.slot === "adjudicator" ? "adjudicator" : "coder";
-  if (input.actorType === "agent_dry_pilot" && input.useStatus !== "dry_run_not_gold")
+  if (
+    input.actorType === "agent_dry_pilot" &&
+    input.useStatus !== "dry_run_not_gold"
+  )
     throw new Error("Agent participants are permanently non-gold");
   const accessCode = `pc_${randomBytes(32).toString("base64url")}`;
   const credentialHash = pulseCodingAccessCodeHash(accessCode);
@@ -751,18 +849,16 @@ export async function issuePulseCodingParticipant(input: {
     slot: input.slot,
   }));
   await db.batch([
-    db
-      .insert(pulseCodingParticipants)
-      .values({
-        id: participantId,
-        studyId: input.studyId,
-        pseudonym: input.pseudonym,
-        role,
-        actorType: input.actorType,
-        useStatus: input.useStatus,
-        credentialHash,
-        expiresAt: input.expiresAt,
-      }),
+    db.insert(pulseCodingParticipants).values({
+      id: participantId,
+      studyId: input.studyId,
+      pseudonym: input.pseudonym,
+      role,
+      actorType: input.actorType,
+      useStatus: input.useStatus,
+      credentialHash,
+      expiresAt: input.expiresAt,
+    }),
     db.insert(pulseCodingAssignments).values(assignmentRows),
     db.insert(pulseCodingAuditLog).values([
       {
@@ -802,71 +898,161 @@ export async function issuePulseCodingParticipant(input: {
 export async function exportPulseCodingStudy(
   session: PulseCodingSession,
   studyId: string,
-): Promise<Record<string, unknown>> {
+): Promise<PulseCodingExport> {
   if (session.role !== "study_admin" && session.role !== "adjudicator")
-    throw new Error("Coding study export requires an adjudicator or study admin");
+    throw new Error(
+      "Coding study export requires an adjudicator or study admin",
+    );
   if (session.kind === "participant" && session.studyId !== studyId)
     throw new Error("Participant cannot export another study");
-  const [studies, packets, participants, assignments, comparisons, adjudications, audit] =
-    await Promise.all([
-      db.select().from(pulseCodingStudies).where(eq(pulseCodingStudies.id, studyId)),
-      db.select().from(pulseCodingPackets).where(eq(pulseCodingPackets.studyId, studyId)),
-      db
-        .select({
-          id: pulseCodingParticipants.id,
-          pseudonym: pulseCodingParticipants.pseudonym,
-          role: pulseCodingParticipants.role,
-          actorType: pulseCodingParticipants.actorType,
-          useStatus: pulseCodingParticipants.useStatus,
-          status: pulseCodingParticipants.status,
-          createdAt: pulseCodingParticipants.createdAt,
-          revokedAt: pulseCodingParticipants.revokedAt,
-        })
-        .from(pulseCodingParticipants)
-        .where(eq(pulseCodingParticipants.studyId, studyId)),
-      db
-        .select({ assignment: pulseCodingAssignments })
-        .from(pulseCodingAssignments)
-        .innerJoin(
-          pulseCodingPackets,
-          eq(pulseCodingAssignments.packetId, pulseCodingPackets.id),
-        )
-        .where(eq(pulseCodingPackets.studyId, studyId)),
-      db
-        .select({ comparison: pulseCodingComparisons })
-        .from(pulseCodingComparisons)
-        .innerJoin(
-          pulseCodingPackets,
-          eq(pulseCodingComparisons.packetId, pulseCodingPackets.id),
-        )
-        .where(eq(pulseCodingPackets.studyId, studyId)),
-      db
-        .select({ adjudication: pulseCodingAdjudications })
-        .from(pulseCodingAdjudications)
-        .innerJoin(
-          pulseCodingComparisons,
-          eq(pulseCodingAdjudications.comparisonId, pulseCodingComparisons.id),
-        )
-        .innerJoin(
-          pulseCodingPackets,
-          eq(pulseCodingComparisons.packetId, pulseCodingPackets.id),
-        )
-        .where(eq(pulseCodingPackets.studyId, studyId)),
-      db
-        .select()
-        .from(pulseCodingAuditLog)
-        .where(eq(pulseCodingAuditLog.studyId, studyId))
-        .orderBy(asc(pulseCodingAuditLog.createdAt), asc(pulseCodingAuditLog.id)),
-    ]);
+  const [
+    studies,
+    packets,
+    participants,
+    assignments,
+    comparisons,
+    adjudications,
+    audit,
+  ] = await Promise.all([
+    db
+      .select({
+        id: pulseCodingStudies.id,
+        slug: pulseCodingStudies.slug,
+        schemaVersion: pulseCodingStudies.schemaVersion,
+        title: pulseCodingStudies.title,
+        purpose: pulseCodingStudies.purpose,
+        protocolVersion: pulseCodingStudies.protocolVersion,
+        codebookVersion: pulseCodingStudies.codebookVersion,
+        ontologyVersion: pulseCodingStudies.ontologyVersion,
+        datasetVersion: pulseCodingStudies.datasetVersion,
+        packetSetSha256: pulseCodingStudies.packetSetSha256,
+        traceSetSha256: pulseCodingStudies.traceSetSha256,
+        status: pulseCodingStudies.status,
+        createdBy: pulseCodingStudies.createdBy,
+        createdAt: pulseCodingStudies.createdAt,
+        closedAt: pulseCodingStudies.closedAt,
+      })
+      .from(pulseCodingStudies)
+      .where(eq(pulseCodingStudies.id, studyId)),
+    db
+      .select({
+        id: pulseCodingPackets.id,
+        studyId: pulseCodingPackets.studyId,
+        packetKey: pulseCodingPackets.packetKey,
+        analysisStatus: pulseCodingPackets.analysisStatus,
+        packetSnapshot: pulseCodingPackets.packetSnapshot,
+        packetSnapshotSha256: pulseCodingPackets.packetSnapshotSha256,
+        importedAt: pulseCodingPackets.importedAt,
+      })
+      .from(pulseCodingPackets)
+      .where(eq(pulseCodingPackets.studyId, studyId)),
+    db
+      .select({
+        id: pulseCodingParticipants.id,
+        pseudonym: pulseCodingParticipants.pseudonym,
+        role: pulseCodingParticipants.role,
+        actorType: pulseCodingParticipants.actorType,
+        useStatus: pulseCodingParticipants.useStatus,
+        status: pulseCodingParticipants.status,
+        createdAt: pulseCodingParticipants.createdAt,
+        revokedAt: pulseCodingParticipants.revokedAt,
+      })
+      .from(pulseCodingParticipants)
+      .where(eq(pulseCodingParticipants.studyId, studyId)),
+    db
+      .select({
+        id: pulseCodingAssignments.id,
+        packetId: pulseCodingAssignments.packetId,
+        participantId: pulseCodingAssignments.participantId,
+        slot: pulseCodingAssignments.slot,
+        status: pulseCodingAssignments.status,
+        draft: pulseCodingAssignments.draft,
+        draftSha256: pulseCodingAssignments.draftSha256,
+        submission: pulseCodingAssignments.submission,
+        submissionSha256: pulseCodingAssignments.submissionSha256,
+        assignedAt: pulseCodingAssignments.assignedAt,
+        draftUpdatedAt: pulseCodingAssignments.draftUpdatedAt,
+        lockedAt: pulseCodingAssignments.lockedAt,
+      })
+      .from(pulseCodingAssignments)
+      .innerJoin(
+        pulseCodingPackets,
+        eq(pulseCodingAssignments.packetId, pulseCodingPackets.id),
+      )
+      .where(eq(pulseCodingPackets.studyId, studyId)),
+    db
+      .select({
+        id: pulseCodingComparisons.id,
+        packetId: pulseCodingComparisons.packetId,
+        coderAssignmentAId: pulseCodingComparisons.coderAssignmentAId,
+        coderAssignmentBId: pulseCodingComparisons.coderAssignmentBId,
+        comparison: pulseCodingComparisons.comparison,
+        comparisonSha256: pulseCodingComparisons.comparisonSha256,
+        disagreementAxes: pulseCodingComparisons.disagreementAxes,
+        generatedAt: pulseCodingComparisons.generatedAt,
+      })
+      .from(pulseCodingComparisons)
+      .innerJoin(
+        pulseCodingPackets,
+        eq(pulseCodingComparisons.packetId, pulseCodingPackets.id),
+      )
+      .where(eq(pulseCodingPackets.studyId, studyId)),
+    db
+      .select({
+        id: pulseCodingAdjudications.id,
+        comparisonId: pulseCodingAdjudications.comparisonId,
+        adjudicatorAssignmentId:
+          pulseCodingAdjudications.adjudicatorAssignmentId,
+        status: pulseCodingAdjudications.status,
+        resolution: pulseCodingAdjudications.resolution,
+        resolutionSha256: pulseCodingAdjudications.resolutionSha256,
+        reasonCodes: pulseCodingAdjudications.reasonCodes,
+        notes: pulseCodingAdjudications.notes,
+        createdAt: pulseCodingAdjudications.createdAt,
+        resolvedAt: pulseCodingAdjudications.resolvedAt,
+      })
+      .from(pulseCodingAdjudications)
+      .innerJoin(
+        pulseCodingComparisons,
+        eq(pulseCodingAdjudications.comparisonId, pulseCodingComparisons.id),
+      )
+      .innerJoin(
+        pulseCodingPackets,
+        eq(pulseCodingComparisons.packetId, pulseCodingPackets.id),
+      )
+      .where(eq(pulseCodingPackets.studyId, studyId)),
+    db
+      .select({
+        id: pulseCodingAuditLog.id,
+        studyId: pulseCodingAuditLog.studyId,
+        packetId: pulseCodingAuditLog.packetId,
+        participantId: pulseCodingAuditLog.participantId,
+        actorId: pulseCodingAuditLog.actorId,
+        actorRole: pulseCodingAuditLog.actorRole,
+        action: pulseCodingAuditLog.action,
+        entityType: pulseCodingAuditLog.entityType,
+        entityId: pulseCodingAuditLog.entityId,
+        requestId: pulseCodingAuditLog.requestId,
+        beforeSha256: pulseCodingAuditLog.beforeSha256,
+        afterSha256: pulseCodingAuditLog.afterSha256,
+        details: pulseCodingAuditLog.details,
+        createdAt: pulseCodingAuditLog.createdAt,
+      })
+      .from(pulseCodingAuditLog)
+      .where(eq(pulseCodingAuditLog.studyId, studyId))
+      .orderBy(asc(pulseCodingAuditLog.createdAt), asc(pulseCodingAuditLog.id)),
+  ]);
   if (!studies[0]) throw new Error("Pulse coding study not found");
   const study = studies[0];
-  const assignmentRows = assignments.map(({ assignment }) => assignment);
-  const comparisonRows = comparisons.map(({ comparison }) => comparison);
-  const adjudicationRows = adjudications.map(({ adjudication }) => adjudication);
+  const assignmentRows = assignments;
+  const comparisonRows = comparisons;
+  const adjudicationRows = adjudications;
   if (session.kind === "admin") {
     const adjudicatedComparisonIds = new Set(
       adjudicationRows
-        .filter(({ status }) => status === "resolved" || status === "unresolved")
+        .filter(
+          ({ status }) => status === "resolved" || status === "unresolved",
+        )
         .map(({ comparisonId }) => comparisonId),
     );
     const terminal =
@@ -896,21 +1082,15 @@ export async function exportPulseCodingStudy(
         "Adjudicator export is limited to a fully assigned study queue",
       );
   }
-  const substantiveAudit = audit.filter(
-    (entry) => entry.action !== "export_generated",
-  );
-  const body = {
-    schemaVersion: "pulse-coding-export/v1",
+  const body = projectPulseCodingExportBody({
     study,
     packets,
     participants,
     assignments: assignmentRows,
     comparisons: comparisonRows,
     adjudications: adjudicationRows,
-    audit: substantiveAudit,
-    claimBoundary:
-      "This export preserves coding evidence and disagreement. It is not a gold release, model validation result, or governance score.",
-  };
+    audit,
+  });
   const semanticSha256 = pulseCodingHash(body);
   const exportedAt = new Date().toISOString();
   await db.insert(pulseCodingAuditLog).values({
@@ -924,5 +1104,5 @@ export async function exportPulseCodingStudy(
     afterSha256: semanticSha256,
     details: { schemaVersion: body.schemaVersion },
   });
-  return { ...body, exportedAt, semanticSha256 };
+  return parsePulseCodingExport({ ...body, exportedAt, semanticSha256 });
 }

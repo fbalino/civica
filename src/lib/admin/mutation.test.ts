@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { redirect } from "next/navigation";
 
 import { ADMIN_SESSION_VERSION, type AdminSession } from "./session";
-import { runAdminMutation, type AdminMutationDependencies } from "./mutation";
+import {
+  adminMutationProblem,
+  runAdminMutation,
+  type AdminMutationDependencies,
+} from "./mutation";
 import { recordAdminLoginAudit, type AdminAuditEvent } from "./mutation-audit";
 
 const session: AdminSession = {
@@ -91,12 +96,38 @@ test("validation responses are retained as rejected outcomes", async () => {
   const response = await runAdminMutation(
     request(),
     descriptor,
-    async () => Response.json({ error: "invalid" }, { status: 400 }),
+    async () =>
+      Response.json(
+        { error: "invalid", code: "INVALID_STATUS" },
+        {
+          status: 400,
+          headers: { "Cache-Control": "public, max-age=3600" },
+        },
+      ),
     state.dependencies,
   );
   assert.equal(response.status, 400);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), {
+    error: "invalid",
+    code: "INVALID_STATUS",
+  });
   assert.equal(state.audits[1].result, "rejected");
   assert.equal(state.audits[1].reasonCode, "http_400");
+});
+
+test("admin mutation problems expose one fixed code and cannot be cached", async () => {
+  const response = adminMutationProblem(
+    "MESSAGE_NOT_FOUND",
+    "message not found",
+    404,
+  );
+  assert.equal(response.status, 404);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), {
+    error: "message not found",
+    code: "MESSAGE_NOT_FOUND",
+  });
 });
 
 test("cross-site requests never call the handler and retain a generic denial", async () => {
@@ -115,7 +146,10 @@ test("cross-site requests never call the handler and retain a generic denial", a
   assert.equal(called, false);
   assert.equal(state.audits.length, 1);
   assert.equal(state.audits[0].result, "rejected");
-  assert.deepEqual(await response.json(), { error: "Forbidden" });
+  assert.deepEqual(await response.json(), {
+    error: "Forbidden",
+    code: "FORBIDDEN",
+  });
 });
 
 test("authorization ignores bearer headers and fails closed on store errors", async () => {
@@ -181,12 +215,34 @@ test("thrown handlers produce a sanitized failed audit outcome", async () => {
     state.dependencies,
   );
   assert.equal(response.status, 500);
-  assert.equal(
-    JSON.stringify(await response.json()).includes("sensitive"),
-    false,
-  );
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  const body = await response.json();
+  assert.deepEqual(body, {
+    error: "Admin mutation failed",
+    code: "ADMIN_MUTATION_FAILED",
+  });
+  assert.equal(JSON.stringify(body).includes("sensitive"), false);
   assert.equal(state.audits.at(-1)?.result, "failed");
   assert.equal(state.audits.at(-1)?.reasonCode, "handler_exception");
+});
+
+test("framework redirects escape the mutation error boundary", async () => {
+  const state = fixture();
+  await assert.rejects(
+    runAdminMutation(
+      request(),
+      descriptor,
+      async () => redirect("/admin"),
+      state.dependencies,
+    ),
+    (error: unknown) =>
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      String(error.digest).startsWith("NEXT_REDIRECT"),
+  );
+  assert.equal(state.audits.length, 1);
+  assert.equal(state.audits[0].event, "attempt");
 });
 
 test("a terminal-audit outage leaves a durable attempted result without falsifying the completed response", async () => {

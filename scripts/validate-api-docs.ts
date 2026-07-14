@@ -17,9 +17,10 @@
  *      AND a `routeId="<id>"` EndpointSection call), so a live public
  *      route can never go undocumented without a build failure.
  *   3. Param drift — the query/path params `contract/registry.ts`
- *      declares for a route are cross-checked against a static scan of
- *      that route's `searchParams.get(All)(...)` calls and its
- *      `params: Promise<{...}>` path-param destructuring.
+ *      declares for a route are cross-checked against a static scan of that
+ *      route's exact `parseQueryContract(..., "schema-id")` registry keys,
+ *      direct `searchParams.get(All)(...)` calls, and its
+ *      `params: Promise<{...}>` path-param declaration.
  *   4. Deprecation consistency — every registry entry with a
  *      `deprecation` contract has a route.ts that actually imports
  *      `withStructuralFamilyDeprecation`; every entry WITHOUT one
@@ -44,6 +45,7 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import ts from "typescript";
 
 import {
   API_ROUTES,
@@ -57,6 +59,7 @@ import {
   V1_RATE_LIMIT_MAX,
   V1_RATE_LIMIT_WINDOW_MS,
 } from "../src/lib/api/contract/rate-limits";
+import { QUERY_CONTRACT_SCHEMAS } from "../src/lib/api/request-contract";
 
 const ROOT = process.cwd();
 const V1_DIR = path.join(ROOT, "src/app/api/v1");
@@ -215,9 +218,76 @@ async function checkDocsCoverage(report: Report): Promise<void> {
 
 export function extractQueryParamsRead(source: string): Set<string> {
   const found = new Set<string>();
-  const re = /searchParams\.get(?:All)?\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(source))) found.add(m[1]);
+  const parsed = ts.createSourceFile(
+    "route.ts",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node)) {
+      const argument = node.arguments[0];
+      if (
+        ts.isPropertyAccessExpression(node.expression) &&
+        /^(?:get|getAll)$/.test(node.expression.name.text) &&
+        ts.isPropertyAccessExpression(node.expression.expression) &&
+        node.expression.expression.name.text === "searchParams" &&
+        argument &&
+        ts.isStringLiteralLike(argument)
+      ) {
+        found.add(argument.text);
+      }
+      const schemaArgument = node.arguments[1];
+      if (
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === "parseQueryContract" &&
+        schemaArgument &&
+        ts.isStringLiteralLike(schemaArgument)
+      ) {
+        const schemaId =
+          schemaArgument.text as keyof typeof QUERY_CONTRACT_SCHEMAS;
+        const definition = QUERY_CONTRACT_SCHEMAS[schemaId];
+        if (definition) {
+          for (const key of Object.keys(definition.schema.shape)) {
+            found.add(key);
+          }
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(parsed);
+  return found;
+}
+
+export function extractUnknownQueryContractIds(source: string): Set<string> {
+  const found = new Set<string>();
+  const parsed = ts.createSourceFile(
+    "route.ts",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const visit = (node: ts.Node) => {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === "parseQueryContract"
+    ) {
+      const schemaArgument = node.arguments[1];
+      if (
+        schemaArgument &&
+        ts.isStringLiteralLike(schemaArgument) &&
+        !Object.hasOwn(QUERY_CONTRACT_SCHEMAS, schemaArgument.text)
+      ) {
+        found.add(schemaArgument.text);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(parsed);
   return found;
 }
 
@@ -245,6 +315,11 @@ export function diffParams(
 ): string[] {
   const errors: string[] = [];
   const queryRead = extractQueryParamsRead(source);
+  for (const schemaId of extractUnknownQueryContractIds(source)) {
+    errors.push(
+      `[param-drift] route "${routeId}" invokes unknown query contract "${schemaId}" in ${filePath}`,
+    );
+  }
   const pathRead = new Set(
     [...extractPathParamsRead(source)].map((n) => `:${n}`),
   );

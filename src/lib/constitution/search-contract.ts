@@ -22,8 +22,21 @@ export type ConstitutionSearchErrorCode =
   | "data_unavailable"
   | "query_timeout";
 
-export type ConstitutionSearchProtectionCode =
-  "RATE_LIMITED" | "RATE_LIMIT_UNAVAILABLE";
+export type ConstitutionSearchProblemCode =
+  | "INVALID_REQUEST"
+  | "QUERY_NOT_SEARCHABLE"
+  | "JURISDICTION_NOT_COVERED"
+  | "CURSOR_STALE"
+  | "RATE_LIMITED"
+  | "RATE_LIMIT_UNAVAILABLE"
+  | "RIGHTS_NOT_READY"
+  | "DATA_UNAVAILABLE"
+  | "QUERY_TIMEOUT";
+
+export type ConstitutionSearchProtectionCode = Extract<
+  ConstitutionSearchProblemCode,
+  "RATE_LIMITED" | "RATE_LIMIT_UNAVAILABLE"
+>;
 
 export interface ConstitutionSearchInput {
   query: string;
@@ -124,8 +137,8 @@ export interface ConstitutionSearchResponse {
 export interface ConstitutionSearchErrorResponse {
   schemaVersion: typeof CONSTITUTION_SEARCH_SCHEMA_VERSION;
   error: ConstitutionSearchErrorCode;
-  /** Stable shared-protection code on rate-limit 429/503 responses only. */
-  code?: ConstitutionSearchProtectionCode;
+  /** Stable machine discriminator for every failed search response. */
+  code: ConstitutionSearchProblemCode;
   message: string;
   details?: { uncoveredJurisdictions: string[] };
 }

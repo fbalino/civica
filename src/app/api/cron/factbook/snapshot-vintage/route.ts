@@ -78,8 +78,7 @@ export function resolveSnapshotVintageIdentity(
   return {
     ok: true,
     cutDate,
-    vintageLabel:
-      requestedLabel ?? deriveVintageLabel(cutDate, "v0.3-beta"),
+    vintageLabel: requestedLabel ?? deriveVintageLabel(cutDate, "v0.3-beta"),
   };
 }
 
@@ -88,58 +87,47 @@ async function handler(request: Request) {
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
 
-  try {
-    const identity = resolveSnapshotVintageIdentity(request);
-    if (!identity.ok) {
-      return NextResponse.json(
-        { ok: false, step: "factbook.snapshot-vintage", error: identity.error },
-        { status: 400 },
-      );
-    }
-    const { cutDate, vintageLabel } = identity;
-    const summary = await snapshotCompleteCandidateRelease({
-      dryRun,
-      vintageLabel,
-      cutDate,
-    });
+  const identity = resolveSnapshotVintageIdentity(request);
+  if (!identity.ok) {
+    return NextResponse.json(
+      { ok: false, step: "factbook.snapshot-vintage", error: identity.error },
+      { status: 400 },
+    );
+  }
+  const { cutDate, vintageLabel } = identity;
+  const summary = await snapshotCompleteCandidateRelease({
+    dryRun,
+    vintageLabel,
+    cutDate,
+  });
 
-    if (summary.winnerCount === 0 || summary.candidateCount === 0) {
-      return NextResponse.json(
-        {
-          ok: false,
-          step: "factbook.snapshot-vintage",
-          dryRun,
-          errors: [{ error: "No complete candidate release produced" }],
-        },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.snapshot-vintage",
-      started: startedAt,
-      finished: new Date().toISOString(),
-      dryRun,
-      vintageLabel: summary.vintageLabel,
-      cutAt: summary.cutAt,
-      candidateCount: summary.candidateCount,
-      winnerCount: summary.winnerCount,
-      candidateSetChecksum: summary.candidateSetChecksum,
-      winnerSetChecksum: summary.winnerSetChecksum,
-      unchanged: summary.unchanged,
-    });
-  } catch (err) {
-    console.error("[cron factbook.snapshot-vintage] failed:", err);
+  if (summary.winnerCount === 0 || summary.candidateCount === 0) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: "empty_result",
         step: "factbook.snapshot-vintage",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: 1,
       },
       { status: 500 },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.snapshot-vintage",
+    started: startedAt,
+    finished: new Date().toISOString(),
+    dryRun,
+    vintageLabel: summary.vintageLabel,
+    cutAt: summary.cutAt,
+    candidateCount: summary.candidateCount,
+    winnerCount: summary.winnerCount,
+    candidateSetChecksum: summary.candidateSetChecksum,
+    winnerSetChecksum: summary.winnerSetChecksum,
+    unchanged: summary.unchanged,
+  });
 }
 
 const cronHandler = withCronJob("factbook.snapshot-vintage", handler);

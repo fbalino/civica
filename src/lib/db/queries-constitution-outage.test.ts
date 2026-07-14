@@ -18,7 +18,14 @@ test("constitution catalog query can preserve an outage signal", () => {
 
   const run = spawnSync(
     process.execPath,
-    ["--import", "tsx", "--input-type=module", "--eval", code],
+    [
+      "--conditions=react-server",
+      "--import",
+      "tsx",
+      "--input-type=module",
+      "--eval",
+      code,
+    ],
     {
       cwd: process.cwd(),
       encoding: "utf8",

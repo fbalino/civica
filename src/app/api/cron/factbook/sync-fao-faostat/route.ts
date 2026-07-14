@@ -37,41 +37,29 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncFaoFaostat(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all 4 FAO indicators.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.fao-faostat", summary);
+  const summary = await syncFaoFaostat(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all 4 FAO indicators.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.fao-faostat", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.fao-faostat.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      vintageLabel: summary.vintageLabel,
-      archiveBytes: summary.archiveBytes,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.fao-faostat.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.fao-faostat.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.fao-faostat.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    vintageLabel: summary.vintageLabel,
+    archiveBytes: summary.archiveBytes,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.fao-faostat", handler);

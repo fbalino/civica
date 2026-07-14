@@ -23,38 +23,26 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncWorldBankWdi(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all 6 WDI indicators.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.wdi", summary);
+  const summary = await syncWorldBankWdi(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all 6 WDI indicators.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.wdi", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.wdi.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.wdi.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.wdi.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.wdi.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.wdi", handler);

@@ -13,13 +13,10 @@
 import { NextResponse } from "next/server";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { parsePathContract } from "@/lib/api/request-contract";
 import { ENTITY_CITATION_RESOLVERS } from "@/lib/citations/resolvers";
-import {
-  ENTITY_ID_PATTERNS,
-  ENTITY_TYPES,
-  isEntityType,
-  zEntityCitation,
-} from "@/lib/citations/stable-identity";
+import { zEntityCitation } from "@/lib/citations/stable-identity";
+import { apiProblem } from "@/lib/api/problem-response";
 
 export async function GET(
   request: Request,
@@ -31,22 +28,17 @@ export async function GET(
   );
   if (limited) return limited;
 
-  const { entityType, id } = await params;
-  if (!isEntityType(entityType)) {
-    return NextResponse.json(
-      { error: "unknown_entity_type", allowed: ENTITY_TYPES },
-      { status: 404 },
-    );
-  }
-  if (!ENTITY_ID_PATTERNS[entityType].test(id)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 404 });
-  }
+  const path = await parsePathContract(params, "entity-citation-params/v1");
+  if (!path.ok) return path.response;
+  const { entityType, id } = path.data;
 
   try {
     const resolver = ENTITY_CITATION_RESOLVERS[entityType];
     const citation = await resolver(id);
     if (!citation) {
-      return NextResponse.json({ error: "not_found" }, { status: 404 });
+      return apiProblem("NOT_FOUND", {
+        headers: { "X-Robots-Tag": "noindex" },
+      });
     }
 
     const parsed = zEntityCitation.safeParse(citation);
@@ -56,10 +48,9 @@ export async function GET(
         entityType,
         parsed.error.flatten(),
       );
-      return NextResponse.json(
-        { error: "data_unavailable", message: "Citation is unavailable." },
-        { status: 503, headers: { "Cache-Control": "no-store" } },
-      );
+      return apiProblem("DATA_UNAVAILABLE", {
+        headers: { "X-Robots-Tag": "noindex" },
+      });
     }
 
     return NextResponse.json(parsed.data, {
@@ -70,9 +61,8 @@ export async function GET(
     });
   } catch (error) {
     console.error("[/api/citations]", error);
-    return NextResponse.json(
-      { error: "data_unavailable", message: "Citation is unavailable." },
-      { status: 503, headers: { "Cache-Control": "no-store" } },
-    );
+    return apiProblem("DATA_UNAVAILABLE", {
+      headers: { "X-Robots-Tag": "noindex" },
+    });
   }
 }

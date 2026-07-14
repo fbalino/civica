@@ -17,6 +17,7 @@ import {
   type ConstitutionSearchInput,
   type ConstitutionSearchResponse,
 } from "@/lib/constitution/search-contract";
+import { shapeConstitutionSearchError } from "@/lib/constitution/search-error-response";
 import { withOg } from "@/lib/og";
 import { checkRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
@@ -83,6 +84,10 @@ export default async function ConstitutionSearchPage({
             rateLimit.status === "limited"
               ? "rate_limited"
               : "data_unavailable",
+          code:
+            rateLimit.status === "limited"
+              ? "RATE_LIMITED"
+              : "RATE_LIMIT_UNAVAILABLE",
           message:
             rateLimit.status === "limited"
               ? "Rate limit exceeded. Try again shortly."
@@ -94,13 +99,10 @@ export default async function ConstitutionSearchPage({
     } catch (caught) {
       const known =
         caught instanceof ConstitutionSearchQueryError ? caught : null;
-      error = {
-        schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
-        error: known?.code ?? "data_unavailable",
-        message:
-          known?.message ??
-          "The constitution search index could not be reached. Please try again later.",
-      };
+      error = shapeConstitutionSearchError(
+        known?.code ?? "data_unavailable",
+        known?.details,
+      ).body;
     }
   }
 

@@ -7,134 +7,100 @@ import {
   rateLimitResponse,
 } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
-
-const VALID_CATEGORIES = [
-  "ci_data_error",
-  "ci_methodology",
-  "pulse_misclassification",
-  "pulse_severity",
-  "pulse_false_positive",
-  "pulse_missing_event",
-  "pulse_duplicate",
-  "other",
-] as const;
-
-const VALID_DIMENSIONS = [
-  "democratic_quality",
-  "rule_of_law",
-  "human_development",
-  "freedoms_rights",
-  "corruption_control",
-  "stability_security",
-];
+import {
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+} from "@/lib/api/request-body";
+import {
+  correctionBodySchema,
+  REQUEST_BODY_LIMITS,
+  type CorrectionBody,
+} from "@/lib/api/request-body-schemas";
+import { withSafeJsonErrors } from "@/lib/api/problem-response";
 
 const CORRECTION_RATE_LIMIT_POLICY =
   getRequestRateLimitPolicy("correction-form");
 
 export async function POST(request: NextRequest) {
-  const rateLimit = await checkRequestRateLimit(
-    request,
-    CORRECTION_RATE_LIMIT_POLICY,
-  );
-  if (rateLimit.status !== "allowed") {
-    return rateLimitResponse(rateLimit, CORRECTION_RATE_LIMIT_POLICY, {
-      limitedMessage:
-        "Too many correction submissions. Please wait before trying again.",
+  return withSafeJsonErrors("api/civica-index/corrections", async () => {
+    const rateLimit = await checkRequestRateLimit(
+      request,
+      CORRECTION_RATE_LIMIT_POLICY,
+    );
+    if (rateLimit.status !== "allowed") {
+      return rateLimitResponse(rateLimit, CORRECTION_RATE_LIMIT_POLICY, {
+        limitedMessage:
+          "Too many correction submissions. Please wait before trying again.",
+      });
+    }
+
+    const parsed = await parseBoundedRequestBody<CorrectionBody>(request, {
+      maxBytes: REQUEST_BODY_LIMITS.correction,
+      media: [{ mediaType: JSON_MEDIA_TYPE, schema: correctionBodySchema }],
     });
-  }
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
 
-  let body: Record<string, unknown>;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
-
-  // --- Server-side validation ---
-  const category = (body.category as string)?.trim();
-  if (
-    !category ||
-    !VALID_CATEGORIES.includes(category as (typeof VALID_CATEGORIES)[number])
-  ) {
-    return NextResponse.json(
-      { error: "Invalid or missing category." },
-      { status: 400 },
-    );
-  }
-
-  const description = (body.description as string)?.trim();
-  if (!description || description.length < 10) {
-    return NextResponse.json(
-      { error: "Description is required (minimum 10 characters)." },
-      { status: 400 },
-    );
-  }
-  if (description.length > 10000) {
-    return NextResponse.json(
-      { error: "Description must be under 10,000 characters." },
-      { status: 400 },
-    );
-  }
-
-  const countrySlug = (body.countrySlug as string)?.trim() || null;
-  const dimension = (body.dimension as string)?.trim() || null;
-  const submitterName = (body.submitterName as string)?.trim() || null;
-  const submitterEmail = (body.submitterEmail as string)?.trim() || null;
-  const submitterAffiliation =
-    (body.submitterAffiliation as string)?.trim() || null;
-  const requestPrivacy = Boolean(body.requestPrivacy);
-
-  // Validate email format if provided
-  if (submitterEmail) {
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRe.test(submitterEmail)) {
+    // --- Server-side validation ---
+    const category = body.category;
+    const description = body.description.trim();
+    if (!description || description.length < 10) {
       return NextResponse.json(
-        { error: "Invalid email address." },
-        { status: 400 },
+        {
+          error: "Description is required (minimum 10 characters).",
+          code: "INVALID_DESCRIPTION",
+        },
+        { status: 400, headers: { "Cache-Control": "no-store" } },
       );
     }
-    if (submitterEmail.length > 320) {
-      return NextResponse.json({ error: "Email too long." }, { status: 400 });
+    const countrySlug = body.countrySlug?.trim() || null;
+    const dimension = body.dimension ?? null;
+    const submitterName = body.submitterName?.trim() || null;
+    const submitterEmail = body.submitterEmail?.trim() || null;
+    const submitterAffiliation = body.submitterAffiliation?.trim() || null;
+    const requestPrivacy = body.requestPrivacy;
+
+    // Validate email format if provided
+    if (submitterEmail) {
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRe.test(submitterEmail)) {
+        return NextResponse.json(
+          { error: "Invalid email address.", code: "INVALID_EMAIL" },
+          { status: 400, headers: { "Cache-Control": "no-store" } },
+        );
+      }
     }
-  }
 
-  // Validate dimension if provided
-  if (dimension && !VALID_DIMENSIONS.includes(dimension)) {
-    return NextResponse.json(
-      { error: "Invalid dimension value." },
-      { status: 400 },
-    );
-  }
-
-  // Resolve country slug → id if provided
-  let countryId: string | null = null;
-  if (countrySlug) {
-    const rows = await db
-      .select({ id: jurisdictions.id })
-      .from(jurisdictions)
-      .where(eq(jurisdictions.slug, countrySlug))
-      .limit(1);
-    if (rows.length === 0) {
-      return NextResponse.json(
-        { error: "Country not found." },
-        { status: 400 },
-      );
+    // Resolve country slug → id if provided
+    let countryId: string | null = null;
+    if (countrySlug) {
+      const rows = await db
+        .select({ id: jurisdictions.id })
+        .from(jurisdictions)
+        .where(eq(jurisdictions.slug, countrySlug))
+        .limit(1);
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: "Country not found.", code: "COUNTRY_NOT_FOUND" },
+          { status: 400, headers: { "Cache-Control": "no-store" } },
+        );
+      }
+      countryId = rows[0].id;
     }
-    countryId = rows[0].id;
-  }
 
-  // Insert
-  await db.insert(correctionLog).values({
-    countryId,
-    category,
-    dimension,
-    submitterName,
-    submitterEmail,
-    submitterAffiliation,
-    description,
-    isPublic: !requestPrivacy,
-    status: "open",
+    // Insert
+    await db.insert(correctionLog).values({
+      countryId,
+      category,
+      dimension,
+      submitterName,
+      submitterEmail,
+      submitterAffiliation,
+      description,
+      isPublic: !requestPrivacy,
+      status: "open",
+    });
+
+    return NextResponse.json({ ok: true }, { status: 201 });
   });
-
-  return NextResponse.json({ ok: true }, { status: 201 });
 }

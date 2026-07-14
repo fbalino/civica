@@ -7,13 +7,19 @@ import {
 } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { getRequestIp } from "@/lib/api/request-ip";
+import {
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+} from "@/lib/api/request-body";
+import {
+  CONTACT_BODY_LIMITS,
+  contactBodySchema,
+  REQUEST_BODY_LIMITS,
+  type ContactBody,
+} from "@/lib/api/request-body-schemas";
+import { withSafeJsonErrors } from "@/lib/api/problem-response";
 
 const CONTACT_RATE_LIMIT_POLICY = getRequestRateLimitPolicy("contact-form");
-
-const MAX_NAME_LEN = 100;
-const MAX_EMAIL_LEN = 254;
-const MAX_SUBJECT_LEN = 200;
-const MAX_MESSAGE_LEN = 5000;
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -31,77 +37,86 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
-  const rateLimit = await checkRequestRateLimit(req, CONTACT_RATE_LIMIT_POLICY);
-  if (rateLimit.status !== "allowed") {
-    return rateLimitResponse(rateLimit, CONTACT_RATE_LIMIT_POLICY, {
-      limitedMessage: "Too many submissions. Please wait before trying again.",
+  return withSafeJsonErrors("api/contact", async () => {
+    const rateLimit = await checkRequestRateLimit(
+      req,
+      CONTACT_RATE_LIMIT_POLICY,
+    );
+    if (rateLimit.status !== "allowed") {
+      return rateLimitResponse(rateLimit, CONTACT_RATE_LIMIT_POLICY, {
+        limitedMessage:
+          "Too many submissions. Please wait before trying again.",
+      });
+    }
+
+    // This separately resolved canonical address is retained with the contact
+    // row under the existing privacy contract. The limiter receives only its
+    // domain-separated HMAC subject through checkRequestRateLimit().
+    const ip = getRequestIp(req);
+
+    const parsed = await parseBoundedRequestBody<ContactBody>(req, {
+      maxBytes: REQUEST_BODY_LIMITS.contact,
+      media: [{ mediaType: JSON_MEDIA_TYPE, schema: contactBodySchema }],
     });
-  }
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
 
-  // This separately resolved canonical address is retained with the contact
-  // row under the existing privacy contract. The limiter receives only its
-  // domain-separated HMAC subject through checkRequestRateLimit().
-  const ip = getRequestIp(req);
+    // Honeypot: bots fill this hidden field, humans leave it empty
+    if (body._trap) {
+      // Return 200 to avoid tipping off bots, but don't store anything
+      return NextResponse.json({ success: true });
+    }
 
-  let body: Record<string, unknown>;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+    const { name, email, subject, message } = body;
 
-  // Honeypot: bots fill this hidden field, humans leave it empty
-  if (body._trap) {
-    // Return 200 to avoid tipping off bots, but don't store anything
-    return NextResponse.json({ success: true });
-  }
+    const errors: Record<string, string> = {};
 
-  const { name, email, subject, message } = body;
+    if (!name || name.trim().length === 0) {
+      errors.name = "Name is required.";
+    } else if (name.trim().length > CONTACT_BODY_LIMITS.name) {
+      errors.name = `Name must be ${CONTACT_BODY_LIMITS.name} characters or fewer.`;
+    }
 
-  const errors: Record<string, string> = {};
+    if (!email || email.trim().length === 0) {
+      errors.email = "Email is required.";
+    } else if (
+      email.trim().length > CONTACT_BODY_LIMITS.email ||
+      !isValidEmail(email.trim())
+    ) {
+      errors.email = "A valid email address is required.";
+    }
 
-  if (!name || typeof name !== "string" || name.trim().length === 0) {
-    errors.name = "Name is required.";
-  } else if (name.trim().length > MAX_NAME_LEN) {
-    errors.name = `Name must be ${MAX_NAME_LEN} characters or fewer.`;
-  }
+    if (!subject || subject.trim().length === 0) {
+      errors.subject = "Subject is required.";
+    } else if (subject.trim().length > CONTACT_BODY_LIMITS.subject) {
+      errors.subject = `Subject must be ${CONTACT_BODY_LIMITS.subject} characters or fewer.`;
+    }
 
-  if (!email || typeof email !== "string" || email.trim().length === 0) {
-    errors.email = "Email is required.";
-  } else if (
-    email.trim().length > MAX_EMAIL_LEN ||
-    !isValidEmail(email.trim())
-  ) {
-    errors.email = "A valid email address is required.";
-  }
+    if (!message || message.trim().length === 0) {
+      errors.message = "Message is required.";
+    } else if (message.trim().length > CONTACT_BODY_LIMITS.message) {
+      errors.message = `Message must be ${CONTACT_BODY_LIMITS.message} characters or fewer.`;
+    }
 
-  if (!subject || typeof subject !== "string" || subject.trim().length === 0) {
-    errors.subject = "Subject is required.";
-  } else if (subject.trim().length > MAX_SUBJECT_LEN) {
-    errors.subject = `Subject must be ${MAX_SUBJECT_LEN} characters or fewer.`;
-  }
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json(
+        { errors, code: "INVALID_CONTACT_FORM" },
+        { status: 422, headers: { "Cache-Control": "no-store" } },
+      );
+    }
 
-  if (!message || typeof message !== "string" || message.trim().length === 0) {
-    errors.message = "Message is required.";
-  } else if (message.trim().length > MAX_MESSAGE_LEN) {
-    errors.message = `Message must be ${MAX_MESSAGE_LEN} characters or fewer.`;
-  }
+    await db.insert(contactSubmissions).values({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      subject: subject.trim(),
+      message: message.trim(),
+      ipAddress: ip,
+    });
 
-  if (Object.keys(errors).length > 0) {
-    return NextResponse.json({ errors }, { status: 422 });
-  }
+    // Email notification: no transactional email provider is configured.
+    // To add notifications, set RESEND_API_KEY (or similar) and call the
+    // provider here. Submissions are readable via GET /api/admin/contact.
 
-  await db.insert(contactSubmissions).values({
-    name: (name as string).trim(),
-    email: (email as string).trim().toLowerCase(),
-    subject: (subject as string).trim(),
-    message: (message as string).trim(),
-    ipAddress: ip,
+    return NextResponse.json({ success: true }, { status: 201 });
   });
-
-  // Email notification: no transactional email provider is configured.
-  // To add notifications, set RESEND_API_KEY (or similar) and call the
-  // provider here. Submissions are readable via GET /api/admin/contact.
-
-  return NextResponse.json({ success: true }, { status: 201 });
 }

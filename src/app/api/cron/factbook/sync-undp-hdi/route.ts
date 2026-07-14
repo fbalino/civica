@@ -33,41 +33,29 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncUndpHdi(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all UNDP HDI indicators.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.undp-hdi", summary);
+  const summary = await syncUndpHdi(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all UNDP HDI indicators.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.undp-hdi", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.undp-hdi.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      csvCountryRows: summary.csvCountryRows,
-      vintageLabel: summary.vintageLabel,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.undp-hdi.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.undp-hdi.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.undp-hdi.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    csvCountryRows: summary.csvCountryRows,
+    vintageLabel: summary.vintageLabel,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.undp-hdi", handler);

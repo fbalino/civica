@@ -22,6 +22,36 @@ const priorSource = currentSource
   .replace(
     /\.where\(\n      sql`\$\{organizationMemberships\.jurisdictionId\} IN \$\{jurisdictionIds\}\n      AND \$\{organizationMemberships\.status\} <> 'unverified_legacy'`,\n    \)/g,
     ".where(sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`)",
+  )
+  .replace(
+    `    .select({
+      factKey: countryFacts.factKey,
+      category: countryFacts.category,
+      sourceId: countryFacts.sourceId,
+      sourceUrl: countryFacts.sourceUrl,
+      factValue: countryFacts.factValue,
+      factValueNumeric: countryFacts.factValueNumeric,
+      factUnit: countryFacts.factUnit,
+      factYear: countryFacts.factYear,
+      valueJson: countryFacts.valueJson,
+      valueStatus: countryFacts.valueStatus,
+      valueStatusReason: countryFacts.valueStatusReason,
+      asOf: countryFacts.asOf,
+      retrievedAt: countryFacts.retrievedAt,
+      upstreamVintageLabel: countryFacts.upstreamVintageLabel,
+      valueType: countryFacts.valueType,
+    })
+    .from(countryFacts)
+    .where(
+      sql\`\${countryFacts.jurisdictionId} = \${jurisdictionId}
+        AND \${countryFacts.factKey} LIKE 'freedom_house%'
+        AND \${countryFacts.status} = 'active'\`,
+    );`,
+    `    .select()
+    .from(countryFacts)
+    .where(
+      sql\`\${countryFacts.jurisdictionId} = \${jurisdictionId} AND \${countryFacts.factKey} LIKE 'freedom_house%'\`,
+    );`,
   );
 
 test("current-party read guards are excluded from Index semantic drift", () => {
@@ -44,6 +74,23 @@ test("organization provenance fields and the legacy-row guard are excluded from 
   );
   assert.notEqual(
     indexProtectedFileHash(path, changedStatus),
+    indexProtectedFileHash(path, currentSource),
+  );
+});
+
+test("the Atlas-only democracy response projection is excluded from Index semantic drift", () => {
+  assert.notEqual(currentSource, priorSource);
+  assert.equal(
+    indexProtectedFileHash(path, currentSource),
+    sha256(priorSource),
+  );
+
+  const changedProjection = currentSource.replace(
+    "valueType: countryFacts.valueType,",
+    "valueType: countryFacts.valueType,\n      id: countryFacts.id,",
+  );
+  assert.notEqual(
+    indexProtectedFileHash(path, changedProjection),
     indexProtectedFileHash(path, currentSource),
   );
 });

@@ -3,113 +3,94 @@ import { eq, sql } from "drizzle-orm";
 import { buildGovTypeStripBands, getMetricStripData } from "@/lib/db/queries";
 import { db } from "@/lib/db";
 import { jurisdictions, metricDefinitions, sources } from "@/lib/db/schema";
-import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import {
+  parsePathContract,
+  parseQueryContract,
+} from "@/lib/api/request-contract";
+import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ metricId: string }> },
 ) {
-  const limited = await enforceRequestRateLimit(
-    req,
-    getRequestRateLimitPolicy("public-dynamic-read"),
-  );
-  if (limited) return limited;
+  return withSafeJsonErrors("api/metrics/[metricId]/strip-data", async () => {
+    const limited = await enforceRequestRateLimit(
+      req,
+      getRequestRateLimitPolicy("public-dynamic-read"),
+    );
+    if (limited) return limited;
 
-  const { metricId } = await params;
-  const { searchParams } = new URL(req.url);
+    const path = await parsePathContract(params, "metric-id-params/v1");
+    if (!path.ok) return path.response;
+    const query = parseQueryContract(req, "metric-strip-query/v1");
+    if (!query.ok) return query.response;
+    const { metricId } = path.data;
+    const { year, govTypes, regions, taxonomy } = query.data;
 
-  const yearParam = searchParams.get("year");
-  if (!yearParam) {
-    return NextResponse.json({ error: "year is required" }, { status: 400 });
-  }
-  const year = parseInt(yearParam, 10);
-  if (isNaN(year)) {
-    return NextResponse.json({ error: "Invalid year" }, { status: 400 });
-  }
+    const rawRows = await getMetricStripData(
+      metricId,
+      year,
+      govTypes,
+      taxonomy,
+      regions,
+    );
 
-  const govTypesParam = searchParams.get("govTypes");
-  const govTypes = govTypesParam
-    ? govTypesParam
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean)
-    : undefined;
-  const regionsParam = searchParams.get("regions");
-  const regions = regionsParam
-    ? regionsParam
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean)
-    : undefined;
-  const taxonomyParam = searchParams.get("taxonomy");
-  const taxonomy: GovernmentTaxonomyLens =
-    taxonomyParam === "structural" || taxonomyParam === "regime"
-      ? taxonomyParam
-      : "raw";
+    const rows = Array.isArray(rawRows)
+      ? rawRows
+      : ((rawRows as { rows: unknown[] }).rows ?? []);
+    const bands = buildGovTypeStripBands(
+      rows as Array<{ govType: string; value: number }>,
+    );
+    const [metricDefRows, coverageRows] = await Promise.all([
+      db
+        .select({
+          id: metricDefinitions.id,
+          name: metricDefinitions.name,
+          description: metricDefinitions.description,
+          category: metricDefinitions.category,
+          unit: metricDefinitions.unit,
+          higherIsBetter: metricDefinitions.higherIsBetter,
+          valueMin: metricDefinitions.valueMin,
+          valueMax: metricDefinitions.valueMax,
+          sourceName: sources.name,
+        })
+        .from(metricDefinitions)
+        .leftJoin(sources, eq(metricDefinitions.defaultSourceId, sources.id))
+        .where(eq(metricDefinitions.id, metricId))
+        .limit(1),
+      db
+        .select({
+          total: sql<number>`COUNT(*) FILTER (WHERE ${jurisdictions.type} = 'sovereign_state')::int`,
+        })
+        .from(jurisdictions),
+    ]);
 
-  const rawRows = await getMetricStripData(
-    metricId,
-    year,
-    govTypes,
-    taxonomy,
-    regions,
-  );
+    const metricDef = metricDefRows[0];
+    if (!metricDef) {
+      return apiProblem("NOT_FOUND");
+    }
 
-  const rows = Array.isArray(rawRows)
-    ? rawRows
-    : ((rawRows as { rows: unknown[] }).rows ?? []);
-  const bands = buildGovTypeStripBands(
-    rows as Array<{ govType: string; value: number }>,
-  );
-  const [metricDefRows, coverageRows] = await Promise.all([
-    db
-      .select({
-        id: metricDefinitions.id,
-        name: metricDefinitions.name,
-        description: metricDefinitions.description,
-        category: metricDefinitions.category,
-        unit: metricDefinitions.unit,
-        higherIsBetter: metricDefinitions.higherIsBetter,
-        valueMin: metricDefinitions.valueMin,
-        valueMax: metricDefinitions.valueMax,
-        sourceName: sources.name,
-      })
-      .from(metricDefinitions)
-      .leftJoin(sources, eq(metricDefinitions.defaultSourceId, sources.id))
-      .where(eq(metricDefinitions.id, metricId))
-      .limit(1),
-    db
-      .select({
-        total: sql<number>`COUNT(*) FILTER (WHERE ${jurisdictions.type} = 'sovereign_state')::int`,
-      })
-      .from(jurisdictions),
-  ]);
+    // Index peer-band stats by govType for O(1) lookup
+    const bandByGovType = Object.fromEntries(
+      (bands as Array<{ govType: string; [k: string]: unknown }>).map((b) => [
+        b.govType,
+        b,
+      ]),
+    );
 
-  const metricDef = metricDefRows[0];
-  if (!metricDef) {
-    return NextResponse.json({ error: "Metric not found" }, { status: 404 });
-  }
-
-  // Index peer-band stats by govType for O(1) lookup
-  const bandByGovType = Object.fromEntries(
-    (bands as Array<{ govType: string; [k: string]: unknown }>).map((b) => [
-      b.govType,
-      b,
-    ]),
-  );
-
-  return NextResponse.json({
-    metricId,
-    year,
-    taxonomy,
-    data: rows,
-    govTypeBands: bandByGovType,
-    metricDef,
-    coverage: {
-      total: Number(coverageRows[0]?.total ?? 0),
-      withData: rows.length,
-    },
+    return NextResponse.json({
+      metricId,
+      year,
+      taxonomy,
+      data: rows,
+      govTypeBands: bandByGovType,
+      metricDef,
+      coverage: {
+        total: Number(coverageRows[0]?.total ?? 0),
+        withData: rows.length,
+      },
+    });
   });
 }

@@ -3,22 +3,23 @@ import {
   apiError,
   corsOptions,
   withRateLimit,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { getCIByGovernmentTypeDots } from "@/lib/db/queries";
 import {
   getGovernmentTaxonomyGroupingKey,
   getGovernmentTaxonomyGroupingLabel,
-  type GovernmentTaxonomyLens,
 } from "@/lib/government-taxonomy";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
   STRUCTURAL_FAMILY_DEPRECATION_META,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexByGovernmentTypeItem } from "@/lib/api/contract/shapes";
-import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 function quantile(sortedValues: number[], percentile: number): number {
   if (sortedValues.length === 0) return 0;
@@ -32,25 +33,23 @@ function quantile(sortedValues: number[], percentile: number): number {
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const quarter = url.searchParams.get("quarter") ?? undefined;
-  const taxonomyParam = url.searchParams.get("taxonomy");
-  const taxonomy: GovernmentTaxonomyLens =
-    taxonomyParam === "structural" || taxonomyParam === "regime"
-      ? taxonomyParam
-      : "raw";
-  const isDeprecatedTaxonomy =
-    taxonomy === "structural" || taxonomy === "regime";
-
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const query = parseQueryContract(request, "v1-index-group-query/v1", {
+    errorHeaders: {
+      ...CORS_HEADERS,
+      ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+    },
+  });
+  if (!query.ok) return query.response;
+  const { quarter, taxonomy } = query.data;
+  const isDeprecatedTaxonomy =
+    taxonomy === "structural" || taxonomy === "regime";
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const release = resolveCiRelease(
-      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
-    );
+    const release = resolveCiRelease(query.data.release);
     const rows = await getCIByGovernmentTypeDots(quarter, release.releaseId);
     const grouped = new Map<string, { label: string; scores: number[] }>();
 

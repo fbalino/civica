@@ -4,6 +4,7 @@ import {
   corsOptions,
   withRateLimit,
   CI_METHODOLOGY_META,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
@@ -14,15 +15,20 @@ import {
   selectCiReleaseDimensionRows,
 } from "@/lib/ci/release-selection";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
   STRUCTURAL_FAMILY_DEPRECATION_META,
+  STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { and, eq, sql } from "drizzle-orm";
 import { shapeIndexCountryData } from "@/lib/api/contract/shapes";
-import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
+import {
+  parsePathContract,
+  parseQueryContract,
+} from "@/lib/api/request-contract";
 
 /**
  * This endpoint serves the current closed release by default. Pass an exact
@@ -36,16 +42,25 @@ export async function GET(
 ) {
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const errorHeaders = {
+    ...CORS_HEADERS,
+    ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+    ...STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+  };
+  const path = await parsePathContract(params, "jurisdiction-slug-params/v1", {
+    errorHeaders,
+  });
+  if (!path.ok) return path.response;
+  const query = parseQueryContract(request, "v1-index-country-query/v1", {
+    errorHeaders,
+  });
+  if (!query.ok) return query.response;
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const { country_slug } = await params;
-    const slug = country_slug.toLowerCase();
-    const url = new URL(request.url);
-    const release = resolveCiRelease(
-      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
-    );
+    const slug = path.data.slug;
+    const release = resolveCiRelease(query.data.release);
     const methodologyVersion = release.methodologyVersion;
 
     const jurisdiction = await getJurisdictionBySlug(slug);
@@ -87,7 +102,7 @@ export async function GET(
       return withIndexDispositionDeprecation(
         withStructuralFamilyDeprecation(
           apiError(
-            `No CI data available for this country in release "${release.releaseId}".`,
+            "No Index score is available for this country and release.",
             404,
           ),
         ),
@@ -167,7 +182,7 @@ export async function GET(
           meta: {
             methodology: CI_METHODOLOGY_META,
             series: release.series,
-            ...STRUCTURAL_FAMILY_DEPRECATION_META,
+            deprecations: STRUCTURAL_FAMILY_DEPRECATION_META.deprecations,
           },
         }),
       ),

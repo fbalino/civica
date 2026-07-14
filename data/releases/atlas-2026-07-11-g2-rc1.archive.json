@@ -2,8 +2,8 @@
   "schemaVersion": "civica-archive-file/v1",
   "candidateId": "atlas-2026-07-11-g2-rc1",
   "path": "atlas-2026-07-11-g2-rc1.zip",
-  "byteLength": 1869780,
-  "sha256": "2d408ebd388d3e149fa5e050ca0bd8543a5061efb017ef16152564c4bf272cf4",
+  "byteLength": 1869779,
+  "sha256": "fcf9b1d62702edd8392868a8e16af328323ab586cfb8ab719b55774a14d46f58",
   "entries": [
     "g2-rc1/CHANGELOG.md",
     "g2-rc1/CITATION.cff",

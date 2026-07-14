@@ -36,7 +36,11 @@ const surfaceContracts: Array<[string, string[]]> = [
   ],
   [
     "src/app/api/v1/countries/route.ts",
-    ["buildJurisdictionStatusPresentation", 'searchParams.get("status")'],
+    [
+      "buildJurisdictionStatusPresentation",
+      '"v1-countries-query/v1"',
+      "status: statusParam",
+    ],
   ],
   [
     "src/app/api/v1/countries/[code]/route.ts",

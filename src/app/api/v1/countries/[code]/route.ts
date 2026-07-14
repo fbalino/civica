@@ -3,6 +3,7 @@ import {
   apiError,
   corsOptions,
   withRateLimit,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
@@ -23,7 +24,10 @@ import {
   type ApiProvenanceEntry,
   type ApiDataValueStatus,
 } from "@/lib/factbook/reconcile/api";
-import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
+import {
+  STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 import {
   shapeCountryDetail,
   shapeCountryDetailMeta,
@@ -36,6 +40,10 @@ import {
   parseAtlasReadSelection,
 } from "@/lib/factbook/read-selection";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import {
+  parsePathContract,
+  parseQueryContract,
+} from "@/lib/api/request-contract";
 
 type CountryDetailGovernment = z.infer<typeof zCountryDetail>["government"];
 type CountryDetailBody = CountryDetailGovernment[string][number];
@@ -77,17 +85,28 @@ export async function GET(
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
+  const errorHeaders = {
+    ...CORS_HEADERS,
+    ...STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+  };
+  const path = await parsePathContract(params, "v1-country-code-params/v1", {
+    errorHeaders,
+  });
+  if (!path.ok) return path.response;
+  const query = parseQueryContract(request, "v1-country-detail-query/v1", {
+    errorHeaders,
+  });
+  if (!query.ok) return query.response;
+
   try {
-    const parsedSelection = parseAtlasReadSelection(
-      new URL(request.url).searchParams.get("as_of"),
-    );
+    const parsedSelection = parseAtlasReadSelection(query.data.as_of);
     if (!parsedSelection.selection)
       return withStructuralFamilyDeprecation(
         apiError(parsedSelection.error, 400),
       );
     const selection = parsedSelection.selection;
-    const { code } = await params;
-    const lookup = code.toLowerCase();
+    const { code } = path.data;
+    const lookup = code;
 
     const results = await db
       .select()
@@ -100,7 +119,7 @@ export async function GET(
     const country = results[0];
     if (!country) {
       return withStructuralFamilyDeprecation(
-        apiError(`Country not found: ${code}`, 404),
+        apiError("Country not found.", 404),
       );
     }
     const classificationMap = await buildGovernmentClassificationMap([country]);
@@ -170,7 +189,7 @@ export async function GET(
         : null;
     if (frozen && !frozen.exists)
       return withStructuralFamilyDeprecation(
-        apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400),
+        apiError("The requested immutable vintage is unavailable.", 400),
       );
     const facts =
       frozen?.resolutions ??

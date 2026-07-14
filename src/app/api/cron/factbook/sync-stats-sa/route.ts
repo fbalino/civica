@@ -54,44 +54,32 @@ export const maxDuration = 300;
 async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncStatsSa(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all Stats SA indicators
-      // in scope.
-      onProgress: (line) => {
-        if (line.startsWith("!") || line.includes("EXTRACTION FAILURE")) {
-          console.error(line);
-        }
-      },
-    });
-    assertExternalSyncSucceeded("factbook.stats-sa", summary);
+  const summary = await syncStatsSa(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all Stats SA indicators
+    // in scope.
+    onProgress: (line) => {
+      if (line.startsWith("!") || line.includes("EXTRACTION FAILURE")) {
+        console.error(line);
+      }
+    },
+  });
+  assertExternalSyncSucceeded("factbook.stats-sa", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.stats-sa.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      vintageLabel: summary.vintageLabel,
-      sourceRowInserted: summary.sourceRowInserted,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.stats-sa.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.stats-sa.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.stats-sa.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    vintageLabel: summary.vintageLabel,
+    sourceRowInserted: summary.sourceRowInserted,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
 const cronHandler = withCronJob("factbook.stats-sa", handler);

@@ -126,10 +126,38 @@ export function apiResponse<T>(data: T, status = 200) {
   return NextResponse.json(data, { status, headers: CORS_HEADERS });
 }
 
-export function apiError(message: string, status: number) {
+export type ApiErrorCode =
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "RATE_LIMITED"
+  | "INTERNAL_ERROR"
+  | "SERVICE_UNAVAILABLE";
+
+function defaultApiErrorCode(status: number): ApiErrorCode {
+  if (status === 400 || status === 422) return "BAD_REQUEST";
+  if (status === 401) return "UNAUTHORIZED";
+  if (status === 403) return "FORBIDDEN";
+  if (status === 404) return "NOT_FOUND";
+  if (status === 409) return "CONFLICT";
+  if (status === 429) return "RATE_LIMITED";
+  if (status === 503) return "SERVICE_UNAVAILABLE";
+  return "INTERNAL_ERROR";
+}
+
+export function apiError(
+  message: string,
+  status: number,
+  code: ApiErrorCode = defaultApiErrorCode(status),
+) {
   return NextResponse.json(
-    { error: message },
-    { status, headers: CORS_HEADERS },
+    { error: message, code },
+    {
+      status,
+      headers: { ...CORS_HEADERS, "Cache-Control": "no-store" },
+    },
   );
 }
 

@@ -149,6 +149,10 @@ test("revocation failure returns 503 and never clears the browser cookie", async
   );
   assert.equal(response.status, 503);
   assert.equal(response.headers.has("set-cookie"), false);
+  assert.deepEqual(await response.clone().json(), {
+    error: "Admin logout is temporarily unavailable",
+    code: "ADMIN_LOGOUT_UNAVAILABLE",
+  });
   assert.equal(state.audits.at(-1)?.result, "failed");
   assert.equal(state.audits.at(-1)?.reasonCode, "revocation_store_unavailable");
 });
@@ -162,5 +166,9 @@ test("attempt-audit failure prevents revocation and cookie clearing", async () =
   );
   assert.equal(response.status, 503);
   assert.equal(response.headers.has("set-cookie"), false);
+  assert.deepEqual(await response.clone().json(), {
+    error: "Admin audit is temporarily unavailable",
+    code: "ADMIN_AUDIT_UNAVAILABLE",
+  });
   assert.equal(state.revokeCalls(), 0);
 });

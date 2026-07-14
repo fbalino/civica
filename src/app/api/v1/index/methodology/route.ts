@@ -4,15 +4,17 @@ import {
   corsOptions,
   withRateLimit,
   CI_METHODOLOGY_META,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { getCIMethodology } from "@/lib/db/queries";
 import { shapeIndexMethodologyData } from "@/lib/api/contract/shapes";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
 } from "@/lib/api/deprecation";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { CI_RELEASE_CONTRACTS } from "@/lib/ci/release-selection";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 function publicMethodologyRecord<
   T extends { id: string; notes: string | null },
@@ -28,13 +30,18 @@ function publicMethodologyRecord<
 export async function GET(request: Request) {
   const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const query = parseQueryContract(request, "v1-index-methodology-query/v1", {
+    errorHeaders: {
+      ...CORS_HEADERS,
+      ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+    },
+  });
+  if (!query.ok) return query.response;
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const url = new URL(request.url);
-    const versionId =
-      url.searchParams.get("version") ?? CURRENT_CI_METHODOLOGY_VERSION;
+    const versionId = query.data.version;
     const methodology = await getCIMethodology(versionId);
     if (!methodology) {
       return withIndexDispositionDeprecation(

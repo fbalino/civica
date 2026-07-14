@@ -21,9 +21,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
-import { withAdminMutation } from "@/lib/admin/mutation";
+import { adminMutationProblem, withAdminMutation } from "@/lib/admin/mutation";
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import type { AdminSession } from "@/lib/admin/session";
+import {
+  FORM_MEDIA_TYPE,
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  adminAdvisoryMutationFormSchema,
+  adminAdvisoryMutationBodySchema,
+  REQUEST_BODY_LIMITS,
+  requestUuidSchema,
+  type AdminAdvisoryMutationBody,
+} from "@/lib/api/request-body-schemas";
 
 const VALID_STATUSES = ["new", "reviewed", "contacted", "archived"] as const;
 type Status = (typeof VALID_STATUSES)[number];
@@ -35,55 +48,61 @@ function isStatus(value: unknown): value is Status {
   );
 }
 
-interface StatusBody {
-  status?: string;
-  redirect?: string;
-  intent?: string;
-  confirm?: string;
-}
-
-async function readBody(
-  request: NextRequest,
-): Promise<{ body: StatusBody; isForm: boolean }> {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const form = await request.formData();
-    return {
-      isForm: true,
-      body: {
-        status: form.get("status") ? String(form.get("status")) : undefined,
-        redirect: form.get("redirect")
-          ? String(form.get("redirect"))
-          : undefined,
-        intent: form.get("intent") ? String(form.get("intent")) : undefined,
-        confirm: form.get("confirm") ? String(form.get("confirm")) : undefined,
-      },
-    };
-  }
-  const json = (await request.json()) as StatusBody;
-  return { isForm: false, body: json };
-}
-
 async function mutateAdvisoryApplication(
   request: NextRequest,
   id: string,
   auth: AdminSession,
 ) {
-  const { body, isForm } = await readBody(request);
+  const parsedId = requestUuidSchema.safeParse(id);
+  if (!parsedId.success) return requestInputErrorResponse("INVALID_REQUEST");
+
+  const parsed = await parseBoundedRequestBody<AdminAdvisoryMutationBody>(
+    request,
+    {
+      maxBytes: REQUEST_BODY_LIMITS.adminAdvisoryMutation,
+      media: [
+        { mediaType: JSON_MEDIA_TYPE, schema: adminAdvisoryMutationBodySchema },
+        { mediaType: FORM_MEDIA_TYPE, schema: adminAdvisoryMutationFormSchema },
+      ],
+    },
+  );
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+  const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
+  id = parsedId.data;
 
   if (body.intent === "delete") {
-    if (body.confirm !== "delete") return NextResponse.json({ error: "deletion confirmation required" }, { status: 400 });
+    if (body.confirm !== "delete")
+      return adminMutationProblem(
+        "DELETION_CONFIRMATION_REQUIRED",
+        "deletion confirmation required",
+        400,
+      );
     const deleted = await db
       .delete(advisoryApplications)
       .where(eq(advisoryApplications.id, id))
       .returning({ id: advisoryApplications.id });
-    if (deleted.length === 0) return NextResponse.json({ error: "application not found" }, { status: 404 });
-    if (isForm) return NextResponse.redirect(new URL("/admin/advisory-applications", request.url), 303);
-    return NextResponse.json({ ok: true, id, deleted: true, reviewerId: auth.reviewerId });
+    if (deleted.length === 0)
+      return adminMutationProblem(
+        "APPLICATION_NOT_FOUND",
+        "application not found",
+        404,
+      );
+    if (isForm)
+      return NextResponse.redirect(
+        new URL("/admin/advisory-applications", request.url),
+        303,
+      );
+    return NextResponse.json({
+      ok: true,
+      id,
+      deleted: true,
+      reviewerId: auth.reviewerId,
+    });
   }
 
   if (!isStatus(body.status)) {
-    return NextResponse.json({ error: "invalid status" }, { status: 400 });
+    return adminMutationProblem("INVALID_STATUS", "invalid status", 400);
   }
 
   const updated = await db
@@ -93,9 +112,10 @@ async function mutateAdvisoryApplication(
     .returning({ id: advisoryApplications.id });
 
   if (updated.length === 0) {
-    return NextResponse.json(
-      { error: "application not found" },
-      { status: 404 },
+    return adminMutationProblem(
+      "APPLICATION_NOT_FOUND",
+      "application not found",
+      404,
     );
   }
 

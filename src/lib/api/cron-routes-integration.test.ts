@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import test from "node:test";
@@ -122,13 +123,13 @@ class FixtureCronStore implements CronExecutionStore {
 }
 
 async function loadRouteModule(routePath: string): Promise<RouteModule> {
-  const file = path.join(
-    process.cwd(),
-    "src/app",
-    routePath.slice(1),
-    "route.ts",
-  );
-  return (await import(pathToFileURL(file).href)) as RouteModule;
+  return (await import(
+    pathToFileURL(routeFilePath(routePath)).href
+  )) as RouteModule;
+}
+
+function routeFilePath(routePath: string): string {
+  return path.join(process.cwd(), "src/app", routePath.slice(1), "route.ts");
 }
 
 test("every cron route exports the shared auth boundary and every scheduled route binds its registered path", async () => {
@@ -219,6 +220,72 @@ test("every scheduled route binding executes authenticated GET and POST deliveri
       assert.equal(calls, 2, `${definition.id} authenticated handler calls`);
     }
   } finally {
+    if (ORIGINAL_SECRET === undefined) delete process.env.CRON_SECRET;
+    else process.env.CRON_SECRET = ORIGINAL_SECRET;
+  }
+});
+
+test("active cron routes delegate unknown exceptions to the safe shared boundary", async () => {
+  for (const definition of CRON_JOB_DEFINITIONS.filter(
+    ({ retired }) => !retired,
+  )) {
+    const source = await readFile(routeFilePath(definition.route), "utf8");
+    assert.doesNotMatch(
+      source,
+      /\bcatch\s*\(/,
+      `${definition.id} must not intercept unknown handler exceptions`,
+    );
+    assert.doesNotMatch(
+      source,
+      /\berrors\s*:\s*summary\.(?:errors|skipped)\b/,
+      `${definition.id} must not serialize raw operational error details`,
+    );
+  }
+});
+
+test("secret-bearing thrown errors never reach any active cron response", async () => {
+  process.env.CRON_SECRET = TEST_SECRET;
+  const originalConsoleError = console.error;
+  console.error = () => {};
+  try {
+    for (const definition of CRON_JOB_DEFINITIONS.filter(
+      ({ retired }) => !retired,
+    )) {
+      const route = await loadRouteModule(definition.route);
+      const store = new FixtureCronStore();
+      const secretFragments = [
+        "postgres://cron-user:database-password@private-db/civica",
+        "provider-api-key-secret",
+        `upstream detail for ${definition.id}`,
+      ];
+      const fixture = {
+        store,
+        handler: () => {
+          throw new Error(secretFragments.join(" | "));
+        },
+      };
+
+      const response = await runWithCronJobFixture(fixture, () =>
+        route.GET!(request(definition.route, "GET", `Bearer ${TEST_SECRET}`)),
+      );
+      const body = await response.text();
+
+      assert.equal(response.status, 500, `${definition.id} safe status`);
+      assert.deepEqual(JSON.parse(body), {
+        ok: false,
+        jobId: definition.id,
+        outcome: "handler_exception",
+      });
+      for (const fragment of secretFragments) {
+        assert.equal(
+          body.includes(fragment),
+          false,
+          `${definition.id} leaked ${fragment}`,
+        );
+      }
+    }
+  } finally {
+    console.error = originalConsoleError;
     if (ORIGINAL_SECRET === undefined) delete process.env.CRON_SECRET;
     else process.env.CRON_SECRET = ORIGINAL_SECRET;
   }

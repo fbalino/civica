@@ -24,55 +24,41 @@ async function handler(request: Request) {
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
-  try {
-    const summary = await syncFactbookWikidata(db, {
-      // Cron always does a full pass; no per-fact filters.
-      // Logs go to Vercel logs via console.log.
-      onProgress: (line) => {
-        // Drop progress lines in cron mode — too verbose for the
-        // log buffer. The summary at the end has counters.
-        if (line.startsWith("!")) console.error(line);
-      },
-      dryRun,
-    });
+  const summary = await syncFactbookWikidata(db, {
+    // Cron always does a full pass; no per-fact filters.
+    // Logs go to Vercel logs via console.log.
+    onProgress: (line) => {
+      // Drop progress lines in cron mode — too verbose for the
+      // log buffer. The summary at the end has counters.
+      if (line.startsWith("!")) console.error(line);
+    },
+    dryRun,
+  });
 
-    if (summary.errors.length > 0 || summary.totalAdmitted === 0) {
-      return NextResponse.json(
-        {
-          ok: false,
-          step: "factbook.wikidata.sync",
-          dryRun,
-          errors:
-            summary.errors.length > 0
-              ? summary.errors
-              : ["No admissible Wikidata facts returned"],
-        },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.wikidata.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsProcessed: summary.jurisdictionsProcessed,
-      totalAdmitted: summary.totalAdmitted,
-      perFact: summary.factCountersByKey,
-      dryRun,
-    });
-  } catch (err) {
-    console.error("[cron factbook.wikidata.sync] failed:", err);
+  if (summary.errors.length > 0 || summary.totalAdmitted === 0) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: summary.errors.length > 0 ? "partial" : "empty_result",
         step: "factbook.wikidata.sync",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: Math.max(1, summary.errors.length),
       },
-      { status: 500 },
+      { status: 502 },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.wikidata.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsProcessed: summary.jurisdictionsProcessed,
+    totalAdmitted: summary.totalAdmitted,
+    perFact: summary.factCountersByKey,
+    dryRun,
+  });
 }
 
 const cronHandler = withCronJob("factbook.wikidata", handler);

@@ -9,32 +9,20 @@ export const dynamic = "force-dynamic";
 
 async function handler(request: Request) {
   const started = new Date().toISOString();
-  try {
-    const summary = await runBillsSync(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      jurisdictionSlug: "united-kingdom",
-      iso2: "GB",
-      fetchDrafts: ({ jurisdictionId }) =>
-        fetchUKBillsForSync({ jurisdictionId, limit: 100 }),
-    });
-    return NextResponse.json({
-      ok: true,
-      step: "bills.uk",
-      started,
-      finished: new Date().toISOString(),
-      summary,
-    });
-  } catch (err) {
-    console.error("[cron bills.uk] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "bills.uk",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  const summary = await runBillsSync(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    jurisdictionSlug: "united-kingdom",
+    iso2: "GB",
+    fetchDrafts: ({ jurisdictionId }) =>
+      fetchUKBillsForSync({ jurisdictionId, limit: 100 }),
+  });
+  return NextResponse.json({
+    ok: true,
+    step: "bills.uk",
+    started,
+    finished: new Date().toISOString(),
+    summary,
+  });
 }
 
 const cronHandler = withCronJob("bills.uk", handler);

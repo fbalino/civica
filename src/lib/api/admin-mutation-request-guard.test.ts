@@ -186,7 +186,7 @@ test("malformed header access fails closed and the response stays generic", asyn
   if (result.ok) return;
   assert.equal(result.reason, "malformed_headers");
   const body = await result.response.json();
-  assert.deepEqual(body, { error: "Forbidden" });
+  assert.deepEqual(body, { error: "Forbidden", code: "FORBIDDEN" });
   assert.doesNotMatch(
     JSON.stringify(body).toLowerCase(),
     /origin|referer|fetch|malformed/,

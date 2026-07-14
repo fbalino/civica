@@ -16,6 +16,8 @@ import { getNotableTopicPeers } from "@/lib/db/queries-constitution";
 import { getTopicLabel, isKnownTopic } from "@/lib/constitute/topics";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { apiProblem } from "@/lib/api/problem-response";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 export const revalidate = 3600;
 
@@ -26,23 +28,13 @@ export async function GET(request: Request) {
   );
   if (limited) return limited;
 
-  const url = new URL(request.url);
-  const topicKey = (url.searchParams.get("topic") ?? "").trim();
-  const excludeSlug = (url.searchParams.get("exclude") ?? "").trim();
-
-  if (!topicKey) {
-    return Response.json(
-      { error: "Missing required `topic` query parameter." },
-      { status: 400 },
-    );
-  }
+  const query = parseQueryContract(request, "constitution-notable-query/v1");
+  if (!query.ok) return query.response;
+  const { topic: topicKey, exclude: excludeSlug } = query.data;
 
   // Reject unknown topic keys up front (mirrors /api/constitution/excerpts).
   if (!isKnownTopic(topicKey)) {
-    return Response.json(
-      { error: `Unknown constitutional topic \`${topicKey}\`.` },
-      { status: 400 },
-    );
+    return apiProblem("INVALID_QUERY");
   }
 
   try {
@@ -51,7 +43,9 @@ export async function GET(request: Request) {
       const rows = await getJurisdictionsBySlugs([excludeSlug]);
       if (rows[0]) excludeId = rows[0].id;
     }
-    const countries = await getNotableTopicPeers(topicKey, excludeId, 3);
+    const countries = await getNotableTopicPeers(topicKey, excludeId, 3, {
+      throwOnError: true,
+    });
     return Response.json({
       topicKey,
       topicLabel: getTopicLabel(topicKey),
@@ -60,8 +54,12 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error("[/api/constitution/excerpts/notable]", err);
     return Response.json(
-      { error: "Failed to load notable constitution excerpts." },
-      { status: 500 },
+      {
+        error: "data_unavailable",
+        code: "DATA_UNAVAILABLE",
+        message: "Notable constitution excerpts are temporarily unavailable.",
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
 }

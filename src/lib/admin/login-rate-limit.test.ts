@@ -180,12 +180,12 @@ test("password route throttles before parsing or password verification and uses 
   );
   const throttle = source.indexOf("await checkAdminLoginRateLimit(request)");
   const response = source.indexOf("rateLimitResponse(rateLimit");
-  const parseForm = source.indexOf("await request.formData()");
+  const parseBody = source.indexOf("await parseBoundedRequestBody");
   const verifyPassword = source.indexOf("await verifyPassword(");
 
   assert.ok(throttle >= 0, "route must invoke the admin login limiter");
   assert.ok(response > throttle, "route must use the shared 429/503 response");
-  assert.ok(parseForm > throttle, "rate limit must precede form parsing");
+  assert.ok(parseBody > throttle, "rate limit must precede body parsing");
   assert.ok(verifyPassword > throttle, "rate limit must precede password KDF");
   assert.match(source, /rateLimit\.status !== "allowed"/);
   assert.doesNotMatch(source, /adminLoginRateLimitKey|createHash/);

@@ -36,54 +36,43 @@ async function handler(request: Request) {
     ? Math.max(1, parseInt(limitParam, 10) || 0)
     : undefined;
 
-  try {
-    const summary = await autoResolveStaleDisputes(db, {
-      dryRun,
-      limit,
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-        else console.log(line);
-      },
-    });
+  const summary = await autoResolveStaleDisputes(db, {
+    dryRun,
+    limit,
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+      else console.log(line);
+    },
+  });
 
-    if (summary.errors.length > 0) {
-      return NextResponse.json(
-        {
-          ok: false,
-          step: "factbook.auto-resolve-disputes",
-          dryRun,
-          errors: summary.errors,
-        },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.auto-resolve-disputes",
-      started: startedAt,
-      finished: new Date().toISOString(),
-      dryRun,
-      scanned: summary.scanned,
-      stillProposed: summary.stillProposed,
-      autoResolved: summary.autoResolved,
-      skipped: summary.skipped,
-      errors: summary.errors,
-      // Per-dispute outcomes are useful for log-only verification at
-      // small scale; capped to 200 for response size sanity.
-      outcomes: summary.outcomes.slice(0, 200),
-    });
-  } catch (err) {
-    console.error("[cron factbook.auto-resolve-disputes] failed:", err);
+  if (summary.errors.length > 0) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: "partial",
         step: "factbook.auto-resolve-disputes",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: summary.errors.length,
       },
       { status: 500 },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.auto-resolve-disputes",
+    started: startedAt,
+    finished: new Date().toISOString(),
+    dryRun,
+    scanned: summary.scanned,
+    stillProposed: summary.stillProposed,
+    autoResolved: summary.autoResolved,
+    skipped: summary.skipped,
+    errorCount: summary.errors.length,
+    // Per-dispute outcomes are useful for log-only verification at
+    // small scale; capped to 200 for response size sanity.
+    outcomes: summary.outcomes.slice(0, 200),
+  });
 }
 
 const cronHandler = withCronJob("factbook.auto-resolve", handler);

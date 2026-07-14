@@ -20,6 +20,12 @@
 
 import { parse, type HTMLElement } from "node-html-parser";
 
+import {
+  fetchPublicHttpBytes,
+  PublicHttpError,
+  type PublicHttpResponse,
+} from "@/lib/net/public-http";
+
 /** Descriptive UA so outlets can identify / allow the crawler. */
 const USER_AGENT =
   "CivicaAtlasBot/1.0 (+https://civicaatlas.org; governance-event classification)";
@@ -30,12 +36,22 @@ const DEFAULT_TIMEOUT_MS = 12_000;
 /** Cap extracted text so a huge page can't bloat a classify prompt. */
 const MAX_CHARS = 4000;
 
+/** Cap decoded HTML before it is allocated or passed to the parser. */
+const MAX_HTML_BYTES = 1_048_576;
+
 /** Below this, extracted text is too thin to help the classifier — return null
  *  and let the caller keep its headline-only fallback. */
 const MIN_USEFUL_CHARS = 200;
 
 /** Statuses worth one retry with backoff — rate limit + transient upstream. */
 const RETRYABLE_STATUS = new Set([429, 502, 503, 504]);
+
+const RETRYABLE_FETCH_ERROR = new Set([
+  "DNS_LOOKUP_FAILED",
+  "REQUEST_ABORTED",
+  "REQUEST_FAILED",
+  "BODY_READ_FAILED",
+]);
 
 function resolveTimeoutMs(): number {
   const raw = Number(process.env.PULSE_ARTICLE_FETCH_TIMEOUT_MS);
@@ -49,17 +65,20 @@ function resolveTimeoutMs(): number {
  * best-effort and run in bulk, so we don't want to stall the batch on any
  * one stubborn URL.
  */
-async function fetchArticleOnce(url: string): Promise<Response | null> {
+async function fetchArticleOnce(
+  url: string,
+): Promise<PublicHttpResponse | null> {
   const attempts = 2; // 1 initial + 1 retry
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchPublicHttpBytes(url, {
         headers: {
           "User-Agent": USER_AGENT,
           Accept: "text/html,application/xhtml+xml",
         },
-        redirect: "follow",
+        maxBodyBytes: MAX_HTML_BYTES,
+        maxRedirects: 3,
         signal: AbortSignal.timeout(resolveTimeoutMs()),
       });
       if (RETRYABLE_STATUS.has(res.status) && i < attempts - 1) {
@@ -74,8 +93,12 @@ async function fetchArticleOnce(url: string): Promise<Response | null> {
       return res;
     } catch (err) {
       lastErr = err;
-      if (i < attempts - 1) {
+      const retryable =
+        err instanceof PublicHttpError && RETRYABLE_FETCH_ERROR.has(err.code);
+      if (retryable && i < attempts - 1) {
         await new Promise((r) => setTimeout(r, 1500));
+      } else {
+        return null;
       }
     }
   }
@@ -124,12 +147,16 @@ const NAMED_ENTITIES: Record<string, string> = {
 };
 
 function decodeEntities(s: string): string {
-  return s
-    // Numeric (decimal + hex) — safety net; most are already decoded.
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => codePointOrEmpty(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, d) => codePointOrEmpty(parseInt(d, 10)))
-    // Named entities we care about.
-    .replace(/&([a-zA-Z]+);/g, (m, name) => NAMED_ENTITIES[name] ?? m);
+  return (
+    s
+      // Numeric (decimal + hex) — safety net; most are already decoded.
+      .replace(/&#x([0-9a-fA-F]+);/g, (_, h) =>
+        codePointOrEmpty(parseInt(h, 16)),
+      )
+      .replace(/&#(\d+);/g, (_, d) => codePointOrEmpty(parseInt(d, 10)))
+      // Named entities we care about.
+      .replace(/&([a-zA-Z]+);/g, (m, name) => NAMED_ENTITIES[name] ?? m)
+  );
 }
 
 function codePointOrEmpty(cp: number): string {
@@ -171,7 +198,18 @@ function isBoilerplateLine(line: string): boolean {
 
 /** Remove chrome nodes that pollute article text before extraction. */
 function stripChrome(root: HTMLElement): void {
-  const selectors = ["script", "style", "noscript", "nav", "header", "footer", "aside", "form", "iframe", "svg"];
+  const selectors = [
+    "script",
+    "style",
+    "noscript",
+    "nav",
+    "header",
+    "footer",
+    "aside",
+    "form",
+    "iframe",
+    "svg",
+  ];
   for (const sel of selectors) {
     for (const el of root.querySelectorAll(sel)) {
       el.remove();
@@ -242,7 +280,7 @@ function densestParagraphText(root: HTMLElement): string {
  * NEVER throws.
  */
 export async function extractArticleText(url: string): Promise<string | null> {
-  let res: Response | null;
+  let res: PublicHttpResponse | null;
   try {
     res = await fetchArticleOnce(url);
   } catch {
@@ -253,12 +291,7 @@ export async function extractArticleText(url: string): Promise<string | null> {
   const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
   if (contentType && !contentType.includes("html")) return null;
 
-  let html: string;
-  try {
-    html = await res.text();
-  } catch {
-    return null;
-  }
+  const html = new TextDecoder("utf-8").decode(res.body);
   if (!html || html.length < 200) return null;
 
   let root: HTMLElement;

@@ -20,6 +20,11 @@ const requiredResearchConsumers = [
   "src/lib/pulse/v2/decouple.ts",
 ];
 
+const releaseContractConsumers = new Map([
+  ["src/app/api/v1/index/[country_slug]/route.ts", "v1-index-country-query/v1"],
+  ["src/app/api/v1/index/rankings/route.ts", "v1-index-rankings-query/v1"],
+]);
+
 assert.equal(manifest.releaseId, CURRENT_CI_RELEASE_ID);
 assert.equal(manifest.quarter, CURRENT_CI_QUARTER);
 assert.equal(manifest.methodologyVersion, CURRENT_CI_METHODOLOGY_VERSION);
@@ -31,6 +36,15 @@ assert.match(manifest.composites.sha256, /^[a-f0-9]{64}$/);
 
 for (const path of requiredResearchConsumers) {
   const source = readFileSync(path, "utf8");
+  const queryContract = releaseContractConsumers.get(path);
+  if (queryContract) {
+    assert.match(source, /resolveCiRelease\(query\.data\.release\)/);
+    assert.ok(
+      source.includes(`parseQueryContract(request, "${queryContract}"`),
+      `${path} must use its closed release query contract`,
+    );
+    continue;
+  }
   assert.match(
     source,
     /CURRENT_CI_(?:METHODOLOGY_VERSION|RELEASE_ID)/,
@@ -38,15 +52,38 @@ for (const path of requiredResearchConsumers) {
   );
 }
 
+const releaseSelection = readFileSync(
+  "src/lib/ci/release-selection.ts",
+  "utf8",
+);
+const requestContracts = readFileSync(
+  "src/lib/api/request-contract.ts",
+  "utf8",
+);
+assert.match(
+  releaseSelection,
+  /resolveCiRelease\(releaseId: string = CURRENT_CI_RELEASE_ID\)/,
+);
+assert.match(requestContracts, /CI_RELEASE_CONTRACTS\.at\(-1\)!/);
+assert.match(requestContracts, /value \?\? CURRENT_CI_RELEASE\.releaseId/);
+
 const atlasLoader = readFileSync("src/lib/atlas/load-atlas-data.ts", "utf8");
-assert.doesNotMatch(atlasLoader, /CURRENT_CI_METHODOLOGY_VERSION|ciCompositeScores|ciScore/,
-  "Atlas must remain independent of the preserved composite under the adopted disposition");
+assert.doesNotMatch(
+  atlasLoader,
+  /CURRENT_CI_METHODOLOGY_VERSION|ciCompositeScores|ciScore/,
+  "Atlas must remain independent of the preserved composite under the adopted disposition",
+);
 
 const calculator = readFileSync("src/lib/ci/calculate-v2.ts", "utf8");
-assert.match(calculator, /eq\(ciDimensionScores\.methodologyVersion, methodologyVersion\)/);
+assert.match(
+  calculator,
+  /eq\(ciDimensionScores\.methodologyVersion, methodologyVersion\)/,
+);
 assert.match(calculator, /orderedDims = \[\.\.\.dims\.values\(\)\]\.sort/);
 assert.match(calculator, /const score = compositeInputs\.reduce/);
 assert.match(calculator, /competitionRankPublishedScores/);
 assert.doesNotMatch(calculator, /simulateComposite\(/);
 
-console.log(`PASS — ${CURRENT_CI_RELEASE_ID} is pinned across ${requiredResearchConsumers.length} research consumers; the public Atlas remains composite-free; checked manifest covers ${manifest.dimensions.rows} dimensions and ${manifest.composites.rows} composites.`);
+console.log(
+  `PASS — ${CURRENT_CI_RELEASE_ID} is pinned across ${requiredResearchConsumers.length} research consumers; the public Atlas remains composite-free; checked manifest covers ${manifest.dimensions.rows} dimensions and ${manifest.composites.rows} composites.`,
+);

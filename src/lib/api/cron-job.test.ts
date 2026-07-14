@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { afterEach, beforeEach, test } from "node:test";
+import { redirect } from "next/navigation";
 
 import type {
   CronExecutionClaim,
@@ -224,6 +225,26 @@ test("missing and wrong secrets fail before delivery-control access", async () =
   assert.equal(store.acquireCalls, 0);
 });
 
+test("framework redirects escape the cron handler error boundary", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    async () => redirect("/admin"),
+    { store, now: () => FIXED_NOW },
+  );
+  await assert.rejects(
+    () =>
+      Promise.resolve(
+        guarded(request(undefined, { secret: "correct-cron-secret" })),
+      ),
+    (error: unknown) =>
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      String(error.digest).startsWith("NEXT_REDIRECT"),
+  );
+});
+
 test("every POST and every parameterized GET requires an Idempotency-Key", async () => {
   const store = new MemoryCronExecutionStore(() => FIXED_NOW);
   const guarded = withCronJob(
@@ -274,6 +295,37 @@ test("invalid idempotency keys are rejected before database access", async () =>
   );
   assert.equal(response.status, 400);
   assert.equal(store.acquireCalls, 0);
+});
+
+test("unknown cron input returns one safe non-cacheable problem before lease", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  let handlerCalls = 0;
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    () => {
+      handlerCalls++;
+      return Response.json({ ok: true });
+    },
+    { store, now: () => FIXED_NOW },
+  );
+
+  const response = await guarded(
+    request("/api/cron/pulse/v2/ingest?secretField=do-not-reflect", {
+      secret: "correct-cron-secret",
+      headers: { "idempotency-key": "invalid-input" },
+    }),
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), {
+    ok: false,
+    jobId: "pulse.v2.ingest",
+    outcome: "invalid_request",
+    code: "unknown_query_parameter",
+  });
+  assert.equal(store.acquireCalls, 0);
+  assert.equal(handlerCalls, 0);
 });
 
 test("a completed delivery suppresses a sequential duplicate", async () => {
@@ -408,13 +460,9 @@ test("changed inputs on the same running delivery key conflict before the handle
     headers: { "idempotency-key": "running-input-conflict" },
   };
 
-  const first = guarded(
-    request("/api/cron/pulse/v2/ingest?country=URY", common),
-  );
+  const first = guarded(request("/api/cron/pulse/v2/ingest?dryRun=1", common));
   await new Promise((resolve) => setImmediate(resolve));
-  const conflict = await guarded(
-    request("/api/cron/pulse/v2/ingest?country=GHA", common),
-  );
+  const conflict = await guarded(request("/api/cron/pulse/v2/ingest", common));
 
   assert.equal(conflict.status, 409);
   assert.equal((await conflict.json()).outcome, "idempotency_key_conflict");
@@ -458,7 +506,10 @@ test("the boundary injects one stable delivery key and overwrites a spoof", asyn
     "pulse.v2.ingest",
     (handlerRequest) => {
       seen.push(cronExecutionKeyFromRequest(handlerRequest));
-      return Response.json({ ok: seen.length > 1 }, { status: seen.length > 1 ? 200 : 502 });
+      return Response.json(
+        { ok: seen.length > 1 },
+        { status: seen.length > 1 ? 200 : 502 },
+      );
     },
     { store, now: () => FIXED_NOW },
   );
@@ -595,13 +646,11 @@ test("reusing one idempotency key with changed query parameters conflicts", asyn
     headers: { "idempotency-key": "same-key" },
   };
   assert.equal(
-    (await guarded(request("/api/cron/pulse/v2/ingest?country=URY", options)))
+    (await guarded(request("/api/cron/pulse/v2/ingest?dryRun=1", options)))
       .status,
     200,
   );
-  const conflict = await guarded(
-    request("/api/cron/pulse/v2/ingest?country=GHA", options),
-  );
+  const conflict = await guarded(request("/api/cron/pulse/v2/ingest", options));
   assert.equal(conflict.status, 409);
   assert.equal((await conflict.json()).outcome, "idempotency_key_conflict");
   assert.equal(handlerCalls, 1);
@@ -611,7 +660,7 @@ test("canonical query ordering does not create a false conflict", async () => {
   const store = new MemoryCronExecutionStore(() => FIXED_NOW);
   let handlerCalls = 0;
   const guarded = withCronJob(
-    "pulse.v2.ingest",
+    "factbook.auto-resolve",
     () => {
       handlerCalls++;
       return Response.json({ ok: true });
@@ -623,16 +672,24 @@ test("canonical query ordering does not create a false conflict", async () => {
     method: "POST",
     headers: { "idempotency-key": "canonical-order" },
   };
-  await guarded(request("/api/cron/pulse/v2/ingest?a=1&b=2", options));
+  await guarded(
+    request(
+      "/api/cron/factbook/auto-resolve-disputes?limit=5&dryRun=1",
+      options,
+    ),
+  );
   const duplicate = await guarded(
-    request("/api/cron/pulse/v2/ingest?b=2&a=1", options),
+    request(
+      "/api/cron/factbook/auto-resolve-disputes?dryRun=1&limit=5",
+      options,
+    ),
   );
   assert.equal(duplicate.status, 200);
   assert.equal((await duplicate.json()).outcome, "duplicate_suppressed");
   assert.equal(handlerCalls, 1);
 });
 
-test("duplicate query-value order cannot hide a semantic conflict", async () => {
+test("duplicate query values fail before lease acquisition", async () => {
   const store = new MemoryCronExecutionStore(() => FIXED_NOW);
   let handlerCalls = 0;
   const guarded = withCronJob(
@@ -648,16 +705,18 @@ test("duplicate query-value order cannot hide a semantic conflict", async () => 
     headers: { "idempotency-key": "duplicate-value-order" },
   };
 
-  await guarded(
-    request("/api/cron/pulse/v2/ingest?dryRun=0&dryRun=1", options),
+  const first = await guarded(
+    request("/api/cron/pulse/v2/ingest?dryRun=1&dryRun=1", options),
   );
-  const conflict = await guarded(
-    request("/api/cron/pulse/v2/ingest?dryRun=1&dryRun=0", options),
+  const second = await guarded(
+    request("/api/cron/pulse/v2/ingest?dryRun=1&dryRun=1", options),
   );
 
-  assert.equal(conflict.status, 409);
-  assert.equal((await conflict.json()).outcome, "idempotency_key_conflict");
-  assert.equal(handlerCalls, 1);
+  assert.equal(first.status, 400);
+  assert.equal((await first.json()).code, "duplicate_query_parameter");
+  assert.equal(second.status, 400);
+  assert.equal(store.acquireCalls, 0);
+  assert.equal(handlerCalls, 0);
 });
 
 test("a manual idempotency key remains stable across schedule slots", async () => {

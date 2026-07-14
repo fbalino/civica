@@ -62,12 +62,14 @@ async function handler(request: Request) {
         .map(providerKeyEnvName)
         .join(", ")} in the Vercel project env to enable).`;
     console.warn(notice);
-    const { httpStatus, ...outcome } = pulseV2ClassifyCronOutcome({
+    const outcome = pulseV2ClassifyCronOutcome({
       missingProviders: missing,
     });
     return NextResponse.json(
       {
-        ...outcome,
+        ok: outcome.ok,
+        outcome: outcome.outcome,
+        reason: outcome.reason,
         step: "pulse.v2.classify",
         dryRun,
         skipped: true,
@@ -80,42 +82,31 @@ async function handler(request: Request) {
         started,
         finished: new Date().toISOString(),
       },
-      { status: httpStatus },
+      { status: outcome.httpStatus },
     );
   }
 
-  try {
-    const sqlClient = neon(process.env.DATABASE_URL!);
-    const db = drizzle({ client: sqlClient, schema });
-    const summary = await classifyClusters(db, {
-      limit: 200,
+  const sqlClient = neon(process.env.DATABASE_URL!);
+  const db = drizzle({ client: sqlClient, schema });
+  const summary = await classifyClusters(db, {
+    limit: 200,
+    dryRun,
+    cronExecutionKey,
+  });
+  const outcome = pulseV2ClassifyCronOutcome({ summary });
+  return NextResponse.json(
+    {
+      ok: outcome.ok,
+      outcome: outcome.outcome,
+      reason: outcome.reason,
+      step: "pulse.v2.classify",
       dryRun,
-      cronExecutionKey,
-    });
-    const { httpStatus, ...outcome } = pulseV2ClassifyCronOutcome({ summary });
-    return NextResponse.json(
-      {
-        ...outcome,
-        step: "pulse.v2.classify",
-        dryRun,
-        started,
-        finished: new Date().toISOString(),
-        summary,
-      },
-      { status: httpStatus },
-    );
-  } catch (err) {
-    console.error("[cron pulse.v2.classify] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "pulse.v2.classify",
-        dryRun,
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+      started,
+      finished: new Date().toISOString(),
+      summary,
+    },
+    { status: outcome.httpStatus },
+  );
 }
 
 const cronHandler = withCronJob("pulse.v2.classify", handler);
