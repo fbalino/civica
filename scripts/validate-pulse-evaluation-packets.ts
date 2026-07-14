@@ -11,14 +11,15 @@ import {
 } from "../src/lib/db/schema";
 import { containsPulseCoderForbiddenField } from "../src/lib/pulse/v2/coder-protocol";
 import {
-  pulseEvaluationPacketManifestErrors,
+  pulseEvaluationPacketReleaseErrors,
+  type PulseEvaluationPacketFrozenInputs,
   type PulseEvaluationPacketFrame,
   type PulseEvaluationPacketManifest,
+  type PulseEvaluationPacketPopulationReference,
 } from "../src/lib/pulse/v2/evaluation-packets";
 import {
   type PulseCodingPacketSnapshot,
 } from "../src/lib/pulse/v2/coding-workspace";
-import { buildPulseEvaluationPacketsFromDatabase } from "./generate-pulse-evaluation-packets";
 import {
   buildSnapshots,
   loadPrivateEvidence,
@@ -30,6 +31,12 @@ const LIVE = process.argv.includes("--live-workspace");
 const checked = JSON.parse(
   readFileSync("data/research/pulse-evaluation-packet-manifest-v1.json", "utf8"),
 ) as PulseEvaluationPacketManifest;
+const frozenInputs = JSON.parse(
+  readFileSync("data/research/pulse-evaluation-packet-frozen-inputs-v1.json", "utf8"),
+) as PulseEvaluationPacketFrozenInputs;
+const population = JSON.parse(
+  readFileSync("data/research/pulse-evaluation-frame-population-v1.json", "utf8"),
+) as PulseEvaluationPacketPopulationReference;
 
 const STUDIES: Record<PulseEvaluationPacketFrame, string> = {
   retained_event_candidate_census: "pulse-evaluation-batch-a-v1",
@@ -78,7 +85,11 @@ async function validateLiveWorkspace() {
     assert.equal(assignments.length, 0, `${slug}: assignment leaked into setup study`);
     const expectedByKey = new Map(expected.map((packet) => [packet.packetKey, packet]));
     const rebuilt = buildSnapshots(frame, studyRow.id, expected, evidenceById);
-    assert.equal(studyRow.packetSetSha256, rebuilt.study.packetSetSha256);
+    assert.equal(
+      studyRow.packetSetSha256,
+      rebuilt.study.packetSetSha256,
+      `${slug}: frozen packet-set hash drifted`,
+    );
     const rebuiltByKey = new Map(rebuilt.snapshots.map((snapshot) => [snapshot.id, snapshot]));
     for (const row of packets) {
       const snapshot = row.packetSnapshot as PulseCodingPacketSnapshot;
@@ -101,9 +112,15 @@ async function validateLiveWorkspace() {
 }
 
 async function main() {
-  assert.deepEqual(pulseEvaluationPacketManifestErrors(checked), []);
-  const generated = await buildPulseEvaluationPacketsFromDatabase();
-  assert.deepEqual(checked, generated, "checked packet manifest drifted from the frozen database frame");
+  assert.deepEqual(
+    pulseEvaluationPacketReleaseErrors({
+      frozenInputs,
+      manifest: checked,
+      population,
+    }),
+    [],
+    "checked packet release does not reproduce from retained frozen inputs",
+  );
   const serialized = JSON.stringify(checked);
   assert.equal(
     /"(?:title|body|raw|headline|description|category|dimension|severityTier|severityValue|classifierRuns|classifierAgreement|reviewStatus|published|humanReviewed|ownerApproval|modelVote|goldLabel|truth)"\s*:/.test(
@@ -114,7 +131,7 @@ async function main() {
   );
   if (LIVE) await validateLiveWorkspace();
   console.log(
-    `PASS — ${checked.counts.totalPackets} rights-safe unlabeled packets${LIVE ? " and two isolated setup studies" : ""}; ${checked.semanticSha256}.`,
+    `PASS — ${checked.counts.totalPackets} rights-safe unlabeled packets reproduced from retained frozen inputs${LIVE ? " and two isolated setup studies" : ""}; ${checked.semanticSha256}.`,
   );
 }
 

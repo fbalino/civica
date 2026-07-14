@@ -1043,3 +1043,21 @@ criteria prevents a disliked comparison, a convenient available domain, or an
 unsupported impression from deciding the outcome after candidates are seen.
 The contract does not assess or clear Civica Atlas or any alternative; BRD-001
 through BRD-003 remain the evidence and professional-review gates.
+
+### APR-D163 — Frozen Pulse packets validate from retained inputs
+
+**Decision:** Treat the checked Pulse evaluation packet manifest and its new
+`pulse-evaluation-packet-frozen-inputs/v1` artifact as one immutable release.
+Normal build validation reconstructs the manifest only from those retained,
+rights-safe inputs and the frozen population reference; it never queries the
+mutable production candidate pool. `--write` verifies the existing release but
+does not refresh it. Current production differences are measured by a separate
+read-only live audit and cannot change packet membership, strata, weights, or
+hashes.
+
+**Why:** A preregistered evaluation sample must not change merely because later
+classification work updates rows whose retrieval times predate the cutoff. The
+retained inputs make the historical calculation reproducible without Neon,
+while the separate live audit keeps real operational drift visible. A mismatch
+in the disabled private coding workspace remains a fail-closed repair task
+(PUL-043), not permission to reseed or weaken the checked release.

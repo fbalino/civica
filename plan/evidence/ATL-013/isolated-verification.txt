@@ -39,12 +39,12 @@ FAIL  exit 1  npm run build
 
         checked packet manifest drifted from the frozen database frame
 
-      The mutable live Pulse candidate pool now reports non_governance
-      population/draw 97/53 instead of frozen 140/77 and pending 881/483
-      instead of frozen 838/459. Refreshing the preregistered packet would
-      destroy the freeze, so no artifact was regenerated. PUL-042 records the
-      separate repair: validate the release from retained frozen inputs and
-      report live drift independently.
+      The checked release uses non_governance population/draw 97/53 and
+      pending 881/483. The mutable live Pulse candidate pool had advanced to
+      140/77 and 838/459 respectively. Refreshing the preregistered packet
+      would destroy the freeze, so no artifact was regenerated. PUL-042
+      records the separate repair: validate the release from retained frozen
+      inputs and report live drift independently.
 
 Dirty-worktree cross-check
 --------------------------

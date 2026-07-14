@@ -1053,3 +1053,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The rubric records no conclusion about Civica Atlas or any alternative;
   BRD-001 through BRD-003 still own research and professional review. Durable
   record: APR-D162.
+
+## 2026-07-13 — Frozen Pulse packets validate from retained inputs
+
+- The checked packet manifest and
+  `pulse-evaluation-packet-frozen-inputs/v1` are one immutable evaluation
+  release. Normal build validation is DB-free and never reconstructs the
+  release from mutable production tables.
+- `--write` verifies without refreshing. Current population changes belong in
+  the separate read-only live audit and cannot alter sample membership,
+  strata, weights, or hashes.
+- The disabled private coding-workspace hash mismatch is PUL-043; never reseed
+  or weaken the frozen release to hide it. Durable record: APR-D163.
