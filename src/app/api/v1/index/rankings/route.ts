@@ -1,10 +1,19 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+} from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
 import { eq, sql, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
-import { retiredIndexApiResponse, withIndexDispositionDeprecation, withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
+import {
+  retiredIndexApiResponse,
+  withIndexDispositionDeprecation,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
@@ -15,12 +24,7 @@ import {
 import { retiredPulseScalarResponse } from "@/lib/api/pulse-scalar-retirement";
 
 type ExtendedTaxonomy =
-  | GovernmentTaxonomyLens
-  | "region"
-  | "income"
-  | "vdem"
-  | "cgv"
-  | "monarchy";
+  GovernmentTaxonomyLens | "region" | "income" | "vdem" | "cgv" | "monarchy";
 
 const PEER_LENS_FACT_KEY: Partial<Record<ExtendedTaxonomy, string>> = {
   region: "world_bank_region",
@@ -29,10 +33,7 @@ const PEER_LENS_FACT_KEY: Partial<Record<ExtendedTaxonomy, string>> = {
   monarchy: "monarchy_status",
 };
 
-function buildPeerLensCondition(
-  taxonomy: ExtendedTaxonomy,
-  value: string,
-) {
+function buildPeerLensCondition(taxonomy: ExtendedTaxonomy, value: string) {
   if (taxonomy === "cgv") {
     return sql`EXISTS (
       SELECT 1 FROM government_taxonomies gt
@@ -59,13 +60,15 @@ export async function GET(request: Request) {
   }
   const sort = requestedSort ?? "ci";
   if (sort !== "ci") {
-    return withIndexDispositionDeprecation(apiError(
-      "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
-      400,
-    ));
+    return withIndexDispositionDeprecation(
+      apiError(
+        "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
+        400,
+      ),
+    );
   }
 
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
@@ -93,12 +96,22 @@ export async function GET(request: Request) {
       ? (taxonomyParam as ExtendedTaxonomy)
       : "raw";
 
-    const limit = Math.min(Math.max(parseInt(limitParam ?? "50", 10) || 50, 1), 250);
+    const limit = Math.min(
+      Math.max(parseInt(limitParam ?? "50", 10) || 50, 1),
+      250,
+    );
     const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
-    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const release = resolveCiRelease(
+      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
+    );
     const methodologyVersion = release.methodologyVersion;
     if (quarterParam && quarterParam !== release.quarter) {
-      return withIndexDispositionDeprecation(apiError(`${release.releaseId} does not contain quarter ${quarterParam}`, 400));
+      return withIndexDispositionDeprecation(
+        apiError(
+          `${release.releaseId} does not contain quarter ${quarterParam}`,
+          400,
+        ),
+      );
     }
     const quarter = release.quarter;
 
@@ -106,20 +119,22 @@ export async function GET(request: Request) {
       // CLM-012 fix: this early-return branch previously omitted
       // `taxonomy` from meta, unlike the two branches below — every
       // /v1/index/rankings response now carries it consistently.
-      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-        apiResponse({
-          data: [],
-          meta: shapeIndexRankingsMeta({
-            total: 0,
-            limit,
-            offset,
-            hasMore: false,
-            quarter: null,
-            taxonomy,
-            series: release.series,
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiResponse({
+            data: [],
+            meta: shapeIndexRankingsMeta({
+              total: 0,
+              limit,
+              offset,
+              hasMore: false,
+              quarter: null,
+              taxonomy,
+              series: release.series,
+            }),
           }),
-        }),
-      ));
+        ),
+      );
     }
 
     const conditions = [
@@ -128,12 +143,14 @@ export async function GET(request: Request) {
     ];
 
     if (continent) {
-      conditions.push(sql`LOWER(${jurisdictions.continent}) = ${continent.toLowerCase()}`);
+      conditions.push(
+        sql`LOWER(${jurisdictions.continent}) = ${continent.toLowerCase()}`,
+      );
     }
     if (governmentType && taxonomy === "raw") {
       conditions.push(
         sql`(LOWER(${jurisdictions.governmentType}) LIKE ${`%${governmentType.toLowerCase()}%`}
-          OR LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${governmentType.toLowerCase()}%`})`
+          OR LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${governmentType.toLowerCase()}%`})`,
       );
     }
 
@@ -181,7 +198,10 @@ export async function GET(request: Request) {
     const rowsQuery = db
       .select(baseSelect)
       .from(ciCompositeScores)
-      .innerJoin(jurisdictions, eq(ciCompositeScores.jurisdictionId, jurisdictions.id))
+      .innerJoin(
+        jurisdictions,
+        eq(ciCompositeScores.jurisdictionId, jurisdictions.id),
+      )
       .$dynamic();
     const orderCol = asc(ciCompositeScores.rank);
 
@@ -192,9 +212,7 @@ export async function GET(request: Request) {
       (taxonomy === "structural" || taxonomy === "regime") &&
       governmentType
     ) {
-      const rows = await rowsQuery
-        .where(where)
-        .orderBy(orderCol);
+      const rows = await rowsQuery.where(where).orderBy(orderCol);
 
       const classificationMap = await buildGovernmentClassificationMap(
         rows.map((row) => ({
@@ -226,32 +244,35 @@ export async function GET(request: Request) {
             : false;
         });
 
-      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-        apiResponse({
-          data: filtered.slice(offset, offset + limit).map(shapeIndexRankingsItem),
-          meta: shapeIndexRankingsMeta({
-            total: filtered.length,
-            limit,
-            offset,
-            hasMore: offset + limit < filtered.length,
-            quarter,
-            taxonomy,
-            series: release.series,
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiResponse({
+            data: filtered
+              .slice(offset, offset + limit)
+              .map(shapeIndexRankingsItem),
+            meta: shapeIndexRankingsMeta({
+              total: filtered.length,
+              limit,
+              offset,
+              hasMore: offset + limit < filtered.length,
+              quarter,
+              taxonomy,
+              series: release.series,
+            }),
           }),
-        }),
-      ));
+        ),
+      );
     }
 
     const [rows, countResult] = await Promise.all([
-      rowsQuery
-        .where(where)
-        .orderBy(orderCol)
-        .limit(limit)
-        .offset(offset),
+      rowsQuery.where(where).orderBy(orderCol).limit(limit).offset(offset),
       db
         .select({ count: sql<number>`count(*)::int` })
         .from(ciCompositeScores)
-        .innerJoin(jurisdictions, eq(ciCompositeScores.jurisdictionId, jurisdictions.id))
+        .innerJoin(
+          jurisdictions,
+          eq(ciCompositeScores.jurisdictionId, jurisdictions.id),
+        )
         .where(where),
     ]);
 
@@ -266,31 +287,35 @@ export async function GET(request: Request) {
       })),
     );
 
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-      apiResponse({
-        data: rows.map(({ jurisdictionId, ...row }) => {
-          const completeness = parsePublishedCiCompleteness(row);
-          return shapeIndexRankingsItem({
-            ...row,
-            ...completeness,
-            governmentClassification:
-              classificationMap.get(jurisdictionId) ?? null,
-          });
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(
+        apiResponse({
+          data: rows.map(({ jurisdictionId, ...row }) => {
+            const completeness = parsePublishedCiCompleteness(row);
+            return shapeIndexRankingsItem({
+              ...row,
+              ...completeness,
+              governmentClassification:
+                classificationMap.get(jurisdictionId) ?? null,
+            });
+          }),
+          meta: shapeIndexRankingsMeta({
+            total,
+            limit,
+            offset,
+            hasMore: offset + limit < total,
+            quarter,
+            taxonomy,
+            series: release.series,
+          }),
         }),
-        meta: shapeIndexRankingsMeta({
-          total,
-          limit,
-          offset,
-          hasMore: offset + limit < total,
-          quarter,
-          taxonomy,
-          series: release.series,
-        }),
-      }),
-    ));
+      ),
+    );
   } catch (e) {
     console.error("API /v1/index/rankings error:", e);
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
+    );
   }
 }
 

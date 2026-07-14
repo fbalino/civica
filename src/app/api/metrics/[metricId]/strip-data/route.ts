@@ -1,19 +1,20 @@
 import { NextResponse } from "next/server";
 import { eq, sql } from "drizzle-orm";
-import {
-  buildGovTypeStripBands,
-  getMetricStripData,
-} from "@/lib/db/queries";
+import { buildGovTypeStripBands, getMetricStripData } from "@/lib/db/queries";
 import { db } from "@/lib/db";
 import { jurisdictions, metricDefinitions, sources } from "@/lib/db/schema";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ metricId: string }> }
+  { params }: { params: Promise<{ metricId: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(req, { scope: "metrics-strip-data" });
+  const limited = await enforceRequestRateLimit(
+    req,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const { metricId } = await params;
@@ -30,11 +31,17 @@ export async function GET(
 
   const govTypesParam = searchParams.get("govTypes");
   const govTypes = govTypesParam
-    ? govTypesParam.split(",").map((t) => t.trim()).filter(Boolean)
+    ? govTypesParam
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
     : undefined;
   const regionsParam = searchParams.get("regions");
   const regions = regionsParam
-    ? regionsParam.split(",").map((t) => t.trim()).filter(Boolean)
+    ? regionsParam
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
     : undefined;
   const taxonomyParam = searchParams.get("taxonomy");
   const taxonomy: GovernmentTaxonomyLens =
@@ -50,7 +57,9 @@ export async function GET(
     regions,
   );
 
-  const rows = Array.isArray(rawRows) ? rawRows : (rawRows as { rows: unknown[] }).rows ?? [];
+  const rows = Array.isArray(rawRows)
+    ? rawRows
+    : ((rawRows as { rows: unknown[] }).rows ?? []);
   const bands = buildGovTypeStripBands(
     rows as Array<{ govType: string; value: number }>,
   );
@@ -85,7 +94,10 @@ export async function GET(
 
   // Index peer-band stats by govType for O(1) lookup
   const bandByGovType = Object.fromEntries(
-    (bands as Array<{ govType: string; [k: string]: unknown }>).map((b) => [b.govType, b])
+    (bands as Array<{ govType: string; [k: string]: unknown }>).map((b) => [
+      b.govType,
+      b,
+    ]),
   );
 
   return NextResponse.json({

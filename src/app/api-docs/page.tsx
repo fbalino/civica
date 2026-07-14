@@ -228,8 +228,8 @@ export default function ApiDocsPage() {
           for sovereign states. All <code>/api/v1/*</code> responses are JSON.
           No authentication is required. A frozen, rights-filtered Atlas
           reference package and a per-country research export (JSON/CSV) are
-          available below; both include only facts whose selected source
-          carries verified public-export terms.
+          available below; both include only facts whose selected source carries
+          verified public-export terms.
         </p>
 
         <div className="api-info-card">
@@ -240,14 +240,20 @@ export default function ApiDocsPage() {
           <div className="api-info-card__row">
             <h3 className="api-section-label">Rate Limits</h3>
             <p className="api-info-card__body">
-              Every <code>/api/v1/*</code> endpoint applies a best-effort per-IP
-              throttle of {countriesRoute.rateLimit?.max} requests per{" "}
-              {(countriesRoute.rateLimit?.windowMs ?? 0) / 1000} seconds
-              (in-memory, per server instance — not a durable global counter).
-              Exceeding a live <code>/api/v1/*</code> endpoint&rsquo;s limit
-              returns 429 with a <code>Retry-After</code> header. The bulk{" "}
-              <code>/api/countries/:slug/export</code> route is not
-              currently rate-limited.
+              Every <code>/api/v1/*</code> GET uses a shared, PostgreSQL-backed
+              counter and allows {countriesRoute.rateLimit?.max} requests per{" "}
+              {(countriesRoute.rateLimit?.windowMs ?? 0) / 1000} seconds for
+              each validated client identity across application instances. The
+              per-country <code>/api/countries/:slug/export</code> GET uses the
+              same distributed, fail-closed policy at{" "}
+              {countryExportRoute.rateLimit?.max} requests per{" "}
+              {(countryExportRoute.rateLimit?.windowMs ?? 0) / 1000} seconds.
+              Exceeding either limit returns{" "}
+              {countriesRoute.rateLimit?.exceededStatus} with a{" "}
+              <code>Retry-After</code> header. If the shared counter is
+              unavailable, the request fails closed with{" "}
+              {countriesRoute.rateLimit?.storeUnavailableStatus}.{" "}
+              <code>OPTIONS</code> requests do not consume either counter.
             </p>
           </div>
           <div className="api-info-card__row">

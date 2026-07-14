@@ -24,11 +24,15 @@ import {
   INDEX_COMPOSITE_SUNSET_DATE_ISO,
   INDEX_DISPOSITION_SUCCESSOR_HREF,
 } from "@/lib/api/deprecation";
+import { CORS_HEADERS } from "@/lib/api/helpers";
 import {
-  RATE_LIMIT_MAX,
-  RATE_LIMIT_WINDOW_MS,
-  CORS_HEADERS,
-} from "@/lib/api/helpers";
+  EXPORT_RATE_LIMIT_MAX,
+  EXPORT_RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_EXCEEDED_STATUS,
+  RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+  V1_RATE_LIMIT_MAX,
+  V1_RATE_LIMIT_WINDOW_MS,
+} from "@/lib/api/contract/rate-limits";
 
 export interface RouteParam {
   name: string;
@@ -40,7 +44,11 @@ export interface RouteParam {
 export interface RateLimitContract {
   max: number;
   windowMs: number;
-  scope: "per-ip";
+  scope: "per-validated-client-identity";
+  backend: "postgres";
+  countedMethods: readonly ["GET"];
+  exceededStatus: typeof RATE_LIMIT_EXCEEDED_STATUS;
+  storeUnavailableStatus: typeof RATE_LIMIT_STORE_UNAVAILABLE_STATUS;
 }
 
 export interface DeprecationEntryContract {
@@ -118,9 +126,23 @@ const indexDispositionDeprecation = (): DeprecationContract => ({
 });
 
 const v1RateLimit: RateLimitContract = {
-  max: RATE_LIMIT_MAX,
-  windowMs: RATE_LIMIT_WINDOW_MS,
-  scope: "per-ip",
+  max: V1_RATE_LIMIT_MAX,
+  windowMs: V1_RATE_LIMIT_WINDOW_MS,
+  scope: "per-validated-client-identity",
+  backend: "postgres",
+  countedMethods: ["GET"],
+  exceededStatus: RATE_LIMIT_EXCEEDED_STATUS,
+  storeUnavailableStatus: RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+};
+
+const exportRateLimit: RateLimitContract = {
+  max: EXPORT_RATE_LIMIT_MAX,
+  windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
+  scope: "per-validated-client-identity",
+  backend: "postgres",
+  countedMethods: ["GET"],
+  exceededStatus: RATE_LIMIT_EXCEEDED_STATUS,
+  storeUnavailableStatus: RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
 };
 
 export const API_ROUTES: RouteContract[] = [
@@ -184,7 +206,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 429, 500],
+    errorStatuses: [400, 429, 500, 503],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countries",
   },
@@ -216,7 +238,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 404, 429, 500],
+    errorStatuses: [400, 404, 429, 500, 503],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countryDetail",
   },
@@ -313,7 +335,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: structuralFamilyDeprecation(true),
     exampleId: "governmentTypes",
   },
@@ -344,7 +366,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexCountry",
   },
@@ -375,7 +397,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexHistory",
   },
@@ -414,7 +436,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     // Field-level deprecation only applies when ?taxonomy=structural|regime
     // is requested — see zIndexByGovernmentTypeResponse's meta union.
     deprecation: indexDispositionDeprecation(),
@@ -455,7 +477,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 429, 500],
+    errorStatuses: [400, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexCompare",
   },
@@ -480,7 +502,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexMethodology",
   },
@@ -551,7 +573,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 410, 429, 500],
+    errorStatuses: [400, 410, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexRankings",
   },
@@ -568,7 +590,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "peerGroupings",
   },
@@ -586,7 +608,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseMethodology",
   },
@@ -603,7 +625,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseClusterCoverage",
   },
@@ -620,7 +642,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseSourceCoverage",
   },
@@ -644,7 +666,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: null,
     exampleId: "pulseDimensions",
   },
@@ -668,7 +690,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: null,
     exampleId: "pulseEvents",
   },
@@ -729,7 +751,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseChangelog",
   },
@@ -765,8 +787,8 @@ export const API_ROUTES: RouteContract[] = [
     ],
     cors: false,
     corsHeaders: null,
-    rateLimit: null,
-    errorStatuses: [400, 404, 500, 503],
+    rateLimit: exportRateLimit,
+    errorStatuses: [400, 404, 429, 500, 503],
     deprecation: null,
     exampleId: "countryExport",
   },

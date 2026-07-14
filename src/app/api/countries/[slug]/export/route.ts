@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 
-import { getAllSources, getCountryFacts, getJurisdictionBySlug } from "@/lib/db/queries";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import {
+  getAllSources,
+  getCountryFacts,
+  getJurisdictionBySlug,
+} from "@/lib/db/queries";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
-import { getFrozenFactsForJurisdiction, metadataFromResolutions, parseAtlasReadSelection } from "@/lib/factbook/read-selection";
+import {
+  getFrozenFactsForJurisdiction,
+  metadataFromResolutions,
+  parseAtlasReadSelection,
+} from "@/lib/factbook/read-selection";
 import {
   buildCountryResearchExport,
   countryResearchExportCsv,
@@ -18,6 +28,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-export"),
+  );
+  if (limited) return limited;
+
   const { slug } = await params;
   const url = new URL(request.url);
   const format = url.searchParams.get("format") ?? "json";
@@ -27,8 +43,14 @@ export async function GET(
       { status: 400 },
     );
   }
-  const parsedSelection = parseAtlasReadSelection(url.searchParams.get("as_of"));
-  if (!parsedSelection.selection) return NextResponse.json({ error: parsedSelection.error, code: "INVALID_AS_OF" }, { status: 400 });
+  const parsedSelection = parseAtlasReadSelection(
+    url.searchParams.get("as_of"),
+  );
+  if (!parsedSelection.selection)
+    return NextResponse.json(
+      { error: parsedSelection.error, code: "INVALID_AS_OF" },
+      { status: 400 },
+    );
   const selection = parsedSelection.selection;
 
   const productDecision = evaluatePublicExport("country-export-json-csv", []);
@@ -54,14 +76,29 @@ export async function GET(
     getAllSources(),
   ]);
   const factKeys = [...new Set(factRows.map((row) => row.factKey))].sort();
-  const frozen = selection.mode === "vintage"
-    ? await getFrozenFactsForJurisdiction(jurisdiction.id, [], selection.asOf)
-    : null;
-  if (frozen && !frozen.exists) return NextResponse.json({ error: "Unsupported immutable vintage", code: "UNSUPPORTED_VINTAGE", asOf: selection.asOf }, { status: 400 });
-  const resolutions = frozen?.resolutions ?? await getCanonicalFactsForJurisdiction(jurisdiction.id, factKeys);
+  const frozen =
+    selection.mode === "vintage"
+      ? await getFrozenFactsForJurisdiction(jurisdiction.id, [], selection.asOf)
+      : null;
+  if (frozen && !frozen.exists)
+    return NextResponse.json(
+      {
+        error: "Unsupported immutable vintage",
+        code: "UNSUPPORTED_VINTAGE",
+        asOf: selection.asOf,
+      },
+      { status: 400 },
+    );
+  const resolutions =
+    frozen?.resolutions ??
+    (await getCanonicalFactsForJurisdiction(jurisdiction.id, factKeys));
   const document = buildCountryResearchExport({
     generatedAt: new Date().toISOString(),
-    selection: metadataFromResolutions(selection, resolutions, frozen ?? undefined),
+    selection: metadataFromResolutions(
+      selection,
+      resolutions,
+      frozen ?? undefined,
+    ),
     jurisdiction: {
       id: jurisdiction.id,
       slug: jurisdiction.slug,
@@ -88,7 +125,10 @@ export async function GET(
 
   const filename = `${jurisdiction.slug}-civica-research-export.${format}`;
   const headers = {
-    "Cache-Control": selection.mode === "vintage" ? "public, max-age=31536000, immutable" : "private, max-age=0, must-revalidate",
+    "Cache-Control":
+      selection.mode === "vintage"
+        ? "public, max-age=31536000, immutable"
+        : "private, max-age=0, must-revalidate",
     "Content-Disposition": `attachment; filename="${filename}"`,
     "X-Civica-Rights-Manifest": RIGHTS_MANIFEST_PATH,
   };

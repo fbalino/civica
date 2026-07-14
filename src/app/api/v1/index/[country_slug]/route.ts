@@ -1,11 +1,18 @@
-import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+  CI_METHODOLOGY_META,
+} from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
+import { ciCompositeScores, ciDimensionScores } from "@/lib/db/schema";
 import {
-  ciCompositeScores,
-  ciDimensionScores,
-} from "@/lib/db/schema";
-import { displayCiReleaseDimensionScore, resolveCiRelease, selectCiReleaseDimensionRows } from "@/lib/ci/release-selection";
+  displayCiReleaseDimensionScore,
+  resolveCiRelease,
+  selectCiReleaseDimensionRows,
+} from "@/lib/ci/release-selection";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   retiredIndexApiResponse,
@@ -25,9 +32,9 @@ import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
  */
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ country_slug: string }> }
+  { params }: { params: Promise<{ country_slug: string }> },
 ) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
@@ -36,12 +43,16 @@ export async function GET(
     const { country_slug } = await params;
     const slug = country_slug.toLowerCase();
     const url = new URL(request.url);
-    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const release = resolveCiRelease(
+      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
+    );
     const methodologyVersion = release.methodologyVersion;
 
     const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) {
-      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Country not found", 404)));
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(apiError("Country not found", 404)),
+      );
     }
 
     // The release contract chooses one exact methodology/quarter coordinate.
@@ -73,12 +84,14 @@ export async function GET(
 
     const composite = releaseScore[0];
     if (!composite) {
-      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-        apiError(
-          `No CI data available for this country in release "${release.releaseId}".`,
-          404,
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError(
+            `No CI data available for this country in release "${release.releaseId}".`,
+            404,
+          ),
         ),
-      ));
+      );
     }
 
     const dimensionRows = await db
@@ -108,10 +121,14 @@ export async function GET(
     // card, and /api/v1/countries. The stored `normalized_score` column
     // is the legacy v1 observed-min-max value and does NOT sum to the v2
     // headline; fall back to it only when raw value / source is missing.
-    const dimensions = selectCiReleaseDimensionRows(dimensionRows, release.releaseId).map((d) => ({
+    const dimensions = selectCiReleaseDimensionRows(
+      dimensionRows,
+      release.releaseId,
+    ).map((d) => ({
       dimension: d.dimension,
       normalizedScore:
-        displayCiReleaseDimensionScore(d, release.releaseId) ?? d.normalizedScore,
+        displayCiReleaseDimensionScore(d, release.releaseId) ??
+        d.normalizedScore,
       rawValue: d.rawValue,
       sourceId: d.sourceId,
       valueStatus: "observed" as const,
@@ -125,36 +142,41 @@ export async function GET(
     // headers + `meta.deprecations` block every sibling structural
     // surface uses (rankings, countries) so consumers get one
     // consistent sunset signal.
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-      apiResponse({
-        data: shapeIndexCountryData({
-          slug: jurisdiction.slug,
-          name: jurisdiction.name,
-          governmentClassification: jurisdiction.governmentClassification ?? null,
-          quarter: composite.quarter,
-          vintageLabel: composite.vintageLabel,
-          score: composite.score,
-          scoreLower: composite.scoreLower,
-          scoreUpper: composite.scoreUpper,
-          completenessFlag: completeness.completenessFlag,
-          rank: composite.rank,
-          totalRanked: composite.totalRanked,
-          isPartial: composite.isPartial,
-          missingDimensions: completeness.missingDimensions,
-          dimensionsAvailable: completeness.dimensionsAvailable,
-          methodologyVersion: composite.methodologyVersion,
-          dimensions,
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(
+        apiResponse({
+          data: shapeIndexCountryData({
+            slug: jurisdiction.slug,
+            name: jurisdiction.name,
+            governmentClassification:
+              jurisdiction.governmentClassification ?? null,
+            quarter: composite.quarter,
+            vintageLabel: composite.vintageLabel,
+            score: composite.score,
+            scoreLower: composite.scoreLower,
+            scoreUpper: composite.scoreUpper,
+            completenessFlag: completeness.completenessFlag,
+            rank: composite.rank,
+            totalRanked: composite.totalRanked,
+            isPartial: composite.isPartial,
+            missingDimensions: completeness.missingDimensions,
+            dimensionsAvailable: completeness.dimensionsAvailable,
+            methodologyVersion: composite.methodologyVersion,
+            dimensions,
+          }),
+          meta: {
+            methodology: CI_METHODOLOGY_META,
+            series: release.series,
+            ...STRUCTURAL_FAMILY_DEPRECATION_META,
+          },
         }),
-        meta: {
-          methodology: CI_METHODOLOGY_META,
-          series: release.series,
-          ...STRUCTURAL_FAMILY_DEPRECATION_META,
-        },
-      }),
-    ));
+      ),
+    );
   } catch (e) {
     console.error("API /v1/index/[country_slug] error:", e);
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
+    );
   }
 }
 

@@ -8,7 +8,7 @@ import { zPulseSourceCoverageReport } from "@/lib/api/contract/schemas";
 import { loadPulseSourceCoverageReport } from "@/lib/pulse/v2/source-coverage";
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
   try {
     // PUBLIC_CLAIM: pulse.source-coverage-runtime

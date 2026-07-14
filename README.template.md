@@ -10,14 +10,17 @@
       {{ctx.helperName}}              ← pre-computed in regenerator
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
+
 # Civica Atlas
 
 <!-- PUBLIC_CLAIM: readme.positioning -->
+
 Civica Atlas is a provenance-first comparative reference to how every country is governed.
 
 [civicaatlas.org](https://civicaatlas.org)
 
 <!-- PUBLIC_CLAIM: readme.release-status -->
+
 > **Status: {{ctx.launchPhaseProse}}.** The data layer and reader pages are live and being used by the team for end-to-end review. Public launch + external methodology review are planned phases, not shipped yet. See [Current state](#current-state) below.
 
 ---
@@ -37,11 +40,13 @@ Country dossiers cover geography, demographics, government, economy, energy, com
 ### Governance Evidence — source-native comparison
 
 <!-- PUBLIC_CLAIM: readme.index-estimate -->
+
 The selected public comparison product presents V-Dem, World Bank Worldwide Governance Indicators, Freedom House, and Transparency International observations without averaging them into a Civica score or rank. Each row keeps its source-native scale, vintage, coverage, and rights context. The former {{ctx.civicaIndexDimensionCountWord}}-dimension composite, its code, and its frozen validation results remain versioned research because the tournament found no original measurement contribution and insufficient evidence for a recommended country ranking.
 
 ### Civica Pulse — experimental event ledger
 
 <!-- PUBLIC_CLAIM: readme.pulse-signal -->
+
 An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Numeric effects are API-only experimental, named per-dimension deltas; reader pages and bulk exports omit them, and Civica does not publish a merged Pulse score or Pulse ranking. The current production ensemble has not completed representative evaluation or independent review. Current status: {{ctx.pulseStatusUpper}}.
 
 ## What makes this different
@@ -66,16 +71,16 @@ Civica's pipeline is built on opposite premises:
 
 This is a pre-launch project. Honest snapshot:
 
-| Metric | Status |
-|---|---|
-| Active source orchestrators writing facts | {{stats.activeSources | "Multiple"}} ({{ctx.tier1ShippedCount}} Tier-1 + CIA archive + Wikidata + V-Dem + {{ctx.nsoInProgressCount}} NSO Wave 1) — IEA scrapped due to license incompatibility |
-| `country_facts` rows | {{ctx.totalFactsRoundedThousands | "Many"}} across {{stats.distinctFactKeys | "many"}} declared fact-keys |
-| Multi-sourced fact-keys (two or more sources, at least one country) | {{stats.multiSourcedFactKeys | "Multiple"}} |
-| Fact-keys with five or more sources | {{stats.fiveSourceFactKeys | "Several"}} ({{ctx.fiveSourceFactKeyNamesProse | "publisher list unavailable while the database is offline"}}) |
-| Adopted methodology resolution docs | {{state.adoptedResolutionCount}}+ |
-| NSO (national statistics office) syncs | First wave: {{ctx.nsoInProgressCount}} in progress ({{ctx.nsoInProgressNamesProse}}); {{ctx.nsoDeferredStatusTableProse}} |
-| External methodology review | {{ctx.externalReviewStatusProse}} |
-| Public launch | Pre-launch; URLs are live but no inbound traffic yet |
+| Metric                                                              | Status                                                                                                                    |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Active source orchestrators writing facts                           | {{stats.activeSources                                                                                                     | "Multiple"}} ({{ctx.tier1ShippedCount}} Tier-1 + CIA archive + Wikidata + V-Dem + {{ctx.nsoInProgressCount}} NSO Wave 1) — IEA scrapped due to license incompatibility |
+| `country_facts` rows                                                | {{ctx.totalFactsRoundedThousands                                                                                          | "Many"}} across {{stats.distinctFactKeys                                                                                                                               | "many"}} declared fact-keys                                   |
+| Multi-sourced fact-keys (two or more sources, at least one country) | {{stats.multiSourcedFactKeys                                                                                              | "Multiple"}}                                                                                                                                                           |
+| Fact-keys with five or more sources                                 | {{stats.fiveSourceFactKeys                                                                                                | "Several"}} ({{ctx.fiveSourceFactKeyNamesProse                                                                                                                         | "publisher list unavailable while the database is offline"}}) |
+| Adopted methodology resolution docs                                 | {{state.adoptedResolutionCount}}+                                                                                         |
+| NSO (national statistics office) syncs                              | First wave: {{ctx.nsoInProgressCount}} in progress ({{ctx.nsoInProgressNamesProse}}); {{ctx.nsoDeferredStatusTableProse}} |
+| External methodology review                                         | {{ctx.externalReviewStatusProse}}                                                                                         |
+| Public launch                                                       | Pre-launch; URLs are live but no inbound traffic yet                                                                      |
 
 The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Index candidate tournament is complete: the source-native Governance Evidence Dashboard is the selected public product, and the v2-Beta composite is preserved as research. A future composite would require a new candidate, preregistered validation, retained uncertainty, calibration evidence, and external review.
 
@@ -113,17 +118,17 @@ Detailed architecture: see [Methodology — Reconciliation](https://civicaatlas.
 
 Public methodology pages (in approximate read order):
 
-| Topic | URL |
-|---|---|
-| **How we approach data** (intro, plain English) | `/methodology/approach` |
-| **Methodology hub** (index of every methodology page) | `/methodology` |
-| Reconciliation — multi-source resolver, dispute rules, provenance | `/country/methodology/reconciliation` |
-| Civica Index — archived composite method and disposition | `/civica-index/methodology` |
-| Civica Index — PCA appendix (the math) | `/civica-index/methodology/pca-appendix` |
-| Civica Pulse — event classification + experimental effects | `/civica-index/methodology/pulse` |
-| Civica Pulse — archived diagnostic smoke test | `/civica-index/methodology/pulse/backtest` |
-| Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping` |
-| Policies — corrections, retractions, versioning, known limitations | `/policies` |
+| Topic                                                                      | URL                                        |
+| -------------------------------------------------------------------------- | ------------------------------------------ |
+| **How we approach data** (intro, plain English)                            | `/methodology/approach`                    |
+| **Methodology hub** (index of every methodology page)                      | `/methodology`                             |
+| Reconciliation — multi-source resolver, dispute rules, provenance          | `/country/methodology/reconciliation`      |
+| Civica Index — archived composite method and disposition                   | `/civica-index/methodology`                |
+| Civica Index — PCA appendix (the math)                                     | `/civica-index/methodology/pca-appendix`   |
+| Civica Pulse — event classification + experimental effects                 | `/civica-index/methodology/pulse`          |
+| Civica Pulse — archived diagnostic smoke test                              | `/civica-index/methodology/pulse/backtest` |
+| Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping`  |
+| Policies — corrections, retractions, versioning, known limitations         | `/policies`                                |
 
 Internal methodology resolution documents (audit trail, eventually published) cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, and more. Public publication of these resolutions is a v1.x deliverable.
 
@@ -162,7 +167,7 @@ git clone https://github.com/fbalino/civica.git
 cd civica
 npm install
 cp .env.example .env.local
-# Fill in DATABASE_URL, ANTHROPIC_API_KEY_CHAT, the Pulse provider keys, ADMIN_USERNAME/ADMIN_PASSWORD_HASH/ADMIN_SESSION_SECRET, CRON_SECRET
+# Fill in DATABASE_URL, ANTHROPIC_API_KEY_CHAT, the Pulse provider keys, ADMIN_USERNAME/ADMIN_PASSWORD_HASH/ADMIN_SESSION_SECRET, RATE_LIMIT_KEY_SECRET, CRON_SECRET
 npm run dev
 ```
 
@@ -174,7 +179,13 @@ Required env vars (documented in `.env.example`):
 - `ANTHROPIC_API_KEY_CHAT` — required for `/api/chat`
 - `DEEPSEEK_API_KEY`, `GLM_API_KEY`, and `ANTHROPIC_API_KEY_PULSE_CLASSIFIER` — required by the default Pulse ensemble, verifier, and subject-attribution pass
 - `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` — the admin-login credentials for the `/admin` back office and `/api/admin/*` routes (all three required; routes fail closed if unset). Generate the password hash with `npm run admin:set-password`.
+- `RATE_LIMIT_KEY_SECRET` — independent HMAC key for opaque distributed
+  rate-limit subjects; required in production and must be at least 32 bytes.
+  Generate it with `openssl rand -hex 32`; do not reuse the admin session key.
 - `CRON_SECRET` — bearer token for the Vercel cron endpoints at `/api/cron/*`
+
+Production traffic policy, secret rotation, and outage checks are documented in
+the [rate-limiting runbook](./data/RATE-LIMITING.md).
 
 Common npm scripts:
 
@@ -238,4 +249,4 @@ For development conventions and project memory, see [AGENTS.md](./AGENTS.md) and
 
 ---
 
-*Civica Atlas is an actively developed comparative reference. Its methods, source coverage, and experimental outputs remain open to correction and review. If you spot a methodological gap, data error, or documentation inconsistency, please open an issue or get in touch.*
+_Civica Atlas is an actively developed comparative reference. Its methods, source coverage, and experimental outputs remain open to correction and review. If you spot a methodological gap, data error, or documentation inconsistency, please open an issue or get in touch._

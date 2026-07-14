@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import {
   getAllSources,
   getIndicatorHistoryForCountry,
@@ -19,6 +21,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-export"),
+  );
+  if (limited) return limited;
+
   const { slug } = await params;
   const url = new URL(request.url);
   const format = url.searchParams.get("format") ?? "json";

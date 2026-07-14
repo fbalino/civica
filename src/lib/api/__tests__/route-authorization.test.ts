@@ -295,7 +295,10 @@ test("admin logout is controlled and the narrower pulse-coding revocation gap st
     (entry) => entry.filePath === "api/pulse-coding/sign-out/route.ts",
   );
   assert.ok(coding);
-  assert.deepEqual(coding.controls, ["same-origin-mutation"]);
+  assert.deepEqual(coding.controls, [
+    "platform-rate-limit",
+    "same-origin-mutation",
+  ]);
   assert.match(coding.note, /OPEN FINDING \(bounded\)/);
 });
 

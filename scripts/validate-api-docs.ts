@@ -31,6 +31,9 @@
  *   6. CSV header contract — the export route's source no longer
  *      hand-types the CSV header/citation strings inline; it calls
  *      into `contract/csv.ts`.
+ *   7. Distributed rate-limit contract — all versioned GETs and the
+ *      country export declare their canonical shared-counter limits,
+ *      counted method, and 429/503 failure responses.
  *
  * The comparison logic in each check is a pure function taking plain
  * strings/sets/arrays — no filesystem or DB access — so
@@ -46,6 +49,14 @@ import {
   API_ROUTES,
   type RouteContract,
 } from "../src/lib/api/contract/registry";
+import {
+  EXPORT_RATE_LIMIT_MAX,
+  EXPORT_RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_EXCEEDED_STATUS,
+  RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+  V1_RATE_LIMIT_MAX,
+  V1_RATE_LIMIT_WINDOW_MS,
+} from "../src/lib/api/contract/rate-limits";
 
 const ROOT = process.cwd();
 const V1_DIR = path.join(ROOT, "src/app/api/v1");
@@ -319,7 +330,9 @@ export function deprecationScopeMismatch(
   helperName = "withStructuralFamilyDeprecation",
 ): string | null {
   if (appliesWhen === "always") {
-    const rateLimitPattern = new RegExp(`if\\s*\\(rateLimited\\)\\s*return\\s+${helperName}\\(rateLimited\\)`);
+    const rateLimitPattern = new RegExp(
+      `if\\s*\\(rateLimited\\)\\s*return\\s+${helperName}\\(rateLimited\\)`,
+    );
     if (!rateLimitPattern.test(source)) {
       return `[deprecation] route "${routeId}" does not decorate its 429 rate-limit response in ${filePath}`;
     }
@@ -462,6 +475,67 @@ function assertNoDuplicateRegistryIds(report: Report): void {
   }
 }
 
+export function findRateLimitContractIssues(
+  registry: Pick<
+    RouteContract,
+    "id" | "versioned" | "method" | "rateLimit" | "errorStatuses"
+  >[],
+): string[] {
+  const issues: string[] = [];
+
+  for (const route of registry) {
+    const expected = route.versioned
+      ? { max: V1_RATE_LIMIT_MAX, windowMs: V1_RATE_LIMIT_WINDOW_MS }
+      : {
+          max: EXPORT_RATE_LIMIT_MAX,
+          windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
+        };
+    const rateLimit = route.rateLimit;
+
+    if (!rateLimit) {
+      issues.push(
+        `[rate-limit] route "${route.id}" has no distributed rate-limit contract`,
+      );
+      continue;
+    }
+
+    if (
+      route.method !== "GET" ||
+      rateLimit.max !== expected.max ||
+      rateLimit.windowMs !== expected.windowMs ||
+      rateLimit.scope !== "per-validated-client-identity" ||
+      rateLimit.backend !== "postgres" ||
+      rateLimit.countedMethods.length !== 1 ||
+      rateLimit.countedMethods[0] !== "GET" ||
+      rateLimit.exceededStatus !== RATE_LIMIT_EXCEEDED_STATUS ||
+      rateLimit.storeUnavailableStatus !== RATE_LIMIT_STORE_UNAVAILABLE_STATUS
+    ) {
+      issues.push(
+        `[rate-limit] route "${route.id}" drifts from its canonical distributed GET-only policy`,
+      );
+    }
+    if (!route.errorStatuses.includes(RATE_LIMIT_EXCEEDED_STATUS)) {
+      issues.push(
+        `[rate-limit] route "${route.id}" does not document ${RATE_LIMIT_EXCEEDED_STATUS}`,
+      );
+    }
+    if (!route.errorStatuses.includes(RATE_LIMIT_STORE_UNAVAILABLE_STATUS)) {
+      issues.push(
+        `[rate-limit] route "${route.id}" does not document ${RATE_LIMIT_STORE_UNAVAILABLE_STATUS}`,
+      );
+    }
+  }
+
+  return issues;
+}
+
+function checkRateLimitContracts(report: Report): void {
+  report.errors.push(...findRateLimitContractIssues(API_ROUTES));
+  report.info.push(
+    `[rate-limit] checked ${API_ROUTES.length} route(s) for canonical distributed limits and 429/503 responses`,
+  );
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -474,8 +548,8 @@ async function main(): Promise<void> {
         "",
         "Deterministic, DB-free, network-free. Checks route<->contract",
         "inventory, docs coverage, param drift, deprecation header",
-        "consistency, generated example validity, and the CSV header",
-        "contract.",
+        "consistency, generated example validity, the CSV header contract,",
+        "and distributed rate-limit contracts.",
       ].join("\n"),
     );
     process.exit(0);
@@ -486,6 +560,7 @@ async function main(): Promise<void> {
   const report: Report = { errors: [], info: [] };
 
   assertNoDuplicateRegistryIds(report);
+  checkRateLimitContracts(report);
   await checkInventory(report);
   await checkDocsCoverage(report);
   await checkParamDrift(report);

@@ -1,4 +1,9 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+} from "@/lib/api/helpers";
 import { getCIByGovernmentTypeDots } from "@/lib/db/queries";
 import {
   getGovernmentTaxonomyGroupingKey,
@@ -34,27 +39,33 @@ export async function GET(request: Request) {
     taxonomyParam === "structural" || taxonomyParam === "regime"
       ? taxonomyParam
       : "raw";
-  const isDeprecatedTaxonomy = taxonomy === "structural" || taxonomy === "regime";
+  const isDeprecatedTaxonomy =
+    taxonomy === "structural" || taxonomy === "regime";
 
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const release = resolveCiRelease(
+      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
+    );
     const rows = await getCIByGovernmentTypeDots(quarter, release.releaseId);
-    const grouped = new Map<
-      string,
-      { label: string; scores: number[] }
-    >();
+    const grouped = new Map<string, { label: string; scores: number[] }>();
 
     for (const row of rows) {
       const label = row.governmentClassification
-        ? getGovernmentTaxonomyGroupingLabel(row.governmentClassification, taxonomy)
+        ? getGovernmentTaxonomyGroupingLabel(
+            row.governmentClassification,
+            taxonomy,
+          )
         : row.governmentType;
       const key = row.governmentClassification
-        ? getGovernmentTaxonomyGroupingKey(row.governmentClassification, taxonomy)
+        ? getGovernmentTaxonomyGroupingKey(
+            row.governmentClassification,
+            taxonomy,
+          )
         : row.governmentType;
       const bucket = grouped.get(key) ?? { label, scores: [] };
       bucket.scores.push(Number(row.score));
@@ -77,20 +88,35 @@ export async function GET(request: Request) {
           q3: quantile(scores, 0.75),
         });
       })
-      .sort((a, b) => b.avgScore - a.avgScore || a.governmentType.localeCompare(b.governmentType));
+      .sort(
+        (a, b) =>
+          b.avgScore - a.avgScore ||
+          a.governmentType.localeCompare(b.governmentType),
+      );
 
     const meta = isDeprecatedTaxonomy
-      ? { quarter: quarter ?? null, taxonomy, series: release.series, ...STRUCTURAL_FAMILY_DEPRECATION_META }
+      ? {
+          quarter: quarter ?? null,
+          taxonomy,
+          series: release.series,
+          ...STRUCTURAL_FAMILY_DEPRECATION_META,
+        }
       : { quarter: quarter ?? null, taxonomy, series: release.series };
 
     const response = apiResponse({ data, meta });
-    return withIndexDispositionDeprecation(isDeprecatedTaxonomy ? withStructuralFamilyDeprecation(response) : response);
+    return withIndexDispositionDeprecation(
+      isDeprecatedTaxonomy
+        ? withStructuralFamilyDeprecation(response)
+        : response,
+    );
   } catch (e) {
     console.error("API /v1/index/by-government-type error:", e);
     const response = apiError("Internal server error", 500);
-    return withIndexDispositionDeprecation(isDeprecatedTaxonomy
-      ? withStructuralFamilyDeprecation(response)
-      : response);
+    return withIndexDispositionDeprecation(
+      isDeprecatedTaxonomy
+        ? withStructuralFamilyDeprecation(response)
+        : response,
+    );
   }
 }
 

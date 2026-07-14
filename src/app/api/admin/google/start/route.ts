@@ -9,6 +9,11 @@
  */
 
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import {
+  checkRequestRateLimit,
+  rateLimitResponse,
+} from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import {
@@ -18,10 +23,25 @@ import {
   GOOGLE_REDIRECT_COOKIE,
 } from "@/lib/admin/google-oauth";
 
+const ADMIN_OAUTH_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
+  "admin-oauth-bootstrap",
+);
+
 export async function GET(request: NextRequest) {
   if (!isGoogleSignInConfigured()) {
     return new NextResponse("Google sign-in is not configured", {
       status: 500,
+    });
+  }
+
+  const rateLimit = await checkRequestRateLimit(
+    request,
+    ADMIN_OAUTH_RATE_LIMIT_POLICY,
+  );
+  if (rateLimit.status !== "allowed") {
+    return rateLimitResponse(rateLimit, ADMIN_OAUTH_RATE_LIMIT_POLICY, {
+      limitedMessage:
+        "Too many sign-in attempts. Please wait before trying again.",
     });
   }
 

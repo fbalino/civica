@@ -1,8 +1,11 @@
-import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
-import { checkDurableRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import {
+  checkRequestRateLimit,
+  rateLimitResponse,
+} from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import {
   ADVISORY_APPLICATION_LIMITS,
   ADVISORY_APPLICATION_POLICY_VERSION,
@@ -10,12 +13,15 @@ import {
   type AdvisoryApplicationInput,
 } from "@/lib/research/advisory-application";
 
-// Per-IP rate limit: max 5 applications per 30 minutes. Applications are a
-// deliberate, one-time act — a tighter window than the contact form's 5/10min.
-const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
+const ADVISORY_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
+  "advisory-application-form",
+);
 
-function json(body: unknown, status: number, headers: Record<string, string> = {}) {
+function json(
+  body: unknown,
+  status: number,
+  headers: Record<string, string> = {},
+) {
   return NextResponse.json(body, {
     status,
     headers: { "Cache-Control": "no-store", ...headers },
@@ -23,6 +29,16 @@ function json(body: unknown, status: number, headers: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkRequestRateLimit(
+    req,
+    ADVISORY_RATE_LIMIT_POLICY,
+  );
+  if (rateLimit.status !== "allowed") {
+    return rateLimitResponse(rateLimit, ADVISORY_RATE_LIMIT_POLICY, {
+      limitedMessage: "Too many applications. Please wait before trying again.",
+    });
+  }
+
   let raw = "";
   try {
     raw = await req.text();
@@ -36,7 +52,8 @@ export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
   try {
     const parsed = JSON.parse(raw) as unknown;
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("not an object");
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      throw new Error("not an object");
     body = parsed as Record<string, unknown>;
   } catch {
     return json({ error: "Invalid JSON body." }, 400);
@@ -48,7 +65,8 @@ export async function POST(req: NextRequest) {
     return json({ success: true, receipt: "onscreen-only" }, 201);
   }
 
-  const value = (key: string) => (typeof body[key] === "string" ? body[key] as string : "");
+  const value = (key: string) =>
+    typeof body[key] === "string" ? (body[key] as string) : "";
   const application: AdvisoryApplicationInput = {
     name: value("name"),
     email: value("email"),
@@ -58,27 +76,14 @@ export async function POST(req: NextRequest) {
     experience: value("experience"),
     links: value("links"),
     cvUrl: value("cvUrl"),
-    consent: body.consent === true && body.privacyNoticeVersion === ADVISORY_APPLICATION_POLICY_VERSION,
+    consent:
+      body.consent === true &&
+      body.privacyNoticeVersion === ADVISORY_APPLICATION_POLICY_VERSION,
   };
   const errors = validateAdvisoryApplication(application);
 
   if (Object.keys(errors).length > 0) {
     return json({ errors }, 422);
-  }
-
-  const ipKey = createHash("sha256").update(`advisory:${getRequestIp(req)}`).digest("hex");
-  const rateLimit = await checkDurableRateLimit({
-    scope: "advisory-applications",
-    key: ipKey,
-    limit: RATE_LIMIT_MAX,
-    windowMs: RATE_LIMIT_WINDOW_MS,
-  });
-  if (!rateLimit.allowed) {
-    return json(
-      { error: "Too many applications. Please wait before trying again." },
-      429,
-      { "Retry-After": String(Math.max(1, Math.ceil(rateLimit.retryAfterMs / 1000))) },
-    );
   }
 
   try {
@@ -96,7 +101,10 @@ export async function POST(req: NextRequest) {
       status: "new",
     });
   } catch {
-    return json({ error: "The application could not be stored. Please try again later." }, 503);
+    return json(
+      { error: "The application could not be stored. Please try again later." },
+      503,
+    );
   }
 
   // Notification: this mirrors the contact form exactly — no transactional

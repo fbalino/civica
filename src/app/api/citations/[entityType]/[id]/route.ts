@@ -11,7 +11,8 @@
  * contract doesn't allow.
  */
 import { NextResponse } from "next/server";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { ENTITY_CITATION_RESOLVERS } from "@/lib/citations/resolvers";
 import {
   ENTITY_ID_PATTERNS,
@@ -24,10 +25,10 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ entityType: string; id: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(request, {
-    scope: "entity-citation",
-    max: 120,
-  });
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const { entityType, id } = await params;

@@ -94,18 +94,14 @@ test("Neon HTTP paths use one atomic request and the legacy API cannot leak full
   assert.ok(
     query.indexOf("SET LOCAL statement_timeout") < query.indexOf("WITH q AS"),
   );
-  assert.ok(
-    query.indexOf("INSERT INTO rate_limits") < query.indexOf("WITH q AS"),
-  );
-  assert.match(query, /SELECT count <= \$\{rateLimit\.limit\}/);
-  assert.match(query, /await incrementSearchRateLimit\(/);
-  assert.doesNotMatch(apiRoute, /checkDurableRateLimit/);
-  assert.doesNotMatch(readerPage, /checkDurableRateLimit/);
+  assert.doesNotMatch(query, /rate_limits|incrementSearchRateLimit/);
+  assert.match(apiRoute, /checkRequestRateLimit\(request, RATE_LIMIT_POLICY\)/);
   assert.match(
-    apiRoute,
-    /searchConstitutionPassages\([\s\S]*scope: "constitution-search"/,
+    readerPage,
+    /checkRequestRateLimit\(request, RATE_LIMIT_POLICY\)/,
   );
-  assert.match(readerPage, /searchConstitutionPassages\(input, \{/);
+  assert.match(apiRoute, /getRequestRateLimitPolicy\("constitution-search"\)/);
+  assert.match(readerPage, /searchConstitutionPassages\(input\)/);
   assert.doesNotMatch(legacy, /fullTextHtml\s*:/);
   const migration = readFileSync(
     "drizzle/authoritative/0030_cute_namora.sql",

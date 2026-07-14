@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
-import { getJurisdictionBySlug, getGovernmentHierarchy } from "@/lib/db/queries";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import {
+  getJurisdictionBySlug,
+  getGovernmentHierarchy,
+} from "@/lib/db/queries";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(req, {
-    scope: "countries-structure",
-  });
+  const limited = await enforceRequestRateLimit(
+    req,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const { slug } = await params;

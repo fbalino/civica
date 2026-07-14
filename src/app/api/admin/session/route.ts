@@ -17,7 +17,10 @@
  * configuration, never from client input.
  */
 
-import { checkAdminLoginRateLimit } from "@/lib/admin/login-rate-limit";
+import {
+  ADMIN_LOGIN_RATE_LIMIT,
+  checkAdminLoginRateLimit,
+} from "@/lib/admin/login-rate-limit";
 import { withAdminLogout } from "@/lib/admin/logout";
 import { recordAdminLoginAudit } from "@/lib/admin/mutation-audit";
 import { verifyPassword } from "@/lib/admin/password";
@@ -28,6 +31,7 @@ import {
   verifyAdminUsername,
 } from "@/lib/admin/session";
 import { guardAdminMutationRequest } from "@/lib/api/admin-mutation-request-guard";
+import { rateLimitResponse } from "@/lib/api/rate-limit-request";
 import { NextRequest, NextResponse } from "next/server";
 
 /** True only when the owner account is fully configured. Fail closed
@@ -51,16 +55,9 @@ export async function POST(request: NextRequest) {
   // This delegates to the shared Postgres-backed atomic limiter, so the
   // attempt budget survives cold starts and is consistent across instances.
   const rateLimit = await checkAdminLoginRateLimit(request);
-  if (!rateLimit.allowed) {
-    return new NextResponse("Too many admin login attempts", {
-      status: 429,
-      headers: {
-        "Cache-Control": "no-store",
-        "Retry-After": String(
-          Math.max(1, Math.ceil(rateLimit.retryAfterMs / 1000)),
-        ),
-        "X-RateLimit-Remaining": "0",
-      },
+  if (rateLimit.status !== "allowed") {
+    return rateLimitResponse(rateLimit, ADMIN_LOGIN_RATE_LIMIT, {
+      limitedMessage: "Too many admin login attempts.",
     });
   }
 

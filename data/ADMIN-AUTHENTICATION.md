@@ -12,8 +12,13 @@ routes. Pulse-coding participant credentials have a separate lifecycle.
 Password sign-in requires both the exact configured `ADMIN_USERNAME` and the
 scrypt `ADMIN_PASSWORD_HASH`. Username comparison, cookie HMAC comparison, and
 password verification use timing-safe primitives. The password KDF still runs
-when the username is wrong, and the durable five-attempt/15-minute IP-bucket
-limit runs before body parsing or the KDF.
+when the username is wrong, and the durable five-attempt/15-minute
+client-identity bucket runs before body parsing or the KDF. The validated
+address is represented in PostgreSQL only by an HMAC-SHA-256 subject derived
+with the independent
+`RATE_LIMIT_KEY_SECRET`; a missing counter or production key fails closed with
+`503`. See [`data/RATE-LIMITING.md`](./RATE-LIMITING.md) for trusted Vercel
+headers, rotation, outage response, and post-deploy checks.
 
 Google sign-in is a second bootstrap path for the same owner identity. It
 requires the short-lived state cookie, a valid provider response, a verified

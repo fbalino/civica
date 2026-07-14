@@ -78,7 +78,7 @@ const CLEAN_TERMS_SOURCE = `
 `;
 
 const CLEAN_API_DOCS_SOURCE =
-  "The bulk export route is not currently rate-limited and does not send CORS headers.";
+  "The bulk export route is rate-limited by a shared PostgreSQL counter and does not send CORS headers.";
 const CLEAN_LICENSING_SOURCE =
   "Reuse rights are source-by-source. See /licensing#reuse for the boundary.";
 
@@ -111,7 +111,9 @@ test("clean fixture: all ten clauses present, findable, and uncontradicted -> 0 
 function stripClausePhrases(source: string, clause: TermsClause): string {
   let result = source;
   for (const pattern of clause.requiredPatterns) {
-    const flags = pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`;
+    const flags = pattern.flags.includes("g")
+      ? pattern.flags
+      : `${pattern.flags}g`;
     result = result.replace(new RegExp(pattern.source, flags), "[[removed]]");
   }
   return result;
@@ -146,7 +148,11 @@ function removeSection(source: string, anchor: string): string {
 test("embedding: removing its whole section is caught as a missing anchor", () => {
   const withoutEmbedding = removeSection(CLEAN_TERMS_SOURCE, "embedding");
   const issues = findMissingClauseAnchors(withoutEmbedding);
-  assert.ok(issues.some((i) => i.clauseId === "embedding" && i.code === "missing-clause-anchor"));
+  assert.ok(
+    issues.some(
+      (i) => i.clauseId === "embedding" && i.code === "missing-clause-anchor",
+    ),
+  );
 });
 
 test("downloads-reuse-rights: removing its whole section is caught as a missing anchor", () => {
@@ -154,14 +160,18 @@ test("downloads-reuse-rights: removing its whole section is caught as a missing 
   const issues = findMissingClauseAnchors(withoutDownloads);
   assert.ok(
     issues.some(
-      (i) => i.clauseId === "downloads-reuse-rights" && i.code === "missing-clause-anchor",
+      (i) =>
+        i.clauseId === "downloads-reuse-rights" &&
+        i.code === "missing-clause-anchor",
     ),
   );
 });
 
 test("removing the whole 'use' section flags every clause anchored there", () => {
   const withoutUse = removeSection(CLEAN_TERMS_SOURCE, "use");
-  const flagged = new Set(findMissingClauseAnchors(withoutUse).map((i) => i.clauseId));
+  const flagged = new Set(
+    findMissingClauseAnchors(withoutUse).map((i) => i.clauseId),
+  );
   assert.ok(flagged.has("acceptable-use"));
   assert.ok(flagged.has("rate-limits"));
   assert.ok(flagged.has("account-none"));
@@ -169,7 +179,9 @@ test("removing the whole 'use' section flags every clause anchored there", () =>
 
 test("removing the whole 'changes' section flags both clauses anchored there", () => {
   const withoutChanges = removeSection(CLEAN_TERMS_SOURCE, "changes");
-  const flagged = new Set(findMissingClauseAnchors(withoutChanges).map((i) => i.clauseId));
+  const flagged = new Set(
+    findMissingClauseAnchors(withoutChanges).map((i) => i.clauseId),
+  );
   assert.ok(flagged.has("governing-terms-change"));
   assert.ok(flagged.has("contact"));
 });
@@ -204,7 +216,9 @@ for (const clause of TERMS_CLAUSES) {
     const combined = `${CLEAN_TERMS_SOURCE}\n${contradiction}`;
     const issues = findContradictingClaims(combined);
     assert.ok(
-      issues.some((i) => i.clauseId === clause.id && i.code === "contradicting-claim"),
+      issues.some(
+        (i) => i.clauseId === clause.id && i.code === "contradicting-claim",
+      ),
     );
   });
 }
@@ -215,7 +229,28 @@ test("a contradiction planted only in apiDocsSource is still caught by the full 
     apiDocsSource: `${CLEAN_API_DOCS_SOURCE} You can embed a live score anywhere.`,
     licensingSource: CLEAN_LICENSING_SOURCE,
   });
-  assert.ok(issues.some((i) => i.clauseId === "embedding" && i.code === "contradicting-claim"));
+  assert.ok(
+    issues.some(
+      (i) => i.clauseId === "embedding" && i.code === "contradicting-claim",
+    ),
+  );
+});
+
+test("truthfully describing the export rate limit is allowed and denying it is caught", () => {
+  assert.deepStrictEqual(validateTermsConditions(cleanInput()), []);
+
+  const issues = validateTermsConditions({
+    ...cleanInput(),
+    apiDocsSource:
+      "The bulk export route is not currently rate-limited and does not send CORS headers.",
+  });
+  assert.ok(
+    issues.some(
+      (issue) =>
+        issue.clauseId === "rate-limits" &&
+        issue.code === "contradicting-claim",
+    ),
+  );
 });
 
 test("a contradiction planted only in licensingSource is still caught by the full validator", () => {
@@ -226,7 +261,9 @@ test("a contradiction planted only in licensingSource is still caught by the ful
   });
   assert.ok(
     issues.some(
-      (i) => i.clauseId === "downloads-reuse-rights" && i.code === "contradicting-claim",
+      (i) =>
+        i.clauseId === "downloads-reuse-rights" &&
+        i.code === "contradicting-claim",
     ),
   );
 });

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "civica-rate-limit-legacy-cleanup-evidence/v1",
+  "capturedAt": "2026-07-14T10:02:06Z",
+  "database": "configured production Neon database",
+  "inspection": "aggregate counts only; no counter key, client address, or secret was selected or retained",
+  "before": {
+    "totalRows": 194,
+    "expiredRows": 194,
+    "legacyRawIdentityFormatRows": 191,
+    "legacyUnkeyedDigestRows": 0
+  },
+  "operation": {
+    "kind": "expired-row cleanup",
+    "predicate": "expires_at <= statement_timestamp()",
+    "deletedRows": 194,
+    "matchesDocumentedApplicationCleanup": true
+  },
+  "after": {
+    "totalRows": 0,
+    "expiredRows": 0,
+    "legacyRawIdentityFormatRows": 0
+  },
+  "forwardProtection": "The shared increment statement now removes expired rows deterministically before writing an HMAC-only subject key."
+}

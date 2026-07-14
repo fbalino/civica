@@ -142,6 +142,33 @@ at the end.
 - **Recovery verification:** the fact resolves to the corrected value on the
   country page and export; `validate:release-quality` clean.
 
+## 8. Rate-limit counter or edge-control incident
+
+- **Detection:** protected routes return `503` with
+  `RATE_LIMIT_UNAVAILABLE`, 429s change unexpectedly, the `rate_limits` table
+  accumulates expired rows, or Vercel reports that the checked all-path
+  firewall rule is inactive or has unpublished changes.
+- **Containment:** keep the verified Vercel WAF rule active and leave dynamic
+  paid/auth/form/export routes fail-closed. Do not restore the legacy
+  process-local limiter and do not bypass the shared counter merely to turn a
+  503 into a 200.
+- **Owner:** Fernando.
+- **Rollback/correction:** restore Neon connectivity or the production
+  `RATE_LIMIT_KEY_SECRET` (minimum 32 bytes, independent of admin/provider
+  secrets), then redeploy. If the key may have leaked, rotate it with
+  `openssl rand -hex 32`; rotation intentionally gives clients fresh budgets.
+  Restore the checked WAF state through Vercel and publish any pending draft.
+- **User communication:** if the database counter outage is sustained, mark
+  affected dynamic APIs/forms unavailable on the status page. Describe it as a
+  protection dependency outage, not as clients exhausting their quotas.
+- **Evidence preservation:** retain deployment IDs, bounded timestamps, Neon
+  error categories, Firewall rule metadata, and the checked evidence at
+  `plan/evidence/PLT-011/vercel-firewall-live.json`. Never retain raw client
+  IPs, counter-key secrets, or complete credentials.
+- **Recovery verification:** follow the spoofing, multi-instance, 429/503, and
+  WAF checks in [`data/RATE-LIMITING.md`](./RATE-LIMITING.md), then run
+  `npm run validate:rate-limit-policy`.
+
 ---
 
 ## Tabletop review (2026-07-12) — recorded gaps

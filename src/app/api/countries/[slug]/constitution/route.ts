@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import { getJurisdictionBySlug, getConstitution } from "@/lib/db/queries";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(req, {
-    scope: "countries-constitution",
-  });
+  const limited = await enforceRequestRateLimit(
+    req,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const { slug } = await params;

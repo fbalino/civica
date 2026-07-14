@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { bills as billsTable, governmentBodies, sources } from "@/lib/db/schema";
+import {
+  bills as billsTable,
+  governmentBodies,
+  sources,
+} from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
@@ -33,7 +38,10 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(req, { scope: "countries-bills" });
+  const limited = await enforceRequestRateLimit(
+    req,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const { slug } = await params;
@@ -57,10 +65,7 @@ export async function GET(
         .from(sources)
         .where(inArray(sources.id, sourceIds));
       for (const r of rows) {
-        sourceMap.set(
-          r.id,
-          r.lastSyncAt ? r.lastSyncAt.toISOString() : null,
-        );
+        sourceMap.set(r.id, r.lastSyncAt ? r.lastSyncAt.toISOString() : null);
       }
     } catch {
       /* sources table read is best-effort */
@@ -70,9 +75,14 @@ export async function GET(
   // Chamber — `bodyId` FK into `government_bodies`, populated for the
   // DE/FR/BR/CA adapters only (see coverage.ts / ATL-013 evidence doc).
   const bodyIds = Array.from(
-    new Set(result.rows.map((b) => b.bodyId).filter((id): id is string => !!id)),
+    new Set(
+      result.rows.map((b) => b.bodyId).filter((id): id is string => !!id),
+    ),
   );
-  const bodyMap = new Map<string, { name: string; chamberType: string | null }>();
+  const bodyMap = new Map<
+    string,
+    { name: string; chamberType: string | null }
+  >();
   if (bodyIds.length > 0) {
     try {
       const bodyRows = await db
@@ -138,9 +148,7 @@ export async function GET(
     supported,
     supportedJurisdictions: BILLS_SUPPORTED_JURISDICTION_NAMES,
     totalTrackedForJurisdiction: totalCount,
-    message: supported
-      ? null
-      : billsCoverageMessage(result.jurisdiction.name),
+    message: supported ? null : billsCoverageMessage(result.jurisdiction.name),
   };
 
   return NextResponse.json({

@@ -74,7 +74,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ code: string }> },
 ) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
@@ -218,7 +218,9 @@ export async function GET(
       population:
         popResolver.numeric != null
           ? Math.round(popResolver.numeric)
-          : (liveFallback ? country.population : null),
+          : liveFallback
+            ? country.population
+            : null,
       gdpBillions:
         gdpResolver.numeric ?? (liveFallback ? country.gdpBillions : null),
       areaSqKm:

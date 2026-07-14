@@ -10,6 +10,11 @@
  */
 
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import {
+  checkRequestRateLimit,
+  rateLimitResponse,
+} from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
@@ -26,6 +31,10 @@ import {
 } from "@/lib/admin/session";
 import { recordAdminLoginAudit } from "@/lib/admin/mutation-audit";
 
+const ADMIN_OAUTH_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
+  "admin-oauth-bootstrap",
+);
+
 function clearOAuthCookieHeaders(): Array<[string, string]> {
   return [
     ["Set-Cookie", `${GOOGLE_STATE_COOKIE}=; Path=/; HttpOnly; Max-Age=0`],
@@ -38,6 +47,17 @@ export async function GET(request: NextRequest) {
 
   if (!isGoogleSignInConfigured() || !isAdminSessionConfigured()) {
     return NextResponse.redirect(failUrl, 303);
+  }
+
+  const rateLimit = await checkRequestRateLimit(
+    request,
+    ADMIN_OAUTH_RATE_LIMIT_POLICY,
+  );
+  if (rateLimit.status !== "allowed") {
+    return rateLimitResponse(rateLimit, ADMIN_OAUTH_RATE_LIMIT_POLICY, {
+      limitedMessage:
+        "Too many sign-in attempts. Please wait before trying again.",
+    });
   }
 
   const cookieJar = await cookies();

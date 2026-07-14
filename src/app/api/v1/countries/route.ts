@@ -211,7 +211,7 @@ function buildPeerLensCondition(
 }
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {

@@ -19,14 +19,16 @@ import { getJurisdictionsBySlugs } from "@/lib/db/queries";
 import { getTopicExcerpts } from "@/lib/db/queries-constitution";
 import { getTopicLabel, isKnownTopic } from "@/lib/constitute/topics";
 import { parseCountrySlugs } from "@/lib/constitution/slugs";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
 export const revalidate = 3600;
 
 export async function GET(request: Request) {
-  const limited = enforceInMemoryRateLimit(request, {
-    scope: "constitution-excerpts",
-  });
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const url = new URL(request.url);

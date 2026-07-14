@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "civica-rate-limit-environment-evidence/v1",
+  "capturedAt": "2026-07-14T09:55:57Z",
+  "projectName": "civica",
+  "projectId": "prj_R9vTWWG1suzmXS0uh1MOcFm1rqLW",
+  "command": "vercel env ls production",
+  "variable": "RATE_LIMIT_KEY_SECRET",
+  "production": {
+    "present": true,
+    "encrypted": true
+  },
+  "preview": {
+    "present": false,
+    "note": "No remote Git branch existed for the attempted branch-scoped Preview configuration. Configure Preview after the branch exists; no preview deployment was created for PLT-011."
+  },
+  "secretValueRetained": false
+}

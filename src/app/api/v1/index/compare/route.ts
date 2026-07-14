@@ -1,6 +1,15 @@
-import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+  CI_METHODOLOGY_META,
+} from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
-import { displayCiReleaseDimensionScore, resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  displayCiReleaseDimensionScore,
+  resolveCiRelease,
+} from "@/lib/ci/release-selection";
 import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
@@ -12,7 +21,7 @@ import {
 import { shapeIndexCompareResult } from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
@@ -21,13 +30,19 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const slugsParam = url.searchParams.getAll("slug");
     const quarter = url.searchParams.get("quarter") ?? undefined;
-    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const release = resolveCiRelease(
+      url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID,
+    );
 
     if (slugsParam.length === 0) {
-      return withIndexDispositionDeprecation(apiError("At least one `slug` query parameter is required", 400));
+      return withIndexDispositionDeprecation(
+        apiError("At least one `slug` query parameter is required", 400),
+      );
     }
     if (slugsParam.length > 10) {
-      return withIndexDispositionDeprecation(apiError("Maximum 10 countries per comparison", 400));
+      return withIndexDispositionDeprecation(
+        apiError("Maximum 10 countries per comparison", 400),
+      );
     }
 
     const slugs = slugsParam.map((s) => s.toLowerCase());
@@ -63,25 +78,26 @@ export async function GET(request: Request) {
           ? (() => {
               const completeness = parsePublishedCiCompleteness(row.composite);
               return {
-              quarter: row.composite.quarter,
-              vintageLabel: row.composite.vintageLabel,
-              score: row.composite.score,
-              scoreLower: row.composite.scoreLower,
-              scoreUpper: row.composite.scoreUpper,
-              completenessFlag: completeness.completenessFlag,
-              rank: row.composite.rank,
-              totalRanked: row.composite.totalRanked,
-              isPartial: row.composite.isPartial,
-              missingDimensions: completeness.missingDimensions,
-              dimensionsAvailable: completeness.dimensionsAvailable,
-              methodologyVersion: row.composite.methodologyVersion,
+                quarter: row.composite.quarter,
+                vintageLabel: row.composite.vintageLabel,
+                score: row.composite.score,
+                scoreLower: row.composite.scoreLower,
+                scoreUpper: row.composite.scoreUpper,
+                completenessFlag: completeness.completenessFlag,
+                rank: row.composite.rank,
+                totalRanked: row.composite.totalRanked,
+                isPartial: row.composite.isPartial,
+                missingDimensions: completeness.missingDimensions,
+                dimensionsAvailable: completeness.dimensionsAvailable,
+                methodologyVersion: row.composite.methodologyVersion,
               };
             })()
           : null,
         dimensions: row.dimensions.map((d) => ({
           dimension: d.dimension,
           normalizedScore:
-            displayCiReleaseDimensionScore(d, release.releaseId) ?? d.normalizedScore,
+            displayCiReleaseDimensionScore(d, release.releaseId) ??
+            d.normalizedScore,
           rawValue: d.rawValue,
           sourceId: d.sourceId,
           valueStatus: "observed" as const,
@@ -93,21 +109,25 @@ export async function GET(request: Request) {
     // `structuralFamily` / `structuralSubtype` fields — attach the same
     // sunset signal the other structural surfaces use (rankings, countries,
     // index/[slug]).
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-      apiResponse({
-        data: results,
-        meta: {
-          quarter: quarter ?? null,
-          count: results.length,
-          methodology: CI_METHODOLOGY_META,
-          series: release.series,
-          ...STRUCTURAL_FAMILY_DEPRECATION_META,
-        },
-      }),
-    ));
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(
+        apiResponse({
+          data: results,
+          meta: {
+            quarter: quarter ?? null,
+            count: results.length,
+            methodology: CI_METHODOLOGY_META,
+            series: release.series,
+            ...STRUCTURAL_FAMILY_DEPRECATION_META,
+          },
+        }),
+      ),
+    );
   } catch (e) {
     console.error("API /v1/index/compare error:", e);
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
+    );
   }
 }
 

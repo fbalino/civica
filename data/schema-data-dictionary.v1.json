@@ -30637,13 +30637,13 @@
     {
       "name": "rate_limits",
       "exportName": "rateLimits",
-      "definition": "Operational request counters used to enforce API limits.",
-      "rowGrain": "One rate-limit key and time window.",
+      "definition": "Shared fixed-window request counters used for fail-closed rate-limit enforcement across application instances.",
+      "rowGrain": "One policy scope, opaque HMAC subject digest, and database-derived window start encoded together in the primary key.",
       "releaseScope": "internal_operational",
-      "sourceOrDerivation": "Generated from application request traffic.",
-      "cadence": "Per request with expiry/cleanup by window.",
-      "vintageSemantics": "window_start identifies the current operational counting interval.",
-      "rights": "Internal security/operations data; excluded from public release.",
+      "sourceOrDerivation": "Generated from protected request traffic after the trusted request identity is converted to an opaque HMAC digest; the database clock derives the window and expiry, so no raw request identity is stored.",
+      "cadence": "Each protected request atomically removes expired rows through the expires_at index and increments its current window, with the count saturated at the policy limit plus one.",
+      "vintageSemantics": "The database-derived window start is encoded in key and expires_at records its end; neither field represents source-data vintage.",
+      "rights": "Internal security/operations data containing no raw request identity; excluded from public release.",
       "deprecation": {
         "status": "active"
       },
@@ -30651,7 +30651,7 @@
         {
           "name": "count",
           "propertyName": "count",
-          "definition": "Count recorded for the rate-limit key and time window.",
+          "definition": "Count recorded for the policy scope, opaque HMAC subject digest, and database-derived window start encoded together in the primary key.",
           "sqlType": "integer",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -30665,10 +30665,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Generated from application request traffic.",
-          "cadence": "Per request with expiry/cleanup by window.",
-          "vintageSemantics": "window_start identifies the current operational counting interval.",
-          "rights": "Internal security/operations data; excluded from public release.",
+          "sourceOrDerivation": "Generated from protected request traffic after the trusted request identity is converted to an opaque HMAC digest; the database clock derives the window and expiry, so no raw request identity is stored.",
+          "cadence": "Each protected request atomically removes expired rows through the expires_at index and increments its current window, with the count saturated at the policy limit plus one.",
+          "vintageSemantics": "The database-derived window start is encoded in key and expires_at records its end; neither field represents source-data vintage.",
+          "rights": "Internal security/operations data containing no raw request identity; excluded from public release.",
           "deprecation": {
             "status": "active"
           }
@@ -30676,7 +30676,7 @@
         {
           "name": "expires_at",
           "propertyName": "expiresAt",
-          "definition": "Expires at recorded for the rate-limit key and time window.",
+          "definition": "Expires at recorded for the policy scope, opaque HMAC subject digest, and database-derived window start encoded together in the primary key.",
           "sqlType": "timestamp with time zone",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -30692,10 +30692,10 @@
             ],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated from application request traffic.",
-          "cadence": "Per request with expiry/cleanup by window.",
-          "vintageSemantics": "Expires at follows this table contract. window_start identifies the current operational counting interval.",
-          "rights": "Internal security/operations data; excluded from public release.",
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated from protected request traffic after the trusted request identity is converted to an opaque HMAC digest; the database clock derives the window and expiry, so no raw request identity is stored.",
+          "cadence": "Each protected request atomically removes expired rows through the expires_at index and increments its current window, with the count saturated at the policy limit plus one.",
+          "vintageSemantics": "Expires at follows this table contract. The database-derived window start is encoded in key and expires_at records its end; neither field represents source-data vintage.",
+          "rights": "Internal security/operations data containing no raw request identity; excluded from public release.",
           "deprecation": {
             "status": "active"
           }
@@ -30703,7 +30703,7 @@
         {
           "name": "key",
           "propertyName": "key",
-          "definition": "Key recorded for the rate-limit key and time window.",
+          "definition": "Key recorded for the policy scope, opaque HMAC subject digest, and database-derived window start encoded together in the primary key.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -30717,10 +30717,10 @@
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Generated from application request traffic.",
-          "cadence": "Per request with expiry/cleanup by window.",
-          "vintageSemantics": "window_start identifies the current operational counting interval.",
-          "rights": "Internal security/operations data; excluded from public release.",
+          "sourceOrDerivation": "Generated from protected request traffic after the trusted request identity is converted to an opaque HMAC digest; the database clock derives the window and expiry, so no raw request identity is stored.",
+          "cadence": "Each protected request atomically removes expired rows through the expires_at index and increments its current window, with the count saturated at the policy limit plus one.",
+          "vintageSemantics": "The database-derived window start is encoded in key and expires_at records its end; neither field represents source-data vintage.",
+          "rights": "Internal security/operations data containing no raw request identity; excluded from public release.",
           "deprecation": {
             "status": "active"
           }

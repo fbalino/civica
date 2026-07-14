@@ -109,6 +109,16 @@ export const ENV_CONTRACT: EnvVarSpec[] = [
     validate: nonEmpty,
   },
   {
+    name: "RATE_LIMIT_KEY_SECRET",
+    requiredIn: ["production"],
+    secret: true,
+    note: "Independent HMAC key that obscures client identities in distributed rate-limit counters.",
+    validate: (value) =>
+      new TextEncoder().encode(value.trim()).byteLength >= 32
+        ? null
+        : "must be at least 32 bytes",
+  },
+  {
     name: "ANTHROPIC_API_KEY_CHAT",
     requiredIn: ["chat"],
     secret: true,
@@ -208,6 +218,18 @@ export function checkEnv(
       const reason = spec.validate(value);
       if (reason) invalid.push(`${spec.name} (${reason})`);
     }
+  }
+  const rateLimitKeySecret = env.RATE_LIMIT_KEY_SECRET?.trim();
+  const adminSessionSecret = env.ADMIN_SESSION_SECRET?.trim();
+  if (
+    context === "production" &&
+    rateLimitKeySecret &&
+    adminSessionSecret &&
+    rateLimitKeySecret === adminSessionSecret
+  ) {
+    invalid.push(
+      "RATE_LIMIT_KEY_SECRET (must differ from ADMIN_SESSION_SECRET)",
+    );
   }
   const degradedOff = ENV_DEGRADES.filter(
     (d) => !env[d.name] || env[d.name]!.trim() === "",

@@ -1240,14 +1240,19 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     deprecation: active,
   },
   rate_limits: {
-    definition: "Operational request counters used to enforce API limits.",
-    rowGrain: "One rate-limit key and time window.",
+    definition:
+      "Shared fixed-window request counters used for fail-closed rate-limit enforcement across application instances.",
+    rowGrain:
+      "One policy scope, opaque HMAC subject digest, and database-derived window start encoded together in the primary key.",
     releaseScope: "internal_operational",
-    sourceOrDerivation: "Generated from application request traffic.",
-    cadence: "Per request with expiry/cleanup by window.",
+    sourceOrDerivation:
+      "Generated from protected request traffic after the trusted request identity is converted to an opaque HMAC digest; the database clock derives the window and expiry, so no raw request identity is stored.",
+    cadence:
+      "Each protected request atomically removes expired rows through the expires_at index and increments its current window, with the count saturated at the policy limit plus one.",
     vintageSemantics:
-      "window_start identifies the current operational counting interval.",
-    rights: "Internal security/operations data; excluded from public release.",
+      "The database-derived window start is encoded in key and expires_at records its end; neither field represents source-data vintage.",
+    rights:
+      "Internal security/operations data containing no raw request identity; excluded from public release.",
     deprecation: active,
   },
 };

@@ -13,7 +13,12 @@
  *   Plan:    ~/civica/plan/structural-family-removal-implementation-plan.md §B-Phase 4
  */
 
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+} from "@/lib/api/helpers";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { STRUCTURAL_GOVERNMENT_TYPES } from "@/lib/data/structural-government-types";
 import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
@@ -23,7 +28,7 @@ import {
 } from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
@@ -55,7 +60,9 @@ export async function GET(request: Request) {
     );
   } catch (e) {
     console.error("API /v1/government-types error:", e);
-    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
+    return withStructuralFamilyDeprecation(
+      apiError("Internal server error", 500),
+    );
   }
 }
 

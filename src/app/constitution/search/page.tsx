@@ -18,7 +18,8 @@ import {
   type ConstitutionSearchResponse,
 } from "@/lib/constitution/search-contract";
 import { withOg } from "@/lib/og";
-import { getRequestIp } from "@/lib/api/request-ip";
+import { checkRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
 export const metadata: Metadata = {
   title: "Search constitutional text",
@@ -32,6 +33,8 @@ export const metadata: Metadata = {
     url: "https://civicaatlas.org/constitution/search",
   }),
 };
+
+const RATE_LIMIT_POLICY = getRequestRateLimitPolicy("constitution-search");
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -72,12 +75,22 @@ export default async function ConstitutionSearchPage({
       headers: requestHeaders,
     });
     try {
-      response = await searchConstitutionPassages(input, {
-        scope: "constitution-search",
-        key: getRequestIp(request),
-        limit: 30,
-        windowMs: 60_000,
-      });
+      const rateLimit = await checkRequestRateLimit(request, RATE_LIMIT_POLICY);
+      if (rateLimit.status !== "allowed") {
+        error = {
+          schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
+          error:
+            rateLimit.status === "limited"
+              ? "rate_limited"
+              : "data_unavailable",
+          message:
+            rateLimit.status === "limited"
+              ? "Rate limit exceeded. Try again shortly."
+              : "Request protection is temporarily unavailable.",
+        };
+      } else {
+        response = await searchConstitutionPassages(input);
+      }
     } catch (caught) {
       const known =
         caught instanceof ConstitutionSearchQueryError ? caught : null;

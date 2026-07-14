@@ -19,9 +19,9 @@ import { shapePulseEventsData } from "@/lib/api/contract/shapes";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ country_slug: string }> }
+  { params }: { params: Promise<{ country_slug: string }> },
 ) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
 
   try {

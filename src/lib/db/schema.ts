@@ -3996,33 +3996,33 @@ export const cronJobAttempts = pgTable(
 // --- Durable (cross-instance) rate limiter ---
 
 /**
- * Fixed-window rate-limit counters, backed by the existing Neon
- * Postgres so a per-IP limit survives serverless cold starts and
- * coordinates across instances (the in-memory limiter in
- * `src/lib/api/rate-limit.ts` cannot — audit 2026-06-07 Security #9).
+ * Shared fixed-window counters for fail-closed request protection across
+ * application instances. One row represents a scope, an opaque HMAC subject
+ * digest, and a database-derived window start, encoded together in the primary
+ * `key` as `${scope}:${subjectHash}:${windowStartMs}`. Raw request identities
+ * never cross the durable-store boundary or reach this table.
  *
- * One row per (scope, key, window-start). The window start is baked
- * into the primary `key` (e.g. `chat-durable:1.2.3.4:1717848000000`)
- * so a new window opens a fresh row at count 1; the previous row goes
- * stale and is reaped opportunistically via the `expires_at` index.
- * No row is ever read to decide allow/deny — the count is incremented
- * and returned atomically by a single `INSERT … ON CONFLICT DO UPDATE
- * … RETURNING count`.
+ * The durable limiter uses one atomic `INSERT … ON CONFLICT DO UPDATE …
+ * RETURNING count`. Database time selects the window and expiry, and the count
+ * saturates at the applicable policy limit plus one. The same statement uses
+ * the `expires_at` index to remove expired windows before incrementing; any
+ * statement failure denies the protected request instead of bypassing the
+ * shared counter.
  *
- * Purely operational/ephemeral: holds no provenance and no user data
- * beyond the request IP for the duration of one window. Safe to
- * truncate at any time (worst case: counters reset for the current
- * window). Written ONLY by `checkDurableRateLimit()`.
+ * This is internal, ephemeral security state with no provenance payload.
+ * Deleting or truncating rows resets active budgets and is not safe while the
+ * protection is expected to remain enforced. Written only through the durable
+ * rate-limit store used by `checkDurableRateLimit()`; store failures deny the
+ * protected request rather than falling back to an in-process counter.
  */
 export const rateLimits = pgTable(
   "rate_limits",
   {
-    /** `${scope}:${key}:${windowStartMs}` — encodes the window. */
+    /** `${scope}:${subjectHash}:${windowStartMs}`; subjectHash is an opaque HMAC digest and the window start comes from database time. */
     key: text("key").primaryKey(),
-    /** Requests seen in this window so far. */
+    /** Requests observed in the window, saturated at the policy limit plus one. */
     count: integer("count").notNull().default(0),
-    /** Wall-clock end of the window (windowStart + windowMs). Only
-     *  used by the lazy reaper; never consulted on the hot path. */
+    /** Database-derived window end used by the increment statement's indexed expiry cleanup, not a separate allow/deny read. */
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (table) => [index("idx_rate_limits_expires_at").on(table.expiresAt)],

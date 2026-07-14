@@ -1,10 +1,24 @@
 import { NextResponse } from "next/server";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { buildGovernanceEvidenceExport } from "@/lib/ci/governance-evidence";
-import { GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES, GOVERNANCE_EVIDENCE_SERIES } from "@/lib/ci/governance-evidence";
+import {
+  GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES,
+  GOVERNANCE_EVIDENCE_SERIES,
+} from "@/lib/ci/governance-evidence";
 import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 import { normalizeCiSeriesType } from "@/lib/ci/series-provenance";
 
-export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-export"),
+  );
+  if (limited) return limited;
+
   const { slug } = await params;
   const requested = new URL(request.url).searchParams.get("series_type");
   let seriesType = GOVERNANCE_EVIDENCE_SERIES.seriesType;
@@ -12,15 +26,24 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     try {
       seriesType = normalizeCiSeriesType(requested);
     } catch {
-      return NextResponse.json({ error: "Unknown series_type", allowed: ["as_published_release", "harmonized_backcast"] }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Unknown series_type",
+          allowed: ["as_published_release", "harmonized_backcast"],
+        },
+        { status: 400 },
+      );
     }
   }
   if (!GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES.includes(seriesType)) {
-    return NextResponse.json({
-      error: "That series type has no Governance Evidence release",
-      requestedSeriesType: seriesType,
-      availableSeriesTypes: GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES,
-    }, { status: 404 });
+    return NextResponse.json(
+      {
+        error: "That series type has no Governance Evidence release",
+        requestedSeriesType: seriesType,
+        availableSeriesTypes: GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES,
+      },
+      { status: 404 },
+    );
   }
   const evidence = await getGovernanceEvidence(slug, seriesType);
 

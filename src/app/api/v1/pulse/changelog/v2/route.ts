@@ -26,18 +26,18 @@ import { PULSE_DIMENSIONS } from "@/lib/pulse/v2/types";
 import { shapePulseChangelogRow } from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
 
   try {
     const url = new URL(request.url);
     const limit = Math.min(
       Math.max(parseInt(url.searchParams.get("limit") ?? "50", 10) || 50, 1),
-      250
+      250,
     );
     const offset = Math.max(
       parseInt(url.searchParams.get("offset") ?? "0", 10) || 0,
-      0
+      0,
     );
 
     const dimensionRaw = url.searchParams.get("dimension");

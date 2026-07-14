@@ -1,10 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import {
-  checkDurableRateLimit,
-  checkInMemoryRateLimit,
-  getRequestIp,
-} from "@/lib/api/rate-limit";
+  checkRequestRateLimit,
+  rateLimitResponse,
+} from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 
@@ -12,9 +12,8 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 // /api/chat is a PUBLIC, unauthenticated endpoint that calls a paid Anthropic
 // model. Per the 2026-06-07 deep audit (Security #1), it previously had no
 // rate limit and no input-size cap, leaving the Anthropic budget open to a
-// curl loop (financial DoS). We bound abuse without harming a single
-// interactive reader by applying two per-IP windows via the shared in-memory
-// limiter, and by hard-capping the request payload BEFORE the model is called.
+// curl loop (financial DoS). Two shared Postgres windows run before body
+// parsing or model work, and the request payload is hard-capped before use.
 //
 // Burst window — 15 requests / 60s per IP. A human chatting interactively
 // sends at most a few messages per minute (each reply streams for several
@@ -25,20 +24,10 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 // time (≈100 completions/hr/IP worst case instead of the ≈900 the minute cap
 // alone would allow) and is still far above any real reading session.
 //
-// Two-layer enforcement (audit Security #9). The in-memory checks above are
-// per-serverless-instance: fast, free, and a good first-line pre-filter, but
-// they reset on cold start and a flood spread across instances can evade them.
-// We therefore mirror BOTH windows in a durable, cross-instance limiter backed
-// by Neon Postgres (`checkDurableRateLimit`), keyed by IP. A single normal
-// reader (well under 15/min and 100/hr) passes every layer unchanged; an
-// abuser is held to the same 15/min + 100/hr cross ALL instances, capping
-// worst-case Anthropic spend per IP regardless of how the load is distributed.
-// If the limiter's DB has a blip, the durable check degrades to the in-memory
-// limiter internally, so a database hiccup never fails a legitimate request.
-const BURST_MAX = 15;
-const BURST_WINDOW_MS = 60_000;
-const HOURLY_MAX = 100;
-const HOURLY_WINDOW_MS = 60 * 60 * 1000;
+// Both budgets are durable across instances. A limiter/configuration outage is
+// an honest fail-closed 503; it never silently becomes a process-local budget.
+const CHAT_BURST_POLICY = getRequestRateLimitPolicy("chat-burst");
+const CHAT_SUSTAINED_POLICY = getRequestRateLimitPolicy("chat-sustained");
 
 // Input bounds — reject oversized / malformed payloads before any model call.
 const MAX_BODY_CHARS = 16_384; // raw request body ceiling (~360 party rows)
@@ -68,66 +57,27 @@ function jsonError(
 ) {
   return new Response(JSON.stringify({ error: message }), {
     status,
-    headers: { "Content-Type": "application/json; charset=utf-8", ...extraHeaders },
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...extraHeaders,
+    },
   });
 }
 
 export async function POST(req: NextRequest) {
-  // 1) Per-IP rate limiting BEFORE parsing or any model call. Two windows:
-  //    a short burst cap and a sustained hourly cap.
-  const ip = getRequestIp(req);
-
-  const burst = checkInMemoryRateLimit({
-    scope: "chat",
-    key: ip,
-    max: BURST_MAX,
-    windowMs: BURST_WINDOW_MS,
-  });
-  if (!burst.allowed) {
-    return jsonError("Too many requests. Please wait a moment and try again.", 429, {
-      "Retry-After": String(burst.retryAfterSeconds),
+  // 1) Shared limits run BEFORE parsing or any model call. The response helper
+  //    distinguishes an exhausted budget (429) from protection outage (503).
+  const burst = await checkRequestRateLimit(req, CHAT_BURST_POLICY);
+  if (burst.status !== "allowed") {
+    return rateLimitResponse(burst, CHAT_BURST_POLICY, {
+      limitedMessage: "Too many requests. Please wait a moment and try again.",
     });
   }
 
-  const hourly = checkInMemoryRateLimit({
-    scope: "chat-hourly",
-    key: ip,
-    max: HOURLY_MAX,
-    windowMs: HOURLY_WINDOW_MS,
-  });
-  if (!hourly.allowed) {
-    return jsonError("Hourly chat limit reached. Please try again later.", 429, {
-      "Retry-After": String(hourly.retryAfterSeconds),
-    });
-  }
-
-  // 1b) Durable, cross-instance enforcement of the SAME two windows. The
-  //     in-memory checks above are per-instance; these mirror them in Neon
-  //     Postgres so a flood distributed across serverless instances is still
-  //     held to 15/min + 100/hr per IP. On a DB blip these degrade to the
-  //     in-memory limiter internally (they never throw), so a hiccup can't
-  //     fail a legitimate request.
-  const durableBurst = await checkDurableRateLimit({
-    scope: "chat-durable",
-    key: ip,
-    limit: BURST_MAX,
-    windowMs: BURST_WINDOW_MS,
-  });
-  if (!durableBurst.allowed) {
-    return jsonError("Too many requests. Please wait a moment and try again.", 429, {
-      "Retry-After": String(Math.max(1, Math.ceil(durableBurst.retryAfterMs / 1000))),
-    });
-  }
-
-  const durableHourly = await checkDurableRateLimit({
-    scope: "chat-durable-hourly",
-    key: ip,
-    limit: HOURLY_MAX,
-    windowMs: HOURLY_WINDOW_MS,
-  });
-  if (!durableHourly.allowed) {
-    return jsonError("Hourly chat limit reached. Please try again later.", 429, {
-      "Retry-After": String(Math.max(1, Math.ceil(durableHourly.retryAfterMs / 1000))),
+  const sustained = await checkRequestRateLimit(req, CHAT_SUSTAINED_POLICY);
+  if (sustained.status !== "allowed") {
+    return rateLimitResponse(sustained, CHAT_SUSTAINED_POLICY, {
+      limitedMessage: "Hourly chat limit reached. Please try again later.",
     });
   }
 
@@ -153,7 +103,10 @@ export async function POST(req: NextRequest) {
     return jsonError("Invalid request body.", 400);
   }
 
-  const { message, context } = parsed as { message?: unknown; context?: unknown };
+  const { message, context } = parsed as {
+    message?: unknown;
+    context?: unknown;
+  };
 
   // 4) Validate + bound the user message.
   if (typeof message !== "string" || message.trim().length === 0) {
@@ -171,9 +124,9 @@ export async function POST(req: NextRequest) {
   //    untrusted (audit Security #11): clamp every string, coerce types, and
   //    cap the parties array so an attacker cannot inflate the system prompt.
   //    This bounds prompt size; it is not an integrity guarantee.
-  const ctx = (typeof context === "object" && context !== null
-    ? context
-    : {}) as Record<string, unknown>;
+  const ctx = (
+    typeof context === "object" && context !== null ? context : {}
+  ) as Record<string, unknown>;
   const clampStr = (v: unknown, max = MAX_CONTEXT_STR_LEN) =>
     typeof v === "string" ? v.slice(0, max) : "";
 
@@ -189,9 +142,10 @@ export async function POST(req: NextRequest) {
     parties = ctx.parties
       .slice(0, MAX_PARTIES)
       .map((p) => {
-        const party = (typeof p === "object" && p !== null
-          ? p
-          : {}) as Record<string, unknown>;
+        const party = (typeof p === "object" && p !== null ? p : {}) as Record<
+          string,
+          unknown
+        >;
         const name = clampStr(party.name, MAX_PARTY_NAME_LEN);
         const seatsNum = Number(party.seats);
         const seats = Number.isFinite(seatsNum) ? Math.trunc(seatsNum) : 0;

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
-import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import {
+  checkRequestRateLimit,
+  rateLimitResponse,
+} from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { getRequestIp } from "@/lib/api/request-ip";
 
-// Per-IP rate limit: max 5 submissions per 10 minutes
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
+const CONTACT_RATE_LIMIT_POLICY = getRequestRateLimitPolicy("contact-form");
 
 const MAX_NAME_LEN = 100;
 const MAX_EMAIL_LEN = 254;
@@ -19,25 +22,26 @@ function isValidEmail(email: string): boolean {
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
-    headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
   });
 }
 
 export async function POST(req: NextRequest) {
-  const ip = getRequestIp(req);
-
-  const rateLimit = checkInMemoryRateLimit({
-    scope: "contact",
-    key: ip,
-    max: RATE_LIMIT_MAX,
-    windowMs: RATE_LIMIT_WINDOW_MS,
-  });
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many submissions. Please wait before trying again." },
-      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
-    );
+  const rateLimit = await checkRequestRateLimit(req, CONTACT_RATE_LIMIT_POLICY);
+  if (rateLimit.status !== "allowed") {
+    return rateLimitResponse(rateLimit, CONTACT_RATE_LIMIT_POLICY, {
+      limitedMessage: "Too many submissions. Please wait before trying again.",
+    });
   }
+
+  // This separately resolved canonical address is retained with the contact
+  // row under the existing privacy contract. The limiter receives only its
+  // domain-separated HMAC subject through checkRequestRateLimit().
+  const ip = getRequestIp(req);
 
   let body: Record<string, unknown>;
   try {
@@ -64,7 +68,10 @@ export async function POST(req: NextRequest) {
 
   if (!email || typeof email !== "string" || email.trim().length === 0) {
     errors.email = "Email is required.";
-  } else if (email.trim().length > MAX_EMAIL_LEN || !isValidEmail(email.trim())) {
+  } else if (
+    email.trim().length > MAX_EMAIL_LEN ||
+    !isValidEmail(email.trim())
+  ) {
     errors.email = "A valid email address is required.";
   }
 

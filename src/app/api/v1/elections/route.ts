@@ -24,7 +24,7 @@ const boolean = (value: string | null) =>
         : null;
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
   const searchParams = new URL(request.url).searchParams;
   const format = searchParams.get("format") ?? "json";

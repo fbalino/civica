@@ -14,7 +14,7 @@ export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
 /** SHA-256 of the complete production build command before the CI refactor. */
 export const BUILD_CORE_SHA256 =
-  "70d3933224cf0a1ee6a58928b09daa4d811f4fa8adbc6eaba3cef73f4a8f0d57";
+  "294fb461240d276af5c4666867f2f751ef2033668e94fc51bb909c703e31b397";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",

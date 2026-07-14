@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { evaluateInteractiveDisplay } from "@/lib/rights/manifest";
 
 const DIGEST = /^sha256:([a-f0-9]{64})$/;
@@ -9,10 +10,10 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ digest: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(request, {
-    scope: "constitution-passage-citation",
-    max: 60,
-  });
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
   const { digest } = await params;
   const match = DIGEST.exec(digest);

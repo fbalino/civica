@@ -7,10 +7,14 @@ import {
   CONSTITUTION_SEARCH_SCHEMA_VERSION,
   type ConstitutionSearchErrorResponse,
 } from "@/lib/constitution/search-contract";
-import { getRequestIp } from "@/lib/api/request-ip";
+import { checkRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { constitutionSearchRateLimitResponse } from "@/lib/constitution/search-rate-limit-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
+
+const RATE_LIMIT_POLICY = getRequestRateLimitPolicy("constitution-search");
 
 function errorResponse(
   error: ConstitutionSearchErrorResponse["error"],
@@ -31,27 +35,24 @@ function errorResponse(
 }
 
 export async function GET(request: Request) {
+  const rateLimit = await checkRequestRateLimit(request, RATE_LIMIT_POLICY);
+  if (rateLimit.status !== "allowed") {
+    return constitutionSearchRateLimitResponse(rateLimit, RATE_LIMIT_POLICY);
+  }
+
   const url = new URL(request.url);
   const rawLimit = url.searchParams.get("limit");
   const limit =
     rawLimit == null ? CONSTITUTION_SEARCH_DEFAULT_LIMIT : Number(rawLimit);
   try {
-    const response = await searchConstitutionPassages(
-      {
-        query: url.searchParams.get("q") ?? "",
-        jurisdictions: url.searchParams.getAll("jurisdiction"),
-        topics: url.searchParams.getAll("topic"),
-        language: (url.searchParams.get("language") ?? "en") as "en",
-        limit,
-        cursor: url.searchParams.get("cursor"),
-      },
-      {
-        scope: "constitution-search",
-        key: getRequestIp(request),
-        limit: 30,
-        windowMs: 60_000,
-      },
-    );
+    const response = await searchConstitutionPassages({
+      query: url.searchParams.get("q") ?? "",
+      jurisdictions: url.searchParams.getAll("jurisdiction"),
+      topics: url.searchParams.getAll("topic"),
+      language: (url.searchParams.get("language") ?? "en") as "en",
+      limit,
+      cursor: url.searchParams.get("cursor"),
+    });
     return Response.json(response, {
       headers: {
         "Cache-Control": "no-store",

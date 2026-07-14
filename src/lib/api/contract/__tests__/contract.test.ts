@@ -19,6 +19,14 @@ import assert from "node:assert/strict";
 import { z } from "zod";
 
 import { API_ROUTES } from "../registry";
+import {
+  EXPORT_RATE_LIMIT_MAX,
+  EXPORT_RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_EXCEEDED_STATUS,
+  RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+  V1_RATE_LIMIT_MAX,
+  V1_RATE_LIMIT_WINDOW_MS,
+} from "../rate-limits";
 import { EXAMPLES } from "../examples";
 import {
   zCountryListItem,
@@ -28,6 +36,7 @@ import {
 import { shapeCountryListItem } from "../shapes";
 import {
   findPhantomRoutes,
+  findRateLimitContractIssues,
   findUncontractedEntries,
   findUndocumentedRoutes,
   diffParams,
@@ -69,6 +78,94 @@ test("no duplicate route ids or path+method pairs in the registry", () => {
     assert.ok(!paths.has(key), `duplicate path+method: ${key}`);
     paths.add(key);
   }
+});
+
+test("every /api/v1 GET declares the canonical distributed fail-closed limit", () => {
+  const versionedRoutes = API_ROUTES.filter((route) => route.versioned);
+  assert.ok(versionedRoutes.length > 0);
+
+  for (const route of versionedRoutes) {
+    assert.equal(route.method, "GET", route.id);
+    assert.deepEqual(
+      route.rateLimit,
+      {
+        max: V1_RATE_LIMIT_MAX,
+        windowMs: V1_RATE_LIMIT_WINDOW_MS,
+        scope: "per-validated-client-identity",
+        backend: "postgres",
+        countedMethods: ["GET"],
+        exceededStatus: RATE_LIMIT_EXCEEDED_STATUS,
+        storeUnavailableStatus: RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+      },
+      route.id,
+    );
+    assert.ok(
+      route.errorStatuses.includes(RATE_LIMIT_EXCEEDED_STATUS),
+      `${route.id} must document the limited response`,
+    );
+    assert.ok(
+      route.errorStatuses.includes(RATE_LIMIT_STORE_UNAVAILABLE_STATUS),
+      `${route.id} must document the shared-counter outage response`,
+    );
+  }
+});
+
+test("country export declares its canonical distributed limit without changing CORS", () => {
+  const route = API_ROUTES.find(({ id }) => id === "country-export");
+  assert.ok(route);
+  assert.deepEqual(route.rateLimit, {
+    max: EXPORT_RATE_LIMIT_MAX,
+    windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
+    scope: "per-validated-client-identity",
+    backend: "postgres",
+    countedMethods: ["GET"],
+    exceededStatus: RATE_LIMIT_EXCEEDED_STATUS,
+    storeUnavailableStatus: RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+  });
+  assert.ok(route.errorStatuses.includes(RATE_LIMIT_EXCEEDED_STATUS));
+  assert.ok(route.errorStatuses.includes(RATE_LIMIT_STORE_UNAVAILABLE_STATUS));
+  assert.equal(route.cors, false);
+  assert.equal(route.corsHeaders, null);
+});
+
+test("API docs validator rejects missing limits and undocumented counter outages", () => {
+  assert.deepEqual(findRateLimitContractIssues(API_ROUTES), []);
+
+  const countries = API_ROUTES.find(({ id }) => id === "countries");
+  assert.ok(countries);
+  assert.match(
+    findRateLimitContractIssues([{ ...countries, rateLimit: null }]).join("\n"),
+    /has no distributed rate-limit contract/,
+  );
+  assert.match(
+    findRateLimitContractIssues([
+      {
+        ...countries,
+        errorStatuses: countries.errorStatuses.filter(
+          (status) => status !== RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+        ),
+      },
+    ]).join("\n"),
+    /does not document 503/,
+  );
+});
+
+test("API Docs renders shared limits from the registry and contains no stale instance-local claims", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const path = await import("node:path");
+  const source = await readFile(
+    path.join(process.cwd(), "src/app/api-docs/page.tsx"),
+    "utf8",
+  );
+  const normalized = source.replace(/\s+/g, " ");
+
+  assert.match(normalized, /PostgreSQL-backed counter/);
+  assert.match(normalized, /OPTIONS.*do not consume either counter/);
+  assert.match(source, /countriesRoute\.rateLimit\?\.max/);
+  assert.match(source, /countryExportRoute\.rateLimit\?\.max/);
+  assert.match(source, /storeUnavailableStatus/);
+  assert.doesNotMatch(normalized, /in-memory, per server instance/i);
+  assert.doesNotMatch(normalized, /export.*not currently rate-limited/i);
 });
 
 // ─────────────────────────────────────────────────────────────────────

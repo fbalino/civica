@@ -5,7 +5,8 @@ import {
   getCoMembers,
 } from "@/lib/data/international-organizations";
 import { COUNTRIES } from "@/components/atlas/data";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
 import {
   ORGANIZATION_MEMBERSHIP_RELEASE_VERSION,
@@ -23,9 +24,10 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(req, {
-    scope: "countries-international",
-  });
+  const limited = await enforceRequestRateLimit(
+    req,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
   const { slug } = await params;
