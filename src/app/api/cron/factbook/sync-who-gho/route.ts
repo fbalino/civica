@@ -3,7 +3,7 @@
  *
  * Runs quarterly via Vercel cron, scheduled one hour after the WB
  * WDI cron to spread load. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). Two GHO indicators × ~190 country rows each;
+ * the shared cron boundary). Two GHO indicators × ~190 country rows each;
  * total wall time is dominated by upserts, expect ~30–60s on a
  * warm DB.
  *
@@ -12,7 +12,7 @@
  * Resolution:  ~/civica/plan/who-gho-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncWhoGho } from "@/lib/factbook/reconcile/sync-who-gho";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -22,9 +22,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -62,4 +59,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.who-gho", handler);
+
+export { cronHandler as GET, cronHandler as POST };

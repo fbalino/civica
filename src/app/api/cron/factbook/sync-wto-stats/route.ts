@@ -2,7 +2,7 @@
  * Phase R.12 — WTO Stats sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 2 indicators sliced from a single bulk-download
+ * the shared cron boundary). 2 indicators sliced from a single bulk-download
  * pass over the WTO merchandise annual ZIP archive (~2 MB compressed).
  * Total wall time is dominated by upserts (~380 rows) plus the in-
  * memory CSV parse; expect ~30–60s on a warm DB.
@@ -38,7 +38,7 @@
  * Resolution:  ~/civica/plan/trade-aggregate-fact-keys-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncWtoStats } from "@/lib/factbook/reconcile/sync-wto-stats";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -48,9 +48,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -91,4 +88,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.wto-stats", handler);
+
+export { cronHandler as GET, cronHandler as POST };

@@ -8,7 +8,7 @@
  * after quarter-end (WB WDI, IMF April / October release,
  * Eurostat ESA quarterly) with the smallest reader-visible delay.
  *
- * Authenticated via `requireCronAuth` against `CRON_SECRET`.
+ * Authenticated via the shared cron boundary against `CRON_SECRET`.
  * Idempotent and resumable — candidates and winners stage under an invisible
  * release record, then one database-verified state transition publishes the
  * complete cut. Same-label drift fails instead of mutating the release.
@@ -29,16 +29,15 @@
  *
  * Diagnostic overrides:
  *   - `?dryRun=1` — runs the resolver but skips DB writes.
- *   - `?vintageLabel=<custom>` — overrides the auto-derived
- *     label. Useful for backfill cuts (e.g., re-cutting a
- *     historical vintage manually).
+ *   - `?vintageLabel=<custom>&cutAt=<ISO timestamp>` — required together for
+ *     manual/idempotency-key deliveries, making retries clock-independent.
  * Partial jurisdiction cuts are forbidden because they cannot constitute a
  * complete reconciliation release.
  *
  * Methodology: ~/civica/plan/vintage-cadence-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { deriveVintageLabel } from "@/lib/factbook/reconcile/snapshot-vintage";
 import { snapshotCompleteCandidateRelease } from "@/lib/factbook/reconcile/snapshot-candidate-release";
 
@@ -49,21 +48,71 @@ export const dynamic = "force-dynamic";
 // limit and gives buffer for slow pairs / network blips.
 export const maxDuration = 300;
 
-async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
+export function resolveSnapshotVintageIdentity(
+  request: Request,
+  now = new Date(),
+):
+  | { ok: true; cutDate: Date; vintageLabel: string }
+  | { ok: false; error: string } {
+  const url = new URL(request.url);
+  const requestedLabel = url.searchParams.get("vintageLabel");
+  const requestedCut = url.searchParams.get("cutAt");
+  const manual = request.headers.has("idempotency-key");
+  if (manual && (!requestedLabel || !requestedCut)) {
+    return {
+      ok: false,
+      error:
+        "Manual vintage deliveries require vintageLabel and cutAt together",
+    };
+  }
+  if ((requestedLabel && !requestedCut) || (!requestedLabel && requestedCut)) {
+    return {
+      ok: false,
+      error: "vintageLabel and cutAt must be supplied together",
+    };
+  }
+  const cutDate = requestedCut ? new Date(requestedCut) : now;
+  if (!Number.isFinite(cutDate.getTime())) {
+    return { ok: false, error: "cutAt must be a valid ISO timestamp" };
+  }
+  return {
+    ok: true,
+    cutDate,
+    vintageLabel:
+      requestedLabel ?? deriveVintageLabel(cutDate, "v0.3-beta"),
+  };
+}
 
+async function handler(request: Request) {
   const startedAt = new Date().toISOString();
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
-  const cutDate = new Date();
-  const vintageLabel = url.searchParams.get("vintageLabel") ?? deriveVintageLabel(cutDate, "v0.3-beta");
 
   try {
-    const summary = await snapshotCompleteCandidateRelease({ dryRun, vintageLabel, cutDate });
+    const identity = resolveSnapshotVintageIdentity(request);
+    if (!identity.ok) {
+      return NextResponse.json(
+        { ok: false, step: "factbook.snapshot-vintage", error: identity.error },
+        { status: 400 },
+      );
+    }
+    const { cutDate, vintageLabel } = identity;
+    const summary = await snapshotCompleteCandidateRelease({
+      dryRun,
+      vintageLabel,
+      cutDate,
+    });
 
     if (summary.winnerCount === 0 || summary.candidateCount === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.snapshot-vintage", dryRun, errors: [{ error: "No complete candidate release produced" }] }, { status: 500 });
+      return NextResponse.json(
+        {
+          ok: false,
+          step: "factbook.snapshot-vintage",
+          dryRun,
+          errors: [{ error: "No complete candidate release produced" }],
+        },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -93,4 +142,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.snapshot-vintage", handler);
+
+export { cronHandler as GET, cronHandler as POST };

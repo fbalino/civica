@@ -48,7 +48,10 @@ const SAME_ORIGIN_MUTATION_CALL =
   /\b(?:guardAdminMutationRequest|withAdminMutation|withAdminLogout)\s*\(/;
 const ADMIN_AUDIT_CALL =
   /\b(?:withAdminMutation|withAdminLogout|recordAdminLoginAudit)\s*\(/;
-const CRON_AUTH_CALL = /\brequireCronAuth\s*\(/;
+// Cron routes may call the low-level bearer-token guard directly or, preferably,
+// use the common execution boundary that performs that check before acquiring a
+// lease. Imports and bare CRON_SECRET references deliberately do not match.
+const CRON_CONTROL_CALL = /\b(?:requireCronAuth|withCronJob)\s*\(/;
 const PULSE_CODING_SESSION_CALL =
   /\bgetPulseCodingSession\s*\(|\bgetPulseCodingParticipantSession\s*\(/;
 const ADMIN_USERNAME_CHECK_CALL = /\bverifyAdminUsername\s*\(/;
@@ -96,7 +99,8 @@ test("admin/cron/pulse-coding route classes are non-empty (guards against a vacu
 });
 
 // ─────────────────────────────────────────────────────────────────────
-// cron-secret — every cron route.ts must declare AND call requireCronAuth()
+// cron-secret — every cron route.ts must declare AND call the common cron
+// control boundary (or the retained low-level auth guard)
 // ─────────────────────────────────────────────────────────────────────
 
 test("every cron-exposure registry entry declares the cron-secret control", () => {
@@ -110,17 +114,17 @@ test("every cron-exposure registry entry declares the cron-secret control", () =
   );
 });
 
-test("every declared cron-secret route.ts source actually calls requireCronAuth()", async () => {
+test("every declared cron-secret route.ts source calls the sanctioned cron control boundary", async () => {
   const missing: string[] = [];
   for (const entry of cronRoutes) {
     if (!entry.controls.includes("cron-secret")) continue;
     const source = await readSource(entry);
-    if (!CRON_AUTH_CALL.test(source)) missing.push(entry.filePath);
+    if (!CRON_CONTROL_CALL.test(source)) missing.push(entry.filePath);
   }
   assert.deepEqual(
     missing,
     [],
-    `cron route(s) declaring cron-secret but never calling requireCronAuth(): ${missing.join(", ")}`,
+    `cron route(s) declaring cron-secret but never calling withCronJob() or requireCronAuth(): ${missing.join(", ")}`,
   );
 });
 
@@ -342,11 +346,31 @@ test("negative fixture: a POST guard cannot satisfy the DELETE handler in the sa
   );
 });
 
-test("negative fixture: a route that only checks CRON_SECRET as a bare string (no requireCronAuth call) fails the stricter call-based marker", () => {
-  // requireCronAuth is the sanctioned single path; a hand-rolled
-  // CRON_SECRET comparison without going through it would not satisfy
-  // this test's call-based marker, which is the intended behavior: it
-  // should fail loudly rather than silently accept a bespoke reimplementation.
+test("positive fixture: withCronJob() satisfies the cron control marker", () => {
+  const source = `
+    import { withCronJob } from "@/lib/api/cron-job";
+    async function handler() {
+      return new Response("ok");
+    }
+    const cronHandler = withCronJob("fixture.job", handler);
+    export { cronHandler as GET };
+  `;
+  assert.equal(CRON_CONTROL_CALL.test(source), true);
+});
+
+test("negative fixture: importing withCronJob without calling it does not satisfy the cron control marker", () => {
+  const source = `
+    import { withCronJob } from "@/lib/api/cron-job";
+    export async function GET() {
+      return new Response("ok");
+    }
+  `;
+  assert.equal(CRON_CONTROL_CALL.test(source), false);
+});
+
+test("negative fixture: a route that only checks CRON_SECRET as a bare string fails the call-based cron control marker", () => {
+  // A hand-rolled CRON_SECRET comparison without the common boundary should
+  // fail loudly rather than silently accept a bespoke reimplementation.
   const source = `
     export async function GET(request: Request) {
       if (request.headers.get("authorization") !== \`Bearer \${process.env.CRON_SECRET}\`) {
@@ -355,5 +379,14 @@ test("negative fixture: a route that only checks CRON_SECRET as a bare string (n
       return new Response("ok");
     }
   `;
-  assert.equal(CRON_AUTH_CALL.test(source), false);
+  assert.equal(CRON_CONTROL_CALL.test(source), false);
+});
+
+test("negative fixture: an unguarded cron handler fails the cron control marker", () => {
+  const source = `
+    export async function GET() {
+      return new Response("ok");
+    }
+  `;
+  assert.equal(CRON_CONTROL_CALL.test(source), false);
 });

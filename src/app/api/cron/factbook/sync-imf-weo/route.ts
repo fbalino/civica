@@ -3,7 +3,7 @@
  *
  * Runs semi-annually via Vercel cron (April + October — matching IMF
  * WEO release cadence). Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 11 WEO indicators × ~189 sovereign-state ISO3
+ * the shared cron boundary). 11 WEO indicators × ~189 sovereign-state ISO3
  * codes fetched in 11 unpaginated calls (~150KB each, ~1.5MB total).
  * Total wall time is dominated by upserts, not fetches; expect
  * ~60–180s on a warm DB.
@@ -13,7 +13,7 @@
  * Resolution:  ~/civica/plan/imf-weo-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncImfWeo } from "@/lib/factbook/reconcile/sync-imf-weo";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -23,9 +23,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -64,4 +61,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.imf-weo", handler);
+
+export { cronHandler as GET, cronHandler as POST };

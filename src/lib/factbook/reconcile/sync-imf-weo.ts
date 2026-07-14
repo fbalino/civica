@@ -46,18 +46,19 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -315,10 +316,7 @@ export interface ImfWeoJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  weoCode: string,
-): PerImfWeoCounters {
+function freshCounters(factKey: string, weoCode: string): PerImfWeoCounters {
   return {
     factKey,
     weoCode,
@@ -341,17 +339,13 @@ function freshCounters(
  * If the catalog fetch fails, the caller falls back to
  * `IMF_WEO_VINTAGE_FALLBACK`.
  */
-async function fetchIndicatorCatalog(): Promise<
-  Map<string, ImfIndicatorMeta>
-> {
+async function fetchIndicatorCatalog(): Promise<Map<string, ImfIndicatorMeta>> {
   const url = `${IMF_BASE_URL}/indicators`;
   const res = await fetch(url, {
     headers: { "User-Agent": IMF_USER_AGENT, Accept: "application/json" },
   });
   if (!res.ok) {
-    throw new Error(
-      `IMF /indicators: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`IMF /indicators: ${res.status} ${res.statusText}`);
   }
   const body = (await res.json()) as {
     indicators?: Record<string, ImfIndicatorMeta>;
@@ -400,16 +394,12 @@ async function fetchIndicator(
     headers: { "User-Agent": IMF_USER_AGENT, Accept: "application/json" },
   });
   if (!res.ok) {
-    throw new Error(
-      `IMF ${weoCode}: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`IMF ${weoCode}: ${res.status} ${res.statusText}`);
   }
   const body = (await res.json()) as ImfIndicatorResponse;
   const indicatorBlock = body.values?.[weoCode];
   if (!indicatorBlock) {
-    throw new Error(
-      `IMF ${weoCode}: response shape missing values.${weoCode}`,
-    );
+    throw new Error(`IMF ${weoCode}: response shape missing values.${weoCode}`);
   }
   return indicatorBlock;
 }
@@ -507,14 +497,16 @@ export async function syncImfWeo(
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -522,9 +514,7 @@ export async function syncImfWeo(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   const counters = new Map<string, PerImfWeoCounters>();
   for (const c of targets) {
@@ -569,11 +559,15 @@ export async function syncImfWeo(
       0,
     );
     counter.observations = observationCount;
-    log(`  fetched ${observationCount} observations across ${Object.keys(rows).length} country codes`);
+    log(
+      `  fetched ${observationCount} observations across ${Object.keys(rows).length} country codes`,
+    );
 
     const latestByIso3 = pickLatestPerCountry(rows);
     counter.jurisdictions_with_value = latestByIso3.size;
-    log(`  ${latestByIso3.size} country codes with at least one non-null value`);
+    log(
+      `  ${latestByIso3.size} country codes with at least one non-null value`,
+    );
 
     for (const [iso3, dp] of latestByIso3) {
       const j = iso3ToJurisdiction.get(iso3);
@@ -596,10 +590,14 @@ export async function syncImfWeo(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -768,15 +766,13 @@ export async function syncImfWeo(
         `envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "IMF WEO",
+      target: `${config.factKey} (${config.weoCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually wrote rows (AGENTS.md provenance invariant).
-  await (options.markSynced ?? markSourcesSynced)("imf_weo", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -791,13 +787,17 @@ export async function syncImfWeo(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -807,6 +807,15 @@ export async function syncImfWeo(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "imf_weo",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerImfWeoCounters> = {};

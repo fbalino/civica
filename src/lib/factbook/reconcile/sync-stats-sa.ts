@@ -106,7 +106,11 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  type CivicaSourceRole,
+} from "./_sync-common";
 import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 type Db = typeof import("@/lib/db").db;
@@ -1541,12 +1545,6 @@ export async function syncStatsSa(
     );
   }
 
-  await (options.markSynced ?? markSourcesSynced)(STATS_SA_SOURCE_ID, {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
-
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
   // duplicates are filtered out by `persistProposedDisputes`.
@@ -1576,6 +1574,15 @@ export async function syncStatsSa(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: STATS_SA_SOURCE_ID,
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerStatsSaCounters> = {};

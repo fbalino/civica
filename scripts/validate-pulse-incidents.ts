@@ -11,6 +11,10 @@ function fail(message: string): never {
 
 const schema = readFileSync("src/lib/db/schema.ts", "utf8");
 const cluster = readFileSync("src/lib/pulse/v2/cluster.ts", "utf8");
+const clusterPublish = readFileSync(
+  "src/lib/pulse/v2/cluster-publish.ts",
+  "utf8",
+);
 const resolution = readFileSync("src/lib/pulse/v2/incident-resolution.ts", "utf8");
 const migration = readFileSync("drizzle/authoritative/0023_wide_gorilla_man.sql", "utf8");
 const repair = readFileSync("scripts/repair-pulse-incidents.ts", "utf8");
@@ -27,9 +31,21 @@ for (const required of [
 for (const required of [
   "loadActiveIncidentCandidates",
   "planIncidentResolution(incidentCandidates)",
-  "attachAssignedEvidenceToCurrentEvent",
+  "publishSemanticClusterPlan",
 ]) {
   if (!cluster.includes(required)) fail(`runtime clustering is missing ${required}`);
+}
+for (const required of [
+  "pulseIncidentAssignments",
+  "pulseIncidentResolutions",
+  "pulseSources",
+  'classificationDisposition: "event"',
+  "await db.batch",
+  "atomicPublishGuard",
+]) {
+  if (!clusterPublish.includes(required)) {
+    fail(`atomic cluster publisher is missing ${required}`);
+  }
 }
 for (const required of [
   "PULSE_INCIDENT_COMPARISON_WINDOW_HOURS",

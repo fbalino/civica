@@ -37,7 +37,7 @@ test("direct-write manual scripts retain retry-safe identity guards", () => {
     "scripts/ingest-indicator-history.ts": [/writeIndicatorHistory/, /dryRun/],
     "scripts/sync-organization-memberships.ts": [
       /neonSql\.transaction/,
-      /sourceFreshnessTransactionQuery/,
+      /markSourcesSyncedTransactionQuery/,
       /DRY_RUN/,
     ],
   };

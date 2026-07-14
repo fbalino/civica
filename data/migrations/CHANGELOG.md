@@ -141,6 +141,33 @@ copied cookie. Recovery otherwise uses an isolated pre-change backup or a
 reviewed forward compensation; never delete the security ledger as an
 ordinary rollback.
 
+`0034_superb_the_fallen` adds the PLT-010 cron delivery boundary. One durable
+execution row deduplicates each scheduled slot or manual Idempotency-Key; one
+persistent lease row serializes every invocation of the same job across
+instances; and one retained row records every attempt. Database-time leases,
+monotonic fences, a three-attempt cap, canonical request hashes, and atomic
+acquire/finalize functions make duplicate, overlapping, expired, and retried
+deliveries explicit. Terminal rows require complete completion/status/result
+evidence. A different delivery blocked by the job lease returns an unqueued
+`busy` state without creating an execution or attempt; a duplicate of the same
+delivery remains inspectable as in progress. Attempts, executions, and lease
+fences reject deletion and truncation. This does not claim exactly-once
+behavior for an external side effect separated from database finalization, so
+every domain writer remains convergent and retry-safe. Recovery uses an
+isolated pre-change backup or a reviewed forward compensation; never reset a
+lease fence or delete cron delivery evidence as an ordinary rollback.
+
+`0035_equal_marvex` adds the immutable Pulse classify delivery-to-run binding.
+Each authenticated `pulse.v2.classify` execution key points to exactly one
+classification pipeline run, while multiple later deliveries may adopt the
+same older running run. The insert guard rejects another cron job or another
+Pulse stage, and UPDATE, DELETE, and TRUNCATE are rejected. This closes the
+case where a later delivery finishes an adopted run but its outer cron
+finalization is lost: retrying that delivery resolves the retained binding
+before considering new queue work. No historical handoffs are invented.
+Recovery uses an isolated pre-change backup or a reviewed forward
+compensation; never rewrite a retained binding as an ordinary rollback.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

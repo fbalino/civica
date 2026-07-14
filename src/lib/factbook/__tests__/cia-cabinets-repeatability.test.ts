@@ -71,8 +71,60 @@ test("CIA cabinet dry-run is stable and performs zero writes", async () => {
 test("CIA cabinet partial upstream failure cannot stamp freshness", async () => {
   const state = harness();
   const stamped: number[] = [];
-  const failedPlan = { ...plan, failed: [{ slug: "canada", reason: "HTML schema changed" }] };
+  const failedPlan = {
+    ...plan,
+    failed: [{ slug: "ghana", reason: "CIA World Leaders returned HTTP 503" }],
+    stats: {
+      ...plan.stats,
+      countriesFetched: 2,
+      countriesFetchFailed: 1,
+      countriesSkipped: 1,
+    },
+  };
   const result = await syncCiaCabinets({ ...baseOptions, db: state.db, plan: failedPlan, markSynced: (async (_id: unknown, options: { rowsWritten: number }) => { stamped.push(options.rowsWritten); return []; }) as never });
-  assert.equal(result.skipped[0]?.reason, "HTML schema changed");
+  assert.equal(result.totalRowsWritten, 3);
+  assert.equal(result.countriesSkipped, 1);
+  assert.equal(result.skipped[0]?.reason, "CIA World Leaders returned HTTP 503");
   assert.deepEqual(stamped, [0]);
+  assert.equal(result.freshnessStamped, false);
+});
+
+test("CIA cabinet expected 404 does not block freshness for successful countries", async () => {
+  const state = harness();
+  const stamped: number[] = [];
+  const planWithExpectedAbsence: CabinetPlan = {
+    ...plan,
+    countries: [
+      ...plan.countries,
+      {
+        slug: "united-states",
+        countryName: null,
+        jurisdictionId: null,
+        jurisdictionName: null,
+        lastUpdated: null,
+        fetchStatus: 404,
+        parseFailed: true,
+        jurisdictionMatched: false,
+        positions: [],
+      },
+    ],
+    stats: {
+      ...plan.stats,
+      countriesFetched: 2,
+      countriesFetchFailed: 1,
+    },
+  };
+  const result = await syncCiaCabinets({
+    ...baseOptions,
+    db: state.db,
+    plan: planWithExpectedAbsence,
+    markSynced: (async (_id: unknown, options: { rowsWritten: number }) => {
+      stamped.push(options.rowsWritten);
+      return options.rowsWritten > 0 ? ["cia_world_leaders"] : [];
+    }) as never,
+  });
+
+  assert.deepEqual(result.skipped, []);
+  assert.deepEqual(stamped, [3]);
+  assert.equal(result.freshnessStamped, true);
 });

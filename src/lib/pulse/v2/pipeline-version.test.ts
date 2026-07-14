@@ -7,10 +7,27 @@ import {
   PULSE_PIPELINE_VERSION,
   buildPulseStageVersionEnvelope,
   legacyPulseStageVersionEnvelope,
+  pulseCronStageRunId,
   pulseStageVersionErrors,
   pulseStageVersionKey,
   summarizePulseVersionSet,
 } from "./pipeline-version";
+
+test("one cron delivery derives stable, stage-specific Pulse run ids", () => {
+  const delivery = "a".repeat(64);
+  const retry = pulseCronStageRunId(delivery, "corroborate");
+  assert.equal(retry, pulseCronStageRunId(delivery, "corroborate"));
+  assert.notEqual(retry, pulseCronStageRunId(delivery, "score"));
+  assert.notEqual(
+    retry,
+    pulseCronStageRunId("b".repeat(64), "corroborate"),
+  );
+  assert.match(
+    retry,
+    /^[a-f0-9]{8}-[a-f0-9]{4}-5[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,
+  );
+  assert.throws(() => pulseCronStageRunId("spoof", "score"));
+});
 
 test("every Pulse stage receives a complete immutable version identity", () => {
   for (const stage of PULSE_PIPELINE_STAGES) {

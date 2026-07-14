@@ -393,15 +393,24 @@ export interface EnrichPersonPortraitsOptions {
   dryRun?: boolean;
   /** Progress sink. Lines starting with `!` are warnings. */
   onProgress?: (line: string) => void;
+  /** Fixture/aggregate seam. Defaults to the sanctioned immediate helper. */
+  markSynced?: typeof markSourcesSynced;
+  /** Bounded fixture seam. Production loads candidates from the database. */
+  loadCandidates?: typeof loadPortraitCandidates;
+  /** Bounded fixture seam. Production computes the live Wikidata plan. */
+  computePlan?: typeof computePersonPortraitPlan;
 }
 
 export interface EnrichPersonPortraitsSummary {
+  /** Partial means at least one planned row failed to write. */
+  status: "completed" | "partial";
   startedAt: string;
   finishedAt: string;
   durationMs: number;
   candidates: number;
   portraitsWritten: number;
   birthdatesWritten: number;
+  writeFailures: number;
   portraitsSkippedNonFree: number;
   portraitsNoImage: number;
   dryRun: boolean;
@@ -427,22 +436,29 @@ export async function enrichPersonPortraits(
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
-  const candidates = await loadPortraitCandidates(db, options.limit);
+  const candidates = await (options.loadCandidates ?? loadPortraitCandidates)(
+    db,
+    options.limit,
+  );
   log(
     `Loaded ${candidates.length} candidate persons (wikidata_qid set, photo_url null)` +
       (options.limit ? ` [--limit=${options.limit}]` : ""),
   );
 
-  const plan = await computePersonPortraitPlan(candidates, log);
+  const plan = await (options.computePlan ?? computePersonPortraitPlan)(
+    candidates,
+    log,
+  );
 
   let portraitsWritten = 0;
   let birthdatesWritten = 0;
+  let writeFailures = 0;
 
   if (!dryRun) {
     // Portraits: bare Commons file name + per-file credit. The candidate query
     // guarantees photo_url IS NULL, so this only ever FILLS, never overwrites.
-    // Per-row try/catch: one unexpected row error must never abort the pass and
-    // lose the freshness stamp for the rows that DID write.
+    // Per-row try/catch retains the complete failure count for the aggregate.
+    // Any failed planned write makes the pass partial and withholds freshness.
     for (const p of plan.portraits) {
       try {
         const res = await db
@@ -454,6 +470,7 @@ export async function enrichPersonPortraits(
         const rowCount = (res as unknown as { rowCount?: number }).rowCount;
         if (rowCount === undefined || rowCount > 0) portraitsWritten++;
       } catch (err) {
+        writeFailures++;
         log(
           `! portrait write failed for ${p.personName} (${p.personQid}): ${
             err instanceof Error ? err.message : String(err)
@@ -473,6 +490,7 @@ export async function enrichPersonPortraits(
         const rowCount = (res as unknown as { rowCount?: number }).rowCount;
         if (rowCount === undefined || rowCount > 0) birthdatesWritten++;
       } catch (err) {
+        writeFailures++;
         log(
           `! birthdate write failed for ${b.personName} (${b.personQid}): ${
             err instanceof Error ? err.message : String(err)
@@ -483,21 +501,23 @@ export async function enrichPersonPortraits(
   }
 
   const totalRowsWritten = portraitsWritten + birthdatesWritten;
-  const stamped = dryRun
+  const stamped = dryRun || writeFailures > 0
     ? []
-    : await markSourcesSynced("wikidata", {
+    : await (options.markSynced ?? markSourcesSynced)("wikidata", {
         rowsWritten: totalRowsWritten,
         executor: db,
       });
 
   const finishedAtMs = Date.now();
   return {
+    status: writeFailures > 0 ? "partial" : "completed",
     startedAt,
     finishedAt: new Date(finishedAtMs).toISOString(),
     durationMs: finishedAtMs - startedAtMs,
     candidates: candidates.length,
     portraitsWritten,
     birthdatesWritten,
+    writeFailures,
     portraitsSkippedNonFree: plan.stats.portraitSkippedNonFree,
     portraitsNoImage: plan.stats.portraitNoImage,
     dryRun,

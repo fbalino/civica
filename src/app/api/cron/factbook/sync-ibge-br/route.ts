@@ -4,7 +4,7 @@
  * **NSO Wave 2 publisher** (alongside R.17 Statistics Canada in
  * parallel; R.16 Destatis-DE deferred to v1.1). Runs quarterly via
  * Vercel cron at 22:00 UTC on the 11th of Jan/Apr/Jul/Oct.
- * Authenticated by `CRON_SECRET` (per `requireCronAuth`).
+ * Authenticated by `CRON_SECRET` (per the shared cron boundary).
  *
  * 4 indicators × 1 jurisdiction (Brazil) via 4 single-row fetches
  * over IBGE's open SIDRA REST endpoint. Each fetch is ~700 bytes
@@ -37,7 +37,7 @@
  * Resolution:  ~/civica/plan/ibge-br-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncIbgeBr } from "@/lib/factbook/reconcile/sync-ibge-br";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -47,9 +47,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -88,4 +85,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.ibge-br", handler);
+
+export { cronHandler as GET, cronHandler as POST };

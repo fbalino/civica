@@ -24,6 +24,7 @@ const WRITERS = [
   "src/lib/ci/calculate.ts",
   "src/lib/ci/calculate-v2.ts",
   "src/lib/pulse/v2/classify.ts",
+  "src/lib/pulse/v2/classification-publication.ts",
   "src/lib/pulse/v2/score.ts",
 ] as const;
 

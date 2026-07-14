@@ -39,6 +39,7 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
+import { markExternalSourceSyncedAfterAggregateSuccess } from "./_sync-common";
 
 export interface WikidataSyncOptions {
   jurisdictionSlug?: string;
@@ -52,6 +53,8 @@ export interface WikidataSyncOptions {
   getClaims?: typeof getClaimsForEntity;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  /** Registry-drift fixture seam; production uses the canonical mapping. */
+  factMappings?: readonly WikidataFactConfig[];
 }
 
 export interface WikidataJurisdiction {
@@ -332,9 +335,18 @@ export async function syncFactbookWikidata(
     `${allJurisdictions.length} jurisdictions with wikidata_qid in scope.`
   );
 
+  const mappings = options.factMappings ?? WIKIDATA_FACT_MAPPING;
   const targetConfigs = options.factKey
-    ? WIKIDATA_FACT_MAPPING.filter((c) => c.factKey === options.factKey)
-    : WIKIDATA_FACT_MAPPING;
+    ? mappings.filter((c) => c.factKey === options.factKey)
+    : mappings;
+  const factDefinitions = new Map(
+    targetConfigs.map((config) => [config.factKey, getFactKey(config.factKey)]),
+  );
+  for (const [factKey, definition] of factDefinitions) {
+    if (!definition) {
+      errors.push(`Configured Wikidata fact key is not registered: ${factKey}`);
+    }
+  }
 
   const factCounters = new Map<string, PerFactCounters>();
   for (const c of targetConfigs) {
@@ -352,7 +364,7 @@ export async function syncFactbookWikidata(
 
     for (const config of targetConfigs) {
       const counters = factCounters.get(config.factKey)!;
-      const factKeyDef = getFactKey(config.factKey);
+      const factKeyDef = factDefinitions.get(config.factKey);
       if (!factKeyDef) continue;
 
       let groupedClaims: GroupedClaim[] = [];
@@ -438,10 +450,12 @@ export async function syncFactbookWikidata(
           })
           .returning({ id: factSnapshots.id });
       } catch (err) {
+        const message = `${j.slug} ${config.factKey}: snapshot insert failed — ${
+          err instanceof Error ? err.message : err
+        }`;
+        errors.push(message);
         log(
-          `! ${j.slug} ${config.factKey}: snapshot insert failed — ${
-            err instanceof Error ? err.message : err
-          }`
+          `! ${message}`
         );
         continue;
       }
@@ -521,12 +535,6 @@ export async function syncFactbookWikidata(
     }
   }
 
-  await (options.markSynced ?? markSourcesSynced)("wikidata", {
-    rowsWritten: errors.length === 0 ? touchedPairs.size : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
-
   // Phase F.6.1 — persist resolver-proposed disputes for every pair
   // we touched. Same dedup contract as the WB WDI sync.
   let disputes: PersistDisputeSummary | null = null;
@@ -546,6 +554,9 @@ export async function syncFactbookWikidata(
           log(`  ${line}`);
         },
       });
+      for (const error of disputes.errors) {
+        errors.push(`disputes: ${error}`);
+      }
     } catch (err) {
       const message = `dispute persistence failed: ${
         err instanceof Error ? err.message : err
@@ -554,6 +565,15 @@ export async function syncFactbookWikidata(
       log(`! ${message}`);
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "wikidata",
+    rowsWritten: touchedPairs.size,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const factCountersByKey: Record<string, PerFactCounters> = {};

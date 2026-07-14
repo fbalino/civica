@@ -2,19 +2,25 @@
  * Phase 5.5 — Pulse v2 ingest orchestrator.
  *
  * Calls every connector in sequence (parallel where possible) and
- * batches their output into the `raw_events` staging table. Stamps
- * `sources.last_sync_at` for each source that returned ≥1 row.
+ * batches their output into the `raw_events` staging table. Eligible source
+ * freshness is collected per connector, then stamped once only after every
+ * connector in the aggregate run succeeds.
  *
- * Each connector is wrapped in a try/catch so one failing source
- * never blocks the others. Connectors that are gated on env vars
- * (ACLED) gracefully return empty without raising.
+ * Each connector is wrapped in a try/catch so every source gets a report.
+ * Any configured connector failure blocks aggregate publication, while
+ * connectors explicitly gated off by absent configuration return an honest
+ * empty success.
  */
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "@/lib/db/schema";
 import { buildJurisdictionMap } from "./country-resolver";
-import { upsertRawEvents, type UpsertResult } from "./upsert";
+import {
+  upsertRawEvents,
+  type UpsertRawEventsOptions,
+  type UpsertResult,
+} from "./upsert";
 import { fetchCivicus } from "./sources/civicus";
 import { fetchRsf } from "./sources/rsf";
 import { fetchAmnesty, fetchHrw } from "./sources/hrw-amnesty";
@@ -29,7 +35,8 @@ import { CURRENT_PULSE_RUNTIME_METHOD } from "./runtime-contract";
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
-  startPulsePipelineRun,
+  preparePulsePipelineRun,
+  pulseCronStageRunId,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
 
@@ -61,7 +68,11 @@ export interface IngestSummary {
   totalSkipped: number;
   totalUnmatched: number;
   totalWouldWrite: number;
+  /** Sources stamped after the complete connector batch succeeded. */
+  sourcesStamped: string[];
   dryRun: boolean;
+  /** True when a retry reused an already-completed deterministic stage run. */
+  reused: boolean;
 }
 
 export interface PulseConnectorResult {
@@ -84,6 +95,7 @@ export interface PulseIngestOptions {
     db: Db,
     rows: RawEventInput[],
     ingestRunId: string,
+    options: UpsertRawEventsOptions,
   ) => Promise<UpsertResult>;
   /** Fixture/replay seam. Production creates and persists a fresh run. */
   runRef?: PulsePipelineRunRef;
@@ -91,6 +103,10 @@ export interface PulseIngestOptions {
    * connector availability unless the caller explicitly requests strictness. */
   failOnConnectorError?: boolean;
   requireNonEmpty?: boolean;
+  /** Stable identity injected by the authenticated cron boundary. */
+  cronExecutionKey?: string;
+  /** Fixture seam for exercising the production pipeline-run lifecycle. */
+  persistRun?: boolean;
 }
 
 export const PULSE_CONNECTOR_METRICS = [
@@ -130,11 +146,50 @@ export function connectorReportsToRunCounts(
       report.skippedDuplicate;
     counts[pulseConnectorMetricKey(report.source, "unmatchedCountry")] =
       report.unmatchedCountry;
-    counts[pulseConnectorMetricKey(report.source, "failed")] = report.error
-      ? 1
-      : 0;
+    counts[pulseConnectorMetricKey(report.source, "failed")] =
+      report.error !== undefined ? 1 : 0;
   }
   return counts;
+}
+
+function completedRunSummary(
+  run: PulsePipelineRunRef,
+  counts: Record<string, number>,
+): IngestSummary {
+  const connectorIds = Object.keys(counts)
+    .map((key) => /^connector\.([a-z0-9_-]+)\.fetched$/.exec(key)?.[1])
+    .filter((value): value is string => value !== undefined)
+    .sort();
+  const count = (key: string) => {
+    const value = counts[key];
+    return Number.isFinite(value) ? value : 0;
+  };
+  return {
+    runId: run.id,
+    versionKey: run.versionKey,
+    reports: connectorIds.map((source) => ({
+      source,
+      fetched: count(pulseConnectorMetricKey(source, "fetched")),
+      inserted: count(pulseConnectorMetricKey(source, "inserted")),
+      skippedDuplicate: count(
+        pulseConnectorMetricKey(source, "skippedDuplicate"),
+      ),
+      unmatchedCountry: count(
+        pulseConnectorMetricKey(source, "unmatchedCountry"),
+      ),
+      wouldWrite: count(pulseConnectorMetricKey(source, "wouldWrite")),
+    })),
+    totalFetched: count("fetched"),
+    totalInserted: count("inserted"),
+    totalSkipped: count("skipped"),
+    totalUnmatched: count("unmatched"),
+    totalWouldWrite: count("wouldWrite"),
+    // Exact stamped source ids are not pipeline-run counts. The completed run
+    // is already durable, so a retry deliberately performs no freshness work.
+    sourcesStamped: [],
+    dryRun: false,
+    reused: true,
+  };
 }
 
 function liveConnectorJobs(map: JurisdictionMap): PulseConnectorJob[] {
@@ -146,12 +201,7 @@ function liveConnectorJobs(map: JurisdictionMap): PulseConnectorJob[] {
     { source: "ipu", fetcher: () => fetchIpuActions(map) },
     {
       source: "acled",
-      fetcher: () =>
-        fetchAcled(map).then((result) => ({
-          rows: result.rows,
-          fetched: result.fetched,
-          unmatchedCountry: result.unmatchedCountry,
-        })),
+      fetcher: () => fetchAcled(map),
     },
     {
       source: "vdem_pulse",
@@ -171,108 +221,209 @@ export async function ingestPulseV2(
   db: Db,
   options: PulseIngestOptions = {},
 ): Promise<IngestSummary> {
-  const map = options.jurisdictionMap ?? (await buildJurisdictionMap(db));
-  const jobs = options.jobs ?? liveConnectorJobs(map);
-  const writeRows = options.writeRows ?? upsertRawEvents;
   const run =
     options.runRef ??
     createPulsePipelineRunRef("ingest", {
+      id: options.cronExecutionKey
+        ? pulseCronStageRunId(options.cronExecutionKey, "ingest")
+        : undefined,
       sourceIds: CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.sourceIds,
     });
-  const persistRun = !options.dryRun && !options.jobs && !options.runRef;
-  if (persistRun) await startPulsePipelineRun(db, run);
-  const reports: ConnectorReport[] = [];
-
-  async function runOne(job: PulseConnectorJob) {
-    try {
-      const result = await job.fetcher();
-      let upsert: UpsertResult = {
-        inserted: 0,
-        skippedDuplicate: 0,
-        sourcesStamped: [],
-      };
-      if (result.rows.length && !options.dryRun) {
-        upsert = await writeRows(db, result.rows, run.id);
-      }
-      reports.push({
-        source: job.source,
-        fetched: result.fetched,
-        inserted: upsert.inserted,
-        skippedDuplicate: upsert.skippedDuplicate,
-        unmatchedCountry: result.unmatchedCountry,
-        wouldWrite: result.rows.length,
-      });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      if (options.failOnConnectorError) {
-        throw new Error(`Pulse connector ${job.source} failed: ${message}`);
-      }
-      console.error(`[ingest:${job.source}] failed:`, err);
-      reports.push({
-        source: job.source,
-        fetched: 0,
-        inserted: 0,
-        skippedDuplicate: 0,
-        unmatchedCountry: 0,
-        wouldWrite: 0,
-        error: message,
-      });
+  const persistRun =
+    options.persistRun ?? (!options.dryRun && !options.jobs && !options.runRef);
+  if (persistRun) {
+    const prepared = await preparePulsePipelineRun(db, run);
+    if (prepared.state === "completed") {
+      return completedRunSummary(run, prepared.counts);
     }
   }
-
-  await Promise.all(jobs.map(runOne));
-
-  reports.sort((left, right) => left.source.localeCompare(right.source));
-  const totalFetched = reports.reduce((a, r) => a + r.fetched, 0);
-  const totalInserted = reports.reduce((a, r) => a + r.inserted, 0);
-  const totalSkipped = reports.reduce((a, r) => a + r.skippedDuplicate, 0);
-  const totalUnmatched = reports.reduce((a, r) => a + r.unmatchedCountry, 0);
-  const totalWouldWrite = reports.reduce(
-    (a, report) => a + report.wouldWrite,
-    0,
+  const map = options.jurisdictionMap ?? (await buildJurisdictionMap(db));
+  const jobs = options.jobs ?? liveConnectorJobs(map);
+  const writeRows = options.writeRows ?? upsertRawEvents;
+  // Fetch every connector before the first raw-event/outcome/freshness write.
+  // Promise.all preserves job order while still allowing the network work to
+  // run concurrently, and failures are collected instead of short-circuiting.
+  const fetched = await Promise.all(
+    jobs.map(async (job) => {
+      try {
+        const result = await job.fetcher();
+        if (result.fetched > 0 && result.rows.length === 0) {
+          const error =
+            `Fetched ${result.fetched} upstream record${result.fetched === 1 ? "" : "s"} ` +
+            "but produced no usable event rows";
+          console.error(`[ingest:${job.source}] failed: ${error}`);
+          return {
+            job,
+            result: null,
+            report: {
+              source: job.source,
+              fetched: result.fetched,
+              inserted: 0,
+              skippedDuplicate: 0,
+              unmatchedCountry: result.unmatchedCountry,
+              wouldWrite: 0,
+              error,
+            } satisfies ConnectorReport,
+          };
+        }
+        return {
+          job,
+          result,
+          report: {
+            source: job.source,
+            fetched: result.fetched,
+            inserted: 0,
+            skippedDuplicate: 0,
+            unmatchedCountry: result.unmatchedCountry,
+            wouldWrite: result.rows.length,
+          } satisfies ConnectorReport,
+        };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`[ingest:${job.source}] failed:`, err);
+        return {
+          job,
+          result: null,
+          report: {
+            source: job.source,
+            fetched: 0,
+            inserted: 0,
+            skippedDuplicate: 0,
+            unmatchedCountry: 0,
+            wouldWrite: 0,
+            error: message,
+          } satisfies ConnectorReport,
+        };
+      }
+    }),
   );
+  const reports = fetched.map(({ report }) => report);
+
+  const totals = () => ({
+    fetched: reports.reduce((sum, report) => sum + report.fetched, 0),
+    inserted: reports.reduce((sum, report) => sum + report.inserted, 0),
+    skipped: reports.reduce((sum, report) => sum + report.skippedDuplicate, 0),
+    unmatched: reports.reduce(
+      (sum, report) => sum + report.unmatchedCountry,
+      0,
+    ),
+    wouldWrite: reports.reduce((sum, report) => sum + report.wouldWrite, 0),
+  });
+  const initialTotals = totals();
   const runCounts = {
-    fetched: totalFetched,
-    inserted: totalInserted,
-    skipped: totalSkipped,
-    unmatched: totalUnmatched,
-    wouldWrite: totalWouldWrite,
+    ...initialTotals,
     ...connectorReportsToRunCounts(reports),
   };
+  const failures = reports
+    .filter(({ error }) => error !== undefined)
+    .map(({ source, error }) => ({ component: source, message: error! }));
 
-  if ((options.requireNonEmpty ?? true) && totalFetched === 0) {
-    if (persistRun) {
+  if (failures.length > 0) {
+    // The successful connector subset is intentionally not published. Its
+    // rows will be fetched again on retry, so no earlier freshness claim can
+    // be stranded as a duplicate-only source on the successful attempt.
+    if (persistRun && !options.cronExecutionKey) {
+      await finishPulsePipelineRun(db, run.id, {
+        status: "partial",
+        counts: runCounts,
+        failures,
+      });
+    }
+    if (options.failOnConnectorError) {
+      const first = failures[0];
+      throw new Error(
+        `Pulse connector ${first.component} failed: ${first.message}`,
+      );
+    }
+    reports.sort((left, right) => left.source.localeCompare(right.source));
+    return {
+      runId: run.id,
+      versionKey: run.versionKey,
+      reports,
+      totalFetched: initialTotals.fetched,
+      totalInserted: 0,
+      totalSkipped: 0,
+      totalUnmatched: initialTotals.unmatched,
+      totalWouldWrite: initialTotals.wouldWrite,
+      sourcesStamped: [],
+      dryRun: options.dryRun ?? false,
+      reused: false,
+    };
+  }
+
+  if ((options.requireNonEmpty ?? true) && initialTotals.wouldWrite === 0) {
+    if (persistRun && !options.cronExecutionKey) {
       await finishPulsePipelineRun(db, run.id, {
         status: "failed",
         counts: runCounts,
-        failures: reports
-          .filter(({ error }) => error)
-          .map(({ source, error }) => ({ component: source, message: error! })),
+        failures: [],
       });
     }
-    throw new Error("Pulse ingestion fixture/upstream returned no rows");
+    throw new Error("Pulse ingestion fixture/upstream returned no usable rows");
   }
 
-  if (persistRun) {
-    const failures = reports
-      .filter(({ error }) => error)
-      .map(({ source, error }) => ({ component: source, message: error! }));
-    await finishPulsePipelineRun(db, run.id, {
-      status: failures.length ? "partial" : "completed",
-      counts: runCounts,
-      failures,
-    });
+  if (options.dryRun) {
+    reports.sort((left, right) => left.source.localeCompare(right.source));
+    return {
+      runId: run.id,
+      versionKey: run.versionKey,
+      reports,
+      totalFetched: initialTotals.fetched,
+      totalInserted: 0,
+      totalSkipped: 0,
+      totalUnmatched: initialTotals.unmatched,
+      totalWouldWrite: initialTotals.wouldWrite,
+      sourcesStamped: [],
+      dryRun: true,
+      reused: false,
+    };
   }
 
+  const allRows: RawEventInput[] = [];
+  const connectorIds: string[] = [];
+  for (const item of fetched) {
+    if (!item.result) continue;
+    allRows.push(...item.result.rows);
+    connectorIds.push(...item.result.rows.map(() => item.job.source));
+  }
+
+  // This is the sole publish call for the aggregate run. The default writer
+  // atomically commits raw rows, duplicate outcomes, source freshness, and the
+  // production pipeline-run completion.
+  const upsert: UpsertResult = await writeRows(db, allRows, run.id, {
+    connectorIds,
+    finalizeRun: persistRun ? { counts: runCounts } : undefined,
+  });
+
+  let outcomeOffset = 0;
+  for (const item of fetched) {
+    if (!item.result) continue;
+    const rowOutcomes = upsert.rowOutcomes.slice(
+      outcomeOffset,
+      outcomeOffset + item.result.rows.length,
+    );
+    outcomeOffset += item.result.rows.length;
+    item.report.inserted = rowOutcomes.filter(
+      (outcome) => outcome === "inserted",
+    ).length;
+    item.report.skippedDuplicate = rowOutcomes.filter(
+      (outcome) => outcome === "duplicate",
+    ).length;
+  }
+
+  reports.sort((left, right) => left.source.localeCompare(right.source));
+  const finalTotals = totals();
   return {
     runId: run.id,
     versionKey: run.versionKey,
     reports,
-    totalFetched,
-    totalInserted,
-    totalSkipped,
-    totalUnmatched,
-    totalWouldWrite,
-    dryRun: options.dryRun ?? false,
+    totalFetched: finalTotals.fetched,
+    totalInserted: upsert.inserted,
+    totalSkipped: upsert.skippedDuplicate,
+    totalUnmatched: finalTotals.unmatched,
+    totalWouldWrite: finalTotals.wouldWrite,
+    sourcesStamped: upsert.sourcesStamped,
+    dryRun: false,
+    reused: false,
   };
 }

@@ -12,33 +12,45 @@ import {
 
 type Db = NeonHttpDatabase<typeof schema>;
 
+export function preparePulseDecisionInsert(
+  db: Db,
+  inputs: readonly PulseDecisionInput[],
+) {
+  const records = inputs.map((input) => createPulseDecision(input));
+  const query = records.length
+    ? db
+        .insert(pulseEventDecisions)
+        .values(
+          records.map((record) => ({
+            schemaVersion: record.schemaVersion,
+            decisionKey: record.decisionKey,
+            clusterId: record.clusterId,
+            eventId: record.eventId,
+            kind: record.kind,
+            verdict: record.verdict,
+            payload: record.payload,
+            actor: record.actor,
+            stageRunId: record.stageRunId,
+            methodVersion: record.methodVersion,
+            rationale: record.rationale,
+            evidenceRefs: record.evidenceRefs,
+            supersedesDecisionKey: record.supersedesDecisionKey,
+            decidedAt: new Date(record.decidedAt),
+          })),
+        )
+        .onConflictDoNothing({ target: pulseEventDecisions.decisionKey })
+    : null;
+  return { records, query };
+}
+
 export async function persistPulseDecisions(
   db: Db,
   inputs: readonly PulseDecisionInput[],
 ): Promise<PulseDecisionRecord[]> {
   if (inputs.length === 0) return [];
-  const records = inputs.map((input) => createPulseDecision(input));
-  await db
-    .insert(pulseEventDecisions)
-    .values(
-      records.map((record) => ({
-        schemaVersion: record.schemaVersion,
-        decisionKey: record.decisionKey,
-        clusterId: record.clusterId,
-        eventId: record.eventId,
-        kind: record.kind,
-        verdict: record.verdict,
-        payload: record.payload,
-        actor: record.actor,
-        stageRunId: record.stageRunId,
-        methodVersion: record.methodVersion,
-        rationale: record.rationale,
-        evidenceRefs: record.evidenceRefs,
-        supersedesDecisionKey: record.supersedesDecisionKey,
-        decidedAt: new Date(record.decidedAt),
-      })),
-    )
-    .onConflictDoNothing({ target: pulseEventDecisions.decisionKey });
+  const { records, query } = preparePulseDecisionInsert(db, inputs);
+  if (!query) return [];
+  await query;
   return records;
 }
 

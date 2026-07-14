@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-14T05:47:59.192Z",
+  "generatedAt": "2026-07-14T08:50:23.324Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -289,7 +289,7 @@
         "pulse_dimensional_deltas": 325,
         "pulse_events_v2": 384,
         "pulse_sources": 529,
-        "raw_events": 1509
+        "raw_events": 1516
       },
       "writesPerformed": 0
     },
@@ -676,8 +676,8 @@
         "pulse_events_v2": 384,
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
-        "raw_events": 1509,
-        "research_evidence_history": 74965,
+        "raw_events": 1516,
+        "research_evidence_history": 74973,
         "statements": 6845,
         "terms": 5475
       },
@@ -755,10 +755,10 @@
         "pulse_incident_assignments": 1507,
         "pulse_incident_resolutions": 479,
         "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 34,
+        "pulse_pipeline_runs": 37,
         "pulse_sources": 529,
-        "raw_events": 1509,
-        "research_evidence_history": 74965
+        "raw_events": 1516,
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },
@@ -785,11 +785,11 @@
       "liveRowCounts": {
         "pulse_classification_attempts": 385,
         "pulse_cluster_classification_states": 385,
-        "pulse_event_decisions": 5098,
+        "pulse_event_decisions": 5099,
         "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 34,
-        "raw_events": 1509,
-        "research_evidence_history": 74965
+        "pulse_pipeline_runs": 37,
+        "raw_events": 1516,
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },
@@ -816,7 +816,7 @@
         "pulse_incidents": 1224,
         "pulse_review_obligations": 175,
         "pulse_review_sla_events": 175,
-        "research_evidence_history": 74965
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },
@@ -860,7 +860,7 @@
       "liveRowCounts": {
         "pulse_dimensional_delta_history": 1625,
         "pulse_dimensional_deltas": 325,
-        "research_evidence_history": 74965
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },
@@ -885,7 +885,7 @@
         "ci_dimension_scores": 4867,
         "pulse_event_absorptions": 0,
         "pulse_events_v2": 384,
-        "research_evidence_history": 74965
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },
@@ -915,8 +915,8 @@
         "pulse_events_v2": 384,
         "pulse_information_environment_releases": 1,
         "pulse_information_environment_values": 251,
-        "pulse_pipeline_runs": 34,
-        "research_evidence_history": 74965
+        "pulse_pipeline_runs": 37,
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },
@@ -968,7 +968,7 @@
         "party_composition_runs": 194,
         "party_identity_events": 1548,
         "political_parties": 1548,
-        "research_evidence_history": 74965,
+        "research_evidence_history": 74973,
         "sources": 57,
         "statements": 6845
       },
@@ -996,7 +996,7 @@
         "jurisdictions": 253,
         "organization_memberships": 1880,
         "organizations": 24,
-        "research_evidence_history": 74965,
+        "research_evidence_history": 74973,
         "sources": 57
       },
       "writesPerformed": 0
@@ -1019,6 +1019,48 @@
       "liveRowCounts": {
         "admin_mutation_audit_log": "missing",
         "admin_session_revocations": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0034_superb_the_fallen",
+      "artifact": "drizzle/authoritative/0034_superb_the_fallen.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "51ac043cd187d0f00e3b60d6cfa56b08231de8911a5a65f0d353a8df01563a86",
+      "affectedRelations": [
+        "cron_job_attempts",
+        "cron_job_executions",
+        "cron_job_leases"
+      ],
+      "statementCount": 148,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0034_superb_the_fallen-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0034_superb_the_fallen --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "cron_job_attempts": "missing",
+        "cron_job_executions": "missing",
+        "cron_job_leases": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0035_equal_marvex",
+      "artifact": "drizzle/authoritative/0035_equal_marvex.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "e10d60be954a5be888934db76218a36dd177981909d689610665fbd4ac645913",
+      "affectedRelations": [
+        "pulse_classification_delivery_bindings"
+      ],
+      "statementCount": 15,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0035_equal_marvex-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0035_equal_marvex --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_classification_delivery_bindings": "missing"
       },
       "writesPerformed": 0
     },
@@ -1222,7 +1264,7 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384,
-        "research_evidence_history": 74965
+        "research_evidence_history": 74973
       },
       "writesPerformed": 0
     },

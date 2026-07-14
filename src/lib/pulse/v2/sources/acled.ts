@@ -16,10 +16,7 @@
  * Resolving licensing for production use is a Phase 5.9 task.
  */
 
-import {
-  type JurisdictionMap,
-  resolveCountry,
-} from "../country-resolver";
+import { type JurisdictionMap, resolveCountry } from "../country-resolver";
 import type { RawEventInput } from "../types";
 
 const ACLED_BASE =
@@ -47,18 +44,39 @@ export interface AcledFetchResult {
   ran: boolean;
 }
 
+export interface AcledFetchOptions {
+  sinceDays?: number;
+  limit?: number;
+  /** Deterministic fixture/configuration seam. Omit to use the environment. */
+  apiKey?: string | null;
+  /** Deterministic fixture/configuration seam. Omit to use the environment. */
+  email?: string | null;
+  baseUrl?: string;
+  fetchImpl?: typeof fetch;
+}
+
 export async function fetchAcled(
   map: JurisdictionMap,
-  opts: { sinceDays?: number; limit?: number } = {}
+  opts: AcledFetchOptions = {},
 ): Promise<AcledFetchResult> {
-  const apiKey = process.env.ACLED_API_KEY;
-  const email = process.env.ACLED_API_EMAIL;
-  if (!apiKey || !email) {
+  const apiKey = Object.hasOwn(opts, "apiKey")
+    ? opts.apiKey
+    : process.env.ACLED_API_KEY;
+  const email = Object.hasOwn(opts, "email")
+    ? opts.email
+    : process.env.ACLED_API_EMAIL;
+  if (!apiKey && !email) {
     console.info(
-      "[acled] ACLED_API_KEY or ACLED_API_EMAIL not set — skipping. " +
-        "Set both to enable; ACLED requires academic registration."
+      "[acled] ACLED_API_KEY and ACLED_API_EMAIL not set — skipping. " +
+        "Set both to enable; ACLED requires academic registration.",
     );
     return { rows: [], unmatchedCountry: 0, fetched: 0, ran: false };
+  }
+  if (!apiKey || !email) {
+    const missing = !apiKey ? "ACLED_API_KEY" : "ACLED_API_EMAIL";
+    throw new Error(
+      `ACLED configuration incomplete: ${missing} is required when the other credential is set`,
+    );
   }
 
   const sinceDays = opts.sinceDays ?? 7;
@@ -77,21 +95,39 @@ export async function fetchAcled(
       "data_id|event_date|event_type|sub_event_type|country|iso|notes|fatalities|source|source_url",
   });
 
-  let acledRows: AcledRow[] = [];
+  const baseUrl = opts.baseUrl ?? ACLED_BASE;
+  const fetchImpl = opts.fetchImpl ?? fetch;
+  let resp: Response;
   try {
-    const resp = await fetch(`${ACLED_BASE}?${params.toString()}`, {
+    resp = await fetchImpl(`${baseUrl}?${params.toString()}`, {
       headers: { Accept: "application/json" },
     });
-    if (!resp.ok) {
-      console.warn(`[acled] returned ${resp.status}`);
-      return { rows: [], unmatchedCountry: 0, fetched: 0, ran: true };
-    }
-    const json = (await resp.json()) as { data?: AcledRow[] };
-    acledRows = json.data ?? [];
   } catch (err) {
-    console.warn(`[acled] fetch failed: ${(err as Error).message}`);
-    return { rows: [], unmatchedCountry: 0, fetched: 0, ran: true };
+    throw new Error(
+      `ACLED request failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
+  if (!resp.ok) {
+    throw new Error(`ACLED request returned HTTP ${resp.status}`);
+  }
+
+  let json: unknown;
+  try {
+    json = await resp.json();
+  } catch (err) {
+    throw new Error(
+      `ACLED response parse failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+  if (
+    typeof json !== "object" ||
+    json === null ||
+    !("data" in json) ||
+    !Array.isArray(json.data)
+  ) {
+    throw new Error("ACLED response parse failed: expected a data array");
+  }
+  const acledRows = json.data as AcledRow[];
 
   const rows: RawEventInput[] = [];
   let unmatchedCountry = 0;

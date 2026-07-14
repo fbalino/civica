@@ -2,7 +2,7 @@
  * Phase R.3 — UN Population Division (WPP 2024) sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). 7 indicators × one fetch each = ~7 round
+ * (per the shared cron boundary). 7 indicators × one fetch each = ~7 round
  * trips, each ~80–250 KB ZIP-CSV. Total wall time dominated by
  * upserts: expect ~30–90s on a warm DB.
  *
@@ -17,7 +17,7 @@
  * Resolution:  ~/civica/plan/un-data-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncUnData } from "@/lib/factbook/reconcile/sync-un-data";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -27,9 +27,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -67,4 +64,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.un-data", handler);
+
+export { cronHandler as GET, cronHandler as POST };

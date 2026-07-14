@@ -2,9 +2,10 @@
  * Phase R.21 — `data_facts_audit_log` writer + reader helpers.
  *
  * The audit-log table was created in Phase F.5 but never wired to a
- * write site. R.21 wires two:
- *   1. Manual reviewer decisions via `POST /api/admin/data-disputes/[id]`
- *   2. Auto-resolve sweeps via `/api/cron/factbook/auto-resolve-disputes`
+ * write site. R.21 wires manual reviewer decisions via
+ * `POST /api/admin/data-disputes/[id]`. Auto-resolve sweeps use the atomic
+ * data-modifying CTE in `auto-resolve-disputes.ts`, so the dispute status and
+ * audit row cannot commit separately.
  *
  * Plus reopen actions (admin reopens a previously-resolved dispute).
  *
@@ -69,11 +70,10 @@ export interface WriteAuditLogInput {
 /**
  * Insert a single audit-log row. Returns the inserted row's id.
  *
- * Errors are not silently swallowed — callers either await the
- * insert before responding (manual review path; surface a 500 if it
- * fails so the operator sees it) or wrap in try/catch and log
- * (cron path; one stuck audit row shouldn't block the rest of the
- * sweep — but every error must be surfaced in the cron summary).
+ * Errors are not silently swallowed. Manual review callers await the insert
+ * before responding and surface a 500 if it fails. Cron auto-resolution does
+ * not call this standalone writer; it uses one atomic PostgreSQL statement so
+ * an audit failure also rolls back the domain-row update.
  */
 export async function writeDisputeAuditLog(
   input: WriteAuditLogInput,
@@ -127,9 +127,8 @@ export async function getAuditLogForDispute(
     ORDER BY created_at DESC
     LIMIT 100
   `);
-  const raw = ((result as unknown as { rows?: unknown[] }).rows ?? result) as Array<
-    Record<string, unknown>
-  >;
+  const raw = ((result as unknown as { rows?: unknown[] }).rows ??
+    result) as Array<Record<string, unknown>>;
   return raw.map((r) => ({
     id: String(r.id),
     disputeId: r.dispute_id ? String(r.dispute_id) : null,
@@ -210,9 +209,8 @@ export async function getAuditTimeline(
     OFFSET ${offset}
   `);
 
-  const raw = ((result as unknown as { rows?: unknown[] }).rows ?? result) as Array<
-    Record<string, unknown>
-  >;
+  const raw = ((result as unknown as { rows?: unknown[] }).rows ??
+    result) as Array<Record<string, unknown>>;
 
   const countResult = await db.execute(sql`
     SELECT COUNT(*)::int AS total

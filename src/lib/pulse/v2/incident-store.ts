@@ -26,14 +26,9 @@ export const PULSE_INCIDENT_ASSIGNMENT_ALGORITHM_VERSION =
   "pulse-incident-assignment/identity-v1" as const;
 
 export type IncidentAssignmentMatchKind =
-  | "new"
-  | "persisted_match"
-  | "post_classification_merge"
-  | "backfill";
+  "new" | "persisted_match" | "post_classification_merge" | "backfill";
 export type IncidentAssignmentFallbackMode =
-  | "semantic"
-  | "conservative_lexical"
-  | "historical_backfill";
+  "semantic" | "conservative_lexical" | "historical_backfill";
 
 export interface IncidentAssignmentPlan {
   schemaVersion: typeof PULSE_INCIDENT_ASSIGNMENT_SCHEMA_VERSION;
@@ -56,10 +51,7 @@ export interface IncidentAssignmentPlan {
 }
 
 export type IncidentResolutionOutcome =
-  | "candidate"
-  | "confirmed_merge"
-  | "rejected"
-  | "unresolved";
+  "candidate" | "confirmed_merge" | "rejected" | "unresolved";
 
 export interface IncidentResolutionRecordPlan {
   schemaVersion: typeof PULSE_INCIDENT_RESOLUTION_VERSION;
@@ -143,7 +135,8 @@ function finiteRange(
 }
 
 function validInstant(value: string, name: string): void {
-  if (!Number.isFinite(Date.parse(value))) throw new Error(`${name} is invalid`);
+  if (!Number.isFinite(Date.parse(value)))
+    throw new Error(`${name} is invalid`);
 }
 
 export function validateIncidentAssignmentPlan(
@@ -186,8 +179,13 @@ export function validateIncidentResolutionRecordPlan(
   if (plan.leftIncidentId === plan.rightIncidentId) {
     throw new Error("incident resolution requires two distinct incidents");
   }
-  if (plan.evidenceRefs.length === 0 || plan.evidenceRefs.some((ref) => !ref.trim())) {
-    throw new Error("incident resolution requires non-blank evidence references");
+  if (
+    plan.evidenceRefs.length === 0 ||
+    plan.evidenceRefs.some((ref) => !ref.trim())
+  ) {
+    throw new Error(
+      "incident resolution requires non-blank evidence references",
+    );
   }
   if (
     plan.outcome === "confirmed_merge" &&
@@ -195,7 +193,9 @@ export function validateIncidentResolutionRecordPlan(
       plan.canonicalIncidentId ?? "",
     )
   ) {
-    throw new Error("confirmed merge requires a canonical incident in the pair");
+    throw new Error(
+      "confirmed merge requires a canonical incident in the pair",
+    );
   }
   if (plan.outcome !== "confirmed_merge" && plan.canonicalIncidentId !== null) {
     throw new Error("only a confirmed merge may identify a canonical incident");
@@ -249,17 +249,23 @@ function iso(value: Date | string): string {
   return value instanceof Date ? value.toISOString() : value;
 }
 
-function projectionToCandidate(row: PersistedIncidentCandidateRow): IncidentCandidate {
-  const eventDate = row.eventDate ?? row.rawFallback?.eventDate ?? row.eventDateStart;
-  if (!eventDate) throw new Error(`incident ${row.incidentId} has no candidate date`);
-  const headline = row.headline ?? row.rawFallback?.title ?? row.representativeTitle;
+function projectionToCandidate(
+  row: PersistedIncidentCandidateRow,
+): IncidentCandidate {
+  const eventDate =
+    row.eventDate ?? row.rawFallback?.eventDate ?? row.eventDateStart;
+  if (!eventDate)
+    throw new Error(`incident ${row.incidentId} has no candidate date`);
+  const headline =
+    row.headline ?? row.rawFallback?.title ?? row.representativeTitle;
   const severity = row.severityTier;
   return {
     incidentId: row.incidentId,
     eventId: row.eventId,
     clusterId: row.clusterId ?? row.rawFallback?.clusterId ?? row.incidentId,
     origin: "persisted",
-    jurisdictionId: row.jurisdictionId ?? row.rawFallback?.jurisdictionId ?? null,
+    jurisdictionId:
+      row.jurisdictionId ?? row.rawFallback?.jurisdictionId ?? null,
     eventDate,
     headline,
     body: row.description ?? row.rawFallback?.body ?? null,
@@ -280,7 +286,9 @@ function projectionToCandidate(row: PersistedIncidentCandidateRow): IncidentCand
         ? "negative"
         : null,
     severity,
-    createdAt: row.eventCreatedAt ? iso(row.eventCreatedAt) : iso(row.incidentCreatedAt),
+    createdAt: row.eventCreatedAt
+      ? iso(row.eventCreatedAt)
+      : iso(row.incidentCreatedAt),
     embedding: row.representativeEmbedding,
   };
 }
@@ -295,13 +303,21 @@ export async function loadActiveIncidentCandidates(
     throw new Error("incident candidate windowStart must not follow windowEnd");
   }
   const windowHours = options.comparisonWindowHours ?? 48;
-  if (!Number.isFinite(windowHours) || windowHours < 0 || windowHours > 24 * 31) {
+  if (
+    !Number.isFinite(windowHours) ||
+    windowHours < 0 ||
+    windowHours > 24 * 31
+  ) {
     throw new Error("comparisonWindowHours must be between 0 and 744");
   }
-  const lower = new Date(Date.parse(options.windowStart) - windowHours * 3_600_000)
+  const lower = new Date(
+    Date.parse(options.windowStart) - windowHours * 3_600_000,
+  )
     .toISOString()
     .slice(0, 10);
-  const upper = new Date(Date.parse(options.windowEnd) + windowHours * 3_600_000)
+  const upper = new Date(
+    Date.parse(options.windowEnd) + windowHours * 3_600_000,
+  )
     .toISOString()
     .slice(0, 10);
 
@@ -340,8 +356,14 @@ export async function loadActiveIncidentCandidates(
       .where(
         and(
           eq(pulseIncidents.status, "active"),
-          gte(sql`coalesce(${pulseEventsV2.eventDate}, ${pulseIncidents.eventDateEnd}, ${pulseIncidents.eventDateStart})`, lower),
-          lte(sql`coalesce(${pulseEventsV2.eventDate}, ${pulseIncidents.eventDateStart}, ${pulseIncidents.eventDateEnd})`, upper),
+          gte(
+            sql`coalesce(${pulseEventsV2.eventDate}, ${pulseIncidents.eventDateEnd}, ${pulseIncidents.eventDateStart})`,
+            lower,
+          ),
+          lte(
+            sql`coalesce(${pulseEventsV2.eventDate}, ${pulseIncidents.eventDateStart}, ${pulseIncidents.eventDateEnd})`,
+            upper,
+          ),
         ),
       );
     const incidentIds = selected.map((row) => row.incidentId);
@@ -381,7 +403,10 @@ export async function loadActiveIncidentCandidates(
   }
   return rows
     .map(projectionToCandidate)
-    .filter((candidate) => candidate.eventDate >= lower && candidate.eventDate <= upper)
+    .filter(
+      (candidate) =>
+        candidate.eventDate >= lower && candidate.eventDate <= upper,
+    )
     .sort((left, right) => left.incidentId.localeCompare(right.incidentId));
 }
 
@@ -394,10 +419,7 @@ export interface NewIncidentPlan {
   createdRunId: string;
 }
 
-export async function insertNewIncident(
-  db: Db,
-  plan: NewIncidentPlan,
-): Promise<string> {
+export function validateNewIncidentPlan(plan: NewIncidentPlan): void {
   nonBlank(plan.representativeTitle, "representativeTitle");
   nonBlank(plan.createdRunId, "createdRunId");
   if (plan.eventDateStart && !/^\d{4}-\d{2}-\d{2}$/.test(plan.eventDateStart)) {
@@ -416,6 +438,13 @@ export async function insertNewIncident(
   if (plan.embedding?.some((component) => !Number.isFinite(component))) {
     throw new Error("incident embedding contains a non-finite component");
   }
+}
+
+export async function insertNewIncident(
+  db: Db,
+  plan: NewIncidentPlan,
+): Promise<string> {
+  validateNewIncidentPlan(plan);
   const identity = normalizeEventIdentity(plan.representativeTitle, plan.body);
   const inserted = await db
     .insert(pulseIncidents)
@@ -461,7 +490,9 @@ export async function assignRawReportToIncident(
     persisted[0]?.assignmentKey !== plan.assignmentKey ||
     persisted[0]?.incidentId !== plan.incidentId
   ) {
-    throw new Error(`raw report ${plan.rawEventId} already has a different assignment`);
+    throw new Error(
+      `raw report ${plan.rawEventId} already has a different assignment`,
+    );
   }
   await db
     .update(rawEvents)
@@ -474,11 +505,17 @@ export async function assignRawReportToIncident(
     .where(
       and(
         eq(rawEvents.id, plan.rawEventId),
-        or(eq(rawEvents.incidentId, plan.incidentId), sql`${rawEvents.incidentId} is null`),
+        or(
+          eq(rawEvents.incidentId, plan.incidentId),
+          sql`${rawEvents.incidentId} is null`,
+        ),
       ),
     );
   const raw = await db
-    .select({ incidentId: rawEvents.incidentId, clusterId: rawEvents.clusterId })
+    .select({
+      incidentId: rawEvents.incidentId,
+      clusterId: rawEvents.clusterId,
+    })
     .from(rawEvents)
     .where(eq(rawEvents.id, plan.rawEventId))
     .limit(1);
@@ -486,7 +523,9 @@ export async function assignRawReportToIncident(
     raw[0]?.incidentId !== plan.incidentId ||
     raw[0]?.clusterId !== plan.rawClusterId
   ) {
-    throw new Error(`raw report ${plan.rawEventId} did not accept its incident assignment`);
+    throw new Error(
+      `raw report ${plan.rawEventId} did not accept its incident assignment`,
+    );
   }
 }
 
@@ -502,10 +541,9 @@ export interface AttachIncidentEvidencePlan {
   rationale: string;
 }
 
-export async function attachAssignedEvidenceToCurrentEvent(
-  db: Db,
+export function validateAttachIncidentEvidencePlan(
   plan: AttachIncidentEvidencePlan,
-): Promise<void> {
+): void {
   for (const [name, value] of [
     ["eventId", plan.eventId],
     ["rawEventId", plan.rawEventId],
@@ -514,8 +552,16 @@ export async function attachAssignedEvidenceToCurrentEvent(
     ["sourceName", plan.sourceName],
     ["stageRunId", plan.stageRunId],
     ["rationale", plan.rationale],
-  ] as const) nonBlank(value, name);
+  ] as const)
+    nonBlank(value, name);
   validInstant(plan.attachedAt, "attachedAt");
+}
+
+export async function attachAssignedEvidenceToCurrentEvent(
+  db: Db,
+  plan: AttachIncidentEvidencePlan,
+): Promise<void> {
+  validateAttachIncidentEvidencePlan(plan);
   const [eventRows, rawRows] = await Promise.all([
     db
       .select({
@@ -536,10 +582,14 @@ export async function attachAssignedEvidenceToCurrentEvent(
       .where(eq(rawEvents.id, plan.rawEventId))
       .limit(1),
   ]);
-  if (!eventRows[0]) throw new Error("evidence target is not a current event projection");
-  if (!rawRows[0]?.incidentId) throw new Error("raw evidence has no incident assignment");
+  if (!eventRows[0])
+    throw new Error("evidence target is not a current event projection");
+  if (!rawRows[0]?.incidentId)
+    throw new Error("raw evidence has no incident assignment");
   if (eventRows[0].incidentId !== rawRows[0].incidentId) {
-    throw new Error("raw evidence and current event belong to different incidents");
+    throw new Error(
+      "raw evidence and current event belong to different incidents",
+    );
   }
   await db
     .insert(pulseSources)
@@ -569,6 +619,116 @@ export async function attachAssignedEvidenceToCurrentEvent(
       classifiedAt: new Date(plan.attachedAt),
     })
     .where(eq(rawEvents.id, plan.rawEventId));
+}
+
+export interface RepairAssignedEvidenceOptions {
+  limit?: number;
+  attachedAt?: Date;
+}
+
+/**
+ * Repair the narrow cluster/classify interleaving where a report receives its
+ * stable incident assignment after classification selected its frozen input,
+ * but before the current event projection commits. The report intentionally
+ * stays outside that model input; a later cluster delivery attaches it as
+ * retained evidence under the already-classified incident.
+ *
+ * Source insertion, raw disposition, inherited classification lineage, and a
+ * final count guard share one PostgreSQL statement. The operation is
+ * repeatable: already attached evidence is no longer pending and is ignored.
+ */
+export async function repairAssignedEvidenceForCurrentEvents(
+  db: Db,
+  options: RepairAssignedEvidenceOptions = {},
+): Promise<number> {
+  const limit = options.limit ?? 1_000;
+  if (!Number.isSafeInteger(limit) || limit <= 0 || limit > 10_000) {
+    throw new Error("late-evidence repair limit must be between 1 and 10000");
+  }
+  const attachedAt = options.attachedAt ?? new Date();
+  if (!Number.isFinite(attachedAt.getTime())) {
+    throw new Error("late-evidence repair attachedAt is invalid");
+  }
+  const rationale =
+    "PUL-031 repaired evidence assigned during classification without reclassification.";
+
+  const result = await db.execute(sql`
+    WITH eligible AS MATERIALIZED (
+      SELECT
+        r.id AS raw_event_id,
+        r.source_id,
+        r.source_type,
+        r.source_url,
+        e.id AS event_id,
+        e.classification_run_id
+      FROM raw_events r
+      CROSS JOIN LATERAL (
+        SELECT current_event.id, current_event.classification_run_id
+        FROM pulse_events_v2 current_event
+        WHERE current_event.incident_id = r.incident_id
+          AND current_event.projection_status = 'current'
+        ORDER BY current_event.updated_at DESC, current_event.id
+        LIMIT 1
+      ) e
+      WHERE r.incident_id IS NOT NULL
+        AND r.cluster_id IS NOT NULL
+        AND r.classification_disposition = 'pending'
+      ORDER BY r.id
+      LIMIT ${limit}
+      FOR UPDATE OF r
+    ), inserted AS (
+      INSERT INTO pulse_sources (
+        event_id, source_id, source_type, source_name, source_url, raw_event_id
+      )
+      SELECT
+        event_id, source_id, source_type, source_id, source_url, raw_event_id
+      FROM eligible
+      ON CONFLICT (raw_event_id) WHERE raw_event_id IS NOT NULL DO NOTHING
+      RETURNING raw_event_id, event_id
+    ), effective_sources AS (
+      SELECT raw_event_id, event_id FROM inserted
+      UNION
+      SELECT e.raw_event_id, e.event_id
+      FROM eligible e
+      JOIN pulse_sources ps
+        ON ps.raw_event_id = e.raw_event_id
+       AND ps.event_id = e.event_id
+    ), updated AS (
+      UPDATE raw_events r
+      SET
+        classification_disposition = 'event',
+        classification_reason = ${rationale},
+        classification_decision = jsonb_build_object(
+          'schemaVersion', ${PULSE_INCIDENT_ASSIGNMENT_SCHEMA_VERSION}::text,
+          'eventId', e.event_id,
+          'rawEventId', e.raw_event_id,
+          'attachedWithoutReclassification', true,
+          'repair', true
+        ),
+        classification_run_id = e.classification_run_id,
+        classified_at = ${attachedAt}
+      FROM eligible e
+      JOIN effective_sources s
+        ON s.raw_event_id = e.raw_event_id
+       AND s.event_id = e.event_id
+      WHERE r.id = e.raw_event_id
+        AND r.classification_disposition = 'pending'
+      RETURNING r.id
+    ), outcome AS (
+      SELECT
+        (SELECT COUNT(*)::integer FROM eligible) AS eligible_count,
+        (SELECT COUNT(*)::integer FROM updated) AS attached_count
+    )
+    SELECT
+      attached_count,
+      1 / (CASE WHEN eligible_count = attached_count THEN 1 ELSE 0 END)
+        AS atomic_guard
+    FROM outcome
+  `);
+  const rows = Array.isArray(result)
+    ? result
+    : ((result as { rows?: Array<{ attached_count?: unknown }> }).rows ?? []);
+  return Number(rows[0]?.attached_count ?? 0);
 }
 
 export async function appendIncidentResolution(

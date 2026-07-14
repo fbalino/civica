@@ -96,7 +96,7 @@ Do not commit secrets, raw licensed datasets that cannot be redistributed, produ
 - Never label a heuristic simulation interval a confidence interval for a true latent score unless the statistical model supports that interpretation.
 - Never collapse “no event observed” into “stable” or “no governance change” without an explicit observability model.
 - Preserve rejected, null, and negative evidence needed to estimate false positives and false negatives.
-- Source freshness is stamped only through `markSourcesSynced()` after a non-dry run actually writes rows.
+- Source freshness is stamped only through the `markSourcesSynced*` API family after eligible domain rows actually commit. Use the transaction/CTE variants when freshness must commit atomically with those rows; dry, failed, empty, and duplicate-only runs never stamp.
 - Every frozen release records code commit, input vintages/hashes, transformation version, schema version, generated-at time, and rights posture.
 - Non-commercial source restrictions are release gates for any future monetization.
 

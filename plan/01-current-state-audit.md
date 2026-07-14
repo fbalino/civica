@@ -49,7 +49,7 @@ Counts are a dated audit snapshot, not evergreen copy. Public statistics must co
 
 - Country routes, the three-tab country information architecture, country search, comparison, maps, organizations, parties, government structure, officeholders, legislatures, elections, conditions, source displays, and exports are real implemented surfaces.
 - Provenance is structural rather than decorative: source rows, source freshness, resolver logic, disputes, canonical facts, and `SourceDot` are integrated.
-- Source sync freshness has a single sanctioned path through `markSourcesSynced()` and a repository validator.
+- Source sync freshness has one sanctioned `markSourcesSynced*` API family, including atomic transaction/CTE variants, and a repository validator.
 - Government taxonomy includes externally sourced regime classifications and a helper layer rather than relying solely on raw prose.
 - Constitution ingestion and topic extraction are substantial and include full text for the available corpus.
 - Indicator history has enough longitudinal observations to support source-native trend surfaces and serious panel analyses.

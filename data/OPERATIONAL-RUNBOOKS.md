@@ -11,10 +11,10 @@ at the end.
 ## 1. Upstream data-source breakage
 
 - **Detection:** a scheduled sync fails, returns zero rows, or an anomalous
-  delta. Job observability (PLT-017 target) and `markSourcesSynced()` — which
-  stamps `last_sync_at` only on a successful row-writing run — mean a broken
-  sync does **not** advance freshness. `SourceDot` shows the stale/frozen state
-  to readers.
+  delta. Job observability (PLT-017 target) and the `markSourcesSynced*` API
+  family — whose atomic variants stamp `last_sync_at` only with eligible
+  committed rows — mean a broken sync does **not** advance freshness.
+  `SourceDot` shows the stale/frozen state to readers.
 - **Containment:** the adapter fails closed (DAT-012) and leaves the prior
   canonical values intact; nothing partial is published. No action degrades
   the rest of the atlas.

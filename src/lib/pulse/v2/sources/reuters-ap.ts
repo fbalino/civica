@@ -8,8 +8,9 @@
  * don't tag country in the structured RSS schema.
  *
  * Both URLs are env-overrideable. The feeds may move (Reuters in
- * particular has rotated their public RSS endpoint a few times).
- * Connector gracefully no-ops on 404.
+ * particular has rotated their public RSS endpoint a few times). An absent
+ * URL is an explicit skip; once configured, retrieval and parsing failures
+ * surface to the aggregate ingest instead of masquerading as a quiet feed.
  */
 
 import { fetchRss, rssItemToEventDate } from "../rss";
@@ -35,26 +36,35 @@ export interface ReutersApFetchResult {
   apFetched: number;
 }
 
+export interface ReutersApFetchOptions {
+  /** Deterministic fixture/configuration seam. Omit to use the environment. */
+  reutersUrl?: string | null;
+  /** Deterministic fixture/configuration seam. Omit to use the environment. */
+  apUrl?: string | null;
+  fetchFeed?: typeof fetchRss;
+}
+
 async function fetchOne(
-  url: string,
+  url: string | null,
   sourceId: string,
-  map: JurisdictionMap
+  map: JurisdictionMap,
+  fetchFeed: typeof fetchRss,
 ): Promise<{ rows: RawEventInput[]; unmatched: number; fetched: number }> {
   if (!url) {
     console.log(
-      `[${sourceId}] no feed URL configured — skipping (set its *_RSS_URL to enable).`
+      `[${sourceId}] no feed URL configured — skipping (set its *_RSS_URL to enable).`,
     );
     return { rows: [], unmatched: 0, fetched: 0 };
   }
   let items;
   try {
-    items = await fetchRss(url);
+    items = await fetchFeed(url);
   } catch (err) {
-    console.warn(
-      `[${sourceId}] feed fetch failed (${url}); returning 0 rows. ` +
-        `Error: ${(err as Error).message}`
+    throw new Error(
+      `${sourceId} feed retrieval failed (${url}): ${
+        err instanceof Error ? err.message : String(err)
+      }`,
     );
-    return { rows: [], unmatched: 0, fetched: 0 };
   }
 
   const rows: RawEventInput[] = [];
@@ -85,15 +95,27 @@ async function fetchOne(
     });
   }
 
+  if (items.length > 0 && rows.length === 0) {
+    throw new Error(
+      `${sourceId} feed parsed ${items.length} upstream record${items.length === 1 ? "" : "s"} but produced no usable event rows`,
+    );
+  }
+
   return { rows, unmatched, fetched: items.length };
 }
 
 export async function fetchReutersAp(
-  map: JurisdictionMap
+  map: JurisdictionMap,
+  opts: ReutersApFetchOptions = {},
 ): Promise<ReutersApFetchResult> {
+  const reutersUrl = Object.hasOwn(opts, "reutersUrl")
+    ? (opts.reutersUrl ?? null)
+    : REUTERS_URL;
+  const apUrl = Object.hasOwn(opts, "apUrl") ? (opts.apUrl ?? null) : AP_URL;
+  const fetchFeed = opts.fetchFeed ?? fetchRss;
   const [reuters, ap] = await Promise.all([
-    fetchOne(REUTERS_URL, "reuters_wire", map),
-    fetchOne(AP_URL, "ap_wire", map),
+    fetchOne(reutersUrl, "reuters_wire", map, fetchFeed),
+    fetchOne(apUrl, "ap_wire", map, fetchFeed),
   ]);
 
   return {

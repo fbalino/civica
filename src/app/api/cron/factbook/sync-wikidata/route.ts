@@ -2,7 +2,7 @@
  * Phase F.2 — Wikidata sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). The full 270-jurisdiction × 8-fact-key
+ * (per the shared cron boundary). The full 270-jurisdiction × 8-fact-key
  * pass takes roughly 10 minutes at Wikidata's 4 req/s politeness
  * floor; allow 540s.
  *
@@ -10,7 +10,7 @@
  * Implementation plan: F.2.
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncFactbookWikidata } from "@/lib/factbook/reconcile/wikidata-sync";
 
@@ -21,9 +21,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
@@ -40,12 +37,18 @@ async function handler(request: Request) {
     });
 
     if (summary.errors.length > 0 || summary.totalAdmitted === 0) {
-      return NextResponse.json({
-        ok: false,
-        step: "factbook.wikidata.sync",
-        dryRun,
-        errors: summary.errors.length > 0 ? summary.errors : ["No admissible Wikidata facts returned"],
-      }, { status: 502 });
+      return NextResponse.json(
+        {
+          ok: false,
+          step: "factbook.wikidata.sync",
+          dryRun,
+          errors:
+            summary.errors.length > 0
+              ? summary.errors
+              : ["No admissible Wikidata facts returned"],
+        },
+        { status: 502 },
+      );
     }
 
     return NextResponse.json({
@@ -67,9 +70,11 @@ async function handler(request: Request) {
         step: "factbook.wikidata.sync",
         error: err instanceof Error ? err.message : String(err),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.wikidata", handler);
+
+export { cronHandler as GET, cronHandler as POST };

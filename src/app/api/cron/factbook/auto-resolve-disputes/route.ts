@@ -2,7 +2,7 @@
  * Phase R.21 — auto-resolve stale `material_error` disputes.
  *
  * Runs daily at 02:30 UTC (per `vercel.json`). Authenticated via
- * `requireCronAuth` against `CRON_SECRET`. Idempotent: stale disputes
+ * the shared cron boundary against `CRON_SECRET`. Idempotent: stale disputes
  * are flipped to `resolved_auto_stale` and skipped on next run; live
  * disputes are left untouched.
  *
@@ -17,7 +17,7 @@
  * Methodology: ~/civica/plan/disputes-triage-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { autoResolveStaleDisputes } from "@/lib/factbook/reconcile/auto-resolve-disputes";
 
@@ -28,14 +28,13 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
   const limitParam = url.searchParams.get("limit");
-  const limit = limitParam ? Math.max(1, parseInt(limitParam, 10) || 0) : undefined;
+  const limit = limitParam
+    ? Math.max(1, parseInt(limitParam, 10) || 0)
+    : undefined;
 
   try {
     const summary = await autoResolveStaleDisputes(db, {
@@ -48,7 +47,15 @@ async function handler(request: Request) {
     });
 
     if (summary.errors.length > 0) {
-      return NextResponse.json({ ok: false, step: "factbook.auto-resolve-disputes", dryRun, errors: summary.errors }, { status: 500 });
+      return NextResponse.json(
+        {
+          ok: false,
+          step: "factbook.auto-resolve-disputes",
+          dryRun,
+          errors: summary.errors,
+        },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -79,4 +86,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.auto-resolve", handler);
+
+export { cronHandler as GET, cronHandler as POST };

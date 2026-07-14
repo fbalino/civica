@@ -91,18 +91,19 @@
 import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -151,7 +152,8 @@ const WTO_MERCHANDISE_ARCHIVE = "merchandise_values_annual_dataset.zip";
  * out. Points to the WTO Stats merchandise dashboard rather than the
  * raw ZIP since the ZIP isn't a stable human-facing landing page.
  */
-const WTO_MERCHANDISE_DOC_URL = "https://stats.wto.org/dashboard/merchandise_en.html";
+const WTO_MERCHANDISE_DOC_URL =
+  "https://stats.wto.org/dashboard/merchandise_en.html";
 
 /**
  * One WTO indicator we care about. The merchandise CSV is indexed
@@ -425,9 +427,7 @@ async function fetchAndParseMerchandiseCsv(
   const entries = zip.getEntries();
   const dataEntry = entries.find((e) => e.entryName.endsWith(".csv"));
   if (!dataEntry) {
-    throw new Error(
-      `WTO archive ${WTO_MERCHANDISE_ARCHIVE}: no .csv entry`,
-    );
+    throw new Error(`WTO archive ${WTO_MERCHANDISE_ARCHIVE}: no .csv entry`);
   }
   const csvText = dataEntry.getData().toString("utf-8");
   log(
@@ -543,10 +543,17 @@ async function runLegacyMigration(
       WHERE fact_key IN ('exports_total_usd', 'imports_total_usd', 'exports_total', 'imports_total')
       GROUP BY fact_key, source_id
       ORDER BY fact_key, source_id`);
-    const rows = (result as unknown as { rows?: Array<{ fact_key: string; source_id: string; n: number }> }).rows ?? [];
+    const rows =
+      (
+        result as unknown as {
+          rows?: Array<{ fact_key: string; source_id: string; n: number }>;
+        }
+      ).rows ?? [];
     let toMigrate = 0;
     for (const r of rows) {
-      log(`  [DRY] would migrate ${r.n} rows from ${r.fact_key} (${r.source_id})`);
+      log(
+        `  [DRY] would migrate ${r.n} rows from ${r.fact_key} (${r.source_id})`,
+      );
       toMigrate += Number(r.n);
     }
     return {
@@ -615,7 +622,9 @@ async function runLegacyMigration(
         `WB imports ${rc(renameImportsWb)} + CIA imports ${rc(renameImportsCia)})`,
     );
   } else {
-    log(`  legacy fact-key migration: 0 rows (already migrated; idempotent no-op)`);
+    log(
+      `  legacy fact-key migration: 0 rows (already migrated; idempotent no-op)`,
+    );
   }
 
   // Step 3 — flip WB role from 'alternate' to 'canonical' on the
@@ -651,7 +660,9 @@ async function runLegacyMigration(
 
   const rowsRoleFlipped = rc(flipExports) + rc(flipImports);
   if (rowsRoleFlipped > 0) {
-    log(`  WB civicaRole flipped alternate→canonical on ${rowsRoleFlipped} rows`);
+    log(
+      `  WB civicaRole flipped alternate→canonical on ${rowsRoleFlipped} rows`,
+    );
   }
 
   // Step 4 — tighten `sources.license` for `wto_stats` from
@@ -666,7 +677,9 @@ async function runLegacyMigration(
     WHERE id = 'wto_stats' AND license = 'open_data_attribution'`);
   const licenseTightened = rc(licenseUpdate) > 0;
   if (licenseTightened) {
-    log(`  sources.license for wto_stats tightened from 'open_data_attribution' → 'ODbL-1.0'`);
+    log(
+      `  sources.license for wto_stats tightened from 'open_data_attribution' → 'ODbL-1.0'`,
+    );
   }
 
   return {
@@ -729,9 +742,7 @@ export async function syncWtoStats(
     );
   } catch (err) {
     errors.push(
-      `legacy migration failed: ${
-        err instanceof Error ? err.message : err
-      }`,
+      `legacy migration failed: ${err instanceof Error ? err.message : err}`,
     );
     legacyMigration = {
       expectedFactKeysRemoved: [],
@@ -742,14 +753,16 @@ export async function syncWtoStats(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -763,7 +776,9 @@ export async function syncWtoStats(
   let allRows: WtoCsvRow[];
   let archiveBytes = 0;
   try {
-    const result = await (options.fetchArchive ?? fetchAndParseMerchandiseCsv)(log);
+    const result = await (options.fetchArchive ?? fetchAndParseMerchandiseCsv)(
+      log,
+    );
     allRows = result.rows;
     archiveBytes = result.archiveBytes;
     log(`  parsed ${allRows.length} CSV rows (after filter)`);
@@ -1011,13 +1026,13 @@ export async function syncWtoStats(
         `(unmatched ISO3: ${counter.skipped_no_jurisdiction}, ` +
         `envelope rejects: ${counter.rejected_envelope})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "WTO Stats",
+      target: `${config.factKey} (${config.wtoIndicatorCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("wto_stats", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -1035,13 +1050,17 @@ export async function syncWtoStats(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return;
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return;
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -1051,6 +1070,15 @@ export async function syncWtoStats(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "wto_stats",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerWtoStatsCounters> = {};

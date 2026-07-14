@@ -28,7 +28,7 @@ Create an exhaustive, repository-grounded master plan that makes Civica Atlas th
 - Keep one writer per mutable file area.
 - Keep planning and operational state inside this project.
 - The design system is a closed set: add or amend canonical tokens/components and `/design-system` before page-local UI work.
-- Preserve source provenance and stamp freshness only through `markSourcesSynced()` after rows are actually written.
+- Preserve source provenance and stamp freshness only through the `markSourcesSynced*` API family after eligible rows actually commit; use its atomic transaction/CTE variants when rows and freshness share one publication boundary.
 - Do not activate paid model APIs without a new explicit approval and USD cap.
 - Default to the primary Codex session; do not spawn Sol-class subagents for
   routine work. Use Luna/Terra only when model selection is enforceable and the

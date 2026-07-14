@@ -2,7 +2,7 @@
  * Phase R.13 — US Census Bureau sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 6 indicators × 1 jurisdiction × ~7 fetches in
+ * the shared cron boundary). 6 indicators × 1 jurisdiction × ~7 fetches in
  * total (urbanization_rate composes 2 datasets). Total wall time is
  * dominated by upserts, not fetches; expect ~5–15s on a warm DB.
  *
@@ -25,7 +25,7 @@
  * Resolution:  ~/civica/plan/us-census-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncUsCensus } from "@/lib/factbook/reconcile/sync-us-census";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -35,9 +35,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -75,4 +72,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.us-census", handler);
+
+export { cronHandler as GET, cronHandler as POST };

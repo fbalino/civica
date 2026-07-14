@@ -1,19 +1,20 @@
 /**
  * Shared, byte-identical helpers extracted from the ~18 factbook
- * reconcile sync adapters (`sync-*.ts`). This module holds ONLY the
- * definitions that were genuinely identical across every adapter — the
- * `payloadHash()` content-hash helper and the `CivicaSourceRole`
- * editorial-role type. Per-adapter logic (fetch + map + counters +
- * `freshCounters()`) is intentionally NOT moved here because it differs
- * per source; extracting it would change behavior.
+ * reconcile sync adapters (`sync-*.ts`). This module holds the definitions
+ * that are genuinely identical across every adapter: payload hashing,
+ * Civica's editorial source-role type, and the final aggregate-success gate
+ * for source freshness. Per-adapter logic (fetch + map + counters +
+ * `freshCounters()`) is intentionally NOT moved here because it differs per
+ * source; extracting it would change behavior.
  *
- * This is a pure extract-and-import: the implementations below are the
- * verbatim definitions that previously lived (copy-pasted) in each
- * adapter. No freshness logic lives here — `last_sync_at` stamping
- * continues to flow through `markSourcesSynced()` from
- * `@/lib/db/source-freshness` inside each adapter, unchanged.
+ * Freshness still flows exclusively through `markSourcesSynced()` from
+ * `@/lib/db/source-freshness`. The shared gate below only decides whether an
+ * adapter is allowed to call that sanctioned writer after every downstream
+ * step, including dispute persistence, has finished successfully.
  */
 import { createHash } from "node:crypto";
+
+import type { markSourcesSynced } from "@/lib/db/source-freshness";
 
 /**
  * Civica's editorial role for a given (source, fact-key) pair.
@@ -41,7 +42,57 @@ export type CivicaSourceRole = "canonical" | "alternate";
  * reconcile adapter.
  */
 export function payloadHash(payload: object): string {
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex");
+  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+}
+
+/**
+ * Record a fail-loud outcome when a configured, required subfeed did not
+ * produce even one usable Civica row. A sibling target writing rows must not
+ * hide an empty response, parser drift, an all-rejected payload, or a complete
+ * jurisdiction-mapping miss for another required target.
+ *
+ * Call this once per configured target after its write/dry-run loop. A
+ * genuinely optional or expected-empty target must model that policy
+ * explicitly instead of silently omitting this assertion.
+ */
+export function recordRequiredSubfeedOutcome(options: {
+  errors: string[];
+  source: string;
+  target: string;
+  rowsWritten: number;
+}): boolean {
+  if (Number.isSafeInteger(options.rowsWritten) && options.rowsWritten > 0) {
+    return true;
+  }
+
+  const message = `${options.source} required subfeed '${options.target}' produced no usable rows`;
+  if (!options.errors.includes(message)) options.errors.push(message);
+  return false;
+}
+
+/**
+ * Stamp an external source only after the adapter's complete error aggregate
+ * is empty. Call this after dispute persistence and after folding any returned
+ * dispute errors into `errors`.
+ *
+ * The callback remains `markSourcesSynced` (or its injected test seam), so its
+ * positive-row and dry-run rules stay authoritative. Skipping the callback
+ * entirely on aggregate failure makes retry behavior explicit: a failed run
+ * cannot consume or advance a freshness stamp.
+ */
+export async function markExternalSourceSyncedAfterAggregateSuccess(options: {
+  sourceIds: string | string[];
+  rowsWritten: number;
+  dryRun?: boolean;
+  executor: Parameters<typeof markSourcesSynced>[1]["executor"];
+  errors: readonly string[];
+  markSynced: typeof markSourcesSynced;
+}): Promise<string[]> {
+  if (options.errors.length > 0) return [];
+
+  return options.markSynced(options.sourceIds, {
+    rowsWritten: options.rowsWritten,
+    dryRun: options.dryRun,
+    executor: options.executor,
+  });
 }

@@ -12,6 +12,7 @@ import {
   versioned,
   type VersionRef,
 } from "@/lib/research/derivation-version";
+import { stableStringify } from "@/lib/data/frozen-vintage";
 import { PULSE_EVENT_ONTOLOGY_VERSION } from "./event-ontology";
 import { PULSE_EMBEDDING_MODEL } from "./embed";
 import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
@@ -76,6 +77,10 @@ export interface PulseStageVersionEnvelope {
   sourceIds: string[];
   models: PulseModelVersionRef[];
   upstreamRunIds: string[];
+  /** Exact stage input/scope identities used to fence deterministic retries. */
+  inputIds?: string[];
+  /** Hash of the exact values admitted on the first deterministic attempt. */
+  inputFingerprint?: string;
 }
 
 export interface PulsePipelineRunRef {
@@ -160,6 +165,9 @@ function canonicalizeEnvelope(
       ),
     ),
     upstreamRunIds: [...new Set(envelope.upstreamRunIds)].sort(),
+    ...(envelope.inputIds
+      ? { inputIds: [...new Set(envelope.inputIds)].sort() }
+      : {}),
   };
 }
 
@@ -199,6 +207,15 @@ export function pulseStageVersionErrors(value: unknown): string[] {
   if (!Array.isArray(envelope.models)) errors.push("models must be an array");
   if (!Array.isArray(envelope.upstreamRunIds))
     errors.push("upstreamRunIds must be an array");
+  if (envelope.inputIds && !Array.isArray(envelope.inputIds)) {
+    errors.push("inputIds must be an array when present");
+  }
+  if (
+    envelope.inputFingerprint &&
+    !/^pulse-stage-input\/sha256:[a-f0-9]{64}$/.test(envelope.inputFingerprint)
+  ) {
+    errors.push("inputFingerprint has an invalid shape");
+  }
   for (const model of envelope.models ?? []) {
     if (!model.role || !model.provider.trim() || !model.model.trim()) {
       errors.push("model references require role, provider, and model");
@@ -220,7 +237,9 @@ export function pulseStageVersionKey(
   const errors = pulseStageVersionErrors(canonical);
   if (errors.length) throw new Error(errors.join("; "));
   return `pulse-stage/sha256:${createHash("sha256")
-    .update(JSON.stringify(canonical))
+    // PostgreSQL jsonb does not preserve object-key insertion order. Hash the
+    // semantic value so a persisted envelope verifies after a jsonb round trip.
+    .update(stableStringify(canonical))
     .digest("hex")}`;
 }
 
@@ -232,6 +251,8 @@ export function buildPulseStageVersionEnvelope(
     models?: readonly PulseModelVersionRef[];
     prompt?: VersionRef;
     algorithm?: VersionRef;
+    inputIds?: readonly string[];
+    inputFingerprint?: string;
   } = {},
 ): PulseStageVersionEnvelope {
   const sourceIds = [...(options.sourceIds ?? activeSourceIds())].sort();
@@ -248,6 +269,10 @@ export function buildPulseStageVersionEnvelope(
     sourceIds: basket.sourceIds,
     models: [...(options.models ?? stageModels(stage))],
     upstreamRunIds: [...(options.upstreamRunIds ?? [])],
+    ...(options.inputIds ? { inputIds: [...options.inputIds] } : {}),
+    ...(options.inputFingerprint
+      ? { inputFingerprint: options.inputFingerprint }
+      : {}),
   });
 }
 
@@ -279,6 +304,8 @@ export function createPulsePipelineRunRef(
     models?: readonly PulseModelVersionRef[];
     prompt?: VersionRef;
     algorithm?: VersionRef;
+    inputIds?: readonly string[];
+    inputFingerprint?: string;
   } = {},
 ): PulsePipelineRunRef {
   const versions = buildPulseStageVersionEnvelope(stage, options);
@@ -289,9 +316,119 @@ export function createPulsePipelineRunRef(
   };
 }
 
+export function pulseStageInputFingerprint(value: unknown): string {
+  return `pulse-stage-input/sha256:${createHash("sha256")
+    .update(stableStringify(value))
+    .digest("hex")}`;
+}
+
+export interface PulsePipelineRunState {
+  run: PulsePipelineRunRef;
+  status: "running" | "completed" | "partial" | "failed" | "legacy";
+  counts: Record<string, number>;
+  startedAt: Date;
+}
+
+/** Read a deterministic run before touching mutable stage inputs. */
+export async function loadPulsePipelineRunState(
+  db: Db,
+  runId: string,
+  expectedStage: PulsePipelineStage,
+): Promise<PulsePipelineRunState | null> {
+  const rows = await db
+    .select({
+      stage: pulsePipelineRuns.stage,
+      status: pulsePipelineRuns.status,
+      versionKey: pulsePipelineRuns.versionKey,
+      versions: pulsePipelineRuns.versions,
+      counts: pulsePipelineRuns.counts,
+      startedAt: pulsePipelineRuns.startedAt,
+    })
+    .from(pulsePipelineRuns)
+    .where(eq(pulsePipelineRuns.id, runId))
+    .limit(1);
+  const row = rows[0];
+  if (!row) return null;
+  if (row.stage !== expectedStage) {
+    throw new Error(`Pulse pipeline run identity collision: ${runId}`);
+  }
+  return {
+    run: { id: runId, versionKey: row.versionKey, versions: row.versions },
+    status: row.status as PulsePipelineRunState["status"],
+    counts: row.counts,
+    startedAt: row.startedAt,
+  };
+}
+
+/** Derive one RFC-4122-shaped UUID for a Pulse stage inside a logical cron
+ * delivery. Retries of that delivery reuse the stage run; later schedule slots
+ * and different manual idempotency keys derive different runs. */
+export function pulseCronStageRunId(
+  executionKey: string,
+  stage: PulsePipelineStage,
+): string {
+  if (!/^[a-f0-9]{64}$/.test(executionKey)) {
+    throw new Error("Pulse cron stage requires a valid execution key");
+  }
+  const bytes = createHash("sha256")
+    .update("civica-pulse-cron-stage-run/v1\0")
+    .update(executionKey)
+    .update("\0")
+    .update(stage)
+    .digest()
+    .subarray(0, 16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x50;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = bytes.toString("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+export type PreparedPulsePipelineRun =
+  { state: "ready" } | { state: "completed"; counts: Record<string, number> };
+
+/**
+ * Start or resume a deterministic production stage run. A completed run is a
+ * durable no-op on delivery retry. An atomic publish failure deliberately
+ * leaves a deterministic run `running`, because the authoritative pipeline-run
+ * guard forbids rewriting terminal evidence back to running.
+ */
+export async function preparePulsePipelineRun(
+  db: Db,
+  run: PulsePipelineRunRef,
+): Promise<PreparedPulsePipelineRun> {
+  const existing = await db
+    .select({
+      stage: pulsePipelineRuns.stage,
+      status: pulsePipelineRuns.status,
+      versionKey: pulsePipelineRuns.versionKey,
+      counts: pulsePipelineRuns.counts,
+    })
+    .from(pulsePipelineRuns)
+    .where(eq(pulsePipelineRuns.id, run.id))
+    .limit(1);
+  const row = existing[0];
+  if (!row) {
+    await startPulsePipelineRun(db, run);
+    return { state: "ready" };
+  }
+  if (row.stage !== run.versions.stage || row.versionKey !== run.versionKey) {
+    throw new Error(`Pulse pipeline run identity collision: ${run.id}`);
+  }
+  if (row.status === "completed") {
+    return { state: "completed", counts: row.counts };
+  }
+  if (row.status !== "running") {
+    throw new Error(
+      `Terminal Pulse pipeline run cannot be resumed: ${run.id} (${row.status})`,
+    );
+  }
+  return { state: "ready" };
+}
+
 export async function startPulsePipelineRun(
   db: Db,
   run: PulsePipelineRunRef,
+  options: { startedAt?: Date } = {},
 ): Promise<void> {
   await db.insert(pulsePipelineRuns).values({
     id: run.id,
@@ -299,6 +436,7 @@ export async function startPulsePipelineRun(
     status: "running",
     versionKey: run.versionKey,
     versions: run.versions,
+    startedAt: options.startedAt,
   });
 }
 

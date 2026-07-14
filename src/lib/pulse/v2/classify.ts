@@ -37,11 +37,14 @@
  * The review queue is `pulse_events_v2` rows where `published = false`.
  */
 
+import { randomUUID } from "node:crypto";
+
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import {
+  pulseClassificationDeliveryBindings,
   pulseEventsV2,
-  pulseSources,
+  pulsePipelineRuns,
   rawEvents,
   sources,
 } from "@/lib/db/schema";
@@ -97,7 +100,6 @@ import {
   normalizeInvalidConsensusForReview,
   PULSE_PUBLICATION_GATE_VERSION,
   singleEngineRequiresReview,
-  verifierObjects,
 } from "./publication-gate";
 import {
   PULSE_CLASSIFICATION_ALGORITHM_VERSION,
@@ -107,6 +109,10 @@ import {
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
+  loadPulsePipelineRunState,
+  pulseCronStageRunId,
+  pulseStageInputFingerprint,
+  pulseStageVersionKey,
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
@@ -130,8 +136,18 @@ import {
   claimClassificationAttempt,
   loadClassificationQueueMetrics,
   settleClassificationAttempt,
+  type ClaimedClassificationAttempt,
   type ClassificationQueueMetricsRow,
 } from "./classification-state-store";
+import {
+  publishClassifiedCluster,
+  publishNonGovernanceCluster,
+} from "./classification-publication";
+import {
+  finalizeClassificationPipelineRun,
+  type ClassificationRunFinalizationResult,
+  type FrozenClassificationCluster,
+} from "./classification-run-finalizer";
 import { PULSE_JURISDICTION_ATTRIBUTION_VERSION } from "./jurisdiction-entities";
 import {
   deriveStoredEnsemble,
@@ -193,8 +209,9 @@ export function currentClassificationConfig(): ClassificationConfigInput {
 }
 
 export const CURRENT_CLASSIFICATION_CONFIG = currentClassificationConfig();
-export const CURRENT_CLASSIFICATION_CONFIG_HASH =
-  buildClassificationConfigHash(CURRENT_CLASSIFICATION_CONFIG);
+export const CURRENT_CLASSIFICATION_CONFIG_HASH = buildClassificationConfigHash(
+  CURRENT_CLASSIFICATION_CONFIG,
+);
 
 /** Verify-run ordinal in classifierRuns (kept distinct from the classify
  *  runs' 1..N ordinals so React keys and audit rows never collide). */
@@ -253,6 +270,8 @@ export interface ClassifySummary {
   queueBefore: ClassificationQueueMetricsRow | null;
   queueAfter: ClassificationQueueMetricsRow | null;
   dryRun: boolean;
+  /** True when a delivery retry reused durable terminal run evidence. */
+  reused: boolean;
   planned: Array<{
     clusterId: string;
     jurisdictionId: string;
@@ -273,16 +292,22 @@ export interface ClassifyClustersOptions {
     headline: string,
     description: string,
     provisionalJurisdictionId?: string | null,
-  ) => Promise<
-    Awaited<ReturnType<typeof resolveSubjectJurisdiction>> | null
-  >;
+  ) => Promise<Awaited<ReturnType<typeof resolveSubjectJurisdiction>> | null>;
   write?: (
     db: Db,
     cluster: ClusterToClassify,
     result: ClassifyOneResult,
     classificationRunId: string,
   ) => Promise<string | null | void>;
+  writeNonEvent?: (
+    db: Db,
+    cluster: ClusterToClassify,
+    classificationRunId: string,
+  ) => Promise<void>;
   runRef?: PulsePipelineRunRef;
+  /** Stable identity injected by the authenticated cron wrapper. */
+  cronExecutionKey?: string;
+  now?: Date;
   failOnError?: boolean;
 }
 
@@ -323,6 +348,313 @@ function validateClusterFixtures(clusters: readonly ClusterToClassify[]): void {
   }
 }
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/** Hash the exact model/publication values admitted by a classify run. */
+export function classificationInputFingerprint(
+  clusters: readonly ClusterToClassify[],
+): string {
+  return pulseStageInputFingerprint(
+    [...clusters]
+      .sort((left, right) => left.clusterId.localeCompare(right.clusterId))
+      .map((cluster) => ({
+        clusterId: cluster.clusterId,
+        incidentId: cluster.incidentId ?? null,
+        jurisdictionId: cluster.jurisdictionId,
+        eventDate: cluster.eventDate,
+        title: cluster.title,
+        body: cluster.body,
+        rawEventIds: [...cluster.rawEventIds].sort(),
+        sourceIds: [...cluster.sourceIds].sort(),
+        sourceTypes: [...cluster.sourceTypes].sort(),
+        clusterRunIds: [...cluster.clusterRunIds].sort(),
+        attributions: [...cluster.attributions].sort((left, right) =>
+          left.rawEventId.localeCompare(right.rawEventId),
+        ),
+      })),
+  );
+}
+
+function classificationInputIds(
+  clusters: readonly ClusterToClassify[],
+): string[] {
+  return [
+    `classification-config:${CURRENT_CLASSIFICATION_CONFIG_HASH}`,
+    ...clusters.flatMap((cluster) => [
+      `cluster:${cluster.clusterId}`,
+      ...cluster.rawEventIds.map(
+        (rawEventId) => `cluster-raw:${cluster.clusterId}:${rawEventId}`,
+      ),
+    ]),
+  ];
+}
+
+function frozenClassificationClusters(
+  inputIds: readonly string[] | undefined,
+  runId: string,
+): {
+  configHash: string;
+  clusters: FrozenClassificationCluster[];
+} {
+  if (!inputIds) {
+    throw new Error(
+      `Running classification run lacks an input snapshot: ${runId}`,
+    );
+  }
+  const configInputs = inputIds.filter((id) =>
+    id.startsWith("classification-config:"),
+  );
+  const configHash = configInputs[0]?.slice("classification-config:".length);
+  if (
+    configInputs.length !== 1 ||
+    !configHash ||
+    !/^pulse-classification-config\/v1\/sha256:[a-f0-9]{64}$/.test(configHash)
+  ) {
+    throw new Error(
+      `Classification run has an invalid configuration input: ${runId}`,
+    );
+  }
+  const clusters = new Map<string, string[]>();
+  for (const inputId of inputIds) {
+    if (inputId.startsWith("classification-config:")) continue;
+    if (inputId.startsWith("cluster:")) {
+      const clusterId = inputId.slice("cluster:".length);
+      if (!UUID_PATTERN.test(clusterId) || clusters.has(clusterId)) {
+        throw new Error(
+          `Classification run has an invalid cluster input: ${runId}`,
+        );
+      }
+      clusters.set(clusterId, []);
+    }
+  }
+  for (const inputId of inputIds) {
+    if (
+      inputId.startsWith("classification-config:") ||
+      inputId.startsWith("cluster:")
+    ) {
+      continue;
+    }
+    const [kind, clusterId, rawEventId, ...rest] = inputId.split(":");
+    if (
+      kind !== "cluster-raw" ||
+      rest.length > 0 ||
+      !UUID_PATTERN.test(clusterId) ||
+      !UUID_PATTERN.test(rawEventId) ||
+      !clusters.has(clusterId)
+    ) {
+      throw new Error(`Classification run has an invalid raw input: ${runId}`);
+    }
+    clusters.get(clusterId)!.push(rawEventId);
+  }
+  const frozen = [...clusters].map(([clusterId, rawEventIds]) => ({
+    clusterId,
+    rawEventIds: [...rawEventIds].sort(),
+  }));
+  if (
+    frozen.some(({ rawEventIds }) => rawEventIds.length === 0) ||
+    new Set(frozen.flatMap(({ rawEventIds }) => rawEventIds)).size !==
+      frozen.reduce((count, { rawEventIds }) => count + rawEventIds.length, 0)
+  ) {
+    throw new Error(
+      `Classification run has an incomplete input snapshot: ${runId}`,
+    );
+  }
+  return {
+    configHash,
+    clusters: frozen.sort((left, right) =>
+      left.clusterId.localeCompare(right.clusterId),
+    ),
+  };
+}
+
+function validatedFrozenClassificationRun(run: PulsePipelineRunRef): {
+  configHash: string;
+  clusters: FrozenClassificationCluster[];
+  inputFingerprint: string;
+} {
+  const frozen = frozenClassificationClusters(run.versions.inputIds, run.id);
+  const inputFingerprint = run.versions.inputFingerprint;
+  if (
+    !inputFingerprint ||
+    !/^pulse-stage-input\/sha256:[a-f0-9]{64}$/.test(inputFingerprint)
+  ) {
+    throw new Error(
+      `Classification run has an invalid input fingerprint: ${run.id}`,
+    );
+  }
+  if (pulseStageVersionKey(run.versions) !== run.versionKey) {
+    throw new Error(
+      `Classification run has a mismatched version key: ${run.id}`,
+    );
+  }
+  return { ...frozen, inputFingerprint };
+}
+
+async function reconstructFrozenClassificationSnapshot(
+  db: Db,
+  run: PulsePipelineRunRef,
+  frozen: ReturnType<typeof validatedFrozenClassificationRun>,
+  fallbackEventDate: string,
+): Promise<ClusterToClassify[]> {
+  const clusterIds = frozen.clusters.map(({ clusterId }) => clusterId);
+  const rawEventIds = frozen.clusters.flatMap(({ rawEventIds }) => rawEventIds);
+  const replayedSnapshot = await loadUnclassifiedClusters(
+    db,
+    Math.max(1, frozen.clusters.length),
+    frozen.configHash,
+    {
+      clusterIds,
+      rawEventIds,
+      includeSettled: true,
+      fallbackEventDate,
+    },
+  );
+  validateClusterFixtures(replayedSnapshot);
+  const replayedClusterIds = replayedSnapshot
+    .map(({ clusterId }) => clusterId)
+    .sort();
+  const replayedRawEventIds = replayedSnapshot
+    .flatMap(({ rawEventIds }) => rawEventIds)
+    .sort();
+  if (
+    JSON.stringify(replayedClusterIds) !==
+      JSON.stringify([...clusterIds].sort()) ||
+    JSON.stringify(replayedRawEventIds) !==
+      JSON.stringify([...rawEventIds].sort())
+  ) {
+    throw new Error(
+      `Classification retry input snapshot is incomplete: ${run.id}`,
+    );
+  }
+  if (
+    classificationInputFingerprint(replayedSnapshot) !== frozen.inputFingerprint
+  ) {
+    throw new Error(`Classification retry input values changed: ${run.id}`);
+  }
+  return replayedSnapshot;
+}
+
+function reusedClassificationSummary(
+  run: PulsePipelineRunRef,
+  counts: Record<string, number>,
+  configHash: string,
+): ClassifySummary {
+  return {
+    runId: run.id,
+    versionKey: run.versionKey,
+    clustersExamined: counts.clustersExamined ?? 0,
+    classified: counts.classified ?? 0,
+    publishedAuto: counts.publishedAuto ?? 0,
+    flaggedForReview: counts.flaggedForReview ?? 0,
+    noneCategory: counts.nonGovernance ?? 0,
+    failed: counts.failed ?? 0,
+    modelCalls: counts.modelCalls ?? 0,
+    retryableFailures: counts.retryableFailures ?? 0,
+    terminalFailures: counts.terminalFailures ?? 0,
+    claimsSkipped: counts.claimsSkipped ?? 0,
+    configHash,
+    queueBefore: null,
+    queueAfter: null,
+    dryRun: false,
+    reused: true,
+    planned: [],
+  };
+}
+
+function applyFinalizedCounts(
+  summary: ClassifySummary,
+  finalized: ClassificationRunFinalizationResult,
+): void {
+  summary.clustersExamined = finalized.counts.clustersExamined ?? 0;
+  summary.classified = finalized.counts.classified ?? 0;
+  summary.publishedAuto = finalized.counts.publishedAuto ?? 0;
+  summary.flaggedForReview = finalized.counts.flaggedForReview ?? 0;
+  summary.noneCategory = finalized.counts.nonGovernance ?? 0;
+  summary.failed = finalized.counts.failed ?? 0;
+  summary.modelCalls = finalized.counts.modelCalls ?? 0;
+  summary.retryableFailures = finalized.counts.retryableFailures ?? 0;
+  summary.terminalFailures = finalized.counts.terminalFailures ?? 0;
+  summary.claimsSkipped = finalized.counts.claimsSkipped ?? 0;
+}
+
+async function loadSoleRunningClassificationRun(
+  db: Db,
+): Promise<Awaited<ReturnType<typeof loadPulsePipelineRunState>>> {
+  const running = await db
+    .select({ id: pulsePipelineRuns.id })
+    .from(pulsePipelineRuns)
+    .where(
+      and(
+        eq(pulsePipelineRuns.stage, "classify"),
+        eq(pulsePipelineRuns.status, "running"),
+      ),
+    )
+    .orderBy(pulsePipelineRuns.startedAt)
+    .limit(2);
+  if (running.length > 1) {
+    throw new Error(
+      "Multiple running classification runs require operator reconciliation",
+    );
+  }
+  return running[0]
+    ? loadPulsePipelineRunState(db, running[0].id, "classify")
+    : null;
+}
+
+async function loadBoundClassificationRun(
+  db: Db,
+  executionKey: string,
+): Promise<Awaited<ReturnType<typeof loadPulsePipelineRunState>>> {
+  const rows = await db
+    .select({
+      classificationRunId:
+        pulseClassificationDeliveryBindings.classificationRunId,
+    })
+    .from(pulseClassificationDeliveryBindings)
+    .where(eq(pulseClassificationDeliveryBindings.executionKey, executionKey))
+    .limit(1);
+  const binding = rows[0];
+  if (!binding) return null;
+  const run = await loadPulsePipelineRunState(
+    db,
+    binding.classificationRunId,
+    "classify",
+  );
+  if (!run) {
+    throw new Error(
+      `Classification delivery binding has no pipeline run: ${executionKey}`,
+    );
+  }
+  return run;
+}
+
+async function bindClassificationDeliveryRun(
+  db: Db,
+  executionKey: string,
+  classificationRunId: string,
+): Promise<void> {
+  await db
+    .insert(pulseClassificationDeliveryBindings)
+    .values({ executionKey, classificationRunId })
+    .onConflictDoNothing({
+      target: pulseClassificationDeliveryBindings.executionKey,
+    });
+  const rows = await db
+    .select({
+      classificationRunId:
+        pulseClassificationDeliveryBindings.classificationRunId,
+    })
+    .from(pulseClassificationDeliveryBindings)
+    .where(eq(pulseClassificationDeliveryBindings.executionKey, executionKey))
+    .limit(1);
+  if (rows[0]?.classificationRunId !== classificationRunId) {
+    throw new Error(
+      `Classification delivery identity collision: ${executionKey}`,
+    );
+  }
+}
+
 /**
  * Pull all clusters that don't yet have a pulse_events_v2 row, then
  * classify each one. Returns a summary.
@@ -332,21 +664,118 @@ export async function classifyClusters(
   opts: ClassifyClustersOptions = {},
 ): Promise<ClassifySummary> {
   const limit = opts.limit ?? 200;
+  const operationNow = opts.now ?? new Date();
+  const persistRun = !opts.dryRun && !opts.clusters && !opts.runRef;
+  const persistState = !opts.dryRun && !opts.clusters;
+  const cronRunId = opts.cronExecutionKey
+    ? pulseCronStageRunId(opts.cronExecutionKey, "classify")
+    : null;
+  if (cronRunId && opts.runRef && opts.runRef.id !== cronRunId) {
+    throw new Error(
+      "classification runRef conflicts with the cron delivery identity",
+    );
+  }
+  let existingRun: Awaited<ReturnType<typeof loadPulsePipelineRunState>> = null;
+  if (persistRun && cronRunId && opts.cronExecutionKey) {
+    existingRun = await loadBoundClassificationRun(db, opts.cronExecutionKey);
+    if (!existingRun) {
+      existingRun =
+        (await loadPulsePipelineRunState(db, cronRunId, "classify")) ??
+        (await loadSoleRunningClassificationRun(db));
+      if (existingRun) {
+        // Persist the handoff before reading, finalizing, or invoking models.
+        // If wrapper finalization fails afterward, the same delivery retry
+        // still resolves to this exact adopted run.
+        await bindClassificationDeliveryRun(
+          db,
+          opts.cronExecutionKey,
+          existingRun.run.id,
+        );
+      }
+    }
+  }
+  const frozen = existingRun
+    ? validatedFrozenClassificationRun(existingRun.run)
+    : null;
+  if (
+    existingRun?.status === "completed" ||
+    existingRun?.status === "partial"
+  ) {
+    return reusedClassificationSummary(
+      existingRun.run,
+      existingRun.counts,
+      frozen!.configHash,
+    );
+  }
+  if (existingRun && existingRun.status !== "running") {
+    throw new Error(
+      `Terminal Pulse pipeline run cannot be resumed: ${existingRun.run.id} (${existingRun.status})`,
+    );
+  }
+  const selectionTime = existingRun?.startedAt ?? operationNow;
+  const fallbackEventDate = selectionTime.toISOString().slice(0, 10);
 
-  const clusters =
-    opts.clusters ??
-    (await loadUnclassifiedClusters(
+  if (existingRun && frozen) {
+    await reconstructFrozenClassificationSnapshot(
+      db,
+      existingRun.run,
+      frozen,
+      fallbackEventDate,
+    );
+    const recovered = await finalizeClassificationPipelineRun(db, {
+      runId: existingRun.run.id,
+      configHash: frozen.configHash,
+      clusters: frozen.clusters,
+    });
+    if (recovered) {
+      return reusedClassificationSummary(
+        existingRun.run,
+        recovered.counts,
+        frozen.configHash,
+      );
+    }
+    if (frozen.configHash !== CURRENT_CLASSIFICATION_CONFIG_HASH) {
+      throw new Error(
+        `Classification retry configuration changed: ${existingRun.run.id}`,
+      );
+    }
+  }
+
+  let clusters: ClusterToClassify[];
+  if (opts.clusters) {
+    clusters = opts.clusters;
+  } else if (existingRun && frozen) {
+    const clusterIds = frozen.clusters.map(({ clusterId }) => clusterId);
+    const rawEventIds = frozen.clusters.flatMap(
+      ({ rawEventIds }) => rawEventIds,
+    );
+    clusters = await loadUnclassifiedClusters(
+      db,
+      Math.max(1, frozen.clusters.length),
+      frozen.configHash,
+      {
+        clusterIds,
+        rawEventIds,
+        fallbackEventDate,
+        eligibilityNow: operationNow,
+      },
+    );
+  } else {
+    clusters = await loadUnclassifiedClusters(
       db,
       limit,
       CURRENT_CLASSIFICATION_CONFIG_HASH,
-    ));
+      { fallbackEventDate, eligibilityNow: operationNow },
+    );
+  }
   validateClusterFixtures(clusters);
   const classify = opts.classify ?? classifyOne;
   const resolveSubject = opts.resolveSubject ?? resolveSubjectJurisdiction;
-  const write = opts.write ?? writeEvent;
   const run =
+    existingRun?.run ??
     opts.runRef ??
     createPulsePipelineRunRef("classify", {
+      id: cronRunId ?? undefined,
       sourceIds: clusters.length
         ? clusters.flatMap(({ sourceIds }) => sourceIds)
         : undefined,
@@ -368,16 +797,22 @@ export async function classifyClusters(
           model: SUBJECT_ATTRIBUTION_MODEL,
         },
       ],
+      inputIds: classificationInputIds(clusters),
+      inputFingerprint: classificationInputFingerprint(clusters),
     });
-  const persistRun = !opts.dryRun && !opts.clusters && !opts.runRef;
-  const persistState = !opts.dryRun && !opts.clusters;
+  if (persistRun && !existingRun) {
+    await startPulsePipelineRun(db, run, { startedAt: selectionTime });
+    if (opts.cronExecutionKey) {
+      await bindClassificationDeliveryRun(db, opts.cronExecutionKey, run.id);
+    }
+  }
   const queueBefore = persistState
     ? await loadClassificationQueueMetrics(
         db,
         CURRENT_CLASSIFICATION_CONFIG_HASH,
+        operationNow,
       )
     : null;
-  if (persistRun) await startPulsePipelineRun(db, run);
 
   const summary: ClassifySummary = {
     runId: run.id,
@@ -396,6 +831,7 @@ export async function classifyClusters(
     queueBefore,
     queueAfter: null,
     dryRun: opts.dryRun ?? false,
+    reused: false,
     planned: [],
   };
 
@@ -409,10 +845,14 @@ export async function classifyClusters(
             configHash: CURRENT_CLASSIFICATION_CONFIG_HASH,
             config: CURRENT_CLASSIFICATION_CONFIG,
             runId: run.id,
+            now: operationNow,
           })
         : null;
     } catch (err) {
-      console.error(`[classify] cluster ${cluster.clusterId} claim failed:`, err);
+      console.error(
+        `[classify] cluster ${cluster.clusterId} claim failed:`,
+        err,
+      );
       summary.failed++;
       continue;
     }
@@ -421,6 +861,10 @@ export async function classifyClusters(
       continue;
     }
     let claimSettled = false;
+    let attemptedOutcome:
+      | { kind: "classified"; result: ClassifyOneResult }
+      | { kind: "none" }
+      | null = null;
     try {
       summary.modelCalls++;
       const result = await classify(cluster);
@@ -436,33 +880,38 @@ export async function classifyClusters(
           });
           claimSettled = true;
           if (status === "retryable_failure") summary.retryableFailures++;
-          else summary.terminalFailures++;
+          else if (status === "terminal_failure") summary.terminalFailures++;
+          else {
+            throw new Error(
+              `Classifier produced no result after attempt ${cluster.clusterId} had already settled as ${status}`,
+            );
+          }
         }
         summary.failed++;
         continue;
       }
       if ("category" in result && result.category === "none") {
-        summary.noneCategory++;
+        attemptedOutcome = { kind: "none" };
         if (!opts.dryRun) {
-          await markClusterDisposition(
-            db,
-            cluster.clusterId,
-            {
-              disposition: "non_governance",
-              reason: "classifier returned category none",
+          if (opts.writeNonEvent) {
+            await opts.writeNonEvent(db, cluster, run.id);
+          } else {
+            await writeNonEventCluster(db, cluster, run.id, {
               decision: result,
-            },
-            run.id,
-          );
-          await persistNonEventDecision(db, cluster, run.id);
+              reason: "classifier returned category none",
+              claim,
+            });
+            claimSettled = Boolean(claim);
+          }
         }
-        if (claim) {
+        if (claim && opts.writeNonEvent) {
           await settleClassificationAttempt(db, claim, {
             outcome: "none",
             modelCallCount: 1,
           });
           claimSettled = true;
         }
+        summary.noneCategory++;
         continue;
       }
       // Narrowed: result is ClassifyOneResult here
@@ -484,6 +933,7 @@ export async function classifyClusters(
       } else {
         ok.autoPublished = false;
       }
+      attemptedOutcome = { kind: "classified", result: ok };
       summary.planned.push({
         clusterId: cluster.clusterId,
         jurisdictionId: ok.classified.jurisdictionId,
@@ -491,7 +941,9 @@ export async function classifyClusters(
         autoPublished: ok.autoPublished,
       });
       const writtenEventId = !opts.dryRun
-        ? await write(db, cluster, ok, run.id)
+        ? opts.write
+          ? await opts.write(db, cluster, ok, run.id)
+          : await writeEvent(db, cluster, ok, run.id, claim)
         : null;
       if (claim) {
         const eventId =
@@ -503,11 +955,13 @@ export async function classifyClusters(
             `Classified cluster ${cluster.clusterId} has no persisted event projection`,
           );
         }
-        await settleClassificationAttempt(db, claim, {
-          outcome: "classified",
-          eventId,
-          modelCallCount: 1,
-        });
+        if (opts.write) {
+          await settleClassificationAttempt(db, claim, {
+            outcome: "classified",
+            eventId,
+            modelCallCount: 1,
+          });
+        }
         claimSettled = true;
       }
       summary.classified++;
@@ -521,11 +975,30 @@ export async function classifyClusters(
           modelCallCount: 1,
         });
         claimSettled = true;
+        if (
+          status === "classified" &&
+          attemptedOutcome?.kind === "classified"
+        ) {
+          summary.classified++;
+          if (attemptedOutcome.result.autoPublished) summary.publishedAuto++;
+          else summary.flaggedForReview++;
+          continue;
+        }
+        if (status === "none" && attemptedOutcome?.kind === "none") {
+          summary.noneCategory++;
+          continue;
+        }
         if (status === "retryable_failure") summary.retryableFailures++;
-        else summary.terminalFailures++;
+        else if (status === "terminal_failure") summary.terminalFailures++;
+        else {
+          throw new Error(
+            `Classification attempt ${cluster.clusterId} settled as ${status} after a mismatched publication failure`,
+            { cause: err },
+          );
+        }
       }
       if (opts.failOnError) {
-        if (persistRun) {
+        if (persistRun && !cronRunId) {
           await finishPulsePipelineRun(db, run.id, {
             status: "failed",
             counts: {
@@ -557,10 +1030,11 @@ export async function classifyClusters(
       ? await loadClassificationQueueMetrics(
           db,
           CURRENT_CLASSIFICATION_CONFIG_HASH,
+          operationNow,
         )
       : null;
   } catch (err) {
-    if (persistRun) {
+    if (persistRun && !cronRunId) {
       await finishPulsePipelineRun(db, run.id, {
         status: "failed",
         counts: {
@@ -579,7 +1053,24 @@ export async function classifyClusters(
     }
     throw err;
   }
-  if (persistRun) {
+  if (persistRun && cronRunId) {
+    const runSnapshot = frozenClassificationClusters(
+      run.versions.inputIds,
+      run.id,
+    );
+    const finalized = await finalizeClassificationPipelineRun(db, {
+      runId: run.id,
+      configHash: runSnapshot.configHash,
+      clusters: runSnapshot.clusters,
+    });
+    if (finalized) {
+      applyFinalizedCounts(summary, finalized);
+    } else if (summary.failed === 0) {
+      throw new Error(
+        `Classification delivery remains incomplete without a retryable failure: ${run.id}`,
+      );
+    }
+  } else if (persistRun) {
     await finishPulsePipelineRun(db, run.id, {
       status: summary.failed > 0 ? "partial" : "completed",
       counts: {
@@ -612,9 +1103,9 @@ export interface ClassifyOneResult {
   classified: ClassifiedEvent;
   autoPublished: boolean;
   verification: VerifyResultLite | null;
-  subjectAttribution?:
-    | Awaited<ReturnType<typeof resolveSubjectJurisdiction>>
-    | null;
+  subjectAttribution?: Awaited<
+    ReturnType<typeof resolveSubjectJurisdiction>
+  > | null;
 }
 
 async function classifyOne(
@@ -1055,25 +1546,54 @@ Body / context:
 ${cluster.body}`;
 }
 
+export interface LoadClassificationClustersOptions {
+  /** Exact frozen cluster membership for a deterministic retry. */
+  clusterIds?: readonly string[];
+  /** Exact frozen raw membership; later reports in the same cluster stay out. */
+  rawEventIds?: readonly string[];
+  /** Reconstruct settled members too so the full run fingerprint can be checked. */
+  includeSettled?: boolean;
+  /** Stable replacement for source rows whose publisher date is absent. */
+  fallbackEventDate?: string;
+  /** Evaluation instant for due-retry membership. */
+  eligibilityNow?: Date;
+}
+
+function uuidMembership(
+  column: ReturnType<typeof sql>,
+  values: readonly string[] | undefined,
+) {
+  if (!values) return sql`true`;
+  if (values.length === 0) return sql`false`;
+  return sql`${column} IN (${sql.join(
+    values.map((value) => sql`${value}::uuid`),
+    sql`, `,
+  )})`;
+}
+
 export async function loadUnclassifiedClusters(
   db: Db,
   limit: number,
   configHash = CURRENT_CLASSIFICATION_CONFIG_HASH,
+  options: LoadClassificationClustersOptions = {},
 ): Promise<ClusterToClassify[]> {
+  const fallbackEventDate =
+    options.fallbackEventDate ?? new Date().toISOString().slice(0, 10);
+  const eligibilityNow = options.eligibilityNow ?? new Date();
   // Group only by event cluster. Members may carry different ingest-time
   // jurisdictions; a deterministic provisional value supports classification,
   // then the dedicated subject-country pass decides the event jurisdiction.
   const result = await db.execute(sql`
     SELECT
       r.cluster_id,
-      (ARRAY_REMOVE(ARRAY_AGG(DISTINCT r.incident_id), NULL))[1] AS incident_id,
-      MIN(COALESCE(r.event_date, CURRENT_DATE)) AS event_date,
+      (ARRAY_REMOVE(ARRAY_AGG(DISTINCT r.incident_id ORDER BY r.incident_id), NULL))[1] AS incident_id,
+      MIN(COALESCE(r.event_date, ${fallbackEventDate}::date)) AS event_date,
       ARRAY_REMOVE(ARRAY_AGG(r.jurisdiction_id ORDER BY r.id), NULL) AS jurisdiction_ids,
       ARRAY_AGG(r.id ORDER BY r.id) AS raw_event_ids,
       ARRAY_AGG(r.source_id ORDER BY r.id) AS source_ids,
       ARRAY_AGG(r.source_type ORDER BY r.id) AS source_types,
       ARRAY_AGG(r.source_url ORDER BY r.id) AS source_urls,
-      ARRAY_AGG(DISTINCT r.cluster_run_id) AS cluster_run_ids,
+      ARRAY_AGG(DISTINCT r.cluster_run_id ORDER BY r.cluster_run_id) AS cluster_run_ids,
       (ARRAY_AGG(r.title ORDER BY r.id))[1] AS first_title,
       ARRAY_AGG(COALESCE(r.body, '') ORDER BY r.id) AS bodies,
       ARRAY_AGG(r.title ORDER BY r.id) AS titles
@@ -1082,15 +1602,21 @@ export async function loadUnclassifiedClusters(
       ON cs.cluster_id = r.cluster_id
      AND cs.config_hash = ${configHash}
     WHERE r.cluster_id IS NOT NULL
-      AND r.classification_disposition = 'pending'
-      AND (
-        cs.id IS NULL OR
-        (cs.status = 'retryable_failure' AND cs.next_retry_at <= NOW())
-      )
-      AND NOT EXISTS (
-        SELECT 1 FROM pulse_sources ps
-        WHERE ps.raw_event_id = r.id
-      )
+      AND ${uuidMembership(sql`r.cluster_id`, options.clusterIds)}
+      AND ${uuidMembership(sql`r.id`, options.rawEventIds)}
+      AND ${
+        options.includeSettled
+          ? sql`true`
+          : sql`r.classification_disposition = 'pending'
+              AND (
+                cs.id IS NULL OR
+                (cs.status = 'retryable_failure' AND cs.next_retry_at <= ${eligibilityNow})
+              )
+              AND NOT EXISTS (
+                SELECT 1 FROM pulse_sources ps
+                WHERE ps.raw_event_id = r.id
+              )`
+      }
     GROUP BY r.cluster_id, cs.id, cs.status, cs.next_retry_at
     HAVING COUNT(r.jurisdiction_id) > 0
     ORDER BY
@@ -1351,7 +1877,9 @@ export function classificationDecisionInputs(input: {
         eligible: result.autoPublished,
         origin: result.autoPublished ? "auto" : "queued",
         gateReasons: [
-          ...(result.autoPublished ? ["automatic_gate_passed"] : ["human_review_required"]),
+          ...(result.autoPublished
+            ? ["automatic_gate_passed"]
+            : ["human_review_required"]),
           ...(!result.subjectAttribution?.primaryJurisdictionId
             ? ["subject_attribution_unresolved"]
             : []),
@@ -1399,8 +1927,7 @@ export function classificationDecisionInputs(input: {
   return decisions;
 }
 
-export async function persistNonEventDecision(
-  db: Db,
+export function nonEventDecisionInputs(
   cluster: ClusterToClassify,
   runId: string,
   override: {
@@ -1408,8 +1935,8 @@ export async function persistNonEventDecision(
     rationale?: string;
     decidedAt?: string;
   } = {},
-): Promise<void> {
-  await persistPulseDecisions(db, [
+): PulseDecisionInput[] {
+  return [
     {
       clusterId: cluster.clusterId,
       eventId: null,
@@ -1432,7 +1959,69 @@ export async function persistNonEventDecision(
       evidenceRefs: cluster.rawEventIds.map((id) => `raw-event:${id}`),
       decidedAt: override.decidedAt ?? new Date().toISOString(),
     },
-  ]);
+  ];
+}
+
+export async function persistNonEventDecision(
+  db: Db,
+  cluster: ClusterToClassify,
+  runId: string,
+  override: {
+    actor?: PulseDecisionActor;
+    rationale?: string;
+    decidedAt?: string;
+  } = {},
+): Promise<void> {
+  await persistPulseDecisions(
+    db,
+    nonEventDecisionInputs(cluster, runId, override),
+  );
+}
+
+export async function writeNonEventCluster(
+  db: Db,
+  cluster: ClusterToClassify,
+  classificationRunId: string,
+  override: {
+    actor?: PulseDecisionActor;
+    rationale?: string;
+    decidedAt?: string;
+    decision?: unknown;
+    reason?: string;
+    claim?: ClaimedClassificationAttempt | null;
+  } = {},
+): Promise<void> {
+  const completedAt = new Date().toISOString();
+  const decidedAt =
+    override.decidedAt ??
+    override.claim?.startedAt.toISOString() ??
+    completedAt;
+  await publishNonGovernanceCluster(db, {
+    clusterId: cluster.clusterId,
+    decisions: nonEventDecisionInputs(cluster, classificationRunId, {
+      actor: override.actor,
+      rationale: override.rationale,
+      decidedAt,
+    }),
+    disposition: {
+      clusterId: cluster.clusterId,
+      rawEventIds: cluster.rawEventIds,
+      disposition: "non_governance",
+      reason:
+        override.reason ??
+        "classifier determined this was not a governance event",
+      decision: override.decision ?? { category: "none" },
+      classificationRunId,
+      completedAt,
+    },
+    settlement: override.claim
+      ? {
+          claim: override.claim,
+          outcome: "none",
+          modelCallCount: 1,
+        }
+      : undefined,
+  });
 }
 
 export async function persistClassificationFailureDecision(
@@ -1476,6 +2065,7 @@ export async function writeEvent(
   cluster: ClusterToClassify,
   result: ClassifyOneResult,
   classificationRunId: string,
+  claim?: ClaimedClassificationAttempt | null,
 ): Promise<string | null> {
   const storedDerivation = deriveStoredEnsemble(
     result.classified.classifierRuns,
@@ -1516,12 +2106,17 @@ export async function writeEvent(
         ? 0.65
         : 0.4;
   const versions = pulseEventVersionEnvelope(cluster.sourceIds);
+  const existingEventId = await loadEventIdForCluster(db, cluster.clusterId);
+  const eventId = existingEventId ?? randomUUID();
+  const completedAt = new Date().toISOString();
+  const decidedAt = claim?.startedAt.toISOString() ?? completedAt;
 
-  const eventRows = await db
-    .insert(pulseEventsV2)
-    .values({
+  await publishClassifiedCluster(db, {
+    event: {
+      id: eventId,
       clusterId: cluster.clusterId,
       incidentId: cluster.incidentId ?? cluster.clusterId,
+      projectionStatus: "current",
       jurisdictionId: result.classified.jurisdictionId,
       eventDate: result.classified.eventDate,
       category: result.classified.category,
@@ -1539,57 +2134,32 @@ export async function writeEvent(
       published: result.autoPublished,
       headline: result.classified.headline,
       description: result.classified.description,
-    })
-    .onConflictDoNothing({ target: pulseEventsV2.clusterId })
-    .returning({ id: pulseEventsV2.id });
-
-  let eventId = eventRows[0]?.id;
-  if (!eventId) {
-    const existing = await db
-      .select({ id: pulseEventsV2.id })
-      .from(pulseEventsV2)
-      .where(eq(pulseEventsV2.clusterId, cluster.clusterId))
-      .limit(1);
-    eventId = existing[0]?.id;
-  }
-  if (!eventId) return null;
-
-  await persistPulseDecisions(
-    db,
-    classificationDecisionInputs({
+    },
+    decisions: classificationDecisionInputs({
       cluster,
       eventId,
       result,
       runId: classificationRunId,
-      decidedAt: new Date().toISOString(),
+      decidedAt,
     }),
-  );
-
-  // Insert pulse_sources rows for every contributing raw_event
-  for (const attr of cluster.attributions) {
-    await db
-      .insert(pulseSources)
-      .values({
-        eventId,
-        sourceId: attr.sourceId,
-        sourceType: attr.sourceType,
-        sourceName: attr.sourceName,
-        sourceUrl: attr.sourceUrl,
-        rawEventId: attr.rawEventId,
-      })
-      .onConflictDoNothing();
-  }
-
-  await markClusterDisposition(
-    db,
-    cluster.clusterId,
-    {
+    attributions: cluster.attributions,
+    disposition: {
+      clusterId: cluster.clusterId,
+      rawEventIds: cluster.rawEventIds,
       disposition: "event",
       reason: "classification admitted as a Pulse event",
       decision: result.classified,
+      classificationRunId,
+      completedAt,
     },
-    classificationRunId,
-  );
+    settlement: claim
+      ? {
+          claim,
+          outcome: "classified",
+          modelCallCount: 1,
+        }
+      : undefined,
+  });
 
   // NOTE: freshness is stamped ONLY at ingest time (upsert.ts), gated on
   // rows actually written. The classifier pass performs no upstream fetch,

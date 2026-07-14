@@ -49,7 +49,13 @@ function semantic(rows: Map<unknown, Array<Record<string, unknown>>>) {
   return [...rows.values()].flat().map((row) => { const copy = structuredClone(row); delete copy.retrievedAt; return copy; });
 }
 
-const personPass = async () => ({ candidates: 0, portraitsWritten: 0, birthdatesWritten: 0 });
+const personPass = async () => ({
+  status: "completed" as const,
+  candidates: 0,
+  portraitsWritten: 0,
+  birthdatesWritten: 0,
+  writeFailures: 0,
+});
 const options = { bindings: [binding] as never, findJurisdictionId: async () => "jurisdiction-1", enrichmentPlan: emptyPlan, enrichPersons: personPass as never, markSynced: (async () => ["wikidata"]) as never };
 
 test("officeholder fixture applications create no duplicate canonical rows", async () => {
@@ -77,5 +83,141 @@ test("malformed officeholder input fails before freshness", async () => {
   const state = harness();
   const stamped: number[] = [];
   await assert.rejects(syncFactbookOfficeholders({ ...options, db: state.db, bindings: [{}] as never, markSynced: (async (_id: unknown, value: { rowsWritten: number }) => { stamped.push(value.rowsWritten); return []; }) as never }));
+  assert.deepEqual(stamped, []);
+});
+
+test("an empty officeholder primary feed fails before enrichment or freshness", async () => {
+  const state = harness();
+  let stampCalls = 0;
+  await assert.rejects(
+    syncFactbookOfficeholders({
+      ...options,
+      db: state.db,
+      bindings: [],
+      enrichmentPlan: {
+        ...emptyPlan,
+        titles: [
+          {
+            officeId: "existing-office",
+            country: "Canada",
+            role: "head_of_government",
+            oldName: "Head of Government",
+            newName: "Prime Minister",
+            positionQid: "Q14211",
+          },
+        ],
+      },
+      markSynced: (async () => {
+        stampCalls++;
+        return ["wikidata"];
+      }) as never,
+    }),
+    /primary feed returned no usable bindings/,
+  );
+  assert.equal(state.writes(), 0);
+  assert.equal(stampCalls, 0);
+});
+
+test("state-only officeholder bindings fail before enrichment or freshness", async () => {
+  const state = harness();
+  let stampCalls = 0;
+  const stateOnly = {
+    state: binding.state,
+    stateLabel: binding.stateLabel,
+    iso2: binding.iso2,
+    iso3: binding.iso3,
+  };
+  await assert.rejects(
+    syncFactbookOfficeholders({
+      ...options,
+      db: state.db,
+      bindings: [stateOnly] as never,
+      enrichmentPlan: {
+        ...emptyPlan,
+        titles: [
+          {
+            officeId: "existing-office",
+            country: "Canada",
+            role: "head_of_government",
+            oldName: "Head of Government",
+            newName: "Prime Minister",
+            positionQid: "Q14211",
+          },
+        ],
+      },
+      markSynced: (async () => {
+        stampCalls++;
+        return ["wikidata"];
+      }) as never,
+    }),
+    /no usable leadership bindings/,
+  );
+  assert.equal(state.writes(), 0);
+  assert.equal(stampCalls, 0);
+});
+
+test("unmapped leadership cannot be masked by enrichment writes", async () => {
+  const state = harness();
+  let stampCalls = 0;
+  let personEnrichmentCalls = 0;
+  await assert.rejects(
+    syncFactbookOfficeholders({
+      ...options,
+      db: state.db,
+      findJurisdictionId: async () => null,
+      enrichmentPlan: {
+        ...emptyPlan,
+        titles: [
+          {
+            officeId: "existing-office",
+            country: "Canada",
+            role: "head_of_government",
+            oldName: "Head of Government",
+            newName: "Prime Minister",
+            positionQid: "Q14211",
+          },
+        ],
+      },
+      enrichPersons: (async () => {
+        personEnrichmentCalls++;
+        return {
+          status: "completed" as const,
+          candidates: 1,
+          portraitsWritten: 1,
+          birthdatesWritten: 0,
+          writeFailures: 0,
+        };
+      }) as never,
+      markSynced: (async () => {
+        stampCalls++;
+        return ["wikidata"];
+      }) as never,
+    }),
+    /primary feed matched zero Civica jurisdictions/,
+  );
+  assert.equal(state.writes(), 0);
+  assert.equal(personEnrichmentCalls, 0);
+  assert.equal(stampCalls, 0);
+});
+
+test("a failed wider person backfill reports partial and never advances freshness", async () => {
+  const state = harness();
+  const stamped: number[] = [];
+  const summary = await syncFactbookOfficeholders({
+    ...options,
+    db: state.db,
+    enrichPersons: (async () => {
+      throw new Error("portrait provider unavailable");
+    }) as never,
+    markSynced: (async (_id: unknown, value: { rowsWritten: number }) => {
+      stamped.push(value.rowsWritten);
+      return ["wikidata"];
+    }) as never,
+  });
+
+  assert.equal(summary.status, "partial");
+  assert.equal(summary.personPortraitBackfillFailed, true);
+  assert.ok(summary.totalRowsWritten > 0);
+  assert.equal(summary.freshnessStamped, false);
   assert.deepEqual(stamped, []);
 });

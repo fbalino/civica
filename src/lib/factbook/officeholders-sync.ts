@@ -62,6 +62,8 @@ export interface OfficeholderSyncOptions {
 }
 
 export interface OfficeholderSyncSummary {
+  /** Whether every stage completed. Partial runs never advance freshness. */
+  status: "completed" | "partial";
   startedAt: string;
   finishedAt: string;
   durationMs: number;
@@ -83,6 +85,8 @@ export interface OfficeholderSyncSummary {
   personPortraitsWritten: number;
   /** Wider `persons` backfill: birthdates filled for non-principal persons. */
   personBirthdatesWritten: number;
+  /** Whether the wider person backfill failed after the principal sync. */
+  personPortraitBackfillFailed: boolean;
   /** Total rows written (base + titles + parties + portraits + birthdates + person backfill) — drives the freshness stamp. */
   totalRowsWritten: number;
   /** Whether `sources.last_sync_at` was stamped this run. */
@@ -1161,6 +1165,20 @@ export async function syncFactbookOfficeholders(
 
   const bindings = options.bindings ?? await sparqlQuery(QUERY);
   log(`Got ${bindings.length} results`);
+  if (bindings.length === 0) {
+    throw new Error(
+      "Wikidata officeholder primary feed returned no usable bindings",
+    );
+  }
+  if (
+    !bindings.some(
+      (binding) => binding.headOfState?.value || binding.headOfGov?.value,
+    )
+  ) {
+    throw new Error(
+      "Wikidata officeholder primary feed returned no usable leadership bindings",
+    );
+  }
 
   let synced = 0;
   let skipped = 0;
@@ -1254,6 +1272,15 @@ export async function syncFactbookOfficeholders(
   log(`=== Base Sync Complete ===`);
   log(`Synced:  ${synced}`);
   log(`Skipped: ${skipped}`);
+
+  // Leadership bindings that cannot be mapped to even one Civica
+  // jurisdiction are a failed primary stage. Do not let unrelated title,
+  // party, or portrait enrichment turn that failure into a healthy run.
+  if (synced === 0) {
+    throw new Error(
+      "Wikidata officeholder primary feed matched zero Civica jurisdictions",
+    );
+  }
 
   // Resolve any remaining QID-as-name persons via Wikidata entity API
   let qidNamesResolved = 0;
@@ -1358,6 +1385,7 @@ export async function syncFactbookOfficeholders(
   // covers all writes, including these.
   let personPortraitsWritten = 0;
   let personBirthdatesWritten = 0;
+  let personPortraitBackfillFailed = false;
   try {
     const personPass = options.dryRun ? null : await (options.enrichPersons ?? enrichPersonPortraits)({
       db,
@@ -1367,15 +1395,23 @@ export async function syncFactbookOfficeholders(
       onProgress: (line) => {
         if (line.startsWith("!")) log(line);
       },
+      // The officeholder aggregate owns the only eligible freshness stamp.
+      // The nested pass reports its writes and any partial failure, but never
+      // advances Wikidata freshness independently.
+      markSynced: async () => [],
     });
     personPortraitsWritten = personPass?.portraitsWritten ?? 0;
     personBirthdatesWritten = personPass?.birthdatesWritten ?? 0;
+    if (personPass?.status === "partial") {
+      personPortraitBackfillFailed = true;
+    }
     log(
         `Person-portrait backfill: ${personPortraitsWritten} portraits, ${personBirthdatesWritten} birthdates (${personPass?.candidates ?? 0} candidates scanned)`,
     );
   } catch (err) {
+    personPortraitBackfillFailed = true;
     log(
-      `! person-portrait backfill failed (non-fatal): ${
+      `! person-portrait backfill failed (partial run): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -1392,11 +1428,13 @@ export async function syncFactbookOfficeholders(
     birthdatesWritten +
     personPortraitsWritten +
     personBirthdatesWritten;
-  const stamped = await (options.markSynced ?? markSourcesSynced)("wikidata", {
-    rowsWritten: totalRowsWritten,
-    dryRun: options.dryRun,
-    executor: db,
-  });
+  const stamped = personPortraitBackfillFailed
+    ? []
+    : await (options.markSynced ?? markSourcesSynced)("wikidata", {
+        rowsWritten: totalRowsWritten,
+        dryRun: options.dryRun,
+        executor: db,
+      });
 
   const finishedAtMs = Date.now();
   log(`=== Sync Complete ===`);
@@ -1405,6 +1443,7 @@ export async function syncFactbookOfficeholders(
   );
 
   return {
+    status: personPortraitBackfillFailed ? "partial" : "completed",
     startedAt,
     finishedAt: new Date(finishedAtMs).toISOString(),
     durationMs: finishedAtMs - startedAtMs,
@@ -1417,6 +1456,7 @@ export async function syncFactbookOfficeholders(
     birthdatesWritten,
     personPortraitsWritten,
     personBirthdatesWritten,
+    personPortraitBackfillFailed,
     totalRowsWritten,
     freshnessStamped: stamped.length > 0,
     dryRun: options.dryRun ?? false,

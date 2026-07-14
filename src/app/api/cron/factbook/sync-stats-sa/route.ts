@@ -9,7 +9,7 @@
  * **Cron cadence: quarterly** at 23:00 UTC on the 11th of
  * January, April, July, October (per resolution §2g + Q4 user
  * override 2026-05-05). Hour 23 sits after R.18 IBGE at 22:00
- * UTC. Authenticated by `CRON_SECRET` (per `requireCronAuth`).
+ * UTC. Authenticated by `CRON_SECRET` (per the shared cron boundary).
  *
  * 4 indicators × 1 jurisdiction (South Africa). Each indicator
  * fetches a PDF (~500KB-5MB) and runs one Anthropic SDK call.
@@ -42,7 +42,7 @@
  * Resolution:  ~/civica/plan/stats-sa-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncStatsSa } from "@/lib/factbook/reconcile/sync-stats-sa";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -52,9 +52,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -97,4 +94,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.stats-sa", handler);
+
+export { cronHandler as GET, cronHandler as POST };

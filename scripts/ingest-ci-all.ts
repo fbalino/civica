@@ -9,7 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { neon } from "@neondatabase/serverless";
 import { canonicalStageChecksum, REQUIRED_CI_ADAPTERS, validateStagedCiRelease, type StagedCiAdapter } from "../src/lib/ci/atomic-ingestion";
-import { sourceFreshnessTransactionQuery } from "../src/lib/db/source-freshness";
+import { markSourcesSyncedTransactionQuery } from "../src/lib/db/source-freshness";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "../src/lib/ci/current-release";
 
 const ADAPTERS = [
@@ -95,7 +95,7 @@ async function main() {
         FROM jsonb_to_recordset(${JSON.stringify(stage.rows)}::jsonb) AS x("jurisdictionId" uuid,"normalizedScore" real,"rawValue" real,"sourceId" text,"indicatorId" text,"upstreamRelease" text,"artifactHash" text,"artifactKind" text,"temporalCoverage" text,"licenseUrl" text,"transformationId" text,"substitutionReason" text,"methodVersion" text,dimension text,quarter text,"methodologyVersion" text,"derivationVersionKey" text,"derivationVersions" jsonb), ingestion
         ON CONFLICT (jurisdiction_id,dimension,quarter,methodology_version,source_id,indicator_id) DO UPDATE SET normalized_score=EXCLUDED.normalized_score,raw_value=EXCLUDED.raw_value,upstream_release=EXCLUDED.upstream_release,artifact_hash=EXCLUDED.artifact_hash,artifact_kind=EXCLUDED.artifact_kind,temporal_coverage=EXCLUDED.temporal_coverage,license_url=EXCLUDED.license_url,transformation_id=EXCLUDED.transformation_id,substitution_reason=EXCLUDED.substitution_reason,method_version=EXCLUDED.method_version,ingestion_id=EXCLUDED.ingestion_id,derivation_version_key=EXCLUDED.derivation_version_key,derivation_versions=EXCLUDED.derivation_versions`;
       }),
-      sourceFreshnessTransactionQuery(txn, [...new Set(stages.map((stage) => stage.sourceId))], totalRows),
+      markSourcesSyncedTransactionQuery(txn, [...new Set(stages.map((stage) => stage.sourceId))], totalRows),
       txn`UPDATE ci_ingestion_runs SET status='completed',adapter_results=${JSON.stringify(adapterManifest)}::jsonb,staged_checksum=${checksum},completed_at=NOW(),error_message=NULL WHERE id=${runId}`,
     ]);
     console.log(`PASS — atomically published ${totalRows} scores for ${quarter}; run ${runId}; checksum ${checksum}.`);

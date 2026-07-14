@@ -11,7 +11,7 @@
  * Schema doc:  ~/civica/plan/phase-f-schema-v0.1.md §11
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { refreshJurisdictionCache } from "@/lib/factbook/reconcile/cache";
 
@@ -22,9 +22,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
@@ -37,7 +34,17 @@ async function handler(request: Request) {
     });
 
     if (summary.errors.length > 0 || summary.jurisdictionsRefreshed === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.refresh-cache", dryRun, errors: summary.errors.length ? summary.errors : ["No jurisdictions refreshed"] }, { status: 500 });
+      return NextResponse.json(
+        {
+          ok: false,
+          step: "factbook.refresh-cache",
+          dryRun,
+          errors: summary.errors.length
+            ? summary.errors
+            : ["No jurisdictions refreshed"],
+        },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -59,9 +66,11 @@ async function handler(request: Request) {
         step: "factbook.refresh-cache",
         error: err instanceof Error ? err.message : String(err),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.refresh-cache", handler);
+
+export { cronHandler as GET, cronHandler as POST };

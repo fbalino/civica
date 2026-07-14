@@ -2,7 +2,7 @@
  * Phase R.17 — Statistics Canada (StatCan) sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 3 indicators × 1 jurisdiction × 3 fetches in
+ * the shared cron boundary). 3 indicators × 1 jurisdiction × 3 fetches in
  * total (the inflation indicator pulls 13 monthly observations in a
  * single fetch, then composes YoY in-process). Total wall time is
  * dominated by upserts, not fetches; expect ~5-10s on a warm DB.
@@ -32,7 +32,7 @@
  * Resolution:  ~/civica/plan/statcan-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncStatCanCa } from "@/lib/factbook/reconcile/sync-statcan-ca";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -42,9 +42,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -82,4 +79,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.statcan-ca", handler);
+
+export { cronHandler as GET, cronHandler as POST };

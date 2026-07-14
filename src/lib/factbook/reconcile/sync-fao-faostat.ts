@@ -77,24 +77,24 @@
 import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 import { M49_TO_ISO3 } from "./sync-un-data";
 
 type Db = typeof import("@/lib/db").db;
 
-const FAO_BULK_BASE_URL =
-  "https://bulks-faostat.fao.org/production";
+const FAO_BULK_BASE_URL = "https://bulks-faostat.fao.org/production";
 const FAO_USER_AGENT =
   "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
 
@@ -133,8 +133,7 @@ const FAO_FAOSTAT_LICENSE = "CC-BY-4.0";
  * each year is its own column. The normalized variant is preferable
  * because slice-by-element-code is a single linear scan.
  */
-const FAO_LAND_USE_ARCHIVE =
-  "Inputs_LandUse_E_All_Data_(Normalized).zip";
+const FAO_LAND_USE_ARCHIVE = "Inputs_LandUse_E_All_Data_(Normalized).zip";
 
 /**
  * Documentation URL for the Land Use (RL) dataset (catalog page).
@@ -583,14 +582,16 @@ export async function syncFaoFaostat(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -598,9 +599,7 @@ export async function syncFaoFaostat(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   // Single bulk-download fetch + parse (vs. one per indicator).
   let allRows: FaoCsvRow[];
@@ -658,10 +657,8 @@ export async function syncFaoFaostat(
       `→ ${config.factKey} (${config.itemCode}/${config.elementCode}) "${config.label}" — slicing…`,
     );
 
-    const { latestByIso3, observationCount, nonIso3Count } = pickLatestPerCountry(
-      allRows,
-      config,
-    );
+    const { latestByIso3, observationCount, nonIso3Count } =
+      pickLatestPerCountry(allRows, config);
     counter.observations = observationCount;
     counter.skipped_no_iso3 = nonIso3Count;
     counter.jurisdictions_with_value = latestByIso3.size;
@@ -864,13 +861,13 @@ export async function syncFaoFaostat(
         `unmatched ISO3: ${counter.skipped_no_jurisdiction}, ` +
         `envelope rejects: ${counter.rejected_envelope})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "FAO FAOSTAT",
+      target: `${config.factKey} (${config.itemCode}/${config.elementCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("fao_faostat", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -885,13 +882,17 @@ export async function syncFaoFaostat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -901,6 +902,15 @@ export async function syncFaoFaostat(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "fao_faostat",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerFaoFaostatCounters> = {};

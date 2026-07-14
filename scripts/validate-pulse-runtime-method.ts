@@ -226,8 +226,8 @@ function validateCadence(
     "The daily score stage must declare corroboration before scoring",
   );
   const scoreRoute = relative("src/app/api/cron/pulse/v2/score/route.ts");
-  const corroborateAt = scoreRoute.indexOf("await corroborateEvents(db)");
-  const scoreAt = scoreRoute.indexOf("await calculateDimensionalDeltas(db)");
+  const corroborateAt = scoreRoute.indexOf("await corroborateEvents(db");
+  const scoreAt = scoreRoute.indexOf("await calculateDimensionalDeltas(db");
   check(
     state,
     corroborateAt >= 0 && scoreAt > corroborateAt,
@@ -539,7 +539,9 @@ function validateConnectors(
   const sourceText = sourceFiles.map(relative).join("\n");
   const declaredSourceIds = [
     ...sourceText.matchAll(/const SOURCE_ID = "([a-z_]+)"/g),
-    ...sourceText.matchAll(/fetchOne\([^\n]+, "([a-z_]+)", map\)/g),
+    ...sourceText.matchAll(
+      /fetchOne\(\s*[^,\n]+,\s*"([a-z_]+)"\s*,\s*map(?:\s*,[^)]*)?\s*\)/g,
+    ),
   ].map((match) => match[1]);
   const contractSourceIds = snapshot.feeds.connectors.flatMap(
     (connector) => connector.sourceIds,
@@ -562,7 +564,10 @@ function validateConnectors(
     relative("src/lib/pulse/v2/sources/acled.ts").includes(
       "if (!apiKey || !email)",
     ) &&
-      relative("src/lib/pulse/v2/sources/rsf.ts").includes("if (!FEED_URL)") &&
+      relative("src/lib/pulse/v2/sources/rsf.ts").includes(
+        "process.env.RSF_RSS_URL ?? null",
+      ) &&
+      relative("src/lib/pulse/v2/sources/rsf.ts").includes("if (!feedUrl)") &&
       relative("src/lib/pulse/v2/sources/reuters-ap.ts").includes(
         'process.env.REUTERS_RSS_URL ?? ""',
       ) &&
@@ -623,7 +628,7 @@ function validateClusteringAndScoring(
   const score = relative("src/lib/pulse/v2/score.ts");
   check(
     state,
-    score.includes("WHERE published = true") &&
+    score.includes("pulse_events_v2.published = true") &&
       score.includes("review_status IN ('approved', 'edited')") &&
       score.includes("category <> 'none'") &&
       score.includes("isPulseClassificationValid") &&

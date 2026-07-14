@@ -2,7 +2,7 @@
  * Phase R.14 — ONS-UK sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 5 indicators × 1 jurisdiction (UK) in 5
+ * the shared cron boundary). 5 indicators × 1 jurisdiction (UK) in 5
  * unpaginated time-series fetches (~30–80KB each, ~250KB total).
  * Total wall time is dominated by upserts, not fetches; expect
  * ~5–10s on a warm DB.
@@ -32,7 +32,7 @@
  * Resolution:  ~/civica/plan/ons-uk-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncOnsUk } from "@/lib/factbook/reconcile/sync-ons-uk";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -42,9 +42,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -84,4 +81,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.ons-uk", handler);
+
+export { cronHandler as GET, cronHandler as POST };

@@ -233,6 +233,12 @@ export const CIA_WORLD_LEADERS_SOURCE_ID = "cia_world_leaders";
 
 export type CabinetSyncDb = typeof sharedDb;
 
+export interface CabinetCountryFetchResult {
+  ok: boolean;
+  status: number;
+  html: string;
+}
+
 export interface CabinetSyncOptions {
   db?: CabinetSyncDb;
   onProgress?: (line: string) => void;
@@ -247,6 +253,10 @@ export interface CabinetSyncOptions {
   dryRun?: boolean;
   plan?: CabinetPlan;
   markSynced?: typeof markSourcesSynced;
+  /** Database-free fixture seam for HTTP/status/schema regression tests. */
+  fetchCountryPage?: (slug: string) => Promise<CabinetCountryFetchResult>;
+  /** Fixture seam that avoids real retry backoff waits. */
+  retryWait?: (delayMs: number) => Promise<void>;
 }
 
 // ─── Position category classification ────────────────────────────────────────
@@ -448,7 +458,7 @@ export function parseCountryHtml(slug: string, html: string): ParsedCountry {
  */
 async function fetchCountry(
   slug: string,
-): Promise<{ ok: boolean; status: number; html: string }> {
+): Promise<CabinetCountryFetchResult> {
   const url = `${CIA_BASE}/${slug}/`;
   const dispatcher = await getCiaDispatcher();
   const res = await fetch(url, {
@@ -469,10 +479,10 @@ async function fetchCountry(
 /**
  * Resilient single-country fetch: retries a transient network/timeout failure
  * up to `maxAttempts` times with exponential backoff, so ONE flaky host never
- * aborts the ~194-country crawl. A non-2xx HTTP response (e.g. a 404) is NOT
- * retried — it's returned as `{ ok:false }` for the caller to treat as an
- * expected skip. Only genuine network/timeout errors are retried; a persistent
- * one after all attempts is re-thrown for the caller to record as a skip.
+ * aborts the ~194-country crawl. Expected 404s are returned immediately.
+ * Retryable HTTP statuses (408/425/429/5xx) and genuine network/timeout errors
+ * use the same bounded retry ladder. Exhausted/non-retryable non-2xx responses
+ * are returned for the aggregate planner to record as explicit failures.
  *
  * The backoff waits are ADDITIONAL to the inter-country crawl-delay applied by
  * the loop — retries stay polite.
@@ -480,23 +490,46 @@ async function fetchCountry(
 async function fetchCountryResilient(
   slug: string,
   log: (line: string) => void,
-  maxAttempts = 3,
-): Promise<{ ok: boolean; status: number; html: string }> {
+  options: {
+    maxAttempts?: number;
+    fetcher?: (slug: string) => Promise<CabinetCountryFetchResult>;
+    wait?: (delayMs: number) => Promise<void>;
+  } = {},
+): Promise<CabinetCountryFetchResult> {
+  const maxAttempts = options.maxAttempts ?? 3;
+  const fetcher = options.fetcher ?? fetchCountry;
+  const waitForRetry =
+    options.wait ??
+    ((delayMs: number) =>
+      new Promise<void>((resolve) => setTimeout(resolve, delayMs)));
   // Exponential-ish backoff between retries (ms): 3s, 8s, 20s.
   const BACKOFFS_MS = [3_000, 8_000, 20_000];
   let lastErr: unknown;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      return await fetchCountry(slug);
+      const result = await fetcher(slug);
+      const retryableStatus =
+        result.status === 408 ||
+        result.status === 425 ||
+        result.status === 429 ||
+        (result.status >= 500 && result.status <= 599);
+      if (result.ok || !retryableStatus || attempt === maxAttempts) {
+        return result;
+      }
+      const delay = BACKOFFS_MS[Math.min(attempt - 1, BACKOFFS_MS.length - 1)];
+      log(
+        `  ↻ ${slug}: HTTP ${result.status}; retry ${attempt}/${maxAttempts - 1} in ${Math.round(delay / 1000)}s`,
+      );
+      await waitForRetry(delay);
     } catch (err) {
       lastErr = err;
       if (!isRetryableNetworkError(err) || attempt === maxAttempts) break;
-      const wait = BACKOFFS_MS[Math.min(attempt - 1, BACKOFFS_MS.length - 1)];
+      const delay = BACKOFFS_MS[Math.min(attempt - 1, BACKOFFS_MS.length - 1)];
       const reason = (err as Error)?.message ?? String(err);
       log(
-        `  ↻ ${slug}: network error (${reason}); retry ${attempt}/${maxAttempts - 1} in ${Math.round(wait / 1000)}s`,
+        `  ↻ ${slug}: network error (${reason}); retry ${attempt}/${maxAttempts - 1} in ${Math.round(delay / 1000)}s`,
       );
-      await new Promise((r) => setTimeout(r, wait));
+      await waitForRetry(delay);
     }
   }
   throw lastErr;
@@ -727,10 +760,10 @@ export interface PlannedCountry {
   positions: PlannedPosition[];
 }
 
-/** A country skipped because its fetch failed after all retries (or an
- * unexpected parse-time throw). Distinct from a clean 404, which is not a
- * failure — see `computeCabinetPlan`. Surfaced so a targeted re-run can pick up
- * the stragglers without redoing the whole crawl. */
+/** A country skipped because its fetch failed after all retries, its HTTP 200
+ * page failed the expected schema, or another country-scoped read/parse step
+ * threw. Distinct from a clean 404, which is not a failure — see
+ * `computeCabinetPlan`. */
 export interface FailedCountry {
   slug: string;
   reason: string;
@@ -738,7 +771,7 @@ export interface FailedCountry {
 
 export interface CabinetPlan {
   countries: PlannedCountry[];
-  /** Countries whose fetch/parse errored after retries and were SKIPPED (the
+  /** Countries whose fetch/schema/parse/read step failed and were SKIPPED (the
    * crawl continued). Empty on a fully-clean run. */
   failed: FailedCountry[];
   stats: {
@@ -746,8 +779,8 @@ export interface CabinetPlan {
     countriesParsed: number;
     countriesUnmatched: number;
     countriesFetchFailed: number;
-    /** Countries SKIPPED after exhausting retries on a network/timeout error
-     * (the crawl continued). Counted separately from an expected 404. */
+    /** Countries SKIPPED after an upstream/schema/country-read failure (the
+     * crawl continued). Counted separately from an expected 404. */
     countriesSkipped: number;
     /** Positions the CIA lists, total across the sample. */
     positionsTotal: number;
@@ -820,6 +853,10 @@ export async function computeCabinetPlan(
   // Dedup person proposals across the whole sample (a human held once, many
   // offices). Keyed by lowercased normalized name.
   const seenNewNames = new Set<string>();
+  const recordCountryFailure = (slug: string, reason: string) => {
+    plan.stats.countriesSkipped++;
+    plan.failed.push({ slug, reason });
+  };
 
   for (let i = 0; i < slugs.length; i++) {
     const slug = slugs[i];
@@ -844,44 +881,61 @@ export async function computeCabinetPlan(
       // Resilient fetch: a network/timeout error retries (backoff) internally.
       // A clean 404 is an expected skip (handled below via `ok === false`), NOT
       // a failure; a persistent network error re-throws into the catch below.
-      const { ok, status, html } = await fetchCountryResilient(slug, log);
+      const { ok, status, html } = await fetchCountryResilient(slug, log, {
+        fetcher: options.fetchCountryPage,
+        wait: options.retryWait,
+      });
       plan.stats.countriesFetched++;
       countedFetched = true;
+
+      const country: PlannedCountry = {
+        slug,
+        countryName: null,
+        jurisdictionId: null,
+        jurisdictionName: null,
+        lastUpdated: null,
+        fetchStatus: status,
+        parseFailed: false,
+        jurisdictionMatched: false,
+        positions: [],
+      };
+
+      if (!ok) {
+        country.parseFailed = true;
+        plan.stats.countriesFetchFailed++;
+        if (status === 404) {
+          // The directory intentionally omits countries that are not foreign
+          // governments from the CIA's perspective (notably the United States).
+          // This absence is expected and must not poison aggregate success.
+          log(`  · ${slug}: not present in CIA World Leaders (HTTP 404)`);
+          plan.countries.push(country);
+          continue;
+        }
+        const reason = `CIA World Leaders returned HTTP ${status}`;
+        recordCountryFailure(slug, reason);
+        log(`! ${slug}: ${reason}`);
+        plan.countries.push(country);
+        continue;
+      }
 
       const juris = await withDbRetry(
         () => findJurisdictionBySlug(db, slug),
         { log, label: `findJurisdiction(${slug})` },
       );
-      const country: PlannedCountry = {
-        slug,
-        countryName: null,
-        jurisdictionId: juris?.id ?? null,
-        jurisdictionName: juris?.name ?? null,
-        lastUpdated: null,
-        fetchStatus: status,
-        parseFailed: false,
-        jurisdictionMatched: !!juris,
-        positions: [],
-      };
+      country.jurisdictionId = juris?.id ?? null;
+      country.jurisdictionName = juris?.name ?? null;
+      country.jurisdictionMatched = !!juris;
       if (!juris) plan.stats.countriesUnmatched++;
-
-      if (!ok) {
-        country.parseFailed = true;
-        plan.stats.countriesFetchFailed++;
-        // A 404 is expected (foreign-governments-only directory; e.g.
-        // united-states) — an ordinary skip, not a failure. Other non-2xx codes
-        // (e.g. 5xx) also land here after the retry loop couldn't get a 2xx.
-        log(`! ${slug}: fetch failed (HTTP ${status})`);
-        plan.countries.push(country);
-        continue;
-      }
 
       const parsed = parseCountryHtml(slug, html);
       country.countryName = parsed.countryName;
       country.lastUpdated = parsed.lastUpdated;
       country.parseFailed = parsed.parseFailed;
       if (parsed.parseFailed) {
-        log(`! ${slug}: parse failed (no leaders section)`);
+        const reason =
+          "CIA World Leaders HTTP 200 page failed the leaders-section schema";
+        recordCountryFailure(slug, reason);
+        log(`! ${slug}: ${reason}`);
         plan.countries.push(country);
         continue;
       }
@@ -951,9 +1005,8 @@ export async function computeCabinetPlan(
       // timeout in findJurisdictionBySlug / resolvePerson, a parse throw) skips
       // THIS country and records it — the crawl runs to completion.
       if (!countedFetched) plan.stats.countriesFetched++;
-      plan.stats.countriesSkipped++;
       const reason = (err as Error)?.message ?? String(err);
-      plan.failed.push({ slug, reason });
+      recordCountryFailure(slug, reason);
       log(`⚠ skipped ${slug}: ${reason}`);
       continue;
     }
@@ -986,10 +1039,10 @@ export function reportCabinetPlan(
   log(`  Countries fetched:            ${s.countriesFetched}`);
   log(`  → parsed OK:                  ${s.countriesParsed}`);
   log(`  → HTTP non-2xx (e.g. 404):    ${s.countriesFetchFailed}`);
-  log(`  → skipped (network, retried): ${s.countriesSkipped}`);
+  log(`  → skipped (aggregate failure): ${s.countriesSkipped}`);
   log(`  → no jurisdiction match:      ${s.countriesUnmatched}`);
   if (plan.failed.length > 0) {
-    log(`\n  SKIPPED after retries (targeted re-run needed):`);
+    log(`\n  SKIPPED after failures (targeted re-run needed):`);
     for (const f of plan.failed) log(`    ⚠ ${f.slug}: ${f.reason}`);
   }
 
@@ -1450,7 +1503,7 @@ export interface CiaCabinetSyncSummary {
   countriesCrawled: number;
   countriesApplied: number;
   countriesFetchFailed: number;
-  /** Countries skipped after exhausting network retries (crawl continued). */
+  /** Countries skipped after an upstream/schema/read/write failure. */
   countriesSkipped: number;
   /** The skipped slugs + reasons, so a targeted re-run can pick up stragglers. */
   skipped: FailedCountry[];
@@ -1669,7 +1722,7 @@ export async function syncCiaCabinets(
   log(`=== CIA Cabinet Sync Complete ===`);
   log(`Countries crawled:        ${summary.countriesCrawled}`);
   log(`Countries applied:        ${summary.countriesApplied}`);
-  log(`Countries skipped (net):  ${summary.countriesSkipped}`);
+  log(`Countries skipped (fail): ${summary.countriesSkipped}`);
   log(`HTTP non-2xx (e.g. 404):  ${summary.countriesFetchFailed}`);
   log(`Offices written:          ${summary.officesWritten}`);
   log(`  · vacant (no term):     ${summary.vacantOffices}`);
@@ -1683,7 +1736,7 @@ export async function syncCiaCabinets(
   log(`Freshness stamped:        ${summary.freshnessStamped}`);
   if (summary.skipped.length > 0) {
     log(
-      `\n⚠ ${summary.skipped.length} country(ies) skipped after retries — the crawl still completed:`,
+      `\n⚠ ${summary.skipped.length} country(ies) skipped after failures — the crawl still completed:`,
     );
     for (const f of summary.skipped) log(`    ${f.slug}: ${f.reason}`);
     log(

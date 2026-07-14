@@ -2,7 +2,7 @@
  * CIA World Leaders cabinet sync — cron handler (day-of-month sharded).
  *
  * Runs DAILY via Vercel cron. Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). Ingests cabinet + central-bank + deputy + other
+ * (per the shared cron boundary). Ingests cabinet + central-bank + deputy + other
  * officials from the CIA "World Leaders" foreign-governments directory
  * (diplomatic dropped per the P4 scope decision) and stamps
  * `sources.last_sync_at` for `cia_world_leaders` (via the shared sync core).
@@ -18,12 +18,13 @@
  * shards 0–2. Freshness re-stamps on any day a shard writes rows.
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import {
   buildCiaSlugList,
   syncCiaCabinets,
 } from "@/lib/factbook/cia-cabinets-sync";
+import { ciaCabinetSyncCronOutcome } from "@/lib/factbook/cron-outcomes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,17 +37,51 @@ export const maxDuration = 600;
 // February) fully cycles. Days 29–31 map back onto shards 0–2 (idempotent).
 const SHARD_COUNT = 28;
 
-async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
+export function resolveCiaCabinetShard(
+  request: Request,
+  now = new Date(),
+): { ok: true; shardIndex: number } | { ok: false; error: string } {
+  const url = new URL(request.url);
+  const requested = url.searchParams.get("shard");
+  const manual = request.headers.has("idempotency-key");
+  if (manual && requested === null) {
+    return {
+      ok: false,
+      error: "Manual cabinet deliveries require an explicit shard (0-27)",
+    };
+  }
+  if (
+    requested !== null &&
+    (!/^\d+$/.test(requested) ||
+      Number(requested) < 0 ||
+      Number(requested) >= SHARD_COUNT)
+  ) {
+    return { ok: false, error: "Cabinet shard must be an integer from 0-27" };
+  }
+  return {
+    ok: true,
+    shardIndex:
+      requested === null
+        ? (now.getUTCDate() - 1) % SHARD_COUNT
+        : Number(requested),
+  };
+}
 
+async function handler(request: Request) {
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
   try {
+    const shard = resolveCiaCabinetShard(request);
+    if (!shard.ok) {
+      return NextResponse.json(
+        { ok: false, step: "factbook.cia-cabinets.sync", error: shard.error },
+        { status: 400 },
+      );
+    }
     // Deterministic, sorted full list → stable per-day shard membership.
     const allSlugs = await buildCiaSlugList(db);
-    const shardIndex = (new Date().getUTCDate() - 1) % SHARD_COUNT;
+    const shardIndex = shard.shardIndex;
     const perShard = Math.ceil(allSlugs.length / SHARD_COUNT);
     const slugs = allSlugs.slice(
       shardIndex * perShard,
@@ -75,13 +110,24 @@ async function handler(request: Request) {
       },
       dryRun,
     });
+    const { httpStatus, ...outcome } = ciaCabinetSyncCronOutcome(summary);
 
-    if (summary.skipped.length > 0 || summary.totalRowsWritten === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.cia-cabinets.sync", dryRun, errors: summary.skipped.length ? summary.skipped : [{ reason: "No cabinet rows produced" }] }, { status: 502 });
+    if (!outcome.ok) {
+      return NextResponse.json(
+        {
+          ...outcome,
+          step: "factbook.cia-cabinets.sync",
+          dryRun,
+          errors: summary.skipped.length
+            ? summary.skipped
+            : [{ reason: outcome.reason ?? "Incomplete cabinet sync" }],
+        },
+        { status: httpStatus },
+      );
     }
 
     return NextResponse.json({
-      ok: true,
+      ...outcome,
       step: "factbook.cia-cabinets.sync",
       started: startedAt,
       finished: summary.finishedAt,
@@ -118,4 +164,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.cia-cabinets", handler);
+
+export { cronHandler as GET, cronHandler as POST };

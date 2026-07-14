@@ -77,18 +77,19 @@
  */
 import { eq, sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -261,8 +262,7 @@ export const US_CENSUS_INDICATORS: readonly UsCensusIndicatorConfig[] = [
     variables: ["DP1_0086C"],
     factKey: "urbanization_rate",
     label: "Urbanization rate (Decennial 2020, post-2022 definition)",
-    docUrl:
-      "https://api.census.gov/data/2020/dec/dp/variables/DP1_0086C.json",
+    docUrl: "https://api.census.gov/data/2020/dec/dp/variables/DP1_0086C.json",
     vintageLabel: DECENNIAL_VINTAGE_LABEL,
     civicaRole: "canonical",
     // valueTransform receives [urbanPop, totalPop] in the order
@@ -364,6 +364,8 @@ export interface UsCensusSyncSummary {
 }
 
 export interface UsCensusSyncOptions {
+  /** Override configured targets for deterministic aggregate fixtures. */
+  targets?: readonly UsCensusIndicatorConfig[];
   /** Limit to a specific fact-key (for testing). */
   factKey?: string;
   /** When true, no DB writes — just exercise fetch + filter + log. */
@@ -527,7 +529,7 @@ export async function syncUsCensus(
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
 
-  const targets = US_CENSUS_INDICATORS.filter((c) => {
+  const targets = (options.targets ?? US_CENSUS_INDICATORS).filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
     return true;
   });
@@ -547,15 +549,17 @@ export async function syncUsCensus(
 
   // Resolve the USA jurisdiction once; the sync is single-jurisdiction
   // by design (Census Bureau scope is US-only).
-  const usaRows = options.jurisdiction ? [options.jurisdiction] : await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso2: jurisdictions.iso2,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(eq(jurisdictions.iso2, "US"));
+  const usaRows = options.jurisdiction
+    ? [options.jurisdiction]
+    : await db
+        .select({
+          id: jurisdictions.id,
+          slug: jurisdictions.slug,
+          iso2: jurisdictions.iso2,
+          iso3: jurisdictions.iso3,
+        })
+        .from(jurisdictions)
+        .where(eq(jurisdictions.iso2, "US"));
   if (usaRows.length === 0) {
     return {
       startedAt,
@@ -565,9 +569,7 @@ export async function syncUsCensus(
       countersByFactKey: {},
       totalWritten: 0,
       disputes: null,
-      errors: [
-        "USA jurisdiction not found in jurisdictions table (iso2='US')",
-      ],
+      errors: ["USA jurisdiction not found in jurisdictions table (iso2='US')"],
       dryRun: options.dryRun ?? false,
     };
   }
@@ -607,7 +609,9 @@ export async function syncUsCensus(
     try {
       if (config.factKey === "urbanization_rate") {
         // Two-dataset composition for urbanization rate.
-        const composed = await (options.fetchUrbanization ?? fetchUrbanizationRate)();
+        const composed = await (
+          options.fetchUrbanization ?? fetchUrbanizationRate
+        )();
         rawCells = [composed];
         numericValue = composed;
       } else {
@@ -635,6 +639,12 @@ export async function syncUsCensus(
       log(
         `  rejected_parse_error: Census returned non-finite value for ${config.factKey} (cells=${JSON.stringify(rawCells)})`,
       );
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "US Census",
+        target: config.factKey,
+        rowsWritten: counter.written,
+      });
       continue;
     }
     counter.jurisdictions_with_value = 1;
@@ -663,6 +673,12 @@ export async function syncUsCensus(
         log(
           `  rejected_envelope: ${config.factKey} = ${numericValue} outside [${min}, ${max}]`,
         );
+        recordRequiredSubfeedOutcome({
+          errors,
+          source: "US Census",
+          target: config.factKey,
+          rowsWritten: counter.written,
+        });
         continue;
       }
     }
@@ -720,6 +736,12 @@ export async function syncUsCensus(
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${usa.id}|${config.factKey}`);
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "US Census",
+        target: config.factKey,
+        rowsWritten: counter.written,
+      });
       continue;
     }
 
@@ -816,13 +838,13 @@ export async function syncUsCensus(
         }`,
       );
     }
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "US Census",
+      target: config.factKey,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("us_census", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -837,13 +859,17 @@ export async function syncUsCensus(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return;
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return;
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -853,6 +879,15 @@ export async function syncUsCensus(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "us_census",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerUsCensusCounters> = {};

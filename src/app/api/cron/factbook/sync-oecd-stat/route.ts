@@ -2,7 +2,7 @@
  * Phase R.7 — OECD.Stat sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 2 indicators × ~37 OECD-member rows in 2
+ * the shared cron boundary). 2 indicators × ~37 OECD-member rows in 2
  * unpaginated SDMX-JSON calls (~50–100KB each, ~150KB total). Total
  * wall time is dominated by upserts, not fetches; expect ~10–30s on a
  * warm DB.
@@ -25,7 +25,7 @@
  * Resolution:  ~/civica/plan/oecd-stat-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncOecdStat } from "@/lib/factbook/reconcile/sync-oecd-stat";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -35,9 +35,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -76,4 +73,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.oecd-stat", handler);
+
+export { cronHandler as GET, cronHandler as POST };

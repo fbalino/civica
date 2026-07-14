@@ -649,7 +649,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 
 ## 2026-07-10 — Freshness follows successful committed writes
 
-- Only `markSourcesSynced()` may change `sources.last_sync_at`.
+- Only the `markSourcesSynced*` API family may change `sources.last_sync_at`;
+  use its transaction/inserted-row variants when the stamp must commit with
+  domain rows, and never stamp failed, dry, empty, or duplicate-only work.
 - It requires a non-dry run, a positive safe-integer write count, normalized
   nonempty source IDs, and a valid timestamp, and reports success only after its
   single update statement succeeds.
@@ -1088,3 +1090,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The owner/platform must still require `verify` through GitHub branch
   protection or a ruleset and retain the first hosted run evidence. Durable
   record: APR-D165.
+
+## 2026-07-14 — Cron recovery is durable at-least-once
+
+- Every cron route crosses one bearer-authenticated, registered job boundary
+  before database or handler work.
+- Scheduled UTC slots and hashed manual Idempotency-Keys deduplicate known
+  deliveries; one database-time job lease, monotonic fences, retained attempts,
+  and a three-attempt cap serialize retries across instances.
+- Multi-stage freshness advances only after aggregate success. Do not claim
+  exactly-once execution across external/business writes and final bookkeeping;
+  DAT-012's convergent writers remain the crash-recovery backstop. Durable
+  record: APR-D166.

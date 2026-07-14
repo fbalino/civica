@@ -26,6 +26,7 @@ import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import {
   jurisdictions,
   pulseEventsV2,
+  pulsePipelineRuns,
   pulseSources,
   rawEvents,
 } from "@/lib/db/schema";
@@ -41,6 +42,10 @@ import type { ClassifierAgreement, SeverityTier } from "./types";
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
+  loadPulsePipelineRunState,
+  preparePulsePipelineRun,
+  pulseCronStageRunId,
+  pulseStageInputFingerprint,
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
@@ -49,7 +54,11 @@ import {
   PULSE_SOURCE_INDEPENDENCE_VERSION,
   type SourceEvidenceReport,
 } from "./source-independence";
-import { persistPulseDecisions } from "./decision-ledger-store";
+import {
+  persistPulseDecisions,
+  preparePulseDecisionInsert,
+} from "./decision-ledger-store";
+import type { PulseDecisionInput } from "./decision-ledger";
 import { PULSE_RUNTIME_METHOD_VERSION } from "./runtime-contract";
 
 type Db = NeonHttpDatabase<typeof schema>;
@@ -61,6 +70,8 @@ export interface CorroborateSummary {
   updated: number;
   averageConfidence: number;
   dryRun: boolean;
+  /** True when a retry reused an already-completed deterministic stage run. */
+  reused: boolean;
   planned: CorroborationPlan[];
 }
 
@@ -104,13 +115,71 @@ export interface CorroborateOptions {
   write?: (db: Db, plan: CorroborationPlan) => Promise<void>;
   now?: Date;
   runRef?: PulsePipelineRunRef;
+  /** Stable logical cron delivery key injected by `withCronJob()`. */
+  cronExecutionKey?: string;
+  /** Integration-fixture seam for exercising the production atomic publish. */
+  persistRun?: boolean;
 }
 
 export async function corroborateEvents(
   db: Db,
   opts: CorroborateOptions = {},
 ): Promise<CorroborateSummary> {
-  const events = opts.events ?? (await loadEvents(db, opts));
+  const persistRun =
+    !opts.dryRun && (opts.persistRun ?? (!opts.events && !opts.write));
+  const cronRunId = opts.cronExecutionKey
+    ? pulseCronStageRunId(opts.cronExecutionKey, "corroborate")
+    : null;
+  if (cronRunId && opts.runRef && opts.runRef.id !== cronRunId) {
+    throw new Error(
+      "corroboration runRef conflicts with the cron delivery identity",
+    );
+  }
+  const existingRun =
+    persistRun && cronRunId
+      ? await loadPulsePipelineRunState(db, cronRunId, "corroborate")
+      : null;
+  if (existingRun?.status === "completed") {
+    return {
+      runId: existingRun.run.id,
+      versionKey: existingRun.run.versionKey,
+      examined: existingRun.counts.examined ?? 0,
+      updated: existingRun.counts.updated ?? 0,
+      averageConfidence: existingRun.counts.averageConfidence ?? 0,
+      dryRun: false,
+      reused: true,
+      planned: [],
+    };
+  }
+  if (existingRun && existingRun.status !== "running") {
+    throw new Error(
+      `Terminal Pulse pipeline run cannot be resumed: ${existingRun.run.id} (${existingRun.status})`,
+    );
+  }
+  const selectionCutoff = existingRun?.startedAt ?? opts.now ?? new Date();
+  const persistedEventIds = existingRun?.run.versions.inputIds?.map((id) =>
+    id.startsWith("event:") ? id.slice("event:".length) : id,
+  );
+  if (existingRun && !persistedEventIds) {
+    throw new Error(
+      `Running corroboration run lacks an input snapshot: ${existingRun.run.id}`,
+    );
+  }
+  const loadedEvents =
+    opts.events ??
+    (await loadEvents(db, selectionCutoff, persistedEventIds ?? null));
+  const events = persistedEventIds
+    ? loadedEvents.filter((event) => persistedEventIds.includes(event.id))
+    : loadedEvents;
+  if (
+    persistedEventIds &&
+    (events.length !== persistedEventIds.length ||
+      events.some((event) => !persistedEventIds.includes(event.id)))
+  ) {
+    throw new Error(
+      `Corroboration retry input snapshot is incomplete: ${existingRun!.run.id}`,
+    );
+  }
   validateEvents(events);
   const informationContexts =
     opts.informationContexts ?? (await loadInformationContexts(db, events));
@@ -121,12 +190,37 @@ export async function corroborateEvents(
       throw new Error(`missing source-count fixture for event: ${event.id}`);
     resolvedCounts.set(
       event.id,
-      fixtureCounts ?? (await loadSourceCounts(db, event.id)),
+      fixtureCounts ??
+        (await loadSourceCounts(db, event.id, selectionCutoff)),
+    );
+  }
+  const inputFingerprint = pulseStageInputFingerprint({
+    events: [...events].sort((a, b) => a.id.localeCompare(b.id)),
+    sourceCounts: [...resolvedCounts]
+      .map(([eventId, counts]) => ({
+        eventId,
+        specialist: [...counts.specialist].sort(),
+        news: [...counts.news].sort(),
+        sourceIds: [...(counts.sourceIds ?? [])].sort(),
+        reportCount: counts.reportCount ?? null,
+      }))
+      .sort((a, b) => a.eventId.localeCompare(b.eventId)),
+    informationContexts: [...informationContexts]
+      .sort(([a], [b]) => a.localeCompare(b)),
+  });
+  if (
+    existingRun &&
+    existingRun.run.versions.inputFingerprint !== inputFingerprint
+  ) {
+    throw new Error(
+      `Corroboration retry input values changed: ${existingRun.run.id}`,
     );
   }
   const run =
+    existingRun?.run ??
     opts.runRef ??
     createPulsePipelineRunRef("corroborate", {
+      id: cronRunId ?? undefined,
       sourceIds: events.length
         ? [...resolvedCounts.values()].flatMap((counts) => [
             ...(counts.sourceIds ?? counts.specialist),
@@ -136,13 +230,36 @@ export async function corroborateEvents(
       upstreamRunIds: events.map(
         ({ classificationRunId }) => classificationRunId,
       ),
+      inputIds: events.map(({ id }) => `event:${id}`),
+      inputFingerprint,
     });
-  const persistRun = !opts.dryRun && !opts.events && !opts.runRef;
-  if (persistRun) await startPulsePipelineRun(db, run);
+  if (persistRun) {
+    const prepared = existingRun
+      ? await preparePulsePipelineRun(db, run)
+      : cronRunId
+        ? (await startPulsePipelineRun(db, run, {
+            startedAt: selectionCutoff,
+          }),
+          { state: "ready" as const })
+        : await preparePulsePipelineRun(db, run);
+    if (prepared.state === "completed") {
+      return {
+        runId: run.id,
+        versionKey: run.versionKey,
+        examined: prepared.counts.examined ?? events.length,
+        updated: prepared.counts.updated ?? 0,
+        averageConfidence: prepared.counts.averageConfidence ?? 0,
+        dryRun: false,
+        reused: true,
+        planned: [],
+      };
+    }
+  }
 
   let updated = 0;
   let totalConfidence = 0;
   const planned: CorroborationPlan[] = [];
+  const now = selectionCutoff;
 
   for (const event of events) {
     const counts = resolvedCounts.get(event.id)!;
@@ -185,31 +302,73 @@ export async function corroborateEvents(
         counts.reportCount ?? counts.specialist.size + counts.news.size,
     };
     planned.push(plan);
-    if (!opts.dryRun) {
+    if (!opts.dryRun && !persistRun) {
       if (opts.write) await opts.write(db, plan);
-      else await writeCorroboration(db, plan, opts.now ?? new Date());
+      else await writeCorroboration(db, plan, now);
       updated++;
     }
   }
 
   if (persistRun) {
-    await finishPulsePipelineRun(db, run.id, {
-      status: "completed",
-      counts: {
-        examined: events.length,
-        updated,
-        contributingReports: [...resolvedCounts.values()].reduce(
-          (sum, counts) =>
-            sum +
-            (counts.reportCount ?? counts.specialist.size + counts.news.size),
-          0,
-        ),
-        independentEvidenceGroups: [...resolvedCounts.values()].reduce(
-          (sum, counts) => sum + counts.specialist.size + counts.news.size,
-          0,
-        ),
-      },
-    });
+    const averageConfidence = events.length
+      ? totalConfidence / events.length
+      : 0;
+    const counts = {
+      examined: events.length,
+      updated: planned.length,
+      averageConfidence,
+      contributingReports: [...resolvedCounts.values()].reduce(
+        (sum, counts) =>
+          sum +
+          (counts.reportCount ?? counts.specialist.size + counts.news.size),
+        0,
+      ),
+      independentEvidenceGroups: [...resolvedCounts.values()].reduce(
+        (sum, counts) => sum + counts.specialist.size + counts.news.size,
+        0,
+      ),
+    };
+    const eventQueries = planned.map((plan) =>
+      corroborationEventUpdateQuery(db, plan, now),
+    );
+    const decisions = preparePulseDecisionInsert(
+      db,
+      planned.map((plan) => corroborationDecisionInput(plan, now)),
+    );
+    const batchQueries = [
+      ...eventQueries,
+      ...(decisions.query ? [decisions.query] : []),
+      db
+        .update(pulsePipelineRuns)
+        .set({
+          status: "completed",
+          counts,
+          failures: [],
+          completedAt: now,
+        })
+        .where(eq(pulsePipelineRuns.id, run.id)),
+    ] as unknown as Parameters<typeof db.batch>[0];
+    try {
+      await db.batch(batchQueries);
+      updated = planned.length;
+    } catch (error) {
+      if (!opts.cronExecutionKey) {
+        await finishPulsePipelineRun(db, run.id, {
+          status: "failed",
+          counts: { ...counts, updated: 0 },
+          failures: [
+            {
+              component: "pulse_corroboration_publish",
+              message:
+                error instanceof Error
+                  ? error.message.slice(0, 500)
+                  : "Unknown atomic corroboration failure",
+            },
+          ],
+        });
+      }
+      throw error;
+    }
   }
 
   return {
@@ -219,6 +378,7 @@ export async function corroborateEvents(
     updated,
     averageConfidence: events.length ? totalConfidence / events.length : 0,
     dryRun: opts.dryRun ?? false,
+    reused: false,
     planned: planned.sort((a, b) => a.eventId.localeCompare(b.eventId)),
   };
 }
@@ -245,7 +405,16 @@ async function writeCorroboration(
   plan: CorroborationPlan,
   now: Date,
 ): Promise<void> {
-  await db
+  await corroborationEventUpdateQuery(db, plan, now);
+  await persistPulseDecisions(db, [corroborationDecisionInput(plan, now)]);
+}
+
+function corroborationEventUpdateQuery(
+  db: Db,
+  plan: CorroborationPlan,
+  now: Date,
+) {
+  return db
     .update(pulseEventsV2)
     .set({
       corroborationConfidence: plan.confidence,
@@ -253,38 +422,42 @@ async function writeCorroboration(
       corroborationRunId: plan.corroborationRunId,
     })
     .where(eq(pulseEventsV2.id, plan.eventId));
-  await persistPulseDecisions(db, [
-    {
-      clusterId: plan.clusterId,
-      eventId: plan.eventId,
-      kind: "corroboration",
-      verdict: "affirmed",
-      payload: {
-        independentEvidenceGroups: plan.independentEvidenceGroups,
-        contributingReports: plan.contributingReports,
-        confidenceWeight: plan.confidence,
-        calibrationStanding: "heuristic_not_probability",
-      },
-      actor: {
-        type: "corroborator",
-        provider: null,
-        model: null,
-        reviewerId: null,
-      },
-      stageRunId: plan.corroborationRunId,
-      methodVersion: PULSE_RUNTIME_METHOD_VERSION,
-      rationale:
-        "Versioned source-independence rules produced a heuristic corroboration weight; it is not a calibrated probability.",
-      evidenceRefs: [
-        `event:${plan.eventId}`,
-        `source-independence:${plan.sourceIndependenceVersion}`,
-        ...(plan.informationEnvironmentContext.sourceUrl
-          ? [plan.informationEnvironmentContext.sourceUrl]
-          : []),
-      ],
-      decidedAt: now.toISOString(),
+}
+
+function corroborationDecisionInput(
+  plan: CorroborationPlan,
+  now: Date,
+): PulseDecisionInput<"corroboration"> {
+  return {
+    clusterId: plan.clusterId,
+    eventId: plan.eventId,
+    kind: "corroboration",
+    verdict: "affirmed",
+    payload: {
+      independentEvidenceGroups: plan.independentEvidenceGroups,
+      contributingReports: plan.contributingReports,
+      confidenceWeight: plan.confidence,
+      calibrationStanding: "heuristic_not_probability",
     },
-  ]);
+    actor: {
+      type: "corroborator",
+      provider: null,
+      model: null,
+      reviewerId: null,
+    },
+    stageRunId: plan.corroborationRunId,
+    methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+    rationale:
+      "Versioned source-independence rules produced a heuristic corroboration weight; it is not a calibrated probability.",
+    evidenceRefs: [
+      `event:${plan.eventId}`,
+      `source-independence:${plan.sourceIndependenceVersion}`,
+      ...(plan.informationEnvironmentContext.sourceUrl
+        ? [plan.informationEnvironmentContext.sourceUrl]
+        : []),
+    ],
+    decidedAt: now.toISOString(),
+  };
 }
 
 function baselineConfidence(
@@ -307,8 +480,17 @@ function baselineConfidence(
 
 async function loadEvents(
   db: Db,
-  _opts: CorroborateOptions,
+  selectionCutoff: Date,
+  eventIds: readonly string[] | null,
 ): Promise<EventRow[]> {
+  const eventPredicate = eventIds
+    ? eventIds.length
+      ? sql`p.id IN (${sql.join(
+          eventIds.map((id) => sql`${id}::uuid`),
+          sql`, `,
+        )})`
+      : sql`false`
+    : sql`true`;
   const result = await db.execute(sql`
     SELECT
       p.id,
@@ -322,7 +504,18 @@ async function loadEvents(
       p.classification_run_id
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
-    WHERE p.projection_status = 'current'
+    WHERE ${eventPredicate}
+      AND p.projection_status = 'current'
+      AND p.created_at <= ${selectionCutoff}
+      AND EXISTS (
+        SELECT 1
+        FROM pulse_cluster_classification_states classification_state
+        WHERE classification_state.event_id = p.id
+          AND classification_state.cluster_id = p.cluster_id
+          AND classification_state.last_run_id = p.classification_run_id
+          AND classification_state.status = 'classified'
+      )
+    ORDER BY p.id
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>).map((r) => ({
@@ -411,6 +604,7 @@ async function loadInformationContexts(
 async function loadSourceCounts(
   db: Db,
   eventId: string,
+  selectionCutoff: Date,
 ): Promise<SourceCounts> {
   const result = await db.execute(sql`
     SELECT
@@ -427,6 +621,7 @@ async function loadSourceCounts(
     JOIN pulse_sources ps ON ps.event_id = evidence_event.id
     JOIN raw_events r ON r.id = ps.raw_event_id
     WHERE current_event.id = ${eventId}
+      AND (ps.created_at IS NULL OR ps.created_at <= ${selectionCutoff})
     ORDER BY ps.raw_event_id
   `);
   const rows = ((result as unknown as { rows?: unknown[] }).rows ??

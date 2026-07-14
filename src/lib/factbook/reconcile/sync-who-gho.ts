@@ -54,18 +54,19 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -315,7 +316,9 @@ export interface WhoGhoSyncOptions {
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
   /** Deterministic fixture seams; production callers omit these. */
-  fetchIndicator?: (config: WhoGhoIndicatorConfig) => Promise<WhoGhoDataPoint[]>;
+  fetchIndicator?: (
+    config: WhoGhoIndicatorConfig,
+  ) => Promise<WhoGhoDataPoint[]>;
   jurisdictions?: WhoGhoJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
@@ -327,10 +330,7 @@ export interface WhoGhoJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  whoCode: string,
-): PerWhoGhoCounters {
+function freshCounters(factKey: string, whoCode: string): PerWhoGhoCounters {
   return {
     factKey,
     whoCode,
@@ -461,14 +461,16 @@ export async function syncWhoGho(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -476,9 +478,7 @@ export async function syncWhoGho(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   const counters = new Map<string, PerWhoGhoCounters>();
   for (const c of targets) {
@@ -545,10 +545,14 @@ export async function syncWhoGho(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -703,13 +707,13 @@ export async function syncWhoGho(
         `(envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "WHO GHO",
+      target: `${config.factKey} (${config.whoCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("who_gho", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -724,13 +728,17 @@ export async function syncWhoGho(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -740,6 +748,15 @@ export async function syncWhoGho(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "who_gho",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerWhoGhoCounters> = {};

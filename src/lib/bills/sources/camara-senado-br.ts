@@ -6,9 +6,10 @@
  * Both feeds return Portuguese titles. The shared summariser produces
  * an English plain-language summary at sync time.
  *
- * Resilience: each chamber fetch is wrapped in try/catch — if one API
- * is down, the other still ships. The Câmara API has been observed to
- * return upstream-504 timeouts at peak load, so this is load-bearing.
+ * Each chamber reports a structured outcome. A failure in either chamber
+ * makes the aggregate scheduled sync fail before it writes rows or advances
+ * source freshness. This is especially important because the Câmara API has
+ * been observed to return upstream 504s at peak load.
  *
  * `bodyId` is resolved from `governmentBodies.chamber_type`:
  *   - "lower" → Câmara dos Deputados
@@ -23,11 +24,53 @@ import { eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "@/lib/db/schema";
 import { governmentBodies } from "@/lib/db/schema";
-import type { BillIngestDraft } from "../types";
+import type {
+  BillFetchBatch,
+  BillIngestDraft,
+  BillSourceFetchOutcome,
+} from "../types";
+import { finalizeBillSourceMapping } from "../source-outcome";
 import { statusToStage } from "../stage";
 
 const CAMARA_SOURCE_ID = "camara_br";
 const SENADO_SOURCE_ID = "senado_br";
+
+type ChamberFetchResult<T> = {
+  rows: T[];
+  outcome: BillSourceFetchOutcome;
+};
+
+function failedFetch<T>(
+  sourceId: string,
+  error: unknown,
+  fetched = 0,
+): ChamberFetchResult<T> {
+  return {
+    rows: [],
+    outcome: {
+      sourceId,
+      status: "failed",
+      fetched,
+      mapped: 0,
+      error: error instanceof Error ? error.message : String(error),
+    },
+  };
+}
+
+function successfulFetch<T>(
+  sourceId: string,
+  rows: T[],
+): ChamberFetchResult<T> {
+  return {
+    rows,
+    outcome: {
+      sourceId,
+      status: "success",
+      fetched: rows.length,
+      mapped: 0,
+    },
+  };
+}
 
 /* ---------- Câmara (lower house) ---------- */
 
@@ -43,7 +86,9 @@ interface CamaraResponse {
   dados?: CamaraRaw[];
 }
 
-async function fetchCamara(limit: number): Promise<CamaraRaw[]> {
+async function fetchCamara(
+  limit: number,
+): Promise<ChamberFetchResult<CamaraRaw>> {
   // The /proposicoes endpoint requires a date filter or specific
   // ordering; "ordem=DESC, ordenarPor=id" returns the freshest IDs.
   const url = `https://dadosabertos.camara.leg.br/api/v2/proposicoes?siglaTipo=PL,PEC,PLP,PDL&itens=${limit}&ordem=DESC&ordenarPor=id`;
@@ -58,16 +103,15 @@ async function fetchCamara(limit: number): Promise<CamaraRaw[]> {
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) {
-      console.warn(`[bills.br] Câmara fetch ${res.status}; skipping`);
-      return [];
+      return failedFetch(CAMARA_SOURCE_ID, `HTTP ${res.status}`);
     }
     const json = (await res.json()) as CamaraResponse;
-    return json.dados ?? [];
+    if (!Array.isArray(json.dados)) {
+      return failedFetch(CAMARA_SOURCE_ID, "response omitted the dados array");
+    }
+    return successfulFetch(CAMARA_SOURCE_ID, json.dados);
   } catch (err) {
-    console.warn(
-      `[bills.br] Câmara fetch failed: ${err instanceof Error ? err.message : err}; skipping`,
-    );
-    return [];
+    return failedFetch(CAMARA_SOURCE_ID, err);
   }
 }
 
@@ -112,7 +156,7 @@ const SENADO_BILL_TYPES = new Set([
   "PLC",
 ]);
 
-async function fetchSenado(): Promise<SenadoMateria[]> {
+async function fetchSenado(): Promise<ChamberFetchResult<SenadoMateria>> {
   const now = new Date();
   const ano = now.getFullYear();
   const mes = String(now.getMonth() + 1).padStart(2, "0");
@@ -130,18 +174,20 @@ async function fetchSenado(): Promise<SenadoMateria[]> {
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) {
-      console.warn(`[bills.br] Senado fetch ${res.status}; skipping`);
-      return [];
+      return failedFetch(SENADO_SOURCE_ID, `HTTP ${res.status}`);
     }
     const json = (await res.json()) as SenadoResponse;
-    const m = json.ListaMateriasAtualizadas?.Materias?.Materia;
-    if (!m) return [];
-    return Array.isArray(m) ? m : [m];
+    if (!json.ListaMateriasAtualizadas) {
+      return failedFetch(
+        SENADO_SOURCE_ID,
+        "response omitted ListaMateriasAtualizadas",
+      );
+    }
+    const m = json.ListaMateriasAtualizadas.Materias?.Materia;
+    const rows = !m ? [] : Array.isArray(m) ? m : [m];
+    return successfulFetch(SENADO_SOURCE_ID, rows);
   } catch (err) {
-    console.warn(
-      `[bills.br] Senado fetch failed: ${err instanceof Error ? err.message : err}; skipping`,
-    );
-    return [];
+    return failedFetch(SENADO_SOURCE_ID, err);
   }
 }
 
@@ -241,7 +287,7 @@ export async function fetchBRBillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** Per-chamber cap. Total returned ≤ 2 × limit. Default 50/each. */
   limit?: number;
-}): Promise<BillIngestDraft[]> {
+}): Promise<BillFetchBatch> {
   const limit = opts.limit ?? 50;
 
   const bodies = await opts.db
@@ -264,14 +310,21 @@ export async function fetchBRBillsForSync(opts: {
     fetchSenado(),
   ]);
 
-  const camaraDrafts = camara
+  const camaraDrafts = camara.rows
     .map((b) => camaraDraft(b, opts.jurisdictionId, lowerBodyId))
     .filter((d): d is BillIngestDraft => d !== null);
 
-  const senadoDrafts = senado
+  const senadoDrafts = senado.rows
     .map((m) => senadoDraft(m, opts.jurisdictionId, upperBodyId))
     .filter((d): d is BillIngestDraft => d !== null)
     .slice(0, limit);
+  const senadoRowsAreExplicitlyNonBill =
+    senado.rows.length > 0 &&
+    senado.rows.every((row) => {
+      const id = row.IdentificacaoMateria?.CodigoMateria;
+      const subtype = row.IdentificacaoMateria?.SiglaSubtipoMateria;
+      return Boolean(id && subtype && !SENADO_BILL_TYPES.has(subtype));
+    });
 
   // Dedupe by `${sourceId}:${externalId}` — chambers share the
   // namespace prefix so collisions across feeds are vanishingly rare,
@@ -285,5 +338,25 @@ export async function fetchBRBillsForSync(opts: {
     seen.add(key);
     out.push(d);
   }
-  return out;
+  const camaraOutcome = finalizeBillSourceMapping(
+    camara.outcome,
+    out.filter((draft) => draft.sourceId === CAMARA_SOURCE_ID).length,
+    {
+      zeroMappedError: `${camara.rows.length} Câmara record(s) produced zero mappable bill drafts`,
+    },
+  );
+  const senadoOutcome = finalizeBillSourceMapping(
+    senado.outcome,
+    out.filter((draft) => draft.sourceId === SENADO_SOURCE_ID).length,
+    {
+      benignEmptyReason: senadoRowsAreExplicitlyNonBill
+        ? "no_bill_records_in_period"
+        : undefined,
+      zeroMappedError: `${senado.rows.length} Senado record(s) produced zero mappable bill drafts`,
+    },
+  );
+  return {
+    drafts: out,
+    sourceOutcomes: [camaraOutcome, senadoOutcome],
+  };
 }

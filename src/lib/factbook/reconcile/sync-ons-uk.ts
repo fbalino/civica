@@ -103,7 +103,12 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -276,8 +281,7 @@ export const ONS_INDICATORS: readonly OnsUkIndicatorConfig[] = [
     urlPath:
       "economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6x/pusf",
     factKey: "public_debt_psnd_pct_gdp",
-    label:
-      "PS Net Debt (excluding public sector banks) as a % of GDP, NSA",
+    label: "PS Net Debt (excluding public sector banks) as a % of GDP, NSA",
     civicaRole: "canonical",
   },
 ];
@@ -354,6 +358,8 @@ export interface OnsSyncSummary {
 }
 
 export interface OnsSyncOptions {
+  /** Override configured targets for deterministic aggregate fixtures. */
+  targets?: readonly OnsUkIndicatorConfig[];
   /** Limit to a specific fact-key (for testing). */
   factKey?: string;
   /** Limit to a specific ONS CDID (for testing). */
@@ -454,9 +460,7 @@ interface OnsTimeSeriesResponse {
  * `years[]` array, returning the latest non-empty year point along
  * with all observations seen for counter visibility.
  */
-async function fetchIndicator(
-  config: OnsUkIndicatorConfig,
-): Promise<{
+async function fetchIndicator(config: OnsUkIndicatorConfig): Promise<{
   latest: OnsYearPoint | null;
   observationCount: number;
   rejectedNoValue: number;
@@ -477,8 +481,7 @@ async function fetchIndicator(
   const body = (await res.json()) as OnsTimeSeriesResponse;
 
   const years = body.years ?? [];
-  const upstreamReleaseDate =
-    body.description?.releaseDate?.trim() || null;
+  const upstreamReleaseDate = body.description?.releaseDate?.trim() || null;
 
   let latest: OnsYearPoint | null = null;
   let rejectedNoValue = 0;
@@ -522,7 +525,10 @@ async function fetchIndicator(
  * Returns `true` if a row was inserted (first run); `false` if the
  * row already existed (UPSERT no-op).
  */
-async function ensureSourceRow(db: Db, log: (line: string) => void): Promise<boolean> {
+async function ensureSourceRow(
+  db: Db,
+  log: (line: string) => void,
+): Promise<boolean> {
   const existing = await db
     .select({ id: sources.id })
     .from(sources)
@@ -572,7 +578,7 @@ export async function syncOnsUk(
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
 
-  const targets = ONS_INDICATORS.filter((c) => {
+  const targets = (options.targets ?? ONS_INDICATORS).filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
     if (options.cdid && c.cdid !== options.cdid) return false;
     return true;
@@ -598,12 +604,13 @@ export async function syncOnsUk(
   let sourceRowInserted = false;
   if (!options.dryRun) {
     try {
-      sourceRowInserted = await (options.ensureSource ?? ensureSourceRow)(db, log);
+      sourceRowInserted = await (options.ensureSource ?? ensureSourceRow)(
+        db,
+        log,
+      );
     } catch (err) {
       errors.push(
-        `ensureSourceRow failed: ${
-          err instanceof Error ? err.message : err
-        }`,
+        `ensureSourceRow failed: ${err instanceof Error ? err.message : err}`,
       );
       // Fall through — the row may already exist; downstream writes
       // will surface a foreign-key error if not.
@@ -611,15 +618,17 @@ export async function syncOnsUk(
   }
 
   // Resolve the GBR jurisdiction once. Single-country NSO scope.
-  const jrows = options.jurisdiction ? [options.jurisdiction] : await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso2: jurisdictions.iso2,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(eq(jurisdictions.iso3, ONS_TARGET_ISO3));
+  const jrows = options.jurisdiction
+    ? [options.jurisdiction]
+    : await db
+        .select({
+          id: jurisdictions.id,
+          slug: jurisdictions.slug,
+          iso2: jurisdictions.iso2,
+          iso3: jurisdictions.iso3,
+        })
+        .from(jurisdictions)
+        .where(eq(jurisdictions.iso3, ONS_TARGET_ISO3));
   const ukJurisdiction = jrows[0] ?? null;
   if (!ukJurisdiction) {
     return {
@@ -661,9 +670,7 @@ export async function syncOnsUk(
       continue;
     }
 
-    log(
-      `→ ${config.factKey} (${config.cdid}) "${config.label}" — fetching…`,
-    );
+    log(`→ ${config.factKey} (${config.cdid}) "${config.label}" — fetching…`);
 
     let latest: OnsYearPoint | null = null;
     let observationCount = 0;
@@ -694,7 +701,15 @@ export async function syncOnsUk(
           : " — no usable points") +
         (upstreamReleaseDate ? ` [released ${upstreamReleaseDate}]` : ""),
     );
-    if (!latest) continue;
+    if (!latest) {
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "ONS",
+        target: `${config.factKey} (${config.cdid})`,
+        rowsWritten: counter.written,
+      });
+      continue;
+    }
 
     counter.jurisdictions_with_value = 1;
 
@@ -725,6 +740,12 @@ export async function syncOnsUk(
         errors.push(
           `${config.factKey}: envelope reject — ${numericValue} outside [${min ?? "-∞"}, ${max ?? "+∞"}]`,
         );
+        recordRequiredSubfeedOutcome({
+          errors,
+          source: "ONS",
+          target: `${config.factKey} (${config.cdid})`,
+          rowsWritten: counter.written,
+        });
         continue;
       }
     }
@@ -775,8 +796,7 @@ export async function syncOnsUk(
         scopePredicate: ONS_SCOPE_PREDICATE,
         onsCdid: config.cdid,
         onsSourceDataset:
-          config.urlPath.split("/").slice(-1)[0]?.toUpperCase() ??
-          null,
+          config.urlPath.split("/").slice(-1)[0]?.toUpperCase() ?? null,
         onsReleaseDate: upstreamReleaseDate,
       },
     ];
@@ -788,6 +808,12 @@ export async function syncOnsUk(
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${ukJurisdiction.id}|${config.factKey}`);
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "ONS",
+        target: `${config.factKey} (${config.cdid})`,
+        rowsWritten: counter.written,
+      });
       continue;
     }
 
@@ -893,13 +919,13 @@ export async function syncOnsUk(
           ? ` [projections: ${counter.projection_rows}]`
           : ""),
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "ONS",
+      target: `${config.factKey} (${config.cdid})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)(ONS_SOURCE_ID, {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -914,13 +940,17 @@ export async function syncOnsUk(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return;
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return;
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -930,6 +960,15 @@ export async function syncOnsUk(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: ONS_SOURCE_ID,
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerOnsCounters> = {};

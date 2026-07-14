@@ -213,7 +213,7 @@ This is the durable decision log for the active master plan. New entries append;
 
 ### APR-D042 — Source freshness is evidence of a successful committed write
 
-**Decision:** `markSourcesSynced()` is the only sanctioned path for changing `sources.last_sync_at`. It stamps only after a non-dry run reports a positive safe-integer row count, at least one normalized source ID, and a valid timestamp. It issues one update for the deduplicated source set and returns stamped IDs only after that update succeeds. Dry, empty, invalid-count, blank-source, invalid-time, and failed-executor paths cannot report freshness. The repository validator scans every production source file and self-tests its detection rules against seeded direct-set, upsert, and raw-SQL violations plus safe read/insert/comment controls.
+**Decision:** The `markSourcesSynced*` API family in `src/lib/db/source-freshness.ts` is the only sanctioned path for changing `sources.last_sync_at`. `markSourcesSynced()` stamps after a non-dry committed write reports a positive safe-integer row count, normalized source IDs, and a valid timestamp. `markSourcesSyncedTransactionQuery()` and `markSourcesSyncedFromInsertedRowsCte()` are the atomic forms: they commit freshness in the same database transaction or statement as the domain rows and derive eligibility from actual inserted rows, so later failure, empty input, and duplicate-only work stamp nothing. No caller may emit its own freshness update. The repository validator scans every production source file and self-tests direct-set, upsert, and raw-SQL detection plus safe controls.
 **Why:** Freshness is a claim about data actually written, not that a job started, reached an upstream endpoint, or attempted an update. One fail-closed helper and a self-testing whole-source scanner prevent empty, partial, dry, or failed runs from making stale inputs appear current.
 
 ### APR-D043 — The schema dictionary is generated, reviewed policy plus exact structure
@@ -1095,3 +1095,24 @@ method contracts have not drifted. Separating immutable reproduction from live
 observation keeps both claims honest. Sharing one production build body avoids
 a weaker CI-only product, and explicit external enforcement avoids pretending
 local source code can configure branch protection.
+
+### APR-D166 — Cron recovery is leased, fenced, and explicitly at-least-once
+
+**Decision:** Put every `/api/cron/**` route behind one `withCronJob()`
+boundary. Authenticate before database access; identify scheduled work by its
+registered UTC slot and manual work by a durable hashed `Idempotency-Key`;
+serialize all invocations of one job with a database-time lease; retain every
+attempt; fence expired workers; and permit at most three attempts for one
+logical delivery. Record the handler's real terminal HTTP outcome before
+returning success. Aggregate multi-stage freshness and advance it only after
+all required stages succeed. Keep the existing DAT-012 convergent-writer
+contract as the recovery backstop rather than claiming exactly-once execution.
+
+**Why:** Vercel documents best-effort delivery, possible duplicate or
+overlapping invocations, and no automatic failure retry. A durable application
+boundary makes known duplicates and concurrency safe across serverless
+instances, while database clock and fencing prevent a timed-out worker from
+closing newer work. No ledger can atomically cover every upstream call or
+business write separated from final bookkeeping, so honest at-least-once
+recovery plus idempotent reconciliation is stronger and more accurate than an
+unsupported exactly-once claim.

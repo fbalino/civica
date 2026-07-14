@@ -155,7 +155,7 @@ function validateStaticContract() {
   }
   const sync = read("scripts/sync-organization-memberships.ts");
   if (
-    !sync.includes("sourceFreshnessTransactionQuery") ||
+    !sync.includes("markSourcesSyncedTransactionQuery") ||
     !sync.includes("unverified_legacy") ||
     !sync.includes("neonSql.transaction")
   ) {

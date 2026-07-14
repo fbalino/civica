@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-14T05:46:13.095Z",
-  "sha256": "70f1f2e50aaf74a6b7b126a11fe93b5481d39cd1eafff9de60ea2ccad88a7df4",
+  "generatedAt": "2026-07-14T08:53:48.534Z",
+  "sha256": "f38227eb1e6e6a3d86951d8a7aa61ce875d6469efd52a4afead9dbbf8896f29c",
   "schema": {
     "columns": [
       {
@@ -3687,6 +3687,339 @@
       },
       {
         "udt": "uuid",
+        "name": "attempt_id",
+        "type": "uuid",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "execution_key",
+        "type": "text",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "job_id",
+        "type": "text",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "int4",
+        "name": "ordinal",
+        "type": "integer",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "int4",
+        "name": "fence",
+        "type": "integer",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "timestamptz",
+        "name": "started_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamptz",
+        "name": "completed_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "int4",
+        "name": "response_status",
+        "type": "integer",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "result_code",
+        "type": "text",
+        "table": "cron_job_attempts",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "execution_key",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "job_id",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "route",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "trigger_kind",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "timestamptz",
+        "name": "schedule_slot",
+        "type": "timestamp with time zone",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "request_mode",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "scope_key",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "request_sha256",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "int4",
+        "name": "attempt_count",
+        "type": "integer",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "int4",
+        "name": "max_attempts",
+        "type": "integer",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "uuid",
+        "name": "last_attempt_id",
+        "type": "uuid",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "int4",
+        "name": "last_fence",
+        "type": "integer",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "timestamptz",
+        "name": "first_started_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "timestamptz",
+        "name": "last_started_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "timestamptz",
+        "name": "completed_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "int4",
+        "name": "response_status",
+        "type": "integer",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "result_code",
+        "type": "text",
+        "table": "cron_job_executions",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "timestamptz",
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_executions",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "timestamptz",
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_executions",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "job_id",
+        "type": "text",
+        "table": "cron_job_leases",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "lease_token",
+        "type": "uuid",
+        "table": "cron_job_leases",
+        "default": null,
+        "nullable": "YES",
+        "position": 2
+      },
+      {
+        "udt": "int4",
+        "name": "lease_fence",
+        "type": "integer",
+        "table": "cron_job_leases",
+        "default": "0",
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "timestamptz",
+        "name": "lease_expires_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_leases",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "execution_key",
+        "type": "text",
+        "table": "cron_job_leases",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "uuid",
+        "name": "attempt_id",
+        "type": "uuid",
+        "table": "cron_job_leases",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "timestamptz",
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "table": "cron_job_leases",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "uuid",
         "name": "id",
         "type": "uuid",
         "table": "data_disputes",
@@ -6393,6 +6726,33 @@
         "default": "now()",
         "nullable": "NO",
         "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "execution_key",
+        "type": "text",
+        "table": "pulse_classification_delivery_bindings",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "classification_run_id",
+        "type": "uuid",
+        "table": "pulse_classification_delivery_bindings",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "timestamptz",
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "table": "pulse_classification_delivery_bindings",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 3
       },
       {
         "udt": "uuid",
@@ -11213,6 +11573,66 @@
         "definition": "CREATE UNIQUE INDEX idx_country_metrics_unique ON public.country_metrics USING btree (jurisdiction_id, metric_id, year)"
       },
       {
+        "name": "cron_job_attempts_pkey",
+        "table": "cron_job_attempts",
+        "definition": "CREATE UNIQUE INDEX cron_job_attempts_pkey ON public.cron_job_attempts USING btree (attempt_id)"
+      },
+      {
+        "name": "idx_cron_job_attempt_execution",
+        "table": "cron_job_attempts",
+        "definition": "CREATE INDEX idx_cron_job_attempt_execution ON public.cron_job_attempts USING btree (execution_key, started_at)"
+      },
+      {
+        "name": "idx_cron_job_attempt_fence",
+        "table": "cron_job_attempts",
+        "definition": "CREATE UNIQUE INDEX idx_cron_job_attempt_fence ON public.cron_job_attempts USING btree (job_id, fence)"
+      },
+      {
+        "name": "idx_cron_job_attempt_ordinal",
+        "table": "cron_job_attempts",
+        "definition": "CREATE UNIQUE INDEX idx_cron_job_attempt_ordinal ON public.cron_job_attempts USING btree (execution_key, ordinal)"
+      },
+      {
+        "name": "idx_cron_job_attempt_status",
+        "table": "cron_job_attempts",
+        "definition": "CREATE INDEX idx_cron_job_attempt_status ON public.cron_job_attempts USING btree (status, started_at)"
+      },
+      {
+        "name": "cron_job_executions_pkey",
+        "table": "cron_job_executions",
+        "definition": "CREATE UNIQUE INDEX cron_job_executions_pkey ON public.cron_job_executions USING btree (execution_key)"
+      },
+      {
+        "name": "idx_cron_job_execution_job_time",
+        "table": "cron_job_executions",
+        "definition": "CREATE INDEX idx_cron_job_execution_job_time ON public.cron_job_executions USING btree (job_id, schedule_slot)"
+      },
+      {
+        "name": "idx_cron_job_execution_manual",
+        "table": "cron_job_executions",
+        "definition": "CREATE UNIQUE INDEX idx_cron_job_execution_manual ON public.cron_job_executions USING btree (job_id, scope_key) WHERE (trigger_kind = 'manual'::text)"
+      },
+      {
+        "name": "idx_cron_job_execution_scheduled",
+        "table": "cron_job_executions",
+        "definition": "CREATE UNIQUE INDEX idx_cron_job_execution_scheduled ON public.cron_job_executions USING btree (job_id, schedule_slot) WHERE (trigger_kind = 'scheduled'::text)"
+      },
+      {
+        "name": "idx_cron_job_execution_status",
+        "table": "cron_job_executions",
+        "definition": "CREATE INDEX idx_cron_job_execution_status ON public.cron_job_executions USING btree (status, updated_at)"
+      },
+      {
+        "name": "cron_job_leases_pkey",
+        "table": "cron_job_leases",
+        "definition": "CREATE UNIQUE INDEX cron_job_leases_pkey ON public.cron_job_leases USING btree (job_id)"
+      },
+      {
+        "name": "idx_cron_job_lease_expiry",
+        "table": "cron_job_leases",
+        "definition": "CREATE INDEX idx_cron_job_lease_expiry ON public.cron_job_leases USING btree (lease_expires_at)"
+      },
+      {
         "name": "data_disputes_pkey",
         "table": "data_disputes",
         "definition": "CREATE UNIQUE INDEX data_disputes_pkey ON public.data_disputes USING btree (id)"
@@ -11531,6 +11951,16 @@
         "name": "pulse_classification_attempts_pkey",
         "table": "pulse_classification_attempts",
         "definition": "CREATE UNIQUE INDEX pulse_classification_attempts_pkey ON public.pulse_classification_attempts USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_classification_delivery_run",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "CREATE INDEX idx_pulse_classification_delivery_run ON public.pulse_classification_delivery_bindings USING btree (classification_run_id)"
+      },
+      {
+        "name": "pulse_classification_delivery_bindings_pkey",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "CREATE UNIQUE INDEX pulse_classification_delivery_bindings_pkey ON public.pulse_classification_delivery_bindings USING btree (execution_key)"
       },
       {
         "name": "idx_pulse_classification_state_cluster_config",
@@ -12210,6 +12640,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.ci_research_panel_rows_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF EXISTS (\n    SELECT 1 FROM public.ci_research_panel_releases\n    WHERE id = COALESCE(OLD.release_id, NEW.release_id) AND status = 'complete'\n  ) THEN\n    RAISE EXCEPTION 'completed Civica Index research panel rows are immutable';\n  END IF;\n  RETURN COALESCE(NEW, OLD);\nEND;\n$function$\n"
       },
       {
+        "name": "civica_acquire_cron_job_v1",
+        "identity": "p_execution_key text, p_job_id text, p_route text, p_trigger_kind text, p_schedule_slot timestamp with time zone, p_request_mode text, p_scope_key text, p_request_sha256 text, p_lease_seconds integer, p_max_attempts integer, p_candidate_lease_token uuid, p_candidate_attempt_id uuid",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_acquire_cron_job_v1(p_execution_key text, p_job_id text, p_route text, p_trigger_kind text, p_schedule_slot timestamp with time zone, p_request_mode text, p_scope_key text, p_request_sha256 text, p_lease_seconds integer, p_max_attempts integer, p_candidate_lease_token uuid, p_candidate_attempt_id uuid)\n RETURNS TABLE(claim_state text, lease_token uuid, lease_expires_at timestamp with time zone, attempt_count integer, attempt_id uuid, lease_fence integer, completed_at timestamp with time zone, response_status integer)\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  v_lease public.cron_job_leases%ROWTYPE;\n  v_execution public.cron_job_executions%ROWTYPE;\n  v_now timestamptz;\n  v_expires_at timestamptz;\n  v_attempt_count integer;\n  v_fence integer;\n  v_affected integer;\nBEGIN\n  IF p_execution_key IS NULL\n     OR p_job_id IS NULL\n     OR p_route IS NULL\n     OR p_trigger_kind IS NULL\n     OR p_request_mode IS NULL\n     OR p_request_sha256 IS NULL\n     OR p_lease_seconds IS NULL\n     OR p_max_attempts IS NULL\n     OR p_execution_key !~ '^[a-f0-9]{64}$'\n     OR p_request_sha256 !~ '^[a-f0-9]{64}$'\n     OR p_job_id !~ '^[a-z][a-z0-9.-]*$'\n     OR length(p_job_id) NOT BETWEEN 1 AND 80\n     OR p_route !~ '^/api/cron/[a-z0-9_./-]+$'\n     OR length(p_route) NOT BETWEEN 1 AND 160\n     OR p_request_mode NOT IN ('apply', 'dry_run')\n     OR p_lease_seconds NOT BETWEEN 1 AND 86400\n     OR p_max_attempts NOT BETWEEN 1 AND 20\n     OR p_candidate_lease_token IS NULL\n     OR p_candidate_attempt_id IS NULL THEN\n    RAISE EXCEPTION 'invalid cron acquisition input';\n  END IF;\n\n  IF p_trigger_kind = 'scheduled' THEN\n    IF p_schedule_slot IS NULL\n       OR NOT isfinite(p_schedule_slot)\n       OR p_scope_key IS NOT NULL\n       OR p_request_mode <> 'apply' THEN\n      RAISE EXCEPTION 'invalid scheduled cron trigger identity';\n    END IF;\n  ELSIF p_trigger_kind = 'manual' THEN\n    IF p_schedule_slot IS NOT NULL\n       OR p_scope_key IS NULL\n       OR p_scope_key !~ '^[a-f0-9]{64}$' THEN\n      RAISE EXCEPTION 'invalid manual cron trigger identity';\n    END IF;\n  ELSE\n    RAISE EXCEPTION 'invalid cron trigger identity';\n  END IF;\n\n  INSERT INTO public.cron_job_leases (job_id, lease_fence, updated_at)\n  VALUES (p_job_id, 0, clock_timestamp())\n  ON CONFLICT (job_id) DO NOTHING;\n\n  SELECT lease_row.*\n  INTO STRICT v_lease\n  FROM public.cron_job_leases AS lease_row\n  WHERE lease_row.job_id = p_job_id\n  FOR UPDATE;\n\n  -- Take the database clock only after lock acquisition so lock wait time\n  -- cannot make lease decisions against a stale transaction timestamp.\n  v_now := clock_timestamp();\n\n  IF v_lease.lease_token IS NOT NULL\n     AND v_lease.lease_expires_at > v_now THEN\n    SELECT execution_row.*\n    INTO STRICT v_execution\n    FROM public.cron_job_executions AS execution_row\n    WHERE execution_row.execution_key = v_lease.execution_key;\n    v_attempt_count := v_execution.attempt_count;\n\n    IF v_lease.execution_key = p_execution_key\n       AND (\n         v_execution.job_id IS DISTINCT FROM p_job_id\n         OR v_execution.route IS DISTINCT FROM p_route\n         OR v_execution.trigger_kind IS DISTINCT FROM p_trigger_kind\n         OR v_execution.schedule_slot IS DISTINCT FROM p_schedule_slot\n         OR v_execution.request_mode IS DISTINCT FROM p_request_mode\n         OR v_execution.scope_key IS DISTINCT FROM p_scope_key\n         OR v_execution.request_sha256 IS DISTINCT FROM p_request_sha256\n         OR v_execution.max_attempts IS DISTINCT FROM p_max_attempts\n       ) THEN\n      RETURN QUERY SELECT\n        'conflict'::text,\n        NULL::uuid,\n        NULL::timestamptz,\n        v_attempt_count,\n        NULL::uuid,\n        NULL::integer,\n        v_execution.completed_at,\n        v_execution.response_status;\n      RETURN;\n    END IF;\n\n    RETURN QUERY SELECT\n      CASE\n        WHEN v_lease.execution_key = p_execution_key THEN 'running'::text\n        ELSE 'busy'::text\n      END,\n      v_lease.lease_token,\n      v_lease.lease_expires_at,\n      v_attempt_count,\n      v_lease.attempt_id,\n      v_lease.lease_fence,\n      NULL::timestamptz,\n      NULL::integer;\n    RETURN;\n  END IF;\n\n  IF v_lease.lease_token IS NOT NULL THEN\n    UPDATE public.cron_job_attempts AS attempt_row\n    SET status = 'expired',\n        completed_at = v_now,\n        response_status = 504,\n        result_code = 'lease_expired'\n    WHERE attempt_row.attempt_id = v_lease.attempt_id\n      AND attempt_row.execution_key = v_lease.execution_key\n      AND attempt_row.job_id = p_job_id\n      AND attempt_row.fence = v_lease.lease_fence\n      AND attempt_row.status = 'running';\n    GET DIAGNOSTICS v_affected = ROW_COUNT;\n    IF v_affected <> 1 THEN\n      RAISE EXCEPTION 'expired cron lease has no matching running attempt';\n    END IF;\n\n    UPDATE public.cron_job_executions AS execution_row\n    SET status = 'failed',\n        completed_at = v_now,\n        response_status = 504,\n        result_code = 'lease_expired',\n        updated_at = v_now\n    WHERE execution_row.execution_key = v_lease.execution_key\n      AND execution_row.job_id = p_job_id\n      AND execution_row.last_attempt_id = v_lease.attempt_id\n      AND execution_row.last_fence = v_lease.lease_fence\n      AND execution_row.status = 'running';\n    GET DIAGNOSTICS v_affected = ROW_COUNT;\n    IF v_affected <> 1 THEN\n      RAISE EXCEPTION 'expired cron lease has no matching running execution';\n    END IF;\n\n    UPDATE public.cron_job_leases AS lease_row\n    SET lease_token = NULL,\n        lease_expires_at = NULL,\n        execution_key = NULL,\n        attempt_id = NULL,\n        updated_at = v_now\n    WHERE lease_row.job_id = p_job_id;\n\n    v_lease.lease_token := NULL;\n    v_lease.lease_expires_at := NULL;\n    v_lease.execution_key := NULL;\n    v_lease.attempt_id := NULL;\n    v_lease.updated_at := v_now;\n  END IF;\n\n  SELECT execution_row.*\n  INTO v_execution\n  FROM public.cron_job_executions AS execution_row\n  WHERE execution_row.execution_key = p_execution_key\n     OR (\n       p_trigger_kind = 'scheduled'\n       AND execution_row.job_id = p_job_id\n       AND execution_row.trigger_kind = 'scheduled'\n       AND execution_row.schedule_slot = p_schedule_slot\n     )\n     OR (\n       p_trigger_kind = 'manual'\n       AND execution_row.job_id = p_job_id\n       AND execution_row.trigger_kind = 'manual'\n       AND execution_row.scope_key = p_scope_key\n     )\n  ORDER BY (execution_row.execution_key = p_execution_key) DESC\n  LIMIT 1\n  FOR UPDATE;\n\n  IF FOUND THEN\n    IF v_execution.execution_key IS DISTINCT FROM p_execution_key\n       OR v_execution.job_id IS DISTINCT FROM p_job_id\n       OR v_execution.route IS DISTINCT FROM p_route\n       OR v_execution.trigger_kind IS DISTINCT FROM p_trigger_kind\n       OR v_execution.schedule_slot IS DISTINCT FROM p_schedule_slot\n       OR v_execution.request_mode IS DISTINCT FROM p_request_mode\n       OR v_execution.scope_key IS DISTINCT FROM p_scope_key\n       OR v_execution.request_sha256 IS DISTINCT FROM p_request_sha256\n       OR v_execution.max_attempts IS DISTINCT FROM p_max_attempts THEN\n      RETURN QUERY SELECT\n        'conflict'::text,\n        NULL::uuid,\n        NULL::timestamptz,\n        v_execution.attempt_count,\n        NULL::uuid,\n        NULL::integer,\n        v_execution.completed_at,\n        v_execution.response_status;\n      RETURN;\n    END IF;\n\n    IF v_execution.status = 'succeeded' THEN\n      RETURN QUERY SELECT\n        'succeeded'::text,\n        NULL::uuid,\n        NULL::timestamptz,\n        v_execution.attempt_count,\n        NULL::uuid,\n        NULL::integer,\n        v_execution.completed_at,\n        v_execution.response_status;\n      RETURN;\n    END IF;\n\n    IF v_execution.status = 'running' THEN\n      RAISE EXCEPTION 'running cron execution has no matching active job lease';\n    END IF;\n\n    IF v_execution.attempt_count >= v_execution.max_attempts THEN\n      RETURN QUERY SELECT\n        'exhausted'::text,\n        NULL::uuid,\n        NULL::timestamptz,\n        v_execution.attempt_count,\n        NULL::uuid,\n        NULL::integer,\n        v_execution.completed_at,\n        v_execution.response_status;\n      RETURN;\n    END IF;\n  END IF;\n\n  IF v_lease.lease_fence = 2147483647 THEN\n    RAISE EXCEPTION 'cron job lease fence exhausted';\n  END IF;\n  v_fence := v_lease.lease_fence + 1;\n  v_expires_at := v_now + make_interval(secs => p_lease_seconds);\n\n  IF FOUND THEN\n    v_attempt_count := v_execution.attempt_count + 1;\n    UPDATE public.cron_job_executions AS execution_row\n    SET status = 'running',\n        attempt_count = v_attempt_count,\n        last_attempt_id = p_candidate_attempt_id,\n        last_fence = v_fence,\n        last_started_at = v_now,\n        completed_at = NULL,\n        response_status = NULL,\n        result_code = NULL,\n        updated_at = v_now\n    WHERE execution_row.execution_key = p_execution_key;\n  ELSE\n    v_attempt_count := 1;\n    INSERT INTO public.cron_job_executions (\n      execution_key,\n      job_id,\n      route,\n      trigger_kind,\n      schedule_slot,\n      request_mode,\n      scope_key,\n      request_sha256,\n      status,\n      attempt_count,\n      max_attempts,\n      last_attempt_id,\n      last_fence,\n      first_started_at,\n      last_started_at,\n      completed_at,\n      response_status,\n      result_code,\n      created_at,\n      updated_at\n    ) VALUES (\n      p_execution_key,\n      p_job_id,\n      p_route,\n      p_trigger_kind,\n      p_schedule_slot,\n      p_request_mode,\n      p_scope_key,\n      p_request_sha256,\n      'running',\n      1,\n      p_max_attempts,\n      p_candidate_attempt_id,\n      v_fence,\n      v_now,\n      v_now,\n      NULL,\n      NULL,\n      NULL,\n      v_now,\n      v_now\n    );\n  END IF;\n\n  INSERT INTO public.cron_job_attempts (\n    attempt_id,\n    execution_key,\n    job_id,\n    ordinal,\n    fence,\n    status,\n    started_at,\n    completed_at,\n    response_status,\n    result_code\n  ) VALUES (\n    p_candidate_attempt_id,\n    p_execution_key,\n    p_job_id,\n    v_attempt_count,\n    v_fence,\n    'running',\n    v_now,\n    NULL,\n    NULL,\n    NULL\n  );\n\n  UPDATE public.cron_job_leases AS lease_row\n  SET lease_token = p_candidate_lease_token,\n      lease_fence = v_fence,\n      lease_expires_at = v_expires_at,\n      execution_key = p_execution_key,\n      attempt_id = p_candidate_attempt_id,\n      updated_at = v_now\n  WHERE lease_row.job_id = p_job_id;\n\n  RETURN QUERY SELECT\n    'acquired'::text,\n    p_candidate_lease_token,\n    v_expires_at,\n    v_attempt_count,\n    p_candidate_attempt_id,\n    v_fence,\n    NULL::timestamptz,\n    NULL::integer;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_capture_constitution_passage_history",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_constitution_passage_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text := COALESCE(after_row->>'passage_id', before_row->>'passage_id');\nBEGIN\n  IF evidence_id IS NULL OR evidence_id !~ '^constitution-passage/sha256:[a-f0-9]{64}$' THEN\n    RAISE EXCEPTION 'constitution passage history requires canonical passage_id';\n  END IF;\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    lower(TG_OP) || '_retained_by_atl_009', current_user\n  );\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -12220,6 +12655,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_research_evidence_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text;\n  evidence_actor text;\n  evidence_reason text;\nBEGIN\n  evidence_id := COALESCE(after_row->>'id', before_row->>'id', md5(before_row::text));\n  evidence_actor := COALESCE(\n    NULLIF(after_row->>'reviewer_id', ''),\n    NULLIF(after_row->>'actor_id', ''),\n    NULLIF(before_row->>'reviewer_id', ''),\n    current_user\n  );\n  evidence_reason := COALESCE(\n    NULLIF(after_row->>'status_reason', ''),\n    NULLIF(after_row->>'review_notes', ''),\n    NULLIF(after_row->>'disposition', ''),\n    NULLIF(after_row->>'classification_reason', ''),\n    NULLIF(before_row->>'status_reason', ''),\n    lower(TG_OP) || '_retained_by_dat_016'\n  );\n\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    evidence_reason, evidence_actor\n  );\n\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_finish_cron_job_v1",
+        "identity": "p_job_id text, p_execution_key text, p_attempt_id uuid, p_lease_token uuid, p_lease_fence integer, p_status text, p_response_status integer, p_result_code text",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_finish_cron_job_v1(p_job_id text, p_execution_key text, p_attempt_id uuid, p_lease_token uuid, p_lease_fence integer, p_status text, p_response_status integer, p_result_code text)\n RETURNS boolean\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  v_lease public.cron_job_leases%ROWTYPE;\n  v_execution public.cron_job_executions%ROWTYPE;\n  v_attempt public.cron_job_attempts%ROWTYPE;\n  v_now timestamptz;\nBEGIN\n  IF p_job_id IS NULL\n     OR p_execution_key IS NULL\n     OR p_attempt_id IS NULL\n     OR p_lease_token IS NULL\n     OR p_lease_fence IS NULL\n     OR p_status IS NULL\n     OR p_response_status IS NULL\n     OR p_result_code IS NULL\n     OR p_job_id !~ '^[a-z][a-z0-9.-]*$'\n     OR length(p_job_id) NOT BETWEEN 1 AND 80\n     OR p_execution_key !~ '^[a-f0-9]{64}$'\n     OR p_lease_fence < 1\n     OR p_status NOT IN ('succeeded', 'failed')\n     OR p_response_status NOT BETWEEN 100 AND 599\n     OR (p_status = 'succeeded' AND p_response_status NOT BETWEEN 200 AND 299)\n     OR (p_status = 'failed' AND p_response_status BETWEEN 200 AND 299)\n     OR p_result_code !~ '^[a-z][a-z0-9_.-]*$'\n     OR length(p_result_code) > 80 THEN\n    RAISE EXCEPTION 'invalid cron finalization input';\n  END IF;\n\n  SELECT lease_row.*\n  INTO v_lease\n  FROM public.cron_job_leases AS lease_row\n  WHERE lease_row.job_id = p_job_id\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RETURN false;\n  END IF;\n\n  v_now := clock_timestamp();\n  IF v_lease.lease_token IS DISTINCT FROM p_lease_token\n     OR v_lease.execution_key IS DISTINCT FROM p_execution_key\n     OR v_lease.attempt_id IS DISTINCT FROM p_attempt_id\n     OR v_lease.lease_fence IS DISTINCT FROM p_lease_fence THEN\n    RETURN false;\n  END IF;\n\n  SELECT execution_row.*\n  INTO v_execution\n  FROM public.cron_job_executions AS execution_row\n  WHERE execution_row.execution_key = p_execution_key\n    AND execution_row.job_id = p_job_id\n    AND execution_row.last_attempt_id = p_attempt_id\n    AND execution_row.last_fence = p_lease_fence\n    AND execution_row.status = 'running'\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RETURN false;\n  END IF;\n\n  SELECT attempt_row.*\n  INTO v_attempt\n  FROM public.cron_job_attempts AS attempt_row\n  WHERE attempt_row.attempt_id = p_attempt_id\n    AND attempt_row.execution_key = p_execution_key\n    AND attempt_row.job_id = p_job_id\n    AND attempt_row.fence = p_lease_fence\n    AND attempt_row.status = 'running'\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RETURN false;\n  END IF;\n\n  IF v_now < v_attempt.started_at THEN\n    v_now := v_attempt.started_at;\n  END IF;\n\n  UPDATE public.cron_job_attempts AS attempt_row\n  SET status = p_status,\n      completed_at = v_now,\n      response_status = p_response_status,\n      result_code = p_result_code\n  WHERE attempt_row.attempt_id = p_attempt_id;\n\n  UPDATE public.cron_job_executions AS execution_row\n  SET status = p_status,\n      completed_at = v_now,\n      response_status = p_response_status,\n      result_code = p_result_code,\n      updated_at = v_now\n  WHERE execution_row.execution_key = p_execution_key;\n\n  UPDATE public.cron_job_leases AS lease_row\n  SET lease_token = NULL,\n      lease_expires_at = NULL,\n      execution_key = NULL,\n      attempt_id = NULL,\n      updated_at = v_now\n  WHERE lease_row.job_id = p_job_id;\n\n  RETURN true;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_guard_candidate_release_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_release_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE actual_candidates integer; actual_winners integer; linked_winners integer;\nBEGIN\n  IF TG_OP <> 'UPDATE' OR OLD.completeness_status <> 'staging' OR NEW.completeness_status <> 'complete_candidates'\n     OR (to_jsonb(OLD) - 'completeness_status') IS DISTINCT FROM (to_jsonb(NEW) - 'completeness_status') THEN\n    RAISE EXCEPTION 'candidate release % is immutable except staging finalization', OLD.vintage_label;\n  END IF;\n  SELECT count(*)::int, count(*) FILTER (WHERE is_canonical_at_cut)::int INTO actual_candidates, actual_winners\n    FROM country_fact_vintage_candidates WHERE vintage_label=NEW.vintage_label;\n  SELECT count(*)::int INTO linked_winners FROM country_fact_vintages v\n    JOIN country_fact_vintage_candidates c ON c.id=v.canonical_candidate_id AND c.vintage_label=v.vintage_label AND c.is_canonical_at_cut\n    WHERE v.vintage_label=NEW.vintage_label;\n  IF actual_candidates <> NEW.candidate_count OR actual_winners <> NEW.winner_count OR linked_winners <> NEW.winner_count THEN\n    RAISE EXCEPTION 'candidate release % is incomplete: candidates %/%, winners %/%, linked %/%', NEW.vintage_label,\n      actual_candidates, NEW.candidate_count, actual_winners, NEW.winner_count, linked_winners, NEW.winner_count;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
@@ -12228,6 +12668,26 @@
         "name": "civica_guard_candidate_snapshot_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_cron_job_attempt_update_v1",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_cron_job_attempt_update_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF OLD.status <> 'running'\n     OR NEW.attempt_id IS DISTINCT FROM OLD.attempt_id\n     OR NEW.execution_key IS DISTINCT FROM OLD.execution_key\n     OR NEW.job_id IS DISTINCT FROM OLD.job_id\n     OR NEW.ordinal IS DISTINCT FROM OLD.ordinal\n     OR NEW.fence IS DISTINCT FROM OLD.fence\n     OR NEW.started_at IS DISTINCT FROM OLD.started_at\n     OR NEW.status NOT IN ('succeeded', 'failed', 'expired')\n     OR NEW.completed_at IS NULL\n     OR NEW.response_status IS NULL\n     OR NEW.result_code IS NULL THEN\n    RAISE EXCEPTION 'cron attempt identity or terminal evidence cannot be rewritten';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_guard_cron_job_execution_update_v1",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_cron_job_execution_update_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF OLD.status = 'succeeded'\n     OR NEW.execution_key IS DISTINCT FROM OLD.execution_key\n     OR NEW.job_id IS DISTINCT FROM OLD.job_id\n     OR NEW.route IS DISTINCT FROM OLD.route\n     OR NEW.trigger_kind IS DISTINCT FROM OLD.trigger_kind\n     OR NEW.schedule_slot IS DISTINCT FROM OLD.schedule_slot\n     OR NEW.request_mode IS DISTINCT FROM OLD.request_mode\n     OR NEW.scope_key IS DISTINCT FROM OLD.scope_key\n     OR NEW.request_sha256 IS DISTINCT FROM OLD.request_sha256\n     OR NEW.max_attempts IS DISTINCT FROM OLD.max_attempts\n     OR NEW.first_started_at IS DISTINCT FROM OLD.first_started_at\n     OR NEW.created_at IS DISTINCT FROM OLD.created_at\n     OR NEW.updated_at < OLD.updated_at THEN\n    RAISE EXCEPTION 'cron execution identity or completed delivery cannot be rewritten';\n  END IF;\n\n  IF NEW.attempt_count = OLD.attempt_count THEN\n    IF OLD.status <> 'running'\n       OR NEW.status NOT IN ('succeeded', 'failed')\n       OR NEW.completed_at IS NULL\n       OR NEW.response_status IS NULL\n       OR NEW.result_code IS NULL\n       OR NEW.last_attempt_id IS DISTINCT FROM OLD.last_attempt_id\n       OR NEW.last_fence IS DISTINCT FROM OLD.last_fence\n       OR NEW.last_started_at IS DISTINCT FROM OLD.last_started_at THEN\n      RAISE EXCEPTION 'invalid cron execution finalization';\n    END IF;\n  ELSIF NEW.attempt_count = OLD.attempt_count + 1 THEN\n    IF OLD.status <> 'failed'\n       OR NEW.status <> 'running'\n       OR NEW.last_attempt_id IS NOT DISTINCT FROM OLD.last_attempt_id\n       OR NEW.last_fence <= OLD.last_fence\n       OR NEW.last_started_at < OLD.last_started_at THEN\n      RAISE EXCEPTION 'invalid cron execution retry transition';\n    END IF;\n  ELSE\n    RAISE EXCEPTION 'cron execution attempt count must advance exactly once';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_guard_cron_job_lease_update_v1",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_cron_job_lease_update_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  v_old_active boolean := OLD.lease_token IS NOT NULL;\n  v_new_active boolean := NEW.lease_token IS NOT NULL;\nBEGIN\n  IF NEW.job_id IS DISTINCT FROM OLD.job_id OR NEW.updated_at < OLD.updated_at THEN\n    RAISE EXCEPTION 'cron job lease identity cannot be rewritten';\n  END IF;\n\n  IF NEW.lease_fence = OLD.lease_fence THEN\n    IF NOT v_old_active OR v_new_active THEN\n      RAISE EXCEPTION 'a cron job lease may retain its fence only when released';\n    END IF;\n  ELSIF NEW.lease_fence = OLD.lease_fence + 1 THEN\n    IF v_old_active OR NOT v_new_active THEN\n      RAISE EXCEPTION 'a cron job lease fence may advance only on acquisition';\n    END IF;\n  ELSE\n    RAISE EXCEPTION 'cron job lease fence must advance monotonically by one';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_guard_pulse_classify_binding_insert_v1",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_pulse_classify_binding_insert_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF NOT EXISTS (\n    SELECT 1\n    FROM public.cron_job_executions AS execution_row\n    WHERE execution_row.execution_key = NEW.execution_key\n      AND execution_row.job_id = 'pulse.v2.classify'\n  ) OR NOT EXISTS (\n    SELECT 1\n    FROM public.pulse_pipeline_runs AS run_row\n    WHERE run_row.id = NEW.classification_run_id\n      AND run_row.stage = 'classify'\n  ) THEN\n    RAISE EXCEPTION 'invalid Pulse classification delivery binding';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "civica_pin_pulse_event_information_environment",
@@ -12265,6 +12725,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_admin_security_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_reject_cron_job_evidence_removal_v1",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_cron_job_evidence_removal_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% cannot be deleted or truncated', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_reject_frozen_vintage_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_frozen_vintage_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' OR OLD.vintage_label IS NOT NULL THEN\n    RAISE EXCEPTION 'frozen vintage % is immutable; publish a new superseding version', OLD.vintage_label;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -12273,6 +12738,11 @@
         "name": "civica_reject_pulse_classification_attempt_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_classification_attempt_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_reject_pulse_classify_binding_mutation_v1",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_pulse_classify_binding_mutation_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse classification delivery bindings are immutable';\nEND;\n$function$\n"
       },
       {
         "name": "civica_reject_pulse_coding_evidence_mutation",
@@ -12697,6 +13167,51 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON country_metrics FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "cron_job_attempt_no_delete",
+        "table": "cron_job_attempts",
+        "definition": "CREATE TRIGGER cron_job_attempt_no_delete BEFORE DELETE ON cron_job_attempts FOR EACH ROW EXECUTE FUNCTION civica_reject_cron_job_evidence_removal_v1()"
+      },
+      {
+        "name": "cron_job_attempt_no_truncate",
+        "table": "cron_job_attempts",
+        "definition": "CREATE TRIGGER cron_job_attempt_no_truncate BEFORE TRUNCATE ON cron_job_attempts FOR EACH STATEMENT EXECUTE FUNCTION civica_reject_cron_job_evidence_removal_v1()"
+      },
+      {
+        "name": "cron_job_attempt_update_guard",
+        "table": "cron_job_attempts",
+        "definition": "CREATE TRIGGER cron_job_attempt_update_guard BEFORE UPDATE ON cron_job_attempts FOR EACH ROW EXECUTE FUNCTION civica_guard_cron_job_attempt_update_v1()"
+      },
+      {
+        "name": "cron_job_execution_no_delete",
+        "table": "cron_job_executions",
+        "definition": "CREATE TRIGGER cron_job_execution_no_delete BEFORE DELETE ON cron_job_executions FOR EACH ROW EXECUTE FUNCTION civica_reject_cron_job_evidence_removal_v1()"
+      },
+      {
+        "name": "cron_job_execution_no_truncate",
+        "table": "cron_job_executions",
+        "definition": "CREATE TRIGGER cron_job_execution_no_truncate BEFORE TRUNCATE ON cron_job_executions FOR EACH STATEMENT EXECUTE FUNCTION civica_reject_cron_job_evidence_removal_v1()"
+      },
+      {
+        "name": "cron_job_execution_update_guard",
+        "table": "cron_job_executions",
+        "definition": "CREATE TRIGGER cron_job_execution_update_guard BEFORE UPDATE ON cron_job_executions FOR EACH ROW EXECUTE FUNCTION civica_guard_cron_job_execution_update_v1()"
+      },
+      {
+        "name": "cron_job_lease_no_delete",
+        "table": "cron_job_leases",
+        "definition": "CREATE TRIGGER cron_job_lease_no_delete BEFORE DELETE ON cron_job_leases FOR EACH ROW EXECUTE FUNCTION civica_reject_cron_job_evidence_removal_v1()"
+      },
+      {
+        "name": "cron_job_lease_no_truncate",
+        "table": "cron_job_leases",
+        "definition": "CREATE TRIGGER cron_job_lease_no_truncate BEFORE TRUNCATE ON cron_job_leases FOR EACH STATEMENT EXECUTE FUNCTION civica_reject_cron_job_evidence_removal_v1()"
+      },
+      {
+        "name": "cron_job_lease_update_guard",
+        "table": "cron_job_leases",
+        "definition": "CREATE TRIGGER cron_job_lease_update_guard BEFORE UPDATE ON cron_job_leases FOR EACH ROW EXECUTE FUNCTION civica_guard_cron_job_lease_update_v1()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "data_disputes",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON data_disputes FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -12780,6 +13295,21 @@
         "name": "pulse_classification_attempts_append_only",
         "table": "pulse_classification_attempts",
         "definition": "CREATE TRIGGER pulse_classification_attempts_append_only BEFORE DELETE OR UPDATE ON pulse_classification_attempts FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_classification_attempt_mutation()"
+      },
+      {
+        "name": "pulse_classification_delivery_insert_guard",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "CREATE TRIGGER pulse_classification_delivery_insert_guard BEFORE INSERT ON pulse_classification_delivery_bindings FOR EACH ROW EXECUTE FUNCTION civica_guard_pulse_classify_binding_insert_v1()"
+      },
+      {
+        "name": "pulse_classification_delivery_no_mutation",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "CREATE TRIGGER pulse_classification_delivery_no_mutation BEFORE DELETE OR UPDATE ON pulse_classification_delivery_bindings FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_classify_binding_mutation_v1()"
+      },
+      {
+        "name": "pulse_classification_delivery_no_truncate",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "CREATE TRIGGER pulse_classification_delivery_no_truncate BEFORE TRUNCATE ON pulse_classification_delivery_bindings FOR EACH STATEMENT EXECUTE FUNCTION civica_reject_pulse_classify_binding_mutation_v1()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -13130,6 +13660,21 @@
       },
       {
         "kind": "r",
+        "name": "cron_job_attempts",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "cron_job_executions",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "cron_job_leases",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "data_disputes",
         "definition": null
       },
@@ -13231,6 +13776,11 @@
       {
         "kind": "r",
         "name": "pulse_classification_attempts",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_classification_delivery_bindings",
         "definition": null
       },
       {
@@ -14010,6 +14560,84 @@
         "definition": "CHECK ((value_status = ANY (ARRAY['observed'::text, 'disputed'::text])) AND value IS NOT NULL OR (value_status = ANY (ARRAY['missing'::text, 'unknown'::text, 'not_applicable'::text, 'not_observed'::text, 'withheld'::text])) AND value IS NULL)"
       },
       {
+        "name": "cron_job_attempt_identity_check",
+        "type": "c",
+        "table": "cron_job_attempts",
+        "definition": "CHECK (execution_key ~ '^[a-f0-9]{64}$'::text AND length(job_id) >= 1 AND length(job_id) <= 80 AND job_id ~ '^[a-z][a-z0-9.-]*$'::text AND ordinal >= 1 AND fence >= 1)"
+      },
+      {
+        "name": "cron_job_attempt_lifecycle_check",
+        "type": "c",
+        "table": "cron_job_attempts",
+        "definition": "CHECK (status = 'running'::text AND completed_at IS NULL AND response_status IS NULL AND result_code IS NULL OR status = 'succeeded'::text AND completed_at IS NOT NULL AND response_status IS NOT NULL AND result_code IS NOT NULL AND completed_at >= started_at AND response_status >= 200 AND response_status <= 299 AND result_code ~ '^[a-z][a-z0-9_.-]*$'::text OR (status = ANY (ARRAY['failed'::text, 'expired'::text])) AND completed_at IS NOT NULL AND response_status IS NOT NULL AND result_code IS NOT NULL AND completed_at >= started_at AND response_status >= 100 AND response_status <= 599 AND NOT (response_status >= 200 AND response_status <= 299) AND result_code ~ '^[a-z][a-z0-9_.-]*$'::text)"
+      },
+      {
+        "name": "cron_job_attempts_execution_key_cron_job_executions_execution_k",
+        "type": "f",
+        "table": "cron_job_attempts",
+        "definition": "FOREIGN KEY (execution_key) REFERENCES cron_job_executions(execution_key) ON DELETE RESTRICT"
+      },
+      {
+        "name": "cron_job_attempts_pkey",
+        "type": "p",
+        "table": "cron_job_attempts",
+        "definition": "PRIMARY KEY (attempt_id)"
+      },
+      {
+        "name": "cron_job_execution_identity_check",
+        "type": "c",
+        "table": "cron_job_executions",
+        "definition": "CHECK (execution_key ~ '^[a-f0-9]{64}$'::text AND length(job_id) >= 1 AND length(job_id) <= 80 AND job_id ~ '^[a-z][a-z0-9.-]*$'::text AND length(route) >= 1 AND length(route) <= 160 AND route ~ '^/api/cron/[a-z0-9_./-]+$'::text AND (scope_key IS NULL OR scope_key ~ '^[a-f0-9]{64}$'::text) AND request_sha256 ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "cron_job_execution_lifecycle_check",
+        "type": "c",
+        "table": "cron_job_executions",
+        "definition": "CHECK (status = 'running'::text AND completed_at IS NULL AND response_status IS NULL AND result_code IS NULL OR status = 'succeeded'::text AND completed_at IS NOT NULL AND response_status IS NOT NULL AND result_code IS NOT NULL AND completed_at >= last_started_at AND response_status >= 200 AND response_status <= 299 AND result_code ~ '^[a-z][a-z0-9_.-]*$'::text OR status = 'failed'::text AND completed_at IS NOT NULL AND response_status IS NOT NULL AND result_code IS NOT NULL AND completed_at >= last_started_at AND response_status >= 100 AND response_status <= 599 AND NOT (response_status >= 200 AND response_status <= 299) AND result_code ~ '^[a-z][a-z0-9_.-]*$'::text)"
+      },
+      {
+        "name": "cron_job_execution_mode_status_check",
+        "type": "c",
+        "table": "cron_job_executions",
+        "definition": "CHECK ((request_mode = ANY (ARRAY['apply'::text, 'dry_run'::text])) AND (status = ANY (ARRAY['running'::text, 'succeeded'::text, 'failed'::text])) AND attempt_count >= 1 AND max_attempts >= 1 AND attempt_count <= max_attempts AND last_fence >= 1)"
+      },
+      {
+        "name": "cron_job_execution_time_order_check",
+        "type": "c",
+        "table": "cron_job_executions",
+        "definition": "CHECK (last_started_at >= first_started_at AND updated_at >= created_at)"
+      },
+      {
+        "name": "cron_job_execution_trigger_check",
+        "type": "c",
+        "table": "cron_job_executions",
+        "definition": "CHECK (trigger_kind = 'scheduled'::text AND schedule_slot IS NOT NULL AND scope_key IS NULL AND request_mode = 'apply'::text OR trigger_kind = 'manual'::text AND schedule_slot IS NULL AND scope_key IS NOT NULL)"
+      },
+      {
+        "name": "cron_job_executions_pkey",
+        "type": "p",
+        "table": "cron_job_executions",
+        "definition": "PRIMARY KEY (execution_key)"
+      },
+      {
+        "name": "cron_job_lease_active_fields_check",
+        "type": "c",
+        "table": "cron_job_leases",
+        "definition": "CHECK (lease_token IS NULL AND lease_expires_at IS NULL AND execution_key IS NULL AND attempt_id IS NULL OR lease_token IS NOT NULL AND lease_expires_at IS NOT NULL AND execution_key IS NOT NULL AND attempt_id IS NOT NULL)"
+      },
+      {
+        "name": "cron_job_lease_identity_check",
+        "type": "c",
+        "table": "cron_job_leases",
+        "definition": "CHECK (length(job_id) >= 1 AND length(job_id) <= 80 AND job_id ~ '^[a-z][a-z0-9.-]*$'::text AND lease_fence >= 0 AND (execution_key IS NULL OR execution_key ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "name": "cron_job_leases_pkey",
+        "type": "p",
+        "table": "cron_job_leases",
+        "definition": "PRIMARY KEY (job_id)"
+      },
+      {
         "name": "data_disputes_fact_id_a_country_facts_id_fk",
         "type": "f",
         "table": "data_disputes",
@@ -14512,6 +15140,30 @@
         "type": "f",
         "table": "pulse_classification_attempts",
         "definition": "FOREIGN KEY (run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_classification_delivery_bindings_pkey",
+        "type": "p",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "PRIMARY KEY (execution_key)"
+      },
+      {
+        "name": "pulse_classification_delivery_execution_check",
+        "type": "c",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "CHECK (execution_key ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "pulse_classification_delivery_execution_fk",
+        "type": "f",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "FOREIGN KEY (execution_key) REFERENCES cron_job_executions(execution_key) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_classification_delivery_run_fk",
+        "type": "f",
+        "table": "pulse_classification_delivery_bindings",
+        "definition": "FOREIGN KEY (classification_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_classification_state_contract_check",

@@ -205,4 +205,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "314ccb9d48c00e6f242b91dcb70d6d5ccf6da0d260e44c39982c822e98395ebc",
     baseline: false,
   },
+  {
+    id: "0034_superb_the_fallen",
+    path: "drizzle/authoritative/0034_superb_the_fallen.sql",
+    sha256: "51ac043cd187d0f00e3b60d6cfa56b08231de8911a5a65f0d353a8df01563a86",
+    baseline: false,
+  },
+  {
+    id: "0035_equal_marvex",
+    path: "drizzle/authoritative/0035_equal_marvex.sql",
+    sha256: "e10d60be954a5be888934db76218a36dd177981909d689610665fbd4ac645913",
+    baseline: false,
+  },
 ] as const;

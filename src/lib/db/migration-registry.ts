@@ -273,6 +273,18 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0034_superb_the_fallen",
+    "drizzle/authoritative/0034_superb_the_fallen.sql",
+    "schema",
+    "journaled",
+  ),
+  shared(
+    "0035_equal_marvex",
+    "drizzle/authoritative/0035_equal_marvex.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

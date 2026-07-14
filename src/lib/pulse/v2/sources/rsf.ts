@@ -5,9 +5,10 @@
  * As of 2026-04, RSF does not publish a public RSS/Atom feed at any
  * standard path on rsf.org. The connector remains in place against
  * a configurable env override so we can plug in the right ingestion
- * surface (likely an API contact) when established. Until then, the
- * connector gracefully returns 0 rows — the schema, scoring, and
- * corroboration pipeline are all RSF-ready when the data turns on.
+ * surface (likely an API contact) when established. An absent override is an
+ * explicit skip; once configured, retrieval failures surface to the aggregate
+ * ingest. The schema, scoring, and corroboration pipeline are all RSF-ready
+ * when the data turns on.
  *
  * Set `RSF_RSS_URL` to enable, OR replace this connector body with
  * the proper API client when we have the licensing/auth path.
@@ -30,23 +31,33 @@ export interface RsfFetchResult {
   fetched: number;
 }
 
-export async function fetchRsf(map: JurisdictionMap): Promise<RsfFetchResult> {
-  if (!FEED_URL) {
+export interface RsfFetchOptions {
+  /** Deterministic fixture/configuration seam. Omit to use the environment. */
+  feedUrl?: string | null;
+  fetchFeed?: typeof fetchRss;
+}
+
+export async function fetchRsf(
+  map: JurisdictionMap,
+  opts: RsfFetchOptions = {},
+): Promise<RsfFetchResult> {
+  const feedUrl = Object.hasOwn(opts, "feedUrl") ? opts.feedUrl : FEED_URL;
+  if (!feedUrl) {
     console.info(
-      "[rsf] RSF_RSS_URL not set — skipping (no public feed available as of 2026-04)."
+      "[rsf] RSF_RSS_URL not set — skipping (no public feed available as of 2026-04).",
     );
     return { rows: [], unmatchedCountry: 0, fetched: 0 };
   }
 
   let items;
   try {
-    items = await fetchRss(FEED_URL);
+    items = await (opts.fetchFeed ?? fetchRss)(feedUrl);
   } catch (err) {
-    console.warn(
-      `[rsf] feed fetch failed (${FEED_URL}); returning 0 rows. ` +
-        `Error: ${(err as Error).message}`
+    throw new Error(
+      `RSF feed retrieval failed (${feedUrl}): ${
+        err instanceof Error ? err.message : String(err)
+      }`,
     );
-    return { rows: [], unmatchedCountry: 0, fetched: 0 };
   }
 
   const rows: RawEventInput[] = [];

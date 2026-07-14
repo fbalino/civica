@@ -32,6 +32,10 @@ import type { DerivationVersionEnvelope } from "@/lib/research/derivation-versio
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
+  loadPulsePipelineRunState,
+  preparePulsePipelineRun,
+  pulseCronStageRunId,
+  pulseStageInputFingerprint,
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
@@ -49,6 +53,8 @@ export interface ScoreSummary {
   /** distinct (country, dimension) tuples with non-trivial deltas (|δ| ≥ 1) */
   significantDeltas: number;
   dryRun: boolean;
+  /** True when a retry reused an already-completed deterministic stage run. */
+  reused: boolean;
   planned: DimensionalDeltaPlan[];
 }
 
@@ -89,21 +95,90 @@ export interface ScoreOptions {
   write?: (db: Db, plan: DimensionalDeltaPlan) => Promise<void>;
   now?: Date;
   runRef?: PulsePipelineRunRef;
+  /** Stable logical cron delivery key injected by `withCronJob()`. */
+  cronExecutionKey?: string;
+  /** Integration-fixture seam for exercising the production atomic publish. */
+  persistRun?: boolean;
 }
 
 export async function calculateDimensionalDeltas(
   db: Db,
   options: ScoreOptions = {},
 ): Promise<ScoreSummary> {
-  const today = options.now ?? new Date();
+  const persistRun =
+    !options.dryRun &&
+    (options.persistRun ?? (!options.events && !options.write));
+  const cronRunId = options.cronExecutionKey
+    ? pulseCronStageRunId(options.cronExecutionKey, "score")
+    : null;
+  if (cronRunId && options.runRef && options.runRef.id !== cronRunId) {
+    throw new Error("score runRef conflicts with the cron delivery identity");
+  }
+  const existingRun =
+    persistRun && cronRunId
+      ? await loadPulsePipelineRunState(db, cronRunId, "score")
+      : null;
+  if (existingRun?.status === "completed") {
+    return {
+      runId: existingRun.run.id,
+      versionKey: existingRun.run.versionKey,
+      eventsConsidered: existingRun.counts.eventsConsidered ?? 0,
+      countriesScored: existingRun.counts.countriesScored ?? 0,
+      dimensionRowsWritten:
+        existingRun.counts.dimensionRowsWritten ?? 0,
+      significantDeltas: existingRun.counts.significantDeltas ?? 0,
+      absorbedEventsExcluded:
+        existingRun.counts.absorbedEventsExcluded ?? 0,
+      dryRun: false,
+      reused: true,
+      planned: [],
+    };
+  }
+  if (existingRun && existingRun.status !== "running") {
+    throw new Error(
+      `Terminal Pulse pipeline run cannot be resumed: ${existingRun.run.id} (${existingRun.status})`,
+    );
+  }
+  const today = existingRun?.startedAt ?? options.now ?? new Date();
   const windowStart = new Date(
     today.getTime() - SCORE_WINDOW_DAYS * 24 * 60 * 60 * 1000
   )
     .toISOString()
     .slice(0, 10);
 
-  const candidateEvents =
-    options.events ?? (await loadPublishedEvents(db, windowStart));
+  const persistedInputIds = existingRun?.run.versions.inputIds;
+  if (existingRun && !persistedInputIds) {
+    throw new Error(
+      `Running score run lacks an input snapshot: ${existingRun.run.id}`,
+    );
+  }
+  const persistedEventIds = (persistedInputIds ?? [])
+    .filter((id) => id.startsWith("event:"))
+    .map((id) => id.slice("event:".length));
+  const persistedJurisdictionIds = (persistedInputIds ?? [])
+    .filter((id) => id.startsWith("jurisdiction:"))
+    .map((id) => id.slice("jurisdiction:".length));
+  const loadedEvents =
+    options.events ??
+    (await loadPublishedEvents(
+      db,
+      windowStart,
+      today.toISOString().slice(0, 10),
+      today,
+      existingRun ? persistedEventIds : null,
+    ));
+  const candidateEvents = existingRun
+    ? loadedEvents.filter((event) => persistedEventIds.includes(event.id))
+    : loadedEvents;
+  if (
+    existingRun &&
+    (candidateEvents.length !== persistedEventIds.length ||
+      candidateEvents.some((event) => !persistedEventIds.includes(event.id)))
+  ) {
+    throw new Error(
+      `Score retry input snapshot is incomplete: ${existingRun.run.id}`,
+    );
+  }
   validatePublishedEvents(candidateEvents);
   const todayDate = today.toISOString().slice(0, 10);
   // Enforce the window in the pure scorer as well as its SQL loader. This
@@ -112,9 +187,29 @@ export async function calculateDimensionalDeltas(
   const events = candidateEvents.filter(
     (event) => event.eventDate >= windowStart && event.eventDate <= todayDate,
   );
+  const existingJurisdictionIds = existingRun
+    ? persistedJurisdictionIds
+    : options.existingJurisdictionIds ??
+      (await loadExistingJurisdictionIds(db));
+  if (existingJurisdictionIds.some((id) => !id.trim())) {
+    throw new Error("score fixture has a blank existing jurisdiction id");
+  }
+  const inputFingerprint = pulseStageInputFingerprint({
+    scoreAsOf: todayDate,
+    events: [...events].sort((a, b) => a.id.localeCompare(b.id)),
+    existingJurisdictionIds: [...existingJurisdictionIds].sort(),
+  });
+  if (
+    existingRun &&
+    existingRun.run.versions.inputFingerprint !== inputFingerprint
+  ) {
+    throw new Error(`Score retry input values changed: ${existingRun.run.id}`);
+  }
   const run =
+    existingRun?.run ??
     options.runRef ??
     createPulsePipelineRunRef("score", {
+      id: cronRunId ?? undefined,
       sourceIds: events.length
         ? events.flatMap(({ sourceIds }) => sourceIds)
         : undefined,
@@ -124,15 +219,36 @@ export async function calculateDimensionalDeltas(
           corroborationRunId,
         ],
       ),
+      inputIds: [
+        ...events.map(({ id }) => `event:${id}`),
+        ...existingJurisdictionIds.map((id) => `jurisdiction:${id}`),
+      ],
+      inputFingerprint,
     });
-  const persistRun =
-    !options.dryRun && !options.events && !options.runRef && !options.write;
-  if (persistRun) await startPulsePipelineRun(db, run);
-  const existingJurisdictionIds = options.existingJurisdictionIds ?? await loadExistingJurisdictionIds(db);
-  if (existingJurisdictionIds.some((id) => !id.trim())) {
-    throw new Error("score fixture has a blank existing jurisdiction id");
+  if (persistRun) {
+    const prepared = existingRun
+      ? await preparePulsePipelineRun(db, run)
+      : cronRunId
+        ? (await startPulsePipelineRun(db, run, { startedAt: today }),
+          { state: "ready" as const })
+        : await preparePulsePipelineRun(db, run);
+    if (prepared.state === "completed") {
+      return {
+        runId: run.id,
+        versionKey: run.versionKey,
+        eventsConsidered: prepared.counts.eventsConsidered ?? events.length,
+        countriesScored: prepared.counts.countriesScored ?? 0,
+        dimensionRowsWritten:
+          prepared.counts.dimensionRowsWritten ?? 0,
+        significantDeltas: prepared.counts.significantDeltas ?? 0,
+        absorbedEventsExcluded:
+          prepared.counts.absorbedEventsExcluded ?? 0,
+        dryRun: false,
+        reused: true,
+        planned: [],
+      };
+    }
   }
-
   // Bucket by (jurisdictionId, dimension)
   type Key = string; // `${jurisdictionId}::${dimension}`
   const buckets = new Map<
@@ -239,7 +355,7 @@ export async function calculateDimensionalDeltas(
               status: "completed",
               counts,
               failures: [],
-              completedAt: new Date(),
+              completedAt: today,
             })
             .where(eq(pulsePipelineRuns.id, run.id)),
         ] as unknown as Parameters<typeof db.batch>[0];
@@ -249,19 +365,21 @@ export async function calculateDimensionalDeltas(
         await db.batch(batchQueries);
         written = planned.length;
       } catch (error) {
-        await finishPulsePipelineRun(db, run.id, {
-          status: "failed",
-          counts: { ...counts, dimensionRowsWritten: 0 },
-          failures: [
-            {
-              component: "pulse_dimensional_delta_history",
-              message:
-                error instanceof Error
-                  ? error.message.slice(0, 500)
-                  : "Unknown atomic score write failure",
-            },
-          ],
-        });
+        if (!options.cronExecutionKey) {
+          await finishPulsePipelineRun(db, run.id, {
+            status: "failed",
+            counts: { ...counts, dimensionRowsWritten: 0 },
+            failures: [
+              {
+                component: "pulse_dimensional_delta_history",
+                message:
+                  error instanceof Error
+                    ? error.message.slice(0, 500)
+                    : "Unknown atomic score write failure",
+              },
+            ],
+          });
+        }
         throw error;
       }
     } else {
@@ -283,6 +401,7 @@ export async function calculateDimensionalDeltas(
       (event) => event.absorptionOutcome === "absorbed",
     ).length,
     dryRun: options.dryRun ?? false,
+    reused: false,
     planned: planned.sort((a, b) => `${a.jurisdictionId}:${a.dimension}`.localeCompare(`${b.jurisdictionId}:${b.dimension}`)),
   };
 }
@@ -371,21 +490,32 @@ async function writeDimensionalDelta(
 
 async function loadPublishedEvents(
   db: Db,
-  sinceDate: string
+  sinceDate: string,
+  throughDate: string,
+  selectionCutoff: Date,
+  eventIds: readonly string[] | null,
 ): Promise<PublishedEvent[]> {
+  const eventPredicate = eventIds
+    ? eventIds.length
+      ? sql`pulse_events_v2.id IN (${sql.join(
+          eventIds.map((id) => sql`${id}::uuid`),
+          sql`, `,
+        )})`
+      : sql`false`
+    : sql`true`;
   const result = await db.execute(sql`
     SELECT
-      id,
-      jurisdiction_id,
-      dimension,
-      category,
-      severity_tier,
-      severity_value,
-      corroboration_confidence,
-      event_date,
-      derivation_versions,
-      publication_run_id,
-      corroboration_run_id,
+      pulse_events_v2.id,
+      pulse_events_v2.jurisdiction_id,
+      pulse_events_v2.dimension,
+      pulse_events_v2.category,
+      pulse_events_v2.severity_tier,
+      pulse_events_v2.severity_value,
+      pulse_events_v2.corroboration_confidence,
+      pulse_events_v2.event_date,
+      pulse_events_v2.derivation_versions,
+      pulse_events_v2.publication_run_id,
+      pulse_events_v2.corroboration_run_id,
       absorption.absorption_key,
       absorption.outcome AS absorption_outcome,
       ARRAY(
@@ -393,6 +523,7 @@ async function loadPublishedEvents(
         FROM pulse_sources ps
         JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
         WHERE source_event.incident_id = pulse_events_v2.incident_id
+          AND (ps.created_at IS NULL OR ps.created_at <= ${selectionCutoff})
         ORDER BY ps.source_id
       ) AS source_ids
     FROM pulse_events_v2
@@ -400,18 +531,38 @@ async function loadPublishedEvents(
       SELECT a.absorption_key, a.outcome
       FROM pulse_event_absorptions a
       WHERE a.event_id = pulse_events_v2.id
-        AND a.as_of <= CURRENT_DATE
+        AND a.as_of <= ${throughDate}
+        AND a.decided_at <= ${selectionCutoff}
       ORDER BY a.as_of DESC, a.decided_at DESC, a.absorption_key DESC
       LIMIT 1
     ) absorption ON true
-    WHERE published = true
-      AND projection_status = 'current'
-      AND publication_run_id IS NOT NULL
-      AND corroboration_run_id IS NOT NULL
-      AND review_status IN ('approved', 'edited')
-      AND category <> 'none'
-      AND event_date >= ${sinceDate}
-      AND event_date <= CURRENT_DATE
+    JOIN pulse_pipeline_runs publication_run
+      ON publication_run.id = pulse_events_v2.publication_run_id
+    JOIN pulse_pipeline_runs corroboration_run
+      ON corroboration_run.id = pulse_events_v2.corroboration_run_id
+     AND corroboration_run.status = 'completed'
+    WHERE ${eventPredicate}
+      AND pulse_events_v2.published = true
+      AND pulse_events_v2.projection_status = 'current'
+      AND pulse_events_v2.review_status IN ('approved', 'edited')
+      AND pulse_events_v2.category <> 'none'
+      AND pulse_events_v2.publication_run_id IS NOT NULL
+      AND pulse_events_v2.corroboration_run_id IS NOT NULL
+      AND (
+        publication_run.status = 'completed'
+        OR EXISTS (
+          SELECT 1
+          FROM pulse_cluster_classification_states classification_state
+          WHERE classification_state.event_id = pulse_events_v2.id
+            AND classification_state.cluster_id = pulse_events_v2.cluster_id
+            AND classification_state.last_run_id = pulse_events_v2.publication_run_id
+            AND classification_state.status = 'classified'
+        )
+      )
+      AND pulse_events_v2.created_at <= ${selectionCutoff}
+      AND pulse_events_v2.event_date >= ${sinceDate}
+      AND pulse_events_v2.event_date <= ${throughDate}
+    ORDER BY pulse_events_v2.id
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>)

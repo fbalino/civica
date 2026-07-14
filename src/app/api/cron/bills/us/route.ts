@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { runBillsSync } from "@/lib/bills/sync";
 import { fetchUSBillsForSync } from "@/lib/bills/sources/us-congress";
@@ -8,9 +8,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const started = new Date().toISOString();
   try {
     const summary = await runBillsSync(db, {
@@ -40,4 +37,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("bills.us", handler);
+
+export { cronHandler as GET, cronHandler as POST };

@@ -96,6 +96,6 @@ test("UNESCO UIS upstream failure cannot stamp freshness", async () => {
     markSynced: (async (_ids: unknown, options: { rowsWritten: number }) => { stampedRows.push(options.rowsWritten); return []; }) as never,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
-  assert.deepEqual(stampedRows, [0]);
+  assert.deepEqual(stampedRows, []);
   assert.equal(state.writes(), 0);
 });

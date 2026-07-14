@@ -2,7 +2,7 @@
  * Phase F.6 — World Bank WDI sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). Six WDI indicators × ~265 economies
+ * (per the shared cron boundary). Six WDI indicators × ~265 economies
  * fetched in 6 paginated calls (most indicators fit in 2–3 pages
  * at per_page=1000). Total wall time is dominated by upserts, not
  * fetches; expect ~60–120s on a warm DB.
@@ -11,7 +11,7 @@
  * Implementation plan: F.6.
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncWorldBankWdi } from "@/lib/factbook/reconcile/sync-wdi";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -21,9 +21,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -60,4 +57,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.wdi", handler);
+
+export { cronHandler as GET, cronHandler as POST };

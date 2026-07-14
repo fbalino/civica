@@ -12,8 +12,10 @@
  * License: Etalab Open Licence v2.0 for both chambers — open data law,
  * commercial use allowed with attribution.
  *
- * Resilience: each chamber fetch is wrapped in try/catch — if one
- * download or parse fails, the other still ships.
+ * Each chamber reports a structured outcome. A failure in either chamber
+ * makes the aggregate scheduled sync fail before it writes rows or advances
+ * source freshness; successful empty feeds remain distinguishable from
+ * failures.
  *
  * Original French titles are stored in `bills.title`; the shared
  * summariser produces an English plain-language summary at sync time.
@@ -27,7 +29,12 @@ import { eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "@/lib/db/schema";
 import { governmentBodies } from "@/lib/db/schema";
-import type { BillIngestDraft } from "../types";
+import type {
+  BillFetchBatch,
+  BillIngestDraft,
+  BillSourceFetchOutcome,
+} from "../types";
+import { finalizeBillSourceMapping } from "../source-outcome";
 import { statusToStage } from "../stage";
 
 const AN_SOURCE_ID = "data_assemblee_fr";
@@ -50,6 +57,43 @@ interface AnDossier {
 interface ExtractedAct {
   date: string;
   libelle: string;
+}
+
+type ChamberFetchResult<T> = {
+  rows: T[];
+  outcome: BillSourceFetchOutcome;
+};
+
+function failedFetch<T>(
+  sourceId: string,
+  error: unknown,
+  fetched = 0,
+): ChamberFetchResult<T> {
+  return {
+    rows: [],
+    outcome: {
+      sourceId,
+      status: "failed",
+      fetched,
+      mapped: 0,
+      error: error instanceof Error ? error.message : String(error),
+    },
+  };
+}
+
+function successfulFetch<T>(
+  sourceId: string,
+  rows: T[],
+): ChamberFetchResult<T> {
+  return {
+    rows,
+    outcome: {
+      sourceId,
+      status: "success",
+      fetched: rows.length,
+      mapped: 0,
+    },
+  };
 }
 
 /** Walk the recursive `actesLegislatifs` tree and return the latest
@@ -83,17 +127,14 @@ function walkLatestAct(node: unknown): ExtractedAct | null {
   return best;
 }
 
-async function fetchAN(limit: number): Promise<AnDossier[]> {
+async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
   // adm-zip is a CommonJS module imported only at runtime — keeps it
   // out of the Next.js client bundle.
   let AdmZip: typeof import("adm-zip");
   try {
     AdmZip = (await import("adm-zip")).default;
   } catch (err) {
-    console.warn(
-      `[bills.fr] adm-zip import failed: ${err instanceof Error ? err.message : err}`,
-    );
-    return [];
+    return failedFetch(AN_SOURCE_ID, err);
   }
   try {
     const res = await fetch(AN_BULK_URL, {
@@ -104,15 +145,23 @@ async function fetchAN(limit: number): Promise<AnDossier[]> {
       signal: AbortSignal.timeout(120_000),
     });
     if (!res.ok) {
-      console.warn(`[bills.fr] AN bulk fetch ${res.status}; skipping`);
-      return [];
+      return failedFetch(AN_SOURCE_ID, `HTTP ${res.status}`);
     }
     const buf = Buffer.from(await res.arrayBuffer());
     const zip = new AdmZip(buf);
-    const entries = zip.getEntries().filter((e) => e.entryName.endsWith(".json"));
+    const entries = zip
+      .getEntries()
+      .filter((e) => e.entryName.endsWith(".json"));
+    if (entries.length === 0) {
+      return failedFetch(
+        AN_SOURCE_ID,
+        "bulk archive contained no JSON entries",
+      );
+    }
 
     type Stamped = { dossier: AnDossier; latest: ExtractedAct | null };
     const out: Stamped[] = [];
+    let malformedEntries = 0;
     for (const e of entries) {
       try {
         const json = JSON.parse(e.getData().toString("utf-8")) as {
@@ -122,16 +171,27 @@ async function fetchAN(limit: number): Promise<AnDossier[]> {
         if (!j || j["@xsi:type"] !== "DossierLegislatif_Type") continue;
         out.push({ dossier: j, latest: walkLatestAct(j.actesLegislatifs) });
       } catch {
-        /* skip malformed entry */
+        malformedEntries++;
       }
     }
-    out.sort((a, b) => (b.latest?.date ?? "").localeCompare(a.latest?.date ?? ""));
-    return out.slice(0, limit).map((s) => s.dossier);
-  } catch (err) {
-    console.warn(
-      `[bills.fr] AN bulk processing failed: ${err instanceof Error ? err.message : err}; skipping`,
+    if (out.length === 0) {
+      return failedFetch(
+        AN_SOURCE_ID,
+        malformedEntries > 0
+          ? `all ${malformedEntries} JSON entries were malformed`
+          : `${entries.length} JSON entries contained no recognized legislative dossiers`,
+        entries.length,
+      );
+    }
+    out.sort((a, b) =>
+      (b.latest?.date ?? "").localeCompare(a.latest?.date ?? ""),
     );
-    return [];
+    return successfulFetch(
+      AN_SOURCE_ID,
+      out.slice(0, limit).map((s) => s.dossier),
+    );
+  } catch (err) {
+    return failedFetch(AN_SOURCE_ID, err);
   }
 }
 
@@ -229,7 +289,9 @@ function ddmmyyyyToIso(value: string): string | null {
   return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
 }
 
-async function fetchSenat(limit: number): Promise<SenatRow[]> {
+async function fetchSenat(
+  limit: number,
+): Promise<ChamberFetchResult<SenatRow>> {
   try {
     const res = await fetch(SENAT_CSV_URL, {
       cache: "no-store",
@@ -239,24 +301,32 @@ async function fetchSenat(limit: number): Promise<SenatRow[]> {
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) {
-      console.warn(`[bills.fr] Sénat CSV fetch ${res.status}; skipping`);
-      return [];
+      return failedFetch(SENAT_SOURCE_ID, `HTTP ${res.status}`);
     }
     // Sénat CSV is served as latin-1; decode explicitly.
     const buf = Buffer.from(await res.arrayBuffer());
     const text = new TextDecoder("iso-8859-1").decode(buf);
+    const lines = text.split(/\r?\n/);
+    if (!lines[0]?.toLowerCase().includes("titre")) {
+      return failedFetch(SENAT_SOURCE_ID, "CSV header was not recognized");
+    }
     const rows = parseSenatCsv(text);
+    const structuredDataLines = lines.slice(1).filter((line) => line.trim());
+    if (structuredDataLines.length > 0 && rows.length === 0) {
+      return failedFetch(
+        SENAT_SOURCE_ID,
+        `${structuredDataLines.length} non-empty CSV row(s) produced zero recognized records`,
+        structuredDataLines.length,
+      );
+    }
     rows.sort((a, b) => {
       const da = ddmmyyyyToIso(a.dateInitiale) ?? "";
       const db = ddmmyyyyToIso(b.dateInitiale) ?? "";
       return db.localeCompare(da);
     });
-    return rows.slice(0, limit);
+    return successfulFetch(SENAT_SOURCE_ID, rows.slice(0, limit));
   } catch (err) {
-    console.warn(
-      `[bills.fr] Sénat CSV failed: ${err instanceof Error ? err.message : err}; skipping`,
-    );
-    return [];
+    return failedFetch(SENAT_SOURCE_ID, err);
   }
 }
 
@@ -307,7 +377,7 @@ export async function fetchFRBillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** Per-chamber cap. Total returned ≤ 2 × limit. Default 50/each. */
   limit?: number;
-}): Promise<BillIngestDraft[]> {
+}): Promise<BillFetchBatch> {
   const limit = opts.limit ?? 50;
 
   const bodies = await opts.db
@@ -326,10 +396,10 @@ export async function fetchFRBillsForSync(opts: {
 
   const [an, senat] = await Promise.all([fetchAN(limit), fetchSenat(limit)]);
 
-  const anDrafts = an
+  const anDrafts = an.rows
     .map((d) => anDraft(d, opts.jurisdictionId, lowerBodyId))
     .filter((d): d is BillIngestDraft => d !== null);
-  const senatDrafts = senat
+  const senatDrafts = senat.rows
     .map((r) => senatDraft(r, opts.jurisdictionId, upperBodyId))
     .filter((d): d is BillIngestDraft => d !== null);
 
@@ -341,5 +411,22 @@ export async function fetchFRBillsForSync(opts: {
     seen.add(key);
     out.push(d);
   }
-  return out;
+  const anOutcome = finalizeBillSourceMapping(
+    an.outcome,
+    out.filter((draft) => draft.sourceId === AN_SOURCE_ID).length,
+    {
+      zeroMappedError: `${an.rows.length} Assemblée dossier(s) produced zero mappable bill drafts`,
+    },
+  );
+  const senatOutcome = finalizeBillSourceMapping(
+    senat.outcome,
+    out.filter((draft) => draft.sourceId === SENAT_SOURCE_ID).length,
+    {
+      zeroMappedError: `${senat.rows.length} Sénat record(s) produced zero mappable bill drafts`,
+    },
+  );
+  return {
+    drafts: out,
+    sourceOutcomes: [anOutcome, senatOutcome],
+  };
 }

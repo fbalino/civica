@@ -39,16 +39,7 @@
  * Methodology: ~/civica/plan/disputes-triage-resolution-v1.md §2a + §2d
  */
 
-import { and, eq, inArray, sql } from "drizzle-orm";
-import {
-  countryFacts,
-  dataDisputes,
-  jurisdictions as jurisdictionsTable,
-} from "@/lib/db/schema";
-import {
-  snapshotDispute,
-  writeDisputeAuditLog,
-} from "@/lib/factbook/reconcile/dispute-audit-log";
+import { sql } from "drizzle-orm";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 
 type Db = typeof import("@/lib/db").db;
@@ -63,8 +54,7 @@ export const AUTO_RESOLVE_STATUS = "resolved_auto_stale";
  * unit tests so the staleness logic can be exercised without DB IO.
  */
 export type StalenessVerdict =
-  | { outcome: "still_proposed" }
-  | { outcome: "auto_resolved"; reason: string };
+  { outcome: "still_proposed" } | { outcome: "auto_resolved"; reason: string };
 
 export interface DisputeVerdictInput {
   factIdA: string | null;
@@ -97,11 +87,7 @@ export function decideStaleness(input: DisputeVerdictInput): StalenessVerdict {
       reason: `fact_a status='${input.factAStatus}' (already demoted)`,
     };
   }
-  if (
-    input.factIdB &&
-    input.factBStatus &&
-    input.factBStatus !== "active"
-  ) {
+  if (input.factIdB && input.factBStatus && input.factBStatus !== "active") {
     return {
       outcome: "auto_resolved",
       reason: `fact_b status='${input.factBStatus}' (already demoted)`,
@@ -147,7 +133,12 @@ export interface AutoResolveOptions {
   onProgress?: (line: string) => void;
   readDisputes?: () => Promise<OpenDisputeRow[]>;
   resolveFacts?: typeof getCanonicalFactsForJurisdiction;
-  writeAudit?: typeof writeDisputeAuditLog;
+  /**
+   * Injectable atomic boundary for deterministic fixtures. Production uses
+   * `closeStaleDisputeAtomically`, which changes the dispute and inserts its
+   * audit row in one PostgreSQL statement.
+   */
+  closeDispute?: AtomicCloseStaleDispute;
 }
 
 export interface OpenDisputeRow {
@@ -162,6 +153,136 @@ export interface OpenDisputeRow {
   factAStatus: string | null;
   factBStatus: string | null;
 }
+
+export interface AtomicCloseInput {
+  disputeId: string;
+  note: string;
+}
+
+export type AtomicCloseResult =
+  { outcome: "closed"; auditId: string } | { outcome: "not_open" };
+
+export type AtomicCloseStaleDispute = (
+  db: Pick<Db, "execute">,
+  input: AtomicCloseInput,
+) => Promise<AtomicCloseResult>;
+
+/**
+ * Close one stale dispute and retain its audit evidence as a single atomic
+ * PostgreSQL statement. This is deliberately a data-modifying CTE rather than
+ * `db.transaction()`: Neon's HTTP driver supports one-shot statements and
+ * non-interactive transactions, not an interactive transaction spanning
+ * separate application awaits.
+ *
+ * The locked candidate and UPDATE both require an open/in-review status. A
+ * concurrent resolver therefore either owns the row and writes exactly one
+ * audit record, or observes `not_open`; it can never overwrite a human or
+ * another cron writer that closed the dispute first. If the audit INSERT
+ * fails, PostgreSQL rolls the UPDATE back with the statement.
+ */
+export const closeStaleDisputeAtomically: AtomicCloseStaleDispute = async (
+  db,
+  input,
+) => {
+  const result = await db.execute(sql`
+    WITH candidate AS MATERIALIZED (
+      SELECT
+        d.id,
+        d.jurisdiction_id,
+        d.fact_key,
+        d.status,
+        d.reviewer_id,
+        d.reviewer_notes,
+        d.resolved_at,
+        d.resolution_action
+      FROM data_disputes d
+      WHERE d.id = ${input.disputeId}
+        AND d.status IN ('open', 'in_review')
+      FOR UPDATE
+    ), updated AS (
+      UPDATE data_disputes d
+      SET
+        status = ${AUTO_RESOLVE_STATUS},
+        reviewer_id = ${AUTO_RESOLVE_REVIEWER_ID},
+        -- resolved_at is a timestamp-without-time-zone column. Store an
+        -- explicitly UTC-naive value so the appended JSON Z remains true
+        -- even if a database session uses a non-UTC TimeZone setting.
+        resolved_at = (NOW() AT TIME ZONE 'UTC'),
+        resolution_action = 'auto_resolve_stale'
+      FROM candidate c
+      WHERE d.id = c.id
+        AND d.status IN ('open', 'in_review')
+      RETURNING
+        d.id,
+        d.jurisdiction_id,
+        d.fact_key,
+        c.status AS before_status,
+        c.reviewer_id AS before_reviewer_id,
+        c.reviewer_notes AS before_reviewer_notes,
+        c.resolved_at AS before_resolved_at,
+        c.resolution_action AS before_resolution_action,
+        d.status AS after_status,
+        d.reviewer_id AS after_reviewer_id,
+        d.reviewer_notes AS after_reviewer_notes,
+        d.resolved_at AS after_resolved_at,
+        d.resolution_action AS after_resolution_action
+    ), audited AS (
+      INSERT INTO data_facts_audit_log (
+        jurisdiction_id,
+        fact_key,
+        dispute_id,
+        action,
+        actor_id,
+        before,
+        after,
+        notes
+      )
+      SELECT
+        u.jurisdiction_id,
+        u.fact_key,
+        u.id,
+        'auto_resolve_stale',
+        ${AUTO_RESOLVE_REVIEWER_ID},
+        jsonb_build_object(
+          'id', u.id,
+          'status', u.before_status,
+          'reviewerId', u.before_reviewer_id,
+          'reviewerNotes', u.before_reviewer_notes,
+          'resolvedAt', CASE
+            WHEN u.before_resolved_at IS NULL THEN NULL
+            ELSE to_char(
+              u.before_resolved_at,
+              'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+            )
+          END,
+          'resolutionAction', u.before_resolution_action
+        ),
+        jsonb_build_object(
+          'id', u.id,
+          'status', u.after_status,
+          'reviewerId', u.after_reviewer_id,
+          'reviewerNotes', u.after_reviewer_notes,
+          'resolvedAt', to_char(
+            u.after_resolved_at,
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+          ),
+          'resolutionAction', u.after_resolution_action
+        ),
+        ${input.note}
+      FROM updated u
+      RETURNING id AS audit_id
+    )
+    SELECT audit_id
+    FROM audited
+  `);
+
+  const rows = ((result as unknown as { rows?: unknown[] }).rows ??
+    result) as Array<Record<string, unknown>>;
+  const auditId = rows[0]?.audit_id;
+  return auditId
+    ? { outcome: "closed", auditId: String(auditId) }
+    : { outcome: "not_open" };
+};
 
 /**
  * Run the sweep over all open `material_error` disputes.
@@ -188,7 +309,9 @@ export async function autoResolveStaleDisputes(
   const limitClause = options.limit
     ? sql`LIMIT ${Math.max(1, options.limit)}`
     : sql``;
-  const rowsResult = options.readDisputes ? null : await db.execute(sql`
+  const rowsResult = options.readDisputes
+    ? null
+    : await db.execute(sql`
     SELECT
       d.id,
       d.jurisdiction_id,
@@ -209,21 +332,26 @@ export async function autoResolveStaleDisputes(
     ORDER BY d.created_at ASC
     ${limitClause}
   `);
-  const raw = rowsResult === null ? [] : (((rowsResult as unknown as { rows?: unknown[] }).rows ??
-    rowsResult) as Array<Record<string, unknown>>);
+  const raw =
+    rowsResult === null
+      ? []
+      : (((rowsResult as unknown as { rows?: unknown[] }).rows ??
+          rowsResult) as Array<Record<string, unknown>>);
 
-  const disputes: OpenDisputeRow[] = options.readDisputes ? await options.readDisputes() : raw.map((r) => ({
-    id: String(r.id),
-    jurisdictionId: String(r.jurisdiction_id),
-    factKey: String(r.fact_key),
-    disputeKind: String(r.dispute_kind),
-    factIdA: r.fact_id_a ? String(r.fact_id_a) : null,
-    factIdB: r.fact_id_b ? String(r.fact_id_b) : null,
-    countrySlug: r.country_slug ? String(r.country_slug) : null,
-    countryName: r.country_name ? String(r.country_name) : null,
-    factAStatus: r.fact_a_status ? String(r.fact_a_status) : null,
-    factBStatus: r.fact_b_status ? String(r.fact_b_status) : null,
-  }));
+  const disputes: OpenDisputeRow[] = options.readDisputes
+    ? await options.readDisputes()
+    : raw.map((r) => ({
+        id: String(r.id),
+        jurisdictionId: String(r.jurisdiction_id),
+        factKey: String(r.fact_key),
+        disputeKind: String(r.dispute_kind),
+        factIdA: r.fact_id_a ? String(r.fact_id_a) : null,
+        factIdB: r.fact_id_b ? String(r.fact_id_b) : null,
+        countrySlug: r.country_slug ? String(r.country_slug) : null,
+        countryName: r.country_name ? String(r.country_name) : null,
+        factAStatus: r.fact_a_status ? String(r.fact_a_status) : null,
+        factBStatus: r.fact_b_status ? String(r.fact_b_status) : null,
+      }));
 
   summary.scanned = disputes.length;
   log(`auto-resolve scan: ${disputes.length} open material_error dispute(s)`);
@@ -252,10 +380,9 @@ export async function autoResolveStaleDisputes(
       ReturnType<typeof getCanonicalFactsForJurisdiction>
     >;
     try {
-      resolverOutputs = await (options.resolveFacts ?? getCanonicalFactsForJurisdiction)(
-        jurisdictionId,
-        factKeys,
-      );
+      resolverOutputs = await (
+        options.resolveFacts ?? getCanonicalFactsForJurisdiction
+      )(jurisdictionId, factKeys);
     } catch (err) {
       const msg = `${jurisdictionId} resolver read: ${err instanceof Error ? err.message : err}`;
       summary.errors.push(msg);
@@ -270,10 +397,15 @@ export async function autoResolveStaleDisputes(
 
     for (const d of myDisputes) {
       try {
-        const outcome = await processOneDispute(db, d, resolverOutputs[d.factKey], {
-          dryRun: options.dryRun ?? false,
-          writeAudit: options.writeAudit ?? writeDisputeAuditLog,
-        });
+        const outcome = await processOneDispute(
+          db,
+          d,
+          resolverOutputs[d.factKey],
+          {
+            dryRun: options.dryRun ?? false,
+            closeDispute: options.closeDispute ?? closeStaleDisputeAtomically,
+          },
+        );
         if (outcome.outcome === "still_proposed") summary.stillProposed++;
         else if (outcome.outcome === "auto_resolved") summary.autoResolved++;
         else summary.skipped++;
@@ -302,7 +434,7 @@ export async function autoResolveStaleDisputes(
 
 interface ProcessOneOptions {
   dryRun: boolean;
-  writeAudit: typeof writeDisputeAuditLog;
+  closeDispute: AtomicCloseStaleDispute;
 }
 
 /**
@@ -313,9 +445,9 @@ interface ProcessOneOptions {
 async function processOneDispute(
   db: Db,
   dispute: OpenDisputeRow,
-  resolverOutput: Awaited<
-    ReturnType<typeof getCanonicalFactsForJurisdiction>
-  >[string] | undefined,
+  resolverOutput:
+    | Awaited<ReturnType<typeof getCanonicalFactsForJurisdiction>>[string]
+    | undefined,
   opts: ProcessOneOptions,
 ): Promise<AutoResolveSummary["outcomes"][number]> {
   const verdict = decideStaleness({
@@ -349,24 +481,6 @@ async function closeStale(
   note: string,
   opts: ProcessOneOptions,
 ): Promise<AutoResolveSummary["outcomes"][number]> {
-  const beforeRows = await db
-    .select()
-    .from(dataDisputes)
-    .where(eq(dataDisputes.id, dispute.id))
-    .limit(1);
-  const before = beforeRows[0];
-  if (!before) {
-    return {
-      disputeId: dispute.id,
-      countrySlug: dispute.countrySlug,
-      factKey: dispute.factKey,
-      outcome: "skipped",
-      note: "dispute row vanished mid-sweep",
-    };
-  }
-
-  const beforeSnap = snapshotDispute(before);
-  const now = new Date();
   if (opts.dryRun) {
     return {
       disputeId: dispute.id,
@@ -377,33 +491,19 @@ async function closeStale(
     };
   }
 
-  await db
-    .update(dataDisputes)
-    .set({
-      status: AUTO_RESOLVE_STATUS,
-      reviewerId: AUTO_RESOLVE_REVIEWER_ID,
-      resolvedAt: now,
-      resolutionAction: "auto_resolve_stale",
-    })
-    .where(eq(dataDisputes.id, dispute.id));
-
-  // Re-read the post-update row so the audit log captures the actual
-  // committed state (defensive in case other writers race the cron).
-  const afterRows = await db
-    .select()
-    .from(dataDisputes)
-    .where(eq(dataDisputes.id, dispute.id))
-    .limit(1);
-  const after = afterRows[0] ?? before;
-
-  await opts.writeAudit({
-    dispute: after,
-    action: "auto_resolve_stale",
-    actorId: AUTO_RESOLVE_REVIEWER_ID,
-    before: beforeSnap,
-    after: snapshotDispute(after),
-    notes: note,
+  const close = await opts.closeDispute(db, {
+    disputeId: dispute.id,
+    note,
   });
+  if (close.outcome === "not_open") {
+    return {
+      disputeId: dispute.id,
+      countrySlug: dispute.countrySlug,
+      factKey: dispute.factKey,
+      outcome: "skipped",
+      note: "dispute was already closed or vanished during the sweep",
+    };
+  }
 
   return {
     disputeId: dispute.id,
@@ -413,10 +513,3 @@ async function closeStale(
     note,
   };
 }
-
-// silence unused-imports linter for symbols imported for type/contract
-// reasons but not directly invoked.
-void countryFacts;
-void jurisdictionsTable;
-void inArray;
-void and;

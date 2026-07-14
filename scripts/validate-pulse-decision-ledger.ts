@@ -60,8 +60,14 @@ async function main() {
     "persistClassificationFailureDecision",
   ]);
   requireFragments("scripts/pulse-apply-classifications.ts", [
-    "persistNonEventDecision",
+    "writeNonEventCluster",
     "persistClassificationFailureDecision",
+  ]);
+  requireFragments("src/lib/pulse/v2/classification-publication.ts", [
+    "publishClassifiedCluster",
+    "publishNonGovernanceCluster",
+    "preparePulseDecisionInsert",
+    "atomicClassificationPublishGuard",
   ]);
   requireFragments("src/lib/pulse/v2/corroborate.ts", [
     'kind: "corroboration"',

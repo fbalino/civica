@@ -96,7 +96,12 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -213,7 +218,8 @@ export const UNESCO_UIS_INDICATORS: readonly UnescoUisIndicatorConfig[] = [
     // Faso 7.5, max Monaco 21.0. 144+ ISO3 coverage.
     uisCode: "SLE.1T8",
     factKey: "expected_years_schooling",
-    label: "School life expectancy from primary to tertiary (ISCED 1-8), both sexes",
+    label:
+      "School life expectancy from primary to tertiary (ISCED 1-8), both sexes",
     docUrl: "https://databrowser.uis.unesco.org/indicator/SLE.1T8",
     civicaRole: "canonical",
   },
@@ -369,10 +375,7 @@ export interface UnescoUisJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  uisCode: string,
-): PerUisCounters {
+function freshCounters(factKey: string, uisCode: string): PerUisCounters {
   return {
     factKey,
     uisCode,
@@ -408,9 +411,7 @@ async function fetchDefaultVersion(): Promise<{
       return { handle: null, label: UIS_VINTAGE_FALLBACK };
     }
     const body = (await res.json()) as UisVersionResponse;
-    const eduTheme = body.themeDataStatus?.find(
-      (t) => t.theme === "EDUCATION",
-    );
+    const eduTheme = body.themeDataStatus?.find((t) => t.theme === "EDUCATION");
     const description = eduTheme?.description?.trim();
     const label = description ? `UIS ${description}` : UIS_VINTAGE_FALLBACK;
     return { handle: body.version ?? null, label };
@@ -446,9 +447,7 @@ async function fetchIndicator(
     headers: { "User-Agent": UIS_USER_AGENT, Accept: "application/json" },
   });
   if (!res.ok) {
-    throw new Error(
-      `UIS ${config.uisCode}: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`UIS ${config.uisCode}: ${res.status} ${res.statusText}`);
   }
   const body = (await res.json()) as UisDataResponse;
   if (Array.isArray(body.hints) && body.hints.length > 0) {
@@ -472,7 +471,11 @@ function pickLatestPerCountry(
 ): Map<string, UisDataPoint> {
   const latest = new Map<string, UisDataPoint>();
   for (const r of rows) {
-    if (r.value === null || r.value === undefined || !Number.isFinite(r.value)) {
+    if (
+      r.value === null ||
+      r.value === undefined ||
+      !Number.isFinite(r.value)
+    ) {
       counter.rejected_no_value++;
       continue;
     }
@@ -533,8 +536,9 @@ export async function syncUnescoUis(
   // startup. Future runs will pick up new EDUCATION theme releases
   // (e.g. "August 2026 Data Release") automatically without code
   // changes.
-  const { handle: versionHandle, label: vintageLabel } =
-    await (options.fetchVersion ?? fetchDefaultVersion)();
+  const { handle: versionHandle, label: vintageLabel } = await (
+    options.fetchVersion ?? fetchDefaultVersion
+  )();
   log(
     `Resolved UIS vintage: "${vintageLabel}"` +
       (versionHandle ? ` (version=${versionHandle})` : " (fallback)"),
@@ -542,14 +546,16 @@ export async function syncUnescoUis(
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -557,9 +563,7 @@ export async function syncUnescoUis(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   const counters = new Map<string, PerUisCounters>();
   for (const c of targets) {
@@ -640,10 +644,14 @@ export async function syncUnescoUis(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -797,6 +805,12 @@ export async function syncUnescoUis(
         `(envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "UNESCO UIS",
+      target: `${config.factKey} (${config.uisCode})`,
+      rowsWritten: counter.written,
+    });
   }
 
   if (!options.dryRun && errors.length === 0) {
@@ -812,14 +826,6 @@ export async function syncUnescoUis(
         .where(eq(sources.id, "unesco_uis"));
     }
   }
-  // Freshness stamp routed through the sole sanctioned helper, which
-  // stamps `last_sync_at` only when the run actually wrote rows.
-  await (options.markSynced ?? markSourcesSynced)("unesco_uis", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
-
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
   // duplicates are filtered out by `persistProposedDisputes`.
@@ -833,13 +839,17 @@ export async function syncUnescoUis(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -849,6 +859,15 @@ export async function syncUnescoUis(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "unesco_uis",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerUisCounters> = {};

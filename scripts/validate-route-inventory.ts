@@ -101,7 +101,7 @@ export interface ScannedControls {
 }
 
 /** Statically scans a route.ts source for the four control-marker
- *  families PLT-008 asks for: admin session import, cron auth import,
+ *  families PLT-008 asks for: admin session import, cron control call,
  *  rate-limit import, and zod/.parse(/input-validation markers. This is
  *  informational cross-check output (printed, not gating) — the pure
  *  `findUncontrolledMutations` check operates on the registry's
@@ -111,7 +111,7 @@ export function scanControlMarkers(source: string): ScannedControls {
   return {
     adminSession:
       /getAdminSession|requireAdminSession|withAdminMutation|withAdminLogout|admin\/session/.test(source),
-    cronAuth: /CRON_SECRET|requireCronAuth|verifyCronSecret/.test(source),
+    cronAuth: /\b(?:requireCronAuth|withCronJob)\s*\(/.test(source),
     rateLimit: /RateLimit|rate-limit|rate_limit/.test(source),
     inputValidationMarker: /\bz\.|from ["']zod["']|\.parse\(|\.safeParse\(/.test(source),
   };
@@ -216,7 +216,7 @@ async function main(): Promise<void> {
     }
     if (registryClaimsCron && !markers.cronAuth) {
       report.warnings.push(
-        `[control-scan] ${entry.filePath}: registry declares cron-secret but no CRON_SECRET/requireCronAuth marker was found in source`,
+        `[control-scan] ${entry.filePath}: registry declares cron-secret but no withCronJob()/requireCronAuth() control call was found in source`,
       );
     }
   }

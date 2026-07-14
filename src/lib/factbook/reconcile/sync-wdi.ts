@@ -38,18 +38,19 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 // Re-exported for backward compatibility: this type historically lived
 // in this module and is imported as `from "./sync-wdi"` by sibling
@@ -59,8 +60,7 @@ export type { CivicaSourceRole };
 type Db = typeof import("@/lib/db").db;
 
 const WB_BASE_URL = "https://api.worldbank.org/v2";
-const WB_USER_AGENT =
-  "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
+const WB_USER_AGENT = "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
 const WB_PER_PAGE = 1000;
 // 10-year window. WB indicators publish 1–2 years after reference
 // year, so reaching back this far guarantees most countries have at
@@ -390,6 +390,8 @@ export interface WdiSyncSummary {
 }
 
 export interface WdiSyncOptions {
+  /** Override configured targets for deterministic aggregate fixtures. */
+  targets?: readonly WdiIndicatorConfig[];
   /** Limit to a specific fact-key (for testing). */
   factKey?: string;
   /** Limit to a specific WB indicator code (for testing). */
@@ -399,7 +401,11 @@ export interface WdiSyncOptions {
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
   /** Deterministic fixture seams; production callers omit these. */
-  fetchIndicator?: (wbCode: string, startYear: number, endYear: number) => Promise<WbDataPoint[]>;
+  fetchIndicator?: (
+    wbCode: string,
+    startYear: number,
+    endYear: number,
+  ) => Promise<WbDataPoint[]>;
   jurisdictions?: WdiJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
@@ -411,10 +417,7 @@ export interface WdiJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  wbCode: string,
-): PerWdiCounters {
+function freshCounters(factKey: string, wbCode: string): PerWdiCounters {
   return {
     factKey,
     wbCode,
@@ -476,9 +479,7 @@ async function fetchIndicator(
  * Pick the most recent non-null observation per country. Returns a
  * map keyed by uppercase iso3.
  */
-function pickLatestPerCountry(
-  rows: WbDataPoint[],
-): Map<string, WbDataPoint> {
+function pickLatestPerCountry(rows: WbDataPoint[]): Map<string, WbDataPoint> {
   const latest = new Map<string, WbDataPoint>();
   for (const r of rows) {
     if (r.value === null || r.value === undefined) continue;
@@ -510,7 +511,7 @@ export async function syncWorldBankWdi(
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
 
-  const targets = WDI_INDICATORS.filter((c) => {
+  const targets = (options.targets ?? WDI_INDICATORS).filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
     if (options.wbCode && c.wbCode !== options.wbCode) return false;
     return true;
@@ -530,14 +531,16 @@ export async function syncWorldBankWdi(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -545,9 +548,7 @@ export async function syncWorldBankWdi(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   const counters = new Map<string, PerWdiCounters>();
   for (const c of targets) {
@@ -581,7 +582,11 @@ export async function syncWorldBankWdi(
 
     let rows: WbDataPoint[];
     try {
-      rows = await (options.fetchIndicator ?? fetchIndicator)(config.wbCode, startYear, endYear);
+      rows = await (options.fetchIndicator ?? fetchIndicator)(
+        config.wbCode,
+        startYear,
+        endYear,
+      );
     } catch (err) {
       errors.push(
         `${config.wbCode} fetch failed: ${
@@ -619,10 +624,14 @@ export async function syncWorldBankWdi(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -762,13 +771,13 @@ export async function syncWorldBankWdi(
         `(envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "WDI",
+      target: `${config.factKey} (${config.wbCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("world_bank", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -783,13 +792,17 @@ export async function syncWorldBankWdi(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -799,6 +812,15 @@ export async function syncWorldBankWdi(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "world_bank",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerWdiCounters> = {};

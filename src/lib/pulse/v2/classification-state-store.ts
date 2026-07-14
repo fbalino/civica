@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
@@ -16,20 +18,124 @@ import {
 type Db = NeonHttpDatabase<typeof schema>;
 
 function rows(result: unknown): Record<string, unknown>[] {
-  return (Array.isArray(result)
-    ? result
-    : ((result as { rows?: Record<string, unknown>[] }).rows ?? [])) as Record<
-    string,
-    unknown
-  >[];
+  return (
+    Array.isArray(result)
+      ? result
+      : ((result as { rows?: Record<string, unknown>[] }).rows ?? [])
+  ) as Record<string, unknown>[];
 }
 
 export interface ClaimedClassificationAttempt {
   clusterId: string;
+  incidentId: string | null;
   configHash: string;
   ordinal: number;
   runId: string;
   startedAt: Date;
+}
+
+export function classificationAttemptKey(
+  claim: Pick<
+    ClaimedClassificationAttempt,
+    "clusterId" | "configHash" | "ordinal" | "runId"
+  >,
+  outcome: PulseClassificationStatus | "started",
+): string {
+  const digest = createHash("sha256")
+    .update(
+      [
+        claim.clusterId.toLowerCase(),
+        claim.configHash,
+        String(claim.ordinal),
+        claim.runId.toLowerCase(),
+        outcome,
+      ].join("\n"),
+    )
+    .digest("hex");
+  return `pulse-classification-attempt/sha256:${digest}`;
+}
+
+const EXPIRED_FINAL_CLAIM_CODE = "classification_claim_expired_at_retry_limit";
+const EXPIRED_FINAL_CLAIM_MESSAGE =
+  "The final classifier claim expired before it could record an outcome.";
+
+/**
+ * A process can die after atomically claiming the final ordinal but before it
+ * settles that claim. Once the lease expires there is no ordinal left to
+ * advance to, so recover that exact state to terminal failure and append the
+ * matching terminal attempt in one statement. The zero model-call count means
+ * no completed call was durably evidenced; metadata preserves that limitation.
+ */
+export async function recoverExpiredFinalClassificationClaim(
+  db: Db,
+  input: { clusterId: string; configHash: string; now?: Date },
+): Promise<boolean> {
+  const now = input.now ?? new Date();
+  const result = await db.execute(sql`
+    WITH recovered AS (
+      UPDATE pulse_cluster_classification_states
+      SET status = 'terminal_failure',
+          next_retry_at = NULL,
+          terminal_at = ${now},
+          lease_expires_at = NULL,
+          last_error_code = ${EXPIRED_FINAL_CLAIM_CODE},
+          last_error_message = ${EXPIRED_FINAL_CLAIM_MESSAGE},
+          event_id = NULL,
+          updated_at = ${now}
+      WHERE cluster_id = ${input.clusterId}::uuid
+        AND config_hash = ${input.configHash}
+        AND status = 'retryable_failure'
+        AND attempt_count = max_attempts
+        AND lease_expires_at IS NOT NULL
+        AND lease_expires_at <= ${now}
+      RETURNING cluster_id, incident_id, config_hash, attempt_count,
+                last_run_id, last_attempt_at
+    ), recorded AS (
+      INSERT INTO pulse_classification_attempts (
+        schema_version, attempt_key, cluster_id, incident_id, config_hash,
+        ordinal, run_id, outcome, model_call_count, started_at, completed_at,
+        next_retry_at, error_code, error_message, metadata, created_at
+      )
+      SELECT
+        ${PULSE_CLASSIFICATION_ATTEMPT_VERSION},
+        'pulse-classification-attempt/sha256:' || encode(
+          digest(
+            r.cluster_id::text || E'\n' || r.config_hash || E'\n' ||
+            r.attempt_count::text || E'\n' || r.last_run_id::text ||
+            E'\nterminal_failure',
+            'sha256'
+          ),
+          'hex'
+        ),
+        r.cluster_id, r.incident_id, r.config_hash, r.attempt_count,
+        r.last_run_id, 'terminal_failure', 0, r.last_attempt_at, ${now},
+        NULL, ${EXPIRED_FINAL_CLAIM_CODE}, ${EXPIRED_FINAL_CLAIM_MESSAGE},
+        ${JSON.stringify({
+          recovery: "expired_final_claim",
+          modelCallCountStanding: "unknown_not_retained",
+        })}::jsonb,
+        ${now}
+      FROM recovered r
+      ON CONFLICT (attempt_key) DO NOTHING
+      RETURNING cluster_id
+    )
+    SELECT
+      (SELECT COUNT(*)::integer FROM recovered) AS recovered_count,
+      1 / CASE WHEN NOT EXISTS (SELECT 1 FROM recovered)
+        OR EXISTS (SELECT 1 FROM recorded)
+        OR EXISTS (
+        SELECT 1
+        FROM recovered r
+        JOIN pulse_classification_attempts a
+          ON a.cluster_id = r.cluster_id
+         AND a.config_hash = r.config_hash
+         AND a.ordinal = r.attempt_count
+         AND a.run_id = r.last_run_id
+         AND a.outcome = 'terminal_failure'
+         AND a.completed_at IS NOT NULL
+      ) THEN 1 ELSE 0 END AS recovery_guard
+  `);
+  return Number(rows(result)[0]?.recovered_count ?? 0) === 1;
 }
 
 /**
@@ -49,6 +155,15 @@ export async function claimClassificationAttempt(
   },
 ): Promise<ClaimedClassificationAttempt | null> {
   const now = input.now ?? new Date();
+  if (
+    await recoverExpiredFinalClassificationClaim(db, {
+      clusterId: input.clusterId,
+      configHash: input.configHash,
+      now,
+    })
+  ) {
+    return null;
+  }
   const leaseExpiresAt = new Date(
     now.getTime() + PULSE_CLASSIFICATION_CLAIM_LEASE_MS,
   );
@@ -107,13 +222,14 @@ export async function claimClassificationAttempt(
       ON CONFLICT (attempt_key) DO NOTHING
       RETURNING ordinal
     )
-    SELECT attempt_count FROM claimed
+    SELECT attempt_count, incident_id FROM claimed
   `);
   const row = rows(result)[0];
   if (!row) return null;
   const ordinal = Number(row.attempt_count);
   return {
     clusterId: input.clusterId,
+    incidentId: row.incident_id ? String(row.incident_id) : null,
     configHash: input.configHash,
     ordinal,
     runId: input.runId,
@@ -154,15 +270,12 @@ export async function settleClassificationAttempt(
   const nextRetryAt = retryable
     ? new Date(
         now.getTime() +
-          retryDelayMs(
-            claim.ordinal,
-            PULSE_CLASSIFICATION_RETRY_POLICY,
-          ),
+          retryDelayMs(claim.ordinal, PULSE_CLASSIFICATION_RETRY_POLICY),
       )
     : null;
   const eventId = input.outcome === "classified" ? input.eventId : null;
-  const terminalAt =
-    status === "retryable_failure" ? null : now;
+  const terminalAt = status === "retryable_failure" ? null : now;
+  const attemptKey = classificationAttemptKey(claim, status);
 
   const updated = await db.execute(sql`
     WITH settled AS (
@@ -176,6 +289,7 @@ export async function settleClassificationAttempt(
         AND config_hash = ${claim.configHash}
         AND attempt_count = ${claim.ordinal}
         AND last_run_id = ${claim.runId}::uuid
+        AND status = 'retryable_failure'
       RETURNING cluster_id, incident_id, config_hash, attempt_count, last_run_id
     ), recorded AS (
       INSERT INTO pulse_classification_attempts (
@@ -185,15 +299,7 @@ export async function settleClassificationAttempt(
       )
       SELECT
         ${PULSE_CLASSIFICATION_ATTEMPT_VERSION},
-        'pulse-classification-attempt/sha256:' || encode(
-          digest(
-            s.cluster_id::text || E'\n' || s.config_hash || E'\n' ||
-            s.attempt_count::text || E'\n' || s.last_run_id::text || E'\n' ||
-            ${status},
-            'sha256'
-          ),
-          'hex'
-        ),
+        ${attemptKey},
         s.cluster_id, s.incident_id, s.config_hash, s.attempt_count,
         s.last_run_id, ${status}, ${input.modelCallCount},
         ${claim.startedAt}, ${now}, ${nextRetryAt},
@@ -206,6 +312,27 @@ export async function settleClassificationAttempt(
     SELECT attempt_count FROM settled
   `);
   if (rows(updated).length !== 1) {
+    // A transaction may commit even if its HTTP response is lost. In that
+    // case the caller's catch path must observe the durable terminal result,
+    // never overwrite a successful classified/none publication with failure.
+    const current = await db.execute(sql`
+      SELECT status
+      FROM pulse_cluster_classification_states
+      WHERE cluster_id = ${claim.clusterId}::uuid
+        AND config_hash = ${claim.configHash}
+        AND attempt_count = ${claim.ordinal}
+        AND last_run_id = ${claim.runId}::uuid
+      LIMIT 1
+    `);
+    const currentStatus = rows(current)[0]?.status;
+    if (
+      currentStatus === "classified" ||
+      currentStatus === "none" ||
+      currentStatus === "retryable_failure" ||
+      currentStatus === "terminal_failure"
+    ) {
+      return currentStatus;
+    }
     throw new Error(
       `Classification attempt ${claim.clusterId}/${claim.ordinal} lost its claim`,
     );

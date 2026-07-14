@@ -427,8 +427,8 @@
     {
       "artifactId": "package-lock",
       "role": "environment",
-      "bytes": 408861,
-      "sha256": "9558f57eba3b959d92f0a83410297d26f348b243a38a6e4a9ff5a40e7e8439a4",
+      "bytes": 409244,
+      "sha256": "343069d93193a39029aa5d7145f9e54b4de28fccf8f4bb8062bf3357878c6e2a",
       "path": "package-lock.json"
     },
     {
@@ -544,5 +544,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "812526963c3c706301b28bea478b5f40e4467a5ac1bfbec74eff92afdb5a9659"
+  "bundleSemanticSha256": "04fe362941419c041cebc6df493ff65b8136aee653e6cc50edbea22d41220120"
 }

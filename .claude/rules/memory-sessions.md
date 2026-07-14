@@ -104,8 +104,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Freedom House dimension: `normalize-v2` expects the **2–14 SUM** (avg×2), not the 1–7 avg.
 - `SourceDot` treats ALL frozen academic/quarterly vintages (incl. `civica_curated`) as frozen
   (amber); green is reserved for genuinely live feeds.
-- `sources.last_sync_at` is stamped ONLY via `markSourcesSynced()` (enforced by
-  `validate:sync-freshness`). Never write it inline.
+- `sources.last_sync_at` is stamped ONLY through the `markSourcesSynced*` API
+  family (enforced by `validate:sync-freshness`). Use the transaction/CTE
+  variants for atomic publication; never write freshness inline.
 - Public election qualification is content-bound, never UUID-only. Any change
   to an election, result, statement, jurisdiction status/identity, or referenced
   source makes the live row fail closed until the checked audit is regenerated.

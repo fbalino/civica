@@ -10,7 +10,7 @@ async function main() {
   const orchestrator = readFileSync("scripts/ingest-ci-all.ts", "utf8");
   const ingest = readFileSync("src/lib/ci/ingest.ts", "utf8");
   const migration = readFileSync("drizzle/authoritative/0003_mixed_mockingbird.sql", "utf8") + readFileSync("drizzle/authoritative/0004_naive_dust.sql", "utf8");
-  for (const token of ["sql.transaction", "validateStagedCiRelease", "canonicalStageChecksum", "sourceFreshnessTransactionQuery", "process.exit(1)", "status='failed'", "status='completed'"]) if (!orchestrator.includes(token)) errors.push(`orchestrator missing ${token}`);
+  for (const token of ["sql.transaction", "validateStagedCiRelease", "canonicalStageChecksum", "markSourcesSyncedTransactionQuery", "process.exit(1)", "status='failed'", "status='completed'"]) if (!orchestrator.includes(token)) errors.push(`orchestrator missing ${token}`);
   if (!ingest.includes("CI_INGEST_STAGE_FILE") || !ingest.includes('flag: "wx"')) errors.push("adapters do not use exclusive stage files");
   for (const adapter of REQUIRED_CI_ADAPTERS) if (!orchestrator.includes(adapter)) errors.push(`required adapter absent: ${adapter}`);
   if (Object.keys(MINIMUM_CI_STAGE_COVERAGE).length !== REQUIRED_CI_ADAPTERS.length) errors.push("coverage policy does not close the adapter inventory");

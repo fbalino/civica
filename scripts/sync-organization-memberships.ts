@@ -21,7 +21,7 @@ import {
   releaseOrganizationMembership,
 } from "../src/lib/organizations/membership-release";
 import { jurisdictions } from "../src/lib/db/schema";
-import { sourceFreshnessTransactionQuery } from "../src/lib/db/source-freshness";
+import { markSourcesSyncedTransactionQuery } from "../src/lib/db/source-freshness";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DATABASE_URL is required");
@@ -356,7 +356,7 @@ async function main() {
         RETURNING id
       ) SELECT count(*)::int AS written FROM upserted
     `,
-    sourceFreshnessTransactionQuery(
+    markSourcesSyncedTransactionQuery(
       neonSql,
       [ORGANIZATION_MEMBERSHIP_SOURCE_ID],
       rowsWritten,

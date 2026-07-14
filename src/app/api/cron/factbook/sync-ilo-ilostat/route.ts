@@ -4,7 +4,7 @@
  * Runs annually each November via Vercel cron (matching the ILOEST
  * release cadence — ILO publishes new modelled-estimate vintages once
  * per year, around early November). Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). 4 ILO indicators × 1 unpaginated fetch
+ * (per the shared cron boundary). 4 ILO indicators × 1 unpaginated fetch
  * each (~150KB each, ~600KB total). Total wall time is dominated by
  * upserts, not fetches; expect ~30–90s on a warm DB.
  *
@@ -16,7 +16,7 @@
  *              imputation vs. modelled projection)
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncIloIlostat } from "@/lib/factbook/reconcile/sync-ilo-ilostat";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -26,9 +26,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
   try {
@@ -67,4 +64,6 @@ async function handler(request: Request) {
   }
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.ilo-ilostat", handler);
+
+export { cronHandler as GET, cronHandler as POST };

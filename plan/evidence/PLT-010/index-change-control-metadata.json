@@ -1,0 +1,38 @@
+{
+  "id": "pulse-cron-recovery-boundary",
+  "toVersion": "civica-index-pulse-cron-recovery-v29",
+  "categories": [
+    "weight_or_model"
+  ],
+  "evidence": {
+    "documentation": [
+      "data/CRON-OPERATIONS.md"
+    ],
+    "registry": [
+      "src/lib/api/cron-job-registry.ts"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PLT-010/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/classify-cron-retry.test.ts",
+      "src/lib/pulse/v2/classification-publication.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-cron-safety.ts",
+      "scripts/validate-pulse-classification-state.ts"
+    ]
+  },
+  "validations": [
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-cron-recovery",
+    "validate:index-research-archive",
+    "validate:pulse-classification-state",
+    "validate:pulse-version-lineage"
+  ]
+}

@@ -3802,6 +3802,197 @@ export const adminMutationAuditLog = pgTable(
   ],
 );
 
+// --- Cron delivery control ---
+
+/**
+ * One row per logical cron delivery. The request fingerprint makes reuse of
+ * an Idempotency-Key with different parameters a visible conflict. Attempts
+ * are retained separately, while this row projects the latest state used to
+ * suppress completed deliveries and cap retries.
+ */
+export const cronJobExecutions = pgTable(
+  "cron_job_executions",
+  {
+    executionKey: text("execution_key").primaryKey(),
+    jobId: text("job_id").notNull(),
+    route: text("route").notNull(),
+    triggerKind: text("trigger_kind").$type<"scheduled" | "manual">().notNull(),
+    scheduleSlot: timestamp("schedule_slot", { withTimezone: true }),
+    requestMode: text("request_mode").notNull(),
+    scopeKey: text("scope_key"),
+    requestSha256: text("request_sha256").notNull(),
+    status: text("status")
+      .$type<"running" | "succeeded" | "failed">()
+      .notNull(),
+    attemptCount: integer("attempt_count").notNull(),
+    maxAttempts: integer("max_attempts").notNull(),
+    lastAttemptId: uuid("last_attempt_id").notNull(),
+    lastFence: integer("last_fence").notNull(),
+    firstStartedAt: timestamp("first_started_at", {
+      withTimezone: true,
+    }).notNull(),
+    lastStartedAt: timestamp("last_started_at", {
+      withTimezone: true,
+    }).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    responseStatus: integer("response_status"),
+    resultCode: text("result_code"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_cron_job_execution_scheduled")
+      .on(table.jobId, table.scheduleSlot)
+      .where(dsql`${table.triggerKind} = 'scheduled'`),
+    uniqueIndex("idx_cron_job_execution_manual")
+      .on(table.jobId, table.scopeKey)
+      .where(dsql`${table.triggerKind} = 'manual'`),
+    index("idx_cron_job_execution_status").on(table.status, table.updatedAt),
+    index("idx_cron_job_execution_job_time").on(
+      table.jobId,
+      table.scheduleSlot,
+    ),
+    check(
+      "cron_job_execution_identity_check",
+      dsql`${table.executionKey} ~ '^[a-f0-9]{64}$' AND length(${table.jobId}) BETWEEN 1 AND 80 AND ${table.jobId} ~ '^[a-z][a-z0-9.-]*$' AND length(${table.route}) BETWEEN 1 AND 160 AND ${table.route} ~ '^/api/cron/[a-z0-9_./-]+$' AND (${table.scopeKey} IS NULL OR ${table.scopeKey} ~ '^[a-f0-9]{64}$') AND ${table.requestSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "cron_job_execution_mode_status_check",
+      dsql`${table.requestMode} IN ('apply','dry_run') AND ${table.status} IN ('running','succeeded','failed') AND ${table.attemptCount} >= 1 AND ${table.maxAttempts} >= 1 AND ${table.attemptCount} <= ${table.maxAttempts} AND ${table.lastFence} >= 1`,
+    ),
+    check(
+      "cron_job_execution_trigger_check",
+      dsql`(${table.triggerKind} = 'scheduled' AND ${table.scheduleSlot} IS NOT NULL AND ${table.scopeKey} IS NULL AND ${table.requestMode} = 'apply') OR (${table.triggerKind} = 'manual' AND ${table.scheduleSlot} IS NULL AND ${table.scopeKey} IS NOT NULL)`,
+    ),
+    check(
+      "cron_job_execution_time_order_check",
+      dsql`${table.lastStartedAt} >= ${table.firstStartedAt} AND ${table.updatedAt} >= ${table.createdAt}`,
+    ),
+    check(
+      "cron_job_execution_lifecycle_check",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL AND ${table.responseStatus} IS NULL AND ${table.resultCode} IS NULL) OR (${table.status} = 'succeeded' AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.lastStartedAt} AND ${table.responseStatus} BETWEEN 200 AND 299 AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$') OR (${table.status} = 'failed' AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.lastStartedAt} AND ${table.responseStatus} BETWEEN 100 AND 599 AND NOT (${table.responseStatus} BETWEEN 200 AND 299) AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$')`,
+    ),
+  ],
+);
+
+/**
+ * Immutable handoff from an authenticated cron delivery to the classify run
+ * that owns its work. A later schedule slot may adopt the sole older running
+ * classify run; retaining that binding lets every retry of the later delivery
+ * return to the same run even if the cron wrapper failed after the run closed.
+ */
+export const pulseClassificationDeliveryBindings = pgTable(
+  "pulse_classification_delivery_bindings",
+  {
+    executionKey: text("execution_key").primaryKey(),
+    classificationRunId: uuid("classification_run_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "pulse_classification_delivery_execution_fk",
+      columns: [table.executionKey],
+      foreignColumns: [cronJobExecutions.executionKey],
+    }).onDelete("restrict"),
+    foreignKey({
+      name: "pulse_classification_delivery_run_fk",
+      columns: [table.classificationRunId],
+      foreignColumns: [pulsePipelineRuns.id],
+    }).onDelete("restrict"),
+    index("idx_pulse_classification_delivery_run").on(
+      table.classificationRunId,
+    ),
+    check(
+      "pulse_classification_delivery_execution_check",
+      dsql`${table.executionKey} ~ '^[a-f0-9]{64}$'`,
+    ),
+  ],
+);
+
+/**
+ * Job-wide mutex. Locking this row serializes every delivery key for a job,
+ * so a manual invocation cannot overlap its scheduled run. The fence only
+ * moves forward and prevents a timed-out runner from finalizing a newer try.
+ */
+export const cronJobLeases = pgTable(
+  "cron_job_leases",
+  {
+    jobId: text("job_id").primaryKey(),
+    leaseToken: uuid("lease_token"),
+    leaseFence: integer("lease_fence").default(0).notNull(),
+    leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+    executionKey: text("execution_key"),
+    attemptId: uuid("attempt_id"),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("idx_cron_job_lease_expiry").on(table.leaseExpiresAt),
+    check(
+      "cron_job_lease_identity_check",
+      dsql`length(${table.jobId}) BETWEEN 1 AND 80 AND ${table.jobId} ~ '^[a-z][a-z0-9.-]*$' AND ${table.leaseFence} >= 0 AND (${table.executionKey} IS NULL OR ${table.executionKey} ~ '^[a-f0-9]{64}$')`,
+    ),
+    check(
+      "cron_job_lease_active_fields_check",
+      dsql`(${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL AND ${table.executionKey} IS NULL AND ${table.attemptId} IS NULL) OR (${table.leaseToken} IS NOT NULL AND ${table.leaseExpiresAt} IS NOT NULL AND ${table.executionKey} IS NOT NULL AND ${table.attemptId} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
+ * One retained row per execution attempt. Running rows make abandoned work
+ * visible; the database acquisition function closes them as expired before a
+ * retry starts. No request body, credential, payload, or error text is stored.
+ */
+export const cronJobAttempts = pgTable(
+  "cron_job_attempts",
+  {
+    attemptId: uuid("attempt_id").primaryKey(),
+    executionKey: text("execution_key")
+      .references(() => cronJobExecutions.executionKey, {
+        onDelete: "restrict",
+      })
+      .notNull(),
+    jobId: text("job_id").notNull(),
+    ordinal: integer("ordinal").notNull(),
+    fence: integer("fence").notNull(),
+    status: text("status")
+      .$type<"running" | "succeeded" | "failed" | "expired">()
+      .notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    responseStatus: integer("response_status"),
+    resultCode: text("result_code"),
+  },
+  (table) => [
+    uniqueIndex("idx_cron_job_attempt_fence").on(table.jobId, table.fence),
+    uniqueIndex("idx_cron_job_attempt_ordinal").on(
+      table.executionKey,
+      table.ordinal,
+    ),
+    index("idx_cron_job_attempt_execution").on(
+      table.executionKey,
+      table.startedAt,
+    ),
+    index("idx_cron_job_attempt_status").on(table.status, table.startedAt),
+    check(
+      "cron_job_attempt_identity_check",
+      dsql`${table.executionKey} ~ '^[a-f0-9]{64}$' AND length(${table.jobId}) BETWEEN 1 AND 80 AND ${table.jobId} ~ '^[a-z][a-z0-9.-]*$' AND ${table.ordinal} >= 1 AND ${table.fence} >= 1`,
+    ),
+    check(
+      "cron_job_attempt_lifecycle_check",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL AND ${table.responseStatus} IS NULL AND ${table.resultCode} IS NULL) OR (${table.status} = 'succeeded' AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.startedAt} AND ${table.responseStatus} BETWEEN 200 AND 299 AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$') OR (${table.status} IN ('failed','expired') AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.startedAt} AND ${table.responseStatus} BETWEEN 100 AND 599 AND NOT (${table.responseStatus} BETWEEN 200 AND 299) AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$')`,
+    ),
+  ],
+);
+
 // --- Durable (cross-instance) rate limiter ---
 
 /**

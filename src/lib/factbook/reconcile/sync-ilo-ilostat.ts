@@ -69,18 +69,19 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -146,7 +147,8 @@ export const ILO_ILOSTAT_INDICATORS: readonly IloIndicatorConfig[] = [
     iloCode: "UNE_2EAP_SEX_AGE_RT_A",
     factKey: "unemployment_rate_pct",
     label: "Unemployment rate (ILO modelled estimates)",
-    docUrl: "https://ilostat.ilo.org/topics/unemployment-and-labour-underutilization/",
+    docUrl:
+      "https://ilostat.ilo.org/topics/unemployment-and-labour-underutilization/",
     sex: "SEX_T",
     classif1: "AGE_YTHADULT_YGE15",
     database: "ILOEST",
@@ -380,12 +382,7 @@ async function fetchIndicatorToc(): Promise<Map<string, IloIndicatorTocRow>> {
   const labelIdx = headers.indexOf("indicator.label");
   const lastUpdateIdx = headers.indexOf("last.update");
   const databaseIdx = headers.indexOf("database");
-  if (
-    idIdx < 0 ||
-    indicatorIdx < 0 ||
-    lastUpdateIdx < 0 ||
-    databaseIdx < 0
-  ) {
+  if (idIdx < 0 || indicatorIdx < 0 || lastUpdateIdx < 0 || databaseIdx < 0) {
     throw new Error(
       `ILO TOC: missing expected headers (got ${headers.join(",")})`,
     );
@@ -453,9 +450,7 @@ async function fetchIndicator(
     headers: { "User-Agent": ILO_USER_AGENT, Accept: "text/csv" },
   });
   if (!res.ok) {
-    throw new Error(
-      `ILO ${config.iloCode}: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`ILO ${config.iloCode}: ${res.status} ${res.statusText}`);
   }
   const body = await res.text();
   const { headers, rows } = parseCsv(body);
@@ -492,8 +487,7 @@ async function fetchIndicator(
       classif1: classif1Idx >= 0 ? (r[classif1Idx] ?? "") : "",
       time,
       obsValue: value,
-      obsStatus:
-        obsStatusIdx >= 0 ? (r[obsStatusIdx] || null) : null,
+      obsStatus: obsStatusIdx >= 0 ? r[obsStatusIdx] || null : null,
     });
   }
   return out;
@@ -554,18 +548,22 @@ export async function syncIloIlostat(
         err instanceof Error ? err.message : err
       }`,
     );
-    log(`Vintage discovery failed; using fallbacks ${JSON.stringify(vintageLabels)}`);
+    log(
+      `Vintage discovery failed; using fallbacks ${JSON.stringify(vintageLabels)}`,
+    );
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -598,7 +596,8 @@ export async function syncIloIlostat(
       continue;
     }
 
-    const vintageLabel = vintageLabels[config.database] ??
+    const vintageLabel =
+      vintageLabels[config.database] ??
       (config.database === "ILOEST"
         ? ILOEST_VINTAGE_FALLBACK
         : ILOSDG_VINTAGE_FALLBACK);
@@ -851,13 +850,13 @@ export async function syncIloIlostat(
         `envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "ILOSTAT",
+      target: `${config.factKey} (${config.iloCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("ilo_ilostat", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -872,13 +871,17 @@ export async function syncIloIlostat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -888,6 +891,15 @@ export async function syncIloIlostat(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "ilo_ilostat",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerIloCounters> = {};
