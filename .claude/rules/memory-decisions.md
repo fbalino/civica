@@ -1102,3 +1102,16 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   exactly-once execution across external/business writes and final bookkeeping;
   DAT-012's convergent writers remain the crash-recovery backstop. Durable
   record: APR-D166.
+
+## 2026-07-14 — Production rate limits are shared and fail closed
+
+- `rate-limit-policy/v1` gives every route-method a closed durable, platform,
+  authenticated, or bounded disposition; no production caller uses a
+  process-memory fallback.
+- Exact budgets use one atomic database-time PostgreSQL counter across
+  instances. Deployment-trusted singular client addresses are canonicalized,
+  scoped, and HMAC-signed with an independent secret before storage.
+- Exhaustion returns `429`; identity/store unavailability returns noncacheable
+  `503`. The verified all-path Vercel rule remains broad outer flood control,
+  not an exact quota. This supersedes APR-D164's temporary memory-fallback
+  note. Durable record: APR-D167.

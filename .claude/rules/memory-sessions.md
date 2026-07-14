@@ -904,3 +904,16 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   Country-versus-Place JSON-LD use the same contract.
 - Politically sensitive fixtures and desktop/mobile browser QA passed. Index
   change-control v26, all 949 tests, and the 105-page production build passed.
+
+## 2026-07-14 — PLT-011 distributed rate limiting completed
+
+- Closed all 100 registered routes and 159 route-methods under
+  `rate-limit-policy/v1`; exact public/auth/form/export budgets now share an
+  atomic PostgreSQL counter with HMAC-only subjects and no memory fallback.
+- Verified the active all-path Vercel outer rule and encrypted Production key;
+  removed 194 expired legacy rows using aggregate-only evidence. Preview and
+  post-deployment behavior remain an explicit manual check; no deployment ran.
+- Clean `npm ci`, 1,635 active tests, route/policy/Index change-control gates,
+  refreshed review-packet hashes, eight browser variants, and `build:ci`
+  passed at implementation commit `92d7ea26`. Evidence:
+  `plan/evidence/PLT-011/`.

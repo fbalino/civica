@@ -1116,3 +1116,28 @@ closing newer work. No ledger can atomically cover every upstream call or
 business write separated from final bookkeeping, so honest at-least-once
 recovery plus idempotent reconciliation is stronger and more accurate than an
 unsupported exactly-once claim.
+
+### APR-D167 — Production rate limits are shared, opaque, and fail closed
+
+**Decision:** Adopt `rate-limit-policy/v1` as the closed disposition for every
+registered route-method. Exact public, paid, credential, form, export, and
+unauthenticated-mutation budgets use one database-time PostgreSQL fixed-window
+statement across instances. Canonical client identity comes only from singular
+deployment-trusted headers, is scoped and HMAC-SHA-256 signed with an
+independent production secret, and is never stored raw. Counter exhaustion is
+a stable `429`; missing identity configuration or shared-store failure is a
+noncacheable `503`, never a process-local allowance. Deterministically remove
+expired legacy rows before every increment. Use the verified all-path Vercel
+rule as broad regional flood control for static downloads and the retired
+embed, and keep exact-origin sign-out available under that platform layer so an
+application-counter outage cannot trap a session cookie. This supersedes only
+APR-D164's temporary statement that non-admin callers retained a memory
+fallback.
+
+**Why:** Serverless instances do not share memory, client-controlled proxy
+chains are not trustworthy identity, and raw network addresses are unnecessary
+counter data. One atomic shared boundary makes the declared budget enforceable
+under concurrency, while distinct limited/unavailable responses avoid both
+silent overuse and misleading availability. The platform rule adds useful
+outer protection without pretending a regional WAF counter supplies exact
+application quotas.
