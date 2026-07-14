@@ -483,8 +483,8 @@
     {
       "artifactId": "selected-product-code-5",
       "role": "selected-product-code",
-      "bytes": 1606,
-      "sha256": "6bf9432491827c85cabeec581a68354714672495fbc7d48528d72efc9344ae00",
+      "bytes": 2007,
+      "sha256": "6a765ec5257c15d1a42e6bec7b4cebe5a55e8c9c5ed8dc4297358cea9b91bfde",
       "path": "src/app/api/governance-evidence/[slug]/route.ts"
     },
     {
@@ -544,5 +544,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "04fe362941419c041cebc6df493ff65b8136aee653e6cc50edbea22d41220120"
+  "bundleSemanticSha256": "4a9f2f74039bc3989666eef964ec3a2f52079a8ba9014300e2bda07747db1580"
 }
