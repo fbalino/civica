@@ -1076,3 +1076,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Admin login consumes a durable cross-instance budget before parsing/KDF work
   and denies access when that store is unavailable. Other rate-limit callers
   keep their existing memory fallback. Durable record: APR-D164.
+
+## 2026-07-14 — CI is credential-free and evidence-bound
+
+- One fork-safe Node 22 `verify` job runs the same hash-bound build core as
+  production on pull requests and `main`, without database/provider secrets.
+- Historical release contracts validate from immutable checked evidence;
+  mutable production comparisons are explicit read-only `:live` audits.
+- Database-backed pages must defer through documented request-time boundaries,
+  never fake a build connection or weaken a validator.
+- The owner/platform must still require `verify` through GitHub branch
+  protection or a ruleset and retain the first hosted run evidence. Durable
+  record: APR-D165.

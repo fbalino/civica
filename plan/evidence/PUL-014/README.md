@@ -18,18 +18,24 @@ Primary strata determine initial draw fractions and base weights. Separate margi
 
 ## Reproducibility
 
-The machine-readable protocol, bounded largest-remainder allocator, stable SHA-256 within-stratum ordering, same-stratum reserve rule, weighting rule, and prohibited changes are executable and tested. The checked population artifact has semantic hash `26e3f46b395dc968afeb4803b2eeb7c48aeb94f05f4f1a41c70a6d51eda01e92`.
+The machine-readable protocol, bounded largest-remainder allocator, stable SHA-256 within-stratum ordering, same-stratum reserve rule, weighting rule, and prohibited changes are executable and tested. The checked population artifact has semantic hash `26e3f46b395dc968afeb4803b2eeb7c48aeb94f05f4f1a41c70a6d51eda01e92`. Normal build validation now verifies that immutable artifact, its semantic hash and internal invariants, and its exact identity/count linkage to the retained PUL-042 inputs without querying Neon. Live reconstruction is a separate, explicit read-only audit; `--write` is rejected unless that live mode is requested.
 
 ## Verification
 
 ```sh
-npm run generate:pulse-evaluation-sampling
 npm run validate:pulse-evaluation-sampling
+npm run validate:pulse-evaluation-sampling:live
+npm run generate:pulse-evaluation-sampling
 npx tsc --noEmit
 npm test
 npm run validate:claims-docs
 npm run build
 ```
+
+The first command is the credential-free checked-release gate used by ordinary
+builds. The second reconstructs and compares the frozen population from Neon.
+The generator is an intentional live release-authoring operation and invokes
+the same reconstruction with `--live --write`.
 
 PUL-015 must create the country-day evidence and search-trace packets. PUL-016 and PUL-017 own independent blinded coding. No accuracy result exists yet.
 

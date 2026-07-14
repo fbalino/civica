@@ -1,12 +1,13 @@
 /**
  * PLT-006 — fail-early environment validation CLI.
  *
- *   tsx scripts/validate-env.ts --context=build|cron|admin|chat|production|...
+ *   tsx scripts/validate-env.ts --context=build|ci|cron|admin|chat|production|...
  *
  * Checks the current process env against the typed contract and exits non-zero
  * with clear, secret-free messages when a required variable is missing or
- * malformed. Optional features that are off (absent-degrades) are printed as
- * notices, not failures.
+ * malformed. The `ci` context is intentionally credential-free; production
+ * `build` remains strict. Optional features that are off (absent-degrades) are
+ * printed as notices, not failures.
  */
 import { config } from "dotenv";
 import {

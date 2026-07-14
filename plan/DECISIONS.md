@@ -1077,3 +1077,21 @@ an unsigned cookie cannot establish an audit actor. A per-instance fallback
 also cannot preserve one login-attempt budget across serverless instances.
 Failing closed is appropriate at this authentication boundary while the shared
 limiter's historical memory fallback remains unchanged for other callers.
+
+### APR-D165 — CI validates immutable evidence without production credentials
+
+**Decision:** Use one fork-safe Node 22 `verify` job for pull requests and
+`main`. It contains no repository secrets or database URL and executes the same
+hash-bound build core as production. A normal build validates immutable,
+checked evidence for historical release contracts; comparison with mutable
+production state is an explicit read-only `:live` audit. Routes that need Neon
+at render time use documented Next.js request boundaries rather than fake build
+credentials or weakened validation. Requiring the job in GitHub repository
+settings remains an owner/platform operation.
+
+**Why:** Forked pull requests cannot safely receive production credentials,
+while a public project still needs deterministic evidence that release and
+method contracts have not drifted. Separating immutable reproduction from live
+observation keeps both claims honest. Sharing one production build body avoids
+a weaker CI-only product, and explicit external enforcement avoids pretending
+local source code can configure branch protection.

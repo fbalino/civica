@@ -1,0 +1,51 @@
+name: Civica continuous integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: civica-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Use supported Node runtime
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Validate canonical CI contract
+        run: npm run validate:ci-workflow
+      - name: Validate master plan
+        run: node plan/tools/validate-master-plan.mjs
+      - name: Scan repository for secrets
+        run: npm run validate:secrets
+      - name: Audit production dependencies
+        run: npm run validate:deps
+      - name: Lint owned source
+        run: npm run validate:lint
+      - name: Type-check
+        run: npm run typecheck
+      - name: Module coverage gates
+        run: npm run validate:module-coverage
+      - name: Credential-free production build
+        run: npm run build:ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Production browser and API smoke
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e -- e2e/harness.selftest.spec.ts e2e/ci-smoke.spec.ts --workers=1 --retries=0

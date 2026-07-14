@@ -90,9 +90,9 @@ function attachErrorCapture(page: Page): CapturedErrors {
 }
 
 export const test = base.extend<{ errors: CapturedErrors }>({
-  errors: async ({ page }, use) => {
+  errors: async ({ page }, applyFixture) => {
     const captured = attachErrorCapture(page);
-    await use(captured);
+    await applyFixture(captured);
   },
 });
 
@@ -110,9 +110,12 @@ export async function setTheme(page: Page, theme: Theme): Promise<void> {
 
 /** Measure horizontal overflow of the root scroller at the current
  *  viewport. `overflow` is scrollWidth - clientWidth (px). */
-export async function measureHorizontalOverflow(
-  page: Page,
-): Promise<{ scrollWidth: number; clientWidth: number; overflow: number; offenders: string[] }> {
+export async function measureHorizontalOverflow(page: Page): Promise<{
+  scrollWidth: number;
+  clientWidth: number;
+  overflow: number;
+  offenders: string[];
+}> {
   return page.evaluate(() => {
     const de = document.documentElement;
     const clientWidth = de.clientWidth;
@@ -136,7 +139,12 @@ export async function measureHorizontalOverflow(
         }
       }
     }
-    return { scrollWidth, clientWidth, overflow: scrollWidth - clientWidth, offenders };
+    return {
+      scrollWidth,
+      clientWidth,
+      overflow: scrollWidth - clientWidth,
+      offenders,
+    };
   });
 }
 

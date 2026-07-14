@@ -12,6 +12,12 @@ The applied ingest run fetched 292 records: 12 Amnesty, 10 CIVICUS, 250 GDELT, a
 
 The live report returns four operating feeds—Amnesty, CIVICUS, GDELT, and Human Rights Watch—zero degraded feeds, and six inactive feeds. ACLED, AP, IPU, Reuters, RSF, and V-Dem do not acquire operating status from a stub, access declaration, or code presence. The endpoint standing is `operational_observability_not_retrieval_validation`.
 
+That paragraph records the original 2026-07-11 acceptance observation; it is
+not a promise about current operations. The read-only 2026-07-14 audit at
+`source-coverage-audit-2026-07-14.json` found three operating feeds, one
+degraded feed, and six inactive feeds because GDELT's latest retained attempt
+failed. Operational state is allowed to change as telemetry changes.
+
 Rights remain fail-closed. The operating sources have pending source-specific terms records, and bulk redistribution remains blocked or pending review according to the rights manifest. Unregistered inactive feeds report missing rights rather than inheriting a permissive default.
 
 ## Canonical artifacts
@@ -32,10 +38,24 @@ This report proves observed connector operation and retained scope. It does not 
 
 ## Verification
 
+### PLT-001 offline/live split — 2026-07-14
+
+The normal validator now checks a full, dated, SHA-256-sealed report without a
+database connection. It binds every feed to the exact runtime connector,
+source-input and rights posture, activation and blind spots; derives state
+from retrieval/evidence conditions; reconciles telemetry, evidence, time, and
+summary fields; and proves that the capture was read-only with zero writes.
+Seeded tests reject resealed structural, registry, rights, state, telemetry,
+evidence, timestamp, and provenance drift. The static artifact is historical
+acceptance evidence only. `npm run validate:pulse-source-coverage:live` is the
+explicit read-only comparison with current Neon and does not require the live
+state to equal the dated snapshot.
+
 See `browser-checks.md` for responsive theme checks and screenshots. The following checks pass:
 
 ```sh
 npm run validate:pulse-source-coverage
+npm run validate:pulse-source-coverage:live
 npm run validate:pulse-runtime:live
 npm run validate:pulse-version-lineage:live
 npm run validate:design-tokens

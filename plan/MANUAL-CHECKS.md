@@ -30,6 +30,7 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 
 ## External systems
 
+- **PLT-001 · Owner/platform:** push the canonical CI branch, confirm the first hosted `verify` job succeeds on both a pull request and `main`, then enable branch protection or a repository ruleset that requires `verify`. Record the run URLs and ruleset screenshot/export under `plan/evidence/PLT-001/`; no hosted run or protection setting is claimed by the local implementation.
 - Confirm DOI registration and metadata display in the chosen repository.
 - Confirm advisory-board and contact submissions arrive, retain required audit data, and produce the promised acknowledgement using real external delivery.
 - **DAT-021 · Owner/platform:** run one provider-managed Neon PITR restore into a disposable branch after documenting the plan's retention window, RPO, cost, branch-deletion procedure, and management credential. Compare the DAT-021 schema/data hashes, then delete only the disposable branch. The local PostgreSQL 17 logical restore and named WAL recovery point are already verified; this remaining check is provider-specific.

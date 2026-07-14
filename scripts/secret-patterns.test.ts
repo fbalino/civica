@@ -8,15 +8,31 @@ import {
   sha256Hex,
 } from "./secret-patterns";
 
+/** Build detector inputs at runtime so the scanner's own tracked test source
+ * never contains a live-shaped credential literal. This is deliberately
+ * stronger than allowlisting this file: a future accidental literal here must
+ * still fail `validate:secrets`. */
+function stitch(...parts: string[]): string {
+  return parts.join("");
+}
+
 test("catches live-format credentials", () => {
+  const anthropic = stitch(
+    "sk-",
+    "ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
+  );
+  const assignedName = stitch("ADMIN_SESSION_SE", "CRET");
   const cases = [
-    'const k = "sk-ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";',
-    "AKIA1B2C3D4E5F6G7H8I", // AWS-shaped (16 upper/digit after AKIA)
-    "ghp_abcdefghijklmnopqrstuvwxyz0123456789",
-    "GOCSPX-abcdefghijklmnopqrstuvwx",
-    "-----BEGIN RSA PRIVATE KEY-----",
-    'DATABASE_URL="postgresql://owner:npg_realLookingPassword@ep-foo.neon.tech/db"',
-    'ADMIN_SESSION_SECRET = "0a1b2c3d4e5f60718293a4b5c6d7e8f9"',
+    `const k = "${anthropic}";`,
+    stitch("AK", "IA1B2C3D4E5F6G7H8I"), // AWS-shaped (16 upper/digit after AKIA)
+    stitch("gh", "p_abcdefghijklmnopqrstuvwxyz0123456789"),
+    stitch("GOC", "SPX-abcdefghijklmnopqrstuvwx"),
+    stitch("-----BEGIN RSA ", "PRIVATE KEY-----"),
+    `DATABASE_URL="${stitch(
+      "postgresql://owner:",
+      "npg_realLookingPassword@ep-foo.neon.tech/db",
+    )}"`,
+    `${assignedName} = "${stitch("0a1b2c3d4e5f60718", "293a4b5c6d7e8f9")}"`,
   ];
   for (const c of cases) {
     assert.ok(findSecrets(c).length >= 1, `should flag: ${c.slice(0, 24)}…`);
@@ -24,7 +40,10 @@ test("catches live-format credentials", () => {
 });
 
 test("never emits the full secret value", () => {
-  const secret = "sk-ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
+  const secret = stitch(
+    "sk-",
+    "ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
+  );
   const [finding] = findSecrets(secret);
   assert.ok(finding);
   assert.ok(!finding.preview.includes("0123456789"));
@@ -47,8 +66,11 @@ test("skips documented placeholders and local/test fixtures", () => {
 });
 
 test("a known-exposed hash suppresses that one finding but not others", () => {
-  const known = "postgresql://owner:npg_realLookingPassword@ep-foo.neon.tech/db";
-  const other = "sk-ant-api03-ZZZZZZZZZZZZZZZZZZZZZZZZ0123456789";
+  const known = stitch(
+    "postgresql://owner:",
+    "npg_realLookingPassword@ep-foo.neon.tech/db",
+  );
+  const other = stitch("sk-", "ant-api03-ZZZZZZZZZZZZZZZZZZZZZZZZ0123456789");
   const text = `${known}\n${other}`;
   const withoutAllow = findSecrets(text);
   assert.ok(withoutAllow.length >= 2);

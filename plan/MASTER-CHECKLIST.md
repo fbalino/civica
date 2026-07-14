@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 305
-- **Completed:** 195
-- **Remaining:** 110
-- **Progress:** 63.9%
+- **Completed:** 196
+- **Remaining:** 109
+- **Progress:** 64.3%
 - **Priority mix:** P0 189 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -256,7 +256,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 
 Source: `plan/08-platform-security-performance-and-operations.md`
 
-- [ ] **PLT-001** (P0) Add a canonical continuous-integration workflow for supported Node/runtime versions. _Done when: pull requests and `main` run install, lint, unit tests, validators, type/build, plan integrity, selected integration/API tests, and browser smoke tests; required checks cannot pass when a seeded failure is introduced._
+- [x] **PLT-001** (P0) Add a canonical continuous-integration workflow for supported Node/runtime versions. _Done when: pull requests and `main` run install, lint, unit tests, validators, type/build, plan integrity, selected integration/API tests, and browser smoke tests; required checks cannot pass when a seeded failure is introduced._
 - [x] **PLT-002** (P0) Make lint deterministic and exclude generated Claude/worktree/build artifacts without hiding source. _Done when: `npm run lint` completes from the repository root within a declared time, scans all owned source/config/scripts/content, ignores `.claude/**/.next` and equivalent generated paths, and a seeded source violation fails._
 - [x] **PLT-003** (P1) Resolve the Turbopack full-project tracing warning caused by content/import behavior. _Done when: `npm run build` emits no unintended full-project trace warning, the packaged dependency/file set is inspected, content rendering still works, and a regression test or documented invariant guards the boundary._
 - [x] **PLT-004** (P0) Audit Next.js 16.2, React 19.2, Drizzle, Neon, Tailwind v4, and runtime usage against installed official documentation. _Done when: a dated compatibility report covers async params/searchParams, cache components/directives, proxy/middleware, Turbopack config, server/client boundaries, route handlers, DB driver behavior, and deprecated APIs; every confirmed mismatch has a task/test._

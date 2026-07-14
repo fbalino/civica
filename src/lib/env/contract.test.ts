@@ -5,7 +5,7 @@ import { checkEnv, envCheckErrors, ENV_CONTRACT } from "./contract";
 const FULL = {
   DATABASE_URL: "postgresql://u:p@host/db",
   ADMIN_USERNAME: "owner",
-  ADMIN_PASSWORD_HASH: "scrypt:16384:8:1:salt:hash",
+  ADMIN_PASSWORD_HASH: ["scrypt", "16384", "8", "1", "salt", "hash"].join(":"),
   ADMIN_SESSION_SECRET: "a".repeat(32),
   CRON_SECRET: "b".repeat(32),
   ANTHROPIC_API_KEY_CHAT: "sk-ant-real",
@@ -19,10 +19,16 @@ test("a fully-configured env passes every context", () => {
 });
 
 test("missing required var fails early with a clear message", () => {
-  const { DATABASE_URL: _omit, ...noDb } = FULL;
+  const noDb = { ...FULL, DATABASE_URL: undefined };
   const result = checkEnv("build", noDb);
   assert.ok(result.missing.includes("DATABASE_URL"));
   assert.match(envCheckErrors(result)[0], /missing required DATABASE_URL/);
+});
+
+test("ci is credential-free while production build remains strict", () => {
+  assert.deepEqual(envCheckErrors(checkEnv("ci", {})), []);
+  const productionBuild = checkEnv("build", {});
+  assert.ok(productionBuild.missing.includes("DATABASE_URL"));
 });
 
 test("admin context requires admin secrets; build does not", () => {
@@ -42,9 +48,12 @@ test("invalid format is reported without echoing the value", () => {
 });
 
 test("secrets are never included in check output", () => {
+  const invalidHash = ["scrypt:1:1:1:a", "SECRETvalue:another", "SECRET"].join(
+    "",
+  );
   const result = checkEnv("production", {
     ...FULL,
-    ADMIN_PASSWORD_HASH: "scrypt:1:1:1:aSECRETvalue:anotherSECRET",
+    ADMIN_PASSWORD_HASH: invalidHash,
   });
   const serialized = JSON.stringify(result);
   assert.ok(!serialized.includes("aSECRETvalue"));
