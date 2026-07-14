@@ -20,7 +20,10 @@ import {
   GOOGLE_STATE_COOKIE,
   GOOGLE_REDIRECT_COOKIE,
 } from "@/lib/admin/google-oauth";
-import { buildAdminCookieHeaders, adminReviewerName } from "@/lib/admin/session";
+import {
+  buildAdminCookieHeaders,
+  isAdminSessionConfigured,
+} from "@/lib/admin/session";
 
 function clearOAuthCookieHeaders(): Array<[string, string]> {
   return [
@@ -32,7 +35,7 @@ function clearOAuthCookieHeaders(): Array<[string, string]> {
 export async function GET(request: NextRequest) {
   const failUrl = new URL("/admin/sign-in?error=google", request.url);
 
-  if (!isGoogleSignInConfigured()) {
+  if (!isGoogleSignInConfigured() || !isAdminSessionConfigured()) {
     return NextResponse.redirect(failUrl, 303);
   }
 
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
   for (const [name, value] of clearOAuthCookieHeaders()) {
     res.headers.append(name, value);
   }
-  for (const [name, value] of buildAdminCookieHeaders(adminReviewerName())) {
+  for (const [name, value] of buildAdminCookieHeaders()) {
     res.headers.append(name, value);
   }
   return res;

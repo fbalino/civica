@@ -12,35 +12,51 @@
  * verified against the salted scrypt hash in ADMIN_PASSWORD_HASH — BOTH
  * must match. There is no bearer/API-key path anymore.
  *
- * The reviewer display name written to the session cookie is the
- * server-configured name (ADMIN_DISPLAY_NAME || ADMIN_USERNAME), NOT a
- * client-supplied value, so audit-log rows always attribute to the
- * owner account.
+ * A durable shared-store throttle runs before request parsing and the
+ * password KDF. Session identity is derived by the cookie minter from server
+ * configuration, never from client input.
  */
 
+import { checkAdminLoginRateLimit } from "@/lib/admin/login-rate-limit";
+import { verifyPassword } from "@/lib/admin/password";
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
-import { NextRequest, NextResponse } from "next/server";
 import {
   buildAdminCookieHeaders,
   buildAdminClearCookieHeaders,
+  isAdminSessionConfigured,
   verifyAdminUsername,
-  adminReviewerName,
 } from "@/lib/admin/session";
-import { verifyPassword } from "@/lib/admin/password";
+import { NextRequest, NextResponse } from "next/server";
 
 /** True only when the owner account is fully configured. Fail closed
  *  (and don't disclose which piece is missing) otherwise. */
 function isAdminConfigured(): boolean {
   return Boolean(
     process.env.ADMIN_USERNAME &&
-      process.env.ADMIN_PASSWORD_HASH &&
-      process.env.ADMIN_SESSION_SECRET,
+    process.env.ADMIN_PASSWORD_HASH &&
+    isAdminSessionConfigured(),
   );
 }
 
 export async function POST(request: NextRequest) {
   if (!isAdminConfigured()) {
     return new NextResponse("Admin login is not configured", { status: 500 });
+  }
+
+  // This delegates to the shared Postgres-backed atomic limiter, so the
+  // attempt budget survives cold starts and is consistent across instances.
+  const rateLimit = await checkAdminLoginRateLimit(request);
+  if (!rateLimit.allowed) {
+    return new NextResponse("Too many admin login attempts", {
+      status: 429,
+      headers: {
+        "Cache-Control": "no-store",
+        "Retry-After": String(
+          Math.max(1, Math.ceil(rateLimit.retryAfterMs / 1000)),
+        ),
+        "X-RateLimit-Remaining": "0",
+      },
+    });
   }
 
   let username = "";
@@ -82,14 +98,17 @@ export async function POST(request: NextRequest) {
   const redirectPath = safeInternalPathOr(redirect, "/admin/pulse-review");
 
   const res = NextResponse.redirect(new URL(redirectPath, request.url), 303);
-  for (const [name, value] of buildAdminCookieHeaders(adminReviewerName())) {
+  for (const [name, value] of buildAdminCookieHeaders()) {
     res.headers.append(name, value);
   }
   return res;
 }
 
 export async function DELETE(request: NextRequest) {
-  const res = NextResponse.redirect(new URL("/admin/sign-in", request.url), 303);
+  const res = NextResponse.redirect(
+    new URL("/admin/sign-in", request.url),
+    303,
+  );
   for (const [name, value] of buildAdminClearCookieHeaders()) {
     res.headers.append(name, value);
   }

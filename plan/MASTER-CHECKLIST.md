@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 305
-- **Completed:** 194
-- **Remaining:** 111
-- **Progress:** 63.6%
+- **Completed:** 195
+- **Remaining:** 110
+- **Progress:** 63.9%
 - **Priority mix:** P0 189 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -282,7 +282,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [x] **PLT-024** (P1) Create operational runbooks for data-source breakage, bad release, compromised key, model outage, stale map/assets, legal takedown, and incorrect country fact. _Done when: each runbook names detection, containment, owner, rollback/correction, user communication, evidence preservation, and recovery verification; a tabletop exercise records gaps._
 - [ ] **PLT-025** (P0) Produce a G4 operations-readiness report. _Done when: route inventory, security scans, CI, job observability, backup/restore evidence, deployment/rollback drill, performance budgets, open incidents, and manual/external checks are summarized with zero unwaived P0/P1 operational finding._
 - [x] **PLT-026** (P0) Distinguish true route not-found from infrastructure failure and add product error boundaries. _Done when: only absent entities return the branded 404; DB/query/service failures produce logged noindex 503/retry responses through tokenized light/dark/mobile `error.tsx`/`global-error.tsx` boundaries; route tests simulate both and prevent caching/indexing a false 404._
-- [ ] **PLT-027** (P0) Close admin redirect, login, session-expiry, and audit-identity gaps. _Done when: a central same-origin redirect validator rejects scheme-relative/backslash/encoded-authority cases; login has durable throttling; signed session state includes identity/issued/expiry/session ID verified server-side; audit actor cannot be changed by an unsigned cookie; regression tests pass._
+- [x] **PLT-027** (P0) Close admin redirect, login, session-expiry, and audit-identity gaps. _Done when: a central same-origin redirect validator rejects scheme-relative/backslash/encoded-authority cases; login has durable throttling; signed session state includes identity/issued/expiry/session ID verified server-side; audit actor cannot be changed by an unsigned cookie; regression tests pass._
 - [ ] **PLT-028** (P1) Move large research-feed filtering and pagination to server/query boundaries. _Done when: Pulse ledger/changelog and comparable feeds fetch at most the requested page plus bounded metadata, filters are URL-addressable, query counts/response bytes meet budgets, and a 5,000-row fixture does not serialize into the initial page._
 - [ ] **PLT-029** (P1) Report cumulative program cost and effort telemetry at every gate. _Done when: a documented ledger linked from `plan/PROGRESS.md` records, at each G-gate and at least weekly while work is active, the subscription plans in use, any paid API spend against the caps in `.orchestrator/state.json`, committed external human spend, and notable cost events; zero unexplained paid-API spend exists; and the reporting format is documented so future workers keep it current._
 

@@ -23,18 +23,41 @@ type RateLimitResult = {
   retryAfterSeconds: number;
 };
 
-type DurableRateLimitOptions = {
+export type DurableRateLimitFailureMode = "memory-fallback" | "deny";
+
+export type DurableRateLimitOptions = {
   scope: string;
   key: string;
   limit: number;
   windowMs: number;
+  /**
+   * Existing public callers degrade to per-instance memory by default. Auth
+   * boundaries can opt into `deny` so a shared-store outage cannot reset the
+   * effective attempt budget across instances.
+   */
+  failureMode?: DurableRateLimitFailureMode;
 };
 
-type DurableRateLimitResult = {
+export type DurableRateLimitResult = {
   allowed: boolean;
   remaining: number;
   retryAfterMs: number;
 };
+
+export interface DurableRateLimitStore {
+  increment(input: {
+    bucketKey: string;
+    expiresAtIso: string;
+  }): Promise<number>;
+  deleteExpired(): Promise<void>;
+}
+
+export interface DurableRateLimitDependencies {
+  /** Test seam for deterministic store failures; production uses Neon. */
+  store?: DurableRateLimitStore;
+  now?: () => number;
+  random?: () => number;
+}
 
 const stores = new Map<string, Map<string, RateLimitEntry>>();
 const SWEEP_INTERVAL_MS = 60_000;
@@ -156,27 +179,16 @@ export function enforceInMemoryRateLimit(
 //   • allowed = count <= limit (so request #(limit+1) in a window is denied).
 //   • Lazy cleanup: stale rows are reaped opportunistically (~1 in N calls)
 //     via the expires_at index, not on every request.
-//   • Graceful degradation: ANY DB error falls back to the in-memory limiter
-//     so a database blip never fails an otherwise-valid request.
+//   • Graceful degradation remains the default: DB errors fall back to the
+//     in-memory limiter so existing public callers preserve their behavior.
+//     Security-sensitive callers may opt into `failureMode: "deny"`, which
+//     fails closed instead of silently losing cross-instance durability.
 
 /** Run the expired-row sweep on ~1 in N calls (amortised cleanup). */
 const DURABLE_CLEANUP_PROBABILITY = 0.02;
 
-export async function checkDurableRateLimit({
-  scope,
-  key,
-  limit,
-  windowMs,
-}: DurableRateLimitOptions): Promise<DurableRateLimitResult> {
-  const now = Date.now();
-  const windowStart = Math.floor(now / windowMs) * windowMs;
-  const windowEnd = windowStart + windowMs;
-  const bucketKey = `${scope}:${key}:${windowStart}`;
-  const expiresAtIso = new Date(windowEnd).toISOString();
-
-  try {
-    // Atomic increment-and-read. INSERT seeds the window at 1; a concurrent
-    // request on the same key conflicts and bumps the existing count by 1.
+const postgresDurableRateLimitStore: DurableRateLimitStore = {
+  async increment({ bucketKey, expiresAtIso }) {
     const result = await db.execute(sql`
       INSERT INTO rate_limits (key, count, expires_at)
       VALUES (${bucketKey}, 1, ${expiresAtIso}::timestamptz)
@@ -184,15 +196,43 @@ export async function checkDurableRateLimit({
       RETURNING count
     `);
     const row = result.rows[0] as { count: number | string } | undefined;
-    const count = row ? Number(row.count) : 1;
+    return row ? Number(row.count) : 1;
+  },
+
+  async deleteExpired() {
+    await db.execute(sql`DELETE FROM rate_limits WHERE expires_at < now()`);
+  },
+};
+
+export async function checkDurableRateLimit(
+  {
+    scope,
+    key,
+    limit,
+    windowMs,
+    failureMode = "memory-fallback",
+  }: DurableRateLimitOptions,
+  dependencies: DurableRateLimitDependencies = {},
+): Promise<DurableRateLimitResult> {
+  const now = dependencies.now?.() ?? Date.now();
+  const windowStart = Math.floor(now / windowMs) * windowMs;
+  const windowEnd = windowStart + windowMs;
+  const bucketKey = `${scope}:${key}:${windowStart}`;
+  const expiresAtIso = new Date(windowEnd).toISOString();
+  const store = dependencies.store ?? postgresDurableRateLimitStore;
+
+  try {
+    // Atomic increment-and-read. INSERT seeds the window at 1; a concurrent
+    // request on the same key conflicts and bumps the existing count by 1.
+    const count = await store.increment({ bucketKey, expiresAtIso });
 
     // Opportunistic reap of expired windows — cheap (indexed) and rare.
     // Wrapped so a cleanup failure can never disturb the decision above.
-    if (Math.random() < DURABLE_CLEANUP_PROBABILITY) {
+    if (
+      (dependencies.random?.() ?? Math.random()) < DURABLE_CLEANUP_PROBABILITY
+    ) {
       try {
-        await db.execute(
-          sql`DELETE FROM rate_limits WHERE expires_at < now()`
-        );
+        await store.deleteExpired();
       } catch {
         // best-effort housekeeping only
       }
@@ -205,9 +245,22 @@ export async function checkDurableRateLimit({
       retryAfterMs: allowed ? 0 : Math.max(0, windowEnd - now),
     };
   } catch {
+    if (failureMode === "deny") {
+      return {
+        allowed: false,
+        remaining: 0,
+        retryAfterMs: Math.max(1, windowEnd - now),
+      };
+    }
+
     // DB unreachable / transient error → degrade to the per-instance limiter
-    // rather than failing the request. Best-effort cross-instance coverage.
-    const fallback = checkInMemoryRateLimit({ scope, key, max: limit, windowMs });
+    // for callers retaining the historical default behavior.
+    const fallback = checkInMemoryRateLimit({
+      scope,
+      key,
+      max: limit,
+      windowMs,
+    });
     return {
       allowed: fallback.allowed,
       remaining: fallback.remaining,

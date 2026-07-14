@@ -1065,3 +1065,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   strata, weights, or hashes.
 - The disabled private coding-workspace hash mismatch is PUL-043; never reseed
   or weaken the frozen release to hide it. Durable record: APR-D163.
+
+## 2026-07-13 — Admin identity and expiry live inside the signed session
+
+- `civica-admin-session/v1` signs the configured reviewer identity, issuance,
+  expiry, and a random session ID; each request verifies all four against the
+  signature, current server identity, fixed lifetime, and server time.
+- The legacy unsigned reviewer cookie is cleared and never trusted, and a
+  missing configured identity has no hardcoded production fallback.
+- Admin login consumes a durable cross-instance budget before parsing/KDF work
+  and denies access when that store is unavailable. Other rate-limit callers
+  keep their existing memory fallback. Durable record: APR-D164.

@@ -1061,3 +1061,19 @@ retained inputs make the historical calculation reproducible without Neon,
 while the separate live audit keeps real operational drift visible. A mismatch
 in the disabled private coding workspace remains a fail-closed repair task
 (PUL-043), not permission to reseed or weaken the checked release.
+
+### APR-D164 — Admin identity and expiry live inside the signed session
+
+**Decision:** Use `civica-admin-session/v1` for every admin session. Its HMAC-
+protected payload carries the server-configured reviewer identity, issued-at,
+expiry, and a random session ID; every request verifies the exact payload,
+signature, current configured identity, lifetime, and server time. Legacy
+unsigned reviewer state is cleared and never trusted. Password login consumes
+a durable cross-instance attempt budget before body parsing or password work,
+and this admin-only path denies access when the shared store is unavailable.
+
+**Why:** Cookie `Max-Age` is a browser instruction, not server-side expiry, and
+an unsigned cookie cannot establish an audit actor. A per-instance fallback
+also cannot preserve one login-attempt budget across serverless instances.
+Failing closed is appropriate at this authentication boundary while the shared
+limiter's historical memory fallback remains unchanged for other callers.
