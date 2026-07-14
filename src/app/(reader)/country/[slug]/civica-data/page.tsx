@@ -232,7 +232,10 @@ export default async function CountryCivicaDataTab({
   const hasGovernment = govStructure.offices.length > 0 && !!orgChart;
   const hasLegislature = !!legislatureData;
   const hasLeaders = leadersRows.length > 0;
-  const hasBills = !!billsResult && billsResult.rows.length > 0;
+  // A valid zero-row result is itself meaningful: the Bills section explains
+  // unsupported coverage instead of silently disappearing. A failed lookup
+  // remains hidden so an outage is never mislabeled as a coverage gap.
+  const hasBills = !!billsResult;
   const hasOrganizations = memberships.length > 0;
   const hasRankings = scoresRows.length > 0;
 

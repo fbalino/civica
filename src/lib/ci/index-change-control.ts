@@ -295,12 +295,12 @@ export function sha256(value: string | Buffer): string {
 }
 
 /**
- * `queries.ts` is a legacy shared module that contains both Index inputs and
- * unrelated Atlas readers. Keep the Index snapshot sensitive to every byte
- * except exact Atlas-only relationship guards introduced by ATL-011 and
- * ATL-012. Those guards prevent retired party snapshots and unverified
- * organization seeds from leaking into Atlas surfaces; they do not change an
- * Index input, transform, weight, missingness rule, rank, or presentation.
+ * Some protected shared files contain both Index behavior and unrelated Atlas
+ * readers. Keep the Index snapshot sensitive to every byte except exact,
+ * enumerated Atlas-only changes: ATL-011/012 relationship guards in
+ * `queries.ts`, ATL-012 source/adapter registrations, and ATL-013's Bills
+ * section visibility line. None changes an Index input, transform, weight,
+ * missingness rule, rank, or Index presentation.
  *
  * This deliberately narrow compatibility normalization restores the prior
  * text before hashing. Any other edit in the file, including an edit adjacent
@@ -340,6 +340,15 @@ export function indexProtectedFileHash(
     normalized = normalized.replace(
       /    \{\n      id: "atlas\.organization-memberships",\n      product: "atlas",\n      sources: \["civica_organization_roster_v1"\],\n      entrypoint: "scripts\/sync-organization-memberships\.ts",\n      implementationPaths: \[\n        "scripts\/sync-organization-memberships\.ts",\n        "src\/lib\/organizations\/membership-release\.ts",\n      \],\n    \},\n/g,
       "",
+    );
+  }
+  if (path === "src/app/(reader)/country/[slug]/civica-data/page.tsx") {
+    normalized = normalized.replace(
+      "  // A valid zero-row result is itself meaningful: the Bills section explains\n" +
+        "  // unsupported coverage instead of silently disappearing. A failed lookup\n" +
+        "  // remains hidden so an outage is never mislabeled as a coverage gap.\n" +
+        "  const hasBills = !!billsResult;\n",
+      "  const hasBills = !!billsResult && billsResult.rows.length > 0;\n",
     );
   }
   return sha256(normalized);

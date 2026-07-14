@@ -24,6 +24,11 @@
   the exact layout row — "reader page" without the shell name causes drift.
 - Prefer simple explanations because the user is non-technical.
 - When possible, verify visual changes locally before handing back URLs.
+- **Owner-retained experiments (2026-07-13):** keep the Uruguay, Ghana, and
+  Japan color-photo trials and the development typography tester in place;
+  do not delete, revert, stage, or fold them into unrelated task commits.
+  Prefer the in-Codex app browser for visual checks and use Playwright only as
+  a fallback when the in-app browser bridge is unavailable.
 - Keep Civica Index and atlas concerns separated clearly in routing and UI copy.
 - Mockups location (as of 05-14-2026, CIV-208): all new PM mockups go in
   `/Users/fernandobalino/Projects/civica/mockups`. Filenames MUST be prefixed

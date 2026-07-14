@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 303
-- **Completed:** 191
+- **Total tasks:** 304
+- **Completed:** 192
 - **Remaining:** 112
-- **Progress:** 63%
-- **Priority mix:** P0 187 · P1 111 · P2 5
+- **Progress:** 63.2%
+- **Priority mix:** P0 188 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -164,6 +164,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [x] **PUL-039** (P1) Prepare the independent-coder recruitment package before any human contact. _Done when: a role specification records required qualifications, blinding/independence and conflict rules, estimated packet workload and hours derived from the frozen evaluation sets, training and qualification steps, and compensation options with realistic cost ranges; candidate sourcing pools and draft outreach copy exist; the owner approval ask with a lead-time estimate is queued in `plan/MANUAL-CHECKS.md`; and no candidate has been contacted._
 - [ ] **PUL-040** (P1) Start the prospective shadow-period clock at the earliest protocol-valid date. _Done when: the preregistered protocol's start prerequisites are enumerated with current status, the earliest compliant start date is computed and recorded, pipeline and method versions for the window are frozen, window output retention is verified running before human labels exist, and the start decision is logged in evidence and `plan/PROGRESS.md`._
 - [x] **PUL-041** (P0) Materialize the remaining coder-ready evaluation packet releases. _Done when: the 384-item event-candidate census and 536-item system-negative draw exist as rights-safe unlabeled frozen packets with exact evidence/search context, packet/codebook/ontology hashes, analysis/reserve status, zero production/model/owner answer fields, workspace import support, and validators proving their counts and linkage to `pulse-evaluation-sampling-frame/v1` before recruitment or PUL-018 runs._
+- [ ] **PUL-042** (P0) Decouple frozen evaluation-packet validation from the mutable live candidate pool. _Done when: the build validates the checked packet manifest from retained frozen population inputs rather than reconstructing it from mutable production tables; post-freeze or late-arriving live rows cannot drift the frozen packet release; seeded frozen-input or manifest tampering fails; and a separate read-only live audit reports population differences without rewriting the preregistered release._
 
 ## Area 06 — Atlas Content and Research Features
 
@@ -181,7 +182,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [ ] **ATL-010** (P2) Build a world leaders directory only from verified office/person/tenure data. _Done when: search/filter/sort and profile links expose source/vintage and ambiguity, acting/interim/co-leadership states are correct, missing portraits do not imply missing data, and directory counts match a release query._
 - [x] **ATL-011** (P1) Audit political-party identity, seats, coalition, and ideology coverage before expanding the party browser. _Done when: every displayed attribute has source/vintage/license, party identity changes/splits are versioned, unknown ideology is not inferred, and any ideology visualization uses an adopted external methodology or remains absent._
 - [x] **ATL-012** (P1) Audit organizations and memberships as dated relationships rather than timeless facts. _Done when: membership type, start/end/status, disputed/observer cases, source/vintage, and organization identity are represented; UI/API/export fixtures cover current and historical memberships._
-- [ ] **ATL-013** (P1) Audit bills/legislative activity coverage and narrow claims to supported jurisdictions. _Done when: source, chamber, status taxonomy, date semantics, pagination, freshness, and jurisdiction coverage are published; unsupported countries render a coverage explanation rather than a misleading empty legislature._
+- [x] **ATL-013** (P1) Audit bills/legislative activity coverage and narrow claims to supported jurisdictions. _Done when: source, chamber, status taxonomy, date semantics, pagination, freshness, and jurisdiction coverage are published; unsupported countries render a coverage explanation rather than a misleading empty legislature._
 - [ ] **ATL-014** (P1) Refocus Compare around source-native institutional and indicator evidence. _Done when: comparison works without an Index score, aligns units/vintages/definitions, exposes provenance and missingness per side, supports stable share URLs/exports, and never ranks incomparable values silently._
 - [ ] **ATL-015** (P1) Refocus Atlas map layers around explicit source-native variables and experimental-layer labels. _Done when: every layer has source/vintage/legend/missing-data behavior, map and tabular values match, experimental Index/Pulse layers are separately labelled or absent, share URLs restore state, and keyboard/table alternatives work._
 - [ ] **ATL-016** (P1) Preserve Civica Conditions as separate contextual indicators rather than a hidden composite. _Done when: every condition retains native source/definition/unit/time, no headline combined score exists, country and comparison surfaces disclose mismatched vintages, and methodology/API docs match fixtures._

@@ -83,3 +83,26 @@ test("the Atlas-only organization adapter is excluded from Index semantic drift"
     sha256(priorRegistry),
   );
 });
+
+test("the Atlas-only Bills coverage state is excluded from Index semantic drift", () => {
+  const pagePath = "src/app/(reader)/country/[slug]/civica-data/page.tsx";
+  const currentPage = readFileSync(pagePath, "utf8");
+  const priorPage = currentPage.replace(
+    "  // A valid zero-row result is itself meaningful: the Bills section explains\n" +
+      "  // unsupported coverage instead of silently disappearing. A failed lookup\n" +
+      "  // remains hidden so an outage is never mislabeled as a coverage gap.\n" +
+      "  const hasBills = !!billsResult;\n",
+    "  const hasBills = !!billsResult && billsResult.rows.length > 0;\n",
+  );
+  assert.notEqual(currentPage, priorPage);
+  assert.equal(
+    indexProtectedFileHash(pagePath, currentPage),
+    sha256(priorPage),
+  );
+
+  const unrelatedEdit = `${currentPage}\n// unrelated protected presentation edit\n`;
+  assert.notEqual(
+    indexProtectedFileHash(pagePath, unrelatedEdit),
+    indexProtectedFileHash(pagePath, currentPage),
+  );
+});

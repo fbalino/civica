@@ -8,6 +8,7 @@ import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
   BILLS_SUPPORTED_JURISDICTION_NAMES,
+  billsCoverageMessage,
   isBillsSupportedSlug,
 } from "@/lib/bills/coverage";
 
@@ -139,7 +140,7 @@ export async function GET(
     totalTrackedForJurisdiction: totalCount,
     message: supported
       ? null
-      : `Civica's bills/legislative-activity pipeline currently covers six jurisdictions (${BILLS_SUPPORTED_JURISDICTION_NAMES.join(", ")}). ${result.jurisdiction.name} is not yet in that set — an empty list here reflects missing coverage, not an absence of legislative activity.`,
+      : billsCoverageMessage(result.jurisdiction.name),
   };
 
   return NextResponse.json({

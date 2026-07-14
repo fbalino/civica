@@ -1,0 +1,59 @@
+ATL-013 isolated verification — 2026-07-13
+
+Scope
+-----
+Detached worktree: /private/tmp/civica-atl013-verify-20260713
+Base commit: 2ebff59f (ATL-012)
+Applied changes: ATL-013 source/test diff only
+Environment: repository .env.local; clean npm ci dependency tree
+
+Focused verification
+--------------------
+PASS  exit 0  node --import tsx --test src/lib/bills/__tests__/atl-013-bills-coverage.test.ts src/lib/ci/index-change-control-nonsemantic.test.ts
+      17 tests passed; 0 failed.
+PASS  exit 0  npx tsc --noEmit
+PASS  exit 0  npm run validate:design-tokens
+      Zero new violations; 209 checked legacy-baseline violations remain.
+PASS  exit 0  npm run validate:source-coverage
+      All 14 operational domains closed.
+PASS  exit 0  git diff --check
+
+Repository-wide scoped verification
+-----------------------------------
+PASS  exit 0  npm test
+      1,361 tests; 1,358 passed; 0 failed; 3 skipped.
+PASS  exit 0  npm run validate:index-change-control
+      Contract v28; 108 protected files.
+PASS  exit 0  npm run validate:claims-docs
+      All aggregate claim/documentation gates passed, including the clean
+      route inventory (100 registered / 100 discovered) and unit suite.
+PASS  exit 0  npx next build
+      Next.js 16.2.7 compiled, type-checked, generated 108/108 static pages,
+      and finalized successfully.
+
+Aggregate build finding outside ATL-013
+---------------------------------------
+FAIL  exit 1  npm run build
+      The ATL-013 code compiled successfully, but the earlier
+      validate:pulse-evaluation-packets build step failed with:
+
+        checked packet manifest drifted from the frozen database frame
+
+      The mutable live Pulse candidate pool now reports non_governance
+      population/draw 97/53 instead of frozen 140/77 and pending 881/483
+      instead of frozen 838/459. Refreshing the preregistered packet would
+      destroy the freeze, so no artifact was regenerated. PUL-042 records the
+      separate repair: validate the release from retained frozen inputs and
+      report live drift independently.
+
+Dirty-worktree cross-check
+--------------------------
+The ordinary worktree's full suite/claims aggregate reported only the two
+owner-confirmed experimental lanes that were deliberately excluded here:
+
+1. the typography tester's local font route is not yet in the production
+   route registry; and
+2. the Uruguay/Ghana/Japan photo trial touches the Index-protected country
+   header presentation.
+
+Neither experiment was edited, staged, or removed for ATL-013.
