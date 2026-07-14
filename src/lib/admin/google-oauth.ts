@@ -8,7 +8,7 @@
  * single-owner admin session. A successful Google sign-in must resolve to
  * an email that exactly matches `ADMIN_GOOGLE_EMAIL` and that Google
  * reports as verified — anything else fails closed. On success the caller
- * issues the normal admin session cookies via `buildAdminCookieHeaders`.
+ * issues the normal admin session cookies via `mintAdminSessionCookie`.
  */
 
 const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";

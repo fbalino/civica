@@ -129,6 +129,18 @@ activates only the checked release and preserves ECOWAS withdrawals as dated
 history. Recovery uses an isolated pre-change backup or reviewed forward
 compensation rather than deleting retained rows.
 
+`0033_flat_hardball` adds the append-only, no-truncate PLT-009 owner-admin security
+boundary: durable logout tombstones store only domain-separated session-ID
+hashes, and a common mutation ledger records bounded request, actor, action,
+target, time, and result events without credentials, raw session IDs, request
+bodies, IP addresses, or unbounded errors. Existing signed sessions remain
+valid until expiry or explicit logout; no historical mutation or revocation
+rows are invented. If old application code must be restored, rotate
+`ADMIN_SESSION_SECRET` so it cannot ignore retained tombstones and revive a
+copied cookie. Recovery otherwise uses an isolated pre-change backup or a
+reviewed forward compensation; never delete the security ledger as an
+ordinary rollback.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

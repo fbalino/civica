@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 305
-- **Completed:** 196
-- **Remaining:** 109
-- **Progress:** 64.3%
+- **Completed:** 197
+- **Remaining:** 108
+- **Progress:** 64.6%
 - **Priority mix:** P0 189 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -264,7 +264,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [x] **PLT-006** (P0) Validate environment configuration by execution context. _Done when: build, dev, tests, scripts, cron, admin, chat, and production startup fail early with clear messages for required missing/invalid variables; optional variables degrade explicitly; secrets are never echoed._
 - [x] **PLT-007** (P0) Add secret and sensitive-artifact scanning. _Done when: CI and pre-release scans cover repository history/current tree, logs/evidence, `.orchestrator`, plan artifacts, source snapshots, env files, and build output; seeded keys/dumps fail and documented false positives are narrowly allowlisted._
 - [x] **PLT-008** (P0) Inventory every route handler by exposure, mutation, data sensitivity, auth, rate limit, cache, input schema, and version. _Done when: all public/admin/cron/internal/embed/export/chat routes are registered; an unregistered route fails CI; the inventory flags mutable or sensitive endpoints without explicit controls._
-- [ ] **PLT-009** (P0) Consolidate and test admin authentication/authorization and audit identity. _Done when: all admin mutations use one reviewed timing-safe auth/session layer, CSRF/cookie/bearer behavior is documented, reviewer identity is sanitized/capped, brute-force/session expiry/logout tests pass, and audit rows identify actor/action/target/time/result._
+- [x] **PLT-009** (P0) Consolidate and test admin authentication/authorization and audit identity. _Done when: all admin mutations use one reviewed timing-safe auth/session layer, CSRF/cookie/bearer behavior is documented, reviewer identity is sanitized/capped, brute-force/session expiry/logout tests pass, and audit rows identify actor/action/target/time/result._
 - [ ] **PLT-010** (P0) Make cron endpoints authenticated, idempotent, concurrency-safe, and success-honest. _Done when: missing/wrong secrets fail closed consistently, duplicate/concurrent deliveries cannot duplicate effects, partial failures do not claim success/freshness, retries are safe, and integration fixtures cover each scheduled route._
 - [ ] **PLT-011** (P1) Replace process-local rate limiting where it is relied upon for production protection. _Done when: a documented distributed or platform-enforced policy covers expensive public APIs, exports, chat, forms, admin login, embeds, and mutation endpoints; multi-instance tests enforce limits and trusted proxy/IP handling is correct._
 - [ ] **PLT-012** (P0) Standardize request validation, output shaping, HTML/content sanitization, and error responses. _Done when: every registered endpoint has a schema or explicit no-input contract, internal fields cannot leak through object spreading, untrusted HTML is sanitized at a documented boundary, errors use stable safe shapes, and fuzz/negative fixtures pass._

@@ -39,7 +39,9 @@ import {
   disputeLoserId,
   OPEN_DISPUTE_STATUSES,
 } from "@/lib/factbook/reconcile/dispute-resolution";
-import { getAdminSession } from "@/lib/admin/session";
+import { withAdminMutation } from "@/lib/admin/mutation";
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import type { AdminSession } from "@/lib/admin/session";
 import {
   snapshotDispute,
   writeDisputeAuditLog,
@@ -90,16 +92,11 @@ async function readBody(
   return { isForm: false, body: json };
 }
 
-export async function POST(
+async function mutateDataDispute(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { id } = await params;
   const { body, isForm } = await readBody(request);
 
   if (!VALID_ACTIONS.has(body.action)) {
@@ -160,7 +157,10 @@ export async function POST(
     });
 
     if (isForm) {
-      const redirect = body.redirect ?? `/admin/data-disputes/${id}`;
+      const redirect = safeInternalPathOr(
+        body.redirect,
+        `/admin/data-disputes/${id}`,
+      );
       return NextResponse.redirect(new URL(redirect, request.url), 303);
     }
     return NextResponse.json({
@@ -287,7 +287,10 @@ export async function POST(
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? `/admin/data-disputes/${id}`;
+    const redirect = safeInternalPathOr(
+      body.redirect,
+      `/admin/data-disputes/${id}`,
+    );
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({
@@ -298,4 +301,21 @@ export async function POST(
     resolvedAt: now.toISOString(),
     demotedFactIds: demotedCount,
   });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/data-disputes/[id]",
+      action: "data_dispute.review",
+      targetType: "data_dispute",
+      targetId: id,
+    },
+    (auth) => mutateDataDispute(request, id, auth),
+  );
 }

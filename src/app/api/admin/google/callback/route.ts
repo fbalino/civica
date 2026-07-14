@@ -5,7 +5,7 @@
  * the authorization code for a Google access token, fetches the account's
  * email, and — ONLY when it exactly matches ADMIN_GOOGLE_EMAIL and Google
  * reports it verified — issues the same admin session cookies the
- * password flow uses (buildAdminCookieHeaders). Any mismatch, missing
+ * password flow uses (mintAdminSessionCookie). Any mismatch, missing
  * config, or malformed callback fails closed to /admin/sign-in?error=google.
  */
 
@@ -21,9 +21,10 @@ import {
   GOOGLE_REDIRECT_COOKIE,
 } from "@/lib/admin/google-oauth";
 import {
-  buildAdminCookieHeaders,
   isAdminSessionConfigured,
+  mintAdminSessionCookie,
 } from "@/lib/admin/session";
+import { recordAdminLoginAudit } from "@/lib/admin/mutation-audit";
 
 function clearOAuthCookieHeaders(): Array<[string, string]> {
   return [
@@ -77,11 +78,30 @@ export async function GET(request: NextRequest) {
     return res;
   }
 
+  const minted = mintAdminSessionCookie();
+  try {
+    await recordAdminLoginAudit({
+      session: minted.session,
+      route: "/api/admin/google/callback",
+      actorSource: "google_login",
+    });
+  } catch (error) {
+    console.error("[admin/google/callback] login audit failed", error);
+    const res = new NextResponse("Admin audit is temporarily unavailable", {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    });
+    for (const [name, value] of clearOAuthCookieHeaders()) {
+      res.headers.append(name, value);
+    }
+    return res;
+  }
+
   const res = NextResponse.redirect(new URL(redirectPath, request.url), 303);
   for (const [name, value] of clearOAuthCookieHeaders()) {
     res.headers.append(name, value);
   }
-  for (const [name, value] of buildAdminCookieHeaders()) {
+  for (const [name, value] of minted.headers) {
     res.headers.append(name, value);
   }
   return res;

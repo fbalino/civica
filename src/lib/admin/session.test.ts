@@ -8,8 +8,8 @@ import {
   ADMIN_SESSION_TTL_SECONDS,
   ADMIN_SESSION_VERSION,
   adminReviewerName,
-  buildAdminCookieHeaders,
   isAdminSessionConfigured,
+  mintAdminSessionCookie,
   sanitizeReviewerName,
   verifyAdminUsername,
   verifySessionCookie,
@@ -66,7 +66,7 @@ function mintCookieValue(
   options?: Parameters<typeof withAdminEnv>[1],
 ): string {
   return withAdminEnv(
-    () => cookieValueFromHeaders(buildAdminCookieHeaders(nowMs)),
+    () => cookieValueFromHeaders(mintAdminSessionCookie(nowMs).headers),
     options,
   );
 }
@@ -150,7 +150,7 @@ test("production identity fails closed with no hardcoded default", () => {
       assert.equal(adminReviewerName(), null);
       assert.equal(isAdminSessionConfigured(), false);
       assert.throws(
-        () => buildAdminCookieHeaders(FIXED_NOW_MS),
+        () => mintAdminSessionCookie(FIXED_NOW_MS),
         /identity or signing secret is not configured/,
       );
     },
@@ -275,7 +275,7 @@ test("session time inputs fail closed outside JavaScript's safe range", () => {
   });
   withAdminEnv(() =>
     assert.throws(
-      () => buildAdminCookieHeaders(Number.MAX_VALUE),
+      () => mintAdminSessionCookie(Number.MAX_VALUE),
       /issuance time is outside the safe range/,
     ),
   );
@@ -314,7 +314,9 @@ test("verification fails closed when no signing secret is supplied", () => {
 });
 
 test("issued cookies align browser Max-Age and clear legacy reviewer state", () => {
-  const headers = withAdminEnv(() => buildAdminCookieHeaders(FIXED_NOW_MS));
+  const headers = withAdminEnv(
+    () => mintAdminSessionCookie(FIXED_NOW_MS).headers,
+  );
   assert.match(
     headers[0][1],
     new RegExp(`Max-Age=${ADMIN_SESSION_TTL_SECONDS}`),

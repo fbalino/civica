@@ -1,6 +1,7 @@
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminSession } from "@/lib/admin/session";
+import { withAdminMutation } from "@/lib/admin/mutation";
+import type { AdminSession } from "@/lib/admin/session";
 import {
   PULSE_REVIEW_EXCEPTION_REASONS,
   grantPulseReviewException,
@@ -16,15 +17,11 @@ function utcDate(value: string): Date {
   return new Date(explicitOffset ? value : `${value}Z`);
 }
 
-export async function POST(
+async function mutatePulseReviewException(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const { id } = await params;
   const form = await request.formData();
   const reason = String(form.get("reason") ?? "") as PulseReviewExceptionReason;
   const note = String(form.get("note") ?? "");
@@ -62,5 +59,22 @@ export async function POST(
   return NextResponse.redirect(
     new URL(safeRedirect(String(form.get("redirect") ?? ""), id), request.url),
     303,
+  );
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/pulse-review/[id]/exception",
+      action: "pulse_review_exception.grant",
+      targetType: "pulse_event",
+      targetId: id,
+    },
+    (auth) => mutatePulseReviewException(request, id, auth),
   );
 }

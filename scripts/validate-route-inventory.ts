@@ -109,7 +109,8 @@ export interface ScannedControls {
  *  bare `.parse(` (e.g. `JSON.parse`) is not reliably "real" validation. */
 export function scanControlMarkers(source: string): ScannedControls {
   return {
-    adminSession: /getAdminSession|requireAdminSession|admin\/session/.test(source),
+    adminSession:
+      /getAdminSession|requireAdminSession|withAdminMutation|withAdminLogout|admin\/session/.test(source),
     cronAuth: /CRON_SECRET|requireCronAuth|verifyCronSecret/.test(source),
     rateLimit: /RateLimit|rate-limit|rate_limit/.test(source),
     inputValidationMarker: /\bz\.|from ["']zod["']|\.parse\(|\.safeParse\(/.test(source),
@@ -210,7 +211,7 @@ async function main(): Promise<void> {
     const registryClaimsCron = entry.controls.includes("cron-secret");
     if (registryClaimsAdmin && !markers.adminSession) {
       report.warnings.push(
-        `[control-scan] ${entry.filePath}: registry declares admin-session but no getAdminSession()-style marker was found in source`,
+        `[control-scan] ${entry.filePath}: registry declares admin-session but no direct/shared owner-session marker was found in source`,
       );
     }
     if (registryClaimsCron && !markers.cronAuth) {

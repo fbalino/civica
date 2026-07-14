@@ -1,9 +1,189 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-13T04:21:33.828Z",
-  "sha256": "7253b6ca45e88d1c358d62a832c359c9066a25775e43db1e911de8501a6b6c4f",
+  "generatedAt": "2026-07-14T05:46:13.095Z",
+  "sha256": "70f1f2e50aaf74a6b7b126a11fe93b5481d39cd1eafff9de60ea2ccad88a7df4",
   "schema": {
     "columns": [
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "admin_mutation_audit_log",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "request_id",
+        "type": "uuid",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "event",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "route",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "method",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "actor_id",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "actor_source",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "session_key",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "action",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "target_type",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "target_id",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "result",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "int4",
+        "name": "http_status",
+        "type": "integer",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "reason_code",
+        "type": "text",
+        "table": "admin_mutation_audit_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "timestamptz",
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "table": "admin_mutation_audit_log",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "session_key",
+        "type": "text",
+        "table": "admin_session_revocations",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "reviewer_id",
+        "type": "text",
+        "table": "admin_session_revocations",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "timestamptz",
+        "name": "issued_at",
+        "type": "timestamp with time zone",
+        "table": "admin_session_revocations",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "timestamptz",
+        "name": "expires_at",
+        "type": "timestamp with time zone",
+        "table": "admin_session_revocations",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "timestamptz",
+        "name": "revoked_at",
+        "type": "timestamp with time zone",
+        "table": "admin_session_revocations",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 5
+      },
       {
         "udt": "uuid",
         "name": "id",
@@ -10618,6 +10798,41 @@
     ],
     "indexes": [
       {
+        "name": "admin_mutation_audit_log_pkey",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE UNIQUE INDEX admin_mutation_audit_log_pkey ON public.admin_mutation_audit_log USING btree (id)"
+      },
+      {
+        "name": "idx_admin_mutation_audit_actor_date",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE INDEX idx_admin_mutation_audit_actor_date ON public.admin_mutation_audit_log USING btree (actor_id, created_at)"
+      },
+      {
+        "name": "idx_admin_mutation_audit_request_event",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE UNIQUE INDEX idx_admin_mutation_audit_request_event ON public.admin_mutation_audit_log USING btree (request_id, event)"
+      },
+      {
+        "name": "idx_admin_mutation_audit_session_date",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE INDEX idx_admin_mutation_audit_session_date ON public.admin_mutation_audit_log USING btree (session_key, created_at)"
+      },
+      {
+        "name": "idx_admin_mutation_audit_target_date",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE INDEX idx_admin_mutation_audit_target_date ON public.admin_mutation_audit_log USING btree (target_type, target_id, created_at)"
+      },
+      {
+        "name": "admin_session_revocations_pkey",
+        "table": "admin_session_revocations",
+        "definition": "CREATE UNIQUE INDEX admin_session_revocations_pkey ON public.admin_session_revocations USING btree (session_key)"
+      },
+      {
+        "name": "idx_admin_session_revocations_expires_at",
+        "table": "admin_session_revocations",
+        "definition": "CREATE INDEX idx_admin_session_revocations_expires_at ON public.admin_session_revocations USING btree (expires_at)"
+      },
+      {
         "name": "advisory_applications_pkey",
         "table": "advisory_applications",
         "definition": "CREATE UNIQUE INDEX advisory_applications_pkey ON public.advisory_applications USING btree (id)"
@@ -12045,6 +12260,11 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_pulse_coding_has_forbidden_field(payload jsonb)\n RETURNS boolean\n LANGUAGE sql\n IMMUTABLE\nAS $function$\n  WITH RECURSIVE walk(value) AS (\n    SELECT COALESCE(payload, 'null'::jsonb)\n    UNION ALL\n    SELECT child.value\n    FROM walk\n    CROSS JOIN LATERAL (\n      SELECT entry.value\n      FROM jsonb_each(\n        CASE WHEN jsonb_typeof(walk.value) = 'object'\n          THEN walk.value ELSE '{}'::jsonb END\n      ) AS entry\n      UNION ALL\n      SELECT element.value\n      FROM jsonb_array_elements(\n        CASE WHEN jsonb_typeof(walk.value) = 'array'\n          THEN walk.value ELSE '[]'::jsonb END\n      ) AS element(value)\n    ) AS child\n  )\n  SELECT EXISTS (\n    SELECT 1\n    FROM walk\n    CROSS JOIN LATERAL jsonb_object_keys(\n      CASE WHEN jsonb_typeof(walk.value) = 'object'\n        THEN walk.value ELSE '{}'::jsonb END\n    ) AS object_key(key)\n    WHERE object_key.key IN (\n      'productionLabel', 'productionDisposition', 'publishedStatus',\n      'modelVote', 'modelConfidence', 'ownerApproval',\n      'otherCoderSubmission', 'adjudicatedAnswer', 'goldLabel', 'truth'\n    )\n  );\n$function$\n"
       },
       {
+        "name": "civica_reject_admin_security_evidence_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_admin_security_evidence_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION '% is append-only', TG_TABLE_NAME;\nEND;\n$function$\n"
+      },
+      {
         "name": "civica_reject_frozen_vintage_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_reject_frozen_vintage_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' OR OLD.vintage_label IS NOT NULL THEN\n    RAISE EXCEPTION 'frozen vintage % is immutable; publish a new superseding version', OLD.vintage_label;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
@@ -12346,6 +12566,26 @@
       }
     ],
     "triggers": [
+      {
+        "name": "admin_mutation_audit_log_append_only",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE TRIGGER admin_mutation_audit_log_append_only BEFORE DELETE OR UPDATE ON admin_mutation_audit_log FOR EACH ROW EXECUTE FUNCTION civica_reject_admin_security_evidence_mutation()"
+      },
+      {
+        "name": "admin_mutation_audit_log_no_truncate",
+        "table": "admin_mutation_audit_log",
+        "definition": "CREATE TRIGGER admin_mutation_audit_log_no_truncate BEFORE TRUNCATE ON admin_mutation_audit_log FOR EACH STATEMENT EXECUTE FUNCTION civica_reject_admin_security_evidence_mutation()"
+      },
+      {
+        "name": "admin_session_revocations_append_only",
+        "table": "admin_session_revocations",
+        "definition": "CREATE TRIGGER admin_session_revocations_append_only BEFORE DELETE OR UPDATE ON admin_session_revocations FOR EACH ROW EXECUTE FUNCTION civica_reject_admin_security_evidence_mutation()"
+      },
+      {
+        "name": "admin_session_revocations_no_truncate",
+        "table": "admin_session_revocations",
+        "definition": "CREATE TRIGGER admin_session_revocations_no_truncate BEFORE TRUNCATE ON admin_session_revocations FOR EACH STATEMENT EXECUTE FUNCTION civica_reject_admin_security_evidence_mutation()"
+      },
       {
         "name": "dat_016_retain_mutation",
         "table": "backtest_cases",
@@ -12748,6 +12988,16 @@
       }
     ],
     "relations": [
+      {
+        "kind": "r",
+        "name": "admin_mutation_audit_log",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "admin_session_revocations",
+        "definition": null
+      },
       {
         "kind": "r",
         "name": "advisory_applications",
@@ -13165,6 +13415,78 @@
       }
     ],
     "constraints": [
+      {
+        "name": "admin_mutation_audit_actor_check",
+        "type": "c",
+        "table": "admin_mutation_audit_log",
+        "definition": "CHECK (length(actor_id) >= 1 AND length(actor_id) <= 80 AND actor_id ~ '^[a-zA-Z0-9 _.\\-]+$'::text AND (actor_source = ANY (ARRAY['admin_session'::text, 'password_login'::text, 'google_login'::text])))"
+      },
+      {
+        "name": "admin_mutation_audit_descriptor_check",
+        "type": "c",
+        "table": "admin_mutation_audit_log",
+        "definition": "CHECK (length(route) >= 1 AND length(route) <= 160 AND \"left\"(route, 1) = '/'::text AND length(action) >= 1 AND length(action) <= 80 AND action ~ '^[a-z][a-z0-9_.-]*$'::text AND length(target_type) >= 1 AND length(target_type) <= 80 AND target_type ~ '^[a-z][a-z0-9_.-]*$'::text AND length(target_id) >= 1 AND length(target_id) <= 160)"
+      },
+      {
+        "name": "admin_mutation_audit_event_result_check",
+        "type": "c",
+        "table": "admin_mutation_audit_log",
+        "definition": "CHECK (event = 'attempt'::text AND result = 'attempted'::text AND http_status IS NULL OR event = 'outcome'::text AND (result = ANY (ARRAY['succeeded'::text, 'rejected'::text, 'failed'::text])) AND http_status >= 100 AND http_status <= 599)"
+      },
+      {
+        "name": "admin_mutation_audit_log_pkey",
+        "type": "p",
+        "table": "admin_mutation_audit_log",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "admin_mutation_audit_method_check",
+        "type": "c",
+        "table": "admin_mutation_audit_log",
+        "definition": "CHECK (method = ANY (ARRAY['GET'::text, 'POST'::text, 'PUT'::text, 'PATCH'::text, 'DELETE'::text]))"
+      },
+      {
+        "name": "admin_mutation_audit_reason_check",
+        "type": "c",
+        "table": "admin_mutation_audit_log",
+        "definition": "CHECK (reason_code IS NULL OR length(reason_code) >= 1 AND length(reason_code) <= 80 AND reason_code ~ '^[a-z][a-z0-9_.-]*$'::text)"
+      },
+      {
+        "name": "admin_mutation_audit_session_key_check",
+        "type": "c",
+        "table": "admin_mutation_audit_log",
+        "definition": "CHECK (session_key ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "admin_session_revocations_key_check",
+        "type": "c",
+        "table": "admin_session_revocations",
+        "definition": "CHECK (session_key ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "admin_session_revocations_lifetime_check",
+        "type": "c",
+        "table": "admin_session_revocations",
+        "definition": "CHECK (expires_at = (issued_at + '7 days'::interval))"
+      },
+      {
+        "name": "admin_session_revocations_pkey",
+        "type": "p",
+        "table": "admin_session_revocations",
+        "definition": "PRIMARY KEY (session_key)"
+      },
+      {
+        "name": "admin_session_revocations_reviewer_check",
+        "type": "c",
+        "table": "admin_session_revocations",
+        "definition": "CHECK (length(reviewer_id) >= 1 AND length(reviewer_id) <= 80 AND reviewer_id ~ '^[a-zA-Z0-9 _.\\-]+$'::text)"
+      },
+      {
+        "name": "admin_session_revocations_time_order_check",
+        "type": "c",
+        "table": "admin_session_revocations",
+        "definition": "CHECK (revoked_at >= (issued_at - '00:01:00'::interval) AND revoked_at < expires_at)"
+      },
       {
         "name": "advisory_applications_pkey",
         "type": "p",

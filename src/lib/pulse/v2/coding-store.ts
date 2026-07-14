@@ -715,6 +715,8 @@ export async function recordPulseCodingAdjudication(input: {
 
 export async function issuePulseCodingParticipant(input: {
   actorId: string;
+  /** Optional preallocated ID lets the owner-admin audit name the exact target. */
+  participantId?: string;
   studyId: string;
   pseudonym: string;
   slot: "coder_a" | "coder_b" | "adjudicator";
@@ -728,7 +730,7 @@ export async function issuePulseCodingParticipant(input: {
     throw new Error("Agent participants are permanently non-gold");
   const accessCode = `pc_${randomBytes(32).toString("base64url")}`;
   const credentialHash = pulseCodingAccessCodeHash(accessCode);
-  const participantId = randomUUID();
+  const participantId = input.participantId ?? randomUUID();
   const [studies, packets] = await Promise.all([
     db
       .select({ id: pulseCodingStudies.id })

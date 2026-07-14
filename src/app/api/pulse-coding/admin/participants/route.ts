@@ -1,15 +1,23 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminSession } from "@/lib/admin/session";
+import { withAdminMutation } from "@/lib/admin/mutation";
+import type { AdminSession } from "@/lib/admin/session";
 import { issuePulseCodingParticipant } from "@/lib/pulse/v2/coding-store";
 
 const SLOTS = new Set(["coder_a", "coder_b", "adjudicator"]);
 const ACTOR_TYPES = new Set(["qualified_human", "agent_dry_pilot"]);
 const USE_STATUSES = new Set(["evaluation_candidate", "dry_run_not_gold"]);
+const EXPECTED_ISSUANCE_ERRORS = new Set([
+  "Agent participants are permanently non-gold",
+  "Pulse coding study not found",
+  "Pulse coding study has no packets",
+]);
 
-export async function POST(request: NextRequest) {
-  const admin = await getAdminSession();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+async function issueParticipant(
+  request: NextRequest,
+  admin: AdminSession,
+  participantId: string,
+) {
   const body = (await request.json()) as Record<string, unknown>;
   const studyId = String(body.studyId ?? "");
   const pseudonym = String(body.pseudonym ?? "").trim().slice(0, 80);
@@ -36,14 +44,35 @@ export async function POST(request: NextRequest) {
       useStatus: useStatus as "evaluation_candidate" | "dry_run_not_gold",
       expiresAt: null,
       requestId: randomUUID(),
+      participantId,
     });
     return NextResponse.json(result, {
       headers: { "cache-control": "no-store" },
     });
   } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !EXPECTED_ISSUANCE_ERRORS.has(error.message)
+    ) {
+      throw error;
+    }
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Access could not be issued" },
+      { error: error.message },
       { status: 409 },
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  const participantId = randomUUID();
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/pulse-coding/admin/participants",
+      action: "pulse_coding_participant.issue",
+      targetType: "pulse_coding_participant",
+      targetId: participantId,
+    },
+    (admin) => issueParticipant(request, admin, participantId),
+  );
 }

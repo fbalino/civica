@@ -10,8 +10,10 @@
  * cryptographically random session ID. The HMAC covers both the outer format
  * version and the payload. Verification checks the signature, payload schema,
  * configured identity, issued-at boundary, fixed seven-day lifetime, expiry,
- * and session-ID shape on every request. Browser Max-Age is only a client-side
- * convenience; it is never the authority for session expiry.
+ * and session-ID shape on every request. Otherwise-valid sessions are then
+ * denied when their domain-separated ID hash appears in the durable logout
+ * tombstone table. Browser Max-Age is only a client-side convenience; it is
+ * never the authority for session expiry.
  *
  * The legacy `civica_admin_reviewer` cookie is cleared when a new session is
  * issued and is never read. Audit identity comes only from the signed payload
@@ -21,6 +23,11 @@
 
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import {
+  databaseAdminSessionRevocationStore,
+  isAdminSessionRevoked,
+  type AdminSessionRevocationStore,
+} from "./session-revocation-store";
 
 export const ADMIN_SESSION_COOKIE = "civica_admin_session";
 /** Retained only so existing browsers can have the obsolete cookie cleared. */
@@ -52,6 +59,11 @@ export interface AdminSession {
 export interface SessionCookieVerification {
   valid: boolean;
   session: AdminSession | null;
+}
+
+export interface MintedAdminSessionCookie {
+  session: AdminSession;
+  headers: Array<[string, string]>;
 }
 
 function invalidSession(): SessionCookieVerification {
@@ -186,10 +198,11 @@ function parsePayload(encoded: string): AdminSession | null {
  * Pure parse, signature, payload, identity, and time verification. `nowMs` is
  * injectable so expiry and issued-at boundaries have deterministic tests.
  */
-export function verifySessionCookie(
+function verifySessionCookieEnvelope(
   cookieValue: string | null | undefined,
   secret: string | null | undefined,
-  nowMs = Date.now(),
+  nowMs: number,
+  bindConfiguredIdentity: boolean,
 ): SessionCookieVerification {
   if (!secret || !cookieValue || !Number.isFinite(nowMs) || nowMs < 0) {
     return invalidSession();
@@ -212,9 +225,11 @@ export function verifySessionCookie(
   const session = parsePayload(encodedPayload);
   if (!session) return invalidSession();
 
-  const expectedIdentity = adminReviewerName();
-  if (!expectedIdentity || !safeEqual(session.reviewerId, expectedIdentity)) {
-    return invalidSession();
+  if (bindConfiguredIdentity) {
+    const expectedIdentity = adminReviewerName();
+    if (!expectedIdentity || !safeEqual(session.reviewerId, expectedIdentity)) {
+      return invalidSession();
+    }
   }
 
   const nowSeconds = Math.floor(nowMs / 1000);
@@ -229,6 +244,44 @@ export function verifySessionCookie(
   return { valid: true, session };
 }
 
+export function verifySessionCookie(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+  nowMs = Date.now(),
+): SessionCookieVerification {
+  return verifySessionCookieEnvelope(cookieValue, secret, nowMs, true);
+}
+
+/**
+ * Verify cryptography, payload shape, and lifetime, then fail closed against
+ * the durable logout denylist. Invalid envelopes never touch the store.
+ */
+export async function verifyActiveSessionCookie(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+  nowMs = Date.now(),
+  revocations: AdminSessionRevocationStore = databaseAdminSessionRevocationStore,
+): Promise<SessionCookieVerification> {
+  const verification = verifySessionCookie(cookieValue, secret, nowMs);
+  if (!verification.valid || !verification.session) return verification;
+  if (await isAdminSessionRevoked(verification.session, revocations)) {
+    return invalidSession();
+  }
+  return verification;
+}
+
+/**
+ * Logout needs the signed actor/session even when the configured display name
+ * changed after issuance. It still enforces signature, schema, and expiry.
+ */
+export function verifySessionCookieForLogout(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+  nowMs = Date.now(),
+): SessionCookieVerification {
+  return verifySessionCookieEnvelope(cookieValue, secret, nowMs, false);
+}
+
 /** Read and validate the admin session cookie against current server state. */
 export async function getAdminSession(): Promise<AdminSession | null> {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -236,7 +289,17 @@ export async function getAdminSession(): Promise<AdminSession | null> {
 
   const cookieJar = await cookies();
   const cookieValue = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
-  const result = verifySessionCookie(cookieValue, secret);
+  const result = await verifyActiveSessionCookie(cookieValue, secret);
+  return result.valid ? result.session : null;
+}
+
+/** Read a still-valid signed envelope for idempotent server-side logout. */
+export async function getAdminSessionForLogout(): Promise<AdminSession | null> {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) return null;
+  const cookieJar = await cookies();
+  const cookieValue = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
+  const result = verifySessionCookieForLogout(cookieValue, secret);
   return result.valid ? result.session : null;
 }
 
@@ -244,9 +307,9 @@ export async function getAdminSession(): Promise<AdminSession | null> {
  * Mint a fresh signed v1 session. Identity is always derived inside this
  * function from server configuration; callers cannot supply an audit actor.
  */
-export function buildAdminCookieHeaders(
+export function mintAdminSessionCookie(
   nowMs = Date.now(),
-): Array<[string, string]> {
+): MintedAdminSessionCookie {
   const secret = process.env.ADMIN_SESSION_SECRET;
   const reviewerId = adminReviewerName();
   if (!secret || !reviewerId || !Number.isFinite(nowMs) || nowMs < 0) {
@@ -278,13 +341,16 @@ export function buildAdminCookieHeaders(
   const common = `Path=/; HttpOnly; SameSite=Lax; Max-Age=${ADMIN_SESSION_TTL_SECONDS}`;
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
   const clearLegacy = `Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`;
-  return [
-    [
-      "Set-Cookie",
-      `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(sessionValue)}; ${common}${secure}`,
+  return {
+    session: payload,
+    headers: [
+      [
+        "Set-Cookie",
+        `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(sessionValue)}; ${common}${secure}`,
+      ],
+      ["Set-Cookie", `${ADMIN_REVIEWER_COOKIE}=; ${clearLegacy}`],
     ],
-    ["Set-Cookie", `${ADMIN_REVIEWER_COOKIE}=; ${clearLegacy}`],
-  ];
+  };
 }
 
 export function buildAdminClearCookieHeaders(): Array<[string, string]> {

@@ -3680,6 +3680,128 @@ export const pulseCorrections = pgTable("pulse_corrections", {
   internalNotes: text("internal_notes"),
 });
 
+// --- Admin authentication and mutation audit ---
+
+/**
+ * PLT-009 durable logout tombstones.
+ *
+ * The browser cookie carries a random signed session ID. Only a
+ * domain-separated SHA-256 digest of that ID reaches this table, so the
+ * revocation store cannot be used to reconstruct a bearer credential. A
+ * matching row makes the cookie invalid until its signed expiry. Rows are
+ * intentionally retained as security evidence; no request path updates or
+ * deletes them.
+ */
+export const adminSessionRevocations = pgTable(
+  "admin_session_revocations",
+  {
+    sessionKey: text("session_key").primaryKey(),
+    reviewerId: text("reviewer_id").notNull(),
+    issuedAt: timestamp("issued_at", { withTimezone: true }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("idx_admin_session_revocations_expires_at").on(table.expiresAt),
+    check(
+      "admin_session_revocations_key_check",
+      dsql`${table.sessionKey} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "admin_session_revocations_reviewer_check",
+      dsql`length(${table.reviewerId}) BETWEEN 1 AND 80 AND ${table.reviewerId} ~ '^[a-zA-Z0-9 _.\\-]+$'`,
+    ),
+    check(
+      "admin_session_revocations_lifetime_check",
+      dsql`${table.expiresAt} = ${table.issuedAt} + interval '7 days'`,
+    ),
+    check(
+      "admin_session_revocations_time_order_check",
+      dsql`${table.revokedAt} >= ${table.issuedAt} - interval '60 seconds' AND ${table.revokedAt} < ${table.expiresAt}`,
+    ),
+  ],
+);
+
+/**
+ * PLT-009 common admin mutation ledger.
+ *
+ * Every authenticated mutation records a bounded attempt before business
+ * work and normally a terminal outcome afterwards. If the outcome insert is
+ * unavailable after business work completes, the durable `attempted` result
+ * marks an interrupted audit lifecycle without inviting a duplicate retry.
+ * Authentication bootstrap and logout record terminal outcomes directly. The
+ * migration installs append-only and no-truncate triggers so
+ * actor/action/target/time/result evidence cannot be rewritten or removed
+ * through ordinary application credentials.
+ */
+export const adminMutationAuditLog = pgTable(
+  "admin_mutation_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requestId: uuid("request_id").notNull(),
+    event: text("event").notNull(),
+    route: text("route").notNull(),
+    method: text("method").notNull(),
+    actorId: text("actor_id").notNull(),
+    actorSource: text("actor_source").notNull(),
+    sessionKey: text("session_key").notNull(),
+    action: text("action").notNull(),
+    targetType: text("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    result: text("result").notNull(),
+    httpStatus: integer("http_status"),
+    reasonCode: text("reason_code"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_admin_mutation_audit_request_event").on(
+      table.requestId,
+      table.event,
+    ),
+    index("idx_admin_mutation_audit_actor_date").on(
+      table.actorId,
+      table.createdAt,
+    ),
+    index("idx_admin_mutation_audit_target_date").on(
+      table.targetType,
+      table.targetId,
+      table.createdAt,
+    ),
+    index("idx_admin_mutation_audit_session_date").on(
+      table.sessionKey,
+      table.createdAt,
+    ),
+    check(
+      "admin_mutation_audit_event_result_check",
+      dsql`(${table.event} = 'attempt' AND ${table.result} = 'attempted' AND ${table.httpStatus} IS NULL) OR (${table.event} = 'outcome' AND ${table.result} IN ('succeeded','rejected','failed') AND ${table.httpStatus} BETWEEN 100 AND 599)`,
+    ),
+    check(
+      "admin_mutation_audit_method_check",
+      dsql`${table.method} IN ('GET','POST','PUT','PATCH','DELETE')`,
+    ),
+    check(
+      "admin_mutation_audit_actor_check",
+      dsql`length(${table.actorId}) BETWEEN 1 AND 80 AND ${table.actorId} ~ '^[a-zA-Z0-9 _.\\-]+$' AND ${table.actorSource} IN ('admin_session','password_login','google_login')`,
+    ),
+    check(
+      "admin_mutation_audit_session_key_check",
+      dsql`${table.sessionKey} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "admin_mutation_audit_descriptor_check",
+      dsql`length(${table.route}) BETWEEN 1 AND 160 AND left(${table.route}, 1) = '/' AND length(${table.action}) BETWEEN 1 AND 80 AND ${table.action} ~ '^[a-z][a-z0-9_.-]*$' AND length(${table.targetType}) BETWEEN 1 AND 80 AND ${table.targetType} ~ '^[a-z][a-z0-9_.-]*$' AND length(${table.targetId}) BETWEEN 1 AND 160`,
+    ),
+    check(
+      "admin_mutation_audit_reason_check",
+      dsql`${table.reasonCode} IS NULL OR (length(${table.reasonCode}) BETWEEN 1 AND 80 AND ${table.reasonCode} ~ '^[a-z][a-z0-9_.-]*$')`,
+    ),
+  ],
+);
+
 // --- Durable (cross-instance) rate limiter ---
 
 /**

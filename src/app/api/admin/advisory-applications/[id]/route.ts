@@ -21,7 +21,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
-import { getAdminSession } from "@/lib/admin/session";
+import { withAdminMutation } from "@/lib/admin/mutation";
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import type { AdminSession } from "@/lib/admin/session";
 
 const VALID_STATUSES = ["new", "reviewed", "contacted", "archived"] as const;
 type Status = (typeof VALID_STATUSES)[number];
@@ -62,16 +64,11 @@ async function readBody(
   return { isForm: false, body: json };
 }
 
-export async function POST(
+async function mutateAdvisoryApplication(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { id } = await params;
   const { body, isForm } = await readBody(request);
 
   if (body.intent === "delete") {
@@ -103,7 +100,10 @@ export async function POST(
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? "/admin/advisory-applications";
+    const redirect = safeInternalPathOr(
+      body.redirect,
+      "/admin/advisory-applications",
+    );
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({
@@ -112,4 +112,21 @@ export async function POST(
     status: body.status,
     reviewerId: auth.reviewerId,
   });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/advisory-applications/[id]",
+      action: "advisory_application.mutate",
+      targetType: "advisory_application",
+      targetId: id,
+    },
+    (auth) => mutateAdvisoryApplication(request, id, auth),
+  );
 }

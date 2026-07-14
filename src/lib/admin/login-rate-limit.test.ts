@@ -3,6 +3,10 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import {
+  checkDurableRateLimit,
+  type DurableRateLimitStore,
+} from "@/lib/api/rate-limit";
+import {
   ADMIN_LOGIN_RATE_LIMIT,
   adminLoginRateLimitKey,
   checkAdminLoginRateLimit,
@@ -77,6 +81,49 @@ test("admin login delegates the exact policy to the durable limiter", async () =
   assert.deepEqual(received, {
     ...ADMIN_LOGIN_RATE_LIMIT,
     key: adminLoginRateLimitKey(request),
+  });
+});
+
+test("admin login allows exactly five concurrent attempts and resets in the next window", async () => {
+  const counts = new Map<string, number>();
+  const store: DurableRateLimitStore = {
+    async increment({ bucketKey }) {
+      const next = (counts.get(bucketKey) ?? 0) + 1;
+      counts.set(bucketKey, next);
+      return next;
+    },
+    async deleteExpired() {},
+  };
+  let now = Date.UTC(2026, 6, 13, 12, 7, 30);
+  const checker: AdminLoginRateLimitChecker = (options) =>
+    checkDurableRateLimit(options, {
+      store,
+      now: () => now,
+      random: () => 1,
+    });
+  const request = new Request("https://civicaatlas.org/api/admin/session", {
+    headers: { "x-real-ip": "203.0.113.42" },
+  });
+
+  const sameWindow = await Promise.all(
+    Array.from({ length: 6 }, () => checkAdminLoginRateLimit(request, checker)),
+  );
+  assert.deepEqual(
+    sameWindow.map(({ allowed }) => allowed),
+    [true, true, true, true, true, false],
+  );
+  assert.deepEqual(
+    sameWindow.map(({ remaining }) => remaining),
+    [4, 3, 2, 1, 0, 0],
+  );
+  assert.ok(sameWindow[5].retryAfterMs > 0);
+
+  now += ADMIN_LOGIN_RATE_LIMIT.windowMs;
+  const reset = await checkAdminLoginRateLimit(request, checker);
+  assert.deepEqual(reset, {
+    allowed: true,
+    remaining: 4,
+    retryAfterMs: 0,
   });
 });
 

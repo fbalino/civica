@@ -3,10 +3,21 @@
   "modules": [
     {
       "name": "admin-session",
-      "testGlobs": ["src/lib/admin/session.test.ts"],
-      "includeGlobs": ["src/lib/admin/session.ts"],
+      "testGlobs": [
+        "src/lib/admin/session.test.ts",
+        "src/lib/admin/session-revocation-store.test.ts",
+        "src/lib/admin/logout.test.ts",
+        "src/lib/admin/mutation.test.ts"
+      ],
+      "includeGlobs": [
+        "src/lib/admin/session.ts",
+        "src/lib/admin/session-revocation-store.ts",
+        "src/lib/admin/mutation-audit.ts",
+        "src/lib/admin/mutation.ts",
+        "src/lib/admin/logout.ts"
+      ],
       "thresholds": { "lines": 85, "branch": 80, "functions": 70 },
-      "note": "Admin-auth-critical: cookie HMAC verify, username check, reviewer-name sanitization. Measured 2026-07-12: lines 92.89 / branch 90.48 / functions 79.17."
+      "note": "Admin-auth-critical: signed cookie verification, reviewer sanitization, durable revocation, exact-origin mutation authorization, and common audit lifecycle. Measured 2026-07-14: lines 90.52 / branch 83.86 / functions 88.04."
     },
     {
       "name": "outcomes-reducer",

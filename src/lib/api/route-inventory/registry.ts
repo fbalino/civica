@@ -19,6 +19,8 @@
  *   - "credential-check"      the login route itself: username/password or access-code verification
  *   - "cron-secret"           gated on requireCronAuth() / CRON_SECRET bearer token
  *   - "rate-limit"            per-IP in-memory and/or durable rate limiting
+ *   - "same-origin-mutation"  exact-origin/Fetch-Metadata CSRF guard
+ *   - "admin-audit"           common actor/action/target/result audit ledger
  *   - "input-validation"      schema/hand-rolled field validation before use
  *   - "public"                intentionally open; no auth (read-only or static)
  *
@@ -26,10 +28,8 @@
  * sensitive entry whose controls don't match its exposure class's
  * minimum bar (cron -> cron-secret; admin/pulse-coding -> a session
  * control or documented oauth-bootstrap; public-mutation ->
- * input-validation or rate-limit). Two real, intentionally-uncontrolled
- * findings are recorded here rather than hidden: the admin and
- * pulse-coding sign-out routes clear cookies with no session check
- * (benign — see their notes). `scripts/validate-route-inventory.ts`
+ * input-validation or rate-limit). The remaining bounded pulse-coding logout
+ * revocation gap is recorded here rather than hidden. `scripts/validate-route-inventory.ts`
  * only fails the build on an UNDOCUMENTED uncontrolled finding (empty
  * `note`); a documented one is printed prominently but does not fail,
  * per PLT-008's "flag, don't hide" mandate.
@@ -62,6 +62,8 @@ export type RouteControl =
   | "credential-check"
   | "cron-secret"
   | "rate-limit"
+  | "same-origin-mutation"
+  | "admin-audit"
   | "input-validation"
   | "public";
 
@@ -88,8 +90,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Flips advisory-application triage status; gated on the admin session cookie via getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Updates or deletes an advisory application through the shared active-session, exact-origin, and common audit boundary.",
   },
   {
     filePath: "api/admin/advisory-applications/route.ts",
@@ -115,8 +117,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Resolves/reopens data disputes with audit-log write; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Resolves/reopens data disputes through the shared active-session, exact-origin, and common audit boundary plus the domain audit log.",
   },
   {
     filePath: "api/admin/google/callback/route.ts",
@@ -142,8 +144,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Flips a contact submission's triage status; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Updates a contact submission through the shared active-session, exact-origin, and common audit boundary.",
   },
   {
     filePath: "api/admin/pulse-review/[id]/exception/route.ts",
@@ -151,8 +153,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Grants a review-SLA exception; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Grants a review-SLA exception through the shared active-session, exact-origin, and common audit boundary.",
   },
   {
     filePath: "api/admin/pulse-review/[id]/route.ts",
@@ -160,8 +162,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Approves/edits/rejects a Pulse event with audit-log write; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Reviews a Pulse event through the shared active-session, exact-origin, and common audit boundary plus the domain audit log.",
   },
   {
     filePath: "api/admin/session/route.ts",
@@ -169,8 +171,14 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["DELETE", "POST"],
     mutation: true,
     sensitive: true,
-    controls: ["credential-check"],
-    note: "POST is the login route itself (constant-time username compare + scrypt password verify against ADMIN_PASSWORD_HASH) — cannot require an existing admin-session, since it is what creates one. DELETE clears cookies unconditionally with no prior session check (same no-risk pattern as the dedicated sign-out routes below); documented, not hidden.",
+    controls: [
+      "credential-check",
+      "rate-limit",
+      "same-origin-mutation",
+      "admin-session",
+      "admin-audit",
+    ],
+    note: "POST is the exact-origin, durably throttled constant-time credential bootstrap and records successful issuance; DELETE uses the shared signed-session revocation and audit boundary.",
   },
   {
     filePath: "api/admin/sign-out/route.ts",
@@ -178,8 +186,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: [],
-    note: "OPEN FINDING (benign): clears admin session cookies with no session check before doing so. Intentional — logging out an already-unauthenticated caller is a no-op, and clearing cookies carries no confidentiality/integrity risk. Flagged by findUncontrolledMutations as an admin-exposure POST with no session control; documented here rather than silenced.",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Idempotent logout verifies any signed envelope, persists a hashed revocation tombstone, records the outcome, then clears cookies; missing/expired cookies only clear after exact-origin validation.",
   },
   {
     filePath: "api/advisory-applications/route.ts",
@@ -736,8 +744,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Issues a pulse-coding participant access code; gated on the OWNER admin session (getAdminSession()), a stronger control than a participant session — this is the coordinator-only provisioning route.",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Issues a participant through the owner-admin shared active-session, exact-origin, and common audit boundary; the coding domain also writes participant/assignment audit rows.",
   },
   {
     filePath: "api/pulse-coding/assignments/[id]/route.ts",
@@ -763,8 +771,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["credential-check"],
-    note: "Pulse-coding sign-in itself (authenticatePulseCodingAccessCode against an issued access code) — cannot require an existing pulse-coding-session, since it is what creates one.",
+    controls: ["credential-check", "same-origin-mutation"],
+    note: "Exact-origin pulse-coding sign-in authenticates an issued access code; it cannot require an existing participant session because it creates one.",
   },
   {
     filePath: "api/pulse-coding/sign-out/route.ts",
@@ -772,8 +780,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: [],
-    note: "OPEN FINDING (benign): clears pulse-coding session cookies with no session check before doing so. Same no-risk logout pattern as /api/admin/sign-out.",
+    controls: ["same-origin-mutation"],
+    note: "OPEN FINDING (bounded): exact-origin logout clears only the pulse-coding browser cookie but has no durable participant-session revocation yet; participant credential revocation remains the server-side invalidation path.",
   },
   {
     filePath: "api/reconciliation-audit/route.ts",

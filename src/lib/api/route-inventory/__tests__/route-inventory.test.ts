@@ -7,9 +7,8 @@
  *      `route.ts` files under src/app, declares the same HTTP methods
  *      those files actually export, and the pure checks report zero
  *      phantom routes / zero stale entries / zero UNDOCUMENTED
- *      uncontrolled mutations against the real data (two real, disclosed
- *      findings — the admin and pulse-coding sign-out routes — are
- *      expected and asserted to carry an explanatory `note`).
+ *      uncontrolled mutations against the real data (the remaining bounded
+ *      pulse-coding logout revocation gap is expected and disclosed).
  *   2. Negative: seeded synthetic fixtures prove each pure check catches
  *      its failure mode — a phantom route, a stale entry, an uncontrolled
  *      cron route, and an uncontrolled admin route.
@@ -96,16 +95,12 @@ test("every uncontrolled-mutation finding on the real registry is a documented, 
     [],
     `undocumented uncontrolled mutation(s) found: ${JSON.stringify(undocumented)}`,
   );
-  // PLT-008 evidence: exactly the two benign, by-design sign-out routes
-  // (clearing a session cookie needs no prior session check) are expected
-  // to be flagged. If this count changes, the registry's `controls`/`note`
-  // fields — not this test — should be updated to explain why.
+  // Owner-admin logout now has durable revocation. The participant-coding
+  // logout still clears only its scoped cookie, so that bounded gap remains
+  // explicitly visible until its separate credential lifecycle is revised.
   assert.deepEqual(
     findings.map((f) => f.filePath).sort(),
-    [
-      "api/admin/sign-out/route.ts",
-      "api/pulse-coding/sign-out/route.ts",
-    ],
+    ["api/pulse-coding/sign-out/route.ts"],
   );
 });
 

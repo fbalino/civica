@@ -25,7 +25,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { pulseEventsV2, pulseReviewAuditLog } from "@/lib/db/schema";
-import { getAdminSession } from "@/lib/admin/session";
+import { withAdminMutation } from "@/lib/admin/mutation";
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import type { AdminSession } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 import { validatePulseClassification } from "@/lib/pulse/v2/review-validation";
 import {
@@ -90,16 +92,11 @@ async function readBody(
   return { isForm: false, body: json };
 }
 
-export async function POST(
+async function mutatePulseEvent(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { id } = await params;
   const { body, isForm } = await readBody(request);
 
   if (!VALID_ACTIONS.has(body.action)) {
@@ -363,8 +360,25 @@ export async function POST(
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? "/admin/pulse-review";
+    const redirect = safeInternalPathOr(body.redirect, "/admin/pulse-review");
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({ ok: true, action: body.action, after });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/pulse-review/[id]",
+      action: "pulse_event.review",
+      targetType: "pulse_event",
+      targetId: id,
+    },
+    (auth) => mutatePulseEvent(request, id, auth),
+  );
 }

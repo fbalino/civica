@@ -18,14 +18,16 @@
  */
 
 import { checkAdminLoginRateLimit } from "@/lib/admin/login-rate-limit";
+import { withAdminLogout } from "@/lib/admin/logout";
+import { recordAdminLoginAudit } from "@/lib/admin/mutation-audit";
 import { verifyPassword } from "@/lib/admin/password";
 import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import {
-  buildAdminCookieHeaders,
-  buildAdminClearCookieHeaders,
   isAdminSessionConfigured,
+  mintAdminSessionCookie,
   verifyAdminUsername,
 } from "@/lib/admin/session";
+import { guardAdminMutationRequest } from "@/lib/api/admin-mutation-request-guard";
 import { NextRequest, NextResponse } from "next/server";
 
 /** True only when the owner account is fully configured. Fail closed
@@ -39,6 +41,9 @@ function isAdminConfigured(): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  const mutationGuard = guardAdminMutationRequest(request);
+  if (!mutationGuard.ok) return mutationGuard.response;
+
   if (!isAdminConfigured()) {
     return new NextResponse("Admin login is not configured", { status: 500 });
   }
@@ -96,21 +101,28 @@ export async function POST(request: NextRequest) {
 
   // Sanitise redirect to a same-origin pathname (PLT-027).
   const redirectPath = safeInternalPathOr(redirect, "/admin/pulse-review");
+  const minted = mintAdminSessionCookie();
+  try {
+    await recordAdminLoginAudit({
+      session: minted.session,
+      route: "/api/admin/session",
+      actorSource: "password_login",
+    });
+  } catch (error) {
+    console.error("[admin/session] login audit failed", error);
+    return new NextResponse("Admin audit is temporarily unavailable", {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
 
   const res = NextResponse.redirect(new URL(redirectPath, request.url), 303);
-  for (const [name, value] of buildAdminCookieHeaders()) {
+  for (const [name, value] of minted.headers) {
     res.headers.append(name, value);
   }
   return res;
 }
 
 export async function DELETE(request: NextRequest) {
-  const res = NextResponse.redirect(
-    new URL("/admin/sign-in", request.url),
-    303,
-  );
-  for (const [name, value] of buildAdminClearCookieHeaders()) {
-    res.headers.append(name, value);
-  }
-  return res;
+  return withAdminLogout(request, "/api/admin/session");
 }

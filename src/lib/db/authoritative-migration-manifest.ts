@@ -199,4 +199,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "8792a833ae6b38470f6f6bc18566f4998ec87822aaa1aec726592467a5bfb8db",
     baseline: false,
   },
+  {
+    id: "0033_flat_hardball",
+    path: "drizzle/authoritative/0033_flat_hardball.sql",
+    sha256: "314ccb9d48c00e6f242b91dcb70d6d5ccf6da0d260e44c39982c822e98395ebc",
+    baseline: false,
+  },
 ] as const;
