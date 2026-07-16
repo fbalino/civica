@@ -11,7 +11,9 @@ at the end.
 ## 1. Upstream data-source breakage
 
 - **Detection:** a scheduled sync fails, returns zero rows, or an anomalous
-  delta. Job observability (PLT-017 target) and the `markSourcesSynced*` API
+  delta. `civica-pipeline-observability/v1` records the closed outcome and
+  `operations.pipeline-alerts` evaluates missed, failed, empty, and anomalous
+  runs. The `markSourcesSynced*` API
   family — whose atomic variants stamp `last_sync_at` only with eligible
   committed rows — mean a broken sync does **not** advance freshness.
   `SourceDot` shows the stale/frozen state to readers.
@@ -27,7 +29,8 @@ at the end.
   domain is affected.
 - **Evidence preservation:** the failed run's error summary and the unchanged
   `last_sync_at` are the record; do not fake freshness.
-- **Recovery verification:** `npm run validate:sync-freshness`; confirm the
+- **Recovery verification:** run `npm run report:pipeline-observability` until
+  the alert closes, then run `npm run validate:sync-freshness`; confirm the
   source's `last_sync_at` advanced and row counts are plausible
   (`validate:release-quality`).
 
@@ -178,10 +181,10 @@ Each runbook was walked through against the current implementation.
 - **#3 compromised key — LIVE GAP:** a real leaked Neon credential is in git
   history and **not yet rotated** (queued in `plan/MANUAL-CHECKS.md`). This is
   the one runbook with an open, unresolved incident.
-- **Detection depends on unbuilt monitoring:** #1/#4/#5 detection references
-  job/error observability and alerts owned by PLT-017/018/020, which are not
-  yet built — today detection is manual (a failed run, a reader report). Until
-  then, add a manual weekly check of the status page and source freshness.
+- **Detection capability remains staged:** #1 has retained source/job
+  observability and a daily alert check from PLT-017. Broader exception routing
+  and public health probes remain owned by PLT-018/020; until then, add a
+  manual weekly check of the status page and source freshness.
 - **User communication is single-channel:** the status page and the `/policies`
   correction flow exist; there is no subscriber notification system (by design,
   APR-D031). Communication is pull, not push.

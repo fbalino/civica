@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "87da5e78b673f1bdc028b595343a783ab57cef38d743484c70761b8dea1907a0",
+  "schemaFingerprint": "a13a7daa1efdece83f37ea89652fdce5d22f54cf8dc80adf9f5c278c7d5c785a",
   "summary": {
-    "tables": 90,
-    "columns": 1256,
+    "tables": 91,
+    "columns": 1274,
     "publicAtlasTables": 22,
     "researchBetaTables": 27,
     "supportTables": 11,
-    "internalTables": 28,
+    "internalTables": 29,
     "privateTables": 2,
     "legacyTables": 1
   },
@@ -19762,6 +19762,486 @@
           "cadence": "Updated when a legislature composition source is retrieved.",
           "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
           "rights": "Identity provenance retains the source URL and license; source-specific reuse restrictions continue to apply.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "production_pipeline_runs",
+      "exportName": "productionPipelineRuns",
+      "definition": "Durable internal outcome ledger for registered scheduled and canonical manual production pipelines.",
+      "rowGrain": "One registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+      "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+      "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+      "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "completed_at",
+          "propertyName": "completedAt",
+          "definition": "Timestamp when the operation completed.",
+          "sqlType": "timestamp with time zone",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "Completed at follows this table contract. source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cost_microusd",
+          "propertyName": "costMicrousd",
+          "definition": "Cost microusd recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "error_summary",
+          "propertyName": "errorSummary",
+          "definition": "Error summary recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "execution_key",
+          "propertyName": "executionKey",
+          "definition": "Execution key recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_production_pipeline_execution"
+            ],
+            "uniqueGroups": [
+              "idx_production_pipeline_execution"
+            ]
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "freshness_source_ids",
+          "propertyName": "freshnessSourceIds",
+          "definition": "Freshness source ids recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text[]",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "metrics",
+          "propertyName": "metrics",
+          "definition": "Metrics recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observability_version",
+          "propertyName": "observabilityVersion",
+          "definition": "Observability version recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "pipeline_id",
+          "propertyName": "pipelineId",
+          "definition": "Pipeline id recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_production_pipeline_id_time",
+              "idx_production_pipeline_schedule_slot"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rows_read",
+          "propertyName": "rowsRead",
+          "definition": "Rows read recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rows_rejected",
+          "propertyName": "rowsRejected",
+          "definition": "Rows rejected recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "rows_written",
+          "propertyName": "rowsWritten",
+          "definition": "Rows written recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schedule_slot",
+          "propertyName": "scheduleSlot",
+          "definition": "Schedule slot recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "timestamp with time zone",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_production_pipeline_schedule_slot"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_versions",
+          "propertyName": "sourceVersions",
+          "definition": "Source versions recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "started_at",
+          "propertyName": "startedAt",
+          "definition": "Timestamp when the operation started.",
+          "sqlType": "timestamp with time zone",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_production_pipeline_status_time",
+              "idx_production_pipeline_id_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "Started at follows this table contract. source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_production_pipeline_status_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "trigger_kind",
+          "propertyName": "triggerKind",
+          "definition": "Trigger kind recorded for the registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+          "cadence": "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+          "vintageSemantics": "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+          "rights": "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
           "deprecation": {
             "status": "active"
           }

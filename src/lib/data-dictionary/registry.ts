@@ -1314,4 +1314,20 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
     deprecation: active,
   },
+  production_pipeline_runs: {
+    definition:
+      "Durable internal outcome ledger for registered scheduled and canonical manual production pipelines.",
+    rowGrain:
+      "One registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+    cadence:
+      "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+    vintageSemantics:
+      "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+    rights:
+      "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
+    deprecation: active,
+  },
 };

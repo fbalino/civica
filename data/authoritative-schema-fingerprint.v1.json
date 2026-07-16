@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-16T03:30:52.000Z",
-  "sha256": "50d12b73c1ad8b20d4907e41a36d1c68669924e4e0d45a56f2a3433cc1b89628",
+  "generatedAt": "2026-07-16T23:47:11.658Z",
+  "sha256": "6c721e92228fc256add2aa65245ce9a2e46551744bf54761c4820ee8cbd0d562",
   "schema": {
     "columns": [
       {
@@ -6668,6 +6668,168 @@
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
+        "table": "production_pipeline_runs",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "pipeline_id",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "trigger_kind",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "execution_key",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "timestamptz",
+        "name": "schedule_slot",
+        "type": "timestamp with time zone",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "timestamptz",
+        "name": "started_at",
+        "type": "timestamp with time zone",
+        "table": "production_pipeline_runs",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamptz",
+        "name": "completed_at",
+        "type": "timestamp with time zone",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "int4",
+        "name": "rows_read",
+        "type": "integer",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "int4",
+        "name": "rows_written",
+        "type": "integer",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "int4",
+        "name": "rows_rejected",
+        "type": "integer",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "jsonb",
+        "name": "source_versions",
+        "type": "jsonb",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "int4",
+        "name": "cost_microusd",
+        "type": "integer",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "error_summary",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 14
+      },
+      {
+        "udt": "_text",
+        "name": "freshness_source_ids",
+        "type": "ARRAY",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "jsonb",
+        "name": "metrics",
+        "type": "jsonb",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "observability_version",
+        "type": "text",
+        "table": "production_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
         "table": "pulse_candidate_outcomes",
         "default": "gen_random_uuid()",
         "nullable": "NO",
@@ -12320,6 +12482,31 @@
         "definition": "CREATE UNIQUE INDEX political_parties_source_external_idx ON public.political_parties USING btree (identity_source_id, identity_external_id)"
       },
       {
+        "name": "idx_production_pipeline_execution",
+        "table": "production_pipeline_runs",
+        "definition": "CREATE UNIQUE INDEX idx_production_pipeline_execution ON public.production_pipeline_runs USING btree (execution_key) WHERE (execution_key IS NOT NULL)"
+      },
+      {
+        "name": "idx_production_pipeline_id_time",
+        "table": "production_pipeline_runs",
+        "definition": "CREATE INDEX idx_production_pipeline_id_time ON public.production_pipeline_runs USING btree (pipeline_id, started_at)"
+      },
+      {
+        "name": "idx_production_pipeline_schedule_slot",
+        "table": "production_pipeline_runs",
+        "definition": "CREATE INDEX idx_production_pipeline_schedule_slot ON public.production_pipeline_runs USING btree (pipeline_id, schedule_slot)"
+      },
+      {
+        "name": "idx_production_pipeline_status_time",
+        "table": "production_pipeline_runs",
+        "definition": "CREATE INDEX idx_production_pipeline_status_time ON public.production_pipeline_runs USING btree (status, started_at)"
+      },
+      {
+        "name": "production_pipeline_runs_pkey",
+        "table": "production_pipeline_runs",
+        "definition": "CREATE UNIQUE INDEX production_pipeline_runs_pkey ON public.production_pipeline_runs USING btree (id)"
+      },
+      {
         "name": "idx_pulse_candidate_outcomes_candidate",
         "table": "pulse_candidate_outcomes",
         "definition": "CREATE INDEX idx_pulse_candidate_outcomes_candidate ON public.pulse_candidate_outcomes USING btree (candidate_kind, candidate_id)"
@@ -14372,6 +14559,11 @@
       },
       {
         "kind": "r",
+        "name": "production_pipeline_runs",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "pulse_candidate_outcomes",
         "definition": null
       },
@@ -15824,6 +16016,42 @@
         "type": "c",
         "table": "political_parties",
         "definition": "CHECK (identity_source_id IS NULL AND identity_external_id IS NULL OR identity_source_id IS NOT NULL AND identity_external_id IS NOT NULL)"
+      },
+      {
+        "name": "production_pipeline_run_counter_bounds",
+        "type": "c",
+        "table": "production_pipeline_runs",
+        "definition": "CHECK ((rows_read IS NULL OR rows_read >= 0) AND (rows_written IS NULL OR rows_written >= 0) AND (rows_rejected IS NULL OR rows_rejected >= 0) AND (cost_microusd IS NULL OR cost_microusd >= 0))"
+      },
+      {
+        "name": "production_pipeline_run_identity_check",
+        "type": "c",
+        "table": "production_pipeline_runs",
+        "definition": "CHECK (length(pipeline_id) >= 1 AND length(pipeline_id) <= 100 AND pipeline_id ~ '^[a-z][a-z0-9.-]*$'::text AND (execution_key IS NULL OR execution_key ~ '^[a-f0-9]{64}$'::text) AND length(release_id) >= 1 AND length(release_id) <= 96 AND release_id ~ '^[A-Za-z0-9._-]+$'::text AND length(observability_version) >= 1 AND length(observability_version) <= 96 AND observability_version ~ '^[A-Za-z0-9._/-]+$'::text)"
+      },
+      {
+        "name": "production_pipeline_run_payload_shape",
+        "type": "c",
+        "table": "production_pipeline_runs",
+        "definition": "CHECK (jsonb_typeof(source_versions) = 'array'::text AND jsonb_typeof(metrics) = 'object'::text AND cardinality(freshness_source_ids) <= 64 AND (error_summary IS NULL OR error_summary ~ '^[a-z][a-z0-9_.-]{0,79}$'::text))"
+      },
+      {
+        "name": "production_pipeline_run_status_shape",
+        "type": "c",
+        "table": "production_pipeline_runs",
+        "definition": "CHECK (status = 'running'::text AND completed_at IS NULL AND error_summary IS NULL OR (status = ANY (ARRAY['succeeded'::text, 'empty'::text, 'anomalous'::text])) AND completed_at IS NOT NULL AND error_summary IS NULL OR status = 'failed'::text AND completed_at IS NOT NULL AND error_summary IS NOT NULL)"
+      },
+      {
+        "name": "production_pipeline_run_trigger_shape",
+        "type": "c",
+        "table": "production_pipeline_runs",
+        "definition": "CHECK (trigger_kind = 'scheduled'::text AND execution_key IS NOT NULL AND schedule_slot IS NOT NULL OR trigger_kind = 'manual'::text AND schedule_slot IS NULL)"
+      },
+      {
+        "name": "production_pipeline_runs_pkey",
+        "type": "p",
+        "table": "production_pipeline_runs",
+        "definition": "PRIMARY KEY (id)"
       },
       {
         "name": "pulse_candidate_outcomes_contract_check",

@@ -1,0 +1,42 @@
+{
+  "contract": "civica-plt-017-verification/v1",
+  "taskId": "PLT-017",
+  "verifiedAt": "2026-07-16",
+  "commands": [
+    {
+      "command": "node --import tsx --test src/lib/platform/pipeline-observability.test.ts src/lib/api/cron-job.test.ts",
+      "result": "passed",
+      "details": "32 tests cover registered source-version handles, safe nullable counters, retry-safe logical identities, start-store outage finalization, and missed/failed/empty/anomalous alerts including recovery after a newer successful run."
+    },
+    {
+      "command": "node --import tsx scripts/run-cron-safety-tests.ts",
+      "result": "passed",
+      "details": "271 focused cron, adapter, freshness, retry, and partial-failure tests passed with the shared observability boundary in place."
+    },
+    {
+      "command": "node --import tsx scripts/validate-pipeline-observability.ts && node --import tsx scripts/validate-cron-safety.ts && node --import tsx scripts/validate-source-input-manifest.ts",
+      "result": "passed",
+      "details": "The 37 scheduled and 11 canonical manual production pipelines, the cron registry, and their source-input contracts are closed."
+    },
+    {
+      "command": "node --import tsx scripts/validate-research-evidence-retention.ts && node --import tsx scripts/validate-schema-data-dictionary.ts && node --import tsx scripts/validate-authoritative-migrations.ts && node --import tsx scripts/validate-migrations.ts",
+      "result": "passed",
+      "details": "The privacy boundary, 91-table/1,274-column dictionary, journaled migration, manifest, and post-migration fingerprint are exact."
+    },
+    {
+      "command": "node --import tsx scripts/plan-migration.ts --all --live --out=plan/evidence/DAT-013/preflight.json && node --import tsx scripts/validate-migration-preflight.ts",
+      "result": "passed",
+      "details": "The configured database was read only: all 57 plans reported zero writes and the additive production_pipeline_runs relation was reported missing."
+    },
+    {
+      "command": "npm run typecheck && node --import tsx scripts/validate-ci-workflow.ts && node --import tsx scripts/validate-doc-references.ts",
+      "result": "passed",
+      "details": "TypeScript, the exact CI script graph, and command/route/document references pass. The source/job observability gate is transitive from the production build's route-performance telemetry gate."
+    }
+  ],
+  "scopedBuildBoundary": {
+    "command": "npm run build",
+    "result": "blocked_by_unrelated_worktree_change",
+    "details": "The build reached and passed the PLT-017 migration/preflight and Atlas review-packet gates, then stopped at validate:index-change-control because the concurrent user-owned src/components/factbook/FactbookHeaderStrip.tsx presentation change has no new Index change-control record. That file is outside PLT-017 and was not modified or authorized by this task."
+  }
+}

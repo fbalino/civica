@@ -206,6 +206,16 @@ an empty table only. PLT-019 owns the staged apply/rehearsal and production
 deploy ordering; recovery before use is a reviewed forward migration or
 isolated pre-change backup, never a fabricated historical telemetry record.
 
+`0038_heavy_slyde` adds the PLT-017 production-pipeline observability ledger.
+Each retained row identifies one registered scheduled or manual pipeline run,
+its bounded start/end/status and row counters, declared source version/vintage
+handles, freshness result, reliable supplied cost, deployment release, and a
+short safe error code. It stores no request content, credentials, raw publisher
+material, source URL, or exception text. The migration is additive and creates
+no historical run rows. PLT-019 owns the staging/production apply rehearsal and
+deployment ordering; recovery is a reviewed forward compensation or isolated
+pre-change backup, never fabricated historical job evidence.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

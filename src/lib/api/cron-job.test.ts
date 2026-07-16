@@ -11,6 +11,7 @@ import type {
 } from "./cron-execution-store";
 import { cronExecutionKeyFromRequest, withCronJob } from "./cron-job";
 import { cacheControlFor } from "@/lib/platform/cache-consistency";
+import type { PipelineRunStore } from "@/lib/platform/pipeline-observability";
 
 interface StoredExecution {
   jobId: string;
@@ -157,6 +158,22 @@ class MemoryCronExecutionStore implements CronExecutionStore {
     });
     this.leases.set(input.jobId, { fence: lease.fence, active: null });
     return true;
+  }
+}
+
+class MemoryPipelineRunStore implements PipelineRunStore {
+  readonly starts: Parameters<PipelineRunStore["start"]>[0][] = [];
+  readonly finishes: Parameters<PipelineRunStore["finish"]>[0][] = [];
+  failStart = false;
+
+  async start(input: Parameters<PipelineRunStore["start"]>[0]) {
+    if (this.failStart) throw new Error("seeded pipeline-store outage");
+    this.starts.push(input);
+    return { id: input.id, startedAt: input.startedAt };
+  }
+
+  async finish(input: Parameters<PipelineRunStore["finish"]>[0]) {
+    this.finishes.push(input);
   }
 }
 
@@ -532,6 +549,61 @@ test("a failed delivery retries with the same key up to success", async () => {
   );
   assert.equal(handlerCalls, 2);
   assert.equal([...store.executions.values()][0].attemptCount, 2);
+});
+
+test("the cron boundary retains a safe failed pipeline run before retrying", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const pipelineStore = new MemoryPipelineRunStore();
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    () =>
+      Response.json(
+        { ok: false, outcome: "upstream_timeout", rowsRead: 12, totalWritten: 0, errorCount: 1 },
+        { status: 502 },
+      ),
+    { store, pipelineStore, now: () => FIXED_NOW },
+  );
+
+  assert.equal(
+    (await guarded(request(undefined, { secret: "correct-cron-secret" }))).status,
+    502,
+  );
+  assert.equal(pipelineStore.starts.length, 1);
+  assert.equal(pipelineStore.starts[0].pipelineId, "pulse.v2.ingest");
+  assert.match(pipelineStore.starts[0].executionKey!, /^[a-f0-9]{64}$/);
+  assert.equal(pipelineStore.finishes.length, 1);
+  assert.equal(pipelineStore.finishes[0].status, "failed");
+  assert.deepEqual(pipelineStore.finishes[0].metrics, {
+    rowsRead: 12,
+    rowsWritten: 0,
+    rowsRejected: 1,
+    costMicrousd: null,
+  });
+  assert.equal(pipelineStore.finishes[0].errorSummary, "upstream_timeout");
+});
+
+test("a pipeline-observability start outage records a retryable failed delivery", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const pipelineStore = new MemoryPipelineRunStore();
+  pipelineStore.failStart = true;
+  let handlerCalls = 0;
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    () => {
+      handlerCalls++;
+      return Response.json({ ok: true });
+    },
+    { store, pipelineStore, now: () => FIXED_NOW },
+  );
+
+  const response = await guarded(
+    request(undefined, { secret: "correct-cron-secret" }),
+  );
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).outcome, "pipeline_observability_unavailable");
+  assert.equal(handlerCalls, 0);
+  assert.equal(store.finishCalls, 1);
+  assert.equal([...store.executions.values()][0].status, "failed");
 });
 
 test("the boundary injects one stable delivery key and overwrites a spoof", async () => {

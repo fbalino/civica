@@ -4247,6 +4247,90 @@ export const routePerformanceObservations = pgTable(
   ],
 );
 
+// --- Durable production-pipeline observability ---
+
+/**
+ * One durable execution record for a registered scheduled or manual production
+ * pipeline. The row deliberately keeps only operational metadata: bounded
+ * counters, declared source version/vintage handles, freshness outcomes, and
+ * a closed error code. It is not a source-payload, request, or error-content
+ * retention channel.
+ */
+export const productionPipelineRuns = pgTable(
+  "production_pipeline_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pipelineId: text("pipeline_id").notNull(),
+    triggerKind: text("trigger_kind")
+      .$type<"scheduled" | "manual">()
+      .notNull(),
+    executionKey: text("execution_key"),
+    scheduleSlot: timestamp("schedule_slot", { withTimezone: true }),
+    status: text("status")
+      .$type<"running" | "succeeded" | "failed" | "empty" | "anomalous">()
+      .notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    rowsRead: integer("rows_read"),
+    rowsWritten: integer("rows_written"),
+    rowsRejected: integer("rows_rejected"),
+    sourceVersions: jsonb("source_versions")
+      .$type<
+        Array<{
+          sourceId: string;
+          upstreamVersion: string;
+          upstreamVintage: string;
+        }>
+      >()
+      .notNull(),
+    costMicrousd: integer("cost_microusd"),
+    errorSummary: text("error_summary"),
+    freshnessSourceIds: text("freshness_source_ids").array().notNull(),
+    metrics: jsonb("metrics").$type<Record<string, number | null>>().notNull(),
+    releaseId: text("release_id").notNull(),
+    observabilityVersion: text("observability_version").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_production_pipeline_execution")
+      .on(table.executionKey)
+      .where(dsql`${table.executionKey} IS NOT NULL`),
+    index("idx_production_pipeline_status_time").on(
+      table.status,
+      table.startedAt,
+    ),
+    index("idx_production_pipeline_id_time").on(
+      table.pipelineId,
+      table.startedAt,
+    ),
+    index("idx_production_pipeline_schedule_slot").on(
+      table.pipelineId,
+      table.scheduleSlot,
+    ),
+    check(
+      "production_pipeline_run_identity_check",
+      dsql`length(${table.pipelineId}) BETWEEN 1 AND 100 AND ${table.pipelineId} ~ '^[a-z][a-z0-9.-]*$' AND (${table.executionKey} IS NULL OR ${table.executionKey} ~ '^[a-f0-9]{64}$') AND length(${table.releaseId}) BETWEEN 1 AND 96 AND ${table.releaseId} ~ '^[A-Za-z0-9._-]+$' AND length(${table.observabilityVersion}) BETWEEN 1 AND 96 AND ${table.observabilityVersion} ~ '^[A-Za-z0-9._/-]+$'`,
+    ),
+    check(
+      "production_pipeline_run_trigger_shape",
+      dsql`(${table.triggerKind} = 'scheduled' AND ${table.executionKey} IS NOT NULL AND ${table.scheduleSlot} IS NOT NULL) OR (${table.triggerKind} = 'manual' AND ${table.scheduleSlot} IS NULL)`,
+    ),
+    check(
+      "production_pipeline_run_status_shape",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL AND ${table.errorSummary} IS NULL) OR (${table.status} IN ('succeeded','empty','anomalous') AND ${table.completedAt} IS NOT NULL AND ${table.errorSummary} IS NULL) OR (${table.status} = 'failed' AND ${table.completedAt} IS NOT NULL AND ${table.errorSummary} IS NOT NULL)`,
+    ),
+    check(
+      "production_pipeline_run_counter_bounds",
+      dsql`(${table.rowsRead} IS NULL OR ${table.rowsRead} >= 0) AND (${table.rowsWritten} IS NULL OR ${table.rowsWritten} >= 0) AND (${table.rowsRejected} IS NULL OR ${table.rowsRejected} >= 0) AND (${table.costMicrousd} IS NULL OR ${table.costMicrousd} >= 0)`,
+    ),
+    check(
+      "production_pipeline_run_payload_shape",
+      dsql`jsonb_typeof(${table.sourceVersions}) = 'array' AND jsonb_typeof(${table.metrics}) = 'object' AND cardinality(${table.freshnessSourceIds}) <= 64 AND (${table.errorSummary} IS NULL OR (${table.errorSummary} ~ '^[a-z][a-z0-9_.-]{0,79}$'))`,
+    ),
+  ],
+);
+
 // --- Durable (cross-instance) rate limiter ---
 
 /**

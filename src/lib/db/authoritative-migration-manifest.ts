@@ -229,4 +229,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "1d59f76489a1feefcc9ca869d2068a2d1bb96be0999c96759d9fce2ba7b8771c",
     baseline: false,
   },
+  {
+    id: "0038_heavy_slyde",
+    path: "drizzle/authoritative/0038_heavy_slyde.sql",
+    sha256: "b18764101e764902f203e1cd537b7a6291c82e68b1ebcc2611118850669ddd87",
+    baseline: false,
+  },
 ] as const;

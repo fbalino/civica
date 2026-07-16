@@ -19,6 +19,12 @@ import {
   scheduleRoutePerformanceObservation,
   scheduleRoutePerformancePrune,
 } from "@/lib/platform/route-performance-telemetry";
+import {
+  finishPipelineRun,
+  startPipelineRun,
+  type PipelineRunHandle,
+  type PipelineRunStore,
+} from "@/lib/platform/pipeline-observability";
 
 const IDEMPOTENCY_HEADER = "idempotency-key";
 const INTERNAL_EXECUTION_KEY_HEADER = "x-civica-cron-execution-key";
@@ -30,6 +36,7 @@ export type CronRouteHandler = (
 interface CronJobDependencies {
   now?: () => Date;
   store?: CronExecutionStore;
+  pipelineStore?: PipelineRunStore;
 }
 
 interface CronJobFixtureContext {
@@ -138,6 +145,16 @@ async function normalizeHandlerResponse(response: Response): Promise<{
     };
   }
   return { response: withCronNoStore(response), succeeded: response.ok };
+}
+
+async function operationalResponsePayload(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) return null;
+  try {
+    return await response.clone().json();
+  } catch {
+    return null;
+  }
 }
 
 function requestMode(request: Request): "apply" | "dry_run" {
@@ -420,6 +437,51 @@ export function withCronJob(
           );
         }
 
+        const shouldRecordPipeline =
+          process.env.NODE_ENV === "production" || Boolean(dependencies.pipelineStore);
+        let pipelineRun: PipelineRunHandle | null = null;
+        if (shouldRecordPipeline) {
+          try {
+            pipelineRun = await startPipelineRun(
+              {
+                pipelineId: definition.id,
+                triggerKind: scope.triggerKind,
+                executionKey,
+                scheduleSlot: scheduleSlot ?? undefined,
+              },
+              dependencies.pipelineStore,
+            );
+          } catch {
+            console.error(`[cron ${jobId}] pipeline_observability_start_failed`);
+            const unavailable = safeJsonResponse(
+              { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
+              503,
+            );
+            try {
+              const finished = await store.finish({
+                executionKey,
+                jobId: definition.id,
+                leaseToken: claim.leaseToken,
+                attemptId: claim.attemptId,
+                leaseFence: claim.leaseFence,
+                status: "failed",
+                responseStatus: unavailable.status,
+                resultCode: "pipeline_observability_unavailable",
+              });
+              if (!finished) {
+                throw new Error("Cron execution lost its lease before finalization");
+              }
+            } catch (error) {
+              console.error(`[cron ${jobId}] delivery finalization failed`, error);
+              return safeJsonResponse(
+                { ok: false, jobId, outcome: "delivery_finalization_failed" },
+                503,
+              );
+            }
+            return unavailable;
+          }
+        }
+
         const normalized = await normalizeHandlerResponse(
           await invokeHandler(
             jobId,
@@ -427,7 +489,30 @@ export function withCronJob(
             withInternalExecutionKey(request, executionKey),
           ),
         );
-        const terminalStatus = normalized.succeeded ? "succeeded" : "failed";
+        let responseForDelivery = normalized.response;
+        let terminalStatus: "succeeded" | "failed" = normalized.succeeded
+          ? "succeeded"
+          : "failed";
+        if (pipelineRun) {
+          try {
+            await finishPipelineRun(
+              {
+                ...pipelineRun,
+                responseStatus: normalized.response.status,
+                succeeded: normalized.succeeded,
+                payload: await operationalResponsePayload(normalized.response),
+              },
+              dependencies.pipelineStore,
+            );
+          } catch {
+            console.error(`[cron ${jobId}] pipeline_observability_finish_failed`);
+            responseForDelivery = safeJsonResponse(
+              { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
+              503,
+            );
+            terminalStatus = "failed";
+          }
+        }
 
         try {
           const finished = await store.finish({
@@ -437,8 +522,8 @@ export function withCronJob(
             attemptId: claim.attemptId,
             leaseFence: claim.leaseFence,
             status: terminalStatus,
-            responseStatus: normalized.response.status,
-            resultCode: normalized.succeeded
+            responseStatus: responseForDelivery.status,
+            resultCode: terminalStatus === "succeeded"
               ? "handler_succeeded"
               : "handler_failed",
           });
@@ -455,7 +540,7 @@ export function withCronJob(
           );
         }
 
-        return normalized.response;
+        return responseForDelivery;
       })();
       return response;
     } finally {

@@ -540,6 +540,8 @@ const DERIVED_INPUTS: Readonly<Record<string, string>> = {
   "pulse.v2.score": "verified Pulse v2 classifications and corroboration state",
   "pulse.v2.review-sla":
     "current Pulse review obligations and append-only SLA event evidence",
+  "operations.pipeline-alerts":
+    "retained production pipeline-run rows and the registered cron schedule contract",
 };
 
 export function productionPipelineContracts(): readonly PipelineInputContract[] {
