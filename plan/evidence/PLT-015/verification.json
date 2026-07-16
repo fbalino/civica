@@ -1,0 +1,32 @@
+{
+  "contract": "civica-plt-015-verification/v1",
+  "taskId": "PLT-015",
+  "verifiedAt": "2026-07-15",
+  "commands": [
+    {
+      "command": "npm run validate:query-budgets",
+      "result": "passed",
+      "details": "Four static fixtures passed; six critical country, constitution, indicator, Index, and Pulse profiles are closed over source files, migration-managed indexes, p95 budgets, and result ceilings."
+    },
+    {
+      "command": "npm run benchmark:query-budgets",
+      "result": "passed",
+      "details": "Ten read-only EXPLAIN ANALYZE samples per profile passed all p95 and result limits. The checked report records pre-0036 Index/Pulse fallbacks without pretending the live database has release pointers."
+    },
+    {
+      "command": "npm run validate:ci-workflow",
+      "result": "passed",
+      "details": "The credential-free production build now includes the static query-budget gate and its hash-bound CI contract remains exact."
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "passed",
+      "details": "TypeScript completed without errors before the final build gate."
+    },
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "details": "The full credentialed production gate completed its ordered validators, including the query-budget static contract, then completed the Next.js production compilation."
+    }
+  ]
+}

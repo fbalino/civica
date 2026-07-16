@@ -1,0 +1,1204 @@
+{
+  "schemaVersion": "civica-query-budget/v1",
+  "generatedAt": "2026-07-16T03:01:26.817Z",
+  "mode": "read-only-live-database",
+  "indexReleaseSchema": "pre-0036",
+  "pulsePublicationSchema": "pre-0036",
+  "iterations": 10,
+  "profiles": [
+    {
+      "id": "country-facts-high-cardinality",
+      "domain": "country",
+      "reader": "/country/[slug] factbook and country export",
+      "sourceFiles": [
+        "src/lib/db/queries.ts",
+        "src/lib/factbook/reconcile/api.ts"
+      ],
+      "fixture": {
+        "label": "largest current fact set",
+        "countrySlug": "spain"
+      },
+      "requiredIndexes": [
+        "idx_country_facts_jurisdiction"
+      ],
+      "maxReturnedRows": 250,
+      "executionP95BudgetMs": 50,
+      "boundedReadShape": "A jurisdiction-keyed set read returns facts in one query; fact rows never trigger per-row source or statement queries.",
+      "queryVariant": "standard",
+      "executionP95Ms": 2.44,
+      "roundTripP95Ms": 520.611083,
+      "maxObservedReturnedRows": 138,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Index Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexesUsed": [
+        "idx_country_facts_jurisdiction",
+        "jurisdictions_slug_unique"
+      ],
+      "maxSharedHitBlocks": 255,
+      "samples": [
+        {
+          "executionMs": 0.344,
+          "roundTripMs": 155.60683300000005,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.294,
+          "roundTripMs": 149.82841699999994,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.291,
+          "roundTripMs": 226.80049999999983,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.299,
+          "roundTripMs": 520.611083,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.436,
+          "roundTripMs": 149.9555409999998,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.344,
+          "roundTripMs": 149.46033399999988,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 2.44,
+          "roundTripMs": 224.69216600000027,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 2.115,
+          "roundTripMs": 152.238292,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.294,
+          "roundTripMs": 147.5067909999998,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        },
+        {
+          "executionMs": 0.289,
+          "roundTripMs": 224.14016699999956,
+          "returnedRows": 138,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_country_facts_jurisdiction",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 255
+        }
+      ]
+    },
+    {
+      "id": "constitution-search-corpus",
+      "domain": "constitution",
+      "reader": "/api/constitution/search",
+      "sourceFiles": [
+        "src/lib/db/queries-constitution-search.ts"
+      ],
+      "fixture": {
+        "label": "full passage corpus phrase search",
+        "query": "freedom of expression"
+      },
+      "requiredIndexes": [
+        "idx_constitution_passages_search"
+      ],
+      "maxReturnedRows": 21,
+      "executionP95BudgetMs": 100,
+      "boundedReadShape": "One GIN-backed passage search limits each response to 20 results plus one cursor sentinel; full corpus text is not selected.",
+      "queryVariant": "standard",
+      "executionP95Ms": 5.952,
+      "roundTripP95Ms": 528.4154170000002,
+      "maxObservedReturnedRows": 21,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexesUsed": [
+        "idx_constitution_passages_search"
+      ],
+      "maxSharedHitBlocks": 2845,
+      "samples": [
+        {
+          "executionMs": 4.08,
+          "roundTripMs": 528.4154170000002,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 1.863,
+          "roundTripMs": 147.91637500000002,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 1.88,
+          "roundTripMs": 153.49383399999988,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 2.171,
+          "roundTripMs": 224.88125000000036,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2845
+        },
+        {
+          "executionMs": 2.311,
+          "roundTripMs": 150.1642499999998,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 2.728,
+          "roundTripMs": 151.45966700000008,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 2.615,
+          "roundTripMs": 223.82124999999996,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 1.91,
+          "roundTripMs": 150.98187499999995,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 5.952,
+          "roundTripMs": 153.72816599999987,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        },
+        {
+          "executionMs": 1.761,
+          "roundTripMs": 218.25800000000027,
+          "returnedRows": 21,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_constitution_passages_search"
+          ],
+          "sharedHitBlocks": 2767
+        }
+      ]
+    },
+    {
+      "id": "indicator-history-high-cardinality",
+      "domain": "indicator",
+      "reader": "/api/countries/[slug]/indicator-history",
+      "sourceFiles": [
+        "src/lib/db/queries.ts"
+      ],
+      "fixture": {
+        "label": "largest country history",
+        "countrySlug": "afghanistan"
+      },
+      "requiredIndexes": [
+        "idx_indicator_history_jur_dim"
+      ],
+      "maxReturnedRows": 500,
+      "executionP95BudgetMs": 50,
+      "boundedReadShape": "One jurisdiction lookup and one jurisdiction-keyed history scan feed all series; in-memory grouping is bounded by the 500-row response ceiling.",
+      "queryVariant": "standard",
+      "executionP95Ms": 2.178,
+      "roundTripP95Ms": 526.0647080000001,
+      "maxObservedReturnedRows": 333,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Index Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexesUsed": [
+        "idx_indicator_history_jur_dim",
+        "jurisdictions_slug_unique"
+      ],
+      "maxSharedHitBlocks": 103,
+      "samples": [
+        {
+          "executionMs": 0.334,
+          "roundTripMs": 526.0647080000001,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.338,
+          "roundTripMs": 145.10054200000013,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.359,
+          "roundTripMs": 151.30791699999963,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 2.178,
+          "roundTripMs": 231.413,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.338,
+          "roundTripMs": 150.09412500000008,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.331,
+          "roundTripMs": 150.929083,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.379,
+          "roundTripMs": 224.43370800000002,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.378,
+          "roundTripMs": 150.85625000000027,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.325,
+          "roundTripMs": 153.89850000000024,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        },
+        {
+          "executionMs": 0.367,
+          "roundTripMs": 217.6898329999999,
+          "returnedRows": 333,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_indicator_history_jur_dim",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 103
+        }
+      ]
+    },
+    {
+      "id": "index-release-rankings",
+      "domain": "index",
+      "reader": "/api/v1/index/rankings",
+      "sourceFiles": [
+        "src/app/api/v1/index/rankings/route.ts",
+        "src/lib/ci/release-store.ts"
+      ],
+      "fixture": {
+        "label": "current complete Index release"
+      },
+      "requiredIndexes": [
+        "idx_ci_composite_quarter_rank"
+      ],
+      "maxReturnedRows": 250,
+      "executionP95BudgetMs": 50,
+      "boundedReadShape": "The post-migration reader selects one release by pointer; its live pre-migration counterpart is set-wise, rank-ordered, and capped by the public 250-row limit rather than filtered in memory.",
+      "queryVariant": "pre-0036-quarter-method",
+      "executionP95Ms": 1.923,
+      "roundTripP95Ms": 664.9077080000002,
+      "maxObservedReturnedRows": 190,
+      "nodeTypes": [
+        "Aggregate",
+        "Hash",
+        "Hash Join",
+        "Limit",
+        "Seq Scan",
+        "Sort",
+        "Subquery Scan"
+      ],
+      "indexesUsed": [],
+      "maxSharedHitBlocks": 2067,
+      "samples": [
+        {
+          "executionMs": 0.959,
+          "roundTripMs": 664.9077080000002,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 1.004,
+          "roundTripMs": 291.168584,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 0.983,
+          "roundTripMs": 373.70270900000014,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 1.923,
+          "roundTripMs": 288.9837499999999,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 0.988,
+          "roundTripMs": 147.07441700000027,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 0.997,
+          "roundTripMs": 144.75691700000016,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 0.953,
+          "roundTripMs": 193.06283399999984,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 0.976,
+          "roundTripMs": 149.49216699999988,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 1.016,
+          "roundTripMs": 144.18033300000025,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        },
+        {
+          "executionMs": 1.055,
+          "roundTripMs": 223.74554199999966,
+          "returnedRows": 190,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2067
+        }
+      ]
+    },
+    {
+      "id": "pulse-publication-panel",
+      "domain": "pulse",
+      "reader": "/api/v1/pulse/[country_slug]/dimensions",
+      "sourceFiles": [
+        "src/lib/db/queries-pulse-v2.ts"
+      ],
+      "fixture": {
+        "label": "current five-dimension Pulse score panel"
+      },
+      "requiredIndexes": [
+        "idx_pulse_dim_history_run_jurisdiction_dimension"
+      ],
+      "maxReturnedRows": 1500,
+      "executionP95BudgetMs": 100,
+      "boundedReadShape": "The post-migration reader validates one pointer-selected run as a complete fixed five-dimension panel; the pre-migration audit selects one newest immutable run and never scans history across runs or queries once per panel row.",
+      "queryVariant": "pre-0036-latest-run",
+      "executionP95Ms": 4.788,
+      "roundTripP95Ms": 529.808792,
+      "maxObservedReturnedRows": 325,
+      "nodeTypes": [
+        "Aggregate",
+        "Hash",
+        "Hash Join",
+        "Limit",
+        "Seq Scan",
+        "Sort",
+        "Subquery Scan"
+      ],
+      "indexesUsed": [],
+      "maxSharedHitBlocks": 2012,
+      "samples": [
+        {
+          "executionMs": 4.352,
+          "roundTripMs": 529.808792,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 1.222,
+          "roundTripMs": 520.3522500000001,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 1.301,
+          "roundTripMs": 150.2780419999999,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 4.038,
+          "roundTripMs": 153.14812500000016,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 1.211,
+          "roundTripMs": 224.53741600000012,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 2012
+        },
+        {
+          "executionMs": 1.3,
+          "roundTripMs": 154.2481670000002,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 1.22,
+          "roundTripMs": 150.31120800000008,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 4.788,
+          "roundTripMs": 219.48350000000028,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 1.183,
+          "roundTripMs": 145.80508399999962,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        },
+        {
+          "executionMs": 1.463,
+          "roundTripMs": 148.31820800000014,
+          "returnedRows": 325,
+          "nodeTypes": [
+            "Aggregate",
+            "Hash",
+            "Hash Join",
+            "Limit",
+            "Seq Scan",
+            "Sort",
+            "Subquery Scan"
+          ],
+          "indexesUsed": [],
+          "sharedHitBlocks": 1991
+        }
+      ]
+    },
+    {
+      "id": "pulse-country-events-high-cardinality",
+      "domain": "pulse",
+      "reader": "country Pulse event context and changelog filters",
+      "sourceFiles": [
+        "src/lib/db/queries-pulse-v2.ts"
+      ],
+      "fixture": {
+        "label": "largest current country event set",
+        "countrySlug": "turkey"
+      },
+      "requiredIndexes": [
+        "idx_pulse_v2_jurisdiction_date"
+      ],
+      "maxReturnedRows": 251,
+      "executionP95BudgetMs": 100,
+      "boundedReadShape": "Current events are jurisdiction-keyed, date-ordered, and request-capped; source attribution is fetched as one set for the selected event IDs.",
+      "queryVariant": "standard",
+      "executionP95Ms": 1.214,
+      "roundTripP95Ms": 531.525791,
+      "maxObservedReturnedRows": 27,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan",
+        "Index Scan",
+        "Limit",
+        "Sort"
+      ],
+      "indexesUsed": [
+        "idx_pulse_v2_jurisdiction_date",
+        "jurisdictions_slug_unique"
+      ],
+      "maxSharedHitBlocks": 104,
+      "samples": [
+        {
+          "executionMs": 1.214,
+          "roundTripMs": 531.525791,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 94
+        },
+        {
+          "executionMs": 0.091,
+          "roundTripMs": 520.4858750000001,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.129,
+          "roundTripMs": 149.7927920000002,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.146,
+          "roundTripMs": 147.38287499999979,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.095,
+          "roundTripMs": 225.72545800000034,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.147,
+          "roundTripMs": 153.0498749999997,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 104
+        },
+        {
+          "executionMs": 0.096,
+          "roundTripMs": 147.28724999999986,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.093,
+          "roundTripMs": 221.69612499999994,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.098,
+          "roundTripMs": 145.80945800000018,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        },
+        {
+          "executionMs": 0.17,
+          "roundTripMs": 146.98170900000014,
+          "returnedRows": 27,
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan",
+            "Index Scan",
+            "Limit",
+            "Sort"
+          ],
+          "indexesUsed": [
+            "idx_pulse_v2_jurisdiction_date",
+            "jurisdictions_slug_unique"
+          ],
+          "sharedHitBlocks": 98
+        }
+      ]
+    }
+  ],
+  "status": "pass",
+  "violations": []
+}

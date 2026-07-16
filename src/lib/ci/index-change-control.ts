@@ -276,6 +276,12 @@ export type IndexChangeEntry = {
   id: string;
   fromVersion: string;
   toVersion: string;
+  /**
+   * Omitted for a methodology change. Evidence-only records are reserved for
+   * append-only refreshes of the six authenticated evidence roles when the
+   * protected Index snapshot is unchanged.
+   */
+  recordKind?: "evidence";
   parentSnapshotSha256: string | null;
   snapshotSha256: string;
   categories: IndexChangeCategory[];
@@ -543,20 +549,22 @@ export function indexChangeControlErrors(
       if (entry.fromVersion !== prior.toVersion)
         errors.push(`${entry.id}: version chain is broken`);
       const changed = changedFiles(prior.protectedFiles, entry.protectedFiles);
-      if (changed.length === 0)
+      const evidenceOnly = entry.recordKind === "evidence";
+      if (!evidenceOnly && changed.length === 0)
         errors.push(`${entry.id}: empty methodology change record`);
-      if (
-        !sameMembers(
-          entry.changedPaths,
-          changed.map((row) => row.path),
-        )
-      )
+      if (evidenceOnly && changed.length > 0)
+        errors.push(
+          `${entry.id}: evidence-only record cannot change protected Index files`,
+        );
+      const expectedPaths = evidenceOnly
+        ? []
+        : changed.map((row) => row.path);
+      if (!sameMembers(entry.changedPaths, expectedPaths))
         errors.push(`${entry.id}: changed path inventory is inaccurate`);
-      if (
-        !sameMembers(entry.categories, [
-          ...new Set(changed.map((row) => row.category)),
-        ])
-      )
+      const expectedCategories = evidenceOnly
+        ? []
+        : [...new Set(changed.map((row) => row.category))];
+      if (!sameMembers(entry.categories, expectedCategories))
         errors.push(
           `${entry.id}: change categories do not match the snapshot diff`,
         );

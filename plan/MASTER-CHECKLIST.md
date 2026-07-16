@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 305
-- **Completed:** 201
-- **Remaining:** 104
-- **Progress:** 65.9%
+- **Completed:** 202
+- **Remaining:** 103
+- **Progress:** 66.2%
 - **Priority mix:** P0 189 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -270,7 +270,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [x] **PLT-012** (P0) Standardize request validation, output shaping, HTML/content sanitization, and error responses. _Done when: every registered endpoint has a schema or explicit no-input contract, internal fields cannot leak through object spreading, untrusted HTML is sanitized at a documented boundary, errors use stable safe shapes, and fuzz/negative fixtures pass._
 - [x] **PLT-013** (P1) Audit security headers, CSP, framing/embed policy, redirects, cookies, CORS, and third-party origins. _Done when: production header tests match a documented policy, nonstandard/no-op headers are gone, only intended embed routes are frameable, external scripts/images/maps/fonts/connectors are allowlisted minimally, and both themes/routes still function._
 - [x] **PLT-014** (P0) Define cache, revalidation, and release consistency rules for DB data and methodology versions. _Done when: each route/query/export declares freshness and invalidation, a release cannot mix incompatible methodology/source versions, cache failures do not serve false freshness, and update/revalidation integration tests pass._
-- [ ] **PLT-015** (P1) Establish database query/index budgets for critical routes and bulk/research APIs. _Done when: representative query plans and p95 budgets are recorded, N+1/unbounded scans are fixed or bounded, indexes are migration-managed, and performance fixtures cover high-cardinality countries/constitutions/indicators/events._
+- [x] **PLT-015** (P1) Establish database query/index budgets for critical routes and bulk/research APIs. _Done when: representative query plans and p95 budgets are recorded, N+1/unbounded scans are fixed or bounded, indexes are migration-managed, and performance fixtures cover high-cardinality countries/constitutions/indicators/events._
 - [ ] **PLT-016** (P1) Add application and route performance telemetry with privacy limits. _Done when: server latency/error/cache/job metrics identify route/version/release without collecting unnecessary personal data, retention/access are documented, alert thresholds are tested, and telemetry failure cannot break reader requests._
 - [ ] **PLT-017** (P0) Build source/job observability and freshness alerts. _Done when: every scheduled/manual production pipeline records start/end/status, rows read/written/rejected, source versions, cost where reliable, error summary, freshness update, and run ID; missed/failed/empty/anomalous runs alert with a tested runbook._
 - [ ] **PLT-018** (P0) Add exception/error monitoring with source maps and release identity. _Done when: server/client/cron/script errors include release/route/job context, sensitive values are scrubbed, alerts route to an owned channel, seeded errors appear and resolve, and known issues can link to correction/status records._

@@ -47,3 +47,11 @@ published release is corrected with a reviewed successor/forward fix rather
 than destructive row edits. A schema rollback must be separately designed and
 rehearsed under PLT-019; it is not implied by this task and must not remove
 evidence-bearing published rows.
+
+The v34-evidence control amendment makes no schema, migration, pointer, or
+publication change. It only preserves the authenticated evidence trail for the
+already-defined PLT-014 boundary.
+
+The v35-evidence amendment validates that evidence-only refreshes cannot reuse
+stale evidence roles; it also makes no schema, migration, pointer, or
+publication change.

@@ -27,3 +27,10 @@ The checked `source-input-manifest/v1` was regenerated after a code-derived
 adapter-version change. R3, R4, and R5 now bind its new exact byte hash while
 retaining the same publisher-byte source hashes, score rows, ranks, and
 semantic release hashes.
+
+The v34-evidence control amendment records the completed verification and
+browser evidence without changing any released observation, API contract, or
+reader behavior.
+
+The v35-evidence amendment validates the evidence-only control itself, again
+without changing released observations, API behavior, or reader output.

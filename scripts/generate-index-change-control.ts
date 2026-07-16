@@ -20,6 +20,7 @@ const metadataArg = process.argv.find((arg) => arg.startsWith("--metadata="));
 type Metadata = {
   id: string;
   toVersion: string;
+  recordKind?: "evidence";
   categories?: IndexChangeCategory[];
   evidence: Record<IndexChangeEvidenceRole, string[]>;
   validations?: string[];
@@ -76,12 +77,24 @@ if (initialize) {
   const prior = registry.entries.at(-1);
   if (!prior) throw new Error("Registry has no baseline.");
   const changed = changedPaths(prior.protectedFiles, snapshot);
+  // Evidence-only records preserve snapshot continuity while authenticating a
+  // complete replacement set of mutable evidence-role hashes.
+  const evidenceOnly = metadata.recordKind === "evidence";
+  if (!evidenceOnly && changed.length === 0)
+    throw new Error(
+      "No protected Index file changed. Use recordKind: evidence only when every evidence role needs an append-only refresh.",
+    );
+  if (evidenceOnly && changed.length > 0)
+    throw new Error(
+      "Evidence-only records cannot include a protected Index file change.",
+    );
   const categories = [...new Set(changed.map((row) => row.category))];
   if (metadata.categories && metadata.categories.slice().sort().join() !== categories.slice().sort().join()) throw new Error("Metadata categories do not match the protected-file diff.");
   const entry = {
     id: metadata.id,
     fromVersion: prior.toVersion,
     toVersion: metadata.toVersion,
+    ...(evidenceOnly ? { recordKind: "evidence" as const } : {}),
     parentSnapshotSha256: prior.snapshotSha256,
     snapshotSha256: indexSnapshotSha256(snapshot),
     categories,

@@ -93,3 +93,6 @@ other byte still fails closed.
 - `verification.json` — machine-readable final command and result ledger
 - `browser-check.json` — Chromium reader-journey smoke on the isolated local
   Civica server
+
+The v34 and v35 evidence-only control records preserve verification provenance;
+they do not alter the PLT-014 release boundary, migration, or published data.
