@@ -10,6 +10,7 @@ import type {
   CronExecutionStore,
 } from "./cron-execution-store";
 import { cronExecutionKeyFromRequest, withCronJob } from "./cron-job";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 interface StoredExecution {
   jobId: string;
@@ -317,7 +318,10 @@ test("unknown cron input returns one safe non-cacheable problem before lease", a
   );
 
   assert.equal(response.status, 400);
-  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(
+    response.headers.get("cache-control"),
+    cacheControlFor("private-live"),
+  );
   assert.deepEqual(await response.json(), {
     ok: false,
     jobId: "pulse.v2.ingest",
@@ -351,6 +355,37 @@ test("a completed delivery suppresses a sequential duplicate", async () => {
   assert.equal(duplicate.status, 200);
   assert.equal((await duplicate.json()).outcome, "duplicate_suppressed");
   assert.equal(handlerCalls, 1);
+});
+
+test("successful cron responses override every public cache header", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    () =>
+      Response.json(
+        { ok: true },
+        {
+          headers: {
+            "Cache-Control": "public, max-age=3600",
+            "CDN-Cache-Control": "public, max-age=3600",
+            "Vercel-CDN-Cache-Control": "public, max-age=3600",
+          },
+        },
+      ),
+    { store, now: () => FIXED_NOW },
+  );
+
+  const response = await guarded(
+    request(undefined, { secret: "correct-cron-secret" }),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(
+    response.headers.get("cache-control"),
+    cacheControlFor("private-live"),
+  );
+  assert.equal(response.headers.get("cdn-cache-control"), "no-store");
+  assert.equal(response.headers.get("vercel-cdn-cache-control"), "no-store");
 });
 
 test("the job-wide lease rejects an unrecorded concurrent delivery with a different key", async () => {

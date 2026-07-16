@@ -18,8 +18,13 @@ import {
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexByGovernmentTypeItem } from "@/lib/api/contract/shapes";
-import { resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  isCiReleaseConsistencyError,
+  publicCiReleaseIdentity,
+} from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parseQueryContract } from "@/lib/api/request-contract";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 function quantile(sortedValues: number[], percentile: number): number {
   if (sortedValues.length === 0) return 0;
@@ -49,7 +54,18 @@ export async function GET(request: Request) {
   if (retired) return retired;
 
   try {
-    const release = resolveCiRelease(query.data.release);
+    const release = await loadPublishedCiRelease(query.data.release);
+    if (quarter && quarter !== release.quarter) {
+      const response = apiError(
+        "The requested quarter is unavailable for this release.",
+        400,
+      );
+      return withIndexDispositionDeprecation(
+        isDeprecatedTaxonomy
+          ? withStructuralFamilyDeprecation(response)
+          : response,
+      );
+    }
     const rows = await getCIByGovernmentTypeDots(quarter, release.releaseId);
     const grouped = new Map<string, { label: string; scores: number[] }>();
 
@@ -95,12 +111,26 @@ export async function GET(request: Request) {
 
     const meta = isDeprecatedTaxonomy
       ? {
-          quarter: quarter ?? null,
+          quarter: release.quarter,
           taxonomy,
+          release: publicCiReleaseIdentity(release),
           series: release.series,
+          components: publicCiPublicationComponents(release, {
+            jurisdiction: "live_current",
+            taxonomy: "live_current",
+          }),
           ...STRUCTURAL_FAMILY_DEPRECATION_META,
         }
-      : { quarter: quarter ?? null, taxonomy, series: release.series };
+      : {
+          quarter: release.quarter,
+          taxonomy,
+          release: publicCiReleaseIdentity(release),
+          series: release.series,
+          components: publicCiPublicationComponents(release, {
+            jurisdiction: "live_current",
+            taxonomy: "live_current",
+          }),
+        };
 
     const response = apiResponse({ data, meta });
     return withIndexDispositionDeprecation(
@@ -110,6 +140,18 @@ export async function GET(request: Request) {
     );
   } catch (e) {
     console.error("API /v1/index/by-government-type error:", e);
+    if (isCiReleaseConsistencyError(e)) {
+      const response = apiError(
+        "The requested release is temporarily unavailable.",
+        503,
+        "RELEASE_INCONSISTENT",
+      );
+      return withIndexDispositionDeprecation(
+        isDeprecatedTaxonomy
+          ? withStructuralFamilyDeprecation(response)
+          : response,
+      );
+    }
     const response = apiError("Internal server error", 500);
     return withIndexDispositionDeprecation(
       isDeprecatedTaxonomy

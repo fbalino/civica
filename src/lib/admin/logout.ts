@@ -16,6 +16,7 @@ import {
   type AdminSessionRevocationStore,
 } from "@/lib/admin/session-revocation-store";
 import { guardAdminMutationRequest } from "@/lib/api/admin-mutation-request-guard";
+import { responseWithCacheProfile } from "@/lib/api/response-cache";
 
 export interface AdminLogoutDependencies {
   getSession(): Promise<AdminSession | null>;
@@ -205,5 +206,8 @@ export async function withAdminLogout(
   request: Request,
   route: "/api/admin/session" | "/api/admin/sign-out",
 ): Promise<Response> {
-  return runAdminLogout(request, route);
+  return responseWithCacheProfile(
+    await runAdminLogout(request, route),
+    "private-live",
+  );
 }

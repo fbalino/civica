@@ -20,7 +20,7 @@ import {
 } from "@/lib/content/site-state";
 import { PROVENANCE_COVERAGE_SUMMARY } from "@/lib/claims/provenance-coverage";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "How We Approach Data — Sources & Reconciliation",

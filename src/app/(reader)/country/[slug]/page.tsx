@@ -29,7 +29,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Factbook tab of the unified /country/[slug] page. Renders ONLY the
 // CIA-sourced sections. The Government section here is the CIA prose

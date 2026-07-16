@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-14T08:53:48.534Z",
-  "sha256": "f38227eb1e6e6a3d86951d8a7aa61ce875d6469efd52a4afead9dbbf8896f29c",
+  "generatedAt": "2026-07-14T14:55:34.519Z",
+  "sha256": "dd74cdb85afc88d1aa2315f474cb8cbf20fed287fb1448c29d0c0eac4585cbf4",
   "schema": {
     "columns": [
       {
@@ -1031,6 +1031,15 @@
         "position": 20
       },
       {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "ci_composite_scores",
+        "default": null,
+        "nullable": "YES",
+        "position": 21
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -1218,6 +1227,240 @@
         "default": null,
         "nullable": "NO",
         "position": 21
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "YES",
+        "position": 22
+      },
+      {
+        "udt": "text",
+        "name": "product",
+        "type": "text",
+        "table": "ci_index_release_pointers",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "ci_index_release_pointers",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "timestamp",
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "table": "ci_index_release_pointers",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "id",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": "'staging'::text",
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "quarter",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "methodology_version",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "methodology_content_sha256",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "vintage_label",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "supersession_kind",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "supersedes_release_id",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "supersedes_vintage_label",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "input_manifest_sha256",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "dimension_row_set_sha256",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "composite_row_set_sha256",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "int4",
+        "name": "dimension_row_count",
+        "type": "integer",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "int4",
+        "name": "composite_row_count",
+        "type": "integer",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "input_transformation_version",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "composite_algorithm_version",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "display_transform_version",
+        "type": "text",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "jsonb",
+        "name": "uncertainty_policy",
+        "type": "jsonb",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "jsonb",
+        "name": "dimension_rules",
+        "type": "jsonb",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "jsonb",
+        "name": "source_artifacts",
+        "type": "jsonb",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "timestamp",
+        "name": "published_at",
+        "type": "timestamp without time zone",
+        "table": "ci_index_releases",
+        "default": null,
+        "nullable": "YES",
+        "position": 21
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "ci_index_releases",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 22
       },
       {
         "udt": "uuid",
@@ -10391,6 +10634,51 @@
         "position": 12
       },
       {
+        "udt": "text",
+        "name": "product",
+        "type": "text",
+        "table": "pulse_score_publication_pointers",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "computation_run_id",
+        "type": "uuid",
+        "table": "pulse_score_publication_pointers",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "version_key",
+        "type": "text",
+        "table": "pulse_score_publication_pointers",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "date",
+        "name": "score_as_of",
+        "type": "date",
+        "table": "pulse_score_publication_pointers",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "timestamp",
+        "name": "published_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_score_publication_pointers",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 5
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -11273,9 +11561,14 @@
         "definition": "CREATE INDEX idx_ci_composite_quarter_rank ON public.ci_composite_scores USING btree (quarter, rank)"
       },
       {
+        "name": "idx_ci_composite_release",
+        "table": "ci_composite_scores",
+        "definition": "CREATE INDEX idx_ci_composite_release ON public.ci_composite_scores USING btree (release_id, jurisdiction_id)"
+      },
+      {
         "name": "idx_ci_composite_unique",
         "table": "ci_composite_scores",
-        "definition": "CREATE UNIQUE INDEX idx_ci_composite_unique ON public.ci_composite_scores USING btree (jurisdiction_id, quarter, methodology_version)"
+        "definition": "CREATE UNIQUE INDEX idx_ci_composite_unique ON public.ci_composite_scores USING btree (jurisdiction_id, quarter, methodology_version, release_id) NULLS NOT DISTINCT"
       },
       {
         "name": "ci_dimension_scores_pkey",
@@ -11298,9 +11591,34 @@
         "definition": "CREATE INDEX idx_ci_dimension_scores_quarter ON public.ci_dimension_scores USING btree (quarter)"
       },
       {
+        "name": "idx_ci_dimension_scores_release",
+        "table": "ci_dimension_scores",
+        "definition": "CREATE INDEX idx_ci_dimension_scores_release ON public.ci_dimension_scores USING btree (release_id, jurisdiction_id)"
+      },
+      {
         "name": "idx_ci_dimension_scores_unique",
         "table": "ci_dimension_scores",
-        "definition": "CREATE UNIQUE INDEX idx_ci_dimension_scores_unique ON public.ci_dimension_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id)"
+        "definition": "CREATE UNIQUE INDEX idx_ci_dimension_scores_unique ON public.ci_dimension_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id, release_id) NULLS NOT DISTINCT"
+      },
+      {
+        "name": "ci_index_release_pointers_pkey",
+        "table": "ci_index_release_pointers",
+        "definition": "CREATE UNIQUE INDEX ci_index_release_pointers_pkey ON public.ci_index_release_pointers USING btree (product)"
+      },
+      {
+        "name": "ci_index_releases_pkey",
+        "table": "ci_index_releases",
+        "definition": "CREATE UNIQUE INDEX ci_index_releases_pkey ON public.ci_index_releases USING btree (id)"
+      },
+      {
+        "name": "ci_index_releases_vintage_label_unique",
+        "table": "ci_index_releases",
+        "definition": "CREATE UNIQUE INDEX ci_index_releases_vintage_label_unique ON public.ci_index_releases USING btree (vintage_label)"
+      },
+      {
+        "name": "idx_ci_index_releases_status",
+        "table": "ci_index_releases",
+        "definition": "CREATE INDEX idx_ci_index_releases_status ON public.ci_index_releases USING btree (status, published_at)"
       },
       {
         "name": "ci_ingestion_runs_pkey",
@@ -12503,6 +12821,16 @@
         "definition": "CREATE UNIQUE INDEX pulse_review_sla_events_pkey ON public.pulse_review_sla_events USING btree (id)"
       },
       {
+        "name": "pulse_score_publication_pointers_computation_run_id_unique",
+        "table": "pulse_score_publication_pointers",
+        "definition": "CREATE UNIQUE INDEX pulse_score_publication_pointers_computation_run_id_unique ON public.pulse_score_publication_pointers USING btree (computation_run_id)"
+      },
+      {
+        "name": "pulse_score_publication_pointers_pkey",
+        "table": "pulse_score_publication_pointers",
+        "definition": "CREATE UNIQUE INDEX pulse_score_publication_pointers_pkey ON public.pulse_score_publication_pointers USING btree (product)"
+      },
+      {
         "name": "idx_pulse_sources_event",
         "table": "pulse_sources",
         "definition": "CREATE INDEX idx_pulse_sources_event ON public.pulse_sources USING btree (event_id)"
@@ -12655,6 +12983,36 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_capture_research_evidence_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  before_row jsonb := to_jsonb(OLD);\n  after_row jsonb := CASE WHEN TG_OP = 'UPDATE' THEN to_jsonb(NEW) ELSE NULL END;\n  evidence_id text;\n  evidence_actor text;\n  evidence_reason text;\nBEGIN\n  evidence_id := COALESCE(after_row->>'id', before_row->>'id', md5(before_row::text));\n  evidence_actor := COALESCE(\n    NULLIF(after_row->>'reviewer_id', ''),\n    NULLIF(after_row->>'actor_id', ''),\n    NULLIF(before_row->>'reviewer_id', ''),\n    current_user\n  );\n  evidence_reason := COALESCE(\n    NULLIF(after_row->>'status_reason', ''),\n    NULLIF(after_row->>'review_notes', ''),\n    NULLIF(after_row->>'disposition', ''),\n    NULLIF(after_row->>'classification_reason', ''),\n    NULLIF(before_row->>'status_reason', ''),\n    lower(TG_OP) || '_retained_by_dat_016'\n  );\n\n  INSERT INTO research_evidence_history (\n    entity_table, entity_id, operation, before, after, reason, actor_id\n  ) VALUES (\n    TG_TABLE_NAME, evidence_id, lower(TG_OP), before_row, after_row,\n    evidence_reason, evidence_actor\n  );\n\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_ci_composite_storage_sha256",
+        "identity": "target_release_id text",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_ci_composite_storage_sha256(target_release_id text)\n RETURNS text\n LANGUAGE sql\n STABLE\nAS $function$\n  SELECT encode(digest(COALESCE(string_agg(jsonb_build_array(\n    score.jurisdiction_id,score.quarter,score.score,score.score_lower,\n    score.score_upper,score.band,score.completeness_flag,score.vintage_label,\n    score.supersedes_vintage_label,score.content_hash,score.rank,\n    score.total_ranked,score.is_partial,score.dimensions_available,\n    score.missing_dimensions,score.methodology_version,score.release_id,\n    score.derivation_version_key,score.derivation_versions\n  )::text,E'\\n' ORDER BY score.jurisdiction_id),''),'sha256'),'hex')\n  FROM ci_composite_scores score WHERE score.release_id=target_release_id\n$function$\n"
+      },
+      {
+        "name": "civica_ci_dimension_storage_sha256",
+        "identity": "target_release_id text",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_ci_dimension_storage_sha256(target_release_id text)\n RETURNS text\n LANGUAGE sql\n STABLE\nAS $function$\n  SELECT encode(digest(COALESCE(string_agg(jsonb_build_array(\n    score.jurisdiction_id,score.dimension,score.quarter,score.normalized_score,\n    score.raw_value,score.source_id,score.indicator_id,score.upstream_release,\n    score.artifact_hash,score.artifact_kind,score.temporal_coverage,\n    score.license_url,score.transformation_id,score.substitution_reason,\n    score.method_version,score.methodology_version,score.release_id,\n    score.derivation_version_key,score.derivation_versions\n  )::text,E'\\n' ORDER BY score.jurisdiction_id,score.dimension,score.source_id,score.indicator_id),''),'sha256'),'hex')\n  FROM ci_dimension_scores score WHERE score.release_id=target_release_id\n$function$\n"
+      },
+      {
+        "name": "civica_ci_expected_derivation_envelope",
+        "identity": "methodology_version text, algorithm_version text, source_ids jsonb",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_ci_expected_derivation_envelope(methodology_version text, algorithm_version text, source_ids jsonb)\n RETURNS jsonb\n LANGUAGE sql\n IMMUTABLE STRICT\nAS $function$\n  SELECT jsonb_build_object(\n    'schemaVersion','derivation-version-envelope/v1',\n    'methodology',jsonb_build_object('state','versioned','id',methodology_version),\n    'algorithm',jsonb_build_object('state','versioned','id',algorithm_version),\n    'prompt',jsonb_build_object('state','not_applicable','reason','The Civica Index calculation does not use a model prompt.'),\n    'taxonomy',jsonb_build_object('state','not_applicable','reason','The Civica Index calculation does not apply a categorical taxonomy.'),\n    'sourceBasket',jsonb_build_object('state','versioned','id',civica_ci_source_basket_version(source_ids)),\n    'sourceIds',source_ids\n  )\n$function$\n"
+      },
+      {
+        "name": "civica_ci_expected_derivation_version_key",
+        "identity": "methodology_version text, algorithm_version text, source_ids jsonb",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_ci_expected_derivation_version_key(methodology_version text, algorithm_version text, source_ids jsonb)\n RETURNS text\n LANGUAGE plpgsql\n IMMUTABLE STRICT\nAS $function$\nDECLARE source_ids_json text; source_basket text; payload text;\nBEGIN\n  IF jsonb_typeof(source_ids)<>'array' OR jsonb_array_length(source_ids)=0 THEN\n    RETURN NULL;\n  END IF;\n  SELECT '[' || string_agg(to_json(source_id)::text,',' ORDER BY ordinal) || ']'\n    INTO source_ids_json\n  FROM jsonb_array_elements_text(source_ids) WITH ORDINALITY AS source(source_id,ordinal);\n  source_basket := civica_ci_source_basket_version(source_ids);\n  payload :=\n    '{\"schemaVersion\":\"derivation-version-envelope/v1\"' ||\n    ',\"methodology\":{\"state\":\"versioned\",\"id\":' || to_json(methodology_version)::text || '}' ||\n    ',\"algorithm\":{\"state\":\"versioned\",\"id\":' || to_json(algorithm_version)::text || '}' ||\n    ',\"prompt\":{\"state\":\"not_applicable\",\"reason\":\"The Civica Index calculation does not use a model prompt.\"}' ||\n    ',\"taxonomy\":{\"state\":\"not_applicable\",\"reason\":\"The Civica Index calculation does not apply a categorical taxonomy.\"}' ||\n    ',\"sourceBasket\":{\"state\":\"versioned\",\"id\":' || to_json(source_basket)::text || '}' ||\n    ',\"sourceIds\":' || source_ids_json || '}';\n  RETURN 'derivation/sha256:' || substr(encode(digest(payload,'sha256'),'hex'),1,16);\nEND $function$\n"
+      },
+      {
+        "name": "civica_ci_methodology_content_sha256",
+        "identity": "target_methodology_id text",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_ci_methodology_content_sha256(target_methodology_id text)\n RETURNS text\n LANGUAGE sql\n STABLE STRICT\nAS $function$\n  SELECT encode(digest(\n    '{\"id\":' || to_json(methodology.id)::text || ',\"weights\":{' ||\n    COALESCE((\n      SELECT string_agg(to_json(weight.key)::text || ':' || weight.value::text, ',' ORDER BY weight.key)\n      FROM jsonb_each(methodology.weights) AS weight(key,value)\n    ),'') || '}}',\n    'sha256'\n  ),'hex')\n  FROM ci_methodology_versions methodology\n  WHERE methodology.id=target_methodology_id\n$function$\n"
+      },
+      {
+        "name": "civica_ci_source_basket_version",
+        "identity": "source_ids jsonb",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_ci_source_basket_version(source_ids jsonb)\n RETURNS text\n LANGUAGE plpgsql\n IMMUTABLE STRICT\nAS $function$\nDECLARE source_lines text;\nBEGIN\n  IF jsonb_typeof(source_ids)<>'array' OR jsonb_array_length(source_ids)=0 THEN\n    RETURN NULL;\n  END IF;\n  SELECT string_agg(source_id,E'\\n' ORDER BY source_id) INTO source_lines\n  FROM jsonb_array_elements_text(source_ids) AS source(source_id);\n  RETURN 'source-basket/sha256:' || substr(encode(digest(source_lines,'sha256'),'hex'),1,16);\nEND $function$\n"
+      },
+      {
         "name": "civica_finish_cron_job_v1",
         "identity": "p_job_id text, p_execution_key text, p_attempt_id uuid, p_lease_token uuid, p_lease_fence integer, p_status text, p_response_status integer, p_result_code text",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_finish_cron_job_v1(p_job_id text, p_execution_key text, p_attempt_id uuid, p_lease_token uuid, p_lease_fence integer, p_status text, p_response_status integer, p_result_code text)\n RETURNS boolean\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  v_lease public.cron_job_leases%ROWTYPE;\n  v_execution public.cron_job_executions%ROWTYPE;\n  v_attempt public.cron_job_attempts%ROWTYPE;\n  v_now timestamptz;\nBEGIN\n  IF p_job_id IS NULL\n     OR p_execution_key IS NULL\n     OR p_attempt_id IS NULL\n     OR p_lease_token IS NULL\n     OR p_lease_fence IS NULL\n     OR p_status IS NULL\n     OR p_response_status IS NULL\n     OR p_result_code IS NULL\n     OR p_job_id !~ '^[a-z][a-z0-9.-]*$'\n     OR length(p_job_id) NOT BETWEEN 1 AND 80\n     OR p_execution_key !~ '^[a-f0-9]{64}$'\n     OR p_lease_fence < 1\n     OR p_status NOT IN ('succeeded', 'failed')\n     OR p_response_status NOT BETWEEN 100 AND 599\n     OR (p_status = 'succeeded' AND p_response_status NOT BETWEEN 200 AND 299)\n     OR (p_status = 'failed' AND p_response_status BETWEEN 200 AND 299)\n     OR p_result_code !~ '^[a-z][a-z0-9_.-]*$'\n     OR length(p_result_code) > 80 THEN\n    RAISE EXCEPTION 'invalid cron finalization input';\n  END IF;\n\n  SELECT lease_row.*\n  INTO v_lease\n  FROM public.cron_job_leases AS lease_row\n  WHERE lease_row.job_id = p_job_id\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RETURN false;\n  END IF;\n\n  v_now := clock_timestamp();\n  IF v_lease.lease_token IS DISTINCT FROM p_lease_token\n     OR v_lease.execution_key IS DISTINCT FROM p_execution_key\n     OR v_lease.attempt_id IS DISTINCT FROM p_attempt_id\n     OR v_lease.lease_fence IS DISTINCT FROM p_lease_fence THEN\n    RETURN false;\n  END IF;\n\n  SELECT execution_row.*\n  INTO v_execution\n  FROM public.cron_job_executions AS execution_row\n  WHERE execution_row.execution_key = p_execution_key\n    AND execution_row.job_id = p_job_id\n    AND execution_row.last_attempt_id = p_attempt_id\n    AND execution_row.last_fence = p_lease_fence\n    AND execution_row.status = 'running'\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RETURN false;\n  END IF;\n\n  SELECT attempt_row.*\n  INTO v_attempt\n  FROM public.cron_job_attempts AS attempt_row\n  WHERE attempt_row.attempt_id = p_attempt_id\n    AND attempt_row.execution_key = p_execution_key\n    AND attempt_row.job_id = p_job_id\n    AND attempt_row.fence = p_lease_fence\n    AND attempt_row.status = 'running'\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RETURN false;\n  END IF;\n\n  IF v_now < v_attempt.started_at THEN\n    v_now := v_attempt.started_at;\n  END IF;\n\n  UPDATE public.cron_job_attempts AS attempt_row\n  SET status = p_status,\n      completed_at = v_now,\n      response_status = p_response_status,\n      result_code = p_result_code\n  WHERE attempt_row.attempt_id = p_attempt_id;\n\n  UPDATE public.cron_job_executions AS execution_row\n  SET status = p_status,\n      completed_at = v_now,\n      response_status = p_response_status,\n      result_code = p_result_code,\n      updated_at = v_now\n  WHERE execution_row.execution_key = p_execution_key;\n\n  UPDATE public.cron_job_leases AS lease_row\n  SET lease_token = NULL,\n      lease_expires_at = NULL,\n      execution_key = NULL,\n      attempt_id = NULL,\n      updated_at = v_now\n  WHERE lease_row.job_id = p_job_id;\n\n  RETURN true;\nEND;\n$function$\n"
@@ -12668,6 +13026,16 @@
         "name": "civica_guard_candidate_snapshot_mutation",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_candidate_snapshot_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases\n    WHERE vintage_label=COALESCE(OLD.vintage_label, NEW.vintage_label);\n  IF release_status <> 'staging' THEN\n    RAISE EXCEPTION 'frozen candidate vintage % is immutable', COALESCE(OLD.vintage_label, NEW.vintage_label);\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_ci_release_header_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_ci_release_header_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP='INSERT' THEN\n    IF NEW.status<>'staging' OR NEW.published_at IS NOT NULL THEN\n      RAISE EXCEPTION 'Index release header % must be inserted as staging', NEW.id;\n    END IF;\n    RETURN NEW;\n  END IF;\n  IF OLD.status='published' THEN\n    RAISE EXCEPTION 'published Index release header % is immutable', OLD.id;\n  END IF;\n  IF TG_OP='DELETE' THEN\n    RAISE EXCEPTION 'Index release header % cannot be deleted', OLD.id;\n  END IF;\n  IF (to_jsonb(OLD) - 'status' - 'published_at')\n     IS DISTINCT FROM (to_jsonb(NEW) - 'status' - 'published_at') THEN\n    RAISE EXCEPTION 'staged Index release header % identity is immutable', OLD.id;\n  END IF;\n  IF NEW.status='published' AND current_setting('civica.ci_release_publication',true) IS DISTINCT FROM NEW.id THEN\n    RAISE EXCEPTION 'Index release % must be finalized through civica_publish_ci_release()', NEW.id;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_ci_release_pointer_delete",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_ci_release_pointer_delete()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Index publication pointer cannot be deleted; publish a verified successor release';\nEND $function$\n"
       },
       {
         "name": "civica_guard_cron_job_attempt_update_v1",
@@ -12685,9 +13053,34 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_cron_job_lease_update_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  v_old_active boolean := OLD.lease_token IS NOT NULL;\n  v_new_active boolean := NEW.lease_token IS NOT NULL;\nBEGIN\n  IF NEW.job_id IS DISTINCT FROM OLD.job_id OR NEW.updated_at < OLD.updated_at THEN\n    RAISE EXCEPTION 'cron job lease identity cannot be rewritten';\n  END IF;\n\n  IF NEW.lease_fence = OLD.lease_fence THEN\n    IF NOT v_old_active OR v_new_active THEN\n      RAISE EXCEPTION 'a cron job lease may retain its fence only when released';\n    END IF;\n  ELSIF NEW.lease_fence = OLD.lease_fence + 1 THEN\n    IF v_old_active OR NOT v_new_active THEN\n      RAISE EXCEPTION 'a cron job lease fence may advance only on acquisition';\n    END IF;\n  ELSE\n    RAISE EXCEPTION 'cron job lease fence must advance monotonically by one';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_guard_published_ci_methodology",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_published_ci_methodology()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF EXISTS (SELECT 1 FROM ci_index_releases WHERE methodology_version=OLD.id AND status='published') THEN\n    RAISE EXCEPTION 'methodology % belongs to a published Index release and is immutable', OLD.id;\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_published_ci_score_mutation",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_published_ci_score_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text; affected_release_id text;\nBEGIN\n  affected_release_id := CASE WHEN TG_OP='DELETE' THEN OLD.release_id ELSE COALESCE(OLD.release_id,NEW.release_id) END;\n  SELECT status INTO release_status FROM ci_index_releases\n    WHERE id=affected_release_id;\n  IF release_status='published' THEN\n    RAISE EXCEPTION 'published Index release % is immutable', affected_release_id;\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_published_pulse_history",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_published_pulse_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_run_id uuid; new_run_id uuid;\nBEGIN\n  IF TG_OP<>'INSERT' THEN old_run_id:=OLD.computation_run_id; END IF;\n  IF TG_OP<>'DELETE' THEN new_run_id:=NEW.computation_run_id; END IF;\n  IF EXISTS (\n    SELECT 1 FROM pulse_score_publication_pointers pointer\n    WHERE pointer.computation_run_id=old_run_id OR pointer.computation_run_id=new_run_id\n  ) THEN\n    RAISE EXCEPTION 'currently published Pulse score history is immutable';\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_guard_published_pulse_run",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_published_pulse_run()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF EXISTS (\n    SELECT 1 FROM pulse_score_publication_pointers pointer\n    WHERE pointer.computation_run_id=OLD.id\n  ) THEN\n    RAISE EXCEPTION 'currently published Pulse score run is immutable';\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
         "name": "civica_guard_pulse_classify_binding_insert_v1",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_pulse_classify_binding_insert_v1()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF NOT EXISTS (\n    SELECT 1\n    FROM public.cron_job_executions AS execution_row\n    WHERE execution_row.execution_key = NEW.execution_key\n      AND execution_row.job_id = 'pulse.v2.classify'\n  ) OR NOT EXISTS (\n    SELECT 1\n    FROM public.pulse_pipeline_runs AS run_row\n    WHERE run_row.id = NEW.classification_run_id\n      AND run_row.stage = 'classify'\n  ) THEN\n    RAISE EXCEPTION 'invalid Pulse classification delivery binding';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_guard_pulse_publication_pointer_delete",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_pulse_publication_pointer_delete()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Pulse publication pointer cannot be deleted; publish a complete successor run';\nEND $function$\n"
       },
       {
         "name": "civica_pin_pulse_event_information_environment",
@@ -12713,6 +13106,11 @@
         "name": "civica_protect_terminal_pulse_coding_adjudication",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_protect_terminal_pulse_coding_adjudication()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    RAISE EXCEPTION 'Pulse coding adjudications cannot be deleted';\n  END IF;\n  IF OLD.status IN ('resolved', 'unresolved') THEN\n    RAISE EXCEPTION 'Terminal Pulse coding adjudications are immutable';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_publish_ci_release",
+        "identity": "target_release_id text, verified_input_manifest_sha256 text, verified_dimension_row_set_sha256 text, verified_composite_row_set_sha256 text, observed_dimension_storage_sha256 text, observed_composite_storage_sha256 text",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_publish_ci_release(target_release_id text, verified_input_manifest_sha256 text, verified_dimension_row_set_sha256 text, verified_composite_row_set_sha256 text, observed_dimension_storage_sha256 text, observed_composite_storage_sha256 text)\n RETURNS void\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  release_row ci_index_releases%ROWTYPE;\n  predecessor_row ci_index_releases%ROWTYPE;\n  current_pointer_release_id text;\n  dimension_count integer;\n  composite_count integer;\n  actual_dimension_storage_sha256 text;\n  actual_composite_storage_sha256 text;\n  actual_methodology_content_sha256 text;\n  actual_source_artifacts jsonb;\nBEGIN\n  SELECT * INTO release_row FROM ci_index_releases WHERE id=target_release_id FOR UPDATE;\n  IF NOT FOUND OR release_row.status<>'staging' THEN\n    RAISE EXCEPTION 'Index release % is not staging', target_release_id;\n  END IF;\n  IF verified_input_manifest_sha256 IS DISTINCT FROM release_row.input_manifest_sha256\n     OR verified_dimension_row_set_sha256 IS DISTINCT FROM release_row.dimension_row_set_sha256\n     OR verified_composite_row_set_sha256 IS DISTINCT FROM release_row.composite_row_set_sha256 THEN\n    RAISE EXCEPTION 'Index release % semantic verification disagrees with its staged header',target_release_id;\n  END IF;\n  -- Publication is rare. Whole-table SHARE locks prevent an insert/update/delete\n  -- race between the caller's semantic hash check and this atomic pointer flip.\n  LOCK TABLE ci_dimension_scores IN SHARE MODE;\n  LOCK TABLE ci_composite_scores IN SHARE MODE;\n  SELECT civica_ci_methodology_content_sha256(release_row.methodology_version)\n    INTO actual_methodology_content_sha256\n  FROM ci_methodology_versions\n  WHERE id=release_row.methodology_version\n  FOR SHARE;\n  IF actual_methodology_content_sha256 IS DISTINCT FROM release_row.methodology_content_sha256 THEN\n    RAISE EXCEPTION 'Index release % methodology content disagrees with its staged header',target_release_id;\n  END IF;\n  SELECT COALESCE(jsonb_object_agg(artifact.identity,artifact.artifact_hash ORDER BY artifact.identity),'{}'::jsonb)\n    INTO actual_source_artifacts\n  FROM (\n    SELECT score.source_id || ':' || score.indicator_id AS identity,min(score.artifact_hash) AS artifact_hash\n    FROM ci_dimension_scores score\n    WHERE score.release_id=target_release_id\n    GROUP BY score.source_id,score.indicator_id\n    HAVING count(DISTINCT score.artifact_hash)=1\n  ) artifact;\n  IF actual_source_artifacts IS DISTINCT FROM release_row.source_artifacts THEN\n    RAISE EXCEPTION 'Index release % source artifact basket is incomplete or contains unselected identities',target_release_id;\n  END IF;\n  SELECT count(*)::int,civica_ci_dimension_storage_sha256(target_release_id)\n    INTO dimension_count,actual_dimension_storage_sha256\n    FROM ci_dimension_scores WHERE release_id=target_release_id;\n  SELECT count(*)::int,civica_ci_composite_storage_sha256(target_release_id)\n    INTO composite_count,actual_composite_storage_sha256\n    FROM ci_composite_scores WHERE release_id=target_release_id;\n  IF dimension_count<>release_row.dimension_row_count OR composite_count<>release_row.composite_row_count THEN\n    RAISE EXCEPTION 'Index release % is incomplete: dimensions %/%, composites %/%',target_release_id,dimension_count,release_row.dimension_row_count,composite_count,release_row.composite_row_count;\n  END IF;\n  IF EXISTS (\n    SELECT 1\n    FROM ci_dimension_scores score\n    WHERE score.release_id=target_release_id\n    GROUP BY score.jurisdiction_id,score.dimension\n    HAVING count(*)<>1\n  ) OR EXISTS (\n    SELECT 1 FROM ci_dimension_scores score\n    WHERE score.release_id=target_release_id AND (\n      score.quarter IS DISTINCT FROM release_row.quarter\n      OR score.methodology_version IS DISTINCT FROM release_row.methodology_version\n      OR release_row.source_artifacts->>(score.source_id || ':' || score.indicator_id) IS DISTINCT FROM score.artifact_hash\n      OR NOT EXISTS (\n        SELECT 1\n        FROM jsonb_array_elements(release_row.dimension_rules) rule\n        WHERE rule->>'dimension'=score.dimension\n          AND rule->>'sourceId'=score.source_id\n          AND rule->>'indicatorId'=score.indicator_id\n          AND rule->>'artifactSha256'=score.artifact_hash\n          AND rule->>'upstreamRelease'=score.upstream_release\n          AND rule->>'artifactKind'=score.artifact_kind\n          AND rule->>'temporalCoverage'=score.temporal_coverage\n          AND rule->>'licenseUrl'=score.license_url\n          AND rule->>'substitutionReason' IS NOT DISTINCT FROM score.substitution_reason\n      )\n      OR score.transformation_id IS DISTINCT FROM release_row.input_transformation_version || ':' || score.dimension\n      OR score.method_version IS DISTINCT FROM release_row.methodology_version\n      OR score.derivation_versions IS DISTINCT FROM civica_ci_expected_derivation_envelope(\n        release_row.methodology_version,\n        release_row.input_transformation_version,\n        to_jsonb(ARRAY[score.source_id]::text[])\n      )\n      OR score.derivation_version_key IS DISTINCT FROM civica_ci_expected_derivation_version_key(\n        release_row.methodology_version,\n        release_row.input_transformation_version,\n        to_jsonb(ARRAY[score.source_id]::text[])\n      )\n    )\n  ) OR EXISTS (\n    SELECT 1 FROM ci_composite_scores score\n    WHERE score.release_id=target_release_id AND (\n      score.quarter IS DISTINCT FROM release_row.quarter\n      OR score.methodology_version IS DISTINCT FROM release_row.methodology_version\n      OR score.vintage_label IS DISTINCT FROM release_row.vintage_label\n      OR score.supersedes_vintage_label IS DISTINCT FROM release_row.supersedes_vintage_label\n      OR score.content_hash !~ '^[a-f0-9]{64}$'\n      OR (release_row.uncertainty_policy->>'bounds'='required' AND (score.score_lower IS NULL OR score.score_upper IS NULL))\n      OR (release_row.uncertainty_policy->>'bounds'='absent' AND (score.score_lower IS NOT NULL OR score.score_upper IS NOT NULL))\n      OR (score.score_lower IS NOT NULL AND score.score_upper IS NOT NULL AND (score.score_lower>score.score OR score.score_upper<score.score OR score.score_lower>score.score_upper))\n      OR score.derivation_versions IS DISTINCT FROM civica_ci_expected_derivation_envelope(\n        release_row.methodology_version,\n        release_row.composite_algorithm_version,\n        (\n          SELECT COALESCE(jsonb_agg(source.source_id ORDER BY source.source_id),'[]'::jsonb)\n          FROM (\n            SELECT DISTINCT dimension.source_id\n            FROM ci_dimension_scores dimension\n            WHERE dimension.release_id=target_release_id\n              AND dimension.jurisdiction_id=score.jurisdiction_id\n          ) source\n        )\n      )\n      OR score.derivation_version_key IS DISTINCT FROM civica_ci_expected_derivation_version_key(\n        release_row.methodology_version,\n        release_row.composite_algorithm_version,\n        (\n          SELECT COALESCE(jsonb_agg(source.source_id ORDER BY source.source_id),'[]'::jsonb)\n          FROM (\n            SELECT DISTINCT dimension.source_id\n            FROM ci_dimension_scores dimension\n            WHERE dimension.release_id=target_release_id\n              AND dimension.jurisdiction_id=score.jurisdiction_id\n          ) source\n        )\n      )\n    )\n  ) THEN\n    RAISE EXCEPTION 'Index release % contains incompatible rows',target_release_id;\n  END IF;\n  IF observed_dimension_storage_sha256 IS DISTINCT FROM actual_dimension_storage_sha256\n     OR observed_composite_storage_sha256 IS DISTINCT FROM actual_composite_storage_sha256 THEN\n    RAISE EXCEPTION 'Index release % changed after semantic verification',target_release_id;\n  END IF;\n  SELECT release_id INTO current_pointer_release_id\n  FROM ci_index_release_pointers\n  WHERE product='civica_index'\n  FOR UPDATE;\n  IF release_row.supersession_kind IN ('none','legacy_unregistered_vintage') THEN\n    IF current_pointer_release_id IS NOT NULL THEN\n      RAISE EXCEPTION 'initial Index release % cannot replace public pointer % without supersession',target_release_id,current_pointer_release_id;\n    END IF;\n  ELSIF release_row.supersession_kind='registered_release' THEN\n    SELECT * INTO predecessor_row\n    FROM ci_index_releases\n    WHERE id=release_row.supersedes_release_id\n    FOR SHARE;\n    IF NOT FOUND\n       OR predecessor_row.status<>'published'\n       OR predecessor_row.vintage_label IS DISTINCT FROM release_row.supersedes_vintage_label THEN\n      RAISE EXCEPTION 'Index release % predecessor is missing, unpublished, or mismatched',target_release_id;\n    END IF;\n    IF current_pointer_release_id IS DISTINCT FROM release_row.supersedes_release_id THEN\n      RAISE EXCEPTION 'Index release % can only replace its declared predecessor %',target_release_id,release_row.supersedes_release_id;\n    END IF;\n  ELSE\n    RAISE EXCEPTION 'Index release % has unsupported supersession kind %',target_release_id,release_row.supersession_kind;\n  END IF;\n  PERFORM set_config('civica.ci_release_publication',target_release_id,true);\n  UPDATE ci_index_releases SET status='published',published_at=NOW() WHERE id=target_release_id;\n  INSERT INTO ci_index_release_pointers(product,release_id,updated_at)\n  VALUES ('civica_index',target_release_id,NOW())\n  ON CONFLICT (product) DO UPDATE SET release_id=EXCLUDED.release_id,updated_at=EXCLUDED.updated_at;\nEND $function$\n"
       },
       {
         "name": "civica_pulse_coding_has_forbidden_field",
@@ -12785,9 +13183,19 @@
         "definition": "CREATE OR REPLACE FUNCTION public.civica_sync_pulse_review_obligation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  obligation_id uuid;\n  queue_time timestamp;\n  priority_value text;\n  escalate_time timestamp;\n  due_time timestamp;\nBEGIN\n  IF NEW.review_status = 'pending'\n     AND NEW.published = false\n     AND NEW.projection_status = 'current' THEN\n    queue_time := CASE\n      WHEN TG_OP = 'INSERT' THEN NEW.created_at\n      ELSE NEW.updated_at\n    END;\n    priority_value := CASE\n      WHEN NEW.severity_tier = 'catastrophic_neg' THEN 'critical'\n      WHEN NEW.severity_tier IN ('severe_neg', 'high_pos') THEN 'urgent'\n      ELSE 'standard'\n    END;\n    escalate_time := CASE\n      WHEN priority_value = 'critical' THEN queue_time\n      WHEN priority_value = 'urgent' THEN queue_time + interval '24 hours'\n      ELSE queue_time + interval '5 days'\n    END;\n    due_time := CASE\n      WHEN priority_value = 'critical' THEN queue_time + interval '24 hours'\n      WHEN priority_value = 'urgent' THEN queue_time + interval '72 hours'\n      ELSE queue_time + interval '7 days'\n    END;\n\n    INSERT INTO pulse_review_obligations (\n      schema_version, event_id, incident_id, sla_version, priority,\n      trigger_reason, queued_at, queued_at_basis, escalate_at, due_at, state\n    ) VALUES (\n      'pulse-review-obligation/v1', NEW.id, NEW.incident_id,\n      'pulse-review-sla/v1', priority_value, 'publication_gate', queue_time,\n      'recorded', escalate_time, due_time, 'open'\n    )\n    ON CONFLICT (event_id, sla_version) DO NOTHING\n    RETURNING id INTO obligation_id;\n\n    IF obligation_id IS NOT NULL THEN\n      INSERT INTO pulse_review_sla_events (\n        schema_version, event_key, obligation_id, kind, actor, reason_code,\n        note, effective_at, expires_at, metadata\n      ) VALUES (\n        'pulse-review-sla-event/v1',\n        'pulse-review-sla-event/sha256:' || encode(\n          digest(obligation_id::text || E'\\nenqueued\\n' || queue_time::text, 'sha256'),\n          'hex'\n        ),\n        obligation_id, 'enqueued',\n        '{\"type\":\"database_trigger\",\"version\":\"pulse-review-sla/v1\"}'::jsonb,\n        'publication_gate',\n        'Classification entered the human-review queue under pulse-review-sla/v1.',\n        queue_time, NULL,\n        jsonb_build_object('priority', priority_value, 'dueAt', due_time)\n      ) ON CONFLICT (event_key) DO NOTHING;\n    END IF;\n  END IF;\n\n  IF TG_OP = 'UPDATE'\n     AND OLD.review_status = 'pending'\n     AND NEW.review_status <> 'pending' THEN\n    UPDATE pulse_review_obligations\n    SET state = 'dispositioned',\n        claimed_by = NULL,\n        claimed_at = NULL,\n        claim_expires_at = NULL,\n        disposition = NEW.review_status,\n        dispositioned_by = COALESCE(NULLIF(NEW.reviewer_id, ''), 'system:event-transition'),\n        dispositioned_at = NEW.updated_at,\n        updated_at = NEW.updated_at\n    WHERE event_id = NEW.id\n      AND sla_version = 'pulse-review-sla/v1'\n      AND state IN ('open','claimed')\n    RETURNING id INTO obligation_id;\n\n    IF obligation_id IS NOT NULL THEN\n      INSERT INTO pulse_review_sla_events (\n        schema_version, event_key, obligation_id, kind, actor, reason_code,\n        note, effective_at, expires_at, metadata\n      ) VALUES (\n        'pulse-review-sla-event/v1',\n        'pulse-review-sla-event/sha256:' || encode(\n          digest(obligation_id::text || E'\\ndispositioned\\n' || NEW.review_status || E'\\n' || NEW.updated_at::text, 'sha256'),\n          'hex'\n        ),\n        obligation_id, 'dispositioned',\n        jsonb_build_object(\n          'type', CASE WHEN NEW.human_reviewed THEN 'human_reviewer' ELSE 'system_transition' END,\n          'reviewerId', NEW.reviewer_id\n        ),\n        NEW.review_status,\n        'The event left the active review queue.',\n        NEW.updated_at, NULL,\n        jsonb_build_object('humanReviewed', NEW.human_reviewed, 'published', NEW.published)\n      ) ON CONFLICT (event_key) DO NOTHING;\n    END IF;\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
+        "name": "civica_validate_ci_release_pointer",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_ci_release_pointer()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text;\nBEGIN\n  SELECT status INTO release_status FROM ci_index_releases WHERE id=NEW.release_id;\n  IF release_status IS DISTINCT FROM 'published' THEN\n    RAISE EXCEPTION 'Index pointer requires a published release';\n  END IF;\n  IF current_setting('civica.ci_release_publication',true) IS DISTINCT FROM NEW.release_id THEN\n    RAISE EXCEPTION 'Index pointer must flip through civica_publish_ci_release()';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "name": "civica_validate_ci_release_score_row",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_ci_release_score_row()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  release_row ci_index_releases%ROWTYPE;\n  expected_artifact text;\n  expected_dimension_rule jsonb;\n  expected_source_ids jsonb;\n  expected_derivation_versions jsonb;\n  expected_derivation_version_key text;\nBEGIN\n  IF NEW.release_id IS NULL THEN\n    IF TG_TABLE_NAME='ci_composite_scores' AND NEW.vintage_label IS NOT NULL THEN\n      RAISE EXCEPTION 'named Index score requires release_id';\n    END IF;\n    RETURN NEW;\n  END IF;\n  SELECT * INTO release_row FROM ci_index_releases WHERE id=NEW.release_id;\n  IF NOT FOUND THEN RAISE EXCEPTION 'unknown Index release %', NEW.release_id; END IF;\n  IF release_row.status='published' THEN\n    RAISE EXCEPTION 'published Index release % is immutable', NEW.release_id;\n  END IF;\n  IF NEW.quarter IS DISTINCT FROM release_row.quarter\n     OR NEW.methodology_version IS DISTINCT FROM release_row.methodology_version THEN\n    RAISE EXCEPTION 'Index score coordinates disagree with release %', NEW.release_id;\n  END IF;\n  IF TG_TABLE_NAME='ci_dimension_scores' THEN\n    SELECT rule INTO expected_dimension_rule\n    FROM jsonb_array_elements(release_row.dimension_rules) rule\n    WHERE rule->>'dimension'=NEW.dimension\n      AND rule->>'sourceId'=NEW.source_id\n      AND rule->>'indicatorId'=NEW.indicator_id;\n    IF NOT FOUND\n       OR expected_dimension_rule->>'artifactSha256' IS DISTINCT FROM NEW.artifact_hash\n       OR expected_dimension_rule->>'upstreamRelease' IS DISTINCT FROM NEW.upstream_release\n       OR expected_dimension_rule->>'artifactKind' IS DISTINCT FROM NEW.artifact_kind\n       OR expected_dimension_rule->>'temporalCoverage' IS DISTINCT FROM NEW.temporal_coverage\n       OR expected_dimension_rule->>'licenseUrl' IS DISTINCT FROM NEW.license_url\n       OR expected_dimension_rule->>'substitutionReason' IS DISTINCT FROM NEW.substitution_reason THEN\n      RAISE EXCEPTION 'Index dimension lineage is outside release %', NEW.release_id;\n    END IF;\n    expected_artifact := release_row.source_artifacts->>(NEW.source_id || ':' || NEW.indicator_id);\n    IF expected_artifact IS NULL OR expected_artifact IS DISTINCT FROM NEW.artifact_hash THEN\n      RAISE EXCEPTION 'Index dimension source artifact is outside release %', NEW.release_id;\n    END IF;\n    expected_source_ids := to_jsonb(ARRAY[NEW.source_id]::text[]);\n    expected_derivation_versions := civica_ci_expected_derivation_envelope(\n      release_row.methodology_version,release_row.input_transformation_version,expected_source_ids\n    );\n    expected_derivation_version_key := civica_ci_expected_derivation_version_key(\n      release_row.methodology_version,release_row.input_transformation_version,expected_source_ids\n    );\n    IF NEW.transformation_id IS DISTINCT FROM release_row.input_transformation_version || ':' || NEW.dimension\n       OR NEW.method_version IS DISTINCT FROM release_row.methodology_version\n       OR NEW.derivation_versions IS DISTINCT FROM expected_derivation_versions\n       OR NEW.derivation_version_key IS DISTINCT FROM expected_derivation_version_key THEN\n      RAISE EXCEPTION 'Index dimension derivation disagrees with release %', NEW.release_id;\n    END IF;\n  ELSE\n    IF NEW.vintage_label IS DISTINCT FROM release_row.vintage_label\n       OR NEW.supersedes_vintage_label IS DISTINCT FROM release_row.supersedes_vintage_label\n       OR NEW.content_hash !~ '^[a-f0-9]{64}$'\n       OR (release_row.uncertainty_policy->>'bounds'='required' AND (NEW.score_lower IS NULL OR NEW.score_upper IS NULL))\n       OR (release_row.uncertainty_policy->>'bounds'='absent' AND (NEW.score_lower IS NOT NULL OR NEW.score_upper IS NOT NULL))\n       OR (NEW.score_lower IS NOT NULL AND NEW.score_upper IS NOT NULL AND (NEW.score_lower>NEW.score OR NEW.score_upper<NEW.score OR NEW.score_lower>NEW.score_upper)) THEN\n      RAISE EXCEPTION 'Index composite identity disagrees with release %', NEW.release_id;\n    END IF;\n    SELECT COALESCE(jsonb_agg(source.source_id ORDER BY source.source_id),'[]'::jsonb)\n      INTO expected_source_ids\n    FROM (\n      SELECT DISTINCT score.source_id\n      FROM ci_dimension_scores score\n      WHERE score.release_id=NEW.release_id AND score.jurisdiction_id=NEW.jurisdiction_id\n    ) source;\n    expected_derivation_versions := civica_ci_expected_derivation_envelope(\n      release_row.methodology_version,release_row.composite_algorithm_version,expected_source_ids\n    );\n    expected_derivation_version_key := civica_ci_expected_derivation_version_key(\n      release_row.methodology_version,release_row.composite_algorithm_version,expected_source_ids\n    );\n    IF jsonb_array_length(expected_source_ids)=0\n       OR NEW.derivation_versions IS DISTINCT FROM expected_derivation_versions\n       OR NEW.derivation_version_key IS DISTINCT FROM expected_derivation_version_key THEN\n      RAISE EXCEPTION 'Index composite derivation disagrees with release %', NEW.release_id;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
         "name": "civica_validate_complete_candidate_winner",
         "identity": "",
-        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_complete_candidate_winner()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text; candidate_winner boolean;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases WHERE vintage_label=NEW.vintage_label;\n  IF release_status = 'complete_candidates' THEN\n    IF NEW.canonical_candidate_id IS NULL THEN RAISE EXCEPTION 'complete candidate release requires canonical_candidate_id'; END IF;\n    SELECT is_canonical_at_cut INTO candidate_winner FROM country_fact_vintage_candidates\n      WHERE id=NEW.canonical_candidate_id AND vintage_label=NEW.vintage_label;\n    IF candidate_winner IS DISTINCT FROM true THEN RAISE EXCEPTION 'canonical candidate pointer is not the frozen winner'; END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_complete_candidate_winner()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE release_status text; candidate_row country_fact_vintage_candidates%ROWTYPE;\nBEGIN\n  SELECT completeness_status INTO release_status FROM country_fact_vintage_releases WHERE vintage_label=NEW.vintage_label;\n  IF release_status IS NULL THEN RAISE EXCEPTION 'unknown candidate release %',NEW.vintage_label; END IF;\n  IF release_status<>'staging' THEN\n    RAISE EXCEPTION 'finalized candidate release % cannot accept new rows',NEW.vintage_label;\n  END IF;\n  IF NEW.canonical_candidate_id IS NULL THEN RAISE EXCEPTION 'complete candidate release requires canonical_candidate_id'; END IF;\n  SELECT * INTO candidate_row FROM country_fact_vintage_candidates\n    WHERE id=NEW.canonical_candidate_id AND vintage_label=NEW.vintage_label;\n  IF NOT FOUND OR candidate_row.is_canonical_at_cut IS DISTINCT FROM true\n     OR candidate_row.jurisdiction_id<>NEW.jurisdiction_id\n     OR candidate_row.fact_key<>NEW.fact_key OR candidate_row.source_id<>NEW.source_id THEN\n    RAISE EXCEPTION 'canonical candidate pointer does not match the frozen winner identity';\n  END IF;\n  IF candidate_row.candidate_payload->>'id'<>NEW.canonical_fact_id::text\n     OR candidate_row.candidate_payload->>'factValue' IS DISTINCT FROM NEW.value_text\n     OR NULLIF(candidate_row.candidate_payload->>'factValueNumeric','')::real IS DISTINCT FROM NEW.value_numeric\n     OR candidate_row.candidate_payload->>'factUnit' IS DISTINCT FROM NEW.value_unit\n     OR candidate_row.candidate_payload->>'methodologyVersion'<>NEW.methodology_version THEN\n    RAISE EXCEPTION 'canonical candidate payload disagrees with frozen vintage row';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
         "name": "civica_validate_frozen_vintage_insert",
@@ -12823,6 +13231,11 @@
         "name": "civica_validate_pulse_incident_merge",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_incident_merge()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  cycle_found boolean;\nBEGIN\n  IF NEW.status = 'merged' THEN\n    WITH RECURSIVE chain(id, merged_into_incident_id) AS (\n      SELECT i.id, i.merged_into_incident_id\n      FROM pulse_incidents i\n      WHERE i.id = NEW.merged_into_incident_id\n      UNION ALL\n      SELECT i.id, i.merged_into_incident_id\n      FROM pulse_incidents i\n      JOIN chain c ON i.id = c.merged_into_incident_id\n    )\n    SELECT EXISTS (SELECT 1 FROM chain WHERE id = NEW.id) INTO cycle_found;\n    IF cycle_found THEN\n      RAISE EXCEPTION 'pulse incident merge cycle detected for %', NEW.id;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_pulse_score_publication",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_pulse_score_publication()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  run_row pulse_pipeline_runs%ROWTYPE;\n  history_count integer;\n  jurisdiction_count integer;\n  score_dates integer;\n  retained_score_as_of date;\nBEGIN\n  -- Keep the exact retained panel stable until the pointer transaction commits.\n  -- A later history INSERT waits, observes the new pointer, and is rejected by\n  -- plt_014_guard_published_pulse_history.\n  LOCK TABLE pulse_dimensional_delta_history IN SHARE MODE;\n  SELECT * INTO run_row FROM pulse_pipeline_runs\n  WHERE id=NEW.computation_run_id\n  FOR SHARE;\n  IF NOT FOUND\n     OR run_row.stage<>'score'\n     OR run_row.status<>'completed'\n     OR run_row.completed_at IS NULL\n     OR jsonb_typeof(run_row.failures)<>'array'\n     OR jsonb_array_length(run_row.failures)<>0 THEN\n    RAISE EXCEPTION 'Pulse score publication requires one successful completed score run';\n  END IF;\n  IF NEW.version_key IS DISTINCT FROM run_row.version_key THEN\n    RAISE EXCEPTION 'Pulse score publication version key mismatch';\n  END IF;\n  IF NEW.published_at<run_row.completed_at THEN\n    RAISE EXCEPTION 'Pulse score publication cannot predate score-run completion';\n  END IF;\n  SELECT count(*)::int,count(DISTINCT jurisdiction_id)::int,\n         count(DISTINCT score_as_of)::int,min(score_as_of)\n    INTO history_count,jurisdiction_count,score_dates,retained_score_as_of\n    FROM pulse_dimensional_delta_history WHERE computation_run_id=NEW.computation_run_id;\n  IF history_count=0\n     OR jurisdiction_count=0\n     OR history_count<>jurisdiction_count*5\n     OR score_dates<>1\n     OR retained_score_as_of IS DISTINCT FROM NEW.score_as_of\n     OR EXISTS (\n       SELECT 1\n       FROM pulse_dimensional_delta_history history\n       WHERE history.computation_run_id=NEW.computation_run_id\n       GROUP BY history.jurisdiction_id\n       HAVING count(*)<>5 OR count(DISTINCT history.dimension)<>5\n     ) THEN\n    RAISE EXCEPTION 'Pulse score publication history is incomplete or mixed';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
         "name": "civica_validate_statement_subject",
@@ -13087,14 +13500,54 @@
         "definition": "CREATE TRIGGER dat_023_validate_vintage BEFORE INSERT ON ci_composite_scores FOR EACH ROW WHEN (new.vintage_label IS NOT NULL) EXECUTE FUNCTION civica_validate_frozen_vintage_insert()"
       },
       {
+        "name": "plt_014_guard_ci_composite_release",
+        "table": "ci_composite_scores",
+        "definition": "CREATE TRIGGER plt_014_guard_ci_composite_release BEFORE DELETE OR UPDATE ON ci_composite_scores FOR EACH ROW EXECUTE FUNCTION civica_guard_published_ci_score_mutation()"
+      },
+      {
+        "name": "plt_014_validate_ci_composite_release",
+        "table": "ci_composite_scores",
+        "definition": "CREATE TRIGGER plt_014_validate_ci_composite_release BEFORE INSERT OR UPDATE ON ci_composite_scores FOR EACH ROW EXECUTE FUNCTION civica_validate_ci_release_score_row()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "ci_dimension_scores",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON ci_dimension_scores FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "plt_014_guard_ci_dimension_release",
+        "table": "ci_dimension_scores",
+        "definition": "CREATE TRIGGER plt_014_guard_ci_dimension_release BEFORE DELETE OR UPDATE ON ci_dimension_scores FOR EACH ROW EXECUTE FUNCTION civica_guard_published_ci_score_mutation()"
+      },
+      {
+        "name": "plt_014_validate_ci_dimension_release",
+        "table": "ci_dimension_scores",
+        "definition": "CREATE TRIGGER plt_014_validate_ci_dimension_release BEFORE INSERT OR UPDATE ON ci_dimension_scores FOR EACH ROW EXECUTE FUNCTION civica_validate_ci_release_score_row()"
+      },
+      {
+        "name": "plt_014_guard_ci_release_pointer_delete",
+        "table": "ci_index_release_pointers",
+        "definition": "CREATE TRIGGER plt_014_guard_ci_release_pointer_delete BEFORE DELETE ON ci_index_release_pointers FOR EACH ROW EXECUTE FUNCTION civica_guard_ci_release_pointer_delete()"
+      },
+      {
+        "name": "plt_014_validate_ci_release_pointer",
+        "table": "ci_index_release_pointers",
+        "definition": "CREATE TRIGGER plt_014_validate_ci_release_pointer BEFORE INSERT OR UPDATE ON ci_index_release_pointers FOR EACH ROW EXECUTE FUNCTION civica_validate_ci_release_pointer()"
+      },
+      {
+        "name": "plt_014_guard_ci_release_header",
+        "table": "ci_index_releases",
+        "definition": "CREATE TRIGGER plt_014_guard_ci_release_header BEFORE INSERT OR DELETE OR UPDATE ON ci_index_releases FOR EACH ROW EXECUTE FUNCTION civica_guard_ci_release_header_mutation()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "ci_ingestion_runs",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON ci_ingestion_runs FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "plt_014_guard_ci_methodology",
+        "table": "ci_methodology_versions",
+        "definition": "CREATE TRIGGER plt_014_guard_ci_methodology BEFORE DELETE OR UPDATE ON ci_methodology_versions FOR EACH ROW EXECUTE FUNCTION civica_guard_published_ci_methodology()"
       },
       {
         "name": "ci_research_panel_release_immutable",
@@ -13362,6 +13815,11 @@
         "definition": "CREATE TRIGGER pulse_coding_packets_append_only BEFORE DELETE OR UPDATE ON pulse_coding_packets FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_coding_evidence_mutation()"
       },
       {
+        "name": "plt_014_guard_published_pulse_history",
+        "table": "pulse_dimensional_delta_history",
+        "definition": "CREATE TRIGGER plt_014_guard_published_pulse_history BEFORE INSERT OR DELETE OR UPDATE ON pulse_dimensional_delta_history FOR EACH ROW EXECUTE FUNCTION civica_guard_published_pulse_history()"
+      },
+      {
         "name": "pulse_dimensional_delta_history_append_only",
         "table": "pulse_dimensional_delta_history",
         "definition": "CREATE TRIGGER pulse_dimensional_delta_history_append_only BEFORE DELETE OR UPDATE ON pulse_dimensional_delta_history FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_dimensional_delta_history_mutation()"
@@ -13457,6 +13915,11 @@
         "definition": "CREATE TRIGGER pulse_information_environment_values_append_only BEFORE DELETE OR UPDATE ON pulse_information_environment_values FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_information_environment_mutation()"
       },
       {
+        "name": "plt_014_guard_published_pulse_run",
+        "table": "pulse_pipeline_runs",
+        "definition": "CREATE TRIGGER plt_014_guard_published_pulse_run BEFORE DELETE OR UPDATE ON pulse_pipeline_runs FOR EACH ROW EXECUTE FUNCTION civica_guard_published_pulse_run()"
+      },
+      {
         "name": "pul_004_pipeline_run_immutable",
         "table": "pulse_pipeline_runs",
         "definition": "CREATE TRIGGER pul_004_pipeline_run_immutable BEFORE DELETE OR UPDATE ON pulse_pipeline_runs FOR EACH ROW EXECUTE FUNCTION pul_004_guard_pipeline_run()"
@@ -13475,6 +13938,16 @@
         "name": "pulse_review_sla_events_append_only",
         "table": "pulse_review_sla_events",
         "definition": "CREATE TRIGGER pulse_review_sla_events_append_only BEFORE DELETE OR UPDATE ON pulse_review_sla_events FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_review_sla_event_mutation()"
+      },
+      {
+        "name": "plt_014_guard_pulse_publication_pointer_delete",
+        "table": "pulse_score_publication_pointers",
+        "definition": "CREATE TRIGGER plt_014_guard_pulse_publication_pointer_delete BEFORE DELETE ON pulse_score_publication_pointers FOR EACH ROW EXECUTE FUNCTION civica_guard_pulse_publication_pointer_delete()"
+      },
+      {
+        "name": "plt_014_validate_pulse_score_publication",
+        "table": "pulse_score_publication_pointers",
+        "definition": "CREATE TRIGGER plt_014_validate_pulse_score_publication BEFORE INSERT OR UPDATE ON pulse_score_publication_pointers FOR EACH ROW EXECUTE FUNCTION civica_validate_pulse_score_publication()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -13571,6 +14044,16 @@
       {
         "kind": "r",
         "name": "ci_dimension_scores",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "ci_index_release_pointers",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "ci_index_releases",
         "definition": null
       },
       {
@@ -13925,6 +14408,11 @@
       },
       {
         "kind": "r",
+        "name": "pulse_score_publication_pointers",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "pulse_sources",
         "definition": null
       },
@@ -14128,6 +14616,18 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "ci_composite_scores_release_id_ci_index_releases_id_fk",
+        "type": "f",
+        "table": "ci_composite_scores",
+        "definition": "FOREIGN KEY (release_id) REFERENCES ci_index_releases(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "idx_ci_composite_unique",
+        "type": "u",
+        "table": "ci_composite_scores",
+        "definition": "UNIQUE NULLS NOT DISTINCT (jurisdiction_id, quarter, methodology_version, release_id)"
+      },
+      {
         "name": "ci_dimension_scores_ingestion_id_ci_source_ingestions_id_fk",
         "type": "f",
         "table": "ci_dimension_scores",
@@ -14158,10 +14658,118 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "ci_dimension_scores_release_id_ci_index_releases_id_fk",
+        "type": "f",
+        "table": "ci_dimension_scores",
+        "definition": "FOREIGN KEY (release_id) REFERENCES ci_index_releases(id) ON DELETE RESTRICT"
+      },
+      {
         "name": "ci_dimension_scores_source_id_sources_id_fk",
         "type": "f",
         "table": "ci_dimension_scores",
         "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "idx_ci_dimension_scores_unique",
+        "type": "u",
+        "table": "ci_dimension_scores",
+        "definition": "UNIQUE NULLS NOT DISTINCT (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id, release_id)"
+      },
+      {
+        "name": "ci_index_release_pointers_pkey",
+        "type": "p",
+        "table": "ci_index_release_pointers",
+        "definition": "PRIMARY KEY (product)"
+      },
+      {
+        "name": "ci_index_release_pointers_product_closed",
+        "type": "c",
+        "table": "ci_index_release_pointers",
+        "definition": "CHECK (product = 'civica_index'::text)"
+      },
+      {
+        "name": "ci_index_release_pointers_release_id_ci_index_releases_id_fk",
+        "type": "f",
+        "table": "ci_index_release_pointers",
+        "definition": "FOREIGN KEY (release_id) REFERENCES ci_index_releases(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ci_index_releases_counts_positive",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (dimension_row_count > 0 AND composite_row_count > 0)"
+      },
+      {
+        "name": "ci_index_releases_dimension_rules_shape",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (jsonb_typeof(dimension_rules) = 'array'::text AND jsonb_array_length(dimension_rules) = 5)"
+      },
+      {
+        "name": "ci_index_releases_hashes_valid",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (methodology_content_sha256 ~ '^[a-f0-9]{64}$'::text AND input_manifest_sha256 ~ '^[a-f0-9]{64}$'::text AND dimension_row_set_sha256 ~ '^[a-f0-9]{64}$'::text AND composite_row_set_sha256 ~ '^[a-f0-9]{64}$'::text)"
+      },
+      {
+        "name": "ci_index_releases_identity_shape",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (id ~ '^ci-[a-z0-9-]+-[0-9]{4}-Q[1-4]$'::text AND quarter ~ '^[0-9]{4}-Q[1-4]$'::text AND btrim(methodology_version) <> ''::text AND btrim(vintage_label) <> ''::text AND btrim(input_transformation_version) <> ''::text AND btrim(composite_algorithm_version) <> ''::text AND btrim(display_transform_version) <> ''::text)"
+      },
+      {
+        "name": "ci_index_releases_methodology_version_ci_methodology_versions_i",
+        "type": "f",
+        "table": "ci_index_releases",
+        "definition": "FOREIGN KEY (methodology_version) REFERENCES ci_methodology_versions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ci_index_releases_pkey",
+        "type": "p",
+        "table": "ci_index_releases",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ci_index_releases_publication_shape",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (status = 'staging'::text AND published_at IS NULL OR status = 'published'::text AND published_at IS NOT NULL)"
+      },
+      {
+        "name": "ci_index_releases_source_artifacts_shape",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (jsonb_typeof(source_artifacts) = 'object'::text AND source_artifacts <> '{}'::jsonb)"
+      },
+      {
+        "name": "ci_index_releases_status_closed",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (status = ANY (ARRAY['staging'::text, 'published'::text]))"
+      },
+      {
+        "name": "ci_index_releases_supersedes_release_id_ci_index_releases_id_fk",
+        "type": "f",
+        "table": "ci_index_releases",
+        "definition": "FOREIGN KEY (supersedes_release_id) REFERENCES ci_index_releases(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ci_index_releases_supersession_shape",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK ((supersession_kind = 'none'::text AND supersedes_release_id IS NULL AND supersedes_vintage_label IS NULL OR supersession_kind = 'legacy_unregistered_vintage'::text AND supersedes_release_id IS NULL AND supersedes_vintage_label IS NOT NULL OR supersession_kind = 'registered_release'::text AND supersedes_release_id IS NOT NULL AND supersedes_vintage_label IS NOT NULL) AND supersedes_release_id IS DISTINCT FROM id)"
+      },
+      {
+        "name": "ci_index_releases_uncertainty_shape",
+        "type": "c",
+        "table": "ci_index_releases",
+        "definition": "CHECK (jsonb_typeof(uncertainty_policy) = 'object'::text AND (uncertainty_policy ->> 'schemaVersion'::text) = 'ci-index-uncertainty/v1'::text AND ((uncertainty_policy ->> 'pointEstimate'::text) = ANY (ARRAY['seeded_simulation_median'::text, 'deterministic_weighted_composite'::text])) AND ((uncertainty_policy ->> 'displayedRange'::text) = ANY (ARRAY['sensitivity_summary_5th_95th_percentile'::text, 'not_published'::text])) AND ((uncertainty_policy ->> 'bounds'::text) = ANY (ARRAY['required'::text, 'absent'::text])) AND ((uncertainty_policy ->> 'simulations'::text)::integer) >= 0 AND ((uncertainty_policy ->> 'covarianceModel'::text) = ANY (ARRAY['independence_assumed'::text, 'not_available'::text])) AND btrim(uncertainty_policy ->> 'interpretation'::text) <> ''::text AND ((uncertainty_policy ->> 'bounds'::text) = 'required'::text) = ((uncertainty_policy ->> 'displayedRange'::text) <> 'not_published'::text) AND (((uncertainty_policy ->> 'simulations'::text)::integer) > 0) = ((uncertainty_policy ->> 'pointEstimate'::text) = 'seeded_simulation_median'::text))"
+      },
+      {
+        "name": "ci_index_releases_vintage_label_unique",
+        "type": "u",
+        "table": "ci_index_releases",
+        "definition": "UNIQUE (vintage_label)"
       },
       {
         "name": "ci_ingestion_runs_pkey",
@@ -15926,6 +16534,36 @@
         "type": "p",
         "table": "pulse_review_sla_events",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_score_publication_pointers_computation_run_id_pulse_pipel",
+        "type": "f",
+        "table": "pulse_score_publication_pointers",
+        "definition": "FOREIGN KEY (computation_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_score_publication_pointers_computation_run_id_unique",
+        "type": "u",
+        "table": "pulse_score_publication_pointers",
+        "definition": "UNIQUE (computation_run_id)"
+      },
+      {
+        "name": "pulse_score_publication_pointers_pkey",
+        "type": "p",
+        "table": "pulse_score_publication_pointers",
+        "definition": "PRIMARY KEY (product)"
+      },
+      {
+        "name": "pulse_score_publication_product_closed",
+        "type": "c",
+        "table": "pulse_score_publication_pointers",
+        "definition": "CHECK (product = 'pulse_dimensions'::text)"
+      },
+      {
+        "name": "pulse_score_publication_version_shape",
+        "type": "c",
+        "table": "pulse_score_publication_pointers",
+        "definition": "CHECK (version_key ~ '^pulse-stage/sha256:[a-f0-9]{64}$'::text)"
       },
       {
         "name": "pulse_sources_event_id_pulse_events_v2_id_fk",

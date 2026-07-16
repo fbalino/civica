@@ -168,6 +168,32 @@ before considering new queue work. No historical handoffs are invented.
 Recovery uses an isolated pre-change backup or a reviewed forward
 compensation; never rewrite a retained binding as an ordinary rollback.
 
+`0036_moaning_toad_men` adds the PLT-014 release-publication boundary. Civica
+Index rows bind to one staged immutable header containing the exact method,
+methodology-content hash, quarter, source-artifact basket, supersession kind,
+release-specific uncertainty policy, transformation versions, row counts, and
+checked clean-room row-set hashes. Release-aware NULLS-NOT-DISTINCT score keys
+preserve legacy draft uniqueness while allowing a future corrected release at
+the same method/period. The retained R3 → unregistered R2 vintage link remains
+explicit; no R2 release header is invented. Publication is never inferred from counts:
+the publication command first reproduces the checked semantic hashes, captures
+database storage fingerprints, and calls one database function that locks
+score writes, rechecks those fingerprints, marks the header published, and
+flips the single public pointer atomically. Published headers, rows, and bound
+methodology records reject mutation. The same migration adds a one-run Pulse
+score pointer that requires a successful completed run, one exact score date,
+and five retained dimension rows for every represented jurisdiction. Published
+Pulse history closes when its score run completes, so replacing the current
+pointer cannot reopen a previously published panel for late inserts; terminal
+runs and deletion of the current pointer also reject mutation. It also
+strengthens the already-triggered complete-candidate Atlas
+winner identity check. Existing Index coordinates are attached to staged
+headers but are deliberately not made public automatically. Deployers must run
+the checked release publication sequence in historical order after migration;
+recovery uses an isolated pre-change backup before publication or a reviewed
+forward release/pointer correction afterward, never a rewrite of a published
+release.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

@@ -17,7 +17,8 @@ import {
   REQUEST_BODY_LIMITS,
   type ContactBody,
 } from "@/lib/api/request-body-schemas";
-import { withSafeJsonErrors } from "@/lib/api/problem-response";
+import { withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 const CONTACT_RATE_LIMIT_POLICY = getRequestRateLimitPolicy("contact-form");
 
@@ -32,12 +33,13 @@ export async function OPTIONS() {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
+      "Cache-Control": cacheControlFor("private-live"),
     },
   });
 }
 
 export async function POST(req: NextRequest) {
-  return withSafeJsonErrors("api/contact", async () => {
+  return withPrivateSafeJsonErrors("api/contact", async () => {
     const rateLimit = await checkRequestRateLimit(
       req,
       CONTACT_RATE_LIMIT_POLICY,

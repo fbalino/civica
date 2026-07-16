@@ -4,14 +4,14 @@ import { advisoryApplications } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { getAdminSession } from "@/lib/admin/session";
 import { shapeAdminAdvisoryFeed } from "@/lib/api/admin-feed-shapes";
-import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { apiProblem, withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 import { parseQueryContract } from "@/lib/api/request-contract";
 
 // Gated on the admin session cookie set by /api/admin/session (mirrors
 // /api/admin/contact). Sign in at /admin/sign-in; no bearer/API-key path.
 
 export async function GET(req: NextRequest) {
-  return withSafeJsonErrors("api/admin/advisory-applications", async () => {
+  return withPrivateSafeJsonErrors("api/admin/advisory-applications", async () => {
     if (!(await getAdminSession())) {
       return apiProblem("UNAUTHORIZED");
     }

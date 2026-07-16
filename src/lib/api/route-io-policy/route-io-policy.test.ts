@@ -325,6 +325,21 @@ test("operational boundary proof rejects a shadowed helper", () => {
   );
 });
 
+test("operational boundary proof accepts the canonical private cache variant", () => {
+  assert.equal(
+    handlerReturnsApprovedErrorBoundary(
+      `
+        import { withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
+        export function POST() {
+          return withPrivateSafeJsonErrors("fixture", async () => Response.json({ ok: true }));
+        }
+      `,
+      "POST",
+    ),
+    true,
+  );
+});
+
 test("P1 routes have actual stable, non-cacheable error response sites", () => {
   const failures: string[] = [];
   for (const { filePath, method } of P1_ERROR_PROFILE_ROUTES) {

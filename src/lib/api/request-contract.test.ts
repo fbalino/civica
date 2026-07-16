@@ -66,6 +66,24 @@ test("query contracts apply defaults and typed transformations", () => {
     ok: true,
     data: { published_only: true, limit: 12, offset: 0 },
   });
+
+  assert.deepEqual(
+    parseQueryContract(request(), "v1-index-methodology-query/v1"),
+    {
+      ok: true,
+      data: {},
+    },
+  );
+  assert.deepEqual(
+    parseQueryContract(
+      request("?version=beta-r4"),
+      "v1-index-methodology-query/v1",
+    ),
+    {
+      ok: true,
+      data: { version: "beta-r4" },
+    },
+  );
 });
 
 test("repeatable query keys preserve order but scalar duplicates fail", async () => {
@@ -113,6 +131,10 @@ test("unknown keys, malformed encodings, invalid types, and ranges fail closed",
     ["v1-elections-query/v1", "?has_results=1"],
     ["metric-strip-query/v1", "?year=2024abc"],
     ["v1-index-rankings-query/v1", "?sort=other"],
+    [
+      "v1-index-methodology-query/v1",
+      "?release=ci-beta-r5-2024-Q4&version=beta-r4",
+    ],
   ] as const;
 
   for (const [schemaId, query] of cases) {

@@ -42,7 +42,7 @@ import {
   REQUEST_BODY_LIMITS,
   type AdminLoginBody,
 } from "@/lib/api/request-body-schemas";
-import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { apiProblem, withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 import { NextRequest, NextResponse } from "next/server";
 
 /** True only when the owner account is fully configured. Fail closed
@@ -56,7 +56,7 @@ function isAdminConfigured(): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  return withSafeJsonErrors("api/admin/session", async () => {
+  return withPrivateSafeJsonErrors("api/admin/session", async () => {
     const mutationGuard = guardAdminMutationRequest(request);
     if (!mutationGuard.ok) return mutationGuard.response;
 

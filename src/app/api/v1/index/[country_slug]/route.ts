@@ -10,10 +10,13 @@ import { db } from "@/lib/db";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
 import { ciCompositeScores, ciDimensionScores } from "@/lib/db/schema";
 import {
+  assertCiReleaseCompositeRow,
   displayCiReleaseDimensionScore,
-  resolveCiRelease,
+  isCiReleaseConsistencyError,
+  publicCiReleaseIdentity,
   selectCiReleaseDimensionRows,
 } from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import {
   INDEX_COMPOSITE_DEPRECATION_HEADERS,
   STRUCTURAL_FAMILY_DEPRECATION_META,
@@ -29,6 +32,7 @@ import {
   parsePathContract,
   parseQueryContract,
 } from "@/lib/api/request-contract";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 /**
  * This endpoint serves the current closed release by default. Pass an exact
@@ -60,7 +64,7 @@ export async function GET(
 
   try {
     const slug = path.data.slug;
-    const release = resolveCiRelease(query.data.release);
+    const release = await loadPublishedCiRelease(query.data.release);
     const methodologyVersion = release.methodologyVersion;
 
     const jurisdiction = await getJurisdictionBySlug(slug);
@@ -74,18 +78,24 @@ export async function GET(
     // Missing data stays missing; this endpoint never falls through to another release.
     const releaseScore = await db
       .select({
+        jurisdictionId: ciCompositeScores.jurisdictionId,
         quarter: ciCompositeScores.quarter,
         score: ciCompositeScores.score,
         scoreLower: ciCompositeScores.scoreLower,
         scoreUpper: ciCompositeScores.scoreUpper,
         completenessFlag: ciCompositeScores.completenessFlag,
         vintageLabel: ciCompositeScores.vintageLabel,
+        supersedesVintageLabel: ciCompositeScores.supersedesVintageLabel,
         rank: ciCompositeScores.rank,
         totalRanked: ciCompositeScores.totalRanked,
         isPartial: ciCompositeScores.isPartial,
         dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
         missingDimensions: ciCompositeScores.missingDimensions,
         methodologyVersion: ciCompositeScores.methodologyVersion,
+        releaseId: ciCompositeScores.releaseId,
+        contentHash: ciCompositeScores.contentHash,
+        derivationVersionKey: ciCompositeScores.derivationVersionKey,
+        derivationVersions: ciCompositeScores.derivationVersions,
       })
       .from(ciCompositeScores)
       .where(
@@ -93,6 +103,7 @@ export async function GET(
           eq(ciCompositeScores.jurisdictionId, jurisdiction.id),
           eq(ciCompositeScores.methodologyVersion, methodologyVersion),
           eq(ciCompositeScores.quarter, release.quarter),
+          eq(ciCompositeScores.releaseId, release.releaseId),
         ),
       )
       .limit(1);
@@ -122,12 +133,21 @@ export async function GET(
         transformationId: ciDimensionScores.transformationId,
         methodVersion: ciDimensionScores.methodVersion,
         artifactHash: ciDimensionScores.artifactHash,
+        upstreamRelease: ciDimensionScores.upstreamRelease,
+        artifactKind: ciDimensionScores.artifactKind,
+        temporalCoverage: ciDimensionScores.temporalCoverage,
+        licenseUrl: ciDimensionScores.licenseUrl,
+        substitutionReason: ciDimensionScores.substitutionReason,
+        releaseId: ciDimensionScores.releaseId,
+        derivationVersionKey: ciDimensionScores.derivationVersionKey,
+        derivationVersions: ciDimensionScores.derivationVersions,
       })
       .from(ciDimensionScores)
       .where(
         sql`${ciDimensionScores.jurisdictionId} = ${jurisdiction.id}
           AND ${ciDimensionScores.quarter} = ${release.quarter}
-          AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion}`,
+          AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion}
+          AND ${ciDimensionScores.releaseId} = ${release.releaseId}`,
       );
 
     // Emit the per-dimension DISPLAY score on the SAME v2 fixed-bound
@@ -148,6 +168,7 @@ export async function GET(
       sourceId: d.sourceId,
       valueStatus: "observed" as const,
     }));
+    assertCiReleaseCompositeRow(composite, release.releaseId);
     const completeness = parsePublishedCiCompleteness(composite);
 
     // This endpoint surfaces `governmentClassification`, which still
@@ -181,7 +202,12 @@ export async function GET(
           }),
           meta: {
             methodology: CI_METHODOLOGY_META,
+            release: publicCiReleaseIdentity(release),
             series: release.series,
+            components: publicCiPublicationComponents(release, {
+              jurisdiction: "live_current",
+              taxonomy: "live_current",
+            }),
             deprecations: STRUCTURAL_FAMILY_DEPRECATION_META.deprecations,
           },
         }),
@@ -189,6 +215,17 @@ export async function GET(
     );
   } catch (e) {
     console.error("API /v1/index/[country_slug] error:", e);
+    if (isCiReleaseConsistencyError(e)) {
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError(
+            "The requested release is temporarily unavailable.",
+            503,
+            "RELEASE_INCONSISTENT",
+          ),
+        ),
+      );
+    }
     return withIndexDispositionDeprecation(
       withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
     );

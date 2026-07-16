@@ -17,7 +17,12 @@ import {
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
-import { resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  assertCiReleaseCompositeRow,
+  isCiReleaseConsistencyError,
+} from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
+import { DEFAULT_GOVERNMENT_TAXONOMY_VERSION } from "@/lib/government-taxonomy";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   shapeIndexRankingsItem,
@@ -41,6 +46,7 @@ function buildPeerLensCondition(taxonomy: ExtendedTaxonomy, value: string) {
     return sql`EXISTS (
       SELECT 1 FROM government_taxonomies gt
       WHERE gt.jurisdiction_id = ${jurisdictions.id}
+        AND gt.taxonomy_version = ${DEFAULT_GOVERNMENT_TAXONOMY_VERSION}
         AND gt.regime_type_cgv = ${value}
     )`;
   }
@@ -79,7 +85,7 @@ export async function GET(request: Request) {
       limit,
       offset,
     } = query.data;
-    const release = resolveCiRelease(query.data.release);
+    const release = await loadPublishedCiRelease(query.data.release);
     const methodologyVersion = release.methodologyVersion;
     if (quarterParam && quarterParam !== release.quarter) {
       return withIndexDispositionDeprecation(
@@ -103,6 +109,7 @@ export async function GET(request: Request) {
               hasMore: false,
               quarter: null,
               taxonomy,
+              release,
               series: release.series,
             }),
           }),
@@ -113,6 +120,7 @@ export async function GET(request: Request) {
     const conditions = [
       sql`${ciCompositeScores.quarter} = ${quarter}`,
       sql`${ciCompositeScores.methodologyVersion} = ${methodologyVersion}`,
+      sql`${ciCompositeScores.releaseId} = ${release.releaseId}`,
     ];
 
     if (continent) {
@@ -147,18 +155,25 @@ export async function GET(request: Request) {
 
     const baseSelect = {
       jurisdictionId: jurisdictions.id,
+      quarter: ciCompositeScores.quarter,
       rank: ciCompositeScores.rank,
       score: ciCompositeScores.score,
       scoreLower: ciCompositeScores.scoreLower,
       scoreUpper: ciCompositeScores.scoreUpper,
       completenessFlag: ciCompositeScores.completenessFlag,
       vintageLabel: ciCompositeScores.vintageLabel,
+      supersedesVintageLabel: ciCompositeScores.supersedesVintageLabel,
       isPartial: ciCompositeScores.isPartial,
       missingDimensions: ciCompositeScores.missingDimensions,
       // CLM-012 addition — every sibling CI endpoint (index/[slug],
       // index/compare) already surfaces this completeness signal.
       dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
       methodologyVersion: ciCompositeScores.methodologyVersion,
+      releaseId: ciCompositeScores.releaseId,
+      contentHash: ciCompositeScores.contentHash,
+      derivationVersionKey: ciCompositeScores.derivationVersionKey,
+      derivationVersions: ciCompositeScores.derivationVersions,
+      totalRanked: ciCompositeScores.totalRanked,
       slug: jurisdictions.slug,
       name: jurisdictions.name,
       iso2: jurisdictions.iso2,
@@ -198,13 +213,29 @@ export async function GET(request: Request) {
       );
 
       const filtered = rows
-        .map(({ jurisdictionId, ...row }) => {
+        .map((row) => {
+          assertCiReleaseCompositeRow(row, release.releaseId);
           const completeness = parsePublishedCiCompleteness(row);
           return {
-            ...row,
-            ...completeness,
+            rank: row.rank,
+            score: row.score,
+            scoreLower: row.scoreLower,
+            scoreUpper: row.scoreUpper,
+            completenessFlag: completeness.completenessFlag,
+            vintageLabel: row.vintageLabel,
+            isPartial: row.isPartial,
+            missingDimensions: completeness.missingDimensions,
+            dimensionsAvailable: completeness.dimensionsAvailable,
+            methodologyVersion: row.methodologyVersion,
+            slug: row.slug,
+            name: row.name,
+            iso2: row.iso2,
+            iso3: row.iso3,
+            continent: row.continent,
+            governmentType: row.governmentType,
+            governmentTypeDetail: row.governmentTypeDetail,
             governmentClassification:
-              classificationMap.get(jurisdictionId) ?? null,
+              classificationMap.get(row.jurisdictionId) ?? null,
           };
         })
         .filter((row) => {
@@ -230,6 +261,7 @@ export async function GET(request: Request) {
               hasMore: offset + limit < filtered.length,
               quarter,
               taxonomy,
+              release,
               series: release.series,
             }),
           }),
@@ -263,13 +295,29 @@ export async function GET(request: Request) {
     return withIndexDispositionDeprecation(
       withStructuralFamilyDeprecation(
         apiResponse({
-          data: rows.map(({ jurisdictionId, ...row }) => {
+          data: rows.map((row) => {
+            assertCiReleaseCompositeRow(row, release.releaseId);
             const completeness = parsePublishedCiCompleteness(row);
             return shapeIndexRankingsItem({
-              ...row,
-              ...completeness,
+              rank: row.rank,
+              score: row.score,
+              scoreLower: row.scoreLower,
+              scoreUpper: row.scoreUpper,
+              completenessFlag: completeness.completenessFlag,
+              vintageLabel: row.vintageLabel,
+              isPartial: row.isPartial,
+              missingDimensions: completeness.missingDimensions,
+              dimensionsAvailable: completeness.dimensionsAvailable,
+              methodologyVersion: row.methodologyVersion,
+              slug: row.slug,
+              name: row.name,
+              iso2: row.iso2,
+              iso3: row.iso3,
+              continent: row.continent,
+              governmentType: row.governmentType,
+              governmentTypeDetail: row.governmentTypeDetail,
               governmentClassification:
-                classificationMap.get(jurisdictionId) ?? null,
+                classificationMap.get(row.jurisdictionId) ?? null,
             });
           }),
           meta: shapeIndexRankingsMeta({
@@ -279,6 +327,7 @@ export async function GET(request: Request) {
             hasMore: offset + limit < total,
             quarter,
             taxonomy,
+            release,
             series: release.series,
           }),
         }),
@@ -286,6 +335,17 @@ export async function GET(request: Request) {
     );
   } catch (e) {
     console.error("API /v1/index/rankings error:", e);
+    if (isCiReleaseConsistencyError(e)) {
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError(
+            "The requested release is temporarily unavailable.",
+            503,
+            "RELEASE_INCONSISTENT",
+          ),
+        ),
+      );
+    }
     return withIndexDispositionDeprecation(
       withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
     );

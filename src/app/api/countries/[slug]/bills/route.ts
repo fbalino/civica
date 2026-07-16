@@ -10,7 +10,7 @@ import { getBillsForJurisdiction } from "@/lib/db/queries";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { parsePathContract } from "@/lib/api/request-contract";
-import { apiProblem } from "@/lib/api/problem-response";
+import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
 import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
@@ -36,7 +36,7 @@ const SOURCE_TAG = BILLS_SOURCE_LABELS;
  * object naming which jurisdictions ARE covered instead of a bare empty
  * `bills: []` array with no explanation.
  */
-export async function GET(
+async function handleBills(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
@@ -159,4 +159,13 @@ export async function GET(
     bills,
     coverage,
   });
+}
+
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ slug: string }> },
+) {
+  return withSafeJsonErrors("api/countries/[slug]/bills", () =>
+    handleBills(request, context),
+  );
 }

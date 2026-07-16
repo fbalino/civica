@@ -18,6 +18,10 @@ import {
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { shapePulseDimensionsData } from "@/lib/api/contract/shapes";
 import { parsePathContract } from "@/lib/api/request-contract";
+import {
+  isPulseReleaseConsistencyError,
+  PULSE_DIMENSIONS_PUBLICATION_COMPONENTS,
+} from "@/lib/pulse/v2/publication-consistency";
 
 export async function GET(
   request: Request,
@@ -33,16 +37,28 @@ export async function GET(
   try {
     const { country_slug } = path.data;
     // PUBLIC_CLAIM: pulse.country-period-observability
-    const data = await getPulseV2ForCountry(country_slug);
+    const result = await getPulseV2ForCountry(country_slug);
 
-    if (!data) return apiError("Country not found", 404);
+    if (!result) return apiError("Country not found", 404);
+    const { publication, ...data } = result;
 
     return apiResponse({
       data: shapePulseDimensionsData(data),
-      meta: { methodology: PULSE_METHODOLOGY_META },
+      meta: {
+        methodology: PULSE_METHODOLOGY_META,
+        release: publication,
+        components: PULSE_DIMENSIONS_PUBLICATION_COMPONENTS,
+      },
     });
   } catch (e) {
     console.error("API /v1/pulse/[country_slug]/dimensions error:", e);
+    if (isPulseReleaseConsistencyError(e)) {
+      return apiError(
+        "The published Pulse release is temporarily unavailable because its components do not agree.",
+        503,
+        "RELEASE_INCONSISTENT",
+      );
+    }
     return apiError("Internal server error", 500);
   }
 }

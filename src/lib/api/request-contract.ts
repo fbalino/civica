@@ -90,10 +90,38 @@ const defaultCiRelease = z.preprocess(
   (value) => value ?? CURRENT_CI_RELEASE.releaseId,
   ciRelease,
 );
-const defaultCiMethodology = z.preprocess(
-  (value) => value ?? CURRENT_CI_RELEASE.methodologyVersion,
-  ciMethodology,
-);
+const ciMethodologyReleaseQuery = z
+  .object({
+    release: ciRelease.optional(),
+    version: ciMethodology.optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    const matches = value.version
+      ? CI_RELEASE_CONTRACTS.filter(
+          (release) => release.methodologyVersion === value.version,
+        )
+      : [];
+    if (value.version && !value.release && matches.length !== 1) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["version"],
+        message: "methodology version is ambiguous; select an exact release",
+      });
+    }
+    if (value.version && value.release) {
+      const release = CI_RELEASE_CONTRACTS.find(
+        (candidate) => candidate.releaseId === value.release,
+      );
+      if (release?.methodologyVersion !== value.version) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version"],
+          message: "methodology version does not match the selected release",
+        });
+      }
+    }
+  });
 
 function uniqueArray<Item extends z.ZodType>(item: Item, max: number) {
   return z
@@ -330,7 +358,7 @@ export const QUERY_CONTRACT_SCHEMAS = {
     repeatableKeys: ["slug"],
   },
   "v1-index-methodology-query/v1": {
-    schema: z.object({ version: defaultCiMethodology }).strict(),
+    schema: ciMethodologyReleaseQuery,
     repeatableKeys: [],
   },
   "v1-index-rankings-query/v1": {

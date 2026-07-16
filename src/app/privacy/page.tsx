@@ -11,7 +11,7 @@ import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { withOg } from "@/lib/og";
 import { ADVISORY_APPLICATION_POLICY } from "@/lib/research/advisory-application";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Privacy Policy",

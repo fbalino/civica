@@ -67,10 +67,24 @@ import {
   CURRENT_CI_METHODOLOGY_VERSION,
   CURRENT_CI_RELEASE_ID,
 } from "@/lib/ci/current-release";
-import { resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  publicCiReleaseIdentity,
+  resolveCiRelease,
+} from "@/lib/ci/release-selection";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
+import {
+  pulseDeltaVersionEnvelope,
+  pulseEventVersionEnvelope,
+} from "@/lib/pulse/v2/versioning";
 
-const currentCiSeries = resolveCiRelease(CURRENT_CI_RELEASE_ID).series;
+const currentCiRelease = resolveCiRelease(CURRENT_CI_RELEASE_ID);
+const currentCiSeries = currentCiRelease.series;
+const currentCiReleaseIdentity = publicCiReleaseIdentity(currentCiRelease);
+const currentCiContextComponents = publicCiPublicationComponents(
+  currentCiRelease,
+  { jurisdiction: "live_current", taxonomy: "live_current" },
+);
 
 /* ────────────────────────────────────────────────────────────────
  * Shared fixture pieces
@@ -403,18 +417,18 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
     slug: "france",
     name: "France",
     governmentClassification: franceClassification,
-    quarter: "2026-Q1",
-    vintageLabel: "Civica Index 2026 Q1 (Beta)",
+    quarter: currentCiRelease.quarter,
+    vintageLabel: currentCiRelease.vintageLabel,
     score: 83.2,
-    scoreLower: 79.1,
-    scoreUpper: 86.4,
+    scoreLower: null,
+    scoreUpper: null,
     completenessFlag: "full",
     rank: 18,
-    totalRanked: 167,
+    totalRanked: currentCiRelease.compositeRowSet.rows,
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta-r3",
+    methodologyVersion: currentCiRelease.methodologyVersion,
     dimensions: [
       {
         dimension: "democratic_quality",
@@ -427,7 +441,9 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
   }),
   meta: {
     methodology: CI_METHODOLOGY_META,
+    release: currentCiReleaseIdentity,
     series: currentCiSeries,
+    components: currentCiContextComponents,
     deprecations: [
       {
         identifier: "structural_family",
@@ -455,23 +471,20 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
 const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
   data: [
     shapeIndexHistoryItem({
-      quarter: "2025-Q4",
-      score: 82.6,
-      rank: 19,
-      totalRanked: 165,
-      isPartial: false,
-    }),
-    shapeIndexHistoryItem({
-      quarter: "2026-Q1",
+      quarter: currentCiRelease.quarter,
       score: 83.2,
       rank: 18,
-      totalRanked: 167,
+      totalRanked: currentCiRelease.compositeRowSet.rows,
       isPartial: false,
     }),
   ],
   meta: {
     methodology: CI_METHODOLOGY_META,
+    release: currentCiReleaseIdentity,
     series: currentCiSeries,
+    components: publicCiPublicationComponents(currentCiRelease, {
+      jurisdiction: "live_current",
+    }),
   },
 });
 
@@ -495,7 +508,7 @@ const indexByGovernmentTypeExampleResponse = zIndexByGovernmentTypeResponse
         q3: 88.9,
       }),
     ],
-    meta: { quarter: "2026-Q1", taxonomy: "raw", series: currentCiSeries },
+    meta: { quarter: currentCiRelease.quarter, taxonomy: "raw", release: currentCiReleaseIdentity, series: currentCiSeries, components: currentCiContextComponents },
   });
 
 /* ────────────────────────────────────────────────────────────────
@@ -514,18 +527,18 @@ const indexCompareResultA = shapeIndexCompareResult({
     governmentClassification: franceClassification,
   },
   composite: {
-    quarter: "2026-Q1",
-    vintageLabel: "Civica Index 2026 Q1 (Beta)",
+    quarter: currentCiRelease.quarter,
+    vintageLabel: currentCiRelease.vintageLabel,
     score: 83.2,
-    scoreLower: 79.1,
-    scoreUpper: 86.4,
+    scoreLower: null,
+    scoreUpper: null,
     completenessFlag: "full",
     rank: 18,
-    totalRanked: 167,
+    totalRanked: currentCiRelease.compositeRowSet.rows,
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta-r3",
+    methodologyVersion: currentCiRelease.methodologyVersion,
   },
   dimensions: [
     {
@@ -565,18 +578,18 @@ const indexCompareResultB = shapeIndexCompareResult({
     },
   },
   composite: {
-    quarter: "2026-Q1",
-    vintageLabel: "Civica Index 2026 Q1 (Beta)",
+    quarter: currentCiRelease.quarter,
+    vintageLabel: currentCiRelease.vintageLabel,
     score: 85.6,
-    scoreLower: 81.9,
-    scoreUpper: 88.7,
+    scoreLower: null,
+    scoreUpper: null,
     completenessFlag: "full",
     rank: 12,
-    totalRanked: 167,
+    totalRanked: currentCiRelease.compositeRowSet.rows,
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta-r3",
+    methodologyVersion: currentCiRelease.methodologyVersion,
   },
   dimensions: [
     {
@@ -592,10 +605,12 @@ const indexCompareResultB = shapeIndexCompareResult({
 const indexCompareExampleResponse = zIndexCompareResponse.parse({
   data: [indexCompareResultA, indexCompareResultB],
   meta: {
-    quarter: null,
+    quarter: currentCiRelease.quarter,
     count: 2,
     methodology: CI_METHODOLOGY_META,
+    release: currentCiReleaseIdentity,
     series: currentCiSeries,
+    components: currentCiContextComponents,
     deprecations: [
       {
         identifier: "structural_family",
@@ -627,10 +642,10 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
       id: CURRENT_CI_METHODOLOGY_VERSION,
       publishedAt: "2026-05-15T00:00:00.000Z",
       weights: {
-        democratic_quality: 0.3,
-        rule_of_law: 0.3,
-        freedom_rights: 0.2,
-        corruption_control: 0.2,
+        democratic_quality: 0.27,
+        rule_of_law: 0.26,
+        freedom_rights: 0.23,
+        corruption_control: 0.24,
       },
       notes:
         "Research-beta composite under active validation. Numeric estimates are secondary experimental outputs and are not categorical country grades.",
@@ -638,7 +653,9 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
     }),
     meta: {
       methodology: CI_METHODOLOGY_META,
+      release: currentCiReleaseIdentity,
       series: currentCiSeries,
+      components: publicCiPublicationComponents(currentCiRelease),
     },
   });
 
@@ -651,14 +668,14 @@ const indexRankingsExampleResponse = zIndexRankingsResponse.strict().parse({
     shapeIndexRankingsItem({
       rank: 1,
       score: 91.4,
-      scoreLower: 88.6,
-      scoreUpper: 93.9,
+      scoreLower: null,
+      scoreUpper: null,
       completenessFlag: "full",
-      vintageLabel: "Civica Index 2026 Q1 (Beta)",
+      vintageLabel: currentCiRelease.vintageLabel,
       isPartial: false,
       missingDimensions: [],
       dimensionsAvailable: 4,
-      methodologyVersion: "beta-r3",
+      methodologyVersion: currentCiRelease.methodologyVersion,
       slug: "norway",
       name: "Norway",
       iso2: "NO",
@@ -670,12 +687,13 @@ const indexRankingsExampleResponse = zIndexRankingsResponse.strict().parse({
     }),
   ],
   meta: shapeIndexRankingsMeta({
-    total: 195,
+    total: currentCiRelease.compositeRowSet.rows,
     limit: 50,
     offset: 0,
     hasMore: true,
-    quarter: "2026-Q1",
+    quarter: currentCiRelease.quarter,
     taxonomy: "raw",
+    release: currentCiRelease,
     series: currentCiSeries,
   }),
 });
@@ -983,6 +1001,18 @@ function pulseVersionIdentityExample(
   };
 }
 
+function pulseDeltaDerivationIdentityExample(contributing: boolean) {
+  const version = pulseDeltaVersionEnvelope(
+    contributing ? [pulseEventVersionEnvelope(["gdelt"]).envelope] : [],
+    contributing ? ["gdelt"] : [],
+  );
+  return {
+    versionKey: version.key,
+    versions: version.envelope,
+    lineageStatus: "current_versioned" as const,
+  };
+}
+
 const pulseExampleVersionSet = {
   state: "single_version" as const,
   versionKeys: [pulseExampleVersionKey],
@@ -1060,6 +1090,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
       rule_of_law: {
         dimension: "rule_of_law",
@@ -1085,6 +1116,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: true,
         limitedReason: "Single event",
         versionIdentity: pulseVersionIdentityExample("score"),
+        derivationIdentity: pulseDeltaDerivationIdentityExample(true),
       },
       freedom_rights: {
         dimension: "freedom_rights",
@@ -1101,6 +1133,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
       corruption_control: {
         dimension: "corruption_control",
@@ -1117,6 +1150,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
       stability: {
         dimension: "stability",
@@ -1133,6 +1167,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
     },
     lastComputedAt: "2026-07-09T09:00:29.000Z",
@@ -1193,6 +1228,39 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
   }),
   meta: {
     methodology: pulseMethodologyMetaExample(),
+    release: {
+      schemaVersion: "pulse-score-publication/v1",
+      product: "pulse_dimensions",
+      scoreAsOf: "2026-07-09",
+      publishedAt: "2026-07-09T09:00:29.000Z",
+      completedAt: "2026-07-09T09:00:29.000Z",
+      versionIdentity: {
+        ...pulseVersionIdentityExample("score"),
+        versionKeySerialization: "stable_json_v1",
+      },
+      lineageCoverage: {
+        schemaVersion: "pulse-score-lineage-coverage/v1",
+        state: "current_versioned_only",
+        totalRows: 5,
+        totalJurisdictions: 1,
+        currentVersionedRows: 5,
+        legacyInputLineageRows: 0,
+        legacyInputLineageJurisdictions: 0,
+      },
+    },
+    components: {
+      dimensionalScores: "frozen_score_publication",
+      contributingEventIds: "frozen_score_publication",
+      derivationLineage:
+        "frozen_explicit_current_or_legacy_input_lineage",
+      drivingEventDetails: "live_context",
+      evidenceQualifiers: "live_context",
+      scoreEvidenceLinkage:
+        "live_context_id_jurisdiction_dimension_sources_checked",
+      jurisdictionIdentity: "live_context",
+      observability: "live_context",
+      informationEnvironment: "live_context",
+    },
   },
 });
 

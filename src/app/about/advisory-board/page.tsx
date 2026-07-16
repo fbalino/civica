@@ -12,7 +12,7 @@ import { Chip } from "@/components/editorial/Pill";
 import { advisoryBoard } from "@/lib/content/site-state";
 import { ADVISORY_BOARD_CHARTER } from "@/lib/research/advisory-board-charter";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 const STATUS_LABEL: Record<string, string> = {
   "coming-soon": "Planned — no members appointed",

@@ -175,6 +175,9 @@ export type DecisionReason =
   | "incumbent_held"
   | "cia_default_group_a"
   | "cia_default_group_c"
+  /** Read-only disclosure for a historical cut whose canonical winner was
+   * retained but whose candidates and cut-time decision were not. */
+  | "canonical_only_legacy"
   | "no_active_rows";
 
 export type DecisionTraceCode =

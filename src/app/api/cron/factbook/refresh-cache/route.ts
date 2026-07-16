@@ -53,6 +53,7 @@ async function handler(request: Request) {
     durationSec: Math.round(summary.durationMs / 1000),
     jurisdictionsRefreshed: summary.jurisdictionsRefreshed,
     fieldsWritten: summary.fieldsWritten,
+    fieldsCleared: summary.fieldsCleared,
     errorCount: summary.errors.length,
     dryRun,
   });

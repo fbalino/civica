@@ -12,7 +12,7 @@ import { Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import "../glossary.css";
 
-export const revalidate = 86400;
+export const revalidate = 0;
 
 const TITLE = "Glossary of Governance Terms";
 const DESCRIPTION =

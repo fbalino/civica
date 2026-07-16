@@ -47,12 +47,35 @@ for (const marker of [
 ]) {
   if (!fixture.includes(marker)) fail(`366-day fixture is missing ${marker}`);
 }
+const countryReaderStart = queries.indexOf(
+  "export async function getPulseV2ForCountry",
+);
+const countryReaderEnd = queries.indexOf(
+  "export async function getPulseV2EventsForCountry",
+  countryReaderStart,
+);
+if (countryReaderStart < 0 || countryReaderEnd < 0) {
+  fail("published country reader boundary is missing");
+}
+const countryReader = queries.slice(countryReaderStart, countryReaderEnd);
 for (const marker of [
   "nEvents > 0 && deltaRow ?",
-  "SCORE_WINDOW_DAYS",
-  "eventDate} <= CURRENT_DATE",
+  "pulseScorePublicationPointers",
+  "pulseDimensionalDeltaHistory",
+  "assertPulseScorePublication(publicationRow)",
+  "const contributingEventIds",
+  "inArray(pulseEventsV2.id, contributingEventIds)",
 ]) {
-  if (!queries.includes(marker)) fail(`public read contract is missing ${marker}`);
+  if (!countryReader.includes(marker))
+    fail(`public read contract is missing ${marker}`);
+}
+if (
+  countryReader.includes("SCORE_WINDOW_DAYS") ||
+  countryReader.includes("CURRENT_DATE")
+) {
+  fail(
+    "public read contract must select its frozen score run by pointer, not re-filter evidence against the current date",
+  );
 }
 if (!retention.includes('"pulse_dimensional_deltas"')) {
   fail("dimensional delta updates are absent from research evidence retention");

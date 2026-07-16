@@ -16,13 +16,13 @@ import {
   REQUEST_BODY_LIMITS,
   type CorrectionBody,
 } from "@/lib/api/request-body-schemas";
-import { withSafeJsonErrors } from "@/lib/api/problem-response";
+import { withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 
 const CORRECTION_RATE_LIMIT_POLICY =
   getRequestRateLimitPolicy("correction-form");
 
 export async function POST(request: NextRequest) {
-  return withSafeJsonErrors("api/civica-index/corrections", async () => {
+  return withPrivateSafeJsonErrors("api/civica-index/corrections", async () => {
     const rateLimit = await checkRequestRateLimit(
       request,
       CORRECTION_RATE_LIMIT_POLICY,

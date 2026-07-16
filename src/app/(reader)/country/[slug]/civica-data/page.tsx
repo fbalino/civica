@@ -13,6 +13,7 @@ import {
 } from "@/lib/db/queries";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { isCiReleaseConsistencyError } from "@/lib/ci/release-selection";
 import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 import { FactbookGovOrgChart } from "@/components/factbook/FactbookGovOrgChart";
 import { FactbookSidebar } from "@/components/factbook/FactbookSidebar";
@@ -42,7 +43,7 @@ import { withOg } from "@/lib/og";
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata
@@ -205,7 +206,10 @@ export default async function CountryCivicaDataTab({
     getLegislatureForJurisdiction(jurisdiction.id).catch(() => null),
     getBillsForJurisdiction(slug, 20).catch(() => null),
     getInternationalMembershipsBySlugs([jurisdiction.id]).catch(() => []),
-    getScoresForJurisdiction(jurisdiction.id).catch(() => []),
+    getScoresForJurisdiction(jurisdiction.id).catch((error) => {
+      if (isCiReleaseConsistencyError(error)) throw error;
+      return [];
+    }),
     getSource("wikidata").catch(() => null),
     // Whole sources table → real `last_sync_at` dates for the per-section
     // Sources strips. Soft-fails to [] so a Neon hiccup just drops the

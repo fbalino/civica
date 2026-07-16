@@ -19,7 +19,7 @@ import { calculateCompositeV2 } from "../src/lib/ci/calculate-v2";
 import { decoupleAbsorbedEvents } from "../src/lib/pulse/v2/decouple";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "../src/lib/db/schema";
-import { CURRENT_CI_RELEASE_ID, SUPERSEDED_CI_VINTAGE_LABEL } from "../src/lib/ci/current-release";
+import { CURRENT_CI_RELEASE_ID } from "../src/lib/ci/current-release";
 import { resolveCiRelease } from "../src/lib/ci/release-selection";
 
 async function main() {
@@ -34,7 +34,7 @@ async function main() {
   const release = resolveCiRelease(releaseId);
   const quarter = positional[0] ?? release.quarter;
   const methodologyVersion = release.methodologyVersion;
-  const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=") ?? SUPERSEDED_CI_VINTAGE_LABEL;
+  const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=") ?? release.supersedesVintageLabel ?? undefined;
 
   if (quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain ${quarter}`);
   const vintageLabel = release.vintageLabel;

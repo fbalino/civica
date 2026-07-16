@@ -22,7 +22,9 @@
  */
 
 import "@/components/scores/scores.css";
+import { Chip } from "@/components/editorial/Pill";
 import { SourceDot } from "@/components/SourceDot";
+import { scoreFreshnessPresentation } from "@/components/scores/freshness-label";
 import {
   getScoresForJurisdiction,
   type ScoreRow,
@@ -109,6 +111,7 @@ export function ScoresAndRankingsView({
       </div>
 
       {rows.map((row) => {
+        const freshness = scoreFreshnessPresentation(row);
         const arrow = row.trend ? ARROW_BY_TREND[row.trend] : null;
         const trendClass = row.trend
           ? `scores-rankings__trend scores-rankings__trend--${row.trend}`
@@ -126,7 +129,16 @@ export function ScoresAndRankingsView({
             className="scores-rankings__row"
             role="row"
           >
-            <span className="scores-rankings__label">{row.label}</span>
+            <span className="scores-rankings__label">
+              <span>{row.label}</span>
+              <Chip
+                variant={freshness.variant}
+                size="sm"
+                aria-label={freshness.ariaLabel}
+              >
+                {freshness.label}
+              </Chip>
+            </span>
 
             <span className="scores-rankings__value">
               <span>{row.scoreFormatted}</span>

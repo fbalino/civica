@@ -1,0 +1,22 @@
+{
+  "contract": "civica-browser-check/v1",
+  "taskId": "PLT-014",
+  "checkedAt": "2026-07-15",
+  "runner": "Playwright Chromium",
+  "baseUrl": "http://localhost:3010",
+  "command": "E2E_BASE_URL=http://localhost:3010 npm run test:e2e -- e2e/qa-010-reader-journeys.spec.ts -g \"search finds|dark theme spot-check: search\"",
+  "result": "passed",
+  "assertions": [
+    "Home search finds Switzerland and reaches the country profile on desktop.",
+    "The same search-to-country journey works at the small-mobile viewport.",
+    "The dark-theme search-to-country journey reaches Civica Data and renders Evidence Coverage."
+  ],
+  "tests": {
+    "passed": 3,
+    "failed": 0
+  },
+  "notes": [
+    "The server was started from this Civica worktree on port 3010.",
+    "Use localhost rather than 127.0.0.1 for local Next development: the latter is intentionally blocked from the dev HMR resource unless explicitly configured as an allowed development origin."
+  ]
+}

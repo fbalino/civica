@@ -17,6 +17,7 @@ import { parsePathContract } from "@/lib/api/request-contract";
 import { ENTITY_CITATION_RESOLVERS } from "@/lib/citations/resolvers";
 import { zEntityCitation } from "@/lib/citations/stable-identity";
 import { apiProblem } from "@/lib/api/problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 export async function GET(
   request: Request,
@@ -55,7 +56,7 @@ export async function GET(
 
     return NextResponse.json(parsed.data, {
       headers: {
-        "Cache-Control": "public, max-age=300",
+        "Cache-Control": cacheControlFor("public-live"),
         "X-Robots-Tag": "noindex",
       },
     });

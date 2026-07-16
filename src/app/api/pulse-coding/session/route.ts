@@ -16,14 +16,14 @@ import {
   REQUEST_BODY_LIMITS,
   type PulseCodingLoginBody,
 } from "@/lib/api/request-body-schemas";
-import { withSafeJsonErrors } from "@/lib/api/problem-response";
+import { withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 
 const PULSE_CREDENTIAL_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
   "pulse-credential-bootstrap",
 );
 
 export async function POST(request: NextRequest) {
-  return withSafeJsonErrors("api/pulse-coding/session", async () => {
+  return withPrivateSafeJsonErrors("api/pulse-coding/session", async () => {
     const mutationGuard = guardAdminMutationRequest(request);
     if (!mutationGuard.ok) return mutationGuard.response;
 

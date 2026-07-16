@@ -10,6 +10,9 @@ import {
 
 const requiredResearchConsumers = [
   "src/app/api/v1/index/[country_slug]/route.ts",
+  "src/app/api/v1/index/[country_slug]/history/route.ts",
+  "src/app/api/v1/index/by-government-type/route.ts",
+  "src/app/api/v1/index/compare/route.ts",
   "src/app/api/v1/index/rankings/route.ts",
   "src/lib/ci/calculate-v2.ts",
   "src/lib/ci/ingest.ts",
@@ -22,6 +25,9 @@ const requiredResearchConsumers = [
 
 const releaseContractConsumers = new Map([
   ["src/app/api/v1/index/[country_slug]/route.ts", "v1-index-country-query/v1"],
+  ["src/app/api/v1/index/[country_slug]/history/route.ts", "v1-index-history-query/v1"],
+  ["src/app/api/v1/index/by-government-type/route.ts", "v1-index-group-query/v1"],
+  ["src/app/api/v1/index/compare/route.ts", "v1-index-compare-query/v1"],
   ["src/app/api/v1/index/rankings/route.ts", "v1-index-rankings-query/v1"],
 ]);
 
@@ -38,7 +44,16 @@ for (const path of requiredResearchConsumers) {
   const source = readFileSync(path, "utf8");
   const queryContract = releaseContractConsumers.get(path);
   if (queryContract) {
-    assert.match(source, /resolveCiRelease\(query\.data\.release\)/);
+    assert.match(
+      source,
+      /await loadPublishedCiRelease\(query\.data\.release\)/,
+      `${path} must validate the exact published header and pointer before reading`,
+    );
+    assert.doesNotMatch(
+      source,
+      /\bresolveCiRelease\b/,
+      `${path} may not fall back to the in-memory release registry`,
+    );
     assert.ok(
       source.includes(`parseQueryContract(request, "${queryContract}"`),
       `${path} must use its closed release query contract`,
@@ -56,6 +71,7 @@ const releaseSelection = readFileSync(
   "src/lib/ci/release-selection.ts",
   "utf8",
 );
+const releaseStore = readFileSync("src/lib/ci/release-store.ts", "utf8");
 const requestContracts = readFileSync(
   "src/lib/api/request-contract.ts",
   "utf8",
@@ -66,6 +82,27 @@ assert.match(
 );
 assert.match(requestContracts, /CI_RELEASE_CONTRACTS\.at\(-1\)!/);
 assert.match(requestContracts, /value \?\? CURRENT_CI_RELEASE\.releaseId/);
+assert.match(
+  releaseStore,
+  /eq\(ciIndexReleases\.status, "published"\)/,
+);
+assert.match(
+  releaseStore,
+  /ciStoredReleaseHeaderErrors\(header, release\)/,
+);
+assert.match(
+  releaseStore,
+  /eq\(ciIndexReleasePointers\.product, "civica_index"\)/,
+);
+assert.match(
+  releaseStore,
+  /pointer\?\.releaseId !== release\.releaseId/,
+);
+assert.doesNotMatch(
+  releaseStore,
+  /catch\s*\(|\.catch\s*\(|return\s+resolveCiRelease\s*\(/,
+  "published release loading must fail closed",
+);
 
 const atlasLoader = readFileSync("src/lib/atlas/load-atlas-data.ts", "utf8");
 assert.doesNotMatch(

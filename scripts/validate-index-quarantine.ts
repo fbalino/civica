@@ -9,7 +9,7 @@ const errors = indexQuarantineErrors({
   indexLanding: read("src/app/(reader)/civica-index/page.tsx"), home: read("src/components/home/HomeGrid.tsx"),
   countryData: read("src/app/(reader)/country/[slug]/civica-data/page.tsx"), compare: read("src/app/compare/page.tsx"),
   rankings: read("src/app/rankings/RankingsMatrix.tsx"), embed: read("src/app/embed/[slug]/route.ts"),
-  generalCountryApi: read("src/app/api/v1/countries/[code]/route.ts"), apiDeprecation: read("src/lib/api/deprecation.ts"),
+  generalCountryApi: read("src/app/api/v1/countries/[code]/route.ts"), auxiliaryCountryScores: read("src/lib/db/queries-scores.ts"), apiDeprecation: read("src/lib/api/deprecation.ts"),
   apiSummaries: API_ROUTES, atlasLoader: read("src/lib/atlas/load-atlas-data.ts"), atlasLayers: read("src/lib/atlas/map-layers.ts"),
   atlasRelease: read("src/lib/exports/atlas-release.ts"), sitemap: read("src/app/sitemap.ts"),
   rightsManifest: read("src/lib/rights/manifest.ts"), publicClaims: PUBLIC_CLAIMS,

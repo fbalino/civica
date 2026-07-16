@@ -6,6 +6,8 @@ import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import "./not-found.css";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Page Not Found — 404",
   description:

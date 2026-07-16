@@ -16,7 +16,7 @@ import {
   type ExampleId,
 } from "@/lib/api/contract/examples";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Public API — Sovereign-State Governance Data",

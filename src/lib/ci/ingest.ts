@@ -15,6 +15,8 @@ import { CI_INGEST_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 import type { StagedCiAdapter, StagedCiRow } from "./atomic-ingestion";
 import { buildIndicatorLineage, frozenCiPublisherHash } from "@/lib/indicators/lineage";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
+import { CURRENT_CI_RELEASE_ID } from "./current-release";
+import { resolveCiRelease } from "./release-selection";
 
 export function createDb() {
   const sqlClient = neon(process.env.DATABASE_URL!);
@@ -62,6 +64,7 @@ export async function runIngestion(
      */
     vintageAt?: Date;
     dryRun?: boolean;
+    releaseId?: string;
     markSynced?: typeof markSourcesSynced;
   },
 ): Promise<{ ingested: number; skipped: number }> {
@@ -71,6 +74,17 @@ export async function runIngestion(
   const iso3Map = await buildIso3Map(db);
   const methodologyVersion = await getLatestMethodologyVersion(db);
   const quarter = yearToQuarter(result.datasetYear);
+  const release = resolveCiRelease(
+    opts?.releaseId ?? process.env.CI_TARGET_RELEASE_ID ?? CURRENT_CI_RELEASE_ID,
+  );
+  if (
+    release.methodologyVersion !== methodologyVersion ||
+    release.quarter !== quarter
+  ) {
+    throw new Error(
+      `${release.releaseId} requires ${release.methodologyVersion}/${release.quarter}, not ${methodologyVersion}/${quarter}`,
+    );
+  }
   const substitutionReason = result.sourceId === "worldbank_wgi" && result.dimension === "democratic_quality"
     ? "Coverage substitution where the primary V-Dem indicator has no jurisdiction row."
     : null;
@@ -111,7 +125,7 @@ export async function runIngestion(
       if (!jurisdictionId) { skipped++; continue; }
       const normalizedScore = normalize(record.rawValue, result.globalMinObserved, result.globalMaxObserved, record.isInverted);
       const versions = ciVersionEnvelope({ methodologyVersion, algorithmVersion: CI_INGEST_ALGORITHM_VERSION, sourceIds: [result.sourceId] });
-      rows.push({ jurisdictionId, iso3: record.iso3.toUpperCase(), normalizedScore, rawValue: record.rawValue, sourceId: result.sourceId, dimension: result.dimension, quarter, methodologyVersion, derivationVersionKey: versions.key, derivationVersions: versions.envelope, ...lineage });
+      rows.push({ jurisdictionId, iso3: record.iso3.toUpperCase(), normalizedScore, rawValue: record.rawValue, sourceId: result.sourceId, dimension: result.dimension, quarter, methodologyVersion, releaseId: release.releaseId, derivationVersionKey: versions.key, derivationVersions: versions.envelope, ...lineage });
     }
     if (rows.length === 0) throw new Error(`${result.sourceId}/${result.dimension}: staging produced zero matched rows`);
     const stage: StagedCiAdapter = {
@@ -123,6 +137,7 @@ export async function runIngestion(
       datasetYear: result.datasetYear,
       quarter,
       methodologyVersion,
+      releaseId: release.releaseId,
       nativeScaleMin: result.records[0]?.nativeMin ?? 0,
       nativeScaleMax: result.records[0]?.nativeMax ?? 1,
       isInverted: result.records[0]?.isInverted ?? false,
@@ -203,6 +218,7 @@ export async function runIngestion(
         ...lineage,
         ingestionId: ingestion.id,
         methodologyVersion,
+        releaseId: release.releaseId,
         derivationVersionKey: versions.key,
         derivationVersions: versions.envelope,
       })
@@ -214,6 +230,7 @@ export async function runIngestion(
           ciDimensionScores.methodologyVersion,
           ciDimensionScores.sourceId,
           ciDimensionScores.indicatorId,
+          ciDimensionScores.releaseId,
         ],
         set: {
           normalizedScore,

@@ -6,6 +6,8 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { INDEX_DISPOSITION } from "@/lib/ci/index-disposition";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Civica Index Research Status",
   // PUBLIC_CLAIM: metadata.index-disposition

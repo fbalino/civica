@@ -18,8 +18,9 @@ import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { apiProblem } from "@/lib/api/problem-response";
 import { parseQueryContract } from "@/lib/api/request-contract";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export async function GET(request: Request) {
   const limited = await enforceRequestRateLimit(
@@ -46,11 +47,14 @@ export async function GET(request: Request) {
     const countries = await getNotableTopicPeers(topicKey, excludeId, 3, {
       throwOnError: true,
     });
-    return Response.json({
-      topicKey,
-      topicLabel: getTopicLabel(topicKey),
-      countries,
-    });
+    return Response.json(
+      {
+        topicKey,
+        topicLabel: getTopicLabel(topicKey),
+        countries,
+      },
+      { headers: { "Cache-Control": cacheControlFor("public-live") } },
+    );
   } catch (err) {
     console.error("[/api/constitution/excerpts/notable]", err);
     return Response.json(

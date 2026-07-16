@@ -243,6 +243,48 @@ export function pulseStageVersionKey(
     .digest("hex")}`;
 }
 
+/**
+ * Reconstruct the content key used before PLT-010 switched stage envelopes to
+ * semantic stable-JSON hashing. PostgreSQL jsonb discards object insertion
+ * order, so the old builder's field order must be stated explicitly here.
+ * Envelopes carrying PLT-010 input snapshots are never eligible for this
+ * compatibility path: every such run was created after stable hashing landed.
+ */
+export function pulseStageLegacyJsonVersionKey(
+  envelope: PulseStageVersionEnvelope,
+): string | null {
+  if (envelope.inputIds !== undefined || envelope.inputFingerprint !== undefined) {
+    return null;
+  }
+  const canonical = canonicalizeEnvelope(envelope);
+  const errors = pulseStageVersionErrors(canonical);
+  if (errors.length) throw new Error(errors.join("; "));
+  const legacyRef = (ref: VersionRef): VersionRef =>
+    ref.state === "versioned"
+      ? { state: "versioned", id: ref.id }
+      : { state: ref.state, reason: ref.reason };
+  const legacyOrderedEnvelope: PulseStageVersionEnvelope = {
+    schemaVersion: canonical.schemaVersion,
+    stage: canonical.stage,
+    methodology: legacyRef(canonical.methodology),
+    ontology: legacyRef(canonical.ontology),
+    pipeline: legacyRef(canonical.pipeline),
+    algorithm: legacyRef(canonical.algorithm),
+    prompt: legacyRef(canonical.prompt),
+    sourceBasket: legacyRef(canonical.sourceBasket),
+    sourceIds: canonical.sourceIds,
+    models: canonical.models.map(({ role, provider, model }) => ({
+      role,
+      provider,
+      model,
+    })),
+    upstreamRunIds: canonical.upstreamRunIds,
+  };
+  return `pulse-stage/sha256:${createHash("sha256")
+    .update(JSON.stringify(legacyOrderedEnvelope))
+    .digest("hex")}`;
+}
+
 export function buildPulseStageVersionEnvelope(
   stage: PulsePipelineStage,
   options: {

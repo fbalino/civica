@@ -10,6 +10,7 @@ export interface IndexQuarantineSurfaces {
   rankings: string;
   embed: string;
   generalCountryApi: string;
+  auxiliaryCountryScores: string;
   apiDeprecation: string;
   apiSummaries: readonly { pathTemplate: string; summary: string }[];
   atlasLoader: string;
@@ -43,6 +44,11 @@ export function indexQuarantineErrors(surface: IndexQuarantineSurfaces): string[
   if (surface.rankings.includes("civica_index") || surface.rankings.includes("governance_quality")) errors.push("rankings table still exposes derived Index columns");
   if (!surface.embed.includes("status: 410") || surface.embed.includes("getCICountryDetail")) errors.push("legacy embed does not fail closed without score data");
   if (surface.generalCountryApi.includes("civicaIndex:") || surface.generalCountryApi.includes("getCICountryDetail")) errors.push("general country API still bundles the composite");
+  if (
+    surface.auxiliaryCountryScores.includes("buildCivicaIndexRow") ||
+    surface.auxiliaryCountryScores.includes('id: "civica-index"') ||
+    surface.auxiliaryCountryScores.includes("ciCompositeScores")
+  ) errors.push("auxiliary country scores still bundle the composite");
   for (const field of ["INDEX_COMPOSITE_SUNSET_DATE", "retiredIndexApiResponse", "status: 410"]) if (!surface.apiDeprecation.includes(field)) errors.push(`API retirement contract omits ${field}`);
   const indexRoutes = surface.apiSummaries.filter((route) => route.pathTemplate.startsWith("/api/v1/index/"));
   if (indexRoutes.length !== 6) errors.push("API registry does not contain the six sunset Index routes");

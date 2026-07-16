@@ -8,6 +8,7 @@ import { checkRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { constitutionSearchRateLimitResponse } from "@/lib/constitution/search-rate-limit-response";
 import { parseQueryContract } from "@/lib/api/request-contract";
+import { withResponseCacheProfile } from "@/lib/api/response-cache";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -28,7 +29,7 @@ function errorResponse(
   });
 }
 
-export async function GET(request: Request) {
+async function handleSearch(request: Request) {
   try {
     const rateLimit = await checkRequestRateLimit(request, RATE_LIMIT_POLICY);
     if (rateLimit.status !== "allowed") {
@@ -62,4 +63,8 @@ export async function GET(request: Request) {
     console.error("[/api/constitution/search]", error);
     return errorResponse("data_unavailable");
   }
+}
+
+export async function GET(request: Request) {
+  return withResponseCacheProfile("public-live", () => handleSearch(request));
 }

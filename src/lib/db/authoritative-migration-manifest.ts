@@ -217,4 +217,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "e10d60be954a5be888934db76218a36dd177981909d689610665fbd4ac645913",
     baseline: false,
   },
+  {
+    id: "0036_moaning_toad_men",
+    path: "drizzle/authoritative/0036_moaning_toad_men.sql",
+    sha256: "0da3dc84b726f52cdd2c0c61f5d734a69fa7c2c37133f9a9b5add695737ddc23",
+    baseline: false,
+  },
 ] as const;

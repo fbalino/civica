@@ -42,9 +42,14 @@ import {
 import type { z } from "zod";
 import { STRUCTURAL_FAMILY_DEPRECATION_META } from "@/lib/api/deprecation";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import {
+  publicCiReleaseIdentity,
+  type CiReleaseContract,
+} from "@/lib/ci/release-selection";
 import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
 import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries
@@ -225,9 +230,16 @@ export function shapeIndexRankingsMeta(input: {
   quarter: string | null;
   taxonomy: string;
   series: z.infer<typeof zCiSeriesProvenance>;
+  release: CiReleaseContract;
 }): z.infer<typeof zIndexRankingsMeta> {
   return zIndexRankingsMeta.parse({
     ...input,
+    release: publicCiReleaseIdentity(input.release),
+    components: publicCiPublicationComponents(input.release, {
+      jurisdiction: "live_current",
+      taxonomy: "live_current",
+      peerFilters: "live_current",
+    }),
     methodology: CI_METHODOLOGY_META,
     ...STRUCTURAL_FAMILY_DEPRECATION_META,
   });

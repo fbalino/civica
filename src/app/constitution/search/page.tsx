@@ -22,6 +22,8 @@ import { withOg } from "@/lib/og";
 import { checkRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Search constitutional text",
   description:

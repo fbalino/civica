@@ -55,7 +55,7 @@ test("authenticated legacy Pulse cron routes return deterministic retirement con
     const bodies = [];
     for (const response of responses) {
       assert.equal(response.status, 410);
-      assert.equal(response.headers.get("Cache-Control"), "no-store");
+      assert.equal(response.headers.get("Cache-Control"), "private, no-store");
       assert.equal(response.headers.get("Deprecation"), "true");
       assert.equal(
         response.headers.get("Link"),

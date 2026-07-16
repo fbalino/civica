@@ -5,6 +5,7 @@ import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { parsePathContract } from "@/lib/api/request-contract";
 import { evaluateInteractiveDisplay } from "@/lib/rights/manifest";
 import { apiProblem } from "@/lib/api/problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 export async function GET(
   request: Request,
@@ -104,7 +105,7 @@ export async function GET(
       },
       {
         headers: {
-          "Cache-Control": "public, max-age=300",
+          "Cache-Control": cacheControlFor("public-live"),
           "X-Robots-Tag": "noindex",
         },
       },

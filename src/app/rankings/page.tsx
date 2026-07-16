@@ -7,7 +7,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import { Banner } from "@/components/editorial/Banner";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Country Rankings — Population, Development & Reference Facts",

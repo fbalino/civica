@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 import { NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 import { requireCronAuth } from "./cron-auth";
 import { validateCronInput } from "./cron-input";
@@ -60,10 +61,24 @@ function safeJsonResponse(
   headers?: HeadersInit,
 ): NextResponse {
   const responseHeaders = new Headers(headers);
-  if (!responseHeaders.has("Cache-Control")) {
-    responseHeaders.set("Cache-Control", "no-store");
-  }
+  applyCronNoStoreHeaders(responseHeaders);
   return NextResponse.json(payload, { status, headers: responseHeaders });
+}
+
+function applyCronNoStoreHeaders(headers: Headers): void {
+  headers.set("Cache-Control", cacheControlFor("private-live"));
+  headers.set("CDN-Cache-Control", "no-store");
+  headers.set("Vercel-CDN-Cache-Control", "no-store");
+}
+
+function withCronNoStore(response: Response): Response {
+  const headers = new Headers(response.headers);
+  applyCronNoStoreHeaders(headers);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 async function invokeHandler(
@@ -102,20 +117,22 @@ async function normalizeHandlerResponse(response: Response): Promise<{
 
   if (response.ok && payload?.ok === false) {
     return {
-      response: safeJsonResponse(payload, 500),
+      response: withCronNoStore(safeJsonResponse(payload, 500)),
       succeeded: false,
     };
   }
   if (!response.ok && payload?.ok === true) {
     return {
-      response: safeJsonResponse(
-        { ok: false, outcome: "invalid_handler_response" },
-        response.status,
+      response: withCronNoStore(
+        safeJsonResponse(
+          { ok: false, outcome: "invalid_handler_response" },
+          response.status,
+        ),
       ),
       succeeded: false,
     };
   }
-  return { response, succeeded: response.ok };
+  return { response: withCronNoStore(response), succeeded: response.ok };
 }
 
 function requestMode(request: Request): "apply" | "dry_run" {

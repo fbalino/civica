@@ -5,8 +5,7 @@
  * fact-key, and writes the canonical value back into the
  * corresponding `jurisdictions` column. This is the only place
  * allowed to write to those columns; surfaces that need fast
- * value-only reads consume from `readCachedField()` in
- * `api.ts`.
+ * bounded-freshness reads consume from `readCachedField()` in `api.ts`.
  *
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §1.0
  * Schema doc:  ~/civica/plan/phase-f-schema-v0.1.md §11
@@ -60,7 +59,10 @@ export interface CacheRefreshSummary {
   finishedAt: string;
   durationMs: number;
   jurisdictionsRefreshed: number;
+  /** Non-null canonical values committed (or projected by a dry run). */
   fieldsWritten: number;
+  /** Withdrawn/unavailable canonical values cleared (or projected by a dry run). */
+  fieldsCleared: number;
   errors: string[];
   dryRun: boolean;
 }
@@ -112,6 +114,7 @@ export async function refreshJurisdictionCache(
 
   let jurisdictionsRefreshed = 0;
   let fieldsWritten = 0;
+  let fieldsCleared = 0;
   const errors: string[] = [];
 
   for (const j of jurisdictionRows) {
@@ -121,7 +124,10 @@ export async function refreshJurisdictionCache(
         ALL_FACT_KEYS
       );
 
-      const update: Partial<{
+      // Every cache column participates in the same atomic update. A missing
+      // canonical clears its former value; retaining it while advancing the
+      // refresh timestamp would falsely relabel stale data as current.
+      const update: {
         capital: string | null;
         population: number | null;
         gdpBillions: number | null;
@@ -130,44 +136,47 @@ export async function refreshJurisdictionCache(
         currency: string | null;
         democracyIndex: number | null;
         factCacheRefreshedAt: Date;
-      }> = { factCacheRefreshedAt: new Date() };
+      } = {
+        capital: null,
+        population: null,
+        gdpBillions: null,
+        areaSqKm: null,
+        languages: null,
+        currency: null,
+        democracyIndex: null,
+        factCacheRefreshedAt: new Date(),
+      };
 
       const popResult = resolved["population_total"];
       if (popResult?.canonical) {
         const v = popResult.canonical.factValueNumeric;
         update.population = v === null ? null : Math.round(v);
-        if (v !== null) fieldsWritten++;
       }
 
       const gdpResult = resolved["gdp_ppp_usd_billions"];
       if (gdpResult?.canonical) {
         update.gdpBillions = gdpResult.canonical.factValueNumeric;
-        if (update.gdpBillions !== null) fieldsWritten++;
       }
 
       const areaResult = resolved["area_total_km2"];
       if (areaResult?.canonical) {
         const v = areaResult.canonical.factValueNumeric;
         update.areaSqKm = v === null ? null : Math.round(v);
-        if (v !== null) fieldsWritten++;
       }
 
       const capitalResult = resolved["capital"];
       if (capitalResult?.canonical?.factValue) {
         update.capital = capitalResult.canonical.factValue;
-        fieldsWritten++;
       }
 
       const langsResult = resolved["official_languages"];
       if (langsResult?.canonical?.factValue) {
         update.languages = langsResult.canonical.factValue;
-        fieldsWritten++;
       }
 
       const currencyResult = resolved["currency_code"];
       if (currencyResult?.canonical?.factValue) {
         update.currency = currencyResult.canonical.factValue;
-        fieldsWritten++;
       }
 
       // democracy_index column historically held a numeric scalar
@@ -182,16 +191,40 @@ export async function refreshJurisdictionCache(
         update.democracyIndex = mapVdemRowToOrdinal(
           vdemResult.canonical.factValue
         );
-        if (update.democracyIndex !== null) fieldsWritten++;
       }
+
+      const cacheValues = [
+        update.capital,
+        update.population,
+        update.gdpBillions,
+        update.areaSqKm,
+        update.languages,
+        update.currency,
+        update.democracyIndex,
+      ];
+      const jurisdictionFieldsWritten = cacheValues.filter(
+        (value) => value !== null
+      ).length;
+      const jurisdictionFieldsCleared =
+        cacheValues.length - jurisdictionFieldsWritten;
 
       if (!options.dryRun) {
-        await db
+        const updated = await db
           .update(jurisdictions)
           .set(update)
-          .where(eq(jurisdictions.id, j.id));
+          .where(eq(jurisdictions.id, j.id))
+          .returning({ id: jurisdictions.id });
+        if (updated.length !== 1) {
+          throw new Error(
+            `cache refresh expected one committed jurisdiction row; updated ${updated.length}`
+          );
+        }
       }
 
+      // Counts advance only after the atomic update is confirmed. Dry runs
+      // intentionally report the same projected counts without writing.
+      fieldsWritten += jurisdictionFieldsWritten;
+      fieldsCleared += jurisdictionFieldsCleared;
       jurisdictionsRefreshed++;
     } catch (err) {
       const msg = `${j.slug}: ${err instanceof Error ? err.message : String(err)}`;
@@ -207,6 +240,7 @@ export async function refreshJurisdictionCache(
     durationMs: finishedAtMs - startedAtMs,
     jurisdictionsRefreshed,
     fieldsWritten,
+    fieldsCleared,
     errors,
     dryRun: options.dryRun ?? false,
   };

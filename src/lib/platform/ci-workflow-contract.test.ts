@@ -292,7 +292,7 @@ test("runtime, permissions, timeout, action, and production-server drift fails",
     assertRejected("runtime/security drift", seeded);
 });
 
-test("script graph rejects credential, context, core, claims, and Index bypasses", () => {
+test("script graph rejects credential, context, core, cache/release, claims, and Index bypasses", () => {
   const fixtures: Array<Record<string, string>> = [
     { ...packageJson.scripts, "build:ci": "DATABASE_URL=x npm run build" },
     {
@@ -303,6 +303,14 @@ test("script graph rejects credential, context, core, claims, and Index bypasses
       ),
     },
     { ...packageJson.scripts, build: "next build" },
+    {
+      ...packageJson.scripts,
+      "validate:cache-consistency": "node -e process.exit(0)",
+    },
+    {
+      ...packageJson.scripts,
+      "validate:release-consistency": "node -e process.exit(0)",
+    },
     {
       ...packageJson.scripts,
       "build:core": packageJson.scripts["build:core"].replace(

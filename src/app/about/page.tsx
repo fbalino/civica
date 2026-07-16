@@ -10,7 +10,7 @@ import { getAllSources } from "@/lib/db/queries";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "About — A Provenance-First Reference Atlas",

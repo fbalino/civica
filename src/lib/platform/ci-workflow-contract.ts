@@ -14,7 +14,7 @@ export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
 /** SHA-256 of the complete production build command before the CI refactor. */
 export const BUILD_CORE_SHA256 =
-  "8cebe3835dce60cc9b12cf3861f7f89f652f8ef8cde5638ceec9e6a7da64c984";
+  "d2e9ef57e4b267005e7c25777ab2a6c5ff11696c83d86b648f3c9a613566b983";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
@@ -215,6 +215,10 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     build: "npm run build:core",
     "build:ci": "npm run --ignore-scripts build",
     "validate:claims-docs": "tsx scripts/validate-claims-docs.ts",
+    "validate:cache-consistency":
+      "node --import tsx --test src/lib/platform/cache-consistency.test.ts src/lib/api/response-cache.test.ts src/lib/api/problem-response.test.ts scripts/validate-cache-consistency.test.ts && tsx scripts/validate-cache-consistency.ts",
+    "validate:release-consistency":
+      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts",
     "validate:build-prereqs":
       "npm run validate:constitution-search && npm run validate:pulse-incidents && npm run validate:pulse-classification-state && npm run validate:pulse-review-sla && npm run validate:pulse-information-environment && npm run validate:pulse-validation-protocol",
   };

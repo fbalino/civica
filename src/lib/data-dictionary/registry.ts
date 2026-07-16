@@ -493,6 +493,35 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rights: "Civica-authored metadata; input-source rights remain separate.",
     deprecation: active,
   },
+  ci_index_releases: {
+    definition:
+      "Immutable release headers for staged and published Civica Index research outputs.",
+    rowGrain: "One exact Index release identity and reproduction contract.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+    cadence:
+      "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+    vintageSemantics:
+      "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+    rights:
+      "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+    deprecation: active,
+  },
+  ci_index_release_pointers: {
+    definition:
+      "Atomic selector for the one complete Civica Index research release exposed by current-release readers.",
+    rowGrain: "One product pointer to one validated published Index release.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Written only by the database publication function after exact release reproduction and completeness checks.",
+    cadence: "Changes only when a verified successor release is published.",
+    vintageSemantics:
+      "updated_at is pointer-switch time; the referenced release retains its own quarter, vintage, calculation, and publication times.",
+    rights:
+      "Operational selector metadata is Civica-authored; the selected release retains its source-specific rights contract.",
+    deprecation: active,
+  },
   ci_source_ingestions: {
     definition: "Run ledger for Civica Index source ingestion.",
     rowGrain:
@@ -589,6 +618,20 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     vintageSemantics:
       "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
     rights: "Derived output subject to the combined rights of included inputs.",
+    deprecation: active,
+  },
+  pulse_score_publication_pointers: {
+    definition:
+      "Atomic selector for the one complete Pulse dimensional score run exposed by the public dimensions reader.",
+    rowGrain: "One product pointer to one completed five-dimension score run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+    cadence: "Changes when a complete successor Pulse score run is published.",
+    vintageSemantics:
+      "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+    rights:
+      "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
     deprecation: active,
   },
   pulse_events: {

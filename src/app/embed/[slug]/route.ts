@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { INDEX_COMPOSITE_SUNSET_DATE } from "@/lib/api/deprecation";
 import { RIGHTS_REGISTRY_URL } from "@/lib/claims/reuse-rights";
 import { parsePathContract } from "@/lib/api/request-contract";
+import { withResponseCacheProfile } from "@/lib/api/response-cache";
 
 function headers() {
   return {
@@ -19,7 +20,7 @@ function headers() {
   };
 }
 
-export async function OPTIONS() {
+async function handleOptions() {
   return new Response(null, { status: 204, headers: headers() });
 }
 
@@ -31,7 +32,7 @@ export async function OPTIONS() {
  *
  * PROVENANCE_COVERAGE: embeds.retired-index
  */
-export async function GET(
+async function handleEmbed(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
@@ -44,4 +45,17 @@ export async function GET(
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}"><title>Civica Index embed retired</title></head>
 <body><main><p><strong>This Civica Index embed has been retired.</strong></p><p>Civica now publishes source-native governance evidence without a composite country score or rank.</p><p><a href="${countryHref}" target="_top">Open Governance Evidence</a></p><p><a href="/licensing#reuse" target="_top">Rights and reuse</a></p></main></body></html>`;
   return new Response(html, { status: 410, headers: headers() });
+}
+
+export async function OPTIONS() {
+  return withResponseCacheProfile("public-live", handleOptions);
+}
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> },
+) {
+  return withResponseCacheProfile("public-live", () =>
+    handleEmbed(request, context),
+  );
 }

@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
+export const revalidate = 0;
+
 /**
  * Composite widgets were part of the superseded public Index product.
  * The selected disposition exposes only source-native observations, so this

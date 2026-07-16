@@ -6,7 +6,7 @@ import type { MetricOption } from "@/components/outcomes/OutcomesExplorer";
 import { withOg } from "@/lib/og";
 import { ResearchArtifactPolicyLinks } from "@/components/policy/ResearchArtifactPolicyLinks";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Civica Conditions — Material Conditions by Country",

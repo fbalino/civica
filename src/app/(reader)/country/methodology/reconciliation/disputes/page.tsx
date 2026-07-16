@@ -13,7 +13,7 @@ import {
 import { reconciliation } from "@/lib/content/site-state";
 import { DisputesFilterClient } from "./DisputesFilterClient";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Data Disputes Log — Reconciliation Conflicts (Beta)",

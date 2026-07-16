@@ -27,9 +27,14 @@ import {
   diffMethods,
 } from "../checks";
 import { scanExportedMethods } from "../../../../../scripts/validate-route-inventory";
+import {
+  isRepositoryOwned,
+  loadRepositoryOwnedFiles,
+} from "../../../../../scripts/repository-owned-files";
 
 const ROOT = process.cwd();
 const APP_DIR = path.join(ROOT, "src/app");
+const REPOSITORY_OWNED_FILES = loadRepositoryOwnedFiles(ROOT);
 
 async function findRouteFilesOnDisk(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -45,12 +50,19 @@ async function findRouteFilesOnDisk(dir: string): Promise<string[]> {
   return found;
 }
 
+async function findRepositoryRouteFilesOnDisk(): Promise<string[]> {
+  const files = await findRouteFilesOnDisk(APP_DIR);
+  return files.filter((file) =>
+    isRepositoryOwned(path.relative(ROOT, file), REPOSITORY_OWNED_FILES),
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Positive: the real registry is internally consistent and complete
 // ─────────────────────────────────────────────────────────────────────
 
 test("the real registry has exactly 100 entries, one per real route.ts file", async () => {
-  const diskFiles = await findRouteFilesOnDisk(APP_DIR);
+  const diskFiles = await findRepositoryRouteFilesOnDisk();
   assert.equal(diskFiles.length, 100, "expected exactly 100 route.ts files under src/app");
   assert.equal(ROUTE_INVENTORY.length, 100);
 });
@@ -64,7 +76,7 @@ test("no duplicate filePath entries in the registry", () => {
 });
 
 test("findPhantomRoutes and findStaleEntries are both empty against the real filesystem", async () => {
-  const diskFiles = await findRouteFilesOnDisk(APP_DIR);
+  const diskFiles = await findRepositoryRouteFilesOnDisk();
   const diskPaths = diskFiles.map((f) => path.relative(APP_DIR, f).split(path.sep).join("/"));
   const registryPaths = ROUTE_INVENTORY.map((r) => r.filePath);
 

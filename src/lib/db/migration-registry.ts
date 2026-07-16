@@ -285,6 +285,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0036_moaning_toad_men",
+    "drizzle/authoritative/0036_moaning_toad_men.sql",
+    "mixed",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

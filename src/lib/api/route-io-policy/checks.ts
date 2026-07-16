@@ -354,14 +354,16 @@ export function handlerReturnsApprovedErrorBoundary(
     true,
     ts.ScriptKind.TS,
   );
-  if (
-    !hasNamedImport(
-      source,
-      "withSafeJsonErrors",
-      "@/lib/api/problem-response",
-    ) ||
-    hasLocalDeclaration(source, "withSafeJsonErrors")
-  ) {
+  const approvedBoundaryNames = [
+    "withSafeJsonErrors",
+    "withPrivateSafeJsonErrors",
+  ] as const;
+  const importedBoundary = approvedBoundaryNames.find(
+    (name) =>
+      hasNamedImport(source, name, "@/lib/api/problem-response") &&
+      !hasLocalDeclaration(source, name),
+  );
+  if (!importedBoundary) {
     return false;
   }
   const handler = exportedHandler(source, method);
@@ -373,7 +375,7 @@ export function handlerReturnsApprovedErrorBoundary(
   const expression = unwrapExpression(statement.expression);
   return (
     ts.isCallExpression(expression) &&
-    callName(expression.expression) === "withSafeJsonErrors"
+    callName(expression.expression) === importedBoundary
   );
 }
 

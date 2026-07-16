@@ -177,6 +177,9 @@ export async function calculateCompositeV2(
 ): Promise<RunSummary> {
   const release = resolveCiRelease(opts.releaseId ?? CURRENT_CI_RELEASE_ID);
   const vintageLabel = opts.vintageLabel ?? null;
+  const supersedesVintageLabel = vintageLabel
+    ? (opts.supersedesVintageLabel ?? release.supersedesVintageLabel)
+    : null;
   const methodologyVersion = opts.methodologyVersion ?? release.methodologyVersion;
   if (quarter !== release.quarter || methodologyVersion !== release.methodologyVersion) {
     throw new Error(`${release.releaseId} requires ${release.methodologyVersion}/${release.quarter}, not ${methodologyVersion}/${quarter}.`);
@@ -191,10 +194,19 @@ export async function calculateCompositeV2(
   if (identity && identity.methodologyVersion !== methodologyVersion.toLowerCase()) {
     throw new Error(`${vintageLabel} publishes methodology ${identity.methodologyVersion}, not ${methodologyVersion}.`);
   }
+  if (
+    vintageLabel &&
+    supersedesVintageLabel !== release.supersedesVintageLabel
+  ) {
+    throw new Error(
+      `${release.releaseId} must supersede ${release.supersedesVintageLabel ?? "no prior vintage"}.`,
+    );
+  }
 
   const rows = await db
     .select({
       jurisdictionId: ciDimensionScores.jurisdictionId,
+      releaseId: ciDimensionScores.releaseId,
       dimension: ciDimensionScores.dimension,
       normalizedScore: ciDimensionScores.normalizedScore,
       rawValue: ciDimensionScores.rawValue,
@@ -205,9 +217,16 @@ export async function calculateCompositeV2(
       transformationId: ciDimensionScores.transformationId,
       methodVersion: ciDimensionScores.methodVersion,
       artifactHash: ciDimensionScores.artifactHash,
+      upstreamRelease: ciDimensionScores.upstreamRelease,
+      artifactKind: ciDimensionScores.artifactKind,
+      temporalCoverage: ciDimensionScores.temporalCoverage,
+      licenseUrl: ciDimensionScores.licenseUrl,
+      substitutionReason: ciDimensionScores.substitutionReason,
+      derivationVersionKey: ciDimensionScores.derivationVersionKey,
+      derivationVersions: ciDimensionScores.derivationVersions,
     })
     .from(ciDimensionScores)
-    .where(and(eq(ciDimensionScores.quarter, quarter), eq(ciDimensionScores.methodologyVersion, methodologyVersion)));
+    .where(and(eq(ciDimensionScores.quarter, quarter), eq(ciDimensionScores.methodologyVersion, methodologyVersion), eq(ciDimensionScores.releaseId, release.releaseId)));
 
   const releaseRows = selectCiReleaseDimensionRows(rows, release.releaseId);
 
@@ -265,11 +284,12 @@ export async function calculateCompositeV2(
       dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
       missingDimensions: ciCompositeScores.missingDimensions,
       methodologyVersion: ciCompositeScores.methodologyVersion,
+      releaseId: ciCompositeScores.releaseId,
       derivationVersionKey: ciCompositeScores.derivationVersionKey,
       derivationVersions: ciCompositeScores.derivationVersions,
     })
     .from(ciCompositeScores)
-    .where(and(eq(ciCompositeScores.quarter, quarter), eq(ciCompositeScores.methodologyVersion, methodologyVersion))) : [];
+    .where(and(eq(ciCompositeScores.quarter, quarter), eq(ciCompositeScores.methodologyVersion, methodologyVersion), eq(ciCompositeScores.releaseId, release.releaseId))) : [];
   const priorReleaseRows = vintageLabel ? await db
     .select({ vintageLabel: ciCompositeScores.vintageLabel })
     .from(ciCompositeScores)
@@ -278,7 +298,7 @@ export async function calculateCompositeV2(
     .map((row) => row.vintageLabel)
     .filter((label): label is string => Boolean(label && label !== vintageLabel));
   if (vintageLabel) {
-    assertSupersession({ label: vintageLabel, supersedes: opts.supersedesVintageLabel, priorLabels });
+    assertSupersession({ label: vintageLabel, supersedes: supersedesVintageLabel, priorLabels });
   }
   const existingByJurisdiction = new Map(
     existingRows
@@ -303,13 +323,14 @@ export async function calculateCompositeV2(
         scoreUpper: r.scoreUpper,
         completenessFlag: r.completeness,
         vintageLabel,
-        supersedesVintageLabel: opts.supersedesVintageLabel ?? null,
+        supersedesVintageLabel,
         rank: ranked.rank,
         totalRanked,
         isPartial: r.completeness === "partial",
         dimensionsAvailable: r.dimensionsAvailable,
         missingDimensions: r.missingDimensions,
         methodologyVersion,
+        releaseId: release.releaseId,
         derivationVersionKey: versions.key,
         derivationVersions: versions.envelope,
     };
@@ -346,6 +367,7 @@ export async function calculateCompositeV2(
           ciCompositeScores.jurisdictionId,
           ciCompositeScores.quarter,
           ciCompositeScores.methodologyVersion,
+          ciCompositeScores.releaseId,
         ],
         set: {
           score: r.scoreInteger,

@@ -14,14 +14,14 @@ import {
   requestUuidSchema,
   type PulseCodingAdjudicationBody,
 } from "@/lib/api/request-body-schemas";
-import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { apiProblem, withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 import { pulseCodingProblem } from "@/lib/api/pulse-coding-problem";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ assignmentId: string }> },
 ) {
-  return withSafeJsonErrors(
+  return withPrivateSafeJsonErrors(
     "api/pulse-coding/adjudications/[assignmentId]",
     async () => {
       const session = await getPulseCodingSession();

@@ -9,8 +9,10 @@ import {
 import { compareCICountries } from "@/lib/db/queries";
 import {
   displayCiReleaseDimensionScore,
-  resolveCiRelease,
+  isCiReleaseConsistencyError,
+  publicCiReleaseIdentity,
 } from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   INDEX_COMPOSITE_DEPRECATION_HEADERS,
@@ -22,6 +24,7 @@ import {
 } from "@/lib/api/deprecation";
 import { shapeIndexCompareResult } from "@/lib/api/contract/shapes";
 import { parseQueryContract } from "@/lib/api/request-contract";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 export async function GET(request: Request) {
   const rateLimited = await withRateLimit(request);
@@ -39,7 +42,14 @@ export async function GET(request: Request) {
 
   try {
     const { slug: slugs, quarter } = query.data;
-    const release = resolveCiRelease(query.data.release);
+    const release = await loadPublishedCiRelease(query.data.release);
+    if (quarter && quarter !== release.quarter) {
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError("The requested quarter is unavailable for this release.", 400),
+        ),
+      );
+    }
     const rows = await compareCICountries(slugs, quarter, release.releaseId);
 
     // Curate a public response shape rather than spreading the raw DB rows.
@@ -108,10 +118,15 @@ export async function GET(request: Request) {
         apiResponse({
           data: results,
           meta: {
-            quarter: quarter ?? null,
+            quarter: release.quarter,
             count: results.length,
             methodology: CI_METHODOLOGY_META,
+            release: publicCiReleaseIdentity(release),
             series: release.series,
+            components: publicCiPublicationComponents(release, {
+              jurisdiction: "live_current",
+              taxonomy: "live_current",
+            }),
             deprecations: STRUCTURAL_FAMILY_DEPRECATION_META.deprecations,
           },
         }),
@@ -119,6 +134,17 @@ export async function GET(request: Request) {
     );
   } catch (e) {
     console.error("API /v1/index/compare error:", e);
+    if (isCiReleaseConsistencyError(e)) {
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError(
+            "The requested release is temporarily unavailable.",
+            503,
+            "RELEASE_INCONSISTENT",
+          ),
+        ),
+      );
+    }
     return withIndexDispositionDeprecation(
       withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
     );

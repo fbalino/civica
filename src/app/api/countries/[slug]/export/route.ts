@@ -28,6 +28,7 @@ import {
   parseQueryContract,
 } from "@/lib/api/request-contract";
 import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 // PUBLIC_CLAIM: export.provenance-coverage
 export async function GET(
@@ -161,10 +162,7 @@ export async function GET(
 
       const filename = `${jurisdiction.slug}-civica-research-export.${format}`;
       const headers = {
-        "Cache-Control":
-          selection.mode === "vintage"
-            ? "public, max-age=31536000, immutable"
-            : "private, max-age=0, must-revalidate",
+        "Cache-Control": cacheControlFor("public-live"),
         "Content-Disposition": `attachment; filename="${filename}"`,
         "X-Civica-Rights-Manifest": RIGHTS_MANIFEST_PATH,
       };

@@ -31,7 +31,7 @@ import {
   mintAdminSessionCookie,
 } from "@/lib/admin/session";
 import { recordAdminLoginAudit } from "@/lib/admin/mutation-audit";
-import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { apiProblem, withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 
 const ADMIN_OAUTH_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
   "admin-oauth-bootstrap",
@@ -45,7 +45,7 @@ function clearOAuthCookieHeaders(): Array<[string, string]> {
 }
 
 export async function GET(request: NextRequest) {
-  return withSafeJsonErrors("api/admin/google/callback", async () => {
+  return withPrivateSafeJsonErrors("api/admin/google/callback", async () => {
     const failUrl = new URL("/admin/sign-in?error=google", request.url);
 
     if (!isGoogleSignInConfigured() || !isAdminSessionConfigured()) {

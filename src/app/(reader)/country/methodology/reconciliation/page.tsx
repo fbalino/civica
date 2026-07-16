@@ -16,7 +16,7 @@ import {
   disputeSla,
 } from "@/lib/content/site-state";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Worked Example 1 (Argentina inflation) derives its threshold from the
 // fact-keys registry rather than retyping it, so the prose can never drift

@@ -14,7 +14,7 @@ import {
 } from "@/lib/db/queries-backtest";
 import { pulse } from "@/lib/content/site-state";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Civica Pulse Backtest Report (Beta)",

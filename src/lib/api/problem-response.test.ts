@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { apiProblem, withSafeJsonErrors } from "./problem-response";
+import {
+  apiProblem,
+  withPrivateSafeJsonErrors,
+  withSafeJsonErrors,
+} from "./problem-response";
 
 test("problem responses use a stable no-store shape", async () => {
   const response = apiProblem("INVALID_QUERY");
@@ -79,4 +83,22 @@ test("expected route-specific errors are forced to no-store", async () => {
     error: "Country not found",
     code: "COUNTRY_NOT_FOUND",
   });
+});
+
+test("safe JSON boundaries seal successful public and private responses", async () => {
+  const publicResponse = await withSafeJsonErrors("fixture", () =>
+    Response.json({ ok: true }),
+  );
+  assert.equal(publicResponse.headers.get("Cache-Control"), "no-store");
+
+  const privateResponse = await withPrivateSafeJsonErrors("fixture", () =>
+    Response.json(
+      { ok: true },
+      { headers: { "Cache-Control": "public, max-age=3600" } },
+    ),
+  );
+  assert.equal(
+    privateResponse.headers.get("Cache-Control"),
+    "private, no-store",
+  );
 });

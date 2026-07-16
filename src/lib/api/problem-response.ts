@@ -1,4 +1,8 @@
 import { unstable_rethrow } from "next/navigation";
+import {
+  responseWithCacheProfile,
+  type HttpResponseCacheProfileId,
+} from "@/lib/api/response-cache";
 
 export const API_PROBLEMS = Object.freeze({
   INVALID_QUERY: {
@@ -20,6 +24,10 @@ export const API_PROBLEMS = Object.freeze({
   ARTIFACT_UNAVAILABLE: {
     status: 503,
     error: "The requested artifact is temporarily unavailable.",
+  },
+  RELEASE_INCONSISTENT: {
+    status: 503,
+    error: "The requested release is temporarily unavailable.",
   },
   INTERNAL_ERROR: {
     status: 500,
@@ -54,28 +62,37 @@ export function apiProblem(
 export async function withSafeJsonErrors(
   operation: string,
   handler: () => Response | Promise<Response>,
-  options: { errorHeaders?: HeadersInit } = {},
+  options: {
+    errorHeaders?: HeadersInit;
+    cacheProfileId?: HttpResponseCacheProfileId;
+  } = {},
 ): Promise<Response> {
+  const cacheProfileId = options.cacheProfileId ?? "public-live";
   try {
     const response = await handler();
-    if (response.status < 400) return response;
-
-    // Route-specific expected errors may carry additional documented fields,
-    // but every error response shares the same non-cacheable transport rule.
-    const headers = new Headers(response.headers);
-    headers.set("Cache-Control", "no-store");
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    });
+    return responseWithCacheProfile(response, cacheProfileId);
   } catch (error) {
     // Preserve Next.js control-flow and dynamic-rendering signals while
     // converting only ordinary application failures to the public problem.
     unstable_rethrow(error);
     console.error(`[${operation}] unhandled route failure`, error);
-    return apiProblem("DATA_UNAVAILABLE", {
-      headers: options.errorHeaders,
-    });
+    return responseWithCacheProfile(
+      apiProblem("DATA_UNAVAILABLE", {
+        headers: options.errorHeaders,
+      }),
+      cacheProfileId,
+    );
   }
+}
+
+/** Fixed-error boundary for authenticated or PII-bearing live routes. */
+export function withPrivateSafeJsonErrors(
+  operation: string,
+  handler: () => Response | Promise<Response>,
+  options: { errorHeaders?: HeadersInit } = {},
+): Promise<Response> {
+  return withSafeJsonErrors(operation, handler, {
+    ...options,
+    cacheProfileId: "private-live",
+  });
 }

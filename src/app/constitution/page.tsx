@@ -14,7 +14,7 @@ import { ConstitutionCountryBar } from "@/components/constitution/ConstitutionCo
 import { ConstitutionLanding } from "@/components/constitution/ConstitutionLanding";
 import { ConstitutionHero } from "@/components/constitution/ConstitutionHero";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 const MAX_SLUGS = DEFAULT_MAX_SLUGS;
 

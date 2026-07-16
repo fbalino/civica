@@ -31,6 +31,7 @@ import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import {
   cachedJurisdictionColumns,
   getCanonicalFactsForJurisdictions,
+  readFreshCachedFieldFromRow,
 } from "@/lib/factbook/reconcile/api";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
@@ -71,6 +72,7 @@ interface ListDisplayRow {
   population: number | null;
   gdpBillions: number | null;
   areaSqKm: number | null;
+  factCacheRefreshedAt: Date | null;
 }
 
 /**
@@ -102,8 +104,15 @@ async function resolveListDisplayFacts(
       areaSqKm: number | null;
     }
   >();
-  if (rows.length === 0)
-    return { values: out, metadata: metadataFromResolutions(selection, {}) };
+  if (rows.length === 0) {
+    const frozenMetadata = selection.mode === "vintage"
+      ? await getImmutableVintageMetadata(selection.asOf)
+      : undefined;
+    return {
+      values: out,
+      metadata: metadataFromResolutions(selection, {}, frozenMetadata),
+    };
+  }
 
   if (selection.mode === "vintage") {
     const [facts, frozenMetadata] = await Promise.all([
@@ -141,6 +150,10 @@ async function resolveListDisplayFacts(
     /* resolver unavailable — fall back to cache values below */
   }
 
+  // One clock boundary for the full page. Cached values are eligible only
+  // when their row timestamp is valid, not future-dated, and no older than
+  // the jurisdiction-cache contract's 24-hour ceiling.
+  const cacheReadAt = new Date();
   for (const row of rows) {
     const f = facts[row.id] ?? {};
     const capText = f[LIST_FACT_FIELDS.capital]?.canonical?.factValue ?? null;
@@ -150,11 +163,29 @@ async function resolveListDisplayFacts(
       f[LIST_FACT_FIELDS.gdpBillions]?.canonical?.factValueNumeric ?? null;
     const areaNum =
       f[LIST_FACT_FIELDS.areaSqKm]?.canonical?.factValueNumeric ?? null;
+    const cachedCapital = readFreshCachedFieldFromRow(row, "capital", {
+      now: cacheReadAt,
+    }).value;
+    const cachedPopulation = readFreshCachedFieldFromRow(
+      row,
+      "population_total",
+      { now: cacheReadAt },
+    ).value;
+    const cachedGdpBillions = readFreshCachedFieldFromRow(
+      row,
+      "gdp_ppp_usd_billions",
+      { now: cacheReadAt },
+    ).value;
+    const cachedAreaSqKm = readFreshCachedFieldFromRow(
+      row,
+      "area_total_km2",
+      { now: cacheReadAt },
+    ).value;
     out.set(row.id, {
-      capital: capText ?? row.capital,
-      population: popNum != null ? Math.round(popNum) : row.population,
-      gdpBillions: gdpNum ?? row.gdpBillions,
-      areaSqKm: areaNum != null ? Math.round(areaNum) : row.areaSqKm,
+      capital: capText ?? cachedCapital,
+      population: popNum != null ? Math.round(popNum) : cachedPopulation,
+      gdpBillions: gdpNum ?? cachedGdpBillions,
+      areaSqKm: areaNum != null ? Math.round(areaNum) : cachedAreaSqKm,
     });
   }
   const flatResolutions = Object.fromEntries(
@@ -303,6 +334,8 @@ export async function GET(request: Request) {
           governmentTypeDetail: jurisdictions.governmentTypeDetail,
           gdpBillions: cachedJurisdictionColumns.gdpBillions,
           areaSqKm: cachedJurisdictionColumns.areaSqKm,
+          factCacheRefreshedAt:
+            cachedJurisdictionColumns.factCacheRefreshedAt,
           flagUrl: jurisdictions.flagUrl,
           type: jurisdictions.type,
           statusSourceIds: jurisdictions.statusSourceIds,
@@ -345,8 +378,10 @@ export async function GET(request: Request) {
           statusNote,
           administeringJurisdictionIso3,
           statusDisputed,
+          factCacheRefreshedAt: _factCacheRefreshedAt,
           ...publicCountry
         } = country;
+        void _factCacheRefreshedAt;
         return shapeCountryListItem({
           ...publicCountry,
           jurisdictionStatus: buildJurisdictionStatusPresentation({
@@ -359,10 +394,10 @@ export async function GET(request: Request) {
             administeringJurisdictionIso3,
             statusDisputed,
           }),
-          capital: d?.capital ?? country.capital,
-          population: d?.population ?? country.population,
-          gdpBillions: d?.gdpBillions ?? country.gdpBillions,
-          areaSqKm: d?.areaSqKm ?? country.areaSqKm,
+          capital: d?.capital ?? null,
+          population: d?.population ?? null,
+          gdpBillions: d?.gdpBillions ?? null,
+          areaSqKm: d?.areaSqKm ?? null,
         });
       });
       return withStructuralFamilyDeprecation(
@@ -395,6 +430,8 @@ export async function GET(request: Request) {
           governmentTypeDetail: jurisdictions.governmentTypeDetail,
           gdpBillions: cachedJurisdictionColumns.gdpBillions,
           areaSqKm: cachedJurisdictionColumns.areaSqKm,
+          factCacheRefreshedAt:
+            cachedJurisdictionColumns.factCacheRefreshedAt,
           flagUrl: jurisdictions.flagUrl,
           type: jurisdictions.type,
           statusSourceIds: jurisdictions.statusSourceIds,
@@ -431,8 +468,10 @@ export async function GET(request: Request) {
             statusNote,
             administeringJurisdictionIso3,
             statusDisputed,
+            factCacheRefreshedAt: _factCacheRefreshedAt,
             ...publicCountry
           } = country;
+          void _factCacheRefreshedAt;
           return shapeCountryListItem({
             ...publicCountry,
             jurisdictionStatus: buildJurisdictionStatusPresentation({
@@ -447,10 +486,10 @@ export async function GET(request: Request) {
             }),
             // Resolver-canonical display facts override the cache,
             // mirroring /api/v1/countries/[code].
-            capital: d?.capital ?? country.capital,
-            population: d?.population ?? country.population,
-            gdpBillions: d?.gdpBillions ?? country.gdpBillions,
-            areaSqKm: d?.areaSqKm ?? country.areaSqKm,
+            capital: d?.capital ?? null,
+            population: d?.population ?? null,
+            gdpBillions: d?.gdpBillions ?? null,
+            areaSqKm: d?.areaSqKm ?? null,
             governmentClassification: classificationMap.get(id) ?? null,
           });
         }),

@@ -4,6 +4,8 @@ import { getAllPosts } from "@/lib/blog";
 import { ORGANIZATIONS } from "@/lib/data/international-organizations";
 import { absoluteUrl, METADATA_CONTENT_RELEASE_DATE } from "@/lib/site";
 
+export const revalidate = 0;
+
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
 interface StaticRoute {

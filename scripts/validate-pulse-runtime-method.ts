@@ -654,12 +654,18 @@ function validateClusteringAndScoring(
   const pulseQueries = relative("src/lib/db/queries-pulse-v2.ts");
   check(
     state,
-    pulseQueries.includes("SCORE_WINDOW_DAYS") &&
-      pulseQueries.includes("eventDate} <= CURRENT_DATE") &&
-      pulseQueries.includes("reviewStatus} IN ('approved', 'edited')") &&
-      pulseQueries.includes("category} <> 'none'") &&
+    score.includes("SCORE_WINDOW_DAYS") &&
+      score.includes("pulse_events_v2.event_date >= ${sinceDate}") &&
+      score.includes("pulse_events_v2.event_date <= ${throughDate}") &&
+      score.includes("pulse_events_v2.review_status IN ('approved', 'edited')") &&
+      score.includes("pulse_events_v2.category <> 'none'") &&
+      pulseQueries.includes("pulseScorePublicationPointers") &&
+      pulseQueries.includes("pulseDimensionalDeltaHistory") &&
+      pulseQueries.includes("assertPulsePublishedDeltaRows") &&
+      pulseQueries.includes("assertPulsePublishedEvidence") &&
+      pulseQueries.includes("contributingEventIds") &&
       pulseQueries.includes("delta: nEvents > 0 && deltaRow ?"),
-    "Country Pulse evidence must use the scorer window/eligibility rules and null unsupported deltas",
+    "Pulse scoring must freeze its window/eligibility inputs and the country reader must use one checked publication with null unsupported deltas",
   );
   const decouple = relative("src/lib/pulse/v2/decouple.ts");
   const calculateIndex = relative("scripts/calculate-ci-v2.ts");

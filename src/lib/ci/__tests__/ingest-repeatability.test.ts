@@ -13,7 +13,7 @@ function harness() {
   const db = {
     select: () => ({ from: (table: unknown) => {
       if (table === jurisdictions) return { where: async () => [{ id: "jurisdiction-1", iso3: "CAN" }] };
-      if (table === ciMethodologyVersions) return { where: () => ({ limit: async () => [{ id: "beta-r3" }] }) };
+      if (table === ciMethodologyVersions) return { where: () => ({ limit: async () => [{ id: "beta-r5" }] }) };
       throw new Error("unexpected select");
     } }),
     insert: (table: unknown) => ({ values: (value: Record<string, unknown>) => ({ onConflictDoUpdate: () => {

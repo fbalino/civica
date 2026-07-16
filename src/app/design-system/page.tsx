@@ -19,7 +19,7 @@ import { MobileNav } from "@/components/MobileNav";
 
 import "./design-system.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 type DesignTokenGroup = {
   id: string;

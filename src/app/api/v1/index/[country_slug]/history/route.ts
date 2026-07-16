@@ -13,11 +13,16 @@ import {
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
 } from "@/lib/api/deprecation";
-import { resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  isCiReleaseConsistencyError,
+  publicCiReleaseIdentity,
+} from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import {
   parsePathContract,
   parseQueryContract,
 } from "@/lib/api/request-contract";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 export async function GET(
   request: Request,
@@ -42,7 +47,7 @@ export async function GET(
 
   try {
     const country_slug = path.data.slug;
-    const release = resolveCiRelease(query.data.release);
+    const release = await loadPublishedCiRelease(query.data.release);
 
     const history = await getCICountryHistory(
       country_slug.toLowerCase(),
@@ -61,11 +66,27 @@ export async function GET(
     return withIndexDispositionDeprecation(
       apiResponse({
         data: history.map(shapeIndexHistoryItem),
-        meta: { methodology: CI_METHODOLOGY_META, series: release.series },
+        meta: {
+          methodology: CI_METHODOLOGY_META,
+          release: publicCiReleaseIdentity(release),
+          series: release.series,
+          components: publicCiPublicationComponents(release, {
+            jurisdiction: "live_current",
+          }),
+        },
       }),
     );
   } catch (e) {
     console.error("API /v1/index/[country_slug]/history error:", e);
+    if (isCiReleaseConsistencyError(e)) {
+      return withIndexDispositionDeprecation(
+        apiError(
+          "The requested release is temporarily unavailable.",
+          503,
+          "RELEASE_INCONSISTENT",
+        ),
+      );
+    }
     return withIndexDispositionDeprecation(
       apiError("Internal server error", 500),
     );

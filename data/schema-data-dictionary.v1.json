@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "53c2daae1c0c5d038036379c523974db56d6decb8661933df2a9bf612ebde5f0",
+  "schemaFingerprint": "887e2174c1e57e8b789fd0bd817b0f2c5b27030870bfeec3393f18d0a49baad3",
   "summary": {
-    "tables": 86,
-    "columns": 1213,
+    "tables": 89,
+    "columns": 1245,
     "publicAtlasTables": 22,
-    "researchBetaTables": 24,
+    "researchBetaTables": 27,
     "supportTables": 11,
     "internalTables": 27,
     "privateTables": 2,
@@ -2809,12 +2809,10 @@
             "indexed": true,
             "foreignKey": "jurisdictions.id",
             "indexGroups": [
-              "idx_ci_composite_unique",
-              "idx_ci_composite_jurisdiction"
+              "idx_ci_composite_jurisdiction",
+              "idx_ci_composite_release"
             ],
-            "uniqueGroups": [
-              "idx_ci_composite_unique"
-            ]
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
@@ -2836,14 +2834,10 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": true,
+            "indexed": false,
             "foreignKey": "ci_methodology_versions.id",
-            "indexGroups": [
-              "idx_ci_composite_unique"
-            ],
-            "uniqueGroups": [
-              "idx_ci_composite_unique"
-            ]
+            "indexGroups": [],
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Relational identifier referencing ci_methodology_versions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
@@ -2893,12 +2887,9 @@
             "indexed": true,
             "foreignKey": null,
             "indexGroups": [
-              "idx_ci_composite_unique",
               "idx_ci_composite_quarter_rank"
             ],
-            "uniqueGroups": [
-              "idx_ci_composite_unique"
-            ]
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
           "cadence": "Per named Index rebuild/release.",
@@ -2928,6 +2919,33 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
+          "rights": "Derived output subject to the combined rights of included inputs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to ci_index_releases.id.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "ci_index_releases.id",
+            "indexGroups": [
+              "idx_ci_composite_release"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing ci_index_releases.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
           "vintageSemantics": "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
           "rights": "Derived output subject to the combined rights of included inputs.",
@@ -3240,14 +3258,10 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": true,
+            "indexed": false,
             "foreignKey": null,
-            "indexGroups": [
-              "idx_ci_dimension_scores_unique"
-            ],
-            "uniqueGroups": [
-              "idx_ci_dimension_scores_unique"
-            ]
+            "indexGroups": [],
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
           "cadence": "Per named Index rebuild/release.",
@@ -3294,14 +3308,10 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": true,
+            "indexed": false,
             "foreignKey": null,
-            "indexGroups": [
-              "idx_ci_dimension_scores_unique"
-            ],
-            "uniqueGroups": [
-              "idx_ci_dimension_scores_unique"
-            ]
+            "indexGroups": [],
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
           "cadence": "Per named Index rebuild/release.",
@@ -3351,12 +3361,10 @@
             "indexed": true,
             "foreignKey": "jurisdictions.id",
             "indexGroups": [
-              "idx_ci_dimension_scores_unique",
-              "idx_ci_dimension_scores_jurisdiction"
+              "idx_ci_dimension_scores_jurisdiction",
+              "idx_ci_dimension_scores_release"
             ],
-            "uniqueGroups": [
-              "idx_ci_dimension_scores_unique"
-            ]
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
@@ -3428,14 +3436,10 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": true,
+            "indexed": false,
             "foreignKey": "ci_methodology_versions.id",
-            "indexGroups": [
-              "idx_ci_dimension_scores_unique"
-            ],
-            "uniqueGroups": [
-              "idx_ci_dimension_scores_unique"
-            ]
+            "indexGroups": [],
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Relational identifier referencing ci_methodology_versions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
@@ -3485,12 +3489,9 @@
             "indexed": true,
             "foreignKey": null,
             "indexGroups": [
-              "idx_ci_dimension_scores_unique",
               "idx_ci_dimension_scores_quarter"
             ],
-            "uniqueGroups": [
-              "idx_ci_dimension_scores_unique"
-            ]
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
           "cadence": "Per named Index rebuild/release.",
@@ -3526,6 +3527,33 @@
           }
         },
         {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to ci_index_releases.id.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "ci_index_releases.id",
+            "indexGroups": [
+              "idx_ci_dimension_scores_release"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing ci_index_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "source_id",
           "propertyName": "sourceId",
           "definition": "Identifier of the registered source responsible for this observation or record.",
@@ -3537,14 +3565,10 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": true,
+            "indexed": false,
             "foreignKey": "sources.id",
-            "indexGroups": [
-              "idx_ci_dimension_scores_unique"
-            ],
-            "uniqueGroups": [
-              "idx_ci_dimension_scores_unique"
-            ]
+            "indexGroups": [],
+            "uniqueGroups": []
           },
           "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
@@ -3650,6 +3674,667 @@
           "cadence": "Per named Index rebuild/release.",
           "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
           "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ci_index_release_pointers",
+      "exportName": "ciIndexReleasePointers",
+      "definition": "Atomic selector for the one complete Civica Index research release exposed by current-release readers.",
+      "rowGrain": "One product pointer to one validated published Index release.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Written only by the database publication function after exact release reproduction and completeness checks.",
+      "cadence": "Changes only when a verified successor release is published.",
+      "vintageSemantics": "updated_at is pointer-switch time; the referenced release retains its own quarter, vintage, calculation, and publication times.",
+      "rights": "Operational selector metadata is Civica-authored; the selected release retains its source-specific rights contract.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "product",
+          "propertyName": "product",
+          "definition": "Product recorded for the product pointer to one validated published Index release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Written only by the database publication function after exact release reproduction and completeness checks.",
+          "cadence": "Changes only when a verified successor release is published.",
+          "vintageSemantics": "updated_at is pointer-switch time; the referenced release retains its own quarter, vintage, calculation, and publication times.",
+          "rights": "Operational selector metadata is Civica-authored; the selected release retains its source-specific rights contract.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to ci_index_releases.id.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "ci_index_releases.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing ci_index_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "Changes only when a verified successor release is published.",
+          "vintageSemantics": "updated_at is pointer-switch time; the referenced release retains its own quarter, vintage, calculation, and publication times.",
+          "rights": "Operational selector metadata is Civica-authored; the selected release retains its source-specific rights contract.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "updated_at",
+          "propertyName": "updatedAt",
+          "definition": "Timestamp when Civica last updated this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Written only by the database publication function after exact release reproduction and completeness checks.",
+          "cadence": "Changes only when a verified successor release is published.",
+          "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
+          "rights": "Operational selector metadata is Civica-authored; the selected release retains its source-specific rights contract.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ci_index_releases",
+      "exportName": "ciIndexReleases",
+      "definition": "Immutable release headers for staged and published Civica Index research outputs.",
+      "rowGrain": "One exact Index release identity and reproduction contract.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+      "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+      "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+      "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "composite_algorithm_version",
+          "propertyName": "compositeAlgorithmVersion",
+          "definition": "Composite algorithm version recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "composite_row_count",
+          "propertyName": "compositeRowCount",
+          "definition": "Composite row count recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "composite_row_set_sha256",
+          "propertyName": "compositeRowSetSha256",
+          "definition": "Composite row set sha256 recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension_row_count",
+          "propertyName": "dimensionRowCount",
+          "definition": "Dimension row count recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension_row_set_sha256",
+          "propertyName": "dimensionRowSetSha256",
+          "definition": "Dimension row set sha256 recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension_rules",
+          "propertyName": "dimensionRules",
+          "definition": "Dimension rules recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "display_transform_version",
+          "propertyName": "displayTransformVersion",
+          "definition": "Display transform version recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "input_manifest_sha256",
+          "propertyName": "inputManifestSha256",
+          "definition": "Input manifest sha256 recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "input_transformation_version",
+          "propertyName": "inputTransformationVersion",
+          "definition": "Input transformation version recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_content_sha256",
+          "propertyName": "methodologyContentSha256",
+          "definition": "Methodology content sha256 recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_version",
+          "propertyName": "methodologyVersion",
+          "definition": "Version of the Civica method that produced or interprets this row.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "ci_methodology_versions.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing ci_methodology_versions.id; substantive provenance follows this table's source contract.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "published_at",
+          "propertyName": "publishedAt",
+          "definition": "Publisher timestamp for the source item.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_index_releases_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "Published at follows this table contract. quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "quarter",
+          "propertyName": "quarter",
+          "definition": "Quarter recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_artifacts",
+          "propertyName": "sourceArtifacts",
+          "definition": "Source artifacts recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_index_releases_status"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersedes_release_id",
+          "propertyName": "supersedesReleaseId",
+          "definition": "Supersedes release id; relational link to ci_index_releases.id.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "ci_index_releases.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing ci_index_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersedes_vintage_label",
+          "propertyName": "supersedesVintageLabel",
+          "definition": "Supersedes vintage label recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "Supersedes vintage label follows this table contract. quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "supersession_kind",
+          "propertyName": "supersessionKind",
+          "definition": "Supersession kind recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "uncertainty_policy",
+          "propertyName": "uncertainty",
+          "definition": "Uncertainty policy recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "vintage_label",
+          "propertyName": "vintageLabel",
+          "definition": "Vintage label recorded for the exact Index release identity and reproduction contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+          "cadence": "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+          "vintageSemantics": "Vintage label follows this table contract. quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+          "rights": "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
           "deprecation": {
             "status": "active"
           }
@@ -30404,6 +31089,147 @@
           "cadence": "Append-only when a review obligation changes operational state.",
           "vintageSemantics": "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
           "rights": "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_score_publication_pointers",
+      "exportName": "pulseScorePublicationPointers",
+      "definition": "Atomic selector for the one complete Pulse dimensional score run exposed by the public dimensions reader.",
+      "rowGrain": "One product pointer to one completed five-dimension score run.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+      "cadence": "Changes when a complete successor Pulse score run is published.",
+      "vintageSemantics": "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+      "rights": "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "computation_run_id",
+          "propertyName": "computationRunId",
+          "definition": "Pulse score-stage run responsible for the stored computed output.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Changes when a complete successor Pulse score run is published.",
+          "vintageSemantics": "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+          "rights": "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "product",
+          "propertyName": "product",
+          "definition": "Product recorded for the product pointer to one completed five-dimension score run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+          "cadence": "Changes when a complete successor Pulse score run is published.",
+          "vintageSemantics": "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+          "rights": "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "published_at",
+          "propertyName": "publishedAt",
+          "definition": "Publisher timestamp for the source item.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+          "cadence": "Changes when a complete successor Pulse score run is published.",
+          "vintageSemantics": "Published at follows this table contract. score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+          "rights": "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "score_as_of",
+          "propertyName": "scoreAsOf",
+          "definition": "Score as of recorded for the product pointer to one completed five-dimension score run.",
+          "sqlType": "date",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+          "cadence": "Changes when a complete successor Pulse score run is published.",
+          "vintageSemantics": "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+          "rights": "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "version_key",
+          "propertyName": "versionKey",
+          "definition": "Content-addressed identifier for the immutable Pulse stage-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+          "cadence": "Changes when a complete successor Pulse score run is published.",
+          "vintageSemantics": "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+          "rights": "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
           "deprecation": {
             "status": "active"
           }

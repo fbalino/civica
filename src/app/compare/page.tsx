@@ -35,7 +35,7 @@ import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 import { CompareIndicatorHistory } from "@/components/compare/CompareIndicatorHistory";
 import { SOURCE_RIGHTS } from "@/lib/rights/manifest";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Series colors resolve from the global :root block in globals.css.
 // No fallback literals — the globals are always present.

@@ -14,7 +14,7 @@ import { civicaIndex, disputeSla, pulse } from "@/lib/content/site-state";
 import { dimensionColorVar } from "@/lib/ci/dimension-colors";
 import { INDEX_DISPOSITION } from "@/lib/ci/index-disposition";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Civica Index Research Methodology and Disposition",

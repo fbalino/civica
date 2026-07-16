@@ -6,6 +6,8 @@ import { CivicaLogo } from "@/components/CivicaLogo";
 import { AdminNav } from "./AdminNav";
 import "@/app/admin.css";
 
+export const revalidate = 0;
+
 /**
  * Admin shell.
  *

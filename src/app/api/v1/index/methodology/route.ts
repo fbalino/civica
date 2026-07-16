@@ -13,8 +13,15 @@ import {
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
 } from "@/lib/api/deprecation";
-import { CI_RELEASE_CONTRACTS } from "@/lib/ci/release-selection";
+import {
+  CI_RELEASE_CONTRACTS,
+  assertCiReleaseMethodologyRecord,
+  isCiReleaseConsistencyError,
+  publicCiReleaseIdentity,
+} from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parseQueryContract } from "@/lib/api/request-contract";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 function publicMethodologyRecord<
   T extends { id: string; notes: string | null },
@@ -41,28 +48,45 @@ export async function GET(request: Request) {
   if (retired) return retired;
 
   try {
-    const versionId = query.data.version;
-    const methodology = await getCIMethodology(versionId);
+    const releaseId =
+      query.data.release ??
+      (query.data.version
+        ? CI_RELEASE_CONTRACTS.find(
+            (candidate) =>
+              candidate.methodologyVersion === query.data.version,
+          )!.releaseId
+        : undefined);
+    const release = await loadPublishedCiRelease(releaseId);
+    const methodology = await getCIMethodology(release.methodologyVersion);
     if (!methodology) {
       return withIndexDispositionDeprecation(
         apiError("Methodology not found", 404),
       );
     }
+    assertCiReleaseMethodologyRecord(methodology, release.releaseId);
 
     return withIndexDispositionDeprecation(
       apiResponse({
         data: shapeIndexMethodologyData(publicMethodologyRecord(methodology)),
         meta: {
           methodology: CI_METHODOLOGY_META,
-          series:
-            CI_RELEASE_CONTRACTS.find(
-              (release) => release.methodologyVersion === versionId,
-            )?.series ?? null,
+          release: publicCiReleaseIdentity(release),
+          series: release.series,
+          components: publicCiPublicationComponents(release),
         },
       }),
     );
   } catch (e) {
     console.error("API /v1/index/methodology error:", e);
+    if (isCiReleaseConsistencyError(e)) {
+      return withIndexDispositionDeprecation(
+        apiError(
+          "The requested release is temporarily unavailable.",
+          503,
+          "RELEASE_INCONSISTENT",
+        ),
+      );
+    }
     return withIndexDispositionDeprecation(
       apiError("Internal server error", 500),
     );

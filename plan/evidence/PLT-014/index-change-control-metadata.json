@@ -1,0 +1,44 @@
+{
+  "id": "sealed-release-manifest-hash-correction",
+  "toVersion": "civica-index-release-consistency-v33",
+  "categories": ["input"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PLT-014/README.md",
+      "plan/evidence/PLT-014/index-change-control.md"
+    ],
+    "registry": [
+      "src/lib/ci/release-selection.ts",
+      "src/lib/platform/cache-consistency.ts"
+    ],
+    "release_note": ["plan/evidence/PLT-014/release-note.md"],
+    "migration_plan": ["plan/evidence/PLT-014/migration-plan.md"],
+    "golden_test": [
+      "src/lib/ci/release-publication.test.ts",
+      "src/lib/exports/atlas-release.test.ts",
+      "scripts/validate-release-consistency.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/ci/release-selection.test.ts",
+      "src/lib/platform/cache-consistency.test.ts",
+      "src/lib/pulse/v2/publication-consistency.test.ts",
+      "scripts/validate-release-consistency.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:api-docs",
+    "validate:atlas-export",
+    "validate:cache-consistency",
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-release-selection",
+    "validate:index-research-archive",
+    "validate:release-consistency"
+  ]
+}

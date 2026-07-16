@@ -14,6 +14,7 @@ import {
 } from "@/lib/rights/manifest";
 import { parseQueryContract } from "@/lib/api/request-contract";
 import { withSafeJsonErrors } from "@/lib/api/problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 export async function GET(request: Request) {
   return withSafeJsonErrors(
@@ -81,7 +82,7 @@ export async function GET(request: Request) {
       });
       const headers = {
         ...CORS_HEADERS,
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": cacheControlFor("public-live"),
         "X-Civica-Rights-Manifest": RIGHTS_MANIFEST_PATH,
       };
       if (format === "csv")

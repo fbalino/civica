@@ -19,7 +19,7 @@ import {
   REQUEST_BODY_LIMITS,
   type AdvisoryApplicationBody,
 } from "@/lib/api/request-body-schemas";
-import { withSafeJsonErrors } from "@/lib/api/problem-response";
+import { withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 
 const ADVISORY_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
   "advisory-application-form",
@@ -37,7 +37,7 @@ function json(
 }
 
 export async function POST(req: NextRequest) {
-  return withSafeJsonErrors("api/advisory-applications", async () => {
+  return withPrivateSafeJsonErrors("api/advisory-applications", async () => {
     const rateLimit = await checkRequestRateLimit(
       req,
       ADVISORY_RATE_LIMIT_POLICY,

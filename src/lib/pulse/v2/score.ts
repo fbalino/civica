@@ -17,6 +17,7 @@ import {
   pulseDimensionalDeltaHistory,
   pulseDimensionalDeltas,
   pulsePipelineRuns,
+  pulseScorePublicationPointers,
 } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { decayedImpact, daysSince } from "./decay";
@@ -345,19 +346,42 @@ export async function calculateDimensionalDeltas(
         ).length,
       };
       try {
+        const completeRun = db
+          .update(pulsePipelineRuns)
+          .set({
+            status: "completed",
+            counts,
+            failures: [],
+            completedAt: today,
+          })
+          .where(eq(pulsePipelineRuns.id, run.id));
+        const publishRun = db
+          .insert(pulseScorePublicationPointers)
+          .values({
+            product: "pulse_dimensions",
+            computationRunId: run.id,
+            versionKey: run.versionKey,
+            scoreAsOf: todayDate,
+            publishedAt: today,
+          })
+          .onConflictDoUpdate({
+            target: pulseScorePublicationPointers.product,
+            set: {
+              computationRunId: run.id,
+              versionKey: run.versionKey,
+              scoreAsOf: todayDate,
+              publishedAt: today,
+            },
+          });
         const batchQueries = [
           ...planned.flatMap((plan) =>
             dimensionalDeltaWriteQueries(db, plan, today),
           ),
-          db
-            .update(pulsePipelineRuns)
-            .set({
-              status: "completed",
-              counts,
-              failures: [],
-              completedAt: today,
-            })
-            .where(eq(pulsePipelineRuns.id, run.id)),
+          completeRun,
+          // Publication is the last statement. Neon applies the batch
+          // atomically, so a pointer failure preserves the prior release and
+          // rolls back the history/projection/run close together.
+          publishRun,
         ] as unknown as Parameters<typeof db.batch>[0];
         // neon-http exposes atomic transactions through batch(); its callback
         // transaction API deliberately throws. The batch contains every

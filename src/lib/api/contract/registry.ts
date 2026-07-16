@@ -492,17 +492,24 @@ export const API_ROUTES: RouteContract[] = [
       "DEPRECATED — preserved composite methodology record. The current disposition and research evidence are published on the methodology page.",
     params: [
       {
+        name: "release",
+        in: "query",
+        type: "string",
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4". This is the canonical selector.',
+      },
+      {
         name: "version",
         in: "query",
         type: "string",
         description:
-          'Optional methodology version id, e.g. "beta". Defaults to the most recently published version.',
+          'Compatibility alias for an unambiguous methodology version, e.g. "beta-r4". Use release when corrections share a methodology and period.',
       },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500, 503],
+    errorStatuses: [400, 404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexMethodology",
   },
@@ -654,7 +661,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/pulse/[country_slug]/dimensions/route.ts",
     versioned: true,
     summary:
-      "Public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, driving events, and a separate country-period observability verdict. No scalar Pulse score; absent events never become stability evidence.",
+      "Public experimental per-dimension Pulse deltas from one immutable score-run publication, with release-checked evidence, separately labeled live context, and a country-period observability verdict. No scalar Pulse score; absent events never become stability evidence.",
     params: [
       {
         name: ":country_slug",

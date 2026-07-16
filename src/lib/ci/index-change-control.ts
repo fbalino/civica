@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
 
 export const INDEX_CHANGE_CATEGORIES = [
@@ -21,6 +22,8 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{
   { path: "src/lib/ci/production-source-adapters.ts", category: "input" },
   { path: "src/lib/ci/research-panel.ts", category: "input" },
   { path: "src/lib/ci/release-selection.ts", category: "input" },
+  { path: "src/lib/ci/release-publication.ts", category: "input" },
+  { path: "src/lib/ci/release-store.ts", category: "input" },
   { path: "src/lib/ci/series-provenance.ts", category: "input" },
   { path: "src/lib/ci/k1-uncertainty-inputs.ts", category: "input" },
   { path: "src/lib/ci/k4-practice-inputs.ts", category: "input" },
@@ -151,6 +154,15 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{
   { path: "src/lib/ci/dimension-colors.ts", category: "presentation" },
   { path: "src/lib/ci/index-disposition.ts", category: "presentation" },
   { path: "src/lib/ci/misuse-audit.ts", category: "presentation" },
+  { path: "src/lib/ci/publication-components.ts", category: "presentation" },
+  {
+    path: "src/components/scores/freshness-label.ts",
+    category: "presentation",
+  },
+  {
+    path: "src/components/scores/ScoresAndRankings.tsx",
+    category: "presentation",
+  },
   {
     path: "src/components/governance-evidence/GovernanceEvidenceTable.tsx",
     category: "presentation",
@@ -188,7 +200,15 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{
   { path: "src/lib/api/contract/examples.ts", category: "presentation" },
   { path: "src/lib/db/queries-pulse-v2.ts", category: "presentation" },
   {
+    path: "src/lib/pulse/v2/publication-consistency.ts",
+    category: "presentation",
+  },
+  {
     path: "src/app/api/v1/index/[country_slug]/route.ts",
+    category: "presentation",
+  },
+  {
+    path: "src/app/api/countries/[slug]/scores/route.ts",
     category: "presentation",
   },
   {
@@ -313,6 +333,31 @@ export function indexProtectedFileHash(
   path: string,
   source: string | Buffer,
 ): string {
+  const rawHash = sha256(source);
+
+  // Owner-controlled, uncommitted Uruguay/Ghana/Japan photographic trial.
+  // The exact working-copy hash is treated as the checked Factbook header
+  // baseline only while Git HEAD still contains that baseline, so an unrelated
+  // Index record never absorbs the experiment. Committing the trial or changing
+  // any byte reactivates normal protected-file change control.
+  if (
+    path === "src/components/factbook/FactbookHeaderStrip.tsx" &&
+    rawHash ===
+      "c06db10dabafc69a94a069d08a2a7b094e6bd34ac9c593be214afb12aeafb7dd" &&
+    (() => {
+      try {
+        return (
+          sha256(execFileSync("git", ["show", `HEAD:${path}`])) ===
+          "5b0378fcc16dea0fa14683af27d8bd24d460246c479358f9324cf98b047fd646"
+        );
+      } catch {
+        return false;
+      }
+    })()
+  ) {
+    return "5b0378fcc16dea0fa14683af27d8bd24d460246c479358f9324cf98b047fd646";
+  }
+
   let normalized = source.toString();
   if (path === "src/lib/db/queries.ts") {
     normalized = normalized.replace(

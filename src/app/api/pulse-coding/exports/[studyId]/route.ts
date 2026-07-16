@@ -3,6 +3,7 @@ import { apiProblem } from "@/lib/api/problem-response";
 import { requestUuidSchema } from "@/lib/api/request-body-schemas";
 import { getPulseCodingSession } from "@/lib/pulse/v2/coding-session";
 import { exportPulseCodingStudy } from "@/lib/pulse/v2/coding-store";
+import { withResponseCacheProfile } from "@/lib/api/response-cache";
 
 const EXPECTED_EXPORT_PROBLEMS: ReadonlyMap<
   string,
@@ -50,7 +51,7 @@ const EXPECTED_EXPORT_PROBLEMS: ReadonlyMap<
   ],
 ]);
 
-export async function GET(
+async function handleExport(
   _request: Request,
   { params }: { params: Promise<{ studyId: string }> },
 ) {
@@ -132,5 +133,15 @@ export async function GET(
           },
         );
     }
+    return apiProblem("DATA_UNAVAILABLE");
   }
+}
+
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ studyId: string }> },
+) {
+  return withResponseCacheProfile("private-live", () =>
+    handleExport(request, context),
+  );
 }

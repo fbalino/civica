@@ -7,6 +7,8 @@ import { getAdminSession } from "@/lib/admin/session";
 import { isGoogleSignInConfigured } from "@/lib/admin/google-oauth";
 import "@/app/admin.css";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Admin sign-in",
   robots: { index: false, follow: false },

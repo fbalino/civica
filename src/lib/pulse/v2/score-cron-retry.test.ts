@@ -215,6 +215,7 @@ test("score publish rolls back, retries one stable run, and never duplicates his
   const database = new PGlite();
   const executionKey = "d".repeat(64);
   const jurisdictionId = "55555555-5555-4555-8555-555555555555";
+  const priorRunId = "44444444-4444-4444-8444-444444444444";
   try {
     await database.exec(`${PIPELINE_DDL}
       CREATE TABLE pulse_dimensional_delta_history (
@@ -248,6 +249,32 @@ test("score publish rolls back, retries one stable run, and never duplicates his
         window_days integer NOT NULL,
         last_computed_at timestamp NOT NULL DEFAULT NOW(),
         UNIQUE (jurisdiction_id, dimension)
+      );
+      CREATE TABLE pulse_score_publication_pointers (
+        product text PRIMARY KEY,
+        computation_run_id uuid NOT NULL UNIQUE,
+        version_key text NOT NULL,
+        score_as_of date NOT NULL,
+        published_at timestamp NOT NULL DEFAULT NOW()
+      );
+      INSERT INTO pulse_pipeline_runs (
+        id, stage, status, version_key, versions, completed_at
+      ) VALUES (
+        '${priorRunId}',
+        'score',
+        'completed',
+        'pulse-stage/sha256:${"a".repeat(64)}',
+        '{}'::jsonb,
+        '2026-07-13T08:00:00.000Z'
+      );
+      INSERT INTO pulse_score_publication_pointers (
+        product, computation_run_id, version_key, score_as_of, published_at
+      ) VALUES (
+        'pulse_dimensions',
+        '${priorRunId}',
+        'pulse-stage/sha256:${"a".repeat(64)}',
+        '2026-07-13',
+        '2026-07-13T08:00:00.000Z'
       );
     `);
     const db = atomicDb(database);
@@ -283,16 +310,24 @@ test("score publish rolls back, retries one stable run, and never duplicates his
           status: string;
           history_rows: number;
           projection_rows: number;
+          published_run_id: string;
         }>(`
           SELECT
             status,
             (SELECT count(*)::integer FROM pulse_dimensional_delta_history) AS history_rows,
-            (SELECT count(*)::integer FROM pulse_dimensional_deltas) AS projection_rows
+            (SELECT count(*)::integer FROM pulse_dimensional_deltas) AS projection_rows,
+            (SELECT computation_run_id::text FROM pulse_score_publication_pointers
+              WHERE product = 'pulse_dimensions') AS published_run_id
           FROM pulse_pipeline_runs
           WHERE id = $1
         `, [runId])
       ).rows[0],
-      { status: "running", history_rows: 0, projection_rows: 0 },
+      {
+        status: "running",
+        history_rows: 0,
+        projection_rows: 0,
+        published_run_id: priorRunId,
+      },
     );
 
     await database.exec(
@@ -334,16 +369,24 @@ test("score publish rolls back, retries one stable run, and never duplicates his
           status: string;
           history_rows: number;
           projection_rows: number;
+          published_run_id: string;
         }>(`
           SELECT
             status,
             (SELECT count(*)::integer FROM pulse_dimensional_delta_history) AS history_rows,
-            (SELECT count(*)::integer FROM pulse_dimensional_deltas) AS projection_rows
+            (SELECT count(*)::integer FROM pulse_dimensional_deltas) AS projection_rows,
+            (SELECT computation_run_id::text FROM pulse_score_publication_pointers
+              WHERE product = 'pulse_dimensions') AS published_run_id
           FROM pulse_pipeline_runs
           WHERE id = $1
         `, [runId])
       ).rows[0],
-      { status: "completed", history_rows: 5, projection_rows: 5 },
+      {
+        status: "completed",
+        history_rows: 5,
+        projection_rows: 5,
+        published_run_id: runId,
+      },
     );
   } finally {
     await database.close();

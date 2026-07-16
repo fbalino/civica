@@ -1,4 +1,5 @@
 import { apiProblem } from "./problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 export interface ImmutableArtifactOptions {
   operation: string;
@@ -19,7 +20,7 @@ export async function immutableArtifactResponse(
       headers: {
         "Content-Type": options.contentType,
         "Content-Disposition": `attachment; filename="${options.filename}"`,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": cacheControlFor("immutable-release"),
         "X-Content-Type-Options": "nosniff",
       },
     });

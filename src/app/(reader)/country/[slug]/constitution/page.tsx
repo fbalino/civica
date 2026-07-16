@@ -14,7 +14,7 @@ import { buildArticleNav } from "@/lib/constitution/article-nav";
 import { withOg } from "@/lib/og";
 import "@/app/civica-data.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata

@@ -17,14 +17,14 @@ import {
   requestUuidSchema,
   type PulseCodingAssignmentBody,
 } from "@/lib/api/request-body-schemas";
-import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { apiProblem, withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 import { pulseCodingProblem } from "@/lib/api/pulse-coding-problem";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  return withSafeJsonErrors("api/pulse-coding/assignments/[id]", async () => {
+  return withPrivateSafeJsonErrors("api/pulse-coding/assignments/[id]", async () => {
     const session = await getPulseCodingSession();
     if (!session || session.kind !== "participant")
       return apiProblem("UNAUTHORIZED");

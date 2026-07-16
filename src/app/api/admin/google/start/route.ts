@@ -23,14 +23,14 @@ import {
   GOOGLE_STATE_COOKIE,
   GOOGLE_REDIRECT_COOKIE,
 } from "@/lib/admin/google-oauth";
-import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { apiProblem, withPrivateSafeJsonErrors } from "@/lib/api/problem-response";
 
 const ADMIN_OAUTH_RATE_LIMIT_POLICY = getRequestRateLimitPolicy(
   "admin-oauth-bootstrap",
 );
 
 export async function GET(request: NextRequest) {
-  return withSafeJsonErrors("api/admin/google/start", async () => {
+  return withPrivateSafeJsonErrors("api/admin/google/start", async () => {
     if (!isGoogleSignInConfigured()) return apiProblem("INTERNAL_ERROR");
 
     const rateLimit = await checkRequestRateLimit(

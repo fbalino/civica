@@ -24,7 +24,7 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { resolveCiRelease } from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import type { TemporalMetadata } from "@/lib/data/temporal-metadata";
 
 export interface LensDistributionEntry {
@@ -115,7 +115,7 @@ export async function getVDemRowDistribution(
 export async function getCgvRegimeDistribution(
   quarter?: string,
 ): Promise<LensDistributionEntry[]> {
-  const release = resolveCiRelease();
+  const release = await loadPublishedCiRelease();
   if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
   const result = await db.execute(sql`
@@ -123,7 +123,10 @@ export async function getCgvRegimeDistribution(
       gt.regime_type_cgv AS key,
       COUNT(DISTINCT gt.jurisdiction_id)::int AS "totalCount",
       COUNT(DISTINCT cs.jurisdiction_id) FILTER (
-        WHERE cs.quarter = ${q} AND cs.methodology_version = ${release.methodologyVersion} AND cs.score IS NOT NULL
+        WHERE cs.quarter = ${q}
+          AND cs.methodology_version = ${release.methodologyVersion}
+          AND cs.release_id = ${release.releaseId}
+          AND cs.score IS NOT NULL
       )::int AS "scoredCount"
     FROM government_taxonomies gt
     JOIN jurisdictions j
@@ -217,7 +220,7 @@ async function distributionForFactKey(
   factKey: string,
   quarter?: string,
 ): Promise<LensDistributionEntry[]> {
-  const release = resolveCiRelease();
+  const release = await loadPublishedCiRelease();
   if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
   const result = await db.execute(sql`
@@ -225,7 +228,10 @@ async function distributionForFactKey(
       cf.fact_value AS key,
       COUNT(DISTINCT cf.jurisdiction_id)::int AS "totalCount",
       COUNT(DISTINCT cs.jurisdiction_id) FILTER (
-        WHERE cs.quarter = ${q} AND cs.methodology_version = ${release.methodologyVersion} AND cs.score IS NOT NULL
+        WHERE cs.quarter = ${q}
+          AND cs.methodology_version = ${release.methodologyVersion}
+          AND cs.release_id = ${release.releaseId}
+          AND cs.score IS NOT NULL
       )::int AS "scoredCount"
     FROM country_facts cf
     JOIN jurisdictions j

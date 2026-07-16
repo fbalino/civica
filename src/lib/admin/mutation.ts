@@ -9,6 +9,7 @@ import {
 import { getAdminSession, type AdminSession } from "@/lib/admin/session";
 import { adminSessionKey } from "@/lib/admin/session-revocation-store";
 import { guardAdminMutationRequest } from "@/lib/api/admin-mutation-request-guard";
+import { responseWithCacheProfile } from "@/lib/api/response-cache";
 import { unstable_rethrow } from "next/navigation";
 
 export interface AdminMutationDependencies {
@@ -219,5 +220,8 @@ export async function withAdminMutation(
   descriptor: AdminAuditDescriptor,
   handler: (session: AdminSession) => Promise<Response>,
 ): Promise<Response> {
-  return runAdminMutation(request, descriptor, handler);
+  return responseWithCacheProfile(
+    await runAdminMutation(request, descriptor, handler),
+    "private-live",
+  );
 }

@@ -15,6 +15,8 @@ import {
   REQUEST_BODY_LIMITS,
   type ChatBody,
 } from "@/lib/api/request-body-schemas";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
+import { withResponseCacheProfile } from "@/lib/api/response-cache";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 
@@ -53,7 +55,7 @@ const TAB_LABELS: Record<string, string> = {
   factbook: "Country factbook",
 };
 
-export async function POST(req: NextRequest) {
+async function handleChat(req: NextRequest) {
   // 1) Shared limits run BEFORE parsing or any model call. The response helper
   //    distinguishes an exhausted budget (429) from protection outage (503).
   const burst = await checkRequestRateLimit(req, CHAT_BURST_POLICY);
@@ -158,7 +160,11 @@ Answer questions grounded in this context. If the user asks about something on t
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache",
+      "Cache-Control": cacheControlFor("private-live"),
     },
   });
+}
+
+export async function POST(req: NextRequest) {
+  return withResponseCacheProfile("private-live", () => handleChat(req));
 }

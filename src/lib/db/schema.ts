@@ -33,6 +33,7 @@ import {
   real,
   boolean,
   jsonb,
+  unique,
   uniqueIndex,
   index,
   foreignKey,
@@ -1464,6 +1465,139 @@ export const ciMethodologyVersions = pgTable("ci_methodology_versions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+/**
+ * Closed publication header for a public Civica Index release.
+ *
+ * Coordinate columns on score rows are useful for research queries, but they
+ * are not a release identity: the same coordinates can otherwise be paired
+ * with changed source rows or a changed method record. Public readers bind to
+ * this immutable header through `release_id` and validate the retained hashes.
+ */
+export const ciIndexReleases = pgTable(
+  "ci_index_releases",
+  {
+    id: text("id").primaryKey(),
+    status: text("status").notNull().default("staging"),
+    quarter: text("quarter").notNull(),
+    methodologyVersion: text("methodology_version")
+      .references(() => ciMethodologyVersions.id, { onDelete: "restrict" })
+      .notNull(),
+    methodologyContentSha256: text("methodology_content_sha256").notNull(),
+    vintageLabel: text("vintage_label").notNull().unique(),
+    supersessionKind: text("supersession_kind", {
+      enum: ["none", "registered_release", "legacy_unregistered_vintage"],
+    }).notNull(),
+    supersedesReleaseId: text("supersedes_release_id"),
+    supersedesVintageLabel: text("supersedes_vintage_label"),
+    inputManifestSha256: text("input_manifest_sha256").notNull(),
+    dimensionRowSetSha256: text("dimension_row_set_sha256").notNull(),
+    compositeRowSetSha256: text("composite_row_set_sha256").notNull(),
+    dimensionRowCount: integer("dimension_row_count").notNull(),
+    compositeRowCount: integer("composite_row_count").notNull(),
+    inputTransformationVersion: text("input_transformation_version").notNull(),
+    compositeAlgorithmVersion: text("composite_algorithm_version").notNull(),
+    displayTransformVersion: text("display_transform_version").notNull(),
+    uncertainty: jsonb("uncertainty_policy")
+      .$type<{
+        schemaVersion: "ci-index-uncertainty/v1";
+        pointEstimate:
+          | "seeded_simulation_median"
+          | "deterministic_weighted_composite";
+        displayedRange:
+          | "sensitivity_summary_5th_95th_percentile"
+          | "not_published";
+        bounds: "required" | "absent";
+        simulations: number;
+        covarianceModel: "independence_assumed" | "not_available";
+        interpretation: string;
+      }>()
+      .notNull(),
+    dimensionRules: jsonb("dimension_rules")
+      .$type<
+        Array<{
+          dimension: string;
+          sourceId: string;
+          indicatorId: string;
+          priority: number;
+          artifactSha256: string;
+          upstreamRelease: string;
+          artifactKind: "publisher_bytes";
+          temporalCoverage: string;
+          licenseUrl: string;
+          substitutionReason: string | null;
+        }>
+      >()
+      .notNull(),
+    sourceArtifacts: jsonb("source_artifacts")
+      .$type<Record<string, string>>()
+      .notNull(),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_ci_index_releases_status").on(table.status, table.publishedAt),
+    foreignKey({
+      name: "ci_index_releases_supersedes_release_id_ci_index_releases_id_fk",
+      columns: [table.supersedesReleaseId],
+      foreignColumns: [table.id],
+    }).onDelete("restrict"),
+    check(
+      "ci_index_releases_status_closed",
+      dsql`${table.status} IN ('staging','published')`,
+    ),
+    check(
+      "ci_index_releases_hashes_valid",
+      dsql`${table.methodologyContentSha256} ~ '^[a-f0-9]{64}$' AND ${table.inputManifestSha256} ~ '^[a-f0-9]{64}$' AND ${table.dimensionRowSetSha256} ~ '^[a-f0-9]{64}$' AND ${table.compositeRowSetSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "ci_index_releases_identity_shape",
+      dsql`${table.id} ~ '^ci-[a-z0-9-]+-[0-9]{4}-Q[1-4]$' AND ${table.quarter} ~ '^[0-9]{4}-Q[1-4]$' AND btrim(${table.methodologyVersion}) <> '' AND btrim(${table.vintageLabel}) <> '' AND btrim(${table.inputTransformationVersion}) <> '' AND btrim(${table.compositeAlgorithmVersion}) <> '' AND btrim(${table.displayTransformVersion}) <> ''`,
+    ),
+    check(
+      "ci_index_releases_supersession_shape",
+      dsql`((${table.supersessionKind} = 'none' AND ${table.supersedesReleaseId} IS NULL AND ${table.supersedesVintageLabel} IS NULL) OR (${table.supersessionKind} = 'legacy_unregistered_vintage' AND ${table.supersedesReleaseId} IS NULL AND ${table.supersedesVintageLabel} IS NOT NULL) OR (${table.supersessionKind} = 'registered_release' AND ${table.supersedesReleaseId} IS NOT NULL AND ${table.supersedesVintageLabel} IS NOT NULL)) AND ${table.supersedesReleaseId} IS DISTINCT FROM ${table.id}`,
+    ),
+    check(
+      "ci_index_releases_uncertainty_shape",
+      dsql`jsonb_typeof(${table.uncertainty}) = 'object' AND ${table.uncertainty}->>'schemaVersion' = 'ci-index-uncertainty/v1' AND ${table.uncertainty}->>'pointEstimate' IN ('seeded_simulation_median','deterministic_weighted_composite') AND ${table.uncertainty}->>'displayedRange' IN ('sensitivity_summary_5th_95th_percentile','not_published') AND ${table.uncertainty}->>'bounds' IN ('required','absent') AND (${table.uncertainty}->>'simulations')::integer >= 0 AND ${table.uncertainty}->>'covarianceModel' IN ('independence_assumed','not_available') AND btrim(${table.uncertainty}->>'interpretation') <> '' AND ((${table.uncertainty}->>'bounds' = 'required') = (${table.uncertainty}->>'displayedRange' <> 'not_published')) AND (((${table.uncertainty}->>'simulations')::integer > 0) = (${table.uncertainty}->>'pointEstimate' = 'seeded_simulation_median'))`,
+    ),
+    check(
+      "ci_index_releases_dimension_rules_shape",
+      dsql`jsonb_typeof(${table.dimensionRules}) = 'array' AND jsonb_array_length(${table.dimensionRules}) = 5`,
+    ),
+    check(
+      "ci_index_releases_source_artifacts_shape",
+      dsql`jsonb_typeof(${table.sourceArtifacts}) = 'object' AND ${table.sourceArtifacts} <> '{}'::jsonb`,
+    ),
+    check(
+      "ci_index_releases_counts_positive",
+      dsql`${table.dimensionRowCount} > 0 AND ${table.compositeRowCount} > 0`,
+    ),
+    check(
+      "ci_index_releases_publication_shape",
+      dsql`(${table.status} = 'staging' AND ${table.publishedAt} IS NULL) OR (${table.status} = 'published' AND ${table.publishedAt} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/** One atomic public pointer; publication flips this only after validation. */
+export const ciIndexReleasePointers = pgTable(
+  "ci_index_release_pointers",
+  {
+    product: text("product").primaryKey(),
+    releaseId: text("release_id")
+      .references(() => ciIndexReleases.id, { onDelete: "restrict" })
+      .notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "ci_index_release_pointers_product_closed",
+      dsql`${table.product} = 'civica_index'`,
+    ),
+  ],
+);
+
 /** One fail-closed orchestration record per multi-source Index refresh. The
  * visible score tables change only in the transaction that marks this run
  * completed; failed staging runs retain their adapter results and error. */
@@ -1579,6 +1713,10 @@ export const ciDimensionScores = pgTable(
     // a no-op (the truncated new name == the existing DB name). Pinning
     // the name here matches the live DB and keeps `push` clean.
     methodologyVersion: text("methodology_version").notNull(),
+    /** Null only on unreleased legacy/research rows. Public reads require it. */
+    releaseId: text("release_id").references(() => ciIndexReleases.id, {
+      onDelete: "restrict",
+    }),
     derivationVersionKey: text("derivation_version_key").notNull(),
     derivationVersions: jsonb("derivation_versions")
       .$type<DerivationVersionEnvelope>()
@@ -1586,16 +1724,21 @@ export const ciDimensionScores = pgTable(
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
-    uniqueIndex("idx_ci_dimension_scores_unique").on(
+    unique("idx_ci_dimension_scores_unique").on(
       table.jurisdictionId,
       table.dimension,
       table.quarter,
       table.methodologyVersion,
       table.sourceId,
       table.indicatorId,
-    ),
+      table.releaseId,
+    ).nullsNotDistinct(),
     index("idx_ci_dimension_scores_quarter").on(table.quarter),
     index("idx_ci_dimension_scores_jurisdiction").on(table.jurisdictionId),
+    index("idx_ci_dimension_scores_release").on(
+      table.releaseId,
+      table.jurisdictionId,
+    ),
     index("idx_ci_dimension_scores_derivation_version").on(
       table.derivationVersionKey,
     ),
@@ -1857,6 +2000,10 @@ export const ciCompositeScores = pgTable(
     // explicit named foreignKey() below, not inline .references(), because
     // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
     methodologyVersion: text("methodology_version").notNull(),
+    /** Null only on unreleased legacy/research rows. Public reads require it. */
+    releaseId: text("release_id").references(() => ciIndexReleases.id, {
+      onDelete: "restrict",
+    }),
     derivationVersionKey: text("derivation_version_key").notNull(),
     derivationVersions: jsonb("derivation_versions")
       .$type<DerivationVersionEnvelope>()
@@ -1864,13 +2011,18 @@ export const ciCompositeScores = pgTable(
     calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_ci_composite_unique").on(
+    unique("idx_ci_composite_unique").on(
       table.jurisdictionId,
       table.quarter,
       table.methodologyVersion,
-    ),
+      table.releaseId,
+    ).nullsNotDistinct(),
     index("idx_ci_composite_quarter_rank").on(table.quarter, table.rank),
     index("idx_ci_composite_jurisdiction").on(table.jurisdictionId),
+    index("idx_ci_composite_release").on(
+      table.releaseId,
+      table.jurisdictionId,
+    ),
     index("idx_ci_composite_derivation_version").on(table.derivationVersionKey),
     foreignKey({
       name: "ci_composite_scores_methodology_version_ci_methodology_versions",
@@ -3183,6 +3335,36 @@ export const pulseDimensionalDeltaHistory = pgTable(
     check(
       "pulse_dimensional_delta_history_window_check",
       dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
+  ],
+);
+
+/**
+ * The one score run currently published by the Pulse dimensional endpoint.
+ * History rows and run completion are written first in the same atomic Neon
+ * batch; this pointer flips last, so readers observe either the whole prior
+ * run or the whole next run and never a mixture of both.
+ */
+export const pulseScorePublicationPointers = pgTable(
+  "pulse_score_publication_pointers",
+  {
+    product: text("product").primaryKey(),
+    computationRunId: uuid("computation_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    versionKey: text("version_key").notNull(),
+    scoreAsOf: date("score_as_of").notNull(),
+    publishedAt: timestamp("published_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "pulse_score_publication_product_closed",
+      dsql`${table.product} = 'pulse_dimensions'`,
+    ),
+    check(
+      "pulse_score_publication_version_shape",
+      dsql`${table.versionKey} ~ '^pulse-stage/sha256:[a-f0-9]{64}$'`,
     ),
   ],
 );

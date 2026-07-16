@@ -5,8 +5,8 @@
  *   Run with:  npm run validate:route-inventory
  *              npm run validate:route-inventory -- --help
  *
- * Deterministic, DB-free, network-free. Does a REAL `find src/app -name
- * route.ts` walk and a REAL static scan of every route.ts source for
+ * Deterministic, DB-free, network-free. Walks repository-owned
+ * route-handler files beneath `src/app` and statically scans every shipped route for
  * exported HTTP method handlers and control markers, then runs the pure
  * comparison functions in `src/lib/api/route-inventory/checks.ts` against
  * `src/lib/api/route-inventory/registry.ts`:
@@ -39,6 +39,10 @@ import {
   findUncontrolledMutations,
   diffMethods,
 } from "../src/lib/api/route-inventory/checks";
+import {
+  isRepositoryOwned,
+  loadRepositoryOwnedFiles,
+} from "./repository-owned-files";
 
 const ROOT = process.cwd();
 const APP_DIR = path.join(ROOT, "src/app");
@@ -149,12 +153,18 @@ async function main(): Promise<void> {
 
   const report: Report = { errors: [], warnings: [], info: [] };
 
-  const diskFiles = await findRouteFiles(APP_DIR);
+  const ownedFiles = loadRepositoryOwnedFiles(ROOT);
+  const diskFiles = (await findRouteFiles(APP_DIR)).filter((absolute) =>
+    isRepositoryOwned(
+      path.relative(ROOT, absolute).split(path.sep).join("/"),
+      ownedFiles,
+    ),
+  );
   const diskPaths = diskFiles.map(toAppRelative).sort();
   const registryPaths = ROUTE_INVENTORY.map((r) => r.filePath).sort();
 
   report.info.push(
-    `${diskPaths.length} route.ts file(s) on disk under src/app, ${ROUTE_INVENTORY.length} registry entr(y/ies)`,
+    `${diskPaths.length} repository-owned route.ts file(s) under src/app, ${ROUTE_INVENTORY.length} registry entr(y/ies)`,
   );
 
   // 0. Duplicate registry entries (a registry bug, not a disk/registry
