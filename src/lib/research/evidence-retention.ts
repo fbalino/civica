@@ -66,8 +66,8 @@ export type RetainedEvidenceRelation =
   (typeof RETAINED_EVIDENCE_RELATIONS)[number];
 
 /** Closed inventory of checked-in code that can delete database evidence.
- * `rate_limits` is the sole exemption: it is ephemeral abuse-control state,
- * not source, interpretation, review, or evaluation evidence. */
+ * Any exemption must be explicitly documented as short-lived operational
+ * state, never source, interpretation, review, or evaluation evidence. */
 export const DESTRUCTIVE_WRITE_PATHS = [
   { path: "scripts/ingest-ci-all.ts", relations: ["ci_dimension_scores"] },
   {
@@ -85,6 +85,12 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     path: "src/lib/api/rate-limit.ts",
     relations: ["rate_limits"],
     exemption: "ephemeral abuse-control counters expire by design",
+  },
+  {
+    path: "src/lib/platform/route-performance-telemetry.ts",
+    relations: ["route_performance_observations"],
+    exemption:
+      "short-lived privacy-bounded operational telemetry is not research evidence",
   },
 ] as const;
 

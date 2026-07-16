@@ -14,6 +14,11 @@ import {
 } from "./cron-execution-store";
 import { CRON_JOB_LEASE_MS, getCronJobDefinition } from "./cron-job-registry";
 import { latestCronScheduleSlot } from "./cron-schedule";
+import {
+  jobPerformanceObservation,
+  scheduleRoutePerformanceObservation,
+  scheduleRoutePerformancePrune,
+} from "@/lib/platform/route-performance-telemetry";
 
 const IDEMPOTENCY_HEADER = "idempotency-key";
 const INTERNAL_EXECUTION_KEY_HEADER = "x-civica-cron-execution-key";
@@ -247,203 +252,224 @@ export function withCronJob(
   return async function guardedCronHandler(
     request: Request,
   ): Promise<Response> {
-    const unauthorized = requireCronAuth(request);
-    if (unauthorized) return unauthorized;
-
-    const pathname = new URL(request.url).pathname;
-    if (pathname !== definition.route) {
-      console.error(
-        `[cron ${jobId}] route registry mismatch: expected ${definition.route}, received ${pathname}`,
-      );
-      return safeJsonResponse(
-        { ok: false, jobId, outcome: "route_registry_mismatch" },
-        500,
-      );
-    }
-
-    const input = validateCronInput(jobId, request);
-    if (!input.ok) {
-      return safeJsonResponse(
-        {
-          ok: false,
-          jobId,
-          outcome: "invalid_request",
-          code: input.problem,
-        },
-        400,
-        { "Cache-Control": "no-store" },
-      );
-    }
-
-    const fixture = cronJobFixtureContext.getStore();
-    const activeHandler: CronRouteHandler = fixture
-      ? (fixtureRequest) => fixture.handler(jobId, fixtureRequest)
-      : handler;
-
-    // Retired v1 routes have no effect to lock, but still share the exact same
-    // authentication and response-honesty boundary.
-    if (definition.retired) {
-      return (
-        await normalizeHandlerResponse(
-          await invokeHandler(jobId, activeHandler, request),
-        )
-      ).response;
-    }
-
-    const scope = readIdempotencyScope(request);
-    if (!scope.ok) return scope.response;
-
-    const now = dependencies.now?.() ?? new Date();
-    const scheduleSlot =
-      scope.triggerKind === "scheduled"
-        ? latestCronScheduleSlot(definition.schedule!, now)
-        : null;
-    const mode = requestMode(request);
-    const requestSha256 = canonicalRequestSha256(request);
-    const executionKey =
-      scope.triggerKind === "scheduled"
-        ? sha256([
-            "civica-cron-execution/v1",
-            "scheduled",
-            definition.id,
-            definition.route,
-            scheduleSlot!.toISOString(),
-          ])
-        : sha256([
-            "civica-cron-execution/v1",
-            "manual",
-            definition.id,
-            definition.route,
-            scope.scopeKey!,
-          ]);
-    const store =
-      dependencies.store ?? fixture?.store ?? postgresCronExecutionStore;
-
-    let claim;
+    const startedAt = performance.now();
+    let response: Response | null = null;
     try {
-      claim = await store.acquire({
-        executionKey,
-        jobId: definition.id,
-        route: definition.route,
-        triggerKind: scope.triggerKind,
-        scheduleSlot,
-        requestMode: mode,
-        scopeKey: scope.scopeKey,
-        requestSha256,
-        leaseMs: CRON_JOB_LEASE_MS,
-        maxAttempts: MAX_CRON_ATTEMPTS,
-      });
-    } catch (error) {
-      console.error(`[cron ${jobId}] delivery control unavailable`, error);
-      return safeJsonResponse(
-        { ok: false, jobId, outcome: "delivery_control_unavailable" },
-        503,
-      );
-    }
+      response = await (async () => {
+        const unauthorized = requireCronAuth(request);
+        if (unauthorized) return unauthorized;
 
-    if (claim.state === "running" || claim.state === "busy") {
-      const retryAfterSeconds = Math.max(
-        1,
-        Math.ceil((claim.leaseExpiresAt.getTime() - now.getTime()) / 1_000),
-      );
-      if (claim.state === "busy") {
-        return safeJsonResponse(
-          {
-            ok: false,
+        const pathname = new URL(request.url).pathname;
+        if (pathname !== definition.route) {
+          console.error(
+            `[cron ${jobId}] route registry mismatch: expected ${definition.route}, received ${pathname}`,
+          );
+          return safeJsonResponse(
+            { ok: false, jobId, outcome: "route_registry_mismatch" },
+            500,
+          );
+        }
+
+        const input = validateCronInput(jobId, request);
+        if (!input.ok) {
+          return safeJsonResponse(
+            {
+              ok: false,
+              jobId,
+              outcome: "invalid_request",
+              code: input.problem,
+            },
+            400,
+            { "Cache-Control": "no-store" },
+          );
+        }
+
+        const fixture = cronJobFixtureContext.getStore();
+        const activeHandler: CronRouteHandler = fixture
+          ? (fixtureRequest) => fixture.handler(jobId, fixtureRequest)
+          : handler;
+
+        // Retired v1 routes have no effect to lock, but still share the exact same
+        // authentication and response-honesty boundary.
+        if (definition.retired) {
+          return (
+            await normalizeHandlerResponse(
+              await invokeHandler(jobId, activeHandler, request),
+            )
+          ).response;
+        }
+
+        const scope = readIdempotencyScope(request);
+        if (!scope.ok) return scope.response;
+
+        const now = dependencies.now?.() ?? new Date();
+        const scheduleSlot =
+          scope.triggerKind === "scheduled"
+            ? latestCronScheduleSlot(definition.schedule!, now)
+            : null;
+        const mode = requestMode(request);
+        const requestSha256 = canonicalRequestSha256(request);
+        const executionKey =
+          scope.triggerKind === "scheduled"
+            ? sha256([
+                "civica-cron-execution/v1",
+                "scheduled",
+                definition.id,
+                definition.route,
+                scheduleSlot!.toISOString(),
+              ])
+            : sha256([
+                "civica-cron-execution/v1",
+                "manual",
+                definition.id,
+                definition.route,
+                scope.scopeKey!,
+              ]);
+        const store =
+          dependencies.store ?? fixture?.store ?? postgresCronExecutionStore;
+
+        let claim;
+        try {
+          claim = await store.acquire({
+            executionKey,
+            jobId: definition.id,
+            route: definition.route,
+            triggerKind: scope.triggerKind,
+            scheduleSlot,
+            requestMode: mode,
+            scopeKey: scope.scopeKey,
+            requestSha256,
+            leaseMs: CRON_JOB_LEASE_MS,
+            maxAttempts: MAX_CRON_ATTEMPTS,
+          });
+        } catch (error) {
+          console.error(`[cron ${jobId}] delivery control unavailable`, error);
+          return safeJsonResponse(
+            { ok: false, jobId, outcome: "delivery_control_unavailable" },
+            503,
+          );
+        }
+
+        if (claim.state === "running" || claim.state === "busy") {
+          const retryAfterSeconds = Math.max(
+            1,
+            Math.ceil((claim.leaseExpiresAt.getTime() - now.getTime()) / 1_000),
+          );
+          if (claim.state === "busy") {
+            return safeJsonResponse(
+              {
+                ok: false,
+                jobId,
+                outcome: "job_busy",
+                jobStarted: false,
+                deliveryRecorded: false,
+              },
+              503,
+              { "Retry-After": String(retryAfterSeconds) },
+            );
+          }
+          return safeJsonResponse(
+            {
+              ok: true,
+              jobId,
+              outcome: "job_in_progress",
+              jobCompleted: false,
+              attemptCount: claim.attemptCount,
+            },
+            202,
+            { "Retry-After": String(retryAfterSeconds) },
+          );
+        }
+
+        if (claim.state === "succeeded") {
+          return safeJsonResponse(
+            {
+              ok: true,
+              jobId,
+              outcome: "duplicate_suppressed",
+              jobCompleted: true,
+              completedAt: claim.completedAt.toISOString(),
+              originalStatus: claim.responseStatus,
+              attemptCount: claim.attemptCount,
+            },
+            200,
+          );
+        }
+
+        if (claim.state === "conflict") {
+          return safeJsonResponse(
+            {
+              ok: false,
+              jobId,
+              outcome: "idempotency_key_conflict",
+              attemptCount: claim.attemptCount,
+            },
+            409,
+          );
+        }
+
+        if (claim.state === "exhausted") {
+          return safeJsonResponse(
+            {
+              ok: false,
+              jobId,
+              outcome: "retry_limit_exhausted",
+              attemptCount: claim.attemptCount,
+            },
+            503,
+          );
+        }
+
+        const normalized = await normalizeHandlerResponse(
+          await invokeHandler(
             jobId,
-            outcome: "job_busy",
-            jobStarted: false,
-            deliveryRecorded: false,
-          },
-          503,
-          { "Retry-After": String(retryAfterSeconds) },
+            activeHandler,
+            withInternalExecutionKey(request, executionKey),
+          ),
         );
-      }
-      return safeJsonResponse(
-        {
-          ok: true,
-          jobId,
-          outcome: "job_in_progress",
-          jobCompleted: false,
-          attemptCount: claim.attemptCount,
-        },
-        202,
-        { "Retry-After": String(retryAfterSeconds) },
+        const terminalStatus = normalized.succeeded ? "succeeded" : "failed";
+
+        try {
+          const finished = await store.finish({
+            executionKey,
+            jobId: definition.id,
+            leaseToken: claim.leaseToken,
+            attemptId: claim.attemptId,
+            leaseFence: claim.leaseFence,
+            status: terminalStatus,
+            responseStatus: normalized.response.status,
+            resultCode: normalized.succeeded
+              ? "handler_succeeded"
+              : "handler_failed",
+          });
+          if (!finished) {
+            throw new Error(
+              "Cron execution lost its lease before finalization",
+            );
+          }
+        } catch (error) {
+          console.error(`[cron ${jobId}] delivery finalization failed`, error);
+          return safeJsonResponse(
+            { ok: false, jobId, outcome: "delivery_finalization_failed" },
+            503,
+          );
+        }
+
+        return normalized.response;
+      })();
+      return response;
+    } finally {
+      scheduleRoutePerformanceObservation(
+        jobPerformanceObservation(
+          definition.id,
+          request.method,
+          performance.now() - startedAt,
+          response?.status ?? 500,
+        ),
       );
+      // Every successful cron delivery is also an opportunity to enforce the
+      // fixed telemetry-retention window without creating a separate tracker.
+      if (!definition.retired) scheduleRoutePerformancePrune();
     }
-
-    if (claim.state === "succeeded") {
-      return safeJsonResponse(
-        {
-          ok: true,
-          jobId,
-          outcome: "duplicate_suppressed",
-          jobCompleted: true,
-          completedAt: claim.completedAt.toISOString(),
-          originalStatus: claim.responseStatus,
-          attemptCount: claim.attemptCount,
-        },
-        200,
-      );
-    }
-
-    if (claim.state === "conflict") {
-      return safeJsonResponse(
-        {
-          ok: false,
-          jobId,
-          outcome: "idempotency_key_conflict",
-          attemptCount: claim.attemptCount,
-        },
-        409,
-      );
-    }
-
-    if (claim.state === "exhausted") {
-      return safeJsonResponse(
-        {
-          ok: false,
-          jobId,
-          outcome: "retry_limit_exhausted",
-          attemptCount: claim.attemptCount,
-        },
-        503,
-      );
-    }
-
-    const normalized = await normalizeHandlerResponse(
-      await invokeHandler(
-        jobId,
-        activeHandler,
-        withInternalExecutionKey(request, executionKey),
-      ),
-    );
-    const terminalStatus = normalized.succeeded ? "succeeded" : "failed";
-
-    try {
-      const finished = await store.finish({
-        executionKey,
-        jobId: definition.id,
-        leaseToken: claim.leaseToken,
-        attemptId: claim.attemptId,
-        leaseFence: claim.leaseFence,
-        status: terminalStatus,
-        responseStatus: normalized.response.status,
-        resultCode: normalized.succeeded
-          ? "handler_succeeded"
-          : "handler_failed",
-      });
-      if (!finished) {
-        throw new Error("Cron execution lost its lease before finalization");
-      }
-    } catch (error) {
-      console.error(`[cron ${jobId}] delivery finalization failed`, error);
-      return safeJsonResponse(
-        { ok: false, jobId, outcome: "delivery_finalization_failed" },
-        503,
-      );
-    }
-
-    return normalized.response;
   };
 }

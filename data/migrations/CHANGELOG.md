@@ -194,6 +194,18 @@ recovery uses an isolated pre-change backup before publication or a reviewed
 forward release/pointer correction afterward, never a rewrite of a published
 release.
 
+`0037_minor_sharon_carter` adds the PLT-016 operational route-performance
+ledger. Each short-lived observation contains only a canonical route template,
+HTTP method, closed metric/surface, bounded numeric duration or status, cache
+profile, deployment release identifier, and telemetry-contract version. It
+deliberately stores no raw pathname or parameter, query, cookie, IP address,
+user agent, request body, account identifier, or error text. The application
+prunes observations older than 30 days after non-retired cron requests; a
+failed telemetry write or prune is non-fatal. This additive migration creates
+an empty table only. PLT-019 owns the staged apply/rehearsal and production
+deploy ordering; recovery before use is a reviewed forward migration or
+isolated pre-change backup, never a fabricated historical telemetry record.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

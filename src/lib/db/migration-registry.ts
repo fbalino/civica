@@ -291,6 +291,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "mixed",
     "journaled",
   ),
+  shared(
+    "0037_minor_sharon_carter",
+    "drizzle/authoritative/0037_minor_sharon_carter.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-14T14:55:34.519Z",
-  "sha256": "dd74cdb85afc88d1aa2315f474cb8cbf20fed287fb1448c29d0c0eac4585cbf4",
+  "generatedAt": "2026-07-16T03:30:52.000Z",
+  "sha256": "50d12b73c1ad8b20d4907e41a36d1c68669924e4e0d45a56f2a3433cc1b89628",
   "schema": {
     "columns": [
       {
@@ -11183,6 +11183,105 @@
         "position": 9
       },
       {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "route_performance_observations",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "timestamptz",
+        "name": "observed_at",
+        "type": "timestamp with time zone",
+        "table": "route_performance_observations",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "route_id",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "method",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "surface",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "metric",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "int4",
+        "name": "duration_ms",
+        "type": "integer",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "int4",
+        "name": "http_status",
+        "type": "integer",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "cache_profile",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "telemetry_version",
+        "type": "text",
+        "table": "route_performance_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
         "udt": "text",
         "name": "id",
         "type": "text",
@@ -12926,6 +13025,26 @@
         "definition": "CREATE UNIQUE INDEX research_evidence_history_pkey ON public.research_evidence_history USING btree (id)"
       },
       {
+        "name": "idx_route_performance_observed_at",
+        "table": "route_performance_observations",
+        "definition": "CREATE INDEX idx_route_performance_observed_at ON public.route_performance_observations USING btree (observed_at)"
+      },
+      {
+        "name": "idx_route_performance_release_time",
+        "table": "route_performance_observations",
+        "definition": "CREATE INDEX idx_route_performance_release_time ON public.route_performance_observations USING btree (release_id, observed_at)"
+      },
+      {
+        "name": "idx_route_performance_route_metric_time",
+        "table": "route_performance_observations",
+        "definition": "CREATE INDEX idx_route_performance_route_metric_time ON public.route_performance_observations USING btree (route_id, metric, observed_at)"
+      },
+      {
+        "name": "route_performance_observations_pkey",
+        "table": "route_performance_observations",
+        "definition": "CREATE UNIQUE INDEX route_performance_observations_pkey ON public.route_performance_observations USING btree (id)"
+      },
+      {
         "name": "sources_pkey",
         "table": "sources",
         "definition": "CREATE UNIQUE INDEX sources_pkey ON public.sources USING btree (id)"
@@ -14434,6 +14553,11 @@
       {
         "kind": "r",
         "name": "research_evidence_history",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "route_performance_observations",
         "definition": null
       },
       {
@@ -16672,6 +16796,54 @@
         "type": "c",
         "table": "research_evidence_history",
         "definition": "CHECK (length(btrim(reason)) > 0)"
+      },
+      {
+        "name": "route_performance_observation_cache_profile_closed",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (cache_profile IS NULL OR (cache_profile = ANY (ARRAY['public-live'::text, 'private-live'::text, 'checked-build-artifact'::text, 'immutable-release'::text, 'build-static'::text, 'build-revalidated'::text, 'document'::text])))"
+      },
+      {
+        "name": "route_performance_observation_duration_bound",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (duration_ms IS NULL OR duration_ms >= 0 AND duration_ms <= 3600000)"
+      },
+      {
+        "name": "route_performance_observation_method_closed",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (method = ANY (ARRAY['GET'::text, 'POST'::text, 'PUT'::text, 'PATCH'::text, 'DELETE'::text, 'HEAD'::text, 'OPTIONS'::text, 'DOCUMENT'::text, 'UNKNOWN'::text]))"
+      },
+      {
+        "name": "route_performance_observation_release_shape",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (length(release_id) >= 1 AND length(release_id) <= 96 AND release_id ~ '^[a-zA-Z0-9._-]+$'::text AND length(telemetry_version) >= 1 AND length(telemetry_version) <= 96 AND telemetry_version ~ '^[a-zA-Z0-9._/-]+$'::text)"
+      },
+      {
+        "name": "route_performance_observation_route_shape",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (length(route_id) >= 1 AND length(route_id) <= 160 AND route_id ~ '^[a-z][a-z0-9._-]*$'::text)"
+      },
+      {
+        "name": "route_performance_observation_status_bound",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (http_status IS NULL OR http_status >= 100 AND http_status <= 599)"
+      },
+      {
+        "name": "route_performance_observation_surface_metric_closed",
+        "type": "c",
+        "table": "route_performance_observations",
+        "definition": "CHECK (surface = 'request'::text AND metric = 'request_duration_ms'::text AND duration_ms IS NOT NULL OR surface = 'job'::text AND metric = 'job_duration_ms'::text AND duration_ms IS NOT NULL OR surface = 'error'::text AND metric = 'server_error'::text AND duration_ms IS NULL)"
+      },
+      {
+        "name": "route_performance_observations_pkey",
+        "type": "p",
+        "table": "route_performance_observations",
+        "definition": "PRIMARY KEY (id)"
       },
       {
         "name": "sources_pkey",

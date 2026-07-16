@@ -4175,6 +4175,78 @@ export const cronJobAttempts = pgTable(
   ],
 );
 
+// --- Privacy-bounded route performance telemetry ---
+
+/**
+ * One numeric, route-template-level observation. This is intentionally not an
+ * analytics event ledger: it never stores a pathname parameter, query string,
+ * cookie, IP address, user agent, request body, account identifier, or error
+ * message. The bounded rows are retained for a short operational window and
+ * are written only after the reader response is complete.
+ */
+export const routePerformanceObservations = pgTable(
+  "route_performance_observations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    observedAt: timestamp("observed_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    routeId: text("route_id").notNull(),
+    method: text("method").notNull(),
+    surface: text("surface")
+      .$type<"request" | "job" | "error">()
+      .notNull(),
+    metric: text("metric")
+      .$type<"request_duration_ms" | "job_duration_ms" | "server_error">()
+      .notNull(),
+    durationMs: integer("duration_ms"),
+    httpStatus: integer("http_status"),
+    cacheProfile: text("cache_profile"),
+    releaseId: text("release_id").notNull(),
+    telemetryVersion: text("telemetry_version").notNull(),
+  },
+  (table) => [
+    index("idx_route_performance_observed_at").on(table.observedAt),
+    index("idx_route_performance_route_metric_time").on(
+      table.routeId,
+      table.metric,
+      table.observedAt,
+    ),
+    index("idx_route_performance_release_time").on(
+      table.releaseId,
+      table.observedAt,
+    ),
+    check(
+      "route_performance_observation_route_shape",
+      dsql`length(${table.routeId}) BETWEEN 1 AND 160 AND ${table.routeId} ~ '^[a-z][a-z0-9._-]*$'`,
+    ),
+    check(
+      "route_performance_observation_method_closed",
+      dsql`${table.method} IN ('GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS','DOCUMENT','UNKNOWN')`,
+    ),
+    check(
+      "route_performance_observation_surface_metric_closed",
+      dsql`(${table.surface} = 'request' AND ${table.metric} = 'request_duration_ms' AND ${table.durationMs} IS NOT NULL) OR (${table.surface} = 'job' AND ${table.metric} = 'job_duration_ms' AND ${table.durationMs} IS NOT NULL) OR (${table.surface} = 'error' AND ${table.metric} = 'server_error' AND ${table.durationMs} IS NULL)`,
+    ),
+    check(
+      "route_performance_observation_duration_bound",
+      dsql`${table.durationMs} IS NULL OR ${table.durationMs} BETWEEN 0 AND 3600000`,
+    ),
+    check(
+      "route_performance_observation_status_bound",
+      dsql`${table.httpStatus} IS NULL OR ${table.httpStatus} BETWEEN 100 AND 599`,
+    ),
+    check(
+      "route_performance_observation_cache_profile_closed",
+      dsql`${table.cacheProfile} IS NULL OR ${table.cacheProfile} IN ('public-live','private-live','checked-build-artifact','immutable-release','build-static','build-revalidated','document')`,
+    ),
+    check(
+      "route_performance_observation_release_shape",
+      dsql`length(${table.releaseId}) BETWEEN 1 AND 96 AND ${table.releaseId} ~ '^[a-zA-Z0-9._-]+$' AND length(${table.telemetryVersion}) BETWEEN 1 AND 96 AND ${table.telemetryVersion} ~ '^[a-zA-Z0-9._/-]+$'`,
+    ),
+  ],
+);
+
 // --- Durable (cross-instance) rate limiter ---
 
 /**

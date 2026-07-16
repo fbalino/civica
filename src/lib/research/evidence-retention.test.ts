@@ -166,16 +166,19 @@ test("reconciliation evaluation view retains non-active facts and disputes", () 
   assert.match(migration, /FROM data_disputes dd/);
 });
 
-test("every registered destructive evidence path is protected or explicitly ephemeral", () => {
+test("every registered destructive evidence path is protected or explicitly short-lived", () => {
   for (const path of DESTRUCTIVE_WRITE_PATHS) {
     for (const relation of path.relations) {
-      if (relation === "rate_limits") {
-        assert.match("exemption" in path ? path.exemption : "", /ephemeral/);
+      if (
+        RETAINED_EVIDENCE_RELATIONS.includes(
+          relation as (typeof RETAINED_EVIDENCE_RELATIONS)[number],
+        )
+      ) {
+        continue;
       } else {
-        assert.ok(
-          RETAINED_EVIDENCE_RELATIONS.includes(
-            relation as (typeof RETAINED_EVIDENCE_RELATIONS)[number],
-          ),
+        assert.match(
+          "exemption" in path ? path.exemption : "",
+          /short-lived|ephemeral/i,
           `${path.path}: ${relation}`,
         );
       }

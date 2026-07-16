@@ -18,9 +18,10 @@ the resulting row. Each history entry records the relation, row identifier,
 operation, reason, actor, and database timestamp. The history table rejects
 updates and deletions.
 
-Rate-limit counters are the only registered deletion exemption. They are
-short-lived abuse-control state and contain no source, classification, review,
-or evaluation evidence.
+Rate-limit counters and route-performance observations are the only registered
+deletion exemptions. They are short-lived abuse-control or privacy-bounded
+operational state and contain no source, classification, review, or evaluation
+evidence.
 
 ## Pulse
 

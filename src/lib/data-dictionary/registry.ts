@@ -1298,4 +1298,20 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Internal security/operations data containing no raw request identity; excluded from public release.",
     deprecation: active,
   },
+  route_performance_observations: {
+    definition:
+      "Short-lived, privacy-bounded server route and cron performance observations used for internal operational diagnosis.",
+    rowGrain:
+      "One completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+    cadence:
+      "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+    vintageSemantics:
+      "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+    rights:
+      "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+    deprecation: active,
+  },
 };

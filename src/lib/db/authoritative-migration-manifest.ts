@@ -223,4 +223,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "0da3dc84b726f52cdd2c0c61f5d734a69fa7c2c37133f9a9b5add695737ddc23",
     baseline: false,
   },
+  {
+    id: "0037_minor_sharon_carter",
+    path: "drizzle/authoritative/0037_minor_sharon_carter.sql",
+    sha256: "1d59f76489a1feefcc9ca869d2068a2d1bb96be0999c96759d9fce2ba7b8771c",
+    baseline: false,
+  },
 ] as const;

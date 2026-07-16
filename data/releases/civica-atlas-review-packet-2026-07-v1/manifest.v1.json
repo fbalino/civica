@@ -36,8 +36,8 @@
       "id": "data_dictionary",
       "path": "data/schema-data-dictionary.v1.json",
       "role": "Complete schema data dictionary",
-      "bytes": 1670675,
-      "sha256": "f97ba61f5ecbc231d8a364876fca30358eb0e530fcb6d1ab9c3346d1c1a27a74"
+      "bytes": 1690843,
+      "sha256": "25f03c688b77814e3dfd0ee38e19ce3e2d85ce0fbc22a689dfc0c7184fd03985"
     },
     {
       "id": "rights_manifest",
@@ -122,5 +122,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "aad06a28c08da2fc3a148eeebba3582bcb4b8f8e45cfd1b4163a41c9515833ed"
+  "semanticSha256": "8f9550adab6efb8e9217c330b50001b4251b086f2e49418e43ce89898d03d6d0"
 }

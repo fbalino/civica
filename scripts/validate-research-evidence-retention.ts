@@ -150,13 +150,12 @@ for (const path of DESTRUCTIVE_WRITE_PATHS) {
   }
   for (const relation of path.relations) {
     if (
-      relation !== "rate_limits" &&
       !RETAINED_EVIDENCE_RELATIONS.includes(
         relation as (typeof RETAINED_EVIDENCE_RELATIONS)[number],
-      )
-    ) {
+      ) &&
+      !("exemption" in path && /short-lived|ephemeral/i.test(path.exemption))
+    )
       fail(`${path.path} deletes unprotected evidence relation ${relation}`);
-    }
   }
 }
 

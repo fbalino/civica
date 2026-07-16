@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T02:40:10.989Z",
+  "generatedAt": "2026-07-16T03:26:13.230Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -137,7 +137,7 @@
       "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bill_summary_cache": 6472,
+        "bill_summary_cache": 6508,
         "contact_submissions": 1,
         "country_metrics": 7449,
         "election_results": 1351,
@@ -203,7 +203,7 @@
       "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bills": 7154
+        "bills": 7196
       },
       "writesPerformed": 0
     },
@@ -1100,6 +1100,25 @@
         "pulse_dimensional_delta_history": 1625,
         "pulse_pipeline_runs": 44,
         "pulse_score_publication_pointers": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0037_minor_sharon_carter",
+      "artifact": "drizzle/authoritative/0037_minor_sharon_carter.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "1d59f76489a1feefcc9ca869d2068a2d1bb96be0999c96759d9fce2ba7b8771c",
+      "affectedRelations": [
+        "route_performance_observations"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0037_minor_sharon_carter-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0037_minor_sharon_carter --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "route_performance_observations": "missing"
       },
       "writesPerformed": 0
     },

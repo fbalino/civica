@@ -14,7 +14,7 @@ export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
 /** SHA-256 of the complete production build command before the CI refactor. */
 export const BUILD_CORE_SHA256 =
-  "c9ba87fcd04aa4d1974f81c075fd69c2244f62a87f588da3b56186222645fa3f";
+  "22d2c55fe80883f12fb81a6d2938c22a0a76bae323e186243228be4c74f5e63a";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
@@ -221,6 +221,8 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
       "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts",
     "validate:query-budgets":
       "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",
+    "validate:route-performance-telemetry":
+      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts",
     "validate:build-prereqs":
       "npm run validate:constitution-search && npm run validate:pulse-incidents && npm run validate:pulse-classification-state && npm run validate:pulse-review-sla && npm run validate:pulse-information-environment && npm run validate:pulse-validation-protocol",
   };
@@ -243,6 +245,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
   for (const required of [
     "npm run validate:index-change-control",
     "npm run validate:query-budgets",
+    "npm run validate:route-performance-telemetry",
     "npm run validate:claims-docs",
     "next build",
   ]) {

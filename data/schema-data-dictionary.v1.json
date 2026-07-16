@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "887e2174c1e57e8b789fd0bd817b0f2c5b27030870bfeec3393f18d0a49baad3",
+  "schemaFingerprint": "87da5e78b673f1bdc028b595343a783ab57cef38d743484c70761b8dea1907a0",
   "summary": {
-    "tables": 89,
-    "columns": 1245,
+    "tables": 90,
+    "columns": 1256,
     "publicAtlasTables": 22,
     "researchBetaTables": 27,
     "supportTables": 11,
-    "internalTables": 27,
+    "internalTables": 28,
     "privateTables": 2,
     "legacyTables": 1
   },
@@ -32616,6 +32616,307 @@
           "cadence": "Synchronously on every update or deletion of a registered protected relation.",
           "vintageSemantics": "Recorded at follows this table contract. recorded_at is mutation time; embedded row timestamps retain their original source, observation, and derivation meanings.",
           "rights": "Internal audit evidence; embedded values retain the rights and access restrictions of their source relation.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "route_performance_observations",
+      "exportName": "routePerformanceObservations",
+      "definition": "Short-lived, privacy-bounded server route and cron performance observations used for internal operational diagnosis.",
+      "rowGrain": "One completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+      "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+      "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+      "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "cache_profile",
+          "propertyName": "cacheProfile",
+          "definition": "Cache profile recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "duration_ms",
+          "propertyName": "durationMs",
+          "definition": "Duration ms recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "milliseconds",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "http_status",
+          "propertyName": "httpStatus",
+          "definition": "Http status recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method",
+          "propertyName": "method",
+          "definition": "Method recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "metric",
+          "propertyName": "metric",
+          "definition": "Metric recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_route_performance_route_metric_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observed_at",
+          "propertyName": "observedAt",
+          "definition": "Observed at recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "timestamp with time zone",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_route_performance_observed_at",
+              "idx_route_performance_route_metric_time",
+              "idx_route_performance_release_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "Observed at follows this table contract. observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_route_performance_release_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "route_id",
+          "propertyName": "routeId",
+          "definition": "Route id recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_route_performance_route_metric_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "surface",
+          "propertyName": "surface",
+          "definition": "Surface recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "telemetry_version",
+          "propertyName": "telemetryVersion",
+          "definition": "Telemetry version recorded for the completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+          "cadence": "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+          "vintageSemantics": "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+          "rights": "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
           "deprecation": {
             "status": "active"
           }
