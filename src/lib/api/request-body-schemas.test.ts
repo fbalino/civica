@@ -109,9 +109,8 @@ const fixtures: Array<{
     body: {
       message: "How is parliament formed?",
       context: {
-        country: "Uruguay",
-        house: "lower",
-        parties: [{ name: "Example", seats: 12 }],
+        countrySlug: "uruguay",
+        tab: "structure",
       },
     },
   },
@@ -196,11 +195,11 @@ test("schemas reject wrong types, nested unknown keys, and non-canonical numbers
     adminLoginBodySchema.safeParse({ username: 7, password: "secret" }),
     chatBodySchema.safeParse({
       message: "Question",
-      context: { parties: [{ name: "Party", seats: "12" }] },
+      context: { countrySlug: "uruguay", tab: "unknown" },
     }),
     chatBodySchema.safeParse({
       message: "Question",
-      context: { parties: [{ name: "Party", seats: 12, hidden: true }] },
+      context: { countrySlug: "Uruguay" },
     }),
     correctionBodySchema.safeParse({
       category: "ci_data_error",
@@ -271,10 +270,8 @@ test("schema collection ceilings reject oversized structured input", () => {
     chatBodySchema.safeParse({
       message: "Question",
       context: {
-        parties: Array.from({ length: 61 }, (_, index) => ({
-          name: `Party ${index}`,
-          seats: index,
-        })),
+        countrySlug: "uruguay",
+        country: "Client-supplied facts are forbidden",
       },
     }).success,
     false,

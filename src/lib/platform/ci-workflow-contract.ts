@@ -218,11 +218,11 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "validate:cache-consistency":
       "node --import tsx --test src/lib/platform/cache-consistency.test.ts src/lib/api/response-cache.test.ts src/lib/api/problem-response.test.ts scripts/validate-cache-consistency.test.ts && tsx scripts/validate-cache-consistency.ts",
     "validate:release-consistency":
-      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts",
+      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts && npm run validate:deployment-rehearsal",
     "validate:query-budgets":
       "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",
     "validate:route-performance-telemetry":
-      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring",
+      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring && npm run validate:health-status && npm run validate:ask-civica",
     "validate:error-monitoring":
       "node --import tsx --test src/lib/platform/error-monitoring.test.ts && tsx scripts/validate-error-monitoring.ts",
     "validate:build-prereqs":

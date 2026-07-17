@@ -206,26 +206,32 @@ export type AdvisoryApplicationBody = z.infer<
   typeof advisoryApplicationBodySchema
 >;
 
-const chatPartySchema = z
-  .object({
-    name: text(120, 1),
-    seats: z.number().int().min(0).max(100_000),
-  })
-  .strict();
 const chatContextSchema = z
   .object({
-    country: optionalText(200),
-    tab: optionalText(200),
-    house: z.enum(["upper", "lower"]).optional(),
-    coalition: optionalText(200),
-    nextElection: optionalText(200),
-    parties: z.array(chatPartySchema).max(60).optional(),
+    // PLT-021: resolve all reader-visible facts on the server. The browser
+    // may choose only the public country route and a closed display tab; it
+    // cannot inject facts, parties, or prose into the model context.
+    countrySlug: z
+      .string()
+      .max(100)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    tab: z
+      .enum([
+        "factbook",
+        "structure",
+        "bills",
+        "elections",
+        "democracy",
+        "leaders",
+        "constitution",
+      ])
+      .optional(),
   })
   .strict();
 export const chatBodySchema = z
   .object({
     message: text(4_000, 1),
-    context: chatContextSchema.optional(),
+    context: chatContextSchema,
   })
   .strict();
 export type ChatBody = z.infer<typeof chatBodySchema>;

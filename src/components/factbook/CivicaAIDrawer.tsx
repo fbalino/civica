@@ -50,6 +50,9 @@ export function CivicaAIDrawer({
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(false);
   const bodyRef = useRef<HTMLDivElement | null>(null);
+  const countrySlug = threadKey.startsWith("country:")
+    ? threadKey.slice("country:".length)
+    : "";
 
   // Hydrate from localStorage on mount.
   useEffect(() => {
@@ -114,10 +117,8 @@ export function CivicaAIDrawer({
         body: JSON.stringify({
           message: t,
           context: {
-            country: countryName,
+            countrySlug,
             tab: apiTab,
-            // No `house` — irrelevant on the factbook surface. The route
-            // skips the Chamber line in the system prompt when absent.
           },
         }),
       });
@@ -169,7 +170,7 @@ export function CivicaAIDrawer({
     } finally {
       setStreaming(false);
     }
-  }, [apiTab, countryName, streaming]);
+  }, [apiTab, countryName, countrySlug, streaming]);
 
   useEffect(() => {
     return onCivicaAsk(({ question, autoSend }) => {

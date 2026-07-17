@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 305
-- **Completed:** 207
-- **Remaining:** 98
-- **Progress:** 67.9%
+- **Completed:** 208
+- **Remaining:** 97
+- **Progress:** 68.2%
 - **Priority mix:** P0 189 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -276,7 +276,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [x] **PLT-018** (P0) Add exception/error monitoring with source maps and release identity. _Done when: server/client/cron/script errors include release/route/job context, sensitive values are scrubbed, alerts route to an owned channel, seeded errors appear and resolve, and known issues can link to correction/status records._
 - [x] **PLT-019** (P1) Document and test deploy, migration, data-release, and rollback ordering. _Done when: a staging rehearsal covers compatible schema deployment, jobs, caches, static assets, release metadata, smoke tests, abort points, rollback/forward-fix, and no old code reads incompatible new data._
 - [x] **PLT-020** (P1) Add production health/status checks aligned with the public status page. _Done when: health probes distinguish application, database, critical assets, scheduled data freshness, and model-dependent optional services; incident thresholds and status-page update responsibility are documented and exercised in a drill._
-- [ ] **PLT-021** (P0) Define Ask Civica's evidence, privacy, prompt, model/version, and failure contract. _Done when: answers cite allowed current context/sources, uncertainty and unavailable data are explicit, prompt/model versions are logged without private content leakage, prompt-injection/data-exfiltration tests pass, retention/user disclosure are published, and model failure degrades safely._
+- [x] **PLT-021** (P0) Define Ask Civica's evidence, privacy, prompt, model/version, and failure contract. _Done when: answers cite allowed current context/sources, uncertainty and unavailable data are explicit, prompt/model versions are logged without private content leakage, prompt-injection/data-exfiltration tests pass, retention/user disclosure are published, and model failure degrades safely._
 - [ ] **PLT-022** (P0) Apply subscription/API credential and cost controls to all model-assisted pipelines. _Done when: provider credentials are scoped, absent keys disable only intended features, paid API jobs have explicit budgets/alerts where used, model/provider substitutions create new versions, raw secrets never enter logs/evidence, and no unapproved fallback billing path exists._
 - [ ] **PLT-023** (P1) Establish database connection, retry, timeout, and transaction semantics for serverless HTTP execution. _Done when: read/write paths document atomicity limits, retries cannot duplicate mutations, timeouts/cancellation are bounded, pool/connection assumptions match Neon guidance, and injected transient failures pass._
 - [x] **PLT-024** (P1) Create operational runbooks for data-source breakage, bad release, compromised key, model outage, stale map/assets, legal takedown, and incorrect country fact. _Done when: each runbook names detection, containment, owner, rollback/correction, user communication, evidence preservation, and recovery verification; a tabletop exercise records gaps._

@@ -30,6 +30,7 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "no-accounts", label: "No accounts, no tracking" },
   { id: "storage", label: "In your browser" },
   { id: "messages", label: "What you send us" },
+  { id: "ask-civica", label: "Ask Civica" },
   { id: "applications", label: "Board applications" },
   { id: "servers", label: "Hosting & logs" },
   { id: "data-licensing", label: "About the data" },
@@ -44,7 +45,7 @@ export default function PrivacyPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Privacy Policy</h1>
-        <p className="editorial-page-meta">Last updated: July 11, 2026</p>
+        <p className="editorial-page-meta">Last updated: July 16, 2026</p>
         <p className="editorial-page-subtitle">
           Civica Atlas is a public reference site. There are no visitor
           accounts, no sign-up, and no advertising or analytics trackers. This
@@ -142,6 +143,48 @@ export default function PrivacyPage() {
               Avoid typing sensitive personal information into it.
             </li>
           </ul>
+        </section>
+
+        <section id="ask-civica" className="editorial-section">
+          <SectionHeader
+            eyebrow="Ask Civica"
+            title="A bounded AI assistant, with no server-side chat history"
+            dek="It can explain only the current, cited country evidence supplied by Civica."
+          />
+
+          <p>
+            Ask Civica sends the question you type and a small, source-labelled
+            country-evidence bundle to Anthropic&rsquo;s API to generate a reply.
+            Civica does not persist Ask Civica questions or replies in its
+            application database, and it does not build a server-side
+            conversation history. The conversation you see remains in your
+            browser&rsquo;s local storage until you clear it or clear site data.
+          </p>
+
+          <p>
+            To run and monitor the feature safely, Civica records only the
+            checked prompt version, model identifier, closed outcome, and a
+            bounded evidence count&mdash;never the question, answer, country,
+            sources, URLs, raw facts, provider error, or API key. The assistant
+            has no web browsing, file, database, account, or secret access.
+            It may be incomplete or unavailable; use the country profile and
+            its sources to verify important claims.
+          </p>
+
+          <p>
+            Anthropic&rsquo;s handling of the request depends on the arrangement
+            for Civica&rsquo;s API organization. Civica does not claim that
+            zero-data retention is enabled. Please avoid entering sensitive
+            personal information, and review Anthropic&rsquo;s{" "}
+            <a
+              href="https://docs.anthropic.com/en/docs/build-with-claude/zero-data-retention"
+              target="_blank"
+              rel="noreferrer"
+            >
+              current API data-retention documentation
+            </a>{" "}
+            for the provider-level boundary.
+          </p>
         </section>
 
         <section id="applications" className="editorial-section">

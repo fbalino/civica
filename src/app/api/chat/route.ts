@@ -17,8 +17,23 @@ import {
 } from "@/lib/api/request-body-schemas";
 import { cacheControlFor } from "@/lib/platform/cache-consistency";
 import { withResponseCacheProfile } from "@/lib/api/response-cache";
+import { getJurisdictionBySlug } from "@/lib/db/queries";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import {
+  ASK_CIVICA_MAX_OUTPUT_TOKENS,
+  ASK_CIVICA_MODEL,
+  ASK_CIVICA_SYSTEM_PROMPT,
+  askCivicaCitationFooter,
+  askCivicaUserPayload,
+  isAskCivicaDirectInjectionAttempt,
+  loadAskCivicaEvidence,
+  recordAskCivicaAudit,
+  type AskCivicaContextRepository,
+} from "@/lib/ask-civica/contract";
+import { recordErrorMonitoringEvent } from "@/lib/platform/error-monitoring";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // --- Abuse / cost controls -------------------------------------------------
 // /api/chat is a PUBLIC, unauthenticated endpoint that calls a paid Anthropic
@@ -41,19 +56,22 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 const CHAT_BURST_POLICY = getRequestRateLimitPolicy("chat-burst");
 const CHAT_SUSTAINED_POLICY = getRequestRateLimitPolicy("chat-sustained");
 
-// Output cap on the Anthropic completion. Bounds per-call token spend.
-const MAX_OUTPUT_TOKENS = 1024;
-
-const TAB_LABELS: Record<string, string> = {
-  chamber: "Chamber composition",
-  bills: "Bills in motion",
-  structure: "Government structure",
-  elections: "Elections",
-  democracy: "Democracy index",
-  leaders: "Leadership",
-  constitution: "Constitution",
-  factbook: "Country factbook",
+const askCivicaRepository: AskCivicaContextRepository = {
+  getJurisdictionBySlug,
+  getCanonicalFactsForJurisdiction: (jurisdictionId, keys) =>
+    getCanonicalFactsForJurisdiction(jurisdictionId, [...keys]),
 };
+
+function unavailableResponse(): Response {
+  return new Response("Ask Civica is temporarily unavailable. Please try again shortly.", {
+    status: 503,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Retry-After": "60",
+      "Cache-Control": cacheControlFor("private-live"),
+    },
+  });
+}
 
 async function handleChat(req: NextRequest) {
   // 1) Shared limits run BEFORE parsing or any model call. The response helper
@@ -78,7 +96,7 @@ async function handleChat(req: NextRequest) {
     media: [{ mediaType: JSON_MEDIA_TYPE, schema: chatBodySchema }],
   });
   if (!parsed.ok) return parsed.response;
-  const { message, context = {} } = parsed.data;
+  const { message, context } = parsed.data;
 
   // 3) Keep the semantic blank-message check separate from structure.
   if (message.trim().length === 0) {
@@ -86,65 +104,110 @@ async function handleChat(req: NextRequest) {
   }
   const userMessage = message.trim();
 
-  // 4) The strict schema bounds every untrusted context field and collection.
-  const countryName = context.country || "the selected country";
-  const tabRaw = context.tab ?? "";
-  const house = context.house;
-  const coalition = context.coalition ?? "";
-  const nextElection = context.nextElection ?? "";
-  const parties = context.parties ?? [];
-
-  const tabLabel = TAB_LABELS[tabRaw] ?? (tabRaw || "Country");
-  // House is only meaningful on chamber/bills tabs (per memory-decisions.md).
-  const houseLabel = house
-    ? house === "upper"
-      ? "upper house"
-      : "lower house"
-    : null;
-
-  let chamberContext = "";
-  if (parties.length > 0 && houseLabel) {
-    const partyList = parties
-      .map((p) => `${p.name} (${p.seats} seats)`)
-      .join(", ");
-    chamberContext = `\nCurrent ${houseLabel} seat distribution: ${partyList}.`;
-    if (coalition) chamberContext += ` Governing coalition: ${coalition}.`;
-    if (nextElection) chamberContext += ` Next election: ${nextElection}.`;
+  // 4) Direct attacks never reach the paid model. More importantly, no
+  // browser-supplied prose is interpolated into the system prompt: the only
+  // evidence comes from the server-side country/source read below.
+  if (isAskCivicaDirectInjectionAttempt(userMessage)) {
+    recordAskCivicaAudit({ outcome: "input_rejected" });
+    return new Response(
+      "Ask Civica cannot help override its safety rules or expose protected system details. I can help with the cited country evidence.",
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": cacheControlFor("private-live"),
+        },
+      },
+    );
   }
 
-  // Only include the Chamber line when house is genuinely relevant.
-  const chamberLine = houseLabel ? `\n- Chamber: ${houseLabel}` : "";
+  let evidence;
+  try {
+    evidence = await loadAskCivicaEvidence(context, askCivicaRepository);
+  } catch {
+    recordAskCivicaAudit({ outcome: "context_unavailable" });
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: "api.chat.post",
+      errorCode: "ask-civica.context-unavailable",
+    });
+    return unavailableResponse();
+  }
+  if (!evidence) {
+    recordAskCivicaAudit({ outcome: "context_unavailable" });
+    return new Response("The selected country context is unavailable. Please reopen the country profile and try again.", {
+      status: 422,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": cacheControlFor("private-live"),
+      },
+    });
+  }
 
-  const systemPrompt = `You are Civica AI, an expert on global governance, legislatures, and political systems. You speak clearly, cite facts, and avoid political bias.
+  const apiKey = process.env.ANTHROPIC_API_KEY_CHAT?.trim();
+  if (!apiKey) {
+    recordAskCivicaAudit({
+      outcome: "model_unavailable",
+      evidenceFactCount: evidence.facts.length,
+    });
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: "api.chat.post",
+      errorCode: "ask-civica.model-unavailable",
+    });
+    return unavailableResponse();
+  }
 
-Current user context:
-- Country: ${countryName}${chamberLine}
-- Active tab: ${tabLabel}${chamberContext}
-
-Answer questions grounded in this context. If the user asks about something on the current tab (${tabLabel}), focus your answer there. Be concise — 2-4 short paragraphs max. Use plain language. If you cite a source, say so briefly at the end.`;
+  recordAskCivicaAudit({ outcome: "started", evidenceFactCount: evidence.facts.length });
+  const client = new Anthropic({ apiKey });
+  const userPayload = askCivicaUserPayload(userMessage, evidence);
+  const citationFooter = askCivicaCitationFooter(evidence);
 
   const encoder = new TextEncoder();
   const readable = new ReadableStream({
     async start(controller) {
       try {
         const stream = await client.messages.stream({
-          model: "claude-sonnet-4-6",
-          max_tokens: MAX_OUTPUT_TOKENS,
-          system: systemPrompt,
-          messages: [{ role: "user", content: userMessage }],
+          model: ASK_CIVICA_MODEL,
+          max_tokens: ASK_CIVICA_MAX_OUTPUT_TOKENS,
+          system: ASK_CIVICA_SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userPayload }],
         });
+        let sawText = false;
         for await (const chunk of stream) {
           if (
             chunk.type === "content_block_delta" &&
             chunk.delta.type === "text_delta"
           ) {
+            sawText = true;
             controller.enqueue(encoder.encode(chunk.delta.text));
           }
         }
+        if (!sawText) {
+          controller.enqueue(
+            encoder.encode(
+              "I could not produce a sourced answer from the current Civica evidence bundle.",
+            ),
+          );
+        }
+        controller.enqueue(encoder.encode(citationFooter));
+        recordAskCivicaAudit({
+          outcome: "completed",
+          evidenceFactCount: evidence.facts.length,
+        });
       } catch (err) {
-        // Log full detail server-side; never leak SDK errors or internal
-        // env-var names to the client (audit Security #10).
-        console.error("[/api/chat] stream error:", err);
+        // Never log the provider exception: SDK errors can include request
+        // metadata or content. PLT-018 records only a closed error identity.
+        void err;
+        recordAskCivicaAudit({
+          outcome: "provider_failure",
+          evidenceFactCount: evidence.facts.length,
+        });
+        await recordErrorMonitoringEvent({
+          surface: "server",
+          routeId: "api.chat.post",
+          errorCode: "ask-civica.provider-failure",
+        });
         controller.enqueue(
           encoder.encode(
             "\n\n_(Chat is temporarily unavailable. Please try again shortly.)_",

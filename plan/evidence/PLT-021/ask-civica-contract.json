@@ -1,0 +1,32 @@
+{
+  "task": "PLT-021",
+  "contract": "ask-civica-contract/v1",
+  "status": "implemented-and-locally-validated",
+  "validatedOn": "2026-07-16",
+  "scope": {
+    "evidence": "Server-resolved canonical country facts only; client prose and fact claims are excluded.",
+    "sources": "Completed replies receive a deterministic source footer to the country profile and selected source labels.",
+    "privacy": "No application-database transcript; browser-local history and content-free operational metadata only.",
+    "failure": "Missing key, context failure, and provider failure return a fixed unavailable response without fallback."
+  },
+  "automatedChecks": [
+    "server evidence is bounded and source-labelled",
+    "prompt injection remains JSON user data and cannot alter the static system prompt",
+    "unavailable and disputed values never become observed facts",
+    "audit records include only contract/prompt/model/outcome/count metadata",
+    "request schema rejects client-supplied country facts and arbitrary tabs"
+  ],
+  "providerReferences": [
+    {
+      "url": "https://docs.anthropic.com/en/docs/build-with-claude/zero-data-retention",
+      "retrievedOn": "2026-07-16",
+      "purpose": "Provider API data-retention disclosure boundary; zero-data-retention is not assumed."
+    },
+    {
+      "url": "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+      "retrievedOn": "2026-07-16",
+      "purpose": "Prompt-injection mitigation boundary: static instructions, untrusted JSON data, least privilege, and adversarial tests."
+    }
+  ],
+  "ownerFollowUp": "Confirm the actual Anthropic organization/workspace retention arrangement before any zero-data-retention claim; retain no credential, account identifier, or console screenshot."
+}
