@@ -313,6 +313,16 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
         "src/lib/platform/pipeline-observability.ts",
       ],
     },
+    {
+      id: "operations.health-alerts",
+      route: "/api/cron/operations/health-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/health-alerts/route.ts",
+        "src/lib/platform/health-status.ts",
+      ],
+    },
   ] as const;
 
 export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] =

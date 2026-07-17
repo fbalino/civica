@@ -389,6 +389,15 @@ const BODY_SCHEMA_EXPECTATIONS: Readonly<
     media: [{ mediaType: "JSON_MEDIA_TYPE", schema: "contactBodySchema" }],
     limit: "contact",
   },
+  "client-error-monitoring-body/v1": {
+    media: [
+      {
+        mediaType: "JSON_MEDIA_TYPE",
+        schema: "clientErrorMonitoringBodySchema",
+      },
+    ],
+    limit: "clientErrorMonitoring",
+  },
   "pulse-adjudication-body/v1": {
     media: [
       {

@@ -104,6 +104,10 @@
     {
       "path": "/api/cron/operations/pipeline-alerts",
       "schedule": "55 23 * * *"
+    },
+    {
+      "path": "/api/cron/operations/health-alerts",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

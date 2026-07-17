@@ -419,10 +419,29 @@ export function indexProtectedFileHash(
       /  spec\(\n    "civica_organization_roster_v1",\n    "https:\/\/www\.civicaatlas\.org\/methodology\/source-coverage",\n    "derived-database",\n    "database-rows",\n    "organization-membership-release\/2026-07-v1",\n    "official organization pages retrieved 2026-07-12",\n    "23 organization identities and 446 retained relationships; nine complete rosters and fourteen selected checked subsets",\n    "restricted-no-redistribution",\n  \),\n/g,
       "",
     );
+    normalized = normalized.replace(
+      '  "operations.health-alerts":\n' +
+        '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
+      "",
+    );
   }
   if (path === "src/lib/data/production-adapter-registry.ts") {
     normalized = normalized.replace(
-      /    \{\n      id: "atlas\.organization-memberships",\n      product: "atlas",\n      sources: \["civica_organization_roster_v1"\],\n      entrypoint: "scripts\/sync-organization-memberships\.ts",\n      implementationPaths: \[\n        "scripts\/sync-organization-memberships\.ts",\n        "src\/lib\/organizations\/membership-release\.ts",\n      \],\n    \},\n/g,
+      /    \{\n      id: "atlas\.organization-memberships",\n      product: "atlas",\n      sources: \["civica_organization_roster_v1"\],\n      canonicalNpmScript: "sync:organization-memberships",\n      entrypoint: "scripts\/sync-organization-memberships\.ts",\n      implementationPaths: \[\n        "scripts\/sync-organization-memberships\.ts",\n        "src\/lib\/organizations\/membership-release\.ts",\n      \],\n    \},\n/g,
+      "",
+    );
+    normalized = normalized.replace(
+      `    {
+      id: "operations.health-alerts",
+      route: "/api/cron/operations/health-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/health-alerts/route.ts",
+        "src/lib/platform/health-status.ts",
+      ],
+    },
+`,
       "",
     );
   }

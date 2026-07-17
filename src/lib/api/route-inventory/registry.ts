@@ -725,6 +725,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "Vercel Cron entrypoint; requireCronAuth() protects the retained production-pipeline alert check before any run detail is read.",
   },
   {
+    filePath: "api/cron/operations/health-alerts/route.ts",
+    exposure: "cron",
+    methods: ["GET", "POST"],
+    mutation: true,
+    sensitive: true,
+    controls: ["cron-secret"],
+    note: "Vercel Cron entrypoint; requireCronAuth() protects the content-free health report and owner alert check before any component state is read.",
+  },
+  {
     filePath: "api/governance-evidence/[slug]/route.ts",
     exposure: "public-read",
     methods: ["GET"],
@@ -732,6 +741,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     sensitive: false,
     controls: ["rate-limit", "public"],
     note: "Public Governance Evidence export using the shared 30/min dynamic-export budget; no PII or authentication.",
+  },
+  {
+    filePath: "api/health/route.ts",
+    exposure: "public-read",
+    methods: ["GET"],
+    mutation: false,
+    sensitive: false,
+    controls: ["platform-rate-limit", "public"],
+    note: "Public, content-free availability contract for the independent monitor and status page; the verified all-path platform WAF supplies flood protection without making a database-backed limiter part of the database probe.",
   },
   {
     filePath: "api/metrics/[metricId]/strip-data/route.ts",

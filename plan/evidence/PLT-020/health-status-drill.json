@@ -1,0 +1,58 @@
+{
+  "task": "PLT-020",
+  "contract": "civica-health-status/v1",
+  "drill": "status-page-publication-decision",
+  "recordedAt": "2026-07-16",
+  "owner": "Fernando Balino",
+  "publicStatusPage": "https://statuspage.incident.io/civica-atlas",
+  "scenarios": [
+    {
+      "id": "database-unavailable",
+      "expectedHttpStatus": 503,
+      "decision": "publish",
+      "threshold": "immediate_core_failure",
+      "components": ["website", "atlas_data"]
+    },
+    {
+      "id": "missed-scheduled-pipeline",
+      "expectedHttpStatus": 200,
+      "firstDecision": "observe",
+      "secondDecision": "publish",
+      "threshold": "two_consecutive_observations",
+      "components": ["atlas_data"]
+    },
+    {
+      "id": "map-asset-unavailable",
+      "expectedHttpStatus": 200,
+      "secondDecision": "publish",
+      "components": ["atlas_map"]
+    },
+    {
+      "id": "ask-civica-unavailable",
+      "expectedHttpStatus": 200,
+      "coreSiteState": "operational",
+      "secondDecision": "publish",
+      "components": ["ask_civica"]
+    }
+  ],
+  "providerBoundary": "Manual Incident.io publication; no provider credential or webhook is retained in the repository.",
+  "verification": {
+    "healthContractTests": "5/5 passed",
+    "cronSafety": "39 scheduled routes and 42 cron route files closed",
+    "localEndpoint": {
+      "observedAtUtc": "2026-07-17T00:48:08.776Z",
+      "httpStatus": 200,
+      "cacheControl": "no-store",
+      "overall": "degraded",
+      "componentStates": {
+        "application": "operational",
+        "database": "operational",
+        "critical_assets": "operational",
+        "scheduled_data_freshness": "unavailable",
+        "model_dependent_optional_services": "operational"
+      },
+      "note": "The configured database has not yet applied the retained pipeline-observability schema, so the probe correctly reports freshness unavailable rather than fabricated freshness."
+    },
+    "browserAutomation": "The local Playwright wrapper could not resolve its playwright-cli binary; endpoint behavior was verified directly against the already-running local application."
+  }
+}

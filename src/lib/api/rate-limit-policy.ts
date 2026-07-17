@@ -181,6 +181,7 @@ export const RATE_LIMIT_POLICIES: readonly RateLimitPolicyDefinition[] = [
   platformWaf("static-release-download", 600, 60_000, "vercel-global-ip"),
   platformWaf("retired-embed", 600, 60_000, "vercel-global-ip"),
   platformWaf("pulse-sign-out", 600, 60_000, "vercel-global-ip"),
+  platformWaf("health-status", 600, 60_000, "vercel-global-ip"),
 ];
 
 export interface DurableDbDisposition {
@@ -415,6 +416,7 @@ const CRON_ROUTES = [
   "api/cron/factbook/sync-wto-stats/route.ts",
   "api/cron/factbook/verify-reconciliation/route.ts",
   "api/cron/operations/error-alerts/route.ts",
+  "api/cron/operations/health-alerts/route.ts",
   "api/cron/operations/pipeline-alerts/route.ts",
   "api/cron/pulse/calculate/route.ts",
   "api/cron/pulse/classify/route.ts",
@@ -641,6 +643,14 @@ export const RATE_LIMIT_ROUTE_POLICIES: readonly RateLimitRoutePolicyMapping[] =
     ...CRON_ROUTES.map((filePath) => route(filePath, ["GET", "POST"], cron())),
 
     route("api/governance-evidence/[slug]/route.ts", ["GET"], CONFIRMED_EXPORT),
+    route(
+      "api/health/route.ts",
+      ["GET"],
+      platform(
+        "health-status",
+        "The verified all-path WAF bounds a public health probe without putting the database-backed application limiter in front of the database availability check.",
+      ),
+    ),
     route(
       "api/metrics/[metricId]/strip-data/route.ts",
       ["GET"],

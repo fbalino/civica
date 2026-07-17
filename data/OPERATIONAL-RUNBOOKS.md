@@ -208,10 +208,11 @@ Each runbook was walked through against the current implementation.
 - **#3 compromised key — LIVE GAP:** a real leaked Neon credential is in git
   history and **not yet rotated** (queued in `plan/MANUAL-CHECKS.md`). This is
   the one runbook with an open, unresolved incident.
-- **Detection capability remains staged:** #1 has retained source/job
-  observability and a daily alert check from PLT-017. Broader exception routing
-  and public health probes remain owned by PLT-018/020; until then, add a
-  manual weekly check of the status page and source freshness.
+- **PLT-020 health/status contract:** `data/HEALTH-STATUS.md` now makes the
+  public `/api/health` component probes, 15-minute owner monitor, fixed
+  Incident.io publication thresholds, and Fernando’s status-page responsibility
+  the canonical path. The provider-side component-label confirmation remains in
+  `plan/MANUAL-CHECKS.md`; it is not claimed by the repository.
 - **User communication is single-channel:** the status page and the `/policies`
   correction flow exist; there is no subscriber notification system (by design,
   APR-D031). Communication is pull, not push.

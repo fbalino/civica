@@ -52,7 +52,42 @@ const priorSource = currentSource
     .where(
       sql\`\${countryFacts.jurisdictionId} = \${jurisdictionId} AND \${countryFacts.factKey} LIKE 'freedom_house%'\`,
     );`,
-  );
+    );
+
+function withoutNonsemanticManifestAdditions(source: string): string {
+  return source
+    .replace(
+      /  spec\(\n    "civica_organization_roster_v1",[\s\S]*?    "restricted-no-redistribution",\n  \),\n/,
+      "",
+    )
+    .replace(
+      '  "operations.health-alerts":\n' +
+        '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
+      "",
+    );
+}
+
+function withoutNonsemanticAdapterAdditions(source: string): string {
+  return source
+    .replace(
+      /    \{\n      id: "atlas\.organization-memberships",[\s\S]*?    \},\n/,
+      "",
+    )
+    .replace(
+      `    {
+      id: "operations.health-alerts",
+      route: "/api/cron/operations/health-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/health-alerts/route.ts",
+        "src/lib/platform/health-status.ts",
+      ],
+    },
+`,
+      "",
+    );
+}
 
 test("current-party read guards are excluded from Index semantic drift", () => {
   assert.notEqual(currentSource, priorSource);
@@ -106,10 +141,18 @@ test("other shared-query edits remain protected Index drift", () => {
 test("the Atlas-only organization source specification is excluded from Index semantic drift", () => {
   const manifestPath = "src/lib/data/source-input-manifest.ts";
   const currentManifest = readFileSync(manifestPath, "utf8");
-  const priorManifest = currentManifest.replace(
-    /  spec\(\n    "civica_organization_roster_v1",[\s\S]*?    "restricted-no-redistribution",\n  \),\n/,
-    "",
+  const priorManifest = withoutNonsemanticManifestAdditions(currentManifest);
+  assert.notEqual(currentManifest, priorManifest);
+  assert.equal(
+    indexProtectedFileHash(manifestPath, currentManifest),
+    sha256(priorManifest),
   );
+});
+
+test("the platform-only health monitor derived input is excluded from Index semantic drift", () => {
+  const manifestPath = "src/lib/data/source-input-manifest.ts";
+  const currentManifest = readFileSync(manifestPath, "utf8");
+  const priorManifest = withoutNonsemanticManifestAdditions(currentManifest);
   assert.notEqual(currentManifest, priorManifest);
   assert.equal(
     indexProtectedFileHash(manifestPath, currentManifest),
@@ -120,10 +163,18 @@ test("the Atlas-only organization source specification is excluded from Index se
 test("the Atlas-only organization adapter is excluded from Index semantic drift", () => {
   const registryPath = "src/lib/data/production-adapter-registry.ts";
   const currentRegistry = readFileSync(registryPath, "utf8");
-  const priorRegistry = currentRegistry.replace(
-    /    \{\n      id: "atlas\.organization-memberships",[\s\S]*?    \},\n/,
-    "",
+  const priorRegistry = withoutNonsemanticAdapterAdditions(currentRegistry);
+  assert.notEqual(currentRegistry, priorRegistry);
+  assert.equal(
+    indexProtectedFileHash(registryPath, currentRegistry),
+    sha256(priorRegistry),
   );
+});
+
+test("the platform-only health monitor adapter is excluded from Index semantic drift", () => {
+  const registryPath = "src/lib/data/production-adapter-registry.ts";
+  const currentRegistry = readFileSync(registryPath, "utf8");
+  const priorRegistry = withoutNonsemanticAdapterAdditions(currentRegistry);
   assert.notEqual(currentRegistry, priorRegistry);
   assert.equal(
     indexProtectedFileHash(registryPath, currentRegistry),
