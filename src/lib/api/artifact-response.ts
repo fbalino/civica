@@ -1,4 +1,3 @@
-import { apiProblem } from "./problem-response";
 import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 export interface ImmutableArtifactOptions {
@@ -6,6 +5,19 @@ export interface ImmutableArtifactOptions {
   filename: string;
   contentType: string;
   load: () => Promise<Uint8Array>;
+}
+
+function artifactUnavailableResponse(): Response {
+  return Response.json(
+    {
+      error: "The requested artifact is temporarily unavailable.",
+      code: "ARTIFACT_UNAVAILABLE",
+    },
+    {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    },
+  );
 }
 
 /** Serve a checked release artifact without exposing filesystem failures. */
@@ -24,8 +36,10 @@ export async function immutableArtifactResponse(
         "X-Content-Type-Options": "nosniff",
       },
     });
-  } catch (error) {
-    console.error(`[${options.operation}] release artifact unavailable`, error);
-    return apiProblem("ARTIFACT_UNAVAILABLE");
+  } catch {
+    // A frozen, shared-cache route must not reach the database-backed error
+    // monitor. Keep the fallback fixed and content-free, including in logs.
+    console.error("[release-artifact] unavailable");
+    return artifactUnavailableResponse();
   }
 }

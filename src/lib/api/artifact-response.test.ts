@@ -23,7 +23,8 @@ test("immutable artifacts preserve exact bytes and download headers", async () =
 
 test("filesystem errors become one safe non-cacheable problem", async () => {
   const previous = console.error;
-  console.error = () => undefined;
+  const logs: unknown[][] = [];
+  console.error = (...args: unknown[]) => logs.push(args);
   try {
     const response = await immutableArtifactResponse({
       operation: "fixture",
@@ -44,6 +45,7 @@ test("filesystem errors become one safe non-cacheable problem", async () => {
       code: "ARTIFACT_UNAVAILABLE",
     });
     assert.doesNotMatch(JSON.stringify(body), /private|postgres|secret|ENOENT/);
+    assert.deepEqual(logs, [["[release-artifact] unavailable"]]);
   } finally {
     console.error = previous;
   }
