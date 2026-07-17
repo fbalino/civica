@@ -39,12 +39,16 @@ at the end.
 - **Detection:** post-deploy smoke/browser checks fail, a release-quality
   anomaly appears, or a reader/owner reports broken output.
 - **Containment:** frozen vintages are immutable (DAT-023), so a bad recompute
-  cannot overwrite a published vintage. Code: Vercel keeps prior deployments.
+  cannot overwrite a published vintage. Manually disable Cron Jobs first, then
+  preserve the failed deployment and current database state for review.
 - **Owner:** Fernando.
-- **Rollback/correction:** `vercel redeploy <prior-good-prod-url>` (or promote
-  the previous deployment). For data, publish a new superseding vintage
-  (never mutate the old one); the migrator runs before build so schema is
-  compatible.
+- **Rollback/correction:** follow the code/data separation in
+  [`DEPLOYMENT-REHEARSAL.md`](./DEPLOYMENT-REHEARSAL.md): use Vercel Instant
+  Rollback for a known reader-compatible deployment, keep the additive schema,
+  and keep Cron Jobs manually disabled until the selected code is safe to
+  write. For data, publish a new superseding vintage (never mutate the old
+  one); schema/data defects are reviewed forward fixes, not implicit reverse
+  DDL.
 - **User communication:** a correction/retraction follows the `/policies`
   contract (CLM-016) with a changelog entry and supersession marker.
 - **Evidence preservation:** keep the bad deployment URL, the diff, and the
@@ -211,8 +215,9 @@ Each runbook was walked through against the current implementation.
 - **User communication is single-channel:** the status page and the `/policies`
   correction flow exist; there is no subscriber notification system (by design,
   APR-D031). Communication is pull, not push.
-- **No automated rollback:** rollback is a manual `vercel redeploy` /
-  supersede-vintage; no one-click rollback exists. Acceptable for a single-owner
-  project; revisit if contributors are added.
+- **No automated data rollback:** application rollback is a manual Vercel
+  Instant Rollback, while data and schema recovery remain a reviewed
+  forward-fix/superseding-release decision. Cron Jobs must be manually disabled
+  because Vercel documents that active jobs can continue after rollback.
 - **Legal (#6):** substantive steps depend on counsel (BRD-003/010), which is a
   manual/external gate not yet engaged.

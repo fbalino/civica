@@ -282,7 +282,7 @@ test("package validation closes stage, check, publish, validator, and build wiri
     "check:ci-release": "tsx scripts/publish-ci-release.ts --check",
     "publish:ci-release": "tsx scripts/publish-ci-release.ts --publish",
     "validate:release-consistency":
-      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts",
+      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts && npm run validate:deployment-rehearsal",
     "build:core": "npm run validate:release-consistency && next build",
   };
   assert.deepEqual(releasePackageScriptErrors(scripts), []);

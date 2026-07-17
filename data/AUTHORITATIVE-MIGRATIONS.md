@@ -24,7 +24,10 @@ fingerprint in `data/authoritative-schema-fingerprint.v1.json`.
   ordered migration once, and verify the resulting fingerprint.
 
 The ledger lives in `civica_meta.schema_migrations`, outside the public schema
-fingerprint. `vercel-build` runs the migrator before the application build.
+fingerprint. Migration is not a Vercel build concern: use the explicit
+owner-operated pre-deploy step in [`DEPLOYMENT-REHEARSAL.md`](./DEPLOYMENT-REHEARSAL.md)
+against the named staging or production target, then deploy a validation-only
+build.
 
 ## Adding a migration
 

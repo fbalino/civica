@@ -180,7 +180,7 @@ export function releasePackageScriptErrors(
     "publish:ci-release":
       "tsx scripts/publish-ci-release.ts --publish",
     "validate:release-consistency":
-      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts",
+      "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts && npm run validate:deployment-rehearsal",
   };
   const errors: string[] = [];
   for (const [name, command] of Object.entries(expected))
