@@ -25,6 +25,12 @@ import {
   type PipelineRunHandle,
   type PipelineRunStore,
 } from "@/lib/platform/pipeline-observability";
+import {
+  monitoringRouteId,
+  pruneErrorMonitoringEvents,
+  recordErrorMonitoringEvent,
+  type ErrorMonitoringStore,
+} from "@/lib/platform/error-monitoring";
 
 const IDEMPOTENCY_HEADER = "idempotency-key";
 const INTERNAL_EXECUTION_KEY_HEADER = "x-civica-cron-execution-key";
@@ -37,6 +43,7 @@ interface CronJobDependencies {
   now?: () => Date;
   store?: CronExecutionStore;
   pipelineStore?: PipelineRunStore;
+  errorMonitoringStore?: ErrorMonitoringStore;
 }
 
 interface CronJobFixtureContext {
@@ -95,19 +102,45 @@ function withCronNoStore(response: Response): Response {
 
 async function invokeHandler(
   jobId: string,
+  route: string,
   handler: CronRouteHandler,
   request: Request,
+  errorMonitoringStore?: ErrorMonitoringStore,
 ): Promise<Response> {
   try {
     return await handler(request);
   } catch (error) {
     unstable_rethrow(error);
-    console.error(`[cron ${jobId}] unhandled failure`, error);
+    await recordCronFailure(
+      jobId,
+      route,
+      "cron.handler_exception",
+      errorMonitoringStore,
+    );
+    console.error(`[cron ${jobId}] unhandled_failure`);
     return safeJsonResponse(
       { ok: false, jobId, outcome: "handler_exception" },
       500,
     );
   }
+}
+
+async function recordCronFailure(
+  jobId: string,
+  route: string,
+  errorCode: string,
+  store?: ErrorMonitoringStore,
+): Promise<void> {
+  if (process.env.NODE_ENV !== "production" && !store) return;
+  await recordErrorMonitoringEvent(
+    {
+      surface: "cron",
+      routeId: monitoringRouteId(route),
+      jobId,
+      errorCode,
+    },
+    store,
+  );
 }
 
 async function normalizeHandlerResponse(response: Response): Promise<{
@@ -278,9 +311,13 @@ export function withCronJob(
 
         const pathname = new URL(request.url).pathname;
         if (pathname !== definition.route) {
-          console.error(
-            `[cron ${jobId}] route registry mismatch: expected ${definition.route}, received ${pathname}`,
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.route_registry_mismatch",
+            dependencies.errorMonitoringStore,
           );
+          console.error(`[cron ${jobId}] route_registry_mismatch`);
           return safeJsonResponse(
             { ok: false, jobId, outcome: "route_registry_mismatch" },
             500,
@@ -311,7 +348,13 @@ export function withCronJob(
         if (definition.retired) {
           return (
             await normalizeHandlerResponse(
-              await invokeHandler(jobId, activeHandler, request),
+              await invokeHandler(
+                jobId,
+                definition.route,
+                activeHandler,
+                request,
+                dependencies.errorMonitoringStore,
+              ),
             )
           ).response;
         }
@@ -360,7 +403,13 @@ export function withCronJob(
             maxAttempts: MAX_CRON_ATTEMPTS,
           });
         } catch (error) {
-          console.error(`[cron ${jobId}] delivery control unavailable`, error);
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.delivery_control_unavailable",
+            dependencies.errorMonitoringStore,
+          );
+          console.error(`[cron ${jobId}] delivery_control_unavailable`);
           return safeJsonResponse(
             { ok: false, jobId, outcome: "delivery_control_unavailable" },
             503,
@@ -452,6 +501,12 @@ export function withCronJob(
               dependencies.pipelineStore,
             );
           } catch {
+            await recordCronFailure(
+              jobId,
+              definition.route,
+              "cron.pipeline_observability_start_failed",
+              dependencies.errorMonitoringStore,
+            );
             console.error(`[cron ${jobId}] pipeline_observability_start_failed`);
             const unavailable = safeJsonResponse(
               { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
@@ -472,7 +527,13 @@ export function withCronJob(
                 throw new Error("Cron execution lost its lease before finalization");
               }
             } catch (error) {
-              console.error(`[cron ${jobId}] delivery finalization failed`, error);
+              await recordCronFailure(
+                jobId,
+                definition.route,
+                "cron.delivery_finalization_failed",
+                dependencies.errorMonitoringStore,
+              );
+              console.error(`[cron ${jobId}] delivery_finalization_failed`);
               return safeJsonResponse(
                 { ok: false, jobId, outcome: "delivery_finalization_failed" },
                 503,
@@ -485,14 +546,24 @@ export function withCronJob(
         const normalized = await normalizeHandlerResponse(
           await invokeHandler(
             jobId,
+            definition.route,
             activeHandler,
             withInternalExecutionKey(request, executionKey),
+            dependencies.errorMonitoringStore,
           ),
         );
         let responseForDelivery = normalized.response;
         let terminalStatus: "succeeded" | "failed" = normalized.succeeded
           ? "succeeded"
           : "failed";
+        if (!normalized.succeeded) {
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.handler_failed",
+            dependencies.errorMonitoringStore,
+          );
+        }
         if (pipelineRun) {
           try {
             await finishPipelineRun(
@@ -505,6 +576,12 @@ export function withCronJob(
               dependencies.pipelineStore,
             );
           } catch {
+            await recordCronFailure(
+              jobId,
+              definition.route,
+              "cron.pipeline_observability_finish_failed",
+              dependencies.errorMonitoringStore,
+            );
             console.error(`[cron ${jobId}] pipeline_observability_finish_failed`);
             responseForDelivery = safeJsonResponse(
               { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
@@ -533,7 +610,13 @@ export function withCronJob(
             );
           }
         } catch (error) {
-          console.error(`[cron ${jobId}] delivery finalization failed`, error);
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.delivery_finalization_failed",
+            dependencies.errorMonitoringStore,
+          );
+          console.error(`[cron ${jobId}] delivery_finalization_failed`);
           return safeJsonResponse(
             { ok: false, jobId, outcome: "delivery_finalization_failed" },
             503,
@@ -555,6 +638,11 @@ export function withCronJob(
       // Every successful cron delivery is also an opportunity to enforce the
       // fixed telemetry-retention window without creating a separate tracker.
       if (!definition.retired) scheduleRoutePerformancePrune();
+      if (!definition.retired && process.env.NODE_ENV === "production") {
+        void pruneErrorMonitoringEvents().catch(() => {
+          console.error("[error-monitoring] prune_failed");
+        });
+      }
     }
   };
 }

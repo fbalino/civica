@@ -119,6 +119,15 @@ export const ENV_CONTRACT: EnvVarSpec[] = [
         : "must be at least 32 bytes",
   },
   {
+    name: "VERCEL_PROTECTED_SOURCEMAPS",
+    requiredIn: [],
+    note: "Explicit production opt-in for browser maps only after Vercel Protected Source Maps is enabled; absent keeps browser maps off.",
+    validate: (value) =>
+      value === "true" || value === "false"
+        ? null
+        : "must be exactly true or false when set",
+  },
+  {
     name: "ANTHROPIC_API_KEY_CHAT",
     requiredIn: ["chat"],
     secret: true,

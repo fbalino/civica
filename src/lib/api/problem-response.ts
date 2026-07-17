@@ -3,6 +3,10 @@ import {
   responseWithCacheProfile,
   type HttpResponseCacheProfileId,
 } from "@/lib/api/response-cache";
+import {
+  monitoringRouteId,
+  recordErrorMonitoringEvent,
+} from "@/lib/platform/error-monitoring";
 
 export const API_PROBLEMS = Object.freeze({
   INVALID_QUERY: {
@@ -75,7 +79,12 @@ export async function withSafeJsonErrors(
     // Preserve Next.js control-flow and dynamic-rendering signals while
     // converting only ordinary application failures to the public problem.
     unstable_rethrow(error);
-    console.error(`[${operation}] unhandled route failure`, error);
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: monitoringRouteId(operation),
+      errorCode: "route.unhandled",
+    });
+    console.error(`[${monitoringRouteId(operation)}] unhandled_route_failure`);
     return responseWithCacheProfile(
       apiProblem("DATA_UNAVAILABLE", {
         headers: options.errorHeaders,

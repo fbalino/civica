@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-16T23:47:11.658Z",
-  "sha256": "6c721e92228fc256add2aa65245ce9a2e46551744bf54761c4820ee8cbd0d562",
+  "generatedAt": "2026-07-17T00:12:59.038Z",
+  "sha256": "1f8adaf16a7eea4cb7d91b55a42b21ee7e22fdcd7e020559d93489b6db781b30",
   "schema": {
     "columns": [
       {
@@ -4728,6 +4728,177 @@
         "default": null,
         "nullable": "YES",
         "position": 13
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "error_monitoring_events",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "fingerprint",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "surface",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "route_id",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "job_id",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "error_code",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "source_map_id",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "timestamptz",
+        "name": "first_seen_at",
+        "type": "timestamp with time zone",
+        "table": "error_monitoring_events",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "timestamptz",
+        "name": "last_seen_at",
+        "type": "timestamp with time zone",
+        "table": "error_monitoring_events",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "int4",
+        "name": "occurrence_count",
+        "type": "integer",
+        "table": "error_monitoring_events",
+        "default": "1",
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": "'open'::text",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "timestamptz",
+        "name": "resolved_at",
+        "type": "timestamp with time zone",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "monitoring_version",
+        "type": "text",
+        "table": "error_monitoring_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "error_monitoring_issue_links",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "event_id",
+        "type": "uuid",
+        "table": "error_monitoring_issue_links",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "record_type",
+        "type": "text",
+        "table": "error_monitoring_issue_links",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "record_id",
+        "type": "text",
+        "table": "error_monitoring_issue_links",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "timestamptz",
+        "name": "linked_at",
+        "type": "timestamp with time zone",
+        "table": "error_monitoring_issue_links",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 5
       },
       {
         "udt": "uuid",
@@ -12262,6 +12433,41 @@
         "definition": "CREATE UNIQUE INDEX elections_pkey ON public.elections USING btree (id)"
       },
       {
+        "name": "error_monitoring_events_pkey",
+        "table": "error_monitoring_events",
+        "definition": "CREATE UNIQUE INDEX error_monitoring_events_pkey ON public.error_monitoring_events USING btree (id)"
+      },
+      {
+        "name": "idx_error_monitoring_fingerprint",
+        "table": "error_monitoring_events",
+        "definition": "CREATE UNIQUE INDEX idx_error_monitoring_fingerprint ON public.error_monitoring_events USING btree (fingerprint)"
+      },
+      {
+        "name": "idx_error_monitoring_open_last_seen",
+        "table": "error_monitoring_events",
+        "definition": "CREATE INDEX idx_error_monitoring_open_last_seen ON public.error_monitoring_events USING btree (status, last_seen_at)"
+      },
+      {
+        "name": "idx_error_monitoring_release_last_seen",
+        "table": "error_monitoring_events",
+        "definition": "CREATE INDEX idx_error_monitoring_release_last_seen ON public.error_monitoring_events USING btree (release_id, last_seen_at)"
+      },
+      {
+        "name": "error_monitoring_issue_links_pkey",
+        "table": "error_monitoring_issue_links",
+        "definition": "CREATE UNIQUE INDEX error_monitoring_issue_links_pkey ON public.error_monitoring_issue_links USING btree (id)"
+      },
+      {
+        "name": "idx_error_monitoring_issue_link_event",
+        "table": "error_monitoring_issue_links",
+        "definition": "CREATE INDEX idx_error_monitoring_issue_link_event ON public.error_monitoring_issue_links USING btree (event_id)"
+      },
+      {
+        "name": "idx_error_monitoring_issue_link_unique",
+        "table": "error_monitoring_issue_links",
+        "definition": "CREATE UNIQUE INDEX idx_error_monitoring_issue_link_unique ON public.error_monitoring_issue_links USING btree (event_id, record_type, record_id)"
+      },
+      {
         "name": "fact_snapshots_pkey",
         "table": "fact_snapshots",
         "definition": "CREATE UNIQUE INDEX fact_snapshots_pkey ON public.fact_snapshots USING btree (id)"
@@ -14484,6 +14690,16 @@
       },
       {
         "kind": "r",
+        "name": "error_monitoring_events",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "error_monitoring_issue_links",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "fact_snapshots",
         "definition": null
       },
@@ -15631,6 +15847,48 @@
         "name": "elections_pkey",
         "type": "p",
         "table": "elections",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "error_monitoring_context_check",
+        "type": "c",
+        "table": "error_monitoring_events",
+        "definition": "CHECK ((surface = ANY (ARRAY['server'::text, 'client'::text])) AND route_id ~ '^[a-z][a-z0-9._-]{0,159}$'::text AND job_id IS NULL OR surface = 'cron'::text AND route_id ~ '^[a-z][a-z0-9._-]{0,159}$'::text AND job_id ~ '^[a-z][a-z0-9.-]{0,79}$'::text OR surface = 'script'::text AND route_id IS NULL AND job_id ~ '^[a-z][a-z0-9.-]{0,79}$'::text)"
+      },
+      {
+        "name": "error_monitoring_events_pkey",
+        "type": "p",
+        "table": "error_monitoring_events",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "error_monitoring_identity_check",
+        "type": "c",
+        "table": "error_monitoring_events",
+        "definition": "CHECK (length(fingerprint) = 64 AND fingerprint ~ '^[a-f0-9]{64}$'::text AND (surface = ANY (ARRAY['server'::text, 'client'::text, 'cron'::text, 'script'::text])) AND error_code ~ '^[a-z][a-z0-9_.-]{0,79}$'::text AND release_id ~ '^[A-Za-z0-9._-]{1,96}$'::text AND source_map_id ~ '^nextjs-protected/[A-Za-z0-9._-]{1,96}$'::text AND length(monitoring_version) >= 1 AND length(monitoring_version) <= 96 AND monitoring_version ~ '^[A-Za-z0-9._/-]+$'::text AND occurrence_count >= 1)"
+      },
+      {
+        "name": "error_monitoring_resolution_shape",
+        "type": "c",
+        "table": "error_monitoring_events",
+        "definition": "CHECK (status = 'open'::text AND resolved_at IS NULL OR status = 'resolved'::text AND resolved_at IS NOT NULL AND resolved_at >= first_seen_at)"
+      },
+      {
+        "name": "error_monitoring_issue_link_shape",
+        "type": "c",
+        "table": "error_monitoring_issue_links",
+        "definition": "CHECK ((record_type = ANY (ARRAY['correction'::text, 'status'::text])) AND record_id ~ '^[A-Za-z0-9._:-]{1,160}$'::text)"
+      },
+      {
+        "name": "error_monitoring_issue_links_event_id_error_monitoring_events_i",
+        "type": "f",
+        "table": "error_monitoring_issue_links",
+        "definition": "FOREIGN KEY (event_id) REFERENCES error_monitoring_events(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "error_monitoring_issue_links_pkey",
+        "type": "p",
+        "table": "error_monitoring_issue_links",
         "definition": "PRIMARY KEY (id)"
       },
       {

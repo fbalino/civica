@@ -216,6 +216,17 @@ no historical run rows. PLT-019 owns the staging/production apply rehearsal and
 deployment ordering; recovery is a reviewed forward compensation or isolated
 pre-change backup, never fabricated historical job evidence.
 
+`0039_living_clea` adds the PLT-018 privacy-bounded exception-monitoring
+ledger. A row is a deterministic fingerprint for a closed server, client, cron,
+or production-script surface plus canonical route/job context, safe error code,
+release identity, and protected source-map identity. It retains lifecycle state,
+occurrence count, and opaque correction/status record links only. The migration
+deliberately excludes exception messages, stacks, digests, request content,
+headers, cookies, IP addresses, account identifiers, and source payloads. It is
+additive and creates no historical error records. PLT-019 owns staged apply and
+production deployment ordering; recovery is a reviewed forward compensation or
+isolated pre-change backup, never fabricated monitoring evidence.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

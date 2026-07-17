@@ -235,4 +235,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "b18764101e764902f203e1cd537b7a6291c82e68b1ebcc2611118850669ddd87",
     baseline: false,
   },
+  {
+    id: "0039_living_clea",
+    path: "drizzle/authoritative/0039_living_clea.sql",
+    sha256: "f2ecbcbbf24aee761968c9c7751d0d537f426450d3c3c69cb611715c2d1e8f1c",
+    baseline: false,
+  },
 ] as const;

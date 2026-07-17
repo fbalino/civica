@@ -172,6 +172,29 @@ at the end.
   WAF checks in [`data/RATE-LIMITING.md`](./RATE-LIMITING.md), then run
   `npm run validate:rate-limit-policy`.
 
+## 9. Exception / error-monitoring incident
+
+- **Detection:** the daily `operations.error-alerts` cron emits a structured
+  `[error-monitoring-alert]` line in the Civica Atlas Vercel Runtime Logs, or
+  `npm run report:error-monitoring` reports an open event.
+- **Containment:** use only the closed release, route, job, and error-code
+  context to find the deployed source-map frame. Do not add a raw exception,
+  stack, request URL, user data, or provider payload to the ledger or logs.
+- **Owner:** Fernando, as owner of the Civica Atlas Vercel project and its
+  Runtime Logs channel.
+- **Rollback/correction:** correct or roll back the affected release, then
+  link its correction-log/status record with `npm run manage:error-monitoring`.
+  Resolve only after the fixed release is deployed and the matching route/job
+  is verified. A repeated signature reopens automatically.
+- **User communication:** PLT-020 owns whether a public status update is
+  warranted; internal error monitoring is not itself a public incident.
+- **Evidence preservation:** retain the event ID, release ID, closed route/job
+  context, source-map identity, correction/status record ID, and verification
+  result. Never retain the raw stack or request content.
+- **Recovery verification:** reproduce the affected route/job safely, confirm
+  the alert has resolved through `npm run report:error-monitoring`, and verify
+  Vercel Protected Source Maps remains enabled before any browser maps ship.
+
 ---
 
 ## Tabletop review (2026-07-12) — recorded gaps

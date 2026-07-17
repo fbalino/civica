@@ -55,7 +55,7 @@ for (const [path, fragments] of Object.entries({
     "npm run report:pipeline-observability",
   ],
   "package.json": [
-    '"validate:route-performance-telemetry": "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability"',
+    '"validate:route-performance-telemetry": "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring"',
   ],
 })) {
   const source = read(path);

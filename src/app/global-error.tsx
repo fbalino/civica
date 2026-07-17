@@ -8,6 +8,7 @@
  * robots noindex so a transient failure is never indexed.
  */
 import { useEffect } from "react";
+import { reportClientBoundaryError } from "@/lib/platform/error-monitoring-client";
 
 export default function GlobalError({
   error,
@@ -17,7 +18,9 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("[global-error]", error.digest ?? "", error.message);
+    // Never serialize an error message, stack, or digest from the browser.
+    // The monitor retains only the route template and closed boundary code.
+    reportClientBoundaryError("global_boundary");
   }, [error]);
 
   return (

@@ -294,6 +294,16 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
       ],
     },
     {
+      id: "operations.error-alerts",
+      route: "/api/cron/operations/error-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/error-alerts/route.ts",
+        "src/lib/platform/error-monitoring.ts",
+      ],
+    },
+    {
       id: "operations.pipeline-alerts",
       route: "/api/cron/operations/pipeline-alerts",
       inputKind: "derived",

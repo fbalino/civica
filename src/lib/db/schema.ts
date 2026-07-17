@@ -4331,6 +4331,97 @@ export const productionPipelineRuns = pgTable(
   ],
 );
 
+// --- Scrubbed exception monitoring ---
+
+/**
+ * One deduplicated, content-free exception signature for a released surface.
+ * No error text, stack trace, request URL, headers, body, account identifier,
+ * or browser digest is retained. A repeat after resolution reopens the same
+ * signature so operators cannot mistake a recurrence for a new issue.
+ */
+export const errorMonitoringEvents = pgTable(
+  "error_monitoring_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fingerprint: text("fingerprint").notNull(),
+    surface: text("surface")
+      .$type<"server" | "client" | "cron" | "script">()
+      .notNull(),
+    routeId: text("route_id"),
+    jobId: text("job_id"),
+    errorCode: text("error_code").notNull(),
+    releaseId: text("release_id").notNull(),
+    sourceMapId: text("source_map_id").notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    occurrenceCount: integer("occurrence_count").notNull().default(1),
+    status: text("status").$type<"open" | "resolved">().notNull().default("open"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    monitoringVersion: text("monitoring_version").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_error_monitoring_fingerprint").on(table.fingerprint),
+    index("idx_error_monitoring_open_last_seen").on(
+      table.status,
+      table.lastSeenAt,
+    ),
+    index("idx_error_monitoring_release_last_seen").on(
+      table.releaseId,
+      table.lastSeenAt,
+    ),
+    check(
+      "error_monitoring_identity_check",
+      dsql`length(${table.fingerprint}) = 64 AND ${table.fingerprint} ~ '^[a-f0-9]{64}$' AND ${table.surface} IN ('server','client','cron','script') AND ${table.errorCode} ~ '^[a-z][a-z0-9_.-]{0,79}$' AND ${table.releaseId} ~ '^[A-Za-z0-9._-]{1,96}$' AND ${table.sourceMapId} ~ '^nextjs-protected/[A-Za-z0-9._-]{1,96}$' AND length(${table.monitoringVersion}) BETWEEN 1 AND 96 AND ${table.monitoringVersion} ~ '^[A-Za-z0-9._/-]+$' AND ${table.occurrenceCount} >= 1`,
+    ),
+    check(
+      "error_monitoring_context_check",
+      dsql`((${table.surface} IN ('server','client') AND ${table.routeId} ~ '^[a-z][a-z0-9._-]{0,159}$' AND ${table.jobId} IS NULL) OR (${table.surface} = 'cron' AND ${table.routeId} ~ '^[a-z][a-z0-9._-]{0,159}$' AND ${table.jobId} ~ '^[a-z][a-z0-9.-]{0,79}$') OR (${table.surface} = 'script' AND ${table.routeId} IS NULL AND ${table.jobId} ~ '^[a-z][a-z0-9.-]{0,79}$'))`,
+    ),
+    check(
+      "error_monitoring_resolution_shape",
+      dsql`(${table.status} = 'open' AND ${table.resolvedAt} IS NULL) OR (${table.status} = 'resolved' AND ${table.resolvedAt} IS NOT NULL AND ${table.resolvedAt} >= ${table.firstSeenAt})`,
+    ),
+  ],
+);
+
+/**
+ * A deliberately small bridge from a monitored exception to the corresponding
+ * correction-log or external status-page record. The reference is an opaque
+ * record ID, never a status URL or reporter-supplied prose.
+ */
+export const errorMonitoringIssueLinks = pgTable(
+  "error_monitoring_issue_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .references(() => errorMonitoringEvents.id, { onDelete: "cascade" })
+      .notNull(),
+    recordType: text("record_type")
+      .$type<"correction" | "status">()
+      .notNull(),
+    recordId: text("record_id").notNull(),
+    linkedAt: timestamp("linked_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_error_monitoring_issue_link_unique").on(
+      table.eventId,
+      table.recordType,
+      table.recordId,
+    ),
+    index("idx_error_monitoring_issue_link_event").on(table.eventId),
+    check(
+      "error_monitoring_issue_link_shape",
+      dsql`${table.recordType} IN ('correction','status') AND ${table.recordId} ~ '^[A-Za-z0-9._:-]{1,160}$'`,
+    ),
+  ],
+);
+
 // --- Durable (cross-instance) rate limiter ---
 
 /**

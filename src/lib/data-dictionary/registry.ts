@@ -1314,6 +1314,38 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
     deprecation: active,
   },
+  error_monitoring_events: {
+    definition:
+      "Privacy-bounded exception fingerprints and lifecycle state for server, client, cron, and production-script failures.",
+    rowGrain:
+      "One deterministic fingerprint for a closed surface, canonical route/job context, error code, release, and source-map identity.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated best-effort by shared error boundaries from closed route/job identifiers, a closed error code, release/source-map identities, and bounded lifecycle timestamps; exception messages, stacks, digests, request bodies, headers, cookies, IP addresses, account identifiers, and source payloads are excluded.",
+    cadence:
+      "Upserted when the same safe fingerprint recurs, resolved by an explicit owner action, and pruned after the registered operational retention period.",
+    vintageSemantics:
+      "first_seen_at, last_seen_at, and resolved_at describe operational incident lifecycle; release_id and source_map_id identify deployed code rather than an upstream data vintage.",
+    rights:
+      "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+    deprecation: active,
+  },
+  error_monitoring_issue_links: {
+    definition:
+      "Owned correction or status-record references associated with an internal error-monitoring fingerprint.",
+    rowGrain:
+      "One error-monitoring event, record type, and opaque correction/status record identifier.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Explicitly linked by the owner through the error-monitoring operational command; free-text notes, URLs, exception content, and source payloads are not stored.",
+    cadence:
+      "Inserted when a known issue is associated with a correction or status record; removed only through the linked event's retention lifecycle.",
+    vintageSemantics:
+      "linked_at records the operational association time and does not claim a source-data vintage.",
+    rights:
+      "Private operational coordination metadata; the referenced correction or status record retains its own access and rights policy.",
+    deprecation: active,
+  },
   production_pipeline_runs: {
     definition:
       "Durable internal outcome ledger for registered scheduled and canonical manual production pipelines.",

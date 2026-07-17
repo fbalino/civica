@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T23:52:47.739Z",
+  "generatedAt": "2026-07-17T00:14:39.012Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -1138,6 +1138,27 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "production_pipeline_runs": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0039_living_clea",
+      "artifact": "drizzle/authoritative/0039_living_clea.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "f2ecbcbbf24aee761968c9c7751d0d537f426450d3c3c69cb611715c2d1e8f1c",
+      "affectedRelations": [
+        "error_monitoring_events",
+        "error_monitoring_issue_links"
+      ],
+      "statementCount": 8,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0039_living_clea-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0039_living_clea --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "error_monitoring_events": "missing",
+        "error_monitoring_issue_links": "missing"
       },
       "writesPerformed": 0
     },

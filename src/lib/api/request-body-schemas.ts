@@ -26,6 +26,7 @@ export const REQUEST_BODY_LIMITS = Object.freeze({
   chat: 16_384,
   contact: 8_192,
   correction: 16_384,
+  clientErrorMonitoring: 1_024,
   pulseParticipant: 8_192,
   pulseCodingLogin: 4_096,
   pulseCodingDraft: 262_144,
@@ -53,6 +54,16 @@ const formRedirect = optionalFormValue(text(2_048));
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const boundedId = text(300, 1);
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
+
+export const clientErrorMonitoringBodySchema = z
+  .object({
+    routePath: z.string().regex(/^\/[A-Za-z0-9/_-]{0,511}$/),
+    errorCode: z.enum(["route_boundary", "global_boundary"]),
+  })
+  .strict();
+export type ClientErrorMonitoringBody = z.infer<
+  typeof clientErrorMonitoringBodySchema
+>;
 
 const ADMIN_ADVISORY_STATUSES = [
   "new",

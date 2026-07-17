@@ -414,6 +414,8 @@ const CRON_ROUTES = [
   "api/cron/factbook/sync-wikidata/route.ts",
   "api/cron/factbook/sync-wto-stats/route.ts",
   "api/cron/factbook/verify-reconciliation/route.ts",
+  "api/cron/operations/error-alerts/route.ts",
+  "api/cron/operations/pipeline-alerts/route.ts",
   "api/cron/pulse/calculate/route.ts",
   "api/cron/pulse/classify/route.ts",
   "api/cron/pulse/ingest/route.ts",
@@ -581,6 +583,16 @@ export const RATE_LIMIT_ROUTE_POLICIES: readonly RateLimitRoutePolicyMapping[] =
         "source-confirmed",
         "The contact form checks the shared fail-closed HMAC/Neon boundary before parsing or storage.",
         "checkRequestRateLimit(",
+      ),
+    ),
+    route(
+      "api/observability/client-error/route.ts",
+      ["POST"],
+      durableDb(
+        ["public-dynamic-read"],
+        "source-confirmed",
+        "The client-boundary signal checks the shared fail-closed HMAC/Neon boundary before bounded parsing or monitoring storage.",
+        "enforceRequestRateLimit(",
       ),
     ),
     route(

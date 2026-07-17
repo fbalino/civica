@@ -4,6 +4,7 @@ import {
   finishPipelineRun,
   startPipelineRun,
 } from "../src/lib/platform/pipeline-observability";
+import { recordErrorMonitoringEvent } from "../src/lib/platform/error-monitoring";
 
 function usage(): never {
   console.error(
@@ -83,6 +84,13 @@ async function main() {
   const { pipelineId, command } = parseArgs(process.argv.slice(2));
   const run = await startPipelineRun({ pipelineId, triggerKind: "manual" });
   const result = await runChild(command);
+  if (result.exitCode !== 0) {
+    await recordErrorMonitoringEvent({
+      surface: "script",
+      jobId: pipelineId,
+      errorCode: "script.child_exit_failure",
+    });
+  }
   const payload = {
     ...metricsFromOutput(result.output),
     outcome: result.exitCode === 0 ? "handler_succeeded" : "child_exit_failure",

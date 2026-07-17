@@ -8,6 +8,7 @@ import type { Instrumentation } from "next";
 export const onRequestError: Instrumentation.onRequestError = async (
   _error,
   request,
+  context,
 ) => {
   if (
     process.env.NODE_ENV !== "production" ||
@@ -15,12 +16,34 @@ export const onRequestError: Instrumentation.onRequestError = async (
   )
     return;
   try {
-    const { recordRoutePerformanceObservation, serverErrorObservation } =
-      await import("./src/lib/platform/route-performance-telemetry");
+    const [
+      {
+        recordRoutePerformanceObservation,
+        serverErrorObservation,
+        classifyRoutePerformanceRequest,
+      },
+      { recordErrorMonitoringEvent },
+    ] = await Promise.all([
+      import("./src/lib/platform/route-performance-telemetry"),
+      import("./src/lib/platform/error-monitoring"),
+    ]);
+    // `routePath` is Next's template, unlike `request.path` which can contain
+    // a reader-specific value. The event ledger never accepts the raw path.
+    const route = classifyRoutePerformanceRequest(
+      context.routePath,
+      request.method,
+    );
     await Promise.race([
-      recordRoutePerformanceObservation(
-        serverErrorObservation(request.path, request.method),
-      ),
+      Promise.all([
+        recordRoutePerformanceObservation(
+          serverErrorObservation(context.routePath, request.method),
+        ),
+        recordErrorMonitoringEvent({
+          surface: "server",
+          routeId: route.routeId,
+          errorCode: `next.${context.routeType}_error`,
+        }),
+      ]),
       new Promise<false>((resolve) => {
         setTimeout(() => resolve(false), 250);
       }),

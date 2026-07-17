@@ -222,7 +222,9 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "validate:query-budgets":
       "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",
     "validate:route-performance-telemetry":
-      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability",
+      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring",
+    "validate:error-monitoring":
+      "node --import tsx --test src/lib/platform/error-monitoring.test.ts && tsx scripts/validate-error-monitoring.ts",
     "validate:build-prereqs":
       "npm run validate:constitution-search && npm run validate:pulse-incidents && npm run validate:pulse-classification-state && npm run validate:pulse-review-sla && npm run validate:pulse-information-environment && npm run validate:pulse-validation-protocol",
   };

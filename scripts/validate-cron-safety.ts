@@ -22,7 +22,7 @@ import { SCHEDULED_PRODUCTION_ADAPTERS } from "../src/lib/data/production-adapte
 const ROOT = process.cwd();
 const APP_DIR = path.join(ROOT, "src/app");
 const CRON_DIR = path.join(APP_DIR, "api/cron");
-const EXPECTED_SCHEDULED_COUNT = 37;
+const EXPECTED_SCHEDULED_COUNT = 38;
 const EXPECTED_RETIRED = [
   { id: "pulse.v1.ingest", route: "/api/cron/pulse/ingest" },
   { id: "pulse.v1.classify", route: "/api/cron/pulse/classify" },
