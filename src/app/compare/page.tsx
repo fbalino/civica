@@ -9,6 +9,7 @@ import {
   getElectionsByJurisdiction,
   getInternationalMembershipsBySlugs,
   getIndicatorHistoryForCountry,
+  getConditionsPublicRelease,
 } from "@/lib/db/queries";
 import {
   CompareCountrySelector,
@@ -33,6 +34,7 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { PageHero } from "@/components/PageHero";
 import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 import { CompareIndicatorHistory } from "@/components/compare/CompareIndicatorHistory";
+import { CompareConditions } from "@/components/compare/CompareConditions";
 import { SOURCE_RIGHTS } from "@/lib/rights/manifest";
 
 export const revalidate = 0;
@@ -153,6 +155,8 @@ export default async function ComparePage({
     Awaited<ReturnType<typeof getIndicatorHistoryForCountry>>
   > = [];
   let indicatorHistoryUnavailable = false;
+  let conditionsRelease: Awaited<ReturnType<typeof getConditionsPublicRelease>> =
+    null;
 
   if (validSlugs.length > 0) {
     try {
@@ -187,6 +191,10 @@ export default async function ComparePage({
       indicatorHistoryUnavailable = true;
       console.error("[/compare] indicator history fetch failed:", err);
     }
+    conditionsRelease = await getConditionsPublicRelease().catch((err) => {
+      console.error("[/compare] Conditions release fetch failed:", err);
+      return null;
+    });
   }
 
   // Phase F.4 — multi-country resolver fetch. Pulls every in-scope
@@ -302,6 +310,15 @@ export default async function ComparePage({
       series: indicatorHistories[index] ?? [],
     }),
   );
+  const conditionsCountries = selectedJurisdictions.map((jurisdiction, index) => ({
+    jurisdiction: {
+      id: jurisdiction.id,
+      slug: jurisdiction.slug,
+      name: jurisdiction.name,
+      iso2: jurisdiction.iso2,
+    },
+    seriesColor: seriesColorFor(index),
+  }));
   const downloadableSourceIds = SOURCE_RIGHTS.filter(
     (rights) => rights.publicExport === "allowed",
   ).map((rights) => rights.sourceId);
@@ -430,8 +447,19 @@ export default async function ComparePage({
               )}
             </section>
 
+            <section id="conditions" className="compare-section">
+              <div className="compare-section-eyebrow">IV · CONDITIONS</div>
+              <h2 className="compare-section-heading">
+                Material indicators, without a hidden composite.
+              </h2>
+              <CompareConditions
+                countries={conditionsCountries}
+                release={conditionsRelease}
+              />
+            </section>
+
             <section id="chambers" className="compare-section">
-              <div className="compare-section-eyebrow">IV · CHAMBERS</div>
+              <div className="compare-section-eyebrow">V · CHAMBERS</div>
               <h2 className="compare-section-heading">
                 Who sits in the legislature?
               </h2>
@@ -439,7 +467,7 @@ export default async function ComparePage({
             </section>
 
             <section id="elections" className="compare-section">
-              <div className="compare-section-eyebrow">V · ELECTIONS</div>
+              <div className="compare-section-eyebrow">VI · ELECTIONS</div>
               <h2 className="compare-section-heading">
                 When and how they vote.
               </h2>
@@ -447,7 +475,7 @@ export default async function ComparePage({
             </section>
 
             <section id="international" className="compare-section">
-              <div className="compare-section-eyebrow">VI · INTERNATIONAL</div>
+              <div className="compare-section-eyebrow">VII · INTERNATIONAL</div>
               <h2 className="compare-section-heading">
                 How they show up in the world.
               </h2>

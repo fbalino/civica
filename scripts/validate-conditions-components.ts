@@ -13,6 +13,11 @@ const migration = read("drizzle/authoritative/0040_closed_young_avengers.sql");
 const releaseMigration = read("drizzle/authoritative/0042_grey_sally_floyd.sql");
 const release = read("src/lib/conditions/release.ts");
 const query = read("src/lib/db/queries.ts");
+const publicRelease = read("src/lib/conditions/public-release.ts");
+const conditionsExplorer = read("src/components/conditions/ConditionsReleaseExplorer.tsx");
+const countryConditionsPanel = read("src/components/conditions/CivicaConditionsPanel.tsx");
+const comparePage = read("src/app/compare/page.tsx");
+const compareConditions = read("src/components/compare/CompareConditions.tsx");
 const economicScript = read("scripts/ingest-conditions-economic.ts");
 const hdiScript = read("scripts/ingest-conditions-hdi.ts");
 const gpiScript = read("scripts/ingest-conditions-gpi.ts");
@@ -96,6 +101,30 @@ for (const token of [
   "getCivicaConditionsComponentLedger",
 ]) {
   if (!query.includes(token)) errors.push(`Conditions read contract omits ${token}`);
+}
+if (!publicRelease.includes("economic stability must not publish a composite score")) {
+  errors.push("public Conditions contract permits an economic-stability composite");
+}
+for (const [surface, source, tokens] of [
+  [
+    "public explorer",
+    conditionsExplorer,
+    ["ConditionsPublicRelease", "No composite published", "component.nativeUnit"],
+  ],
+  [
+    "country panel",
+    countryConditionsPanel,
+    ["No composite published", "component.referenceYear", "component.nativeUnit", "stacked"],
+  ],
+  [
+    "compare surface",
+    comparePage + compareConditions,
+    ["CompareConditions", "getConditionsPublicRelease", "Reference years can differ", "CivicaConditionsPanel"],
+  ],
+] as const) {
+  for (const token of tokens) {
+    if (!source.includes(token)) errors.push(`${surface} omits ${token}`);
+  }
 }
 
 if (errors.length) {

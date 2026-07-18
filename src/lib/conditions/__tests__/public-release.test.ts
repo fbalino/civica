@@ -170,3 +170,17 @@ test("Conditions public release refuses a mismatched or scored unaligned calcula
   });
   assert.match(errors.join(" "), /belongs to another release/);
 });
+
+test("Conditions public release never exposes an economic-stability composite", () => {
+  const errors = conditionsPublicReleaseErrors({
+    release: releases[1],
+    calculations: [
+      calculation({
+        dimension: "economic_stability",
+        normalizedScore: 72.4,
+        rawValue: 0.724,
+      }),
+    ],
+  });
+  assert.match(errors.join(" "), /economic stability must not publish a composite score/);
+});

@@ -274,6 +274,10 @@
   gap: var(--space-4);
 }
 
+.conditions-country-grid--stacked {
+  grid-template-columns: 1fr;
+}
+
 .conditions-country-card {
   display: grid;
   gap: var(--space-3);

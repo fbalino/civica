@@ -29,12 +29,13 @@ function formatNumber(value: number | null, maximumFractionDigits = 2) {
 }
 
 function calculationScore(calculation: ConditionsPublicCalculation) {
+  if (calculation.dimension === "economic_stability") {
+    return "No composite published";
+  }
   if (calculation.normalizedScore !== null) {
     return `${formatNumber(calculation.normalizedScore, 1)} / 100`;
   }
-  return calculation.dimension === "economic_stability"
-    ? "No composite published"
-    : "Not scored";
+  return "Not scored";
 }
 
 function CountryConditionCard({
@@ -89,9 +90,13 @@ function CountryConditionCard({
 export function CivicaConditionsPanel({
   jurisdictionId,
   release,
+  showHeading = true,
+  stacked = false,
 }: {
   jurisdictionId: string;
   release: ConditionsPublicRelease | null;
+  showHeading?: boolean;
+  stacked?: boolean;
 }) {
   const calculations = release?.calculations.filter(
     (calculation) => calculation.jurisdictionId === jurisdictionId,
@@ -102,18 +107,20 @@ export function CivicaConditionsPanel({
 
   return (
     <div className="conditions-country-panel">
-      <div className="conditions-country-heading">
-        <div>
-          <p className="conditions-country-eyebrow">Civica Conditions</p>
-          <p className="conditions-country-intro">
-            Separate source-native material indicators. They are not combined
-            with governance or each other.
-          </p>
+      {showHeading ? (
+        <div className="conditions-country-heading">
+          <div>
+            <p className="conditions-country-eyebrow">Civica Conditions</p>
+            <p className="conditions-country-intro">
+              Separate source-native material indicators. They are not combined
+              with governance or each other.
+            </p>
+          </div>
+          <Link className="conditions-country-link" href={releaseHref}>
+            Explore release
+          </Link>
         </div>
-        <Link className="conditions-country-link" href={releaseHref}>
-          Explore release
-        </Link>
-      </div>
+      ) : null}
       {release === null ? (
         <p className="editorial-empty">
           No versioned Conditions release is available for this country yet.
@@ -123,7 +130,9 @@ export function CivicaConditionsPanel({
           This release has no Conditions calculation for this country.
         </p>
       ) : (
-        <div className="conditions-country-grid">
+        <div
+          className={`conditions-country-grid${stacked ? " conditions-country-grid--stacked" : ""}`}
+        >
           {calculations.map((calculation) => (
             <CountryConditionCard
               key={calculation.calculationKey}

@@ -117,6 +117,14 @@ export function conditionsPublicReleaseErrors(input: {
     if (calculation.alignmentStatus !== "aligned" && calculation.normalizedScore !== null) {
       errors.push(`${calculation.calculationKey}: unaligned calculation carries a score`);
     }
+    if (
+      calculation.dimension === "economic_stability" &&
+      calculation.normalizedScore !== null
+    ) {
+      errors.push(
+        `${calculation.calculationKey}: economic stability must not publish a composite score`,
+      );
+    }
     if (new Set(calculation.components.map((component) => component.componentId)).size !== calculation.components.length) {
       errors.push(`${calculation.calculationKey}: duplicate component ID`);
     }

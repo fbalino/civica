@@ -6,6 +6,7 @@ const SECTIONS = [
   { id: "overview", label: "Overview" },
   { id: "governance-evidence", label: "Evidence" },
   { id: "longitudinal", label: "History" },
+  { id: "conditions", label: "Conditions" },
   { id: "chambers", label: "Chambers" },
   { id: "elections", label: "Elections" },
   { id: "international", label: "International" },

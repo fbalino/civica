@@ -38,11 +38,11 @@ function formatNumber(value: number | null, maximumFractionDigits = 2) {
 }
 
 function scoreLabel(calculation: ConditionsPublicCalculation) {
-  if (calculation.normalizedScore !== null) {
-    return `${formatNumber(calculation.normalizedScore, 1)} / 100`;
-  }
   if (calculation.dimension === "economic_stability") {
     return "No composite published";
+  }
+  if (calculation.normalizedScore !== null) {
+    return `${formatNumber(calculation.normalizedScore, 1)} / 100`;
   }
   return "Not scored";
 }
