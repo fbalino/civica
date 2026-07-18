@@ -11,6 +11,7 @@ function headers() {
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Security-Policy": "frame-ancestors *",
     "Content-Type": "text/html; charset=utf-8",
+    "X-Robots-Tag": "noindex, nofollow",
     "Cache-Control": "no-store",
     "CDN-Cache-Control": "no-store",
     "Vercel-CDN-Cache-Control": "no-store",
@@ -42,8 +43,8 @@ async function handleEmbed(
   const countryHref = `/governance-evidence?country=${encodeURIComponent(slug)}`;
   // PUBLIC_CLAIM: embeds.retired-index
   const html = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}"><title>Civica Index embed retired</title></head>
-<body><main><p><strong>This Civica Index embed has been retired.</strong></p><p>Civica now publishes source-native governance evidence without a composite country score or rank.</p><p><a href="${countryHref}" target="_top">Open Governance Evidence</a></p><p><a href="/licensing#reuse" target="_top">Rights and reuse</a></p></main></body></html>`;
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, nofollow"><meta name="description" content="Retirement notice for the former Civica Index embed."><meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}"><title>Civica Index embed retired</title></head>
+<body><main aria-labelledby="embed-retired-title"><h1 id="embed-retired-title">Civica Index embed retired</h1><p>This Civica Index embed has been retired. Civica now publishes source-native governance evidence without a composite country score or rank.</p><p><a href="${countryHref}" target="_top">Open Governance Evidence</a> · <a href="/licensing#reuse" target="_top">Rights and reuse</a></p></main></body></html>`;
   return new Response(html, { status: 410, headers: headers() });
 }
 

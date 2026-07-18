@@ -77,6 +77,12 @@ test("legacy embed variants are gone and cannot enter browser or CDN caches", as
     );
     assert.equal(response.status, 410);
     assertNeverCached(response);
+    assert.equal(response.headers.get("X-Robots-Tag"), "noindex, nofollow");
+    const html = await response.text();
+    assert.match(html, /<h1 id="embed-retired-title">Civica Index embed retired<\/h1>/);
+    assert.match(html, /<main aria-labelledby="embed-retired-title">/);
+    assert.match(html, /<meta name="robots" content="noindex, nofollow">/);
+    assert.doesNotMatch(html, /<iframe\b|Civica Index score|Country rank/i);
   }
 
   const options = await optionsRetiredEmbed();

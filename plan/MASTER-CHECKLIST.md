@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 221
-- **Remaining:** 85
-- **Progress:** 72.2%
+- **Completed:** 222
+- **Remaining:** 84
+- **Progress:** 72.5%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -238,7 +238,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [ ] **EXP-027** (P1) Verify charts/maps/tables have accessible nonvisual equivalents and export paths. _Done when: every research visualization exposes title/description/source/vintage, keyboard interaction where applicable, tabular or textual equivalent, missing-data semantics, and downloadable underlying data consistent with the display._
 - [ ] **EXP-028** (P0) Run a final module-led blind visual audit after fixes. _Done when: finders receive only canonical invariants, enumerate every module, adversarial verifiers confirm findings, sealed known issues are all independently found or proven fixed, negative controls stay absent, and the confirmed ledger has zero open P0/P1 items before G4._
 - [ ] **EXP-029** (P1) Define English-only and internationalization/localization readiness explicitly. _Done when: language scope is disclosed, country/person/office/party names preserve native/source forms where appropriate, locale-aware dates/numbers/collation and right-to-left/long-text stress fixtures pass, source-language/translation labels are visible, and no UI implies translations the project does not provide._
-- [ ] **EXP-030** (P0) Repair published embed presets and document semantics. _Done when: small/medium/large/custom outer dimensions exactly match advertised iframe dimensions in light/dark without clipping visible fields/footer, generated documents have a meaningful title/H1/landmarks/robots policy and concise accessible name, and browser fixtures cover every preset._
+- [x] **EXP-030** (P0) Repair published embed presets and document semantics. _Done when: small/medium/large/custom outer dimensions exactly match advertised iframe dimensions in light/dark without clipping visible fields/footer, generated documents have a meaningful title/H1/landmarks/robots policy and concise accessible name, and browser fixtures cover every preset._
 - [ ] **EXP-031** (P0) Make embed design and provenance derive from visible fields. _Done when: embed styling uses canonical versioned tokens/components or a generated embed token contract, every visible score/taxonomy/Pulse/fact field contributes its actual source/method/vintage/rights citation, hidden facts do not appear in attribution, and contract/browser tests match._
 - [x] **EXP-032** (P0) Restore the country Constitution route to the canonical three-tab shell and heading hierarchy. _Done when: Factbook/Civica Data/Constitution share required country search/sidebar/body geometry, each document has exactly one H1 with logical subsequent headings, and desktop/mobile/light/dark comparisons pass without duplicating the country name._
 - [x] **EXP-033** (P0) Make Atlas selection/compare behavior accessible and truthful on pointer, keyboard, and touch. _Done when: the map has a page H1 and synchronized accessible country list or focusable controls, selection/state are announced, keyboard activation works, touch has an explicit two-country compare flow or no impossible instruction, and map/list values remain synchronized._
