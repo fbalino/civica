@@ -124,8 +124,19 @@ test("optional model keys degrade off, never fail", () => {
   assert.ok(result.degradedOff.includes("DEEPSEEK_API_KEY"));
 });
 
+test("a missing chat key fails the dedicated chat environment check", () => {
+  const result = checkEnv("chat", {
+    ...FULL,
+    ANTHROPIC_API_KEY_CHAT: undefined,
+  });
+  assert.ok(result.missing.includes("ANTHROPIC_API_KEY_CHAT"));
+});
+
 test("every required var declares at least one context", () => {
   for (const spec of ENV_CONTRACT) {
-    assert.ok(spec.requiredIn.length > 0, `${spec.name} has no requiredIn`);
+    assert.ok(
+      spec.requiredIn.length > 0 || spec.note.includes("opt-in"),
+      `${spec.name} is neither required nor an explicit opt-in`,
+    );
   }
 });

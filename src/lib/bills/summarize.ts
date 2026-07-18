@@ -13,9 +13,20 @@ import Anthropic from "@anthropic-ai/sdk";
 import { eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { billSummaryCache } from "@/lib/db/schema";
+import {
+  assertModelOperationRequest,
+  modelOperationVersion,
+} from "@/lib/model-operations/contract";
 import type * as schema from "@/lib/db/schema";
 
 type Db = NeonHttpDatabase<typeof schema>;
+
+export const BILLS_SUMMARY_MODEL = "claude-haiku-4-5-20251001" as const;
+export const BILLS_SUMMARY_MODEL_VERSION = modelOperationVersion(
+  "bills-summarize",
+  "anthropic",
+  BILLS_SUMMARY_MODEL,
+);
 
 /**
  * Lazy-initialised so dotenv (loaded synchronously at the top of each
@@ -26,14 +37,18 @@ type Db = NeonHttpDatabase<typeof schema>;
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_BILLS_SUMMARIZE });
+    _anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY_BILLS_SUMMARIZE,
+      maxRetries: 0,
+    });
   }
   return _anthropic;
 }
 
-/** Builds the same `${iso2}::${title}` cache key the route used to use. */
+/** A model change receives a fresh cache namespace rather than silently
+ * serving a prior model's text as current output. */
 export function makeCacheKey(iso2: string, billTitle: string): string {
-  return `${iso2}::${billTitle.slice(0, 120)}`;
+  return `${BILLS_SUMMARY_MODEL_VERSION}::${iso2}::${billTitle.slice(0, 120)}`;
 }
 
 /**
@@ -73,19 +88,22 @@ async function generateChunk(
   if (inputs.length === 0) return [];
 
   const billList = inputs
-    .map((b, i) => `${i + 1}. "${b.promptTitle}"`)
+    .map((b, i) => `${i + 1}. "${b.promptTitle.slice(0, 240)}"`)
     .join("\n");
 
   try {
+    const userPrompt = `For each bill below, write exactly ONE plain-English sentence (15–30 words) explaining what the bill aims to do or what it would change if passed, written for a general audience. Some titles may be in a non-English language — write the summary in English regardless. Focus on real-world impact. Return ONLY a raw JSON array of strings — no markdown, no code fences, no explanation.\n\nBills:\n${billList}`;
+    const maxTokens = Math.max(600, inputs.length * 75);
+    assertModelOperationRequest("bills-summarize", userPrompt.length, maxTokens);
     const msg = await getAnthropic().messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: BILLS_SUMMARY_MODEL,
       // Budget ~60 output tokens per bill (≈25-word sentence + JSON
       // overhead). At CHUNK_SIZE=20 → 1500 tokens.
-      max_tokens: Math.max(600, inputs.length * 75),
+      max_tokens: maxTokens,
       messages: [
         {
           role: "user",
-          content: `For each bill below, write exactly ONE plain-English sentence (15–30 words) explaining what the bill aims to do or what it would change if passed, written for a general audience. Some titles may be in a non-English language — write the summary in English regardless. Focus on real-world impact. Return ONLY a raw JSON array of strings — no markdown, no code fences, no explanation.\n\nBills:\n${billList}`,
+          content: userPrompt,
         },
       ],
     });
@@ -108,6 +126,7 @@ async function generateChunk(
 /** Bills per Anthropic call — keeps responses well under the model's
  * output cap and survives the occasional verbose summary. */
 const CHUNK_SIZE = 20;
+const MAX_BILL_SUMMARY_CALLS_PER_EXECUTION = 25;
 
 /**
  * Generate one-sentence summaries via Claude Haiku. Splits inputs into
@@ -122,13 +141,20 @@ export async function generateSummariesBatch(
     return inputs.map(() => "");
   }
 
+  const allowedInputs = inputs.slice(
+    0,
+    CHUNK_SIZE * MAX_BILL_SUMMARY_CALLS_PER_EXECUTION,
+  );
   const out: string[] = [];
-  for (let i = 0; i < inputs.length; i += CHUNK_SIZE) {
-    const chunk = inputs.slice(i, i + CHUNK_SIZE);
+  for (let i = 0; i < allowedInputs.length; i += CHUNK_SIZE) {
+    const chunk = allowedInputs.slice(i, i + CHUNK_SIZE);
     const summaries = await generateChunk(chunk);
     out.push(...summaries);
   }
-  return out;
+  // A caller cannot convert a larger upstream import into unbounded paid
+  // work. The skipped rows remain source-title-only and will be reconsidered
+  // by a later bounded sync.
+  return [...out, ...inputs.slice(allowedInputs.length).map(() => "")];
 }
 
 /**
@@ -152,4 +178,3 @@ export async function writeCachedSummary(
     /* non-fatal */
   }
 }
-

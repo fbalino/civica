@@ -202,8 +202,7 @@ export function currentClassificationConfig(): ClassificationConfigInput {
       promptVersion: SUBJECT_ATTRIBUTION_PROMPT_VERSION,
     },
     decodeMode: "temperature-0-json",
-    thinkingMode:
-      process.env.PULSE_COMPAT_THINKING === "enabled" ? "enabled" : "disabled",
+    thinkingMode: "disabled",
     retryPolicy: PULSE_CLASSIFICATION_RETRY_POLICY,
   };
 }
@@ -663,7 +662,10 @@ export async function classifyClusters(
   db: Db,
   opts: ClassifyClustersOptions = {},
 ): Promise<ClassifySummary> {
-  const limit = opts.limit ?? 200;
+  // One cron execution is a bounded paid batch. The cluster cap plus the
+  // provider contract are the local cost ceiling; provider workspaces carry
+  // the monthly cap and alert threshold.
+  const limit = Math.min(opts.limit ?? 50, 50);
   const operationNow = opts.now ?? new Date();
   const persistRun = !opts.dryRun && !opts.clusters && !opts.runRef;
   const persistState = !opts.dryRun && !opts.clusters;
@@ -1467,24 +1469,24 @@ async function runClassify(
 ): Promise<ClassifyResultLite | null> {
   let response;
   try {
-    response = await callClassifier(config, {
-      system: SYSTEM_PROMPT,
-      user: userContent,
-      maxTokens: 800,
-      expectJson: true,
-    });
-  } catch (err) {
-    console.error(
-      `[classify] classify call failed (${config.provider}/${config.model}):`,
-      err,
+    response = await callClassifier(
+      config,
+      {
+        system: SYSTEM_PROMPT,
+        user: userContent,
+        maxTokens: 800,
+        expectJson: true,
+      },
+      {},
+      "pulse-classify",
     );
+  } catch {
+    console.warn("[pulse-classify] provider_call_failed");
     return null;
   }
   const parsed = parseClassify(response.text);
   if (!parsed) {
-    console.warn(
-      `[classify] classify parse failed (${config.provider}/${config.model}): ${response.text.slice(0, 100)}`,
-    );
+    console.warn("[pulse-classify] provider_parse_failed");
     return null;
   }
   return parsed;
@@ -1511,24 +1513,24 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
 - rationale: ${first.rationale}`;
   let response;
   try {
-    response = await callClassifier(config, {
-      system: VERIFY_SYSTEM_PROMPT,
-      user: verifyContent,
-      maxTokens: 500,
-      expectJson: true,
-    });
-  } catch (err) {
-    console.error(
-      `[classify] verify call failed (${config.provider}/${config.model}):`,
-      err,
+    response = await callClassifier(
+      config,
+      {
+        system: VERIFY_SYSTEM_PROMPT,
+        user: verifyContent,
+        maxTokens: 500,
+        expectJson: true,
+      },
+      {},
+      "pulse-verify",
     );
+  } catch {
+    console.warn("[pulse-verify] provider_call_failed");
     return null;
   }
   const parsed = parseVerify(response.text);
   if (!parsed) {
-    console.warn(
-      `[classify] verify parse failed: ${response.text.slice(0, 100)}`,
-    );
+    console.warn("[pulse-verify] provider_parse_failed");
     return null;
   }
   return parsed;

@@ -17,14 +17,26 @@ import Anthropic from "@anthropic-ai/sdk";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { pulseEventsV2 } from "@/lib/db/schema";
+import {
+  assertModelOperationRequest,
+  modelOperationVersion,
+} from "@/lib/model-operations/contract";
 
 export const PULSE_REVIEW_SUMMARY_PROVIDER = "anthropic" as const;
 export const PULSE_REVIEW_SUMMARY_MODEL = "claude-haiku-4-5-20251001" as const;
+export const PULSE_REVIEW_SUMMARY_MODEL_VERSION = modelOperationVersion(
+  "pulse-review-summary",
+  PULSE_REVIEW_SUMMARY_PROVIDER,
+  PULSE_REVIEW_SUMMARY_MODEL,
+);
 
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_PULSE_SUMMARIZE });
+    _anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY_PULSE_SUMMARIZE,
+      maxRetries: 0,
+    });
   }
   return _anthropic;
 }
@@ -65,6 +77,11 @@ export async function generatePulseSummary(
   ].join("\n\n");
 
   try {
+    assertModelOperationRequest(
+      "pulse-review-summary",
+      SYSTEM_PROMPT.length + userPrompt.length,
+      280,
+    );
     const response = await anthropic.messages.create({
       model: PULSE_REVIEW_SUMMARY_MODEL,
       max_tokens: 280,
@@ -77,8 +94,8 @@ export async function generatePulseSummary(
     const text = block.text.trim();
     if (text.length < 10) return null;
     return text;
-  } catch (err) {
-    console.error("[pulse-summarise] generation failed", err);
+  } catch {
+    console.error("[pulse-summarise] generation_failed");
     return null;
   }
 }
@@ -110,8 +127,8 @@ export async function ensurePulseSummary(args: {
       .update(pulseEventsV2)
       .set({ aiSummary: fresh, updatedAt: new Date() })
       .where(eq(pulseEventsV2.id, args.eventId));
-  } catch (err) {
-    console.error("[pulse-summarise] persist failed", err);
+  } catch {
+    console.error("[pulse-summarise] persist_failed");
   }
   return fresh;
 }

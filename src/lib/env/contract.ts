@@ -131,7 +131,7 @@ export const ENV_CONTRACT: EnvVarSpec[] = [
     name: "ANTHROPIC_API_KEY_CHAT",
     requiredIn: ["chat"],
     secret: true,
-    note: "Powers /api/chat (Ask Civica). Chat is disabled without it.",
+    note: "Powers /api/chat (Ask Civica). Runtime environment drift still returns a fixed unavailable response.",
     validate: nonEmpty,
   },
 ];

@@ -1,10 +1,16 @@
 import { contentVersion } from "@/lib/research/derivation-version";
 import { sourceName } from "@/lib/factbook/reconcile/api";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import { modelOperationVersion } from "@/lib/model-operations/contract";
 
 export const ASK_CIVICA_CONTRACT_VERSION = "ask-civica-contract/v1" as const;
 export const ASK_CIVICA_MODEL = "claude-sonnet-4-6" as const;
 export const ASK_CIVICA_MAX_OUTPUT_TOKENS = 1_024;
+export const ASK_CIVICA_MODEL_VERSION = modelOperationVersion(
+  "ask-civica",
+  "anthropic",
+  ASK_CIVICA_MODEL,
+);
 
 export const ASK_CIVICA_SYSTEM_PROMPT = `You are Ask Civica, a bounded assistant for Civica Atlas.
 
@@ -228,7 +234,7 @@ export function formatAskCivicaAuditEvent(input: {
   evidenceFactCount?: number;
 }): string {
   const count = Math.max(0, Math.min(ASK_CIVICA_FACTS.length, Math.trunc(input.evidenceFactCount ?? 0)));
-  return `[ask-civica] contract=${ASK_CIVICA_CONTRACT_VERSION} prompt=${ASK_CIVICA_PROMPT_VERSION} model=${ASK_CIVICA_MODEL} outcome=${input.outcome} evidence_facts=${count}`;
+  return `[ask-civica] contract=${ASK_CIVICA_CONTRACT_VERSION} prompt=${ASK_CIVICA_PROMPT_VERSION} model=${ASK_CIVICA_MODEL} model_version=${ASK_CIVICA_MODEL_VERSION} outcome=${input.outcome} evidence_facts=${count}`;
 }
 
 export function recordAskCivicaAudit(

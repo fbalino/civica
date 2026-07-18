@@ -10,6 +10,10 @@ import { sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
 import type * as schema from "@/lib/db/schema";
+import {
+  assertModelOperationRequest,
+  modelOperationVersion,
+} from "@/lib/model-operations/contract";
 import { contentVersion } from "@/lib/research/derivation-version";
 import type { PulseDecisionPayloads } from "./decision-ledger";
 import {
@@ -25,6 +29,11 @@ type Db = NeonHttpDatabase<typeof schema>;
 
 export const SUBJECT_ATTRIBUTION_PROVIDER = "anthropic" as const;
 export const SUBJECT_ATTRIBUTION_MODEL = "claude-sonnet-4-6" as const;
+export const SUBJECT_ATTRIBUTION_MODEL_VERSION = modelOperationVersion(
+  "pulse-subject-attribution",
+  SUBJECT_ATTRIBUTION_PROVIDER,
+  SUBJECT_ATTRIBUTION_MODEL,
+);
 
 export const SUBJECT_ATTRIBUTION_SYSTEM_PROMPT = `You classify jurisdiction roles for a governance-event ledger.
 Use the retained headline, description, and the human-readable Civica entity context. Never infer the subject from the outlet, language, or an internal id.
@@ -167,6 +176,7 @@ let anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   anthropic ??= new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY_PULSE_CLASSIFIER,
+    maxRetries: 0,
   });
   return anthropic;
 }
@@ -177,6 +187,12 @@ export async function classifySubjectCountry(
   entityContext: string,
 ): Promise<SubjectVerdict | null> {
   try {
+    const userContent = `${entityContext}\n\nHeadline: ${headline}\nDescription: ${(description || "").slice(0, 3000)}`;
+    assertModelOperationRequest(
+      "pulse-subject-attribution",
+      SUBJECT_ATTRIBUTION_SYSTEM_PROMPT.length + userContent.length,
+      700,
+    );
     const response = await getAnthropic().messages.create({
       model: SUBJECT_ATTRIBUTION_MODEL,
       max_tokens: 700,
@@ -184,7 +200,7 @@ export async function classifySubjectCountry(
       messages: [
         {
           role: "user",
-          content: `${entityContext}\n\nHeadline: ${headline}\nDescription: ${(description || "").slice(0, 3000)}`,
+          content: userContent,
         },
       ],
     });

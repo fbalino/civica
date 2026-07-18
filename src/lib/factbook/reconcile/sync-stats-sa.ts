@@ -101,6 +101,10 @@ import {
   sources,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  assertModelOperationRequest,
+  modelOperationVersion,
+} from "@/lib/model-operations/contract";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -187,6 +191,11 @@ const STATS_SA_SCOPE_PREDICATE = "South Africa";
  */
 const STATS_SA_EXTRACTION_MODEL = "claude-haiku-4-5-20251001";
 const STATS_SA_EXTRACTION_PROMPT_VERSION = "v1.0";
+const STATS_SA_EXTRACTION_MODEL_VERSION = modelOperationVersion(
+  "stats-sa-reconciliation",
+  "anthropic",
+  STATS_SA_EXTRACTION_MODEL,
+);
 
 /**
  * Lazy-init the Anthropic client per the project convention.
@@ -196,7 +205,10 @@ const STATS_SA_EXTRACTION_PROMPT_VERSION = "v1.0";
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_RECONCILIATION });
+    _anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY_RECONCILIATION,
+      maxRetries: 0,
+    });
   }
   return _anthropic;
 }
@@ -252,10 +264,10 @@ export interface StatsSaIndicatorConfig {
    *  long appendices well past that limit (P0211 QLFS Q4 2025 ships
    *  139 pages; Table A is on page 1). Setting `maxPages` causes
    *  the orchestrator to use `pdf-lib` to extract just the first N
-   *  pages before encoding for the SDK. Defaults to 30 — enough
-   *  for the headline tables in all 4 R.19 PDFs (verified against
-   *  the 2026Q2 vintage; Table A / Key findings / Summary always
-   *  appear within the first ~10 pages). */
+ *  pages before encoding for the SDK. Defaults to 12 — enough
+ *  for the headline tables in all 4 R.19 PDFs (verified against
+ *  the 2026Q2 vintage; Table A / Key findings / Summary always
+ *  appear within the first ~10 pages). */
   maxPages?: number;
 }
 
@@ -845,6 +857,11 @@ async function extractFromPdf(
 
   let response: Anthropic.Message;
   try {
+    assertModelOperationRequest(
+      "stats-sa-reconciliation",
+      pdf.base64.length + prompt.length,
+      1024,
+    );
     response = await client.messages.create({
       model: STATS_SA_EXTRACTION_MODEL,
       max_tokens: 1024,
@@ -871,12 +888,8 @@ async function extractFromPdf(
         },
       ],
     });
-  } catch (err) {
-    log(
-      `  EXTRACTION FAILURE: Anthropic SDK call threw — ${
-        err instanceof Error ? err.message : err
-      }`,
-    );
+  } catch {
+    log("  EXTRACTION FAILURE: model request unavailable or over budget.");
     return null;
   }
 
@@ -1234,7 +1247,7 @@ export async function syncStatsSa(
     //    for the Anthropic SDK 100-page cap).
     const candidates = enumerateCandidateUrls(config, now);
     log(`  candidate URLs (${candidates.length}): trying newest first.`);
-    const maxPages = config.maxPages ?? 30;
+    const maxPages = config.maxPages ?? 12;
     const pdf = await (options.fetchPdf ?? fetchLatestPdf)(candidates, maxPages, log);
     if (!pdf) {
       counter.rejected_no_pdf++;
@@ -1380,6 +1393,7 @@ export async function syncStatsSa(
       statsSaPdfTruncated: pdf.truncated,
       statsSaExtractionPromptVersion: STATS_SA_EXTRACTION_PROMPT_VERSION,
       statsSaExtractionModel: STATS_SA_EXTRACTION_MODEL,
+      statsSaExtractionModelVersion: STATS_SA_EXTRACTION_MODEL_VERSION,
       statsSaVintage: STATS_SA_VINTAGE,
     };
     // Mark the GDP methodology choice explicitly per resolution §2c.
@@ -1412,6 +1426,7 @@ export async function syncStatsSa(
         statsSaRawQuote: ext.rawQuote,
         statsSaExtractionPromptVersion: STATS_SA_EXTRACTION_PROMPT_VERSION,
         statsSaExtractionModel: STATS_SA_EXTRACTION_MODEL,
+        statsSaExtractionModelVersion: STATS_SA_EXTRACTION_MODEL_VERSION,
       },
     ];
     if (config.pCode === "P0441") {
@@ -1616,6 +1631,7 @@ export const __test = {
   deriveAsOf,
   STATS_SA_EXTRACTION_PROMPT_VERSION,
   STATS_SA_EXTRACTION_MODEL,
+  STATS_SA_EXTRACTION_MODEL_VERSION,
   STATS_SA_LICENSE,
   STATS_SA_LICENSE_CITATION,
 };

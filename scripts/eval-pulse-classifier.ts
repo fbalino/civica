@@ -82,6 +82,7 @@ import {
 import { computeConsensus, type EnsembleRun } from "../src/lib/pulse/v2/ensemble";
 import { HUMAN_REVIEW_TIERS } from "../src/lib/pulse/v2/taxonomy";
 import type { SeverityTier } from "../src/lib/pulse/v2/types";
+import { modelOperationControl } from "../src/lib/model-operations/contract";
 
 /* ------------------------------------------------------------------ */
 /*  CLI parsing                                                        */
@@ -276,7 +277,8 @@ ${row.description}`;
         maxTokens: 800,
         expectJson: true,
       },
-      httpOpts
+      httpOpts,
+      "pulse-backtest",
     );
     inputTokens += c.usage.inputTokens;
     outputTokens += c.usage.outputTokens;
@@ -310,7 +312,8 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
             maxTokens: 500,
             expectJson: true,
           },
-          httpOpts
+          httpOpts,
+          "pulse-backtest",
         );
         inputTokens += v.usage.inputTokens;
         outputTokens += v.usage.outputTokens;
@@ -319,8 +322,8 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
         /* verify failure doesn't change category/tier agreement */
       }
     }
-  } catch (err) {
-    console.error(`  [eval] ${row.eventId} classify failed:`, err);
+  } catch {
+    console.error("[pulse-eval] classify_call_failed");
   }
 
   return {
@@ -391,7 +394,7 @@ function engineKey(cfg: ResolvedProviderConfig): string {
 
 async function runEnsembleEval() {
   const mock = hasFlag("--mock");
-  const n = Number(argValue("--n") ?? "200") || 200;
+  const requestedN = Number(argValue("--n") ?? "200") || 200;
   const configuredEnsemble = resolveClassifyEnsemble();
   const configuredVerify = resolveEnsembleVerifyConfig();
 
@@ -408,6 +411,17 @@ async function runEnsembleEval() {
     ? configuredEnsemble.map(toMockEngine)
     : configuredEnsemble;
   const verifyCfg = mock ? toMockEngine(configuredVerify) : configuredVerify;
+  // A real ensemble row can issue one classify call per engine plus one
+  // verifier call. Keep the entire diagnostic within its paid-call ceiling;
+  // --mock remains intentionally unconstrained because it makes no request.
+  const maxRealRows = Math.max(
+    1,
+    Math.floor(
+      modelOperationControl("pulse-backtest").maxCallsPerExecution /
+        (ensemble.length + 1),
+    ),
+  );
+  const n = mock ? requestedN : Math.min(requestedN, maxRealRows);
 
   console.log(`\nPulse classifier eval — ENSEMBLE mode${mock ? "  [MOCK]" : ""}`);
   console.log(
@@ -415,6 +429,11 @@ async function runEnsembleEval() {
   );
   console.log(`Verify engine: ${engineKey(verifyCfg)}`);
   console.log(`Sample size (clusters): up to ${n}\n`);
+  if (!mock && n < requestedN) {
+    console.log(
+      `Paid sample capped at ${n} clusters by the pulse-backtest call budget.`,
+    );
+  }
 
   // Key gate: every engine that will actually run needs its key (unless
   // --mock). The verify engine key is required too.
@@ -471,7 +490,8 @@ async function runEnsembleEval() {
             maxTokens: 800,
             expectJson: true,
           },
-          httpOpts
+          httpOpts,
+          "pulse-backtest",
         );
         return { cfg, resp: c };
       })
@@ -527,7 +547,8 @@ async function runEnsembleEval() {
             maxTokens: 500,
             expectJson: true,
           },
-          httpOpts
+          httpOpts,
+          "pulse-backtest",
         );
         inputTokens += v.usage.inputTokens;
         outputTokens += v.usage.outputTokens;
@@ -822,7 +843,15 @@ async function main() {
   const provider = parseProviderArg(argValue("--provider"));
   const model =
     (argValue("--model") ?? "").trim() || PROVIDER_DEFAULT_MODEL[provider];
-  const n = Number(argValue("--n") ?? "200") || 200;
+  const requestedN = Number(argValue("--n") ?? "200") || 200;
+  // A single-candidate row has one classify and at most one verify call.
+  // Mock runs are zero-cost and can use a larger sample for plumbing checks.
+  const n = mock
+    ? requestedN
+    : Math.min(
+        requestedN,
+        Math.floor(modelOperationControl("pulse-backtest").maxCallsPerExecution / 2),
+      );
   const cfg: ResolvedProviderConfig = { provider, model };
 
   console.log(
@@ -831,6 +860,11 @@ async function main() {
     }`
   );
   console.log(`Sample size (gold rows): up to ${n}\n`);
+  if (!mock && n < requestedN) {
+    console.log(
+      `Paid sample capped at ${n} rows by the pulse-backtest call budget.`,
+    );
+  }
 
   // Key gate: real runs require a candidate key. Mock runs need neither
   // a key nor the network.

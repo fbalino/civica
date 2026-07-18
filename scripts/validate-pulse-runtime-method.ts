@@ -492,7 +492,8 @@ function validateProviderRoles(
   check(
     state,
     backtest.includes("const BACKTEST_CONFIG = resolveBacktestConfig()") &&
-      backtest.includes(': "anthropic";') &&
+      backtest.includes('!raw') &&
+      backtest.includes('? "anthropic"') &&
       backtest.includes("PROVIDER_DEFAULT_MODEL[provider]"),
     "Backtest must remain a separately resolved, Anthropic-default single engine",
   );

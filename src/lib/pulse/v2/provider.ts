@@ -15,8 +15,8 @@
  * the daily Pulse cron can run fully automated. Three providers are
  * supported:
  *
- *   - "anthropic" — the existing SDK path. KEPT as the default for
- *     backtests and as a fallback; same models the pipeline shipped with.
+ *   - "anthropic" — the existing SDK path. Kept as an explicitly approved
+ *     default for backtests; same models the pipeline shipped with.
  *   - "deepseek"  — OpenAI-compatible chat completions at
  *     https://api.deepseek.com. Best current general model:
  *     `deepseek-v4-flash` (V3-era `deepseek-chat`/`deepseek-reasoner`
@@ -58,6 +58,12 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import {
+  assertModelOperationRequest,
+  isApprovedPulseProviderModel,
+  modelOperationControl,
+  type ModelOperationId,
+} from "@/lib/model-operations/contract";
 
 export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
 
@@ -175,13 +181,18 @@ export function resolveProviderConfig(
   pass: ClassifierPass
 ): ResolvedProviderConfig {
   void pass;
-  const providerEnv = process.env.PULSE_VERIFY_PROVIDER;
-  const modelEnv = process.env.PULSE_VERIFY_MODEL;
+  const providerEnv = (process.env.PULSE_VERIFY_PROVIDER ?? "").trim();
+  const modelEnv = (process.env.PULSE_VERIFY_MODEL ?? "").trim();
 
   // Retained single-engine verification defaults to DeepSeek.
-  const provider = parseProvider(providerEnv, "deepseek");
-  const model =
-    (modelEnv ?? "").trim() || PROVIDER_DEFAULT_MODEL[provider];
+  const provider = providerEnv ? parseProvider(providerEnv, "openai") : "deepseek";
+  if (providerEnv && provider === "openai" && providerEnv.toLowerCase() !== "openai") {
+    throw new Error("PULSE_VERIFY_PROVIDER is not an approved provider");
+  }
+  const model = modelEnv || PROVIDER_DEFAULT_MODEL[provider];
+  if (!isApprovedPulseProviderModel(provider, model)) {
+    throw new Error("PULSE_VERIFY_MODEL is not approved for PULSE_VERIFY_PROVIDER");
+  }
   return { provider, model };
 }
 
@@ -233,6 +244,7 @@ export function parseProviderModelPair(
     normalizedProv === "zhipu";
   if (!known) return null;
   const model = rest.join(":").trim() || PROVIDER_DEFAULT_MODEL[provider];
+  if (!isApprovedPulseProviderModel(provider, model)) return null;
   return { provider, model };
 }
 
@@ -240,8 +252,9 @@ export function parseProviderModelPair(
  * Resolve the classify ENSEMBLE from `PULSE_CLASSIFY_ENSEMBLE` — a comma
  * list of `provider:model` pairs. Unset → the default three-vendor
  * ensemble. When the var names exactly ONE valid pair, the caller runs in
- * single-engine mode (the prior behavior). Unknown/blank tokens are dropped;
- * if every token is invalid the default ensemble is used.
+ * single-engine mode (the prior behavior). An unset value selects the checked
+ * default ensemble; an invalid explicit value stops the path rather than
+ * silently spending against a different configuration.
  */
 export function resolveClassifyEnsemble(): ResolvedProviderConfig[] {
   const raw = (process.env.PULSE_CLASSIFY_ENSEMBLE ?? "").trim();
@@ -250,7 +263,10 @@ export function resolveClassifyEnsemble(): ResolvedProviderConfig[] {
     .split(",")
     .map((t) => parseProviderModelPair(t))
     .filter((p): p is ResolvedProviderConfig => p !== null);
-  return parsed.length > 0 ? parsed : DEFAULT_ENSEMBLE;
+  if (parsed.length !== raw.split(",").length) {
+    throw new Error("PULSE_CLASSIFY_ENSEMBLE contains an unapproved provider/model");
+  }
+  return parsed;
 }
 
 /**
@@ -260,7 +276,9 @@ export function resolveClassifyEnsemble(): ResolvedProviderConfig[] {
 export function resolveEnsembleVerifyConfig(): ResolvedProviderConfig {
   const raw = (process.env.PULSE_ENSEMBLE_VERIFY ?? "").trim();
   if (!raw) return DEFAULT_ENSEMBLE_VERIFY;
-  return parseProviderModelPair(raw) ?? DEFAULT_ENSEMBLE_VERIFY;
+  const parsed = parseProviderModelPair(raw);
+  if (!parsed) throw new Error("PULSE_ENSEMBLE_VERIFY is not an approved provider/model");
+  return parsed;
 }
 
 /** The env var that must be set for a provider to run. */
@@ -313,7 +331,7 @@ async function fetchWithRetry(
     }
   }
   if (lastErr) throw lastErr;
-  return fetchImpl(url, init);
+  throw new Error("Classifier request exhausted its bounded retry budget");
 }
 
 /* ------------------------------------------------------------------ */
@@ -325,6 +343,7 @@ function getAnthropic(): Anthropic {
   if (!_anthropic) {
     _anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY_PULSE_CLASSIFIER,
+      maxRetries: 0,
     });
   }
   return _anthropic;
@@ -380,6 +399,7 @@ async function callOpenAiCompat(
   provider: "deepseek" | "glm" | "openai",
   model: string,
   req: ProviderRequest,
+  operation: ModelOperationId,
   opts: OpenAiCompatOptions = {}
 ): Promise<ProviderResponse> {
   const apiKey =
@@ -396,6 +416,10 @@ async function callOpenAiCompat(
   // does not emit a billed reasoning stream on gpt-4.1-mini, so it gets the
   // plain answer-sized budget and no thinking param.
   const isHybridReasoner = provider === "deepseek" || provider === "glm";
+  const maxTokens = isHybridReasoner
+    ? Math.max(req.maxTokens * 4, 4096)
+    : req.maxTokens;
+  assertModelOperationRequest(operation, req.system.length + req.user.length, maxTokens);
 
   const body: Record<string, unknown> = {
     model,
@@ -409,30 +433,18 @@ async function callOpenAiCompat(
     // still reads only `message.content`, and the eval script measures the real
     // token cost including reasoning. OpenAI (no billed reasoning stream on
     // gpt-4.1-mini) gets the plain answer-sized budget.
-    max_tokens: isHybridReasoner
-      ? Math.max(req.maxTokens * 4, 4096)
-      : req.maxTokens,
+    max_tokens: maxTokens,
     messages: [
       { role: "system", content: req.system },
       { role: "user", content: req.user },
     ],
   };
-  // Both DeepSeek V4 and GLM current-gen accept this switch. Default is
-  // DISABLED for a practical reason: the billed reasoning stream draws from
-  // the same output budget and truncates the answer JSON on long clusters
-  // (measured before the switch existed). Whether reasoning actually helps
-  // classification quality is an EMPIRICAL question — the eval script runs
-  // both arms via PULSE_COMPAT_THINKING=enabled, which also raises the output
-  // ceiling so reasoning has room. OpenAI does not accept this field, so it is
-  // only sent for hybrid reasoners.
+  // Both DeepSeek V4 and GLM current-gen accept this switch. Civica's paid
+  // production path keeps reasoning disabled: a runtime environment flag must
+  // never expand a billing ceiling. A future approved experiment needs a new
+  // versioned contract rather than a secret configuration toggle.
   if (isHybridReasoner) {
-    body.thinking =
-      process.env.PULSE_COMPAT_THINKING === "enabled"
-        ? { type: "enabled" }
-        : { type: "disabled" };
-    if (process.env.PULSE_COMPAT_THINKING === "enabled") {
-      body.max_tokens = Math.max(req.maxTokens * 4, 16384);
-    }
+    body.thinking = { type: "disabled" };
   }
   // JSON mode: both DeepSeek and GLM accept the OpenAI-style flag. The
   // methodology prompts already end with "Respond with JSON ONLY", so
@@ -455,15 +467,12 @@ async function callOpenAiCompat(
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(60_000),
     },
-    4,
+    modelOperationControl(operation).maxAttemptsPerCall,
     opts.fetchImpl ?? fetch
   );
 
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(
-      `${provider} API error: ${res.status} ${res.statusText} ${detail.slice(0, 200)}`
-    );
+    throw new Error(`${provider} API error: ${res.status}`);
   }
 
   const data = (await res.json()) as OpenAiCompatResponse;
@@ -493,10 +502,15 @@ async function callOpenAiCompat(
 export async function callClassifier(
   config: ResolvedProviderConfig,
   req: ProviderRequest,
-  opts: OpenAiCompatOptions = {}
+  opts: OpenAiCompatOptions = {},
+  operation: ModelOperationId = "pulse-classify",
 ): Promise<ProviderResponse> {
+  if (!isApprovedPulseProviderModel(config.provider, config.model)) {
+    throw new Error("Classifier provider/model is not approved");
+  }
   if (config.provider === "anthropic") {
+    assertModelOperationRequest(operation, req.system.length + req.user.length, req.maxTokens);
     return callAnthropic(config.model, req);
   }
-  return callOpenAiCompat(config.provider, config.model, req, opts);
+  return callOpenAiCompat(config.provider, config.model, req, operation, opts);
 }

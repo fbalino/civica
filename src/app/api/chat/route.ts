@@ -31,6 +31,7 @@ import {
   type AskCivicaContextRepository,
 } from "@/lib/ask-civica/contract";
 import { recordErrorMonitoringEvent } from "@/lib/platform/error-monitoring";
+import { assertModelOperationRequest } from "@/lib/model-operations/contract";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -159,8 +160,26 @@ async function handleChat(req: NextRequest) {
   }
 
   recordAskCivicaAudit({ outcome: "started", evidenceFactCount: evidence.facts.length });
-  const client = new Anthropic({ apiKey });
   const userPayload = askCivicaUserPayload(userMessage, evidence);
+  try {
+    assertModelOperationRequest(
+      "ask-civica",
+      ASK_CIVICA_SYSTEM_PROMPT.length + userPayload.length,
+      ASK_CIVICA_MAX_OUTPUT_TOKENS,
+    );
+  } catch {
+    recordAskCivicaAudit({
+      outcome: "model_unavailable",
+      evidenceFactCount: evidence.facts.length,
+    });
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: "api.chat.post",
+      errorCode: "ask-civica.request-over-budget",
+    });
+    return unavailableResponse();
+  }
+  const client = new Anthropic({ apiKey, maxRetries: 0 });
   const citationFooter = askCivicaCitationFooter(evidence);
 
   const encoder = new TextEncoder();
