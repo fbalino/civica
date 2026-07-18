@@ -32,6 +32,15 @@ async function stabilizeVisualPage(
         transition-delay: 0s !important;
         caret-color: transparent !important;
       }
+      /* Third-party cartography and flag CDN responses are intentionally
+         excluded from canonical page baselines. Their own availability and
+         fallback behavior are covered by QA-016; hiding them here keeps this
+         suite focused on Civica's rendering and prevents network timing from
+         changing a page-level baseline. The elements retain their layout. */
+      .country-map-preview,
+      img[src*="flagcdn.com"] {
+        visibility: hidden !important;
+      }
     `,
   });
   await page.evaluate(async () => {

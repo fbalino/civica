@@ -31,6 +31,9 @@ read-only test database; the test report must make that boundary visible.
 - Screenshot inputs use committed local assets plus the declared fixture data;
   live network-only content, clocks, randomized IDs, and volatile telemetry are
   excluded or masked rather than silently accepted.
+- The country-map preview and FlagCDN pixels are masked while retaining their
+  layout: QA-016 separately verifies their provider and fallback behavior, so
+  transient third-party responses cannot make a Civica page baseline flaky.
 - Each baseline records its route, viewport, theme, state, fixture requirement,
   browser project, platform, SHA-256 image hash, and input-contract hash in a
   checked manifest. The manifest rejects missing, duplicate, or unregistered
