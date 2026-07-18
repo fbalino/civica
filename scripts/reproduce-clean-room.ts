@@ -8,7 +8,11 @@ const expectedPath = "data/fixtures/clean-room/expected.v1.json";
 
 const credentialKeys = ["DATABASE_URL", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"];
 const hasCredentials = credentialKeys.some((key) => process.env[key]);
-if (hasCredentials && process.env.VERCEL && !process.env.CIVICA_CLEAN_ROOM_CHILD) {
+// A production build requires DATABASE_URL at its entry point, while this
+// fixture must prove it can run without any credential. Always fork a
+// sanitized child when the parent has credentials; limiting that safeguard to
+// Vercel made the documented local/CI build path impossible to complete.
+if (hasCredentials && !process.env.CIVICA_CLEAN_ROOM_CHILD) {
   const cleanEnvironment = Object.fromEntries(
     Object.entries(process.env).filter(([key]) => !credentialKeys.includes(key)),
   ) as NodeJS.ProcessEnv;
