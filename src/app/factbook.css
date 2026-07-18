@@ -2133,7 +2133,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
     display: none;
   }
   .factbook-outcomes-position {
-    font-size: 9px;
+    font-size: var(--text-12);
     padding: 2px 4px;
   }
   .factbook-outcomes-name {
@@ -2192,14 +2192,14 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 }
 .factbook-org-chart-node-label {
   font-family: var(--font-heading);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 400;
   fill: var(--color-text-primary);
   letter-spacing: var(--tracking-tighter);
 }
 .factbook-org-chart-node-sublabel {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-12);
   letter-spacing: 0.04em;
   fill: var(--color-text-60);
 }
@@ -2267,10 +2267,10 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
     max-width: 100% !important;
   }
   .factbook-org-chart-node-label {
-    font-size: 11px;
+    font-size: var(--text-12);
   }
   .factbook-org-chart-node-sublabel {
-    font-size: 9px;
+    font-size: var(--text-12);
   }
 }
 

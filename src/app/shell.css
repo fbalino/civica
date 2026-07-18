@@ -202,7 +202,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: var(--text-12);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     cursor: pointer;
