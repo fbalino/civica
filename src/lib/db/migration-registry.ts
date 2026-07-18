@@ -321,6 +321,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "mixed",
     "journaled",
   ),
+  shared(
+    "0043_pulse_decay_lifecycle",
+    "drizzle/authoritative/0043_pulse_decay_lifecycle.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

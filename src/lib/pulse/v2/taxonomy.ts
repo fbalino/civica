@@ -861,4 +861,11 @@ export function halfLifeFor(categoryId: string): number {
 
 export const DELTA_LOWER_BOUND = -15;
 export const DELTA_UPPER_BOUND = 10;
-export const SCORE_WINDOW_DAYS = 365;
+/**
+ * The scorer must always retain the complete configured decay curve. Deriving
+ * the window from the taxonomy means a newly declared longer half-life cannot
+ * be silently truncated by a separately maintained lookback constant.
+ */
+export const SCORE_WINDOW_DAYS = Math.max(
+  ...EVENT_CATEGORIES.map(({ halfLifeDays }) => halfLifeDays),
+);

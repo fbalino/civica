@@ -43,7 +43,7 @@ legacy-quarantined item is unpublished and is not a human review decision.
 Pulse dimensional scores have a mutable current-state projection and a separate
 append-only `pulse-dimensional-delta-history/v1` ledger. Every computation
 records its score run, jurisdiction, dimension, contributing event IDs,
-derivation envelope, score date, and trailing 365-day lookback. Zero-output
+derivation envelope, score date, and versioned 365- or 730-day lookback. Zero-output
 clearing rows remain in that ledger so an aged-out signal can be reproduced
 without treating its deleted or zeroed current projection as historical truth.
 

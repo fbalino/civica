@@ -1139,7 +1139,7 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Versioned experimental scoring from verified Pulse v2 event classifications.",
     cadence: "Daily after classification/corroboration and on rescore.",
     vintageSemantics:
-      "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+      "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
     rights:
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
     deprecation: active,
@@ -1155,7 +1155,7 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     cadence:
       "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
     vintageSemantics:
-      "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+      "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
     rights:
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
     deprecation: active,

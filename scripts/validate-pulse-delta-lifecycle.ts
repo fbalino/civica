@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
+import { SCORE_WINDOW_DAYS } from "../src/lib/pulse/v2/taxonomy";
 import { PULSE_DELTA_ALGORITHM_VERSION } from "../src/lib/pulse/v2/versioning";
 
 config({ path: ".env.local", override: true });
@@ -18,6 +19,7 @@ const retention = readFileSync(
 );
 const schema = readFileSync("src/lib/db/schema.ts", "utf8");
 const runtime = readFileSync("src/lib/pulse/v2/runtime-contract.ts", "utf8");
+const lifecycle = readFileSync("src/lib/pulse/v2/event-lifecycle.ts", "utf8");
 
 for (const marker of [
   "SELECT DISTINCT jurisdiction_id FROM pulse_dimensional_deltas",
@@ -35,17 +37,28 @@ for (const marker of [
 }
 if (
   !runtime.includes("append_only_per_score_run_jurisdiction_dimension") ||
-  !runtime.includes("history_projection_and_run_completion_one_transaction")
+  !runtime.includes("history_projection_and_run_completion_one_transaction") ||
+  !runtime.includes("PULSE_SCORE_EVENT_LIFECYCLE_POLICY")
 ) {
   fail("runtime contract does not disclose append-only history and atomicity");
 }
 for (const marker of [
-  "a 366-day-old event clears prior country state",
+  "one day beyond the configured window clears prior country state",
+  "every declared category remains scoreable through its own half-life",
+  "clamp deterministic totals to both declared bounds",
   "eventsConsidered, 0",
   "contributingEventIds, []",
   'sourceBasket.state, "not_applicable"',
 ]) {
-  if (!fixture.includes(marker)) fail(`366-day fixture is missing ${marker}`);
+  if (!fixture.includes(marker)) fail(`score fixture is missing ${marker}`);
+}
+for (const marker of [
+  "current_projection_only_with_retained_superseded_history",
+  "never_inferred_from_an_earlier_event_or_extended_without_new_evidence",
+  "separately_accepted_later_event_with_its_own_date_and_incident",
+  "isScoreableEventLifecycle",
+]) {
+  if (!lifecycle.includes(marker)) fail(`event lifecycle contract is missing ${marker}`);
 }
 const countryReaderStart = queries.indexOf(
   "export async function getPulseV2ForCountry",
@@ -90,6 +103,9 @@ if (
 ) {
   fail("delta rows do not retain computation and derivation identity");
 }
+if (!schema.includes("windowDays} IN (365, 730)")) {
+  fail("delta rows do not retain the closed historic/current window set");
+}
 for (const marker of [
   '"pulse_dimensional_delta_history"',
   '"pulse-dimensional-delta-history/v1"',
@@ -105,19 +121,7 @@ async function validateLive(): Promise<void> {
   const sql = neon(process.env.DATABASE_URL);
   const [state, trigger, history] = await Promise.all([
     sql`
-      WITH eligible AS (
-        SELECT jurisdiction_id, dimension, count(*)::int AS event_count
-        FROM pulse_events_v2
-        WHERE published = true
-          AND projection_status = 'current'
-          AND publication_run_id IS NOT NULL
-          AND corroboration_run_id IS NOT NULL
-          AND review_status IN ('approved', 'edited')
-          AND category <> 'none'
-          AND event_date >= CURRENT_DATE - (365 * interval '1 day')
-          AND event_date <= CURRENT_DATE
-        GROUP BY jurisdiction_id, dimension
-      ), incomplete AS (
+      WITH incomplete AS (
         SELECT jurisdiction_id
         FROM pulse_dimensional_deltas
         GROUP BY jurisdiction_id
@@ -131,9 +135,17 @@ async function validateLive(): Promise<void> {
         count(*) FILTER (
           WHERE abs(pdd.delta_value) > 1e-9
             AND NOT EXISTS (
-              SELECT 1 FROM eligible e
+              SELECT 1 FROM pulse_events_v2 e
               WHERE e.jurisdiction_id = pdd.jurisdiction_id
                 AND e.dimension = pdd.dimension
+                AND e.published = true
+                AND e.projection_status = 'current'
+                AND e.publication_run_id IS NOT NULL
+                AND e.corroboration_run_id IS NOT NULL
+                AND e.review_status IN ('approved', 'edited')
+                AND e.category <> 'none'
+                AND e.event_date >= pdd.score_as_of - (pdd.window_days * interval '1 day')
+                AND e.event_date <= pdd.score_as_of
             )
         )::int AS stale_nonzero,
         count(*) FILTER (
@@ -144,6 +156,9 @@ async function validateLive(): Promise<void> {
           WHERE pdd.derivation_versions->'algorithm'->>'id'
             <> ${PULSE_DELTA_ALGORITHM_VERSION}
         )::int AS wrong_algorithm,
+        count(*) FILTER (
+          WHERE pdd.window_days <> ${SCORE_WINDOW_DAYS}
+        )::int AS current_wrong_window,
         count(*) FILTER (
           WHERE r.id IS NULL OR r.stage <> 'score' OR r.status <> 'completed'
         )::int AS invalid_run,
@@ -157,15 +172,7 @@ async function validateLive(): Promise<void> {
             OR h.window_start IS DISTINCT FROM pdd.window_start
             OR h.window_days IS DISTINCT FROM pdd.window_days
         )::int AS current_history_mismatch,
-        (SELECT count(*)::int FROM incomplete) AS incomplete_jurisdictions,
-        (
-          SELECT count(*)::int FROM eligible e
-          WHERE NOT EXISTS (
-            SELECT 1 FROM pulse_dimensional_deltas d
-            WHERE d.jurisdiction_id = e.jurisdiction_id
-              AND d.dimension = e.dimension
-          )
-        ) AS missing_eligible_pairs
+        (SELECT count(*)::int FROM incomplete) AS incomplete_jurisdictions
       FROM pulse_dimensional_deltas pdd
       LEFT JOIN pulse_pipeline_runs r ON r.id = pdd.computation_run_id
       LEFT JOIN pulse_dimensional_delta_history h
@@ -194,8 +201,8 @@ async function validateLive(): Promise<void> {
         count(DISTINCT computation_run_id)::int AS runs,
         count(*) FILTER (
           WHERE schema_version <> 'pulse-dimensional-delta-history/v1'
-            OR window_days <> 365
-            OR score_as_of - window_start <> 365
+            OR window_days NOT IN (365, ${SCORE_WINDOW_DAYS})
+            OR score_as_of - window_start <> window_days
         )::int AS invalid_window,
         (
           SELECT count(*)::int
@@ -215,10 +222,10 @@ async function validateLive(): Promise<void> {
     stale_nonzero: row?.stale_nonzero,
     invalid_zero: row?.invalid_zero,
     wrong_algorithm: row?.wrong_algorithm,
+    current_wrong_window: row?.current_wrong_window,
     invalid_run: row?.invalid_run,
     current_history_mismatch: row?.current_history_mismatch,
     incomplete_jurisdictions: row?.incomplete_jurisdictions,
-    missing_eligible_pairs: row?.missing_eligible_pairs,
   })) {
     if (Number(value) !== 0) fail(`live ${name}=${value}`);
   }
@@ -257,7 +264,7 @@ async function validateLive(): Promise<void> {
 async function main(): Promise<void> {
   if (process.argv.includes("--live")) await validateLive();
   console.log(
-    "PASS — pulse-delta-lifecycle/v1 closes the 365-day boundary, stale-state clearing, version identity, retained history, and public no-signal contract.",
+    "PASS — pulse-delta-lifecycle/v1 closes the configured decay boundary, stale-state clearing, version identity, retained history, and public no-signal contract.",
   );
 }
 

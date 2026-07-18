@@ -253,4 +253,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "3661572663a1fdb881892b345b3a508f8be1fb4a590d3c1ed5979e85e356a769",
     baseline: false,
   },
+  {
+    id: "0043_pulse_decay_lifecycle",
+    path: "drizzle/authoritative/0043_pulse_decay_lifecycle.sql",
+    sha256: "7c8bbe2d0a71a14f72fe6602feaf25bab66bfa06a7f034e0488f4b23f8853892",
+    baseline: false,
+  },
 ] as const;

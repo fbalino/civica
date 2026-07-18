@@ -295,6 +295,13 @@
       "when": 1784373148215,
       "tag": "0042_grey_sally_floyd",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1784381344000,
+      "tag": "0043_pulse_decay_lifecycle",
+      "breakpoints": true
     }
   ]
 }

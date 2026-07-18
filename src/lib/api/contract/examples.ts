@@ -1118,8 +1118,8 @@ function pulseMethodologyMetaExample() {
       format: "per_dimension",
       public_status: "public_experimental",
       scalar_pulse_score: false as const,
-      trailing_window_days: 365,
-      bounds_per_dimension: { lower: -10, upper: 10 },
+      trailing_window_days: 730,
+      bounds_per_dimension: { lower: -15, upper: 10 },
     },
     evaluation: {
       current_production_backtest_complete: false,

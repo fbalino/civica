@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "ddacc5691fe493732536605b726758f7fff85c45bb5f8b1438551421975264ad",
+  "contractHash": "87a60069971401ef228a68a004b3fad780b153c0a7ec3a4f0b7168d5c17e6bf1",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -362,6 +362,12 @@
       "corruption_control",
       "stability"
     ],
+    "eventLifecycle": {
+      "persistence": "never_inferred_from_an_earlier_event_or_extended_without_new_evidence",
+      "recurrence": "separately_accepted_later_event_with_its_own_date_and_incident",
+      "supersession": "current_projection_only_with_retained_superseded_history",
+      "version": "pulse-event-lifecycle/v1"
+    },
     "impactFormula": "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)",
     "includedEvents": "published_only",
     "inputMethodCoverage": "row_level_versioned_with_explicit_legacy",
@@ -374,8 +380,8 @@
       "score"
     ],
     "shape": "per_dimension",
-    "trailingWindowDays": 365,
-    "windowBoundary": "inclusive_365_days_future_excluded",
+    "trailingWindowDays": 730,
+    "windowBoundary": "inclusive_maximum_configured_half_life_days_future_excluded",
     "writeAtomicity": "history_projection_and_run_completion_one_transaction"
   },
   "observability": {

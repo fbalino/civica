@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-18T11:17:30.500Z",
-  "sha256": "e1f235df3365201b394b0c0a4850727d7c8317f0816c4014ded2309666af291f",
+  "generatedAt": "2026-07-18T13:33:31.000Z",
+  "sha256": "01d0ff69c2b10cfcab623693081a259e27610cc51cbca236d4315ae1e3b118ab",
   "schema": {
     "columns": [
       {
@@ -17411,7 +17411,7 @@
         "name": "pulse_dimensional_delta_history_window_check",
         "type": "c",
         "table": "pulse_dimensional_delta_history",
-        "definition": "CHECK (window_days = 365 AND window_start = (score_as_of - window_days))"
+        "definition": "CHECK ((window_days = ANY (ARRAY[365, 730])) AND window_start = (score_as_of - window_days))"
       },
       {
         "name": "pulse_dimensional_deltas_computation_run_id_pulse_pipeline_runs",
@@ -17447,7 +17447,7 @@
         "name": "pulse_dimensional_deltas_window_check",
         "type": "c",
         "table": "pulse_dimensional_deltas",
-        "definition": "CHECK (window_days = 365 AND window_start = (score_as_of - window_days))"
+        "definition": "CHECK ((window_days = ANY (ARRAY[365, 730])) AND window_start = (score_as_of - window_days))"
       },
       {
         "name": "pulse_event_absorptions_absorption_key_unique",

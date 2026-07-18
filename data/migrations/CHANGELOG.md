@@ -250,6 +250,14 @@ release. The migration retains history for the release, reference-set, and
 parameter relations. Recovery is a forward successor release or isolated
 pre-change backup; never change a frozen population or parameter in place.
 
+`0043_pulse_decay_lifecycle` replaces the fixed 365-day score-window checks
+with a closed compatibility set of 365 and 730 days while retaining the exact
+date-arithmetic invariant. It changes no score value and writes no history:
+the existing 365-day outputs remain immutable, and a subsequent score run
+creates separately versioned 730-day projections/history. Recovery is an
+isolated pre-change backup or reviewed forward compensation; never rewrite the
+retained output ledger to make prior runs appear to use the newer window.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

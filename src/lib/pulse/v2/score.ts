@@ -2,13 +2,13 @@
  * Phase 5.5 — Pulse v2 dimensional delta scoring.
  *
  * For each (country, dimension), sum the decayed impacts of all
- * `published=true` pulse_events_v2 rows in the trailing 365-day
- * window. Clamp to [-15, +10] per spec §4.3. Upsert into
+ * `published=true` pulse_events_v2 rows in the trailing window derived from
+ * the longest declared category half-life. Clamp to [-15, +10] per spec §4.3. Upsert into
  * `pulse_dimensional_deltas`.
  *
- * The trailing window is 365 days. Category decay is applied only inside that
- * window, so configured half-lives longer than the window are truncated when
- * the event ages out.
+ * Category decay is applied through every configured half-life. A separate
+ * lifecycle guard admits only current, published, reviewed event projections;
+ * persistence is never inferred and later recurrences require new events.
  */
 
 import { eq, sql } from "drizzle-orm";
@@ -28,6 +28,10 @@ import {
 } from "./taxonomy";
 import { PULSE_DIMENSIONS, type PulseDimension } from "./types";
 import { isPulseClassificationValid } from "./review-validation";
+import {
+  isScoreableEventLifecycle,
+  type ScoreLifecycleEvent,
+} from "./event-lifecycle";
 import { pulseDeltaVersionEnvelope } from "./versioning";
 import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
 import {
@@ -59,7 +63,7 @@ export interface ScoreSummary {
   planned: DimensionalDeltaPlan[];
 }
 
-export interface PublishedEvent {
+export interface PublishedEvent extends ScoreLifecycleEvent {
   id: string;
   jurisdictionId: string;
   dimension: PulseDimension;
@@ -436,6 +440,9 @@ function validatePublishedEvents(events: PublishedEvent[]): void {
     if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("score fixture has a blank event or jurisdiction id");
     if (!event.publicationRunId.trim()) throw new Error(`score fixture has no publication run: ${event.id}`);
     if (!event.corroborationRunId.trim()) throw new Error(`score fixture has no corroboration run: ${event.id}`);
+    if (!isScoreableEventLifecycle(event)) {
+      throw new Error(`score fixture has an ineligible event lifecycle: ${event.id}`);
+    }
     if (event.absorptionOutcome === "absorbed" && !event.absorptionDecisionKey)
       throw new Error(`score fixture has absorbed status without decision evidence: ${event.id}`);
     if (!PULSE_DIMENSIONS.includes(event.dimension)) throw new Error(`score fixture has an invalid dimension: ${event.dimension}`);
@@ -533,6 +540,9 @@ async function loadPublishedEvents(
       pulse_events_v2.jurisdiction_id,
       pulse_events_v2.dimension,
       pulse_events_v2.category,
+      pulse_events_v2.projection_status,
+      pulse_events_v2.published,
+      pulse_events_v2.review_status,
       pulse_events_v2.severity_tier,
       pulse_events_v2.severity_value,
       pulse_events_v2.corroboration_confidence,
@@ -595,6 +605,9 @@ async function loadPublishedEvents(
       jurisdictionId: String(r.jurisdiction_id),
       dimension: r.dimension as PulseDimension,
       category: String(r.category),
+      projectionStatus: r.projection_status as PublishedEvent["projectionStatus"],
+      published: Boolean(r.published),
+      reviewStatus: r.review_status as PublishedEvent["reviewStatus"],
       severityTier: String(r.severity_tier),
       severityValue: Number(r.severity_value),
       corroborationConfidence: Number(r.corroboration_confidence),

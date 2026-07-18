@@ -26348,7 +26348,7 @@
       "releaseScope": "research_beta",
       "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
       "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-      "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+      "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
       "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
       "deprecation": {
         "status": "active"
@@ -26377,7 +26377,7 @@
           },
           "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26402,7 +26402,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26452,7 +26452,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26479,7 +26479,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26504,7 +26504,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26533,7 +26533,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26558,7 +26558,7 @@
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26588,7 +26588,7 @@
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26613,7 +26613,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26640,7 +26640,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26665,7 +26665,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26690,7 +26690,7 @@
           },
           "sourceOrDerivation": "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
           "cadence": "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+          "vintageSemantics": "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26706,7 +26706,7 @@
       "releaseScope": "research_beta",
       "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
       "cadence": "Daily after classification/corroboration and on rescore.",
-      "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+      "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
       "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
       "deprecation": {
         "status": "active"
@@ -26733,7 +26733,7 @@
           },
           "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26758,7 +26758,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26783,7 +26783,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26810,7 +26810,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26835,7 +26835,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26864,7 +26864,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26889,7 +26889,7 @@
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26919,7 +26919,7 @@
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26944,7 +26944,7 @@
           },
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "Last computed at follows this table contract. score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "Last computed at follows this table contract. score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26969,7 +26969,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -26994,7 +26994,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"
@@ -27019,7 +27019,7 @@
           },
           "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
           "cadence": "Daily after classification/corroboration and on rescore.",
-          "vintageSemantics": "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+          "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
           "deprecation": {
             "status": "active"

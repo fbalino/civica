@@ -3406,7 +3406,7 @@ export const pulseSources = pgTable(
  * Current dimensional delta state per (country, dimension).
  *
  * Recomputed daily from all `pulse_events_v2` rows where `published=true`
- * within the trailing 365-day window, applying category-specific decay
+ * within the versioned 365- or 730-day window, applying category-specific decay
  * per spec §4.1, then clamped to [-15, +10] per §4.3.
  *
  * One row per (jurisdictionId, dimension). Daily score script upserts.
@@ -3435,7 +3435,7 @@ export const pulseDimensionalDeltas = pgTable(
     scoreAsOf: date("score_as_of").notNull(),
     /** Inclusive start date of the score window. */
     windowStart: date("window_start").notNull(),
-    /** Closed production contract: trailing 365 calendar days. */
+    /** Closed production contract: a versioned 365- or 730-day lookback. */
     windowDays: integer("window_days").notNull(),
     lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
   },
@@ -3457,7 +3457,7 @@ export const pulseDimensionalDeltas = pgTable(
     ),
     check(
       "pulse_dimensional_deltas_window_check",
-      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+      dsql`${table.windowDays} IN (365, 730) AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
     ),
   ],
 );
@@ -3522,7 +3522,7 @@ export const pulseDimensionalDeltaHistory = pgTable(
     ),
     check(
       "pulse_dimensional_delta_history_window_check",
-      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+      dsql`${table.windowDays} IN (365, 730) AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
     ),
   ],
 );

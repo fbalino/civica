@@ -852,6 +852,28 @@ the current state while the public null preserves the distinction between no
 eligible event, low observation, and stability. Immutable per-run outputs make
 later method comparisons and exact historical replay possible.
 
+### APR-D169 — Pulse decay retains the longest declared half-life
+
+**Decision:** The active Pulse scorer derives its trailing lookback from the
+largest taxonomy half-life (currently 730 days) and records that value on each
+current and append-only history row. The former 365-day rows remain immutable
+historical outputs. The score algorithm advances to
+`pulse-delta/decay-window-v2.5+incident-resolution-v1+output-history-v1+absorption-evidence-v1`;
+the outer classifier/runtime version does not change because the classifier,
+taxonomy identity, and pipeline method do not change.
+
+Only a current, published, approved or edited event projection can score. A
+correction supersedes its prior projection while retaining it; persistence is
+not inferred from an earlier event; and a later recurrence must be represented
+by a separately accepted event with its own date and incident.
+
+**Why:** A 365-day inclusion window silently truncated the second half of a
+declared 730-day decay curve. Retaining both window values preserves exact
+interpretation of older output history while a fresh, algorithm-versioned
+recompute produces the new current projection. Treating persistence or
+recurrence as an inference would turn a bounded event ledger into an
+unreviewed state model.
+
 ### APR-D151 — Pulse agreement is a stored-evidence derivation
 
 **Decision:** Adopt `pulse-stored-ensemble/v1` under runtime method
