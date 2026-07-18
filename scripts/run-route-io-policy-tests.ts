@@ -4,6 +4,14 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 
+function testEnvironment(): NodeJS.ProcessEnv {
+  const env = { ...process.env, NODE_ENV: "test" };
+  // The production build supplies DATABASE_URL to validate runtime setup;
+  // these DB-free route fixtures must exercise their in-process seams only.
+  delete env.DATABASE_URL;
+  return env;
+}
+
 /**
  * Exact DB-free regression manifest for PLT-012. Keeping this list closed
  * prevents a misspelled glob or moved test from silently turning the security
@@ -61,7 +69,7 @@ const result = spawnSync(
   ["--import", "tsx", "--test", ...testFiles],
   {
     cwd: ROOT,
-    env: process.env,
+    env: testEnvironment(),
     stdio: "inherit",
   },
 );
