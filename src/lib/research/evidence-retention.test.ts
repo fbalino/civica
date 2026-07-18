@@ -52,6 +52,10 @@ const partyIdentityMigration = readFileSync(
   "drizzle/authoritative/0031_hot_saracen.sql",
   "utf8",
 );
+const conditionsComponentsMigration = readFileSync(
+  "drizzle/authoritative/0040_closed_young_avengers.sql",
+  "utf8",
+);
 const classify = readFileSync("src/lib/pulse/v2/classify.ts", "utf8");
 const subscriptionApply = readFileSync(
   "scripts/pulse-apply-classifications.ts",
@@ -73,6 +77,7 @@ test("every protected relation receives a synchronous retention trigger", () => 
         reviewSlaMigration.includes(`ON ${relation}`) ||
         absorptionMigration.includes(`ON ${relation}`) ||
         informationEnvironmentMigration.includes(`ON ${relation}`) ||
+        conditionsComponentsMigration.includes(`ON "${relation}"`) ||
         // Drizzle emits the quoted identifier form in 0030.
         constitutionPassageMigration.includes(`ON "${relation}"`) ||
         partyIdentityMigration.includes(`ON ${relation}`),

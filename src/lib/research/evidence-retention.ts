@@ -13,6 +13,8 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "ci_composite_scores",
   "ci_dimension_scores",
   "ci_ingestion_runs",
+  "civica_conditions_calculations",
+  "civica_conditions_components",
   "civica_conditions_scores",
   "constitutions",
   "constitution_passages",

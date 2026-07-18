@@ -2163,6 +2163,38 @@ export const organizationMemberships = pgTable(
 // --- Phase 5.2 — Civica Conditions companion layer ---
 
 /**
+ * One declared Conditions calculation, including refused/missing candidates
+ * that do not produce a score. Component rows join through calculationKey.
+ */
+export const civicaConditionsCalculations = pgTable(
+  "civica_conditions_calculations",
+  {
+    calculationKey: text("calculation_key").primaryKey(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    alignmentPolicy: text("alignment_policy").notNull(),
+    alignmentStatus: text("alignment_status").notNull(),
+    /** Present only when all included components share one reference year. */
+    referenceYear: integer("reference_year"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_conditions_calculation_jurisdiction").on(
+      table.jurisdictionId,
+      table.dimension,
+      table.methodologyVersion,
+    ),
+    check(
+      "conditions_calculation_contract_check",
+      dsql`${table.calculationKey} ~ '^conditions-calculation/v1/sha256:[a-f0-9]{64}$' AND ${table.alignmentPolicy} = 'all-components-same-reference-year/v1' AND ${table.alignmentStatus} IN ('aligned','mixed_year_refused','missing_component') AND ((${table.alignmentStatus} = 'aligned' AND ${table.referenceYear} BETWEEN 1800 AND 2200) OR (${table.alignmentStatus} <> 'aligned' AND ${table.referenceYear} IS NULL))`,
+    ),
+  ],
+);
+
+/**
  * Civica Conditions scores — material conditions companion to the CI.
  * Three dimensions, each surfaced separately on country pages; never merged
  * into a headline number and never combined with the CI composite.
@@ -2200,6 +2232,13 @@ export const civicaConditionsScores = pgTable(
     datasetYear: integer("dataset_year").notNull(),
     /** Methodology version tag — "beta" during the v2 rebuild */
     methodologyVersion: text("methodology_version").notNull(),
+    /**
+     * Required for decomposition-aware scores. Historic rows remain null and
+     * are deliberately excluded from the decomposable read path.
+     */
+    calculationKey: text("calculation_key").references(
+      () => civicaConditionsCalculations.calculationKey,
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -2213,9 +2252,63 @@ export const civicaConditionsScores = pgTable(
     ),
     index("idx_conditions_quarter").on(table.quarter),
     index("idx_conditions_jurisdiction").on(table.jurisdictionId),
+    index("idx_conditions_calculation").on(table.calculationKey),
     check(
       "civica_conditions_scores_lineage_check",
       dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+  ],
+);
+
+/**
+ * Native source inputs considered for a Conditions calculation. Unavailable
+ * inputs are rows too: their closed value state explains why no score exists.
+ */
+export const civicaConditionsComponents = pgTable(
+  "civica_conditions_components",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    calculationKey: text("calculation_key")
+      .references(() => civicaConditionsCalculations.calculationKey)
+      .notNull(),
+    componentId: text("component_id").notNull(),
+    nativeValue: real("native_value"),
+    nativeUnit: text("native_unit").notNull(),
+    referenceYear: integer("reference_year"),
+    valueStatus: text("value_status").notNull(),
+    valueStatusReason: text("value_status_reason"),
+    inclusionDecision: text("inclusion_decision").notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    indicatorId: text("indicator_id").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    artifactKind: text("artifact_kind").notNull(),
+    temporalCoverage: text("temporal_coverage").notNull(),
+    licenseUrl: text("license_url").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    substitutionReason: text("substitution_reason"),
+    methodVersion: text("method_version").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_conditions_component_unique").on(
+      table.calculationKey,
+      table.componentId,
+    ),
+    index("idx_conditions_component_source").on(table.sourceId, table.indicatorId),
+    check(
+      "conditions_component_lineage_check",
+      dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+    check(
+      "conditions_component_value_state_check",
+      dsql`${table.valueStatus} IN ('observed','missing','unknown','not_applicable','not_observed','disputed','withheld') AND (((${table.valueStatus} IN ('observed','disputed')) AND ${table.nativeValue} IS NOT NULL AND ${table.referenceYear} BETWEEN 1800 AND 2200) OR ((${table.valueStatus} NOT IN ('observed','disputed')) AND ${table.nativeValue} IS NULL AND ${table.referenceYear} IS NULL)) AND ((${table.valueStatus} = 'observed' AND ${table.valueStatusReason} IS NULL) OR (${table.valueStatus} <> 'observed' AND length(trim(${table.valueStatusReason})) > 0))`,
+    ),
+    check(
+      "conditions_component_inclusion_check",
+      dsql`${table.inclusionDecision} IN ('included','excluded_missing','refused_mixed_year')`,
     ),
   ],
 );

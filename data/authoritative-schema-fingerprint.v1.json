@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-17T00:12:59.038Z",
-  "sha256": "1f8adaf16a7eea4cb7d91b55a42b21ee7e22fdcd7e020559d93489b6db781b30",
+  "generatedAt": "2026-07-18T10:57:03.489Z",
+  "sha256": "dd71ee71e10933f7ad4b4699a14e10458d8def41cf9d94399677804ef0fa64da",
   "schema": {
     "columns": [
       {
@@ -2210,6 +2210,258 @@
         "position": 22
       },
       {
+        "udt": "text",
+        "name": "calculation_key",
+        "type": "text",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "uuid",
+        "name": "jurisdiction_id",
+        "type": "uuid",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "dimension",
+        "type": "text",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "methodology_version",
+        "type": "text",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "alignment_policy",
+        "type": "text",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "alignment_status",
+        "type": "text",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "int4",
+        "name": "reference_year",
+        "type": "integer",
+        "table": "civica_conditions_calculations",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "civica_conditions_calculations",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "civica_conditions_components",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "calculation_key",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "component_id",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "float4",
+        "name": "native_value",
+        "type": "real",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "YES",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "native_unit",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "int4",
+        "name": "reference_year",
+        "type": "integer",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "YES",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "value_status",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "value_status_reason",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "YES",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "inclusion_decision",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "indicator_id",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "artifact_hash",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "artifact_kind",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "temporal_coverage",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "license_url",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "transformation_id",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "substitution_reason",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "civica_conditions_components",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "civica_conditions_components",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 20
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -2379,6 +2631,15 @@
         "default": null,
         "nullable": "NO",
         "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "calculation_key",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "YES",
+        "position": 20
       },
       {
         "udt": "text",
@@ -12103,9 +12364,39 @@
         "definition": "CREATE UNIQUE INDEX idx_ci_source_ingestions_unique ON public.ci_source_ingestions USING btree (source_id, dimension, dataset_year, indicator_id)"
       },
       {
+        "name": "civica_conditions_calculations_pkey",
+        "table": "civica_conditions_calculations",
+        "definition": "CREATE UNIQUE INDEX civica_conditions_calculations_pkey ON public.civica_conditions_calculations USING btree (calculation_key)"
+      },
+      {
+        "name": "idx_conditions_calculation_jurisdiction",
+        "table": "civica_conditions_calculations",
+        "definition": "CREATE INDEX idx_conditions_calculation_jurisdiction ON public.civica_conditions_calculations USING btree (jurisdiction_id, dimension, methodology_version)"
+      },
+      {
+        "name": "civica_conditions_components_pkey",
+        "table": "civica_conditions_components",
+        "definition": "CREATE UNIQUE INDEX civica_conditions_components_pkey ON public.civica_conditions_components USING btree (id)"
+      },
+      {
+        "name": "idx_conditions_component_source",
+        "table": "civica_conditions_components",
+        "definition": "CREATE INDEX idx_conditions_component_source ON public.civica_conditions_components USING btree (source_id, indicator_id)"
+      },
+      {
+        "name": "idx_conditions_component_unique",
+        "table": "civica_conditions_components",
+        "definition": "CREATE UNIQUE INDEX idx_conditions_component_unique ON public.civica_conditions_components USING btree (calculation_key, component_id)"
+      },
+      {
         "name": "civica_conditions_scores_pkey",
         "table": "civica_conditions_scores",
         "definition": "CREATE UNIQUE INDEX civica_conditions_scores_pkey ON public.civica_conditions_scores USING btree (id)"
+      },
+      {
+        "name": "idx_conditions_calculation",
+        "table": "civica_conditions_scores",
+        "definition": "CREATE INDEX idx_conditions_calculation ON public.civica_conditions_scores USING btree (calculation_key)"
       },
       {
         "name": "idx_conditions_jurisdiction",
@@ -13577,7 +13868,7 @@
       {
         "name": "civica_guard_published_pulse_history",
         "identity": "",
-        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_published_pulse_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_run_id uuid; new_run_id uuid;\nBEGIN\n  IF TG_OP<>'INSERT' THEN old_run_id:=OLD.computation_run_id; END IF;\n  IF TG_OP<>'DELETE' THEN new_run_id:=NEW.computation_run_id; END IF;\n  IF EXISTS (\n    SELECT 1 FROM pulse_score_publication_pointers pointer\n    WHERE pointer.computation_run_id=old_run_id OR pointer.computation_run_id=new_run_id\n  ) THEN\n    RAISE EXCEPTION 'currently published Pulse score history is immutable';\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_guard_published_pulse_history()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_run_id uuid; new_run_id uuid;\nBEGIN\n  IF TG_OP<>'INSERT' THEN old_run_id:=OLD.computation_run_id; END IF;\n  IF TG_OP<>'DELETE' THEN new_run_id:=NEW.computation_run_id; END IF;\n  IF EXISTS (\n    SELECT 1 FROM pulse_pipeline_runs run\n    WHERE (run.id=old_run_id OR run.id=new_run_id)\n      AND run.stage='score'\n      AND run.status='completed'\n  ) THEN\n    RAISE EXCEPTION 'completed Pulse score history is immutable';\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
       },
       {
         "name": "civica_guard_published_pulse_run",
@@ -14070,6 +14361,16 @@
         "name": "ci_research_panel_rows_immutable",
         "table": "ci_research_panel_rows",
         "definition": "CREATE TRIGGER ci_research_panel_rows_immutable BEFORE INSERT OR DELETE OR UPDATE ON ci_research_panel_rows FOR EACH ROW EXECUTE FUNCTION ci_research_panel_rows_immutable()"
+      },
+      {
+        "name": "dat_016_retain_mutation",
+        "table": "civica_conditions_calculations",
+        "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON civica_conditions_calculations FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "dat_016_retain_mutation",
+        "table": "civica_conditions_components",
+        "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON civica_conditions_components FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -14591,6 +14892,16 @@
       {
         "kind": "r",
         "name": "ci_source_ingestions",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "civica_conditions_calculations",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "civica_conditions_components",
         "definition": null
       },
       {
@@ -15416,6 +15727,66 @@
         "type": "f",
         "table": "ci_source_ingestions",
         "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "civica_conditions_calculations_jurisdiction_id_jurisdictions_id",
+        "type": "f",
+        "table": "civica_conditions_calculations",
+        "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "civica_conditions_calculations_pkey",
+        "type": "p",
+        "table": "civica_conditions_calculations",
+        "definition": "PRIMARY KEY (calculation_key)"
+      },
+      {
+        "name": "conditions_calculation_contract_check",
+        "type": "c",
+        "table": "civica_conditions_calculations",
+        "definition": "CHECK (calculation_key ~ '^conditions-calculation/v1/sha256:[a-f0-9]{64}$'::text AND alignment_policy = 'all-components-same-reference-year/v1'::text AND (alignment_status = ANY (ARRAY['aligned'::text, 'mixed_year_refused'::text, 'missing_component'::text])) AND (alignment_status = 'aligned'::text AND reference_year >= 1800 AND reference_year <= 2200 OR alignment_status <> 'aligned'::text AND reference_year IS NULL))"
+      },
+      {
+        "name": "civica_conditions_components_calculation_key_civica_conditions_",
+        "type": "f",
+        "table": "civica_conditions_components",
+        "definition": "FOREIGN KEY (calculation_key) REFERENCES civica_conditions_calculations(calculation_key)"
+      },
+      {
+        "name": "civica_conditions_components_pkey",
+        "type": "p",
+        "table": "civica_conditions_components",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "civica_conditions_components_source_id_sources_id_fk",
+        "type": "f",
+        "table": "civica_conditions_components",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "conditions_component_inclusion_check",
+        "type": "c",
+        "table": "civica_conditions_components",
+        "definition": "CHECK (inclusion_decision = ANY (ARRAY['included'::text, 'excluded_missing'::text, 'refused_mixed_year'::text]))"
+      },
+      {
+        "name": "conditions_component_lineage_check",
+        "type": "c",
+        "table": "civica_conditions_components",
+        "definition": "CHECK (artifact_hash ~ '^[a-f0-9]{64}$'::text AND (artifact_kind = ANY (ARRAY['publisher_bytes'::text, 'normalized_batch'::text])) AND license_url ~~ 'https://%'::text)"
+      },
+      {
+        "name": "conditions_component_value_state_check",
+        "type": "c",
+        "table": "civica_conditions_components",
+        "definition": "CHECK ((value_status = ANY (ARRAY['observed'::text, 'missing'::text, 'unknown'::text, 'not_applicable'::text, 'not_observed'::text, 'disputed'::text, 'withheld'::text])) AND ((value_status = ANY (ARRAY['observed'::text, 'disputed'::text])) AND native_value IS NOT NULL AND reference_year >= 1800 AND reference_year <= 2200 OR (value_status <> ALL (ARRAY['observed'::text, 'disputed'::text])) AND native_value IS NULL AND reference_year IS NULL) AND (value_status = 'observed'::text AND value_status_reason IS NULL OR value_status <> 'observed'::text AND length(TRIM(BOTH FROM value_status_reason)) > 0))"
+      },
+      {
+        "name": "civica_conditions_scores_calculation_key_civica_conditions_calc",
+        "type": "f",
+        "table": "civica_conditions_scores",
+        "definition": "FOREIGN KEY (calculation_key) REFERENCES civica_conditions_calculations(calculation_key)"
       },
       {
         "name": "civica_conditions_scores_jurisdiction_id_jurisdictions_id_fk",

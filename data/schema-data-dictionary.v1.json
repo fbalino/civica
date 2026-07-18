@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "6e70ccd7949b4777f55b870f44f2e8724e7f06ebc692f1fb54c330d04789c6f6",
+  "schemaFingerprint": "59f4501efda1c0a4cba42ece2aa4ca5a056eb4a5f6b4d8ed00a993bcf08604a7",
   "summary": {
-    "tables": 93,
-    "columns": 1293,
+    "tables": 95,
+    "columns": 1322,
     "publicAtlasTables": 22,
-    "researchBetaTables": 27,
+    "researchBetaTables": 29,
     "supportTables": 11,
     "internalTables": 31,
     "privateTables": 2,
@@ -5541,7 +5541,7 @@
         {
           "name": "native_unit",
           "propertyName": "nativeUnit",
-          "definition": "Native unit recorded for the release, jurisdiction, year, source, and indicator, including explicit missing cells.",
+          "definition": "Unit or scale declared for the native Conditions component value.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6528,14 +6528,764 @@
       ]
     },
     {
+      "name": "civica_conditions_calculations",
+      "exportName": "civicaConditionsCalculations",
+      "definition": "Versioned Conditions calculation decisions, including aligned scores and explicitly unavailable candidates.",
+      "rowGrain": "One jurisdiction, Conditions dimension, component-input bundle, and methodology decision.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+      "cadence": "Per upstream ingestion run and revised methodology version.",
+      "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+      "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "alignment_policy",
+          "propertyName": "alignmentPolicy",
+          "definition": "Versioned rule governing whether component reference years may be combined.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "alignment_status",
+          "propertyName": "alignmentStatus",
+          "definition": "Closed outcome of the Conditions year-alignment check.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "calculation_key",
+          "propertyName": "calculationKey",
+          "definition": "Content-addressed Conditions input-bundle identity linking a score to its retained calculation and components.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension",
+          "propertyName": "dimension",
+          "definition": "Dimension recorded for the jurisdiction, Conditions dimension, component-input bundle, and methodology decision.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_conditions_calculation_jurisdiction"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_id",
+          "propertyName": "jurisdictionId",
+          "definition": "Identifier of the jurisdiction represented by this row.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "jurisdictions.id",
+            "indexGroups": [
+              "idx_conditions_calculation_jurisdiction"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_version",
+          "propertyName": "methodologyVersion",
+          "definition": "Version of the Civica method that produced or interprets this row.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_conditions_calculation_jurisdiction"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reference_year",
+          "propertyName": "referenceYear",
+          "definition": "Observation/reference year. Calculation-level values exist only when all included components share this year.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "Gregorian calendar year",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic Civica calculation envelope over the retained component rows.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "Reference year follows this table contract. reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "civica_conditions_components",
+      "exportName": "civicaConditionsComponents",
+      "definition": "Native source components considered for a Conditions calculation, including unavailable or refused inputs.",
+      "rowGrain": "One declared component in one Conditions calculation input bundle.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+      "cadence": "Per upstream ingestion run and source correction.",
+      "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+      "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "artifact_hash",
+          "propertyName": "artifactHash",
+          "definition": "Artifact hash recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "artifact_kind",
+          "propertyName": "artifactKind",
+          "definition": "Artifact kind recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "calculation_key",
+          "propertyName": "calculationKey",
+          "definition": "Content-addressed Conditions input-bundle identity linking a score to its retained calculation and components.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "civica_conditions_calculations.calculation_key",
+            "indexGroups": [
+              "idx_conditions_component_unique"
+            ],
+            "uniqueGroups": [
+              "idx_conditions_component_unique"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_calculations.calculation_key; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "component_id",
+          "propertyName": "componentId",
+          "definition": "Stable identifier of one declared native input within a Conditions dimension.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_conditions_component_unique"
+            ],
+            "uniqueGroups": [
+              "idx_conditions_component_unique"
+            ]
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "inclusion_decision",
+          "propertyName": "inclusionDecision",
+          "definition": "Whether the component was included, excluded for absence, or refused because reference years differ.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "indicator_id",
+          "propertyName": "indicatorId",
+          "definition": "Indicator id recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_conditions_component_source"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "license_url",
+          "propertyName": "licenseUrl",
+          "definition": "License url recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "native_unit",
+          "propertyName": "nativeUnit",
+          "definition": "Unit or scale declared for the native Conditions component value.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "native_value",
+          "propertyName": "nativeValue",
+          "definition": "Native-scale component observation; never a normalized or combined Conditions score.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reference_year",
+          "propertyName": "referenceYear",
+          "definition": "Observation/reference year. Calculation-level values exist only when all included components share this year.",
+          "sqlType": "integer",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "Gregorian calendar year",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "Reference year follows this table contract. reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "sources.id",
+            "indexGroups": [
+              "idx_conditions_component_source"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "substitution_reason",
+          "propertyName": "substitutionReason",
+          "definition": "Substitution reason recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "temporal_coverage",
+          "propertyName": "temporalCoverage",
+          "definition": "Temporal coverage recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transformation_id",
+          "propertyName": "transformationId",
+          "definition": "Transformation id recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the declared component in one Conditions calculation input bundle.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "valueStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status_reason",
+          "propertyName": "valueStatusReason",
+          "definition": "Required explanation for every non-observed data-availability state; null only for observed values.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null is permitted only when value_status is observed; every other state requires a non-empty reason.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source observation or explicit no-observation outcome with full input lineage.",
+          "cadence": "Per upstream ingestion run and source correction.",
+          "vintageSemantics": "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+          "rights": "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
       "name": "civica_conditions_scores",
       "exportName": "civicaConditionsScores",
       "definition": "Country-level descriptive Conditions indicators and display positions.",
-      "rowGrain": "One jurisdiction, metric, data year, source, and methodology version.",
+      "rowGrain": "One decomposable jurisdiction, metric, reference year, source, and methodology version.",
       "releaseScope": "research_beta",
       "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
       "cadence": "Per upstream annual/source release.",
-      "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+      "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
       "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
       "deprecation": {
         "status": "active"
@@ -6544,7 +7294,7 @@
         {
           "name": "artifact_hash",
           "propertyName": "artifactHash",
-          "definition": "Artifact hash recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Artifact hash recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6560,7 +7310,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6569,7 +7319,7 @@
         {
           "name": "artifact_kind",
           "propertyName": "artifactKind",
-          "definition": "Artifact kind recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Artifact kind recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6585,7 +7335,34 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "calculation_key",
+          "propertyName": "calculationKey",
+          "definition": "Content-addressed Conditions input-bundle identity linking a score to its retained calculation and components.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "civica_conditions_calculations.calculation_key",
+            "indexGroups": [
+              "idx_conditions_calculation"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_calculations.calculation_key; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6619,7 +7396,7 @@
         {
           "name": "dataset_year",
           "propertyName": "datasetYear",
-          "definition": "Dataset year recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Dataset year recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "integer",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6635,7 +7412,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "Dataset year follows this table contract. data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "Dataset year follows this table contract. dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6644,7 +7421,7 @@
         {
           "name": "dimension",
           "propertyName": "dimension",
-          "definition": "Dimension recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Dimension recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6664,7 +7441,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6689,7 +7466,7 @@
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6698,7 +7475,7 @@
         {
           "name": "indicator_id",
           "propertyName": "indicatorId",
-          "definition": "Indicator id recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Indicator id recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6718,7 +7495,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6748,7 +7525,7 @@
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6757,7 +7534,7 @@
         {
           "name": "license_url",
           "propertyName": "licenseUrl",
-          "definition": "License url recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "License url recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6773,7 +7550,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6782,7 +7559,7 @@
         {
           "name": "method_version",
           "propertyName": "methodVersion",
-          "definition": "Method version recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Method version recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6836,7 +7613,7 @@
         {
           "name": "normalized_score",
           "propertyName": "normalizedScore",
-          "definition": "Normalized score recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Normalized score recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "real",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6852,7 +7629,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6861,7 +7638,7 @@
         {
           "name": "quarter",
           "propertyName": "quarter",
-          "definition": "Quarter recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Quarter recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6882,7 +7659,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6891,7 +7668,7 @@
         {
           "name": "raw_value",
           "propertyName": "rawValue",
-          "definition": "Raw value recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Raw value recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "real",
           "nullable": true,
           "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
@@ -6907,7 +7684,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6936,7 +7713,7 @@
           },
           "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6945,7 +7722,7 @@
         {
           "name": "substitution_reason",
           "propertyName": "substitutionReason",
-          "definition": "Substitution reason recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Substitution reason recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": true,
           "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
@@ -6961,7 +7738,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6970,7 +7747,7 @@
         {
           "name": "temporal_coverage",
           "propertyName": "temporalCoverage",
-          "definition": "Temporal coverage recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Temporal coverage recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -6986,7 +7763,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -6995,7 +7772,7 @@
         {
           "name": "transformation_id",
           "propertyName": "transformationId",
-          "definition": "Transformation id recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Transformation id recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -7011,7 +7788,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -7020,7 +7797,7 @@
         {
           "name": "upstream_release",
           "propertyName": "upstreamRelease",
-          "definition": "Upstream release recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "definition": "Upstream release recorded for the decomposable jurisdiction, metric, reference year, source, and methodology version.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -7036,7 +7813,7 @@
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
-          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"

@@ -1,0 +1,86 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const root = process.cwd();
+const read = (path: string) => readFileSync(resolve(root, path), "utf8");
+const errors: string[] = [];
+
+const contract = read("src/lib/conditions/contract.ts");
+const economic = read("src/lib/conditions/economic.ts");
+const writer = read("src/lib/conditions/ingest.ts");
+const schema = read("src/lib/db/schema.ts");
+const migration = read("drizzle/authoritative/0040_closed_young_avengers.sql");
+const query = read("src/lib/db/queries.ts");
+const economicScript = read("scripts/ingest-conditions-economic.ts");
+const hdiScript = read("scripts/ingest-conditions-hdi.ts");
+const gpiScript = read("scripts/ingest-conditions-gpi.ts");
+
+for (const token of [
+  "CURRENT_CONDITIONS_METHODOLOGY_VERSION",
+  "all-components-same-reference-year/v1",
+  "mixed_year_refused",
+  "missing_component",
+  "conditionCalculationKey",
+  "conditionCalculationErrors",
+]) {
+  if (!contract.includes(token)) errors.push(`Conditions contract omits ${token}`);
+}
+for (const table of [
+  "civica_conditions_calculations",
+  "civica_conditions_components",
+]) {
+  if (!schema.includes(table)) errors.push(`schema omits ${table}`);
+  if (!migration.includes(table)) errors.push(`migration omits ${table}`);
+  if (!migration.includes(`ON \"${table}\"`)) {
+    errors.push(`migration omits a retention trigger for ${table}`);
+  }
+}
+for (const token of [
+  "conditions_component_value_state_check",
+  "conditions_component_inclusion_check",
+  "conditions_calculation_contract_check",
+]) {
+  if (!migration.includes(token)) errors.push(`migration omits ${token}`);
+}
+for (const token of [
+  "civicaConditionsCalculations",
+  "civicaConditionsComponents",
+  "calculationKey",
+  "componentId",
+]) {
+  if (!writer.includes(token)) errors.push(`writer omits ${token}`);
+}
+if (!economic.includes("mixed_year_refused") || !economic.includes("missing_component")) {
+  errors.push("economic builder does not preserve refusal and absence states");
+}
+if (/available\.length\s*<\s*2/.test(economicScript) || /Math\.max\(\s*\.\.\.\(available/.test(economicScript)) {
+  errors.push("economic ingestion retains the legacy partial/newest-year shortcut");
+}
+for (const script of [hdiScript, gpiScript]) {
+  if (!script.includes("CURRENT_CONDITIONS_METHODOLOGY_VERSION")) {
+    errors.push("single-component Conditions writer uses an unversioned legacy method");
+  }
+  if (!script.includes("conditionCalculationKey")) {
+    errors.push("single-component Conditions writer omits the calculation ledger");
+  }
+  if (!script.includes("SOURCE_METHODOLOGY_VERSION")) {
+    errors.push("single-component Conditions writer does not pin its source methodology");
+  }
+}
+for (const token of [
+  "civica_conditions_calculations",
+  "civica_conditions_components",
+  "ccc.alignment_status = 'aligned'",
+  "getCivicaConditionsComponentLedger",
+]) {
+  if (!query.includes(token)) errors.push(`Conditions read contract omits ${token}`);
+}
+
+if (errors.length) {
+  for (const error of errors) console.error(`ERROR: ${error}`);
+  process.exit(1);
+}
+
+console.log(
+  "PASS — conditions-components/v1 retains exact inputs, explicit missing/refused decisions, and aligned-only scores.",
+);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCivicaConditionsForJurisdiction } from "@/lib/db/queries";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
+import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "@/lib/conditions/contract";
 
 // ── Dimension metadata ────────────────────────────────────────────────────────
 
@@ -173,7 +174,7 @@ interface CivicaConditionsPanelProps {
 
 export async function CivicaConditionsPanel({
   jurisdictionId,
-  methodologyVersion = "beta",
+  methodologyVersion = CURRENT_CONDITIONS_METHODOLOGY_VERSION,
 }: CivicaConditionsPanelProps) {
   let rows: Awaited<ReturnType<typeof getCivicaConditionsForJurisdiction>> = [];
   try {

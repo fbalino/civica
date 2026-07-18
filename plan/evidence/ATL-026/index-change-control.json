@@ -1,0 +1,13 @@
+{
+  "id": "atl-026-conditions-component-ledger",
+  "toVersion": "civica-index-conditions-ledger-v40",
+  "categories": ["input"],
+  "evidence": {
+    "documentation": ["plan/ATL-026-conditions-components-2026-07-18.md"],
+    "registry": ["src/lib/conditions/contract.ts"],
+    "release_note": ["plan/evidence/ATL-026/release-note.md"],
+    "migration_plan": ["plan/evidence/ATL-026/migration-plan.md"],
+    "golden_test": ["src/lib/conditions/__tests__/conditions-golden.test.ts"],
+    "contract_test": ["src/lib/conditions/__tests__/ingest-repeatability.test.ts", "src/lib/conditions/__tests__/migration.test.ts"]
+  }
+}

@@ -60,6 +60,10 @@ const partyIdentityMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0031_hot_saracen.sql"),
   "utf8",
 );
+const conditionsComponentsMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0040_closed_young_avengers.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -98,6 +102,9 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !deltaHistoryMigration.includes(`ON ${relation}`) &&
     !absorptionMigration.includes(`ON ${relation}`) &&
     !informationEnvironmentMigration.includes(`ON ${relation}`) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
+      conditionsComponentsMigration,
+    ) &&
     !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
       constitutionPassageMigration,
     ) &&

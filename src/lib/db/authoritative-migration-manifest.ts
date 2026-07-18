@@ -241,4 +241,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "f2ecbcbbf24aee761968c9c7751d0d537f426450d3c3c69cb611715c2d1e8f1c",
     baseline: false,
   },
+  {
+    id: "0040_closed_young_avengers",
+    path: "drizzle/authoritative/0040_closed_young_avengers.sql",
+    sha256: "467fbe0f8e9d7b4e4149fcaf60e730db9e5a2d54f65d6782294ad2bf5cab51a9",
+    baseline: false,
+  },
 ] as const;

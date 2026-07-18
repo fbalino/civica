@@ -11,6 +11,7 @@ import {
 } from "@/lib/ci/release-selection";
 import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parseDataValueStatus } from "@/lib/data/value-state";
+import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "@/lib/conditions/contract";
 import {
   buildGovernmentClassificationMap,
   type JurisdictionTaxonomyInput,
@@ -2100,7 +2101,7 @@ export async function getBillsForJurisdiction(slug: string, limit = 10) {
  */
 export async function getCivicaConditionsForJurisdiction(
   jurisdictionId: string,
-  methodologyVersion: string = "beta",
+  methodologyVersion: string = CURRENT_CONDITIONS_METHODOLOGY_VERSION,
 ) {
   // For each dimension, pick the row with the latest quarter.
   const rows = await db.execute(sql`
@@ -2112,11 +2113,17 @@ export async function getCivicaConditionsForJurisdiction(
       ccs.source_id         AS "sourceId",
       ccs.dataset_year      AS "datasetYear",
       ccs.methodology_version AS "methodologyVersion",
+      ccs.calculation_key   AS "calculationKey",
+      ccc.reference_year    AS "referenceYear",
+      ccc.alignment_status  AS "alignmentStatus",
       s.name                AS "sourceName"
     FROM civica_conditions_scores ccs
+    INNER JOIN civica_conditions_calculations ccc
+      ON ccc.calculation_key = ccs.calculation_key
     LEFT JOIN sources s ON ccs.source_id = s.id
     WHERE ccs.jurisdiction_id = ${jurisdictionId}
       AND ccs.methodology_version = ${methodologyVersion}
+      AND ccc.alignment_status = 'aligned'
     ORDER BY ccs.dimension, ccs.quarter DESC
   `);
 
@@ -2132,6 +2139,70 @@ export async function getCivicaConditionsForJurisdiction(
     sourceId: string;
     datasetYear: number;
     methodologyVersion: string;
+    calculationKey: string;
+    referenceYear: number;
+    alignmentStatus: "aligned";
+    sourceName: string | null;
+  }>;
+}
+
+/**
+ * The non-display Conditions ledger. It retains every native component and
+ * refusal/missing decision so researchers can inspect a score without
+ * inferring its reference year from a newest available input.
+ */
+export async function getCivicaConditionsComponentLedger(
+  jurisdictionId: string,
+  methodologyVersion: string = CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+) {
+  const result = await db.execute(sql`
+    SELECT
+      ccal.calculation_key AS "calculationKey",
+      ccal.dimension,
+      ccal.alignment_policy AS "alignmentPolicy",
+      ccal.alignment_status AS "alignmentStatus",
+      ccal.reference_year AS "referenceYear",
+      component.component_id AS "componentId",
+      component.native_value AS "nativeValue",
+      component.native_unit AS "nativeUnit",
+      component.reference_year AS "componentReferenceYear",
+      component.value_status AS "valueStatus",
+      component.value_status_reason AS "valueStatusReason",
+      component.inclusion_decision AS "inclusionDecision",
+      component.source_id AS "sourceId",
+      component.indicator_id AS "indicatorId",
+      component.upstream_release AS "upstreamRelease",
+      component.artifact_hash AS "artifactHash",
+      component.license_url AS "licenseUrl",
+      component.transformation_id AS "transformationId",
+      source.name AS "sourceName"
+    FROM civica_conditions_calculations ccal
+    INNER JOIN civica_conditions_components component
+      ON component.calculation_key = ccal.calculation_key
+    LEFT JOIN sources source ON source.id = component.source_id
+    WHERE ccal.jurisdiction_id = ${jurisdictionId}
+      AND ccal.methodology_version = ${methodologyVersion}
+    ORDER BY ccal.dimension, ccal.created_at DESC, component.component_id
+  `);
+  return (Array.isArray(result) ? result : (result as { rows?: unknown[] }).rows ?? []) as Array<{
+    calculationKey: string;
+    dimension: string;
+    alignmentPolicy: string;
+    alignmentStatus: string;
+    referenceYear: number | null;
+    componentId: string;
+    nativeValue: number | null;
+    nativeUnit: string;
+    componentReferenceYear: number | null;
+    valueStatus: string;
+    valueStatusReason: string | null;
+    inclusionDecision: string;
+    sourceId: string;
+    indicatorId: string;
+    upstreamRelease: string;
+    artifactHash: string;
+    licenseUrl: string;
+    transformationId: string;
     sourceName: string | null;
   }>;
 }

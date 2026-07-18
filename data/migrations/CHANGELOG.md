@@ -227,6 +227,20 @@ additive and creates no historical error records. PLT-019 owns staged apply and
 production deployment ordering; recovery is a reviewed forward compensation or
 isolated pre-change backup, never fabricated monitoring evidence.
 
+`0040_closed_young_avengers` adds the ATL-026 Conditions calculation ledger.
+Every Conditions calculation now retains its dimension, methodology version,
+alignment policy/status, and a complete set of native component observations.
+Each component records its value state, reference year, source and indicator
+lineage, inclusion decision, and the transformation that makes the calculation
+reproducible. A score is written only when every required component is observed
+for one shared reference year; mixed-year and missing-input calculations are
+persisted as unavailable rather than labelled with the newest component year.
+The migration is additive and keeps legacy score rows intact but unqualified for
+the new decomposable Conditions read path. Conditions calculation and component
+updates/deletes enter the research-evidence history ledger. Recovery is a
+reviewed forward correction or isolated pre-change backup; never invent a
+component observation or rewrite retained evidence as ordinary rollback.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

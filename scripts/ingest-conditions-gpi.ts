@@ -1,107 +1,111 @@
-/**
- * Civica Conditions — Peace & Security dimension
- *
- * Copies GPI rows from ci_dimension_scores (where dimension='stability_security')
- * into civica_conditions_scores with dimension='peace_security' (renamed per spec §2.8).
- *
- * Normalization per spec §2.3 (GPI is inverted — 1.0 = most peaceful, 5.0 = least):
- *   normalized_score = ((5.0 − raw) / 4.0) × 100
- *
- * Source: Institute for Economics & Peace — Global Peace Index (source_id = 'global_peace_index')
- * Dimension: peace_security
- * Quarter convention: ${dataset_year}-Q4
- */
+/** Civica Conditions — Peace & Security component ledger. */
 
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
+import { and, eq } from "drizzle-orm";
+
 import { db } from "../src/lib/db";
 import { ciDimensionScores } from "../src/lib/db/schema";
-import { and, eq } from "drizzle-orm";
-import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
+import {
+  CONDITIONS_ALIGNMENT_POLICY,
+  CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  conditionCalculationKey,
+  type ConditionScoreInput,
+} from "../src/lib/conditions/contract";
+import { writeConditionScores } from "../src/lib/conditions/ingest";
 
-const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "global_peace_index";
-// GPI is stored under stability_security in the CI pipeline
 const CI_DIMENSION = "stability_security";
-const CONDITIONS_DIMENSION = "peace_security";
+const SOURCE_METHODOLOGY_VERSION = "v1.0";
+const CONDITIONS_DIMENSION = "peace_security" as const;
 const DRY_RUN = process.argv.includes("--dry-run");
 
+function referenceYear(quarter: string): number | null {
+  const match = /^(\d{4})-Q[1-4]$/.exec(quarter);
+  return match ? Number(match[1]) : null;
+}
+
 function normalizeGpi(raw: number): number {
-  // GPI scale 1–5, inverted: 1.0 = most peaceful (best), 5.0 = least peaceful (worst)
-  // spec §2.3: ((5.0 − raw) / 4.0) × 100
-  const score = ((5.0 - raw) / 4.0) * 100;
-  return Math.min(100, Math.max(0, score));
+  return Math.min(100, Math.max(0, ((5 - raw) / 4) * 100));
+}
+
+function conditionRow(
+  row: typeof ciDimensionScores.$inferSelect,
+): ConditionScoreInput {
+  const year = referenceYear(row.quarter);
+  const observed = row.rawValue !== null && year !== null;
+  const reason = row.rawValue === null
+    ? "The copied GPI source row has no native raw value"
+    : "The copied GPI source row has an invalid reference quarter";
+  const component = {
+    componentId: "global_peace_index" as const,
+    nativeValue: observed ? row.rawValue : null,
+    nativeUnit: "index_1_5_inverted",
+    referenceYear: observed ? year : null,
+    valueStatus: observed ? ("observed" as const) : ("missing" as const),
+    valueStatusReason: observed ? null : reason,
+    inclusionDecision: observed ? ("included" as const) : ("excluded_missing" as const),
+    sourceId: SOURCE_ID,
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-gpi-component/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  const base = {
+    jurisdictionId: row.jurisdictionId,
+    dimension: CONDITIONS_DIMENSION,
+    quarter: observed ? row.quarter : null,
+    normalizedScore: observed ? normalizeGpi(row.rawValue!) : null,
+    rawValue: observed ? row.rawValue : null,
+    sourceId: SOURCE_ID,
+    datasetYear: observed ? year : null,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceYear: observed ? year : null,
+    alignmentPolicy: CONDITIONS_ALIGNMENT_POLICY,
+    alignmentStatus: observed ? ("aligned" as const) : ("missing_component" as const),
+    components: [component],
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-gpi-fixed-bound/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  return { ...base, calculationKey: conditionCalculationKey(base) };
 }
 
 async function main() {
-  console.log("=== Civica Conditions — Peace & Security (GPI) ===\n");
-
-  // Pull all GPI rows from ci_dimension_scores
-  const ciRows = await db
+  console.log("=== Civica Conditions — Peace & Security component ledger ===\n");
+  const sourceRows = await db
     .select()
     .from(ciDimensionScores)
     .where(
       and(
         eq(ciDimensionScores.dimension, CI_DIMENSION),
-        eq(ciDimensionScores.sourceId, SOURCE_ID)
-      )
+        eq(ciDimensionScores.sourceId, SOURCE_ID),
+        eq(ciDimensionScores.methodologyVersion, SOURCE_METHODOLOGY_VERSION),
+      ),
     );
-
-  if (ciRows.length === 0) {
-    console.log("No GPI rows found in ci_dimension_scores. Run ingest:ci first.");
-    process.exit(1);
+  if (!sourceRows.length) {
+    throw new Error("No GPI rows found in ci_dimension_scores. Run ingest:ci first.");
   }
 
-  console.log(`Found ${ciRows.length} GPI rows in ci_dimension_scores.`);
-
-  let upserted = 0;
-  const output: ConditionScoreInput[] = [];
-
-  for (const row of ciRows) {
-    const rawValue = row.rawValue ?? null;
-
-    // Apply the fixed-bound inversion formula
-    const normalizedScore = rawValue !== null
-      ? normalizeGpi(rawValue)
-      : row.normalizedScore; // fallback if raw value wasn't stored
-
-    const quarter = row.quarter;
-    const datasetYear = parseInt(quarter.split("-")[0], 10);
-
-    output.push({
-        jurisdictionId: row.jurisdictionId,
-        dimension: CONDITIONS_DIMENSION,
-        quarter,
-        normalizedScore,
-        rawValue,
-        sourceId: SOURCE_ID,
-        datasetYear,
-        methodologyVersion: METHODOLOGY_VERSION,
-        indicatorId: row.indicatorId,
-        upstreamRelease: row.upstreamRelease,
-        artifactHash: row.artifactHash,
-        artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
-        temporalCoverage: row.temporalCoverage,
-        licenseUrl: row.licenseUrl,
-        transformationId: "conditions-gpi-fixed-bound/v1",
-        substitutionReason: null,
-        methodVersion: METHODOLOGY_VERSION,
-      });
-
-    upserted++;
-  }
-
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually upserted rows (AGENTS.md provenance invariant). The
-  // helper applies the same `upserted > 0` gate internally.
-  await writeConditionScores(db, output, { dryRun: DRY_RUN });
-
-  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${upserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
+  const rows = sourceRows.map(conditionRow);
+  const summary = await writeConditionScores(db, rows, { dryRun: DRY_RUN });
+  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? rows.length : summary.componentsWritten} component rows.`);
+  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
 }
 
-main().catch((err) => {
-  console.error("Ingest failed:", err);
+main().catch((error) => {
+  console.error("Ingest failed:", error);
   process.exit(1);
 });

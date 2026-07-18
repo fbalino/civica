@@ -1,91 +1,109 @@
-/**
- * Civica Conditions — Human Development dimension
- *
- * Copies existing HDI rows from ci_dimension_scores into
- * civica_conditions_scores using the fixed-bound normalization from
- * the methodology spec §2.3: score × 100 (HDI is already 0–1).
- *
- * Source: UNDP Human Development Index (source_id = 'undp_hdi')
- * Dimension: human_development
- * Quarter convention: ${dataset_year}-Q4 (same as CI pipeline)
- */
+/** Civica Conditions — Human Development component ledger. */
 
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
+import { and, eq } from "drizzle-orm";
+
 import { db } from "../src/lib/db";
 import { ciDimensionScores } from "../src/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
+import {
+  CONDITIONS_ALIGNMENT_POLICY,
+  CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  conditionCalculationKey,
+  type ConditionScoreInput,
+} from "../src/lib/conditions/contract";
+import { writeConditionScores } from "../src/lib/conditions/ingest";
 
-const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "undp_hdi";
 const CI_DIMENSION = "human_development";
-const CONDITIONS_DIMENSION = "human_development";
+const SOURCE_METHODOLOGY_VERSION = "v1.0";
+const CONDITIONS_DIMENSION = "human_development" as const;
 const DRY_RUN = process.argv.includes("--dry-run");
 
-async function main() {
-  console.log("=== Civica Conditions — Human Development (HDI) ===\n");
-
-  // Pull all HDI rows from ci_dimension_scores
-  const ciRows = await db
-    .select()
-    .from(ciDimensionScores)
-    .where(eq(ciDimensionScores.dimension, CI_DIMENSION));
-
-  if (ciRows.length === 0) {
-    console.log("No HDI rows found in ci_dimension_scores. Run ingest:ci first.");
-    process.exit(1);
-  }
-
-  console.log(`Found ${ciRows.length} HDI rows in ci_dimension_scores.`);
-
-  let inserted = 0;
-  const output: ConditionScoreInput[] = [];
-
-  for (const row of ciRows) {
-    // spec §2.3 fixed bound: HDI is 0–1, so score × 100 = normalized score
-    const rawValue = row.rawValue ?? null;
-    const normalizedScore = rawValue !== null
-      ? Math.min(100, Math.max(0, rawValue * 100))
-      : row.normalizedScore; // fallback to existing normalized score if no raw
-
-    const quarter = row.quarter;
-    const datasetYear = parseInt(quarter.split("-")[0], 10);
-
-    output.push({
-        jurisdictionId: row.jurisdictionId,
-        dimension: CONDITIONS_DIMENSION,
-        quarter,
-        normalizedScore,
-        rawValue,
-        sourceId: SOURCE_ID,
-        datasetYear,
-        methodologyVersion: METHODOLOGY_VERSION,
-        indicatorId: row.indicatorId,
-        upstreamRelease: row.upstreamRelease,
-        artifactHash: row.artifactHash,
-        artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
-        temporalCoverage: row.temporalCoverage,
-        licenseUrl: row.licenseUrl,
-        transformationId: "conditions-hdi-fixed-bound/v1",
-        substitutionReason: null,
-        methodVersion: METHODOLOGY_VERSION,
-      });
-
-    inserted++;
-  }
-
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually upserted rows (AGENTS.md provenance invariant). The
-  // helper applies the same `inserted > 0` gate internally.
-  await writeConditionScores(db, output, { dryRun: DRY_RUN });
-
-  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${inserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
+function referenceYear(quarter: string): number | null {
+  const match = /^(\d{4})-Q[1-4]$/.exec(quarter);
+  return match ? Number(match[1]) : null;
 }
 
-main().catch((err) => {
-  console.error("Ingest failed:", err);
+function conditionRow(
+  row: typeof ciDimensionScores.$inferSelect,
+): ConditionScoreInput {
+  const year = referenceYear(row.quarter);
+  const observed = row.rawValue !== null && year !== null;
+  const reason = row.rawValue === null
+    ? "The copied HDI source row has no native raw value"
+    : "The copied HDI source row has an invalid reference quarter";
+  const component = {
+    componentId: "hdi" as const,
+    nativeValue: observed ? row.rawValue : null,
+    nativeUnit: "index_0_1",
+    referenceYear: observed ? year : null,
+    valueStatus: observed ? ("observed" as const) : ("missing" as const),
+    valueStatusReason: observed ? null : reason,
+    inclusionDecision: observed ? ("included" as const) : ("excluded_missing" as const),
+    sourceId: SOURCE_ID,
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-hdi-component/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  const base = {
+    jurisdictionId: row.jurisdictionId,
+    dimension: CONDITIONS_DIMENSION,
+    quarter: observed ? row.quarter : null,
+    normalizedScore: observed
+      ? Math.min(100, Math.max(0, row.rawValue! * 100))
+      : null,
+    rawValue: observed ? row.rawValue : null,
+    sourceId: SOURCE_ID,
+    datasetYear: observed ? year : null,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceYear: observed ? year : null,
+    alignmentPolicy: CONDITIONS_ALIGNMENT_POLICY,
+    alignmentStatus: observed ? ("aligned" as const) : ("missing_component" as const),
+    components: [component],
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-hdi-fixed-bound/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  return { ...base, calculationKey: conditionCalculationKey(base) };
+}
+
+async function main() {
+  console.log("=== Civica Conditions — Human Development component ledger ===\n");
+  const sourceRows = await db
+    .select()
+    .from(ciDimensionScores)
+    .where(
+      and(
+        eq(ciDimensionScores.dimension, CI_DIMENSION),
+        eq(ciDimensionScores.sourceId, SOURCE_ID),
+        eq(ciDimensionScores.methodologyVersion, SOURCE_METHODOLOGY_VERSION),
+      ),
+    );
+  if (!sourceRows.length) {
+    throw new Error("No HDI rows found in ci_dimension_scores. Run ingest:ci first.");
+  }
+
+  const rows = sourceRows.map(conditionRow);
+  const summary = await writeConditionScores(db, rows, { dryRun: DRY_RUN });
+  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? rows.length : summary.componentsWritten} component rows.`);
+  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
+}
+
+main().catch((error) => {
+  console.error("Ingest failed:", error);
   process.exit(1);
 });

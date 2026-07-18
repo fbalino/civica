@@ -281,6 +281,13 @@
       "when": 1784246699602,
       "tag": "0039_living_clea",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1784371681068,
+      "tag": "0040_closed_young_avengers",
+      "breakpoints": true
     }
   ]
 }

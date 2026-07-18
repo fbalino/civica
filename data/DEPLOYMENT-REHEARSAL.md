@@ -2,12 +2,12 @@
 
 **Contract:** `civica-deployment-rehearsal/v1`
 **Owner:** Fernando Balino
-**Last reviewed:** 2026-07-16
+**Last reviewed:** 2026-07-18
 
 This is the mandatory order for schema, data release, application deployment,
 and recovery. It closes the gap between the configured production database,
 whose authoritative ledger ends at `0032_sparkling_genesis`, and the additive
-PLT migrations `0033` through `0039`.
+PLT/ATL migrations `0033` through `0040`.
 
 ## Non-negotiable boundaries
 

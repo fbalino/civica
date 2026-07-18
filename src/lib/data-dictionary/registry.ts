@@ -674,17 +674,47 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
     deprecation: active,
   },
+  civica_conditions_calculations: {
+    definition:
+      "Versioned Conditions calculation decisions, including aligned scores and explicitly unavailable candidates.",
+    rowGrain:
+      "One jurisdiction, Conditions dimension, component-input bundle, and methodology decision.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Deterministic Civica calculation envelope over the retained component rows.",
+    cadence: "Per upstream ingestion run and revised methodology version.",
+    vintageSemantics:
+      "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+    rights:
+      "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+    deprecation: active,
+  },
+  civica_conditions_components: {
+    definition:
+      "Native source components considered for a Conditions calculation, including unavailable or refused inputs.",
+    rowGrain:
+      "One declared component in one Conditions calculation input bundle.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Captured source observation or explicit no-observation outcome with full input lineage.",
+    cadence: "Per upstream ingestion run and source correction.",
+    vintageSemantics:
+      "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+    rights:
+      "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+    deprecation: active,
+  },
   civica_conditions_scores: {
     definition:
       "Country-level descriptive Conditions indicators and display positions.",
     rowGrain:
-      "One jurisdiction, metric, data year, source, and methodology version.",
+      "One decomposable jurisdiction, metric, reference year, source, and methodology version.",
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Versioned transform of HDI, GPI, and World Bank economic inputs.",
     cadence: "Per upstream annual/source release.",
     vintageSemantics:
-      "data_year is observation/reference year; calculated_at is computation time.",
+      "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
     rights:
       "Resolved per source_id; derived display positions inherit input restrictions.",
     deprecation: active,

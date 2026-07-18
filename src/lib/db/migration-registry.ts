@@ -309,6 +309,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0040_closed_young_avengers",
+    "drizzle/authoritative/0040_closed_young_avengers.sql",
+    "mixed",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",
