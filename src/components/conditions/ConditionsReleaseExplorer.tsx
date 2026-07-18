@@ -129,6 +129,11 @@ export function ConditionsReleaseExplorer({
         Civica will not publish a stability composite until its frozen
         longitudinal validation is complete.
       </Banner>
+      <p className="editorial-tool-dek">
+        <Link href="/civica-conditions/methodology">
+          Read the Conditions codebook and replication boundary.
+        </Link>
+      </p>
 
       {release === null ? (
         <p className="editorial-empty">
