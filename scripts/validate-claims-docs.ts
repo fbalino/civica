@@ -89,6 +89,8 @@ function cleanTestEnvironment(): NodeJS.ProcessEnv {
     // nested `npm run test` sees its declared test environment.
     npm_config_production: "false",
     npm_config_omit: "",
+    NPM_CONFIG_PRODUCTION: "false",
+    NPM_CONFIG_OMIT: "",
   };
   for (const key of TEST_CREDENTIAL_KEYS) delete env[key];
   return env;
