@@ -3840,6 +3840,8 @@ export const pulseCodingStudies = pgTable(
     datasetVersion: text("dataset_version").notNull(),
     packetSetSha256: text("packet_set_sha256").notNull(),
     traceSetSha256: text("trace_set_sha256"),
+    supersedesStudyId: uuid("supersedes_study_id"),
+    supersessionReason: text("supersession_reason"),
     status: text("status").notNull().default("setup"),
     createdBy: text("created_by").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -3850,10 +3852,20 @@ export const pulseCodingStudies = pgTable(
       "pulse_coding_studies_contract_check",
       dsql`${table.schemaVersion} = 'pulse-coding-workspace/v1' AND ${table.purpose} IN ('instruction_pilot','evaluation') AND ${table.status} IN ('setup','active','closed') AND ${table.protocolVersion} <> '' AND ${table.codebookVersion} <> '' AND ${table.ontologyVersion} <> '' AND ${table.datasetVersion} <> '' AND ${table.packetSetSha256} ~ '^[a-f0-9]{64}$' AND (${table.traceSetSha256} IS NULL OR ${table.traceSetSha256} ~ '^[a-f0-9]{64}$')`,
     ),
+    check(
+      "pulse_coding_studies_supersession_check",
+      dsql`((${table.supersedesStudyId} IS NULL AND ${table.supersessionReason} IS NULL) OR (${table.supersedesStudyId} IS NOT NULL AND ${table.supersessionReason} = 'frozen_packet_hash_mismatch' AND ${table.id} <> ${table.supersedesStudyId}))`,
+    ),
+    foreignKey({
+      name: "pulse_coding_studies_supersedes_study_id_pulse_coding_studies_id_fk",
+      columns: [table.supersedesStudyId],
+      foreignColumns: [table.id],
+    }).onDelete("restrict"),
     uniqueIndex("idx_pulse_coding_study_identity").on(
       table.protocolVersion,
       table.packetSetSha256,
     ),
+    uniqueIndex("idx_pulse_coding_study_supersedes").on(table.supersedesStudyId),
     index("idx_pulse_coding_study_status").on(table.status, table.createdAt),
   ],
 );

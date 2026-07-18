@@ -265,4 +265,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "d1b3b5b47ff1de45ef2854756d6834aee16b057272093b730add8e618fab7469",
     baseline: false,
   },
+  {
+    id: "0045_pulse_evaluation_workspace_reconciliation",
+    path: "drizzle/authoritative/0045_pulse_evaluation_workspace_reconciliation.sql",
+    sha256: "78deee17328f6931c5cc0aaf1cb7885b85047eeefc1e8968efb33f4013ed1caf",
+    baseline: false,
+  },
 ] as const;

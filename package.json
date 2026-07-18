@@ -424,6 +424,7 @@
     "validate:pulse-coder-recruitment": "node --import tsx --test src/lib/pulse/v2/coder-recruitment.test.ts && tsx scripts/validate-pulse-coder-recruitment.ts",
     "generate:pulse-evaluation-packets": "tsx scripts/generate-pulse-evaluation-packets.ts --write",
     "seed:pulse-evaluation-coding-studies": "tsx scripts/seed-pulse-evaluation-coding-studies.ts",
+    "plan:pulse-evaluation-workspace-reconciliation": "tsx scripts/reconcile-pulse-evaluation-coding-workspace.ts",
     "validate:pulse-evaluation-packets": "node --import tsx --test src/lib/pulse/v2/evaluation-packets.test.ts && tsx scripts/validate-pulse-evaluation-packets.ts",
     "validate:pulse-evaluation-packets:live": "tsx scripts/validate-pulse-evaluation-packets.ts --live-workspace",
     "generate:reviewer-selection-criteria": "tsx scripts/generate-reviewer-selection-criteria.ts --write",

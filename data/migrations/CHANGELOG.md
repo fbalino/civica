@@ -268,6 +268,15 @@ notes, prompt, or model response is copied. Recovery is an isolated pre-change
 backup or a reviewed forward compensation; never update a baseline or erase a
 prior alert to hide a distribution change.
 
+`0045_pulse_evaluation_workspace_reconciliation` adds an explicit, restrictive
+supersession reference for an immutable Pulse coding-study repair. It changes
+no existing study, packet, participant, assignment, evidence, or audit row.
+After review of the zero-write reconciliation plan, PUL-043 may append one
+disabled successor study with the checked frozen packet set and an explicit
+`frozen_packet_hash_mismatch` link to the retained legacy setup study. Recovery
+is a reviewed forward successor or isolated pre-change backup; never reseed or
+rewrite the original workspace to make its historical hash appear correct.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

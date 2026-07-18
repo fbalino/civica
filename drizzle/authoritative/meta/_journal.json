@@ -309,6 +309,13 @@
       "when": 1784382167000,
       "tag": "0044_pulse_drift_monitoring",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1784383050000,
+      "tag": "0045_pulse_evaluation_workspace_reconciliation",
+      "breakpoints": true
     }
   ]
 }

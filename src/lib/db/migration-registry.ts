@@ -333,6 +333,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0045_pulse_evaluation_workspace_reconciliation",
+    "drizzle/authoritative/0045_pulse_evaluation_workspace_reconciliation.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

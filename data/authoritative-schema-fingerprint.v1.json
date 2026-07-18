@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-18T13:46:01.869Z",
-  "sha256": "e64ecf0298f7460fbe111775f52043306eed0a8c5582d355139f040a652cc8e7",
+  "generatedAt": "2026-07-18T14:01:03.325Z",
+  "sha256": "6c724c61b9292ea5b4a8ebc2d982c708d89035b71c0f510ef521b193411bb00a",
   "schema": {
     "columns": [
       {
@@ -8718,6 +8718,24 @@
       },
       {
         "udt": "uuid",
+        "name": "supersedes_study_id",
+        "type": "uuid",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "supersession_reason",
+        "type": "text",
+        "table": "pulse_coding_studies",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "uuid",
         "name": "id",
         "type": "uuid",
         "table": "pulse_corrections",
@@ -13765,6 +13783,11 @@
         "definition": "CREATE INDEX idx_pulse_coding_study_status ON public.pulse_coding_studies USING btree (status, created_at)"
       },
       {
+        "name": "idx_pulse_coding_study_supersedes",
+        "table": "pulse_coding_studies",
+        "definition": "CREATE UNIQUE INDEX idx_pulse_coding_study_supersedes ON public.pulse_coding_studies USING btree (supersedes_study_id)"
+      },
+      {
         "name": "pulse_coding_studies_pkey",
         "table": "pulse_coding_studies",
         "definition": "CREATE UNIQUE INDEX pulse_coding_studies_pkey ON public.pulse_coding_studies USING btree (id)"
@@ -17725,6 +17748,18 @@
         "type": "u",
         "table": "pulse_coding_studies",
         "definition": "UNIQUE (slug)"
+      },
+      {
+        "name": "pulse_coding_studies_supersedes_study_id_pulse_coding_studies_i",
+        "type": "f",
+        "table": "pulse_coding_studies",
+        "definition": "FOREIGN KEY (supersedes_study_id) REFERENCES pulse_coding_studies(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_coding_studies_supersession_check",
+        "type": "c",
+        "table": "pulse_coding_studies",
+        "definition": "CHECK (supersedes_study_id IS NULL AND supersession_reason IS NULL OR supersedes_study_id IS NOT NULL AND supersession_reason = 'frozen_packet_hash_mismatch'::text AND id <> supersedes_study_id)"
       },
       {
         "name": "pulse_corrections_country_id_jurisdictions_id_fk",
