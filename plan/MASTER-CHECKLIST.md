@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 231
-- **Remaining:** 75
-- **Progress:** 75.5%
+- **Completed:** 232
+- **Remaining:** 74
+- **Progress:** 75.8%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -232,7 +232,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-021** (P1) Verify contrast and non-color communication in both themes. _Done when: text, focus rings, status/source dots, charts, maps, tier/experimental states, overlays, disabled/hover states, and data warnings meet the adopted WCAG target or have documented justified exceptions; seeded low-contrast tokens fail tests._
 - [x] **EXP-022** (P1) Enforce reduced-motion, animation interruption, and no-essential-motion behavior. _Done when: `prefers-reduced-motion` disables nonessential entrances/parallax/transitions, controls remain usable during/after animation, and browser tests cover representative editorial, map, menu, and overlay interactions._
 - [x] **EXP-023** (P1) Standardize meaningful alternative text and decorative-image treatment. _Done when: flags, portraits, maps, charts, engravings, Record art, organization marks, and icons follow a documented semantic policy; duplicate visual/caption announcements are removed; accessibility snapshots cover each class._
-- [ ] **EXP-024** (P1) Resolve map, media, control, caption, and sticky-layer stacking conflicts systematically. _Done when: a documented z-layer/token model replaces accidental equal z-index/DOM-order behavior, overlays/menus/tooltips/lightboxes/maps work together, and a collision test suite passes across routes/viewports._
+- [x] **EXP-024** (P1) Resolve map, media, control, caption, and sticky-layer stacking conflicts systematically. _Done when: a documented z-layer/token model replaces accidental equal z-index/DOM-order behavior, overlays/menus/tooltips/lightboxes/maps work together, and a collision test suite passes across routes/viewports._
 - [ ] **EXP-025** (P1) Add stable screenshot/visual-regression coverage for canonical modules. _Done when: approved baselines cover `/design-system`, home, country tabs, atlas, compare, Index, Pulse ledger, methodology, constitution, elections, Record, API docs, advisory board, errors, embeds, menus, and representative data states in both themes/major viewports; review tooling distinguishes intentional updates._
 - [ ] **EXP-026** (P1) Establish reader-page visual performance budgets. _Done when: LCP/CLS/INP, JS, CSS, image/font bytes, request count, map initialization, and long-task budgets are declared for representative routes, measured in CI or scheduled runs, and seeded regressions fail._
 - [ ] **EXP-027** (P1) Verify charts/maps/tables have accessible nonvisual equivalents and export paths. _Done when: every research visualization exposes title/description/source/vintage, keyboard interaction where applicable, tabular or textual equivalent, missing-data semantics, and downloadable underlying data consistent with the display._
