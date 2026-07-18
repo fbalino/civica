@@ -6,9 +6,9 @@
  *
  * Shared by the desktop megamenu (`NavLinks`) and the mobile accordion
  * (`MobileNav`) so the two never drift. Each entry pairs with a spot
- * engraving (`public/engravings/spot-*.webp` + `-dark` variant) chosen to
- * evoke the destination — the light/dark swap uses the site-wide
- * `theme-engraving-light` / `theme-engraving-dark` classes.
+ * engraving (`public/engravings/navigation/spot-*.webp` + `-dark` variant)
+ * chosen to evoke the destination. They are compact 96px derived assets;
+ * the shared themed renderer transfers only the active variant.
  *
  * Every href resolves to a real route under `src/app` (verified against the
  * routing tree). Keep this list in sync with those routes.
@@ -17,7 +17,7 @@ export type ExploreNavItem = {
   href: string;
   label: string;
   description: string;
-  /** Spot-engraving basename: /engravings/spot-{engraving}{-dark}.webp */
+  /** Compact navigation-engraving basename: spot-{engraving}{-dark}.webp */
   engraving: "laurel" | "globe" | "compass" | "column" | "ship" | "mountains";
 };
 

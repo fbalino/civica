@@ -33,8 +33,8 @@
  *   • SSR / pre-mount → render with NO transform (resting position), so first
  *     paint is correct and there is never a window read during render. The
  *     transform only attaches once mounted on the client.
- *   • When a dark-mode asset is supplied, both images keep the same hero class
- *     and the global theme-image CSS swaps them via `data-theme`.
+ *   • When a dark-mode asset is supplied, one themed background resolves via
+ *     `data-theme`, so the inactive source is not downloaded.
  */
 
 import {

@@ -106,4 +106,30 @@ test.describe("EXP-017 — navigation and hero asset budget", () => {
     expect(heroPaths).toContain("/engravings/hero-dark.webp");
     expect(heroPaths).not.toContain("/engravings/hero.webp");
   });
+
+  test("closed mobile menu defers its compact navigation art", async ({ page }) => {
+    const responses: Response[] = [];
+    page.on("response", (response) => responses.push(response));
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/about", { waitUntil: "networkidle" });
+    expect(navigationArtPaths(responses)).toEqual([]);
+
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await expect(page.locator(".mobile-menu")).toBeVisible();
+    await expect
+      .poll(() => navigationArtPaths(responses).length)
+      .toBe(NAVIGATION_ART_NAMES.length);
+
+    const artResponses = responses.filter((response) =>
+      localPath(response.url()).startsWith(NAVIGATION_ART_PREFIX),
+    );
+    expect(navigationArtPaths(responses).sort()).toEqual(
+      expectedNavigationArtPaths("light"),
+    );
+    const totalBytes = (
+      await Promise.all(artResponses.map((response) => response.body()))
+    ).reduce((sum, body) => sum + body.byteLength, 0);
+    expect(totalBytes).toBeLessThanOrEqual(MAX_OPEN_MENU_ART_BYTES);
+  });
 });

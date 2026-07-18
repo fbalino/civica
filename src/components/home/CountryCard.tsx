@@ -14,7 +14,7 @@ import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
  *
  * The country engraving (`/engravings/countries/<iso3>.webp`) is the card
  * image. When a matching `-dark.webp` asset exists, it is passed separately
- * and swapped by the global theme-image CSS.
+ * through one CSS-backed themed renderer, so only the active variant loads.
  */
 
 export interface CountryCardStat {
