@@ -12,9 +12,9 @@ import { createHash } from "node:crypto";
 export const CANONICAL_CI_WORKFLOW = ".github/workflows/ci.yml";
 export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
-/** SHA-256 of the complete production build command before the CI refactor. */
+/** SHA-256 of the complete credential-free production build command. */
 export const BUILD_CORE_SHA256 =
-  "22d2c55fe80883f12fb81a6d2938c22a0a76bae323e186243228be4c74f5e63a";
+  "c6b58b0c5988e0ba3df2753814d741bdfaa3b4dd39161ab4c8911d2de2d726f0";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
@@ -248,6 +248,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "npm run validate:index-change-control",
     "npm run validate:query-budgets",
     "npm run validate:route-performance-telemetry",
+    "npm run validate:verification-matrix",
     "npm run validate:claims-docs",
     "next build",
   ]) {

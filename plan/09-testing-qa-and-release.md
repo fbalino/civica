@@ -6,7 +6,7 @@
 
 ## Tasks
 
-- [ ] **QA-001** (P0) Create a test/verification matrix from every production route, pipeline, research calculation, data domain, and failure state to its existing or required tests. _Done when: every item has unit/integration/DB/browser/manual coverage status, owner, fixture, command, and gap task; no critical surface is unregistered._
+- [x] **QA-001** (P0) Create a test/verification matrix from every production route, pipeline, research calculation, data domain, and failure state to its existing or required tests. _Done when: every item has unit/integration/DB/browser/manual coverage status, owner, fixture, command, and gap task; no critical surface is unregistered._
 - [x] **QA-002** (P1) Set meaningful module-level coverage requirements rather than one misleading global percentage. _Done when: Index, Pulse, reconciliation, source freshness, auth, API contracts, content templates, and critical UI state reducers have justified branch/behavior thresholds; seeded untested branches fail the relevant gate._
 - [ ] **QA-003** (P0) Create deterministic, legally shareable database fixtures for tests. _Done when: fixtures cover representative countries/entities, full/partial/missing/disputed/stale data, multiple sources, jurisdictions/statuses, constitutions/elections/organizations, Index candidates, Pulse negatives/clusters, and migrations without production credentials._
 - [x] **QA-004** (P0) Keep live-database tests explicitly read-only and separable from fixture tests. _Done when: `npm run test:db` refuses unsafe/mutable connection modes, executes documented read-only queries/invariants, reports the target environment/vintage safely, and no test can modify production._
