@@ -173,7 +173,7 @@
 .not-found__note {
   font-family: var(--font-body);
   font-size: var(--text-14);
-  color: var(--color-text-50);
+  color: var(--color-text-primary);
   margin: var(--space-8) 0 0;
 }
 
