@@ -35,7 +35,7 @@ export function ThemedDecorativeImage({
 
   return (
     <span
-      className={["civica-themed-image", className].filter(Boolean).join(" ")}
+      className={`civica-themed-image${className ? ` ${className}` : ""}`}
       style={themedStyle}
       aria-hidden="true"
     />
