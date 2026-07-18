@@ -19,7 +19,7 @@ import {
   SOURCE_RIGHTS,
 } from "@/lib/rights/manifest";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Licensing — Data & Code Reuse Terms",
