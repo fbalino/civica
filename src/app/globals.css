@@ -622,8 +622,16 @@ a {
   background-color: var(--color-source-frozen);
 }
 
+.source-dot--experimental {
+  background-color: var(--color-status-info);
+}
+
+.source-dot--unknown {
+  background-color: var(--color-text-40);
+}
+
 .source-dot::after {
-  content: attr(data-source) "\A" attr(data-date);
+  content: attr(data-source) "\A" attr(data-state) "\A" attr(data-date) "\A" attr(data-vintage) "\A" attr(data-rights);
   display: none;
   white-space: pre-line;
   position: absolute;
@@ -632,8 +640,8 @@ a {
   transform: translateX(-50%);
   background: var(--color-tooltip-bg);
   color: var(--color-tooltip-text);
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
   font-size: var(--text-12);
   line-height: 1.4;
   padding: 6px 10px;
@@ -643,6 +651,7 @@ a {
   transition: none;
   z-index: 50;
   min-width: max-content;
+  max-width: min(24rem, calc(100vw - var(--space-8)));
   text-align: center;
 }
 
@@ -651,11 +660,15 @@ a {
   display: block;
 }
 
+.source-dot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: var(--space-1);
+}
+
 @media (max-width: 640px) {
   .source-dot::after {
     min-width: 0;
-    max-width: min(220px, calc(100vw - var(--space-8)));
-    white-space: normal;
+    white-space: pre-line;
   }
 }
 

@@ -744,11 +744,29 @@ export default function DesignSystemPage() {
                 }}
               >
                 <span>
-                  Live <SourceDot source="wikidata" retrievedAt="2026-06-01" />
+                  Live{" "}
+                  <SourceDot
+                    source="wikidata"
+                    retrievedAt="2026-06-01T12:34:56Z"
+                    upstreamVintage="Wikidata revision at retrieval"
+                  />
                 </span>
                 <span>
                   Frozen{" "}
-                  <SourceDot source="cia_factbook" retrievedAt="2026-01-15" />
+                  <SourceDot
+                    source="cia_factbook"
+                    retrievedAt="2026-01-15"
+                    upstreamVintage="CIA World Factbook 2026 archive"
+                  />
+                </span>
+                <span>
+                  Experimental{" "}
+                  <SourceDot
+                    source="wikidata"
+                    retrievedAt={null}
+                    state="experimental"
+                    upstreamVintage={null}
+                  />
                 </span>
               </div>
             </div>
