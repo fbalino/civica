@@ -294,6 +294,10 @@
   gap: 8px;
   align-items: flex-start;
   font-family: var(--font-body);
+  /* The legend can cover much of the narrow map. Its explanatory surface
+     must not consume map taps; restore hit testing only for its controls and
+     source links below. */
+  pointer-events: none;
 }
 
 /* Map-furniture treatment for the canonical .segmented control — same
@@ -302,6 +306,7 @@
   box-shadow: var(--shadow-hard-md);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
 }
 
 .atlas-indicator-legend {
@@ -363,6 +368,7 @@
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: var(--space-1);
+  pointer-events: auto;
 }
 
 /* Slim hint bar at the bottom of the Atlas map. Replaced the larger
