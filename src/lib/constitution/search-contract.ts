@@ -176,7 +176,7 @@ export const constitutionSearchInputSchema = z
   .strict()
   .superRefine((value, context) => {
     if (
-      Buffer.byteLength(value.query, "utf8") >
+      new TextEncoder().encode(value.query).byteLength >
       CONSTITUTION_SEARCH_MAX_QUERY_BYTES
     ) {
       context.addIssue({

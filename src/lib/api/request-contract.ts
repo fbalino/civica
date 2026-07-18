@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { apiProblem } from "@/lib/api/problem-response";
-import { CI_RELEASE_CONTRACTS } from "@/lib/ci/release-selection";
+import { apiProblem } from "@/lib/api/problem";
+import { CI_RELEASE_QUERY_IDENTITIES } from "@/lib/ci/release-query-identities";
 import { JURISDICTION_STATUS_TYPES } from "@/lib/jurisdictions/status-taxonomy";
 
 const MAX_RAW_QUERY_BYTES = 16_384;
@@ -24,12 +24,12 @@ const ATLAS_VINTAGE =
   /^Civica Atlas Reconciled v[^\s]+ — vintage \d{4}-Q[1-4]$/;
 
 const CI_RELEASE_IDS = new Set(
-  CI_RELEASE_CONTRACTS.map((release) => release.releaseId),
+  CI_RELEASE_QUERY_IDENTITIES.map((release) => release.releaseId),
 );
 const CI_METHODOLOGY_VERSIONS = new Set(
-  CI_RELEASE_CONTRACTS.map((release) => release.methodologyVersion),
+  CI_RELEASE_QUERY_IDENTITIES.map((release) => release.methodologyVersion),
 );
-const CURRENT_CI_RELEASE = CI_RELEASE_CONTRACTS.at(-1)!;
+const CURRENT_CI_RELEASE = CI_RELEASE_QUERY_IDENTITIES.at(-1)!;
 
 const utf8Length = (value: string) => new TextEncoder().encode(value).length;
 const withoutNullByte = (value: string) => !value.includes("\0");
@@ -98,7 +98,7 @@ const ciMethodologyReleaseQuery = z
   .strict()
   .superRefine((value, ctx) => {
     const matches = value.version
-      ? CI_RELEASE_CONTRACTS.filter(
+      ? CI_RELEASE_QUERY_IDENTITIES.filter(
           (release) => release.methodologyVersion === value.version,
         )
       : [];
@@ -110,7 +110,7 @@ const ciMethodologyReleaseQuery = z
       });
     }
     if (value.version && value.release) {
-      const release = CI_RELEASE_CONTRACTS.find(
+      const release = CI_RELEASE_QUERY_IDENTITIES.find(
         (candidate) => candidate.releaseId === value.release,
       );
       if (release?.methodologyVersion !== value.version) {

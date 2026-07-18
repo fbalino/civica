@@ -80,7 +80,7 @@ assert.match(
   releaseSelection,
   /resolveCiRelease\(releaseId: string = CURRENT_CI_RELEASE_ID\)/,
 );
-assert.match(requestContracts, /CI_RELEASE_CONTRACTS\.at\(-1\)!/);
+assert.match(requestContracts, /CI_RELEASE_QUERY_IDENTITIES\.at\(-1\)!/);
 assert.match(requestContracts, /value \?\? CURRENT_CI_RELEASE\.releaseId/);
 assert.match(
   releaseStore,
