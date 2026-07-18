@@ -184,7 +184,7 @@ test("Economic Conditions retains an absent component and withholds the score", 
   assert.equal(rows[0].components[1].valueStatusReason, "No published value");
 });
 
-test("Economic Conditions freezes separate reference populations and z-score parameters per year", () => {
+test("Economic Conditions freezes separate source-native populations per year without a score transform", () => {
   const observations = [
     {
       jurisdictionId: "y2023-a",
@@ -209,8 +209,37 @@ test("Economic Conditions freezes separate reference populations and z-score par
   assert.deepEqual(referenceSets.map((set) => set.referencePeriod), ["2023-Q4", "2024-Q4"]);
   assert.deepEqual(referenceSets[0].jurisdictionIds, ["y2023-a", "y2023-b"]);
   assert.deepEqual(referenceSets[1].jurisdictionIds, ["y2024-a"]);
-  assert.equal(referenceSets[0].parameters.find((parameter) => parameter.componentId === "inflation")?.mean, 4);
-  assert.equal(referenceSets[1].parameters.find((parameter) => parameter.componentId === "inflation")?.mean, 20);
+  assert.deepEqual(
+    referenceSets[0].parameters.map((parameter) => ({
+      direction: parameter.direction,
+      transformationId: parameter.transformationId,
+      mean: parameter.mean,
+      standardDeviation: parameter.standardDeviation,
+    })),
+    [
+      { direction: "not_ranked", transformationId: "conditions-economic-source-native/v1", mean: null, standardDeviation: null },
+      { direction: "not_ranked", transformationId: "conditions-economic-source-native/v1", mean: null, standardDeviation: null },
+      { direction: "not_ranked", transformationId: "conditions-economic-source-native/v1", mean: null, standardDeviation: null },
+    ],
+  );
+});
+
+test("Economic Conditions preserves aligned source inputs while withholding an unvalidated score", () => {
+  const rows = buildEconomicConditionsCalculations({
+    releaseId: "conditions-economic-fixture-v1",
+    methodologyVersion: "conditions-components/v1",
+    lineages: economicLineages(),
+    observations: [{
+      jurisdictionId: "aligned-source-native",
+      inflation: { value: 3.1, referenceYear: 2024, valueStatus: "observed", valueStatusReason: null },
+      unemployment: { value: 5.2, referenceYear: 2024, valueStatus: "observed", valueStatusReason: null },
+      gdpGrowth: { value: 2.4, referenceYear: 2024, valueStatus: "observed", valueStatusReason: null },
+    }],
+  });
+  assert.equal(rows[0].alignmentStatus, "aligned");
+  assert.equal(rows[0].normalizedScore, null);
+  assert.equal(rows[0].rawValue, null);
+  assert.equal(rows[0].referenceYear, 2024);
 });
 
 test("Conditions release manifest is order-independent and rejects an unbound calculation", () => {

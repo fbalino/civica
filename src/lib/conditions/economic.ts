@@ -33,42 +33,6 @@ export interface EconomicLineages {
   >;
 }
 
-function mean(values: readonly number[]): number {
-  return values.reduce((total, value) => total + value, 0) / values.length;
-}
-
-function stddev(values: readonly number[], average: number): number {
-  const variance = mean(values.map((value) => (value - average) ** 2));
-  return Math.sqrt(variance) || 1;
-}
-
-function normalCdf(z: number): number {
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-
-  const sign = z < 0 ? -1 : 1;
-  const x = Math.abs(z) / Math.SQRT2;
-  const t = 1.0 / (1.0 + p * x);
-  const y =
-    1.0 -
-    (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) *
-      Math.exp(-x * x);
-  return 0.5 * (1.0 + sign * y);
-}
-
-type EconomicStats = {
-  inflationMean: number;
-  inflationStddev: number;
-  unemploymentMean: number;
-  unemploymentStddev: number;
-  gdpGrowthMean: number;
-  gdpGrowthStddev: number;
-};
-
 function alignedReferenceYear(observation: EconomicObservation): number | null {
   const components = [
     observation.inflation,
@@ -80,23 +44,6 @@ function alignedReferenceYear(observation: EconomicObservation): number | null {
   }
   const years = new Set(components.map((component) => component.referenceYear));
   return years.size === 1 ? observation.inflation.referenceYear : null;
-}
-
-function economicStats(observations: readonly EconomicObservation[]): EconomicStats {
-  const inflationValues = observations.map((observation) => observation.inflation.value!);
-  const unemploymentValues = observations.map((observation) => observation.unemployment.value!);
-  const gdpGrowthValues = observations.map((observation) => observation.gdpGrowth.value!);
-  const inflationMean = mean(inflationValues);
-  const unemploymentMean = mean(unemploymentValues);
-  const gdpGrowthMean = mean(gdpGrowthValues);
-  return {
-    inflationMean,
-    inflationStddev: stddev(inflationValues, inflationMean),
-    unemploymentMean,
-    unemploymentStddev: stddev(unemploymentValues, unemploymentMean),
-    gdpGrowthMean,
-    gdpGrowthStddev: stddev(gdpGrowthValues, gdpGrowthMean),
-  };
 }
 
 function groupAlignedObservations(
@@ -114,9 +61,10 @@ function groupAlignedObservations(
 }
 
 /**
- * The frozen cross-country reference sets for economic normalization. Each
- * period has its own population and parameters: values from a newer period
- * cannot move an earlier period's distribution.
+ * Frozen, per-year source-native economic populations. There is no authorized
+ * scalar transformation: the registry preserves the exact components and
+ * candidate population needed for ATL-028 without equating GDP growth with
+ * economic stability.
  */
 export function buildEconomicReferenceSets(
   observations: readonly EconomicObservation[],
@@ -138,9 +86,7 @@ export function buildEconomicReferenceSets(
     mixedYearRefusedCount;
 
   return [...groups.entries()]
-    .map(([year, group]) => {
-      const statistics = economicStats(group);
-      return {
+    .map(([year, group]) => ({
         dimension: "economic_stability" as const,
         referencePeriod: `${year}-Q4`,
         jurisdictionIds: group.map((observation) => observation.jurisdictionId).sort(),
@@ -153,34 +99,33 @@ export function buildEconomicReferenceSets(
         parameters: [
           {
             componentId: "inflation" as const,
-            direction: "lower_is_better" as const,
-            transformationId: "conditions-economic-aligned-z-cdf/v2",
-            mean: statistics.inflationMean,
-            standardDeviation: statistics.inflationStddev,
+            direction: "not_ranked" as const,
+            transformationId: "conditions-economic-source-native/v1",
+            mean: null,
+            standardDeviation: null,
             lowerBound: null,
             upperBound: null,
           },
           {
             componentId: "unemployment" as const,
-            direction: "lower_is_better" as const,
-            transformationId: "conditions-economic-aligned-z-cdf/v2",
-            mean: statistics.unemploymentMean,
-            standardDeviation: statistics.unemploymentStddev,
+            direction: "not_ranked" as const,
+            transformationId: "conditions-economic-source-native/v1",
+            mean: null,
+            standardDeviation: null,
             lowerBound: null,
             upperBound: null,
           },
           {
             componentId: "gdp_growth" as const,
-            direction: "higher_is_better" as const,
-            transformationId: "conditions-economic-aligned-z-cdf/v2",
-            mean: statistics.gdpGrowthMean,
-            standardDeviation: statistics.gdpGrowthStddev,
+            direction: "not_ranked" as const,
+            transformationId: "conditions-economic-source-native/v1",
+            mean: null,
+            standardDeviation: null,
             lowerBound: null,
             upperBound: null,
           },
         ],
-      } satisfies ConditionsReferenceSet;
-    })
+      } satisfies ConditionsReferenceSet))
     .sort((left, right) => left.referencePeriod.localeCompare(right.referencePeriod));
 }
 
@@ -287,9 +232,9 @@ function unavailableCalculation(
 }
 
 /**
- * Builds decomposable economic Conditions calculations. Scores are created
- * only when all three declared inputs are observed in the same reference year;
- * missing or mixed-year candidates remain persisted as unavailable ledgers.
+ * Builds decomposable economic Conditions calculations. An aligned native
+ * ledger is retained only when all inputs share one reference year. It
+ * deliberately emits no score until ATL-028 validates a longitudinal construct.
  */
 export function buildEconomicConditionsCalculations(input: {
   observations: readonly EconomicObservation[];
@@ -297,13 +242,6 @@ export function buildEconomicConditionsCalculations(input: {
   methodologyVersion: string;
   lineages: EconomicLineages;
 }): ConditionScoreInput[] {
-  const statsByYear = new Map(
-    [...groupAlignedObservations(input.observations)].map(([year, group]) => [
-      year,
-      economicStats(group),
-    ]),
-  );
-
   return input.observations.map((observation) => {
     const components = [
       observation.inflation,
@@ -324,17 +262,6 @@ export function buildEconomicConditionsCalculations(input: {
     }
 
     const referenceYear = observation.inflation.referenceYear!;
-    const statistics = statsByYear.get(referenceYear);
-    if (!statistics) {
-      throw new Error(`Missing frozen economic reference set for ${referenceYear}`);
-    }
-    const compositeZ = mean([
-      -(observation.inflation.value! - statistics.inflationMean) / statistics.inflationStddev,
-      -(observation.unemployment.value! - statistics.unemploymentMean) / statistics.unemploymentStddev,
-      (observation.gdpGrowth.value! - statistics.gdpGrowthMean) / statistics.gdpGrowthStddev,
-    ]);
-    const normalizedScore = Math.round(normalCdf(compositeZ) * 1000) / 10;
-    const rawValue = Math.round(compositeZ * 1000) / 1000;
     const calculationComponents = draftComponents(
       observation,
       input.lineages,
@@ -345,8 +272,8 @@ export function buildEconomicConditionsCalculations(input: {
       jurisdictionId: observation.jurisdictionId,
       dimension: "economic_stability" as const,
       quarter: `${referenceYear}-Q4`,
-      normalizedScore,
-      rawValue,
+      normalizedScore: null,
+      rawValue: null,
       sourceId: "worldbank_economic",
       datasetYear: referenceYear,
       methodologyVersion: input.methodologyVersion,

@@ -22,7 +22,7 @@ const DIMENSION_META: Record<
   economic_stability: {
     label: "Economic Stability",
     shortLabel: "WB",
-    description: "Inflation, unemployment, and GDP growth composite. Source: World Bank.",
+    description: "Source-native inflation, unemployment, and real GDP growth inputs. No stability composite is currently published. Source: World Bank.",
   },
 };
 
@@ -35,11 +35,13 @@ function DimensionCard({
   score,
   sourceName,
   quarter,
+  unscoredReason,
 }: {
   dimension: string;
   score: number | null;
   sourceName: string | null;
   quarter: string | null;
+  unscoredReason?: string;
 }) {
   const meta = DIMENSION_META[dimension] ?? {
     label: dimension,
@@ -159,7 +161,7 @@ function DimensionCard({
       >
         {score != null
           ? [sourceName ?? meta.shortLabel, quarter].filter(Boolean).join(" · ")
-          : "Data not yet available for this country."}
+          : unscoredReason ?? "Data not yet available for this country."}
       </p>
     </div>
   );
@@ -256,9 +258,14 @@ export async function CivicaConditionsPanel({
             <DimensionCard
               key={dim}
               dimension={dim}
-              score={row?.normalizedScore ?? null}
+              score={dim === "economic_stability" ? null : row?.normalizedScore ?? null}
               sourceName={row?.sourceName ?? null}
               quarter={row?.quarter ?? null}
+              unscoredReason={
+                dim === "economic_stability"
+                  ? "Source-native inputs are retained; no stability score is published while longitudinal validation is under way."
+                  : undefined
+              }
             />
           );
         })}

@@ -194,11 +194,19 @@ export function conditionCalculationErrors(input: ConditionScoreInput): string[]
     if (!input.quarter || input.quarter !== `${referenceYear}-Q4`) {
       errors.push("aligned calculation quarter must match its reference year");
     }
-    if (!Number.isFinite(input.normalizedScore) || input.normalizedScore! < 0 || input.normalizedScore! > 100) {
-      errors.push("aligned calculation requires a normalized 0–100 score");
-    }
-    if (!Number.isFinite(input.rawValue)) {
-      errors.push("aligned calculation requires a finite raw value");
+    if (input.dimension === "economic_stability") {
+      // ATL-028: aligned source inputs are retained without asserting that a
+      // current-year growth value establishes a stability score.
+      if (input.normalizedScore !== null || input.rawValue !== null) {
+        errors.push("economic stability has no score before construct validation");
+      }
+    } else {
+      if (!Number.isFinite(input.normalizedScore) || input.normalizedScore! < 0 || input.normalizedScore! > 100) {
+        errors.push("aligned calculation requires a normalized 0–100 score");
+      }
+      if (!Number.isFinite(input.rawValue)) {
+        errors.push("aligned calculation requires a finite raw value");
+      }
     }
     if (input.components.some((component) => component.inclusionDecision !== "included")) {
       errors.push("aligned calculation must include every component");

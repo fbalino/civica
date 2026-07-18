@@ -2,9 +2,9 @@
  * Civica Conditions — Economic Stability inputs
  *
  * Fetches the three declared World Bank indicators and persists every input
- * as a component ledger row. A score exists only where all three components
- * are observed in the same reference year; mixed-year candidates are retained
- * as refused rather than labelled with their newest value.
+ * as a component ledger row. The release deliberately emits no economic
+ * stability score until ATL-028 validates a longitudinal construct; aligned
+ * source-native inputs remain queryable and mixed-year candidates are refused.
  */
 
 import { config } from "dotenv";
@@ -118,7 +118,7 @@ function economicLineages(observations: readonly EconomicObservation[]) {
   return {
     score: buildIndicatorLineage({
       ...common,
-      transformationId: "conditions-economic-aligned-z-cdf/v2",
+      transformationId: "conditions-economic-source-native/v1",
       rows: observations,
     }),
     components: {
@@ -199,7 +199,8 @@ async function main() {
   ).length;
 
   console.log(`\n${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.calculationsWritten || summary.proposed} calculation ledgers and ${summary.componentsWritten || rows.length * 3} component rows.`);
-  console.log(`Scores available: ${aligned}; mixed-year refused: ${mixedYear}; missing component: ${missing}.`);
+  console.log(`Aligned source-native ledgers: ${aligned}; mixed-year refused: ${mixedYear}; missing component: ${missing}.`);
+  console.log("Economic stability scores are intentionally withheld pending the ATL-028 frozen longitudinal construct study.");
   console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
 }
 

@@ -2091,13 +2091,14 @@ export async function getBillsForJurisdiction(slug: string, limit = 10) {
 
 /**
  * Phase 5.4 — Civica Conditions companion layer.
- * Returns the latest score row for each of the 3 dimensions
- * (human_development, peace_security, economic_stability) for a given
- * jurisdictionId under the specified methodologyVersion.
+ * Returns the latest published score row for Conditions dimensions for a given
+ * jurisdictionId under the specified methodologyVersion. The economic
+ * component ledger is intentionally separate: ATL-028 does not authorize an
+ * economic-stability score from a current-year growth observation.
  *
- * At most 3 rows are returned (one per dimension). If a dimension has
- * no data, it is simply absent from the array — callers render a
- * placeholder card for missing dimensions.
+ * At most two rows are returned (one per currently scoreable dimension). If a
+ * dimension has no published score, it is absent — callers render an honest
+ * placeholder.
  */
 export async function getCivicaConditionsForJurisdiction(
   jurisdictionId: string,
@@ -2124,6 +2125,7 @@ export async function getCivicaConditionsForJurisdiction(
     WHERE ccs.jurisdiction_id = ${jurisdictionId}
       AND ccs.methodology_version = ${methodologyVersion}
       AND ccc.alignment_status = 'aligned'
+      AND ccs.dimension <> 'economic_stability'
     ORDER BY ccs.dimension, ccs.quarter DESC
   `);
 

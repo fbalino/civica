@@ -15,6 +15,8 @@ export const CONDITIONS_MISSINGNESS_POLICY =
 export const CONDITIONS_DIRECTIONS = [
   "higher_is_better",
   "lower_is_better",
+  /** A source-native input is retained without a scalar quality direction. */
+  "not_ranked",
 ] as const;
 export type ConditionsDirection = (typeof CONDITIONS_DIRECTIONS)[number];
 
