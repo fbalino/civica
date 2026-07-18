@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { createHash } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
 import {
   fetchBuffer,
@@ -48,10 +49,42 @@ function selectiveCsv(text: string, columns: string[]) {
   if (!idx) throw new Error("CSV columns missing");
   return out;
 }
-async function exact(url: string, hash: string) {
+const FROZEN_INPUT_DIRECTORY = process.env.CIVICA_RESEARCH_INPUT_DIR
+  ? resolve(process.env.CIVICA_RESEARCH_INPUT_DIR)
+  : null;
+const ALLOW_NETWORK_CAPTURE = process.argv.includes("--allow-network-capture");
+
+/**
+ * Loads a retained publisher byte stream by content hash. Statistical replay
+ * must not silently substitute whatever happens to be available at a mutable
+ * publisher URL. A deliberate capture may use the network, but only when it
+ * writes the verified bytes into the protected local cache for later replay.
+ */
+export async function exactFrozenInput(url: string, hash: string) {
+  const cachePath = FROZEN_INPUT_DIRECTORY
+    ? join(FROZEN_INPUT_DIRECTORY, "sha256", hash)
+    : null;
+  if (cachePath && existsSync(cachePath)) {
+    const retained = readFileSync(cachePath);
+    const retainedHash = sha(retained);
+    if (retainedHash !== hash) {
+      throw new Error(`retained input hash drift ${cachePath}: expected ${hash}, got ${retainedHash}`);
+    }
+    return retained;
+  }
+  if (!ALLOW_NETWORK_CAPTURE) {
+    throw new Error(
+      `Missing retained frozen input ${hash}. Set CIVICA_RESEARCH_INPUT_DIR to the protected cache; network retrieval is disabled during replay.`,
+    );
+  }
+  if (!cachePath) {
+    throw new Error("--allow-network-capture requires CIVICA_RESEARCH_INPUT_DIR so verified bytes are retained");
+  }
   const b = await fetchBuffer(url);
   const actual = sha(b);
   if (actual !== hash) throw new Error(`hash drift ${url} ${actual}`);
+  mkdirSync(resolve(cachePath, ".."), { recursive: true });
+  writeFileSync(cachePath, b);
   return b;
 }
 const eventSet = (rows: Record<string, string>[]) => {
@@ -239,7 +272,7 @@ export async function buildIndexLongitudinalAnalysis() {
     LONGITUDINAL_VALIDATION_INPUTS.captures.qogJan25,
     LONGITUDINAL_VALIDATION_INPUTS.captures.qogJan26,
   ]) {
-    const b = await exact(c.url, c.sha256);
+    const b = await exactFrozenInput(c.url, c.sha256);
     qogRows.push(
       selectiveCsv(b.toString("utf8"), ["ccodealp", "year", "br_dem"]),
     );
@@ -277,7 +310,7 @@ export async function buildIndexLongitudinalAnalysis() {
     jan25VsJan26: agreement(eventSets[1], eventSets[2]),
   };
   const v14capture = LONGITUDINAL_VALIDATION_INPUTS.captures.vdemV14;
-  const v14buf = await exact(v14capture.url, v14capture.sha256);
+  const v14buf = await exactFrozenInput(v14capture.url, v14capture.sha256);
   const v14rows = selectiveCsv(
     zipEntryText(v14buf, (n) => n === "V-Dem-CY-Core-v14.csv"),
     ["country_text_id", "year", "v2x_libdem"],
