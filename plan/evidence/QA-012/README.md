@@ -28,7 +28,7 @@ the configured development environment. The final command and exit status:
 
 ```sh
 E2E_BASE_URL=http://localhost:3100 npm run test:e2e:a11y
-# 46 passed (42.0s), exit 0
+# 47 passed (46.6s), exit 0
 ```
 
 Coverage: fourteen canonical reader/admin routes in light and dark themes
@@ -36,8 +36,8 @@ Coverage: fourteen canonical reader/admin routes in light and dark themes
 chart; Atlas; selected Compare; rankings; Conditions; methodology; API
 documentation; contact; owner sign-in error; coding sign-in error; and branded
 404. Contact validation is also audited in both themes, for 30 axe audits.
-Ten shared-control keyboard journeys plus six contact/sign-in form journeys
-make 46 checks total.
+Eleven shared-control keyboard journeys plus six contact/sign-in form journeys
+make 47 checks total.
 
 The dark API-documentation audit was additionally repeated three times after
 the shared-token repair: 3/3 passed. The mobile-menu keyboard journey was
@@ -54,6 +54,8 @@ repeated three times after the test waited for client hydration: 3/3 passed.
   now provide the keyboard behavior their tab semantics promise.
 - Decorative Atlas map layers no longer intercept country pointer selection;
   the accessible native selector and map remain synchronized.
+- Organization membership-map country shapes are semantic links, so the
+  complete roster remains keyboard-operable on both its visual and list views.
 - The country-search shortcut, Conditions footer links, and coding sign-in
   owner link now meet the audited contrast and link-discernibility rules.
 
