@@ -6,6 +6,7 @@ import {
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
@@ -250,27 +251,7 @@ export default function MethodologyHubPage() {
                           {entry.title}
                         </h3>
                         {entry.beta && (
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              fontFamily: "var(--font-body)",
-                              fontSize: "var(--text-12)",
-                              fontWeight: 500,
-                              letterSpacing: 0,
-                              textTransform: "none",
-                              padding: "3px 9px",
-                              background:
-                                "color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg))",
-                              border:
-                                "1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent)",
-                              color:
-                                "color-mix(in oklab, var(--color-status-warning), black 32%)",
-                              borderRadius: "var(--radius-sm)",
-                            }}
-                          >
-                            Beta
-                          </span>
+                          <BetaChip />
                         )}
                       </div>
                       <p

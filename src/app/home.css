@@ -168,6 +168,12 @@
   margin: 0 0 var(--space-5);
   max-width: 46ch;
 }
+
+[data-theme="dark"] .home-feature-num,
+[data-theme="dark"] .home-feature-desc {
+  color: var(--color-text-primary);
+}
+
 .home-feature-link {
   font-family: var(--font-body);
   font-size: var(--text-14);

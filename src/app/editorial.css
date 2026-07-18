@@ -800,6 +800,10 @@
   font-weight: 500;
 }
 
+.reader-sidebar-link.is-active .reader-sidebar-num {
+  color: var(--color-text-primary);
+}
+
 .reader-sidebar-num {
   font-family: var(--font-mono);
   font-size: var(--text-12);
