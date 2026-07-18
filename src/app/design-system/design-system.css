@@ -225,9 +225,174 @@
   margin-top: var(--space-8); display: flex; justify-content: space-between;
 }
 
+/* EXP-014 — three pre-selection Explore directions. These are scoped to the
+   canonical design-system page and use only existing semantic tokens. */
+.ds-component-note {
+  max-width: 58ch;
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.explore-concepts {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.explore-concept {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border: var(--border-hairline) solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+
+.explore-concept__intro {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 58ch;
+}
+
+.explore-concept__number {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.explore-concept__intro h4 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-32);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-snug);
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+
+.explore-concept__intro > p:last-child {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.explore-index {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.explore-index__group {
+  border-top: var(--border-hairline) solid var(--color-border-default);
+  padding-top: var(--space-3);
+}
+
+.explore-index__group h5 {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.explore-index__group ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.explore-index__group a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-hairline) solid transparent;
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-snug);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: color var(--motion-fast) var(--motion-ease-out), border-color var(--motion-fast) var(--motion-ease-out);
+}
+
+.explore-index__group a > span {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+}
+
+.explore-index__group a:hover,
+.explore-index__group a:focus-visible {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+  outline: none;
+}
+
+.explore-emblem-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.explore-emblem {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  min-height: calc(var(--space-8) + var(--space-7));
+  padding: var(--space-4);
+  border: var(--border-hairline) solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-snug);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: background var(--motion-fast) var(--motion-ease-out), border-color var(--motion-fast) var(--motion-ease-out), color var(--motion-fast) var(--motion-ease-out);
+}
+
+.explore-emblem svg {
+  width: var(--space-6);
+  height: var(--space-6);
+  stroke-width: var(--border-hairline);
+  color: var(--color-accent);
+}
+
+.explore-emblem:hover,
+.explore-emblem:focus-visible {
+  border-color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface-primary));
+  color: var(--color-accent);
+  outline: none;
+}
+
+.explore-concept--reading-room .explore-menu {
+  width: min(40rem, 100%);
+}
+
 @media (max-width: 768px) {
   .ds-section-head { flex-direction: column; gap: var(--space-2); }
   .ds-section-head .dek { margin-left: 0; text-align: left; }
   .ds-section-head h2 { font-size: var(--text-28); }
   .ds-type-row { grid-template-columns: 1fr; gap: var(--space-2); }
+  .explore-index,
+  .explore-emblem-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

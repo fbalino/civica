@@ -14,6 +14,7 @@ import { SegmentedControlDemo } from "./SegmentedControlDemo";
 import { IndicatorTrendChartDemo } from "./IndicatorTrendChartDemo";
 import { IdeologyCompassDemo } from "./IdeologyCompassDemo";
 import { ExploreMenuDemo } from "./ExploreMenuDemo";
+import { ExploreConceptDemos } from "./ExploreConceptDemos";
 import { CountryDirectory } from "@/components/country/CountryDirectory";
 import { MobileNav } from "@/components/MobileNav";
 
@@ -849,6 +850,16 @@ export default function DesignSystemPage() {
                   This figure failed reconciliation.
                 </Banner>
               </div>
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4 id="explore-concepts">Explore navigation concept study</h4>
+              <p className="ds-component-note">
+                Three non-production directions for the owner decision. Each
+                uses the shared eight-destination identity and renders as real
+                keyboard-focusable links.
+              </p>
+              <ExploreConceptDemos />
             </div>
 
             <div className="ds-comp ds-comp--wide">
