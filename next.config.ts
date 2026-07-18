@@ -68,6 +68,11 @@ const FRAME_PROTECTION_HEADERS = [
 
 const nextConfig: NextConfig = {
   /* cacheComponents: true — re-enable after adding `use cache` to data functions */
+  // CountryHoverCard uses the approved 70-quality preview rendition. Next 16
+  // validates image optimizer quality requests against this explicit allowlist.
+  images: {
+    qualities: [70],
+  },
   turbopack: {
     root: __dirname,
     // Stable bundle/map debug IDs bind a monitored release to its protected
