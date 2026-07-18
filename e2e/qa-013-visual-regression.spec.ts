@@ -62,7 +62,7 @@ test.describe("QA-013 / EXP-025 — canonical visual baselines", () => {
     for (const theme of VISUAL_REGRESSION_THEMES) {
       for (const viewport of VISUAL_REGRESSION_VIEWPORTS) {
         const caseId = visualRegressionCaseId(scenario, theme, viewport);
-        test(`${caseId} matches its approved visual baseline`, async ({
+        test(`${caseId} matches its checked visual baseline`, async ({
           browser,
         }, testInfo) => {
           test.skip(

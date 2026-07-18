@@ -32,18 +32,22 @@ read-only test database; the test report must make that boundary visible.
   live network-only content, clocks, randomized IDs, and volatile telemetry are
   excluded or masked rather than silently accepted.
 - Each baseline records its route, viewport, theme, state, fixture requirement,
-  browser project, and input-contract hash in a checked manifest.
+  browser project, platform, SHA-256 image hash, and input-contract hash in a
+  checked manifest. The manifest rejects missing, duplicate, or unregistered
+  matrix cases rather than treating a raw image count as coverage.
 
 ## Review and update workflow
 
 1. `npm run test:e2e:visual` compares against checked baselines and writes
    Playwright diffs only under ignored `output/playwright/`.
 2. A candidate update must be generated explicitly with
-   `VISUAL_BASELINE_UPDATE=1`; normal test/CI commands never rewrite expected
-   artifacts.
-3. The update command requires a reviewer name and reason, writes the pending
-   baseline manifest, and reports every changed case. A reviewer then inspects
-   the image diff and promotes the manifest/artifacts in the same change.
+   `npm run update:e2e:visual -- --author=<name> --reason=<rationale>`;
+   normal test/CI commands never rewrite expected artifacts. The command writes
+   a candidate manifest only after the complete 68-case matrix succeeds.
+3. A reviewer inspects the candidate images and promotes it explicitly with
+   `VISUAL_BASELINE_APPROVE=1 npm run approve:e2e:visual -- --reviewer=<name>
+   --reason=<review rationale>`. Approval verifies every image hash and writes
+   the approved manifest; `npm run validate:visual-baselines` checks it later.
 4. A contract test mutates one declared visual token in an in-memory fixture
    and proves that the baseline comparator rejects the altered result.
 
