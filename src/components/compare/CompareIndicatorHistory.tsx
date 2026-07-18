@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { DataValueState } from "@/components/DataValueState";
 import { Button } from "@/components/editorial/Button";
 import { IndicatorTrendChart } from "@/components/ci/IndicatorTrendChart";
+import { SourceDot } from "@/components/SourceDot";
 import type { IndicatorHistorySeries } from "@/lib/db/queries";
 import {
   indicatorHistoryCatalogEntry,
@@ -22,9 +23,11 @@ export interface CompareIndicatorHistoryCountry {
 export function CompareIndicatorHistory({
   countries,
   downloadableSourceIds,
+  sourceFreshness,
 }: {
   countries: CompareIndicatorHistoryCountry[];
   downloadableSourceIds: string[];
+  sourceFreshness: Record<string, string | null> | null;
 }) {
   const options = useMemo(() => {
     const seen = new Map<
@@ -96,6 +99,18 @@ export function CompareIndicatorHistory({
       : [],
   );
   const exportAllowed = downloadableSourceIds.includes(selected.sourceId);
+  const sourceRetrievedAt = sourceFreshness?.[selected.sourceId];
+  const exportHref = (
+    country: CompareIndicatorHistoryCountry,
+    format: "json" | "csv",
+  ) => {
+    const params = new URLSearchParams({
+      format,
+      indicator: selected.indicator,
+      source: selected.sourceId,
+    });
+    return `/api/countries/${encodeURIComponent(country.slug)}/indicator-history?${params.toString()}`;
+  };
 
   return (
     <div className="compare-indicator-history">
@@ -132,7 +147,17 @@ export function CompareIndicatorHistory({
           {catalog?.unit ?? "source-native units"} · {catalog?.nativeScale}
         </span>
         <span>
-          Source: {sourceLabel(selected.sourceId)} · {catalog?.expectedCadence}
+          Source: {sourceLabel(selected.sourceId)}
+          {sourceFreshness ? (
+            <SourceDot
+              source={selected.sourceId}
+              retrievedAt={sourceRetrievedAt ?? null}
+            />
+          ) : (
+            " · freshness marker temporarily unavailable"
+          )}
+          {" · "}
+          {catalog?.expectedCadence}
         </span>
       </div>
 
@@ -146,6 +171,11 @@ export function CompareIndicatorHistory({
         {selectedByCountry.map(({ country, series }) => {
           const years = series?.points.map((point) => point.year) ?? [];
           const breaks = indicatorObservationBreaks(years);
+          const vintages = [
+            ...new Set(
+              series?.lineage.map((lineage) => lineage.upstreamRelease) ?? [],
+            ),
+          ];
           return (
             <div
               key={country.slug}
@@ -153,13 +183,20 @@ export function CompareIndicatorHistory({
             >
               <strong>{country.name}</strong>
               {years.length > 0 ? (
-                <span>
-                  {Math.min(...years)}–{Math.max(...years)} · {years.length}{" "}
-                  observations
-                  {breaks.length > 0
-                    ? ` · ${breaks.length} break${breaks.length === 1 ? "" : "s"}`
-                    : " · no break longer than two years"}
-                </span>
+                <>
+                  <span>
+                    {Math.min(...years)}–{Math.max(...years)} · {years.length}{" "}
+                    observations
+                    {breaks.length > 0
+                      ? ` · ${breaks.length} break${breaks.length === 1 ? "" : "s"}`
+                      : " · no break longer than two years"}
+                  </span>
+                  {vintages.length > 0 ? (
+                    <span>
+                      Publisher vintage{vintages.length === 1 ? "" : "s"}: {vintages.join(", ")}
+                    </span>
+                  ) : null}
+                </>
               ) : (
                 <DataValueState
                   status="not_observed"
@@ -167,13 +204,14 @@ export function CompareIndicatorHistory({
                 />
               )}
               {exportAllowed && years.length > 0 ? (
-                <Button
-                  href={`/api/countries/${encodeURIComponent(country.slug)}/indicator-history?format=csv&indicator=${encodeURIComponent(selected.indicator)}`}
-                  variant="text"
-                  size="sm"
-                >
-                  Download CSV
-                </Button>
+                <div className="compare-indicator-history-downloads">
+                  <Button href={exportHref(country, "json")} variant="text" size="sm">
+                    Download JSON
+                  </Button>
+                  <Button href={exportHref(country, "csv")} variant="text" size="sm">
+                    Download CSV
+                  </Button>
+                </div>
               ) : null}
             </div>
           );

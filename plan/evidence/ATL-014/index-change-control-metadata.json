@@ -1,0 +1,13 @@
+{
+  "id": "atl-014-source-native-compare-presentation",
+  "toVersion": "civica-index-source-native-compare-v48",
+  "categories": ["input", "presentation"],
+  "evidence": {
+    "documentation": ["plan/ATL-014-source-native-compare-2026-07-18.md"],
+    "registry": ["src/lib/ci/quarantine-contract.ts"],
+    "release_note": ["plan/evidence/ATL-014/index-change-control-release-note.md"],
+    "migration_plan": ["plan/evidence/ATL-014/index-change-control-migration-plan.md"],
+    "golden_test": ["e2e/atl-014-source-native-compare.spec.ts"],
+    "contract_test": ["src/lib/compare/atl-014-compare-contract.test.ts"]
+  }
+}

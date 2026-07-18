@@ -53,6 +53,7 @@ import {
   persons,
   sources,
   legislatureParties,
+  partyCompositionRuns,
   constitutions,
   elections,
   electionResults,
@@ -623,9 +624,31 @@ export async function getLegislatureComposition(jurisdictionId: string) {
     )
     .orderBy(desc(legislatureParties.seatCount));
 
+  const compositionRunIds = [
+    ...new Set(parties.map((party) => party.compositionRunId)),
+  ];
+  const compositionRuns =
+    compositionRunIds.length > 0
+      ? await db
+          .select()
+          .from(partyCompositionRuns)
+          .where(inArray(partyCompositionRuns.id, compositionRunIds))
+      : [];
+
   return bodies.map((body) => ({
     body,
     parties: parties.filter((p) => p.bodyId === body.id),
+    compositionSources: compositionRuns
+      .filter((run) => run.bodyId === body.id)
+      .map((run) => ({
+        runKey: run.runKey,
+        sourceId: run.sourceId,
+        sourceUrl: run.sourceUrl,
+        sourceLicense: run.sourceLicense,
+        sourceRetrievedAt: run.sourceRetrievedAt,
+        recordedAt: run.recordedAt,
+        writerVersion: run.writerVersion,
+      })),
   }));
 }
 

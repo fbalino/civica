@@ -10,6 +10,7 @@ import {
   getInternationalMembershipsBySlugs,
   getIndicatorHistoryForCountry,
   getConditionsPublicRelease,
+  getAllSources,
 } from "@/lib/db/queries";
 import {
   CompareCountrySelector,
@@ -154,6 +155,7 @@ export default async function ComparePage({
     Awaited<ReturnType<typeof getIndicatorHistoryForCountry>>
   > = [];
   let indicatorHistoryUnavailable = false;
+  let sourceFreshness: Record<string, string | null> | null = null;
   let conditionsRelease: Awaited<ReturnType<typeof getConditionsPublicRelease>> =
     null;
   const unavailableSections: string[] = [];
@@ -166,6 +168,7 @@ export default async function ComparePage({
       membershipsResult,
       indicatorHistoriesResult,
       conditionsReleaseResult,
+      sourcesResult,
     ] = await Promise.all([
       captureAtlasSurfaceQuery(() =>
         Promise.all(selectedJurisdictions.map(({ slug }) => getGovernanceEvidence(slug))),
@@ -181,6 +184,7 @@ export default async function ComparePage({
         Promise.all(selectedJurisdictions.map(({ slug }) => getIndicatorHistoryForCountry(slug))),
       ),
       captureAtlasSurfaceQuery(getConditionsPublicRelease),
+      captureAtlasSurfaceQuery(getAllSources),
     ]);
     if (governanceEvidenceResult.status === "available") {
       governanceEvidence = governanceEvidenceResult.value;
@@ -212,6 +216,16 @@ export default async function ComparePage({
       conditionsRelease = conditionsReleaseResult.value;
     } else {
       unavailableSections.push("Conditions");
+    }
+    if (sourcesResult.status === "available") {
+      sourceFreshness = Object.fromEntries(
+        sourcesResult.value.map((source) => [
+          source.id,
+          source.lastSyncAt?.toISOString() ?? null,
+        ]),
+      );
+    } else {
+      unavailableSections.push("source freshness");
     }
     const electionResults = await Promise.allSettled(
       ids.map((id) => getElectionsByJurisdiction(id)),
@@ -509,6 +523,7 @@ export default async function ComparePage({
                 <CompareIndicatorHistory
                   countries={indicatorHistoryCountries}
                   downloadableSourceIds={downloadableSourceIds}
+                  sourceFreshness={sourceFreshness}
                 />
               )}
             </section>

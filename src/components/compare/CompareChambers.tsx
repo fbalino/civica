@@ -1,6 +1,8 @@
 import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
 import { CompareColumnHeader } from "./CompareColumnHeader";
 import type { getLegislatureComposition } from "@/lib/db/queries";
+import { SourceDot } from "@/components/SourceDot";
+import { sourceLabel } from "@/lib/data/sources";
 
 type Composition = Awaited<ReturnType<typeof getLegislatureComposition>>;
 
@@ -41,6 +43,47 @@ function toCanonicalChamber(
       color: party.partyColor ?? "var(--color-text-40)",
     })),
   };
+}
+
+function compositionProvenance(entry: Composition[number]) {
+  const sources = entry.compositionSources;
+  if (sources.length === 0) {
+    return (
+      <p className="compare-chamber-provenance">
+        No source-bound composition release is recorded for this chamber. This
+        is a provenance gap, not evidence that the chamber has no seats.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="compare-chamber-provenance" aria-label="Chamber composition provenance">
+      {sources.map((source) => {
+        const retrievedAt = source.sourceRetrievedAt
+          ? source.sourceRetrievedAt.toISOString()
+          : null;
+        return (
+          <li key={source.runKey}>
+            {source.sourceId ? (
+              <>
+                <SourceDot source={source.sourceId} retrievedAt={retrievedAt} />
+                {" "}
+                {source.sourceUrl ? (
+                  <a href={source.sourceUrl} target="_blank" rel="noreferrer">
+                    {sourceLabel(source.sourceId)} composition release
+                  </a>
+                ) : (
+                  `${sourceLabel(source.sourceId)} composition release`
+                )}
+              </>
+            ) : (
+              "Composition release has no registered source identity"
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 export function CompareChambers({ countries }: CompareChambersProps) {
@@ -93,6 +136,7 @@ export function CompareChambers({ countries }: CompareChambersProps) {
                   }
                   countryName={c.jurisdiction.name}
                 />
+                {compositionProvenance(lower)}
               </div>
             ) : (
               <div className="compare-chamber-placeholder">
@@ -108,6 +152,7 @@ export function CompareChambers({ countries }: CompareChambersProps) {
                   houseLabel="Upper house"
                   countryName={c.jurisdiction.name}
                 />
+                {compositionProvenance(upper)}
               </div>
             )}
           </div>

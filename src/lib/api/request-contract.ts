@@ -278,6 +278,7 @@ export const QUERY_CONTRACT_SCHEMAS = {
       .object({
         format: z.enum(["json", "csv"]).default("json"),
         indicator: text(200, 1).regex(IDENTIFIER).optional(),
+        source: text(200, 1).regex(IDENTIFIER).optional(),
       })
       .strict(),
     repeatableKeys: [],

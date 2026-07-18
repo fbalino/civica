@@ -95,6 +95,20 @@ test("query contracts apply defaults and typed transformations", () => {
       data: { release: "conditions-atlas-v1" },
     },
   );
+  assert.deepEqual(
+    parseQueryContract(
+      request("?format=csv&indicator=rl.est&source=worldbank_wgi"),
+      "indicator-history-query/v1",
+    ),
+    {
+      ok: true,
+      data: {
+        format: "csv",
+        indicator: "rl.est",
+        source: "worldbank_wgi",
+      },
+    },
+  );
 });
 
 test("repeatable query keys preserve order but scalar duplicates fail", async () => {

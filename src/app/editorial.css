@@ -3956,6 +3956,27 @@ a.constitution-xref-card-country:hover {
   font-size: var(--text-12);
   color: var(--color-text-40);
 }
+.compare-chamber-provenance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-40);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  list-style: none;
+}
+.compare-chamber-provenance li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.compare-overview-provenance-gap {
+  color: var(--color-text-40);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+}
 .compare-chamber-placeholder {
   padding: var(--space-8) var(--space-5);
   background: var(--color-grid-cell);

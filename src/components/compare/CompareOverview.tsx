@@ -32,7 +32,6 @@ interface Jurisdiction {
   capital: string | null;
   governmentType: string | null;
   governmentTypeDetail: string | null;
-  democracyIndex: number | null;
   continent: string | null;
   governmentClassification?: GovernmentClassification | null;
 }
@@ -70,7 +69,6 @@ function extractLeader(
 interface Row {
   label: string;
   values: (string | null)[];
-  numericValues?: (number | null)[];
   source?: string;
   /**
    * Phase F.4 — when set, we look up `facts[factKey]` per country and
@@ -120,13 +118,11 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
     {
       label: "Population",
       values: resolved.map((r) => (r.popN != null ? formatNumber(r.popN) : null)),
-      numericValues: resolved.map((r) => r.popN),
       factKey: "population_total",
     },
     {
       label: "GDP",
       values: resolved.map((r) => (r.gdpN != null ? `$${r.gdpN.toFixed(1)}B` : null)),
-      numericValues: resolved.map((r) => r.gdpN),
       factKey: "gdp_ppp_usd_billions",
     },
     {
@@ -134,7 +130,6 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
       values: resolved.map((r) =>
         r.areaN != null ? `${r.areaN.toLocaleString()} km²` : null,
       ),
-      numericValues: resolved.map((r) => r.areaN),
       factKey: "area_total_km2",
     },
     {
@@ -154,13 +149,6 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
           c.jurisdiction.governmentTypeDetail ?? c.jurisdiction.governmentType
         )
       ),
-    },
-    {
-      label: "Democracy Index",
-      values: countries.map((c) =>
-        c.jurisdiction.democracyIndex ? c.jurisdiction.democracyIndex.toFixed(2) : null
-      ),
-      numericValues: countries.map((c) => c.jurisdiction.democracyIndex),
     },
     {
       label: "Head of State",
@@ -209,16 +197,6 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
         {rows.map((row) => {
           const hasAny = row.values.some((v) => v != null);
           if (!hasAny) return null;
-          let maxIdx = -1;
-          if (row.numericValues) {
-            let maxVal = -Infinity;
-            row.numericValues.forEach((val, idx) => {
-              if (val != null && val > maxVal) {
-                maxVal = val;
-                maxIdx = idx;
-              }
-            });
-          }
 
           return [
             <div
@@ -247,6 +225,7 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
               const country = countries[i];
               const fact = row.factKey ? country?.facts?.[row.factKey] : null;
               const hasCanonical = fact?.canonical != null;
+              const hasSourceGap = val != null && !hasCanonical && !row.source;
               return (
                 <div
                   key={`${row.label}-${i}`}
@@ -263,16 +242,12 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: "var(--text-14)",
-                      color:
-                        maxIdx === i && row.numericValues
-                          ? "var(--color-accent)"
-                          : "var(--color-text-primary)",
-                      fontWeight:
-                        maxIdx === i && row.numericValues ? 500 : 400,
+                      color: "var(--color-text-primary)",
+                      fontWeight: 400,
                       textAlign: "center",
                     }}
                   >
-                    {val ?? "—"}
+                    {val ?? "No value recorded"}
                   </span>
                   {val && row.factKey && hasCanonical && fact ? (
                     <FactValueDot
@@ -286,6 +261,11 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
                   {val && row.source && !hasCanonical && (
                     <SourceDot source={row.source} retrievedAt={null} />
                   )}
+                  {hasSourceGap ? (
+                    <span className="compare-overview-provenance-gap">
+                      No source record
+                    </span>
+                  ) : null}
                 </div>
               );
             }),

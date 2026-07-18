@@ -947,6 +947,12 @@
   font-size: var(--text-14);
 }
 
+.compare-indicator-history-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 @media (max-width: 768px) {
   .compare-indicator-history-coverage {
     grid-template-columns: minmax(0, 1fr);

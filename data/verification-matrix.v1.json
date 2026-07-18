@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "b09af8f5e103a44201ab4a001c1665b75dc7a029c92d37b7888fb39370a4abeb",
+  "semanticHash": "905824f69cd4b81cbfc7be20ef40fd8a86ea3755d3ad431916d4ff90c1a2c680",
   "summary": {
     "route": 175,
     "pipeline": 50,
@@ -4776,7 +4776,9 @@
           "evidence": [
             "src/lib/ci/quarantine-contract.test.ts",
             "src/lib/atlas/atl-018-country-reader.test.ts",
-            "e2e/atl-018-data-states.spec.ts"
+            "src/lib/atlas/map-layers.test.ts",
+            "e2e/atl-018-data-states.spec.ts",
+            "e2e/atl-015-source-native-map.spec.ts"
           ],
           "gapTask": null
         },

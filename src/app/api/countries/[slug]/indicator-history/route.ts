@@ -46,6 +46,7 @@ export async function GET(
       const { slug } = path.data;
       const { format } = query.data;
       const indicator = query.data.indicator ?? null;
+      const source = query.data.source ?? null;
 
       const product = evaluatePublicExport(
         "indicator-history-country-export",
@@ -87,10 +88,12 @@ export async function GET(
         getIndicatorHistoryForCountry(slug),
         getAllSources(),
       ]);
-      const selectedSeries = indicator
-        ? allSeries.filter((series) => series.indicator === indicator)
-        : allSeries;
-      if (indicator && selectedSeries.length === 0) {
+      const selectedSeries = allSeries.filter(
+        (series) =>
+          (!indicator || series.indicator === indicator) &&
+          (!source || series.sourceId === source),
+      );
+      if ((indicator || source) && selectedSeries.length === 0) {
         return NextResponse.json(
           {
             error: "Indicator history not found for this country.",
