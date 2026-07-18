@@ -1,8 +1,9 @@
 # QA-012 — accessibility automation and keyboard journeys
 
-Partial evidence recorded 2026-07-18. QA-012 remains open: its done-when
-criterion requires the full canonical control/state matrix, including the
-admin and isolated-fixture surfaces owned by QA-011.
+Automated evidence updated 2026-07-18. QA-012 remains open only for a
+documented human-assisted screen-reader review; its canonical control/state
+matrix is now covered by the command below, including public admin error
+states and the isolated form journeys owned by EXP-034/QA-011.
 
 ## Current implementation
 
@@ -13,9 +14,12 @@ admin and isolated-fixture surfaces owned by QA-011.
 - The suite records the compact axe result for each case as a Playwright
   attachment. HTML/JSON reports, traces, and failure screenshots remain in the
   gitignored `output/playwright/` directory.
-- Keyboard journeys cover desktop Explore disclosure and Escape focus return,
-  mobile-menu focus trap and Escape focus return, country search selection,
-  and roving focus for shared segmented controls (Arrow, Home, End).
+- Keyboard journeys cover desktop Explore disclosure and Escape focus return;
+  mobile navigation drawer focus trap and Escape focus return; country search;
+  filters; shared select menus; sortable tables; indicator-chart series
+  toggles; segmented controls; map/lightbox dialogs; citation tabs; and Atlas
+  selection/comparison. The integrated EXP-034 journeys cover contact
+  reachability and validation focus plus both sign-in error alerts.
 
 ## Isolated browser evidence
 
@@ -24,13 +28,16 @@ the configured development environment. The final command and exit status:
 
 ```sh
 E2E_BASE_URL=http://localhost:3100 npm run test:e2e:a11y
-# 26 passed (33.5s), exit 0
+# 46 passed (42.0s), exit 0
 ```
 
-Coverage: eleven canonical reader routes in light and dark themes (22 audits):
-home; country Factbook; country Civica Data; Atlas; selected Compare; rankings;
-Conditions; methodology; API documentation; contact; and branded 404. The four
-keyboard journeys above make 26 checks total.
+Coverage: fourteen canonical reader/admin routes in light and dark themes
+(28 audits): home; country Factbook; country Civica Data; country longitudinal
+chart; Atlas; selected Compare; rankings; Conditions; methodology; API
+documentation; contact; owner sign-in error; coding sign-in error; and branded
+404. Contact validation is also audited in both themes, for 30 axe audits.
+Ten shared-control keyboard journeys plus six contact/sign-in form journeys
+make 46 checks total.
 
 The dark API-documentation audit was additionally repeated three times after
 the shared-token repair: 3/3 passed. The mobile-menu keyboard journey was
@@ -45,12 +52,18 @@ repeated three times after the test waited for client hydration: 3/3 passed.
   hand-rolled pill.
 - Informative controls gained names/roles where missing; segmented controls
   now provide the keyboard behavior their tab semantics promise.
+- Decorative Atlas map layers no longer intercept country pointer selection;
+  the accessible native selector and map remain synchronized.
+- The country-search shortcut, Conditions footer links, and coding sign-in
+  owner link now meet the audited contrast and link-discernibility rules.
 
 ## Limitations and next evidence
 
-This result does not demonstrate all controls or assistive technologies. It is
-Chromium plus automated axe and scripted keyboard coverage, not a claim of
-universal WCAG conformance. The remaining reader controls and the admin/reviewer
-states must be added after QA-011's isolated fixture environment exists. A
-documented manual assistive-technology review is still required before checking
-QA-012 in the master checklist.
+This result does not demonstrate every assistive technology. It is Chromium
+plus automated axe and scripted keyboard coverage, not a claim of universal
+WCAG conformance. Before checking QA-012 in the master checklist, add a
+non-mutating manual screen-reader review of the reader country route, contact
+validation, and both sign-in error pages. Record the browser, assistive
+technology/version, navigation keys, observed labels/announcements, and any
+findings here. An attempted local assistive-technology bridge could not attach
+within its bounded run, so no manual result is claimed or inferred.

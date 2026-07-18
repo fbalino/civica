@@ -2,9 +2,9 @@
 
 ## Status
 
-Partial implementation and browser verification complete; QA-012 remains open
-until its full control and admin-state matrix is covered. The Playwright
-harness now has a dedicated accessibility command:
+The automated reader, form, and public-admin error-state matrix is complete.
+QA-012 remains open only for its documented human-assisted screen-reader
+review. The Playwright harness has a dedicated accessibility command:
 
 ```sh
 npm run test:e2e:a11y
@@ -19,21 +19,27 @@ with affected selectors. This preserves the hash of the already frozen review
 packet, which includes `package-lock.json` as an immutable input.
 
 The complementary keyboard suite exercises the desktop Explore disclosure,
-mobile menu focus trap/Escape restoration, country search selection, and the
-shared segmented-control arrow-key/roving-focus behavior. The generic
-`SegmentedControl` now implements arrow, Home, and End movement for every
+mobile navigation drawer focus trap/Escape restoration, country search,
+shared select menus, sortable tables, indicator-chart series toggles,
+segmented controls, map/lightbox dialogs, citation tabs, Atlas selection and
+comparison, and the error paths in the contact and both sign-in forms. The
+generic `SegmentedControl` implements arrow, Home, and End movement for every
 consumer instead of advertising `tablist` semantics with click-only behavior.
 
-The isolated real-browser run on 2026-07-18 passed all 26 current checks with
-no axe suppressions: 22 WCAG A/AA route-and-theme audits plus four keyboard
-journeys. Its command, covered states, repaired findings, and retained output
-location are recorded in `plan/evidence/QA-012/README.md`.
+The isolated real-browser run on 2026-07-18 passed all 46 checks with no axe
+suppressions: 30 WCAG A/AA route-and-theme/state audits, 10 shared-control
+keyboard journeys, and six contact/sign-in form error journeys. Its command,
+covered states, repaired findings, and retained output location are recorded
+in `plan/evidence/QA-012/README.md`.
 
 ## Remaining evidence before completion
 
-1. Extend the scenario ledger to the remaining reader/admin states and every
-   control class (filters, drawers, lightboxes, maps, charts, tables,
-   accordions, and forms) after the isolated fixtures in QA-011 are available.
-2. Archive browser/assistive-technology review evidence and the contrast
-   findings in `plan/evidence/QA-012/`; update the master checklist only when
-   the full state/control matrix is proven.
+1. Conduct and archive a non-mutating manual screen-reader review on the
+   current production-candidate browser/build. Cover the reader country route,
+   contact validation, and both sign-in error states; record browser,
+   assistive technology, navigation keys, observed labels/announcements, and
+   any findings in `plan/evidence/QA-012/`.
+2. Update the master checklist only if that human-assisted review confirms the
+   labels, focus order, and error announcements represented by the automated
+   suite. The automated command does not by itself claim universal WCAG
+   conformance.
