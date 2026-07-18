@@ -19,14 +19,25 @@ The expected hashes are the checked capture identities in
 writing the verified bytes to that protected local cache. The cache is ignored
 and may never be committed or publicly served.
 
+`npm run validate:statistical-reproducibility` is the aggregate static gate for
+nine checked statistical artifacts. It pins the bytes of every result,
+registered file input, dimensionality table/figure, semantic result hash,
+analysis entrypoint, replay command, and every randomized analysis seed. A
+changed input, output, method entrypoint, seed, table, figure, or removed
+validator fails rather than silently reusing a prior result. The relevant
+private release manifests retain the expected database-row hashes; the final
+replay evidence must verify those hashes against the protected database before
+this becomes a closed reproducibility claim.
+
 ## Remaining closure work
 
 1. Retain the four approved historical source bytes in the protected cache and
    rerun the longitudinal validator without network access.
 2. Apply the same retained-input replay contract to every analytical generator
-   still querying a frozen private release directly.
-3. Add the single aggregate QA-008 command that reruns all registered analyses,
-   records versions/seeds/tolerances/input hashes, and proves a changed input
-   or method version cannot reuse an old result.
+   still querying a frozen private release directly, including its exact
+   protected row hash.
+3. Execute the registered validators in an isolated, read-only environment,
+   record the environment metadata and tolerances, and demonstrate a changed
+   input or method version cannot reuse an old result.
 4. Preserve the successful commands, environment metadata, and deliberate
    drift fixtures under `plan/evidence/QA-008/` before checking the task.
