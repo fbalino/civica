@@ -746,8 +746,11 @@
   flex-wrap: wrap;
 }
 .editorial-footer-nav a {
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
 }
 .editorial-footer-nav a:hover {
   text-decoration: underline;

@@ -169,13 +169,13 @@ test.describe("QA-012 — keyboard journeys", () => {
     await selector.focus();
     await expect(selector).toBeFocused();
 
-    // Pointer selection writes back to the same native selector state.
-    // Do this before fly-to changes the map viewport, so this remains an
-    // actionability check on the country's actual rendered geometry.
-    await page.locator('path[data-id="jpn"]').first().click();
-    await expect(selector).toHaveValue("jpn");
+    // Pointer selection writes back to the same native selector state. Germany
+    // is a compact mainland geometry, so Playwright can click its visible paint
+    // rather than the empty center of a multi-part country's bounding box.
+    await page.locator('path[data-id="deu"]').first().click();
+    await expect(selector).toHaveValue("deu");
     await expect(page.getByRole("status")).toHaveText(
-      "Japan selected. Choose an action below.",
+      "Germany selected. Choose an action below.",
     );
 
     await selector.selectOption("fra");
@@ -188,7 +188,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     );
 
     await page.getByRole("button", { name: "Add to comparison" }).click();
-    await selector.selectOption("fra");
+    await selector.selectOption("deu");
     await page.getByRole("button", { name: "Add to comparison" }).click();
     await expect(page.getByRole("button", { name: "Open compare" })).toBeEnabled();
   });
