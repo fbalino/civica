@@ -2,13 +2,17 @@
 
 Automated evidence updated 2026-07-18. QA-012 remains open only for a
 documented human-assisted screen-reader review; its canonical control/state
-matrix is now covered by the command below, including public admin error
-states and the isolated form journeys owned by EXP-034/QA-011.
+matrix is covered by the command below, including public admin error states
+and the isolated form journeys owned by EXP-034/QA-011.
 
 ## Current implementation
 
 - `npm run test:e2e:a11y` runs `e2e/qa-012-accessibility.spec.ts` and
   `e2e/qa-012-keyboard.spec.ts` through the shared real-browser harness.
+- CI requires that command after the credential-free production build. It runs
+  database-independent routes and keyboard journeys; routes that genuinely
+  need the declared read-only fixture database are visibly skipped instead of
+  being replaced by a fabricated data state.
 - The audit injects the lockfile-pinned `axe-core` runtime and fails on all
   WCAG A/AA violations, including computed contrast. It uses no suppressions.
 - The suite records the compact axe result for each case as a Playwright
@@ -23,12 +27,13 @@ states and the isolated form journeys owned by EXP-034/QA-011.
 
 ## Isolated browser evidence
 
-An isolated disposable worktree ran the real application on port 3100 against
-the configured development environment. The final command and exit status:
+An isolated disposable worktree ran the real application from a clean
+production build. The controlled-fixture command and exit status:
 
 ```sh
-E2E_BASE_URL=http://localhost:3100 npm run test:e2e:a11y
-# 51 passed (1.3m), exit 0
+E2E_BASE_URL=http://localhost:3102 E2E_PERFORMANCE_FIXTURE_DB=1 \
+  npm run test:e2e:a11y
+# 51 passed, 0 skipped, 0 unexpected (about 61s), exit 0
 ```
 
 Coverage: fourteen canonical reader/admin routes in light and dark themes
@@ -43,6 +48,19 @@ checks total.
 The dark API-documentation audit was additionally repeated three times after
 the shared-token repair: 3/3 passed. The mobile-menu keyboard journey was
 repeated three times after the test waited for client hydration: 3/3 passed.
+
+The fresh credential-free production build used by CI also passed its honest
+subset:
+
+```sh
+E2E_BASE_URL=http://localhost:3102 npm run test:e2e:a11y
+# 30 passed, 21 fixture-dependent checks skipped, exit 0
+```
+
+The skipped checks are the eight country/Atlas theme audits, nine data-backed
+keyboard journeys, and four Atlas pointer/keyboard matrix cases. They run in
+full only when `E2E_PERFORMANCE_FIXTURE_DB=1` declares the controlled read-only
+fixture; CI does not receive database credentials.
 
 ## Findings repaired before the passing run
 
@@ -62,6 +80,11 @@ repeated three times after the test waited for client hydration: 3/3 passed.
   the explicit two-country comparison flow.
 - The country-search shortcut, Conditions footer links, and coding sign-in
   owner link now meet the audited contrast and link-discernibility rules.
+- Next 16's image optimizer now explicitly permits the 70-quality Atlas card
+  preview rendition, so hover-card image requests no longer produce 400s.
+- On narrow screens, the explanatory Atlas legend no longer intercepts map
+  taps: its segmented control and source links retain hit testing while the
+  non-interactive legend area passes taps through to the map.
 
 ## Limitations and next evidence
 

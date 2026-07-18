@@ -15,8 +15,11 @@ Deque's official Playwright package documentation on 2026-07-18) to audit
 representative canonical reader routes and selected states in both themes. Each
 audit attaches its compact result JSON to the retained Playwright output; WCAG
 A/AA violations, including browser-evaluated contrast failures, fail the test
-with affected selectors. This preserves the hash of the already frozen review
-packet, which includes `package-lock.json` as an immutable input.
+with affected selectors. The credential-free CI workflow now requires this
+command: it runs every database-independent journey and explicitly skips only
+the routes that need the controlled read-only fixture database. This preserves
+the hash of the already frozen review packet, which includes `package-lock.json`
+as an immutable input.
 
 The complementary keyboard suite exercises the desktop Explore disclosure,
 mobile navigation drawer focus trap/Escape restoration, country search,
@@ -26,12 +29,13 @@ comparison, and the error paths in the contact and both sign-in forms. The
 generic `SegmentedControl` implements arrow, Home, and End movement for every
 consumer instead of advertising `tablist` semantics with click-only behavior.
 
-The isolated real-browser run on 2026-07-18 passed all 51 checks with no axe
-suppressions: 30 WCAG A/AA route-and-theme/state audits, 11 shared-control
-keyboard journeys, four Atlas selection/compare journeys, and six
-contact/sign-in form error journeys. Its command, covered states, repaired
-findings, and retained output location are recorded in
-`plan/evidence/QA-012/README.md`.
+The isolated real-browser controlled-fixture run on 2026-07-18 passed all 51
+checks with no axe suppressions: 30 WCAG A/AA route-and-theme/state audits, 11
+shared-control keyboard journeys, four Atlas selection/compare journeys, and
+six contact/sign-in form error journeys. A separate credential-free production
+build passed 30 database-independent checks and skipped 21 fixture-dependent
+ones. Its commands, covered states, repaired findings, and retained output
+location are recorded in `plan/evidence/QA-012/README.md`.
 
 ## Remaining evidence before completion
 
