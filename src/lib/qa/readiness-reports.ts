@@ -181,7 +181,7 @@ export function loadReadinessInputs(root = process.cwd()): ReadinessInputs {
         completed: task.completed,
         evidencePath,
         evidencePresent: existsSync(join(root, evidencePath)),
-        progressPresent: new RegExp(`^- ${task.id} completed:`, "m").test(progress),
+        progressPresent: new RegExp(`^- ${task.id} completed\\b`, "m").test(progress),
         manualCheckLines: manualLines.flatMap((line, index) => line.includes(task.id) ? [index + 1] : []),
       });
     }

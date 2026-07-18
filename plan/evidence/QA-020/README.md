@@ -19,15 +19,16 @@ shell-evaluate report data or store command output.
 ## Current truthful state
 
 The checked report records 306 tasks: 215 complete, 91 remaining, 38 open P0,
-and 86 open P0/P1 tasks. All gates are `blocked`. It identifies the existing
-completion-record gaps for `IDX-037`, `ATL-007`, and `EXP-034`; it does not
-invent evidence for them.
+and 86 open P0/P1 tasks. All gates are `blocked`. Its completion-log parser
+recognizes the project's established `TASK-ID completed…` grammar (including
+qualified completions such as “completed through” and “completed and
+corrected”), while still rejecting a checked task with no completion record or
+evidence directory.
 
 The live G2 runner was executed on 2026-07-18. Its five fixed commands passed:
 master-plan integrity, G2 Atlas validation, offline Atlas reproduction,
 clean-room validation, and release-quality-report integrity. Its overall
-status remained `blocked` because readiness also requires complete plan
-evidence and no open P0 work.
+status remained `blocked` because readiness requires no open P0 work.
 
 ## Verification
 

@@ -18,7 +18,7 @@ function task(id: string, priority: "P0" | "P1" | "P2", checked: boolean) {
   return `- [${checked ? "x" : " "}] **${id}** (${priority}) Fixture task. _Done when: fixture completes._`;
 }
 
-function fixture(options: { completed: boolean; evidence?: boolean; progress?: boolean }) {
+function fixture(options: { completed: boolean; evidence?: boolean; progress?: boolean; progressLine?: string }) {
   const root = mkdtempSync(join(tmpdir(), "civica-readiness-"));
   mkdirSync(join(root, "plan", "evidence"), { recursive: true });
   mkdirSync(join(root, "data", "readiness"), { recursive: true });
@@ -26,7 +26,12 @@ function fixture(options: { completed: boolean; evidence?: boolean; progress?: b
   const second = task("QA-099", "P0", false);
   writeFileSync(join(root, "plan", "02-fixture.md"), `# Area fixture\n\n${first}\n${second}\n`);
   writeFileSync(join(root, "plan", "MASTER-CHECKLIST.md"), `# Master\n\n${first}\n${second}\n`);
-  writeFileSync(join(root, "plan", "PROGRESS.md"), options.progress === false ? "# Progress\n" : "# Progress\n\n- QA-001 completed: fixture\n");
+  writeFileSync(
+    join(root, "plan", "PROGRESS.md"),
+    options.progress === false
+      ? "# Progress\n"
+      : `# Progress\n\n${options.progressLine ?? "- QA-001 completed: fixture"}\n`,
+  );
   writeFileSync(join(root, "plan", "MANUAL-CHECKS.md"), "# Manual\n\n- **QA-099** requires a human check.\n");
   writeFileSync(join(root, "data", "readiness", "waivers.v1.json"), '{"schemaVersion":"civica-readiness-waivers/v1","waivers":[]}\n');
   if (options.evidence !== false) mkdirSync(join(root, "plan", "evidence", "QA-001"));
@@ -57,6 +62,16 @@ test("missing evidence or progress is a visible blocking gap", () => {
     const report = buildGateReadinessReport(loadReadinessInputs(root), "G2", passing("G2"));
     assert.equal(report.status, "blocked");
     assert.deepEqual(report.evidenceGaps, ["QA-001: completion record missing", "QA-001: evidence directory missing"]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("qualified completion records remain valid completion evidence", () => {
+  const root = fixture({ completed: true, progressLine: "- QA-001 completed and corrected: fixture" });
+  try {
+    const report = buildGateReadinessReport(loadReadinessInputs(root), "G2", passing("G2"));
+    assert.deepEqual(report.evidenceGaps, []);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
