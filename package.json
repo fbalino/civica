@@ -388,6 +388,7 @@
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "test:e2e": "playwright test",
+    "test:e2e:a11y": "playwright test e2e/qa-012-accessibility.spec.ts e2e/qa-012-keyboard.spec.ts",
     "test:e2e:report": "playwright show-report output/playwright/report",
     "validate:module-coverage": "tsx scripts/validate-module-coverage.ts",
     "validate:ci-workflow": "tsx scripts/validate-ci-workflow.ts",
