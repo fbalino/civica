@@ -765,7 +765,7 @@
   font-size: var(--text-12);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
-  color: var(--color-text-40);
+  color: var(--color-text-25);
   margin: 0 0 var(--space-4);
   font-weight: 400;
 }
