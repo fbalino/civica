@@ -28,8 +28,8 @@ same selection, profile, and two-country comparison state.
    `plan/PROGRESS.md` line, then—and only then—check EXP-033 in both checklist
    mirrors.
 
-## Current boundary
+## Completion
 
-Implementation is underway. Browser evidence is not yet available because the
-local Playwright executable is hanging before test discovery; EXP-033 remains
-unchecked.
+Completed 2026-07-18. The focused Chromium contract passed at desktop and
+small-mobile widths in both themes, and the expanded accessibility suite passed
+51 checks. The durable evidence is `plan/evidence/EXP-033/README.md`.

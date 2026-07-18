@@ -26,11 +26,12 @@ comparison, and the error paths in the contact and both sign-in forms. The
 generic `SegmentedControl` implements arrow, Home, and End movement for every
 consumer instead of advertising `tablist` semantics with click-only behavior.
 
-The isolated real-browser run on 2026-07-18 passed all 47 checks with no axe
+The isolated real-browser run on 2026-07-18 passed all 51 checks with no axe
 suppressions: 30 WCAG A/AA route-and-theme/state audits, 11 shared-control
-keyboard journeys, and six contact/sign-in form error journeys. Its command,
-covered states, repaired findings, and retained output location are recorded
-in `plan/evidence/QA-012/README.md`.
+keyboard journeys, four Atlas selection/compare journeys, and six
+contact/sign-in form error journeys. Its command, covered states, repaired
+findings, and retained output location are recorded in
+`plan/evidence/QA-012/README.md`.
 
 ## Remaining evidence before completion
 
