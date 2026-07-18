@@ -89,7 +89,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     await trigger.focus();
     await page.keyboard.press("Enter");
 
-    const listbox = page.getByRole("listbox", { name: "Select region" });
+    const listbox = page.getByRole("listbox", { name: "Filter by region" });
     await expect(listbox).toBeVisible();
     await expect(listbox.getByRole("option", { selected: true })).toBeFocused();
 
@@ -168,6 +168,16 @@ test.describe("QA-012 — keyboard journeys", () => {
     await waitForReactHydration(selector);
     await selector.focus();
     await expect(selector).toBeFocused();
+
+    // Pointer selection writes back to the same native selector state.
+    // Do this before fly-to changes the map viewport, so this remains an
+    // actionability check on the country's actual rendered geometry.
+    await page.locator('path[data-id="jpn"]').first().click();
+    await expect(selector).toHaveValue("jpn");
+    await expect(page.getByRole("status")).toHaveText(
+      "Japan selected. Choose an action below.",
+    );
+
     await selector.selectOption("fra");
     await expect(page.getByRole("status")).toHaveText(
       "France selected. Choose an action below.",
@@ -175,13 +185,6 @@ test.describe("QA-012 — keyboard journeys", () => {
     await expect(page.locator('path[data-id="fra"]').first()).toHaveAttribute(
       "data-selected",
       "1",
-    );
-
-    // Pointer selection writes back to the same native selector state.
-    await page.locator('path[data-id="jpn"]').first().click();
-    await expect(selector).toHaveValue("jpn");
-    await expect(page.getByRole("status")).toHaveText(
-      "Japan selected. Choose an action below.",
     );
 
     await page.getByRole("button", { name: "Add to comparison" }).click();

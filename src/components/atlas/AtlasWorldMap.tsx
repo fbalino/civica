@@ -392,9 +392,15 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               width="4000"
               height="2000"
               fill="url(#dots)"
+              pointerEvents="none"
             />
             {/* Graticule */}
-            <g stroke="var(--atlas-rule-2)" strokeWidth="1" fill="none">
+            <g
+              stroke="var(--atlas-rule-2)"
+              strokeWidth="1"
+              fill="none"
+              pointerEvents="none"
+            >
               {Array.from({ length: 9 }, (_, i) => (
                 <line
                   key={`h${i}`}
