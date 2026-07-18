@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "948c3b7e4ee94d030b25cad84751bcc35e84c8f4803b3435ea534791c781ad59",
+  "semanticHash": "e27fc5dcc3eb691752e350730189e467a6ebe38499ffe6dc159fe8d967ac608e",
   "summary": {
     "route": 173,
     "pipeline": 50,
@@ -1738,7 +1738,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -1784,7 +1785,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -1830,7 +1832,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -1876,7 +1879,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -1922,7 +1926,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -1968,7 +1973,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2014,7 +2020,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2060,7 +2067,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2106,7 +2114,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2152,7 +2161,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2198,7 +2208,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2244,7 +2255,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2290,7 +2302,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2336,7 +2349,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2382,7 +2396,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2428,7 +2443,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2520,7 +2536,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2566,7 +2583,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2612,7 +2630,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2658,7 +2677,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2704,7 +2724,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2750,7 +2771,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2796,7 +2818,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2842,7 +2865,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2888,7 +2912,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2934,7 +2959,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -2980,7 +3006,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3118,7 +3145,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3164,7 +3192,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3210,7 +3239,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3256,7 +3286,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3302,7 +3333,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3348,7 +3380,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3440,7 +3473,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3486,7 +3520,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3532,7 +3567,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3578,7 +3614,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3624,7 +3661,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },
@@ -3900,7 +3938,8 @@
           "status": "covered",
           "evidence": [
             "npm run validate:pipeline-observability",
-            "npm run validate:production-adapters"
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
           ],
           "gapTask": null
         },

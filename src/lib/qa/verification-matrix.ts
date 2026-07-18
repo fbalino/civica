@@ -199,27 +199,37 @@ function pipelineEntries(): VerificationMatrixEntry[] {
       pipeline,
       trigger: "manual" as const,
     })),
-  ].map(({ pipeline, trigger }) => ({
-    id: `pipeline:${pipeline.id}`,
-    kind: "pipeline" as const,
-    title: `${pipeline.id} ${trigger} production pipeline`,
-    source: pipeline.implementationPaths.join(", "),
-    critical: true as const,
-    owner: trigger === "scheduled" ? "Scheduled data operations" : "Data ingestion and release operations",
-    fixture: trigger === "scheduled"
-      ? `Registered ${pipeline.id} cron adapter and source-input specification`
-      : `Registered ${pipeline.id} manual adapter and canonical command`,
-    command: trigger === "scheduled"
-      ? "npm run validate:pipeline-observability && npm run validate:production-adapters"
-      : `npm run ${pipeline.canonicalNpmScript}`,
-    coverage: coverage({
-      unit: cell("covered", [pipelineTest]),
-      integration: cell("covered", ["npm run validate:pipeline-observability", "npm run validate:production-adapters"]),
-      database: cell("covered", ["npm run validate:fixture-database"]),
-      browser: na(),
-      manual: cell("planned", ["Scheduled-data failure recovery journey"], "QA-011"),
-    }),
-  }));
+  ].map(({ pipeline, trigger }) => {
+    const external =
+      trigger === "manual" ||
+      ("inputKind" in pipeline && pipeline.inputKind === "external");
+    const integrationEvidence = [
+      "npm run validate:pipeline-observability",
+      "npm run validate:production-adapters",
+    ];
+    if (external) integrationEvidence.push("npm run validate:ingestion-contract-fixtures");
+    return {
+      id: `pipeline:${pipeline.id}`,
+      kind: "pipeline" as const,
+      title: `${pipeline.id} ${trigger} production pipeline`,
+      source: pipeline.implementationPaths.join(", "),
+      critical: true as const,
+      owner: trigger === "scheduled" ? "Scheduled data operations" : "Data ingestion and release operations",
+      fixture: trigger === "scheduled"
+        ? `Registered ${pipeline.id} cron adapter and source-input specification`
+        : `Registered ${pipeline.id} manual adapter and canonical command`,
+      command: trigger === "scheduled"
+        ? "npm run validate:pipeline-observability && npm run validate:production-adapters"
+        : `npm run ${pipeline.canonicalNpmScript}`,
+      coverage: coverage({
+        unit: cell("covered", [pipelineTest]),
+        integration: cell("covered", integrationEvidence),
+        database: cell("covered", ["npm run validate:fixture-database"]),
+        browser: na(),
+        manual: cell("planned", ["Scheduled-data failure recovery journey"], "QA-011"),
+      }),
+    };
+  });
 }
 
 function calculationEntries(): VerificationMatrixEntry[] {

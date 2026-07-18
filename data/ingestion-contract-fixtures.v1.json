@@ -1,0 +1,5663 @@
+{
+  "schemaVersion": "civica-ingestion-contract-fixtures/v1",
+  "generatedFrom": "production-adapter-registry/source-input-manifest/rights-manifest",
+  "fixtureCount": 62,
+  "sourceCount": 44,
+  "externalPipelineCount": 39,
+  "fixtures": [
+    {
+      "fixtureId": "atlas.cia-factbook:cia_factbook",
+      "pipelineId": "atlas.cia-factbook",
+      "sourceId": "cia_factbook",
+      "source": {
+        "canonicalUrl": "https://github.com/factbook/factbook.json",
+        "format": "json",
+        "upstreamVersion": "frozen repository revision",
+        "upstreamVintage": "2026-01 frozen editorial vintage",
+        "expectedCoverage": "all matched Factbook country and territory records",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/__tests__/atlas-seed-writer.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.constitutions:constitute_project",
+      "pipelineId": "atlas.constitutions",
+      "sourceId": "constitute_project",
+      "source": {
+        "canonicalUrl": "https://www.constituteproject.org/service/",
+        "format": "json",
+        "upstreamVersion": "service response at retrieval",
+        "upstreamVintage": "constitution document dates plus retrieval date",
+        "expectedCoverage": "matched constitutions and excerpts available through the service",
+        "redistributionPosture": "non-commercial"
+      },
+      "publicExport": "non-commercial-only",
+      "witnessTests": [
+        "src/lib/constitute/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.country-metrics:transparency_intl",
+      "pipelineId": "atlas.country-metrics",
+      "sourceId": "transparency_intl",
+      "source": {
+        "canonicalUrl": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "CPI 2024 results workbook",
+        "upstreamVintage": "2024 edition",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/metrics/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.country-metrics:undp_hdi",
+      "pipelineId": "atlas.country-metrics",
+      "sourceId": "undp_hdi",
+      "source": {
+        "canonicalUrl": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+        "format": "csv",
+        "upstreamVersion": "2025 Human Development Report composite-indices time series",
+        "upstreamVintage": "report edition and observation year retained per value",
+        "expectedCoverage": "countries in the selected HDI series matched to Civica",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/metrics/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.country-metrics:world_bank",
+      "pipelineId": "atlas.country-metrics",
+      "sourceId": "world_bank",
+      "source": {
+        "canonicalUrl": "https://api.worldbank.org/v2",
+        "format": "json",
+        "upstreamVersion": "World Bank Indicators API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured indicators and available economies",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/metrics/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.elections:international_idea",
+      "pipelineId": "atlas.elections",
+      "sourceId": "international_idea",
+      "source": {
+        "canonicalUrl": "https://www.idea.int/data-tools/export?type=region_only&themeId=293&world=all",
+        "format": "xlsx",
+        "upstreamVersion": "export response at retrieval",
+        "upstreamVintage": "election dates retained per row",
+        "expectedCoverage": "presidential and parliamentary turnout rows matched to Civica elections",
+        "redistributionPosture": "non-commercial"
+      },
+      "publicExport": "non-commercial-only",
+      "witnessTests": [
+        "src/lib/elections/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.elections:ipu_parline",
+      "pipelineId": "atlas.elections",
+      "sourceId": "ipu_parline",
+      "source": {
+        "canonicalUrl": "https://api.data.ipu.org/v1",
+        "format": "json",
+        "upstreamVersion": "Parline API response at retrieval",
+        "upstreamVintage": "legislature/election dates retained per row",
+        "expectedCoverage": "available national legislatures, chambers, elections, and party seats",
+        "redistributionPosture": "non-commercial"
+      },
+      "publicExport": "non-commercial-only",
+      "witnessTests": [
+        "src/lib/elections/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.elections:wikidata",
+      "pipelineId": "atlas.elections",
+      "sourceId": "wikidata",
+      "source": {
+        "canonicalUrl": "https://query.wikidata.org/sparql",
+        "format": "rdf-json",
+        "upstreamVersion": "Wikidata revision state at retrieval",
+        "upstreamVintage": "statement/reference dates plus retrieval date",
+        "expectedCoverage": "entities matched by the configured SPARQL query",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/elections/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.government-taxonomy:bjornskov_rode",
+      "pipelineId": "atlas.government-taxonomy",
+      "sourceId": "bjornskov_rode",
+      "source": {
+        "canonicalUrl": "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
+        "format": "mixed",
+        "upstreamVersion": "QoG Standard release containing Bjornskov-Rode/CGV",
+        "upstreamVintage": "dataset reference year retained per row",
+        "expectedCoverage": "matched jurisdictions in the selected cross-section",
+        "redistributionPosture": "non-commercial"
+      },
+      "publicExport": "non-commercial-only",
+      "witnessTests": [
+        "src/lib/government-taxonomy/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.government-taxonomy:cia_factbook",
+      "pipelineId": "atlas.government-taxonomy",
+      "sourceId": "cia_factbook",
+      "source": {
+        "canonicalUrl": "https://github.com/factbook/factbook.json",
+        "format": "json",
+        "upstreamVersion": "frozen repository revision",
+        "upstreamVintage": "2026-01 frozen editorial vintage",
+        "expectedCoverage": "all matched Factbook country and territory records",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/government-taxonomy/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.government-taxonomy:wikidata",
+      "pipelineId": "atlas.government-taxonomy",
+      "sourceId": "wikidata",
+      "source": {
+        "canonicalUrl": "https://query.wikidata.org/sparql",
+        "format": "rdf-json",
+        "upstreamVersion": "Wikidata revision state at retrieval",
+        "upstreamVintage": "statement/reference dates plus retrieval date",
+        "expectedCoverage": "entities matched by the configured SPARQL query",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/government-taxonomy/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.indicator-history:freedom_house",
+      "pipelineId": "atlas.indicator-history",
+      "sourceId": "freedom_house",
+      "source": {
+        "canonicalUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "Freedom in the World workbook through 2024",
+        "upstreamVintage": "2024 edition",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/research/__tests__/manual-writers-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.indicator-history:transparency_intl",
+      "pipelineId": "atlas.indicator-history",
+      "sourceId": "transparency_intl",
+      "source": {
+        "canonicalUrl": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "CPI 2024 results workbook",
+        "upstreamVintage": "2024 edition",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/research/__tests__/manual-writers-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.indicator-history:undp_hdi",
+      "pipelineId": "atlas.indicator-history",
+      "sourceId": "undp_hdi",
+      "source": {
+        "canonicalUrl": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+        "format": "csv",
+        "upstreamVersion": "2025 Human Development Report composite-indices time series",
+        "upstreamVintage": "report edition and observation year retained per value",
+        "expectedCoverage": "countries in the selected HDI series matched to Civica",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/research/__tests__/manual-writers-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.indicator-history:vdem",
+      "pipelineId": "atlas.indicator-history",
+      "sourceId": "vdem",
+      "source": {
+        "canonicalUrl": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip",
+        "format": "zip-csv",
+        "upstreamVersion": "V-Dem Country-Year Core v15",
+        "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/research/__tests__/manual-writers-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.indicator-history:worldbank_wgi",
+      "pipelineId": "atlas.indicator-history",
+      "sourceId": "worldbank_wgi",
+      "source": {
+        "canonicalUrl": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "WGI 2025 revision",
+        "upstreamVintage": "2024 observations",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/research/__tests__/manual-writers-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.legislatures-parties:ipu_parline",
+      "pipelineId": "atlas.legislatures-parties",
+      "sourceId": "ipu_parline",
+      "source": {
+        "canonicalUrl": "https://api.data.ipu.org/v1",
+        "format": "json",
+        "upstreamVersion": "Parline API response at retrieval",
+        "upstreamVintage": "legislature/election dates retained per row",
+        "expectedCoverage": "available national legislatures, chambers, elections, and party seats",
+        "redistributionPosture": "non-commercial"
+      },
+      "publicExport": "non-commercial-only",
+      "witnessTests": [
+        "src/lib/legislatures/__tests__/composition-writer.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.legislatures-parties:wikidata",
+      "pipelineId": "atlas.legislatures-parties",
+      "sourceId": "wikidata",
+      "source": {
+        "canonicalUrl": "https://query.wikidata.org/sparql",
+        "format": "rdf-json",
+        "upstreamVersion": "Wikidata revision state at retrieval",
+        "upstreamVintage": "statement/reference dates plus retrieval date",
+        "expectedCoverage": "entities matched by the configured SPARQL query",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/legislatures/__tests__/composition-writer.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.organization-memberships:civica_organization_roster_v1",
+      "pipelineId": "atlas.organization-memberships",
+      "sourceId": "civica_organization_roster_v1",
+      "source": {
+        "canonicalUrl": "https://www.civicaatlas.org/methodology/source-coverage",
+        "format": "database-rows",
+        "upstreamVersion": "organization-membership-release/2026-07-v1",
+        "upstreamVintage": "official organization pages retrieved 2026-07-12",
+        "expectedCoverage": "23 organization identities and 446 retained relationships; nine complete rosters and fourteen selected checked subsets",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/data/__tests__/atl-012-organization-memberships-dated-relationships.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.party-positions:vparty",
+      "pipelineId": "atlas.party-positions",
+      "sourceId": "vparty",
+      "source": {
+        "canonicalUrl": "https://www.v-dem.net/data/v-party-dataset/",
+        "format": "csv",
+        "upstreamVersion": "V-Party v2",
+        "upstreamVintage": "fixed February 2022 release covering through 2019",
+        "expectedCoverage": "matched parties present in the fixed release",
+        "redistributionPosture": "open-share-alike"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/research/__tests__/manual-writers-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.br:camara_br",
+      "pipelineId": "bills.br",
+      "sourceId": "camara_br",
+      "source": {
+        "canonicalUrl": "https://dadosabertos.camara.leg.br/api/v2",
+        "format": "json",
+        "upstreamVersion": "API v2",
+        "upstreamVintage": "bill update/publication timestamps",
+        "expectedCoverage": "most recent configured Câmara proceedings",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/sync.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.br:senado_br",
+      "pipelineId": "bills.br",
+      "sourceId": "senado_br",
+      "source": {
+        "canonicalUrl": "https://legis.senado.leg.br/dadosabertos",
+        "format": "xml",
+        "upstreamVersion": "open-data response at retrieval",
+        "upstreamVintage": "bill update/publication timestamps",
+        "expectedCoverage": "most recent configured Senado Federal proceedings",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/sync.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.ca:legisinfo_ca",
+      "pipelineId": "bills.ca",
+      "sourceId": "legisinfo_ca",
+      "source": {
+        "canonicalUrl": "https://www.parl.ca/legisinfo/en/bills/json",
+        "format": "json",
+        "upstreamVersion": "LEGISinfo response schema at retrieval",
+        "upstreamVintage": "bill update/publication timestamps",
+        "expectedCoverage": "latest configured Canadian bills",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/upsert.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.de:bundestag_dip",
+      "pipelineId": "bills.de",
+      "sourceId": "bundestag_dip",
+      "source": {
+        "canonicalUrl": "https://search.dip.bundestag.de/api/v1",
+        "format": "json",
+        "upstreamVersion": "API response schema at retrieval",
+        "upstreamVintage": "bill update/publication timestamps",
+        "expectedCoverage": "most recent configured Bundestag proceedings",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/upsert.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.fr:data_assemblee_fr",
+      "pipelineId": "bills.fr",
+      "sourceId": "data_assemblee_fr",
+      "source": {
+        "canonicalUrl": "https://data.assemblee-nationale.fr",
+        "format": "mixed",
+        "upstreamVersion": "publisher dataset/API response at retrieval",
+        "upstreamVintage": "dossier update/publication timestamps",
+        "expectedCoverage": "latest configured Assemblée nationale dossiers",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/sync.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.fr:senat_fr",
+      "pipelineId": "bills.fr",
+      "sourceId": "senat_fr",
+      "source": {
+        "canonicalUrl": "https://data.senat.fr",
+        "format": "mixed",
+        "upstreamVersion": "publisher dataset response at retrieval",
+        "upstreamVintage": "dossier update/publication timestamps",
+        "expectedCoverage": "latest configured Sénat dossiers",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/sync.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.uk:uk_parliament",
+      "pipelineId": "bills.uk",
+      "sourceId": "uk_parliament",
+      "source": {
+        "canonicalUrl": "https://bills-api.parliament.uk/api/v1",
+        "format": "json",
+        "upstreamVersion": "UK Parliament Bills API response at retrieval",
+        "upstreamVintage": "bill update/publication timestamps",
+        "expectedCoverage": "latest configured United Kingdom bills",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/upsert.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "bills.us:congress_gov",
+      "pipelineId": "bills.us",
+      "sourceId": "congress_gov",
+      "source": {
+        "canonicalUrl": "https://api.congress.gov/v3",
+        "format": "json",
+        "upstreamVersion": "Congress.gov API v3",
+        "upstreamVintage": "bill update/publication timestamps",
+        "expectedCoverage": "latest configured United States bills",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/bills/sources/source-fixtures.test.ts",
+        "src/lib/bills/upsert.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "conditions.current-beta:global_peace_index",
+      "pipelineId": "conditions.current-beta",
+      "sourceId": "global_peace_index",
+      "source": {
+        "canonicalUrl": "https://www.visionofhumanity.org/maps/",
+        "format": "mixed",
+        "upstreamVersion": "operator-supplied licensed edition",
+        "upstreamVintage": "edition year retained per row",
+        "expectedCoverage": "countries present in the supplied edition",
+        "redistributionPosture": "non-commercial"
+      },
+      "publicExport": "non-commercial-only",
+      "witnessTests": [
+        "src/lib/conditions/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "conditions.current-beta:undp_hdi",
+      "pipelineId": "conditions.current-beta",
+      "sourceId": "undp_hdi",
+      "source": {
+        "canonicalUrl": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+        "format": "csv",
+        "upstreamVersion": "2025 Human Development Report composite-indices time series",
+        "upstreamVintage": "report edition and observation year retained per value",
+        "expectedCoverage": "countries in the selected HDI series matched to Civica",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/conditions/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "conditions.current-beta:worldbank_economic",
+      "pipelineId": "conditions.current-beta",
+      "sourceId": "worldbank_economic",
+      "source": {
+        "canonicalUrl": "https://api.worldbank.org/v2",
+        "format": "json",
+        "upstreamVersion": "World Bank Indicators API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured economic-condition indicators and available economies",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/conditions/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.cia-cabinets:cia_world_leaders",
+      "pipelineId": "factbook.cia-cabinets",
+      "sourceId": "cia_world_leaders",
+      "source": {
+        "canonicalUrl": "https://www.cia.gov/resources/world-leaders/foreign-governments/",
+        "format": "html",
+        "upstreamVersion": "page response at retrieval",
+        "upstreamVintage": "page retrieval date",
+        "expectedCoverage": "all country pages and parsed officials available in the directory",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/__tests__/cia-cabinets-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.classifications:cia_factbook",
+      "pipelineId": "factbook.classifications",
+      "sourceId": "cia_factbook",
+      "source": {
+        "canonicalUrl": "https://github.com/factbook/factbook.json",
+        "format": "json",
+        "upstreamVersion": "frozen repository revision",
+        "upstreamVintage": "2026-01 frozen editorial vintage",
+        "expectedCoverage": "all matched Factbook country and territory records",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-classifications-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.classifications:vdem",
+      "pipelineId": "factbook.classifications",
+      "sourceId": "vdem",
+      "source": {
+        "canonicalUrl": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip",
+        "format": "zip-csv",
+        "upstreamVersion": "V-Dem Country-Year Core v15",
+        "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-classifications-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.classifications:world_bank",
+      "pipelineId": "factbook.classifications",
+      "sourceId": "world_bank",
+      "source": {
+        "canonicalUrl": "https://api.worldbank.org/v2",
+        "format": "json",
+        "upstreamVersion": "World Bank Indicators API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured indicators and available economies",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-classifications-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.eurostat:eurostat",
+      "pipelineId": "factbook.eurostat",
+      "sourceId": "eurostat",
+      "source": {
+        "canonicalUrl": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/",
+        "format": "json",
+        "upstreamVersion": "dissemination API response at retrieval",
+        "upstreamVintage": "observation time retained per value",
+        "expectedCoverage": "configured indicators for Eurostat-covered jurisdictions",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-eurostat-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.fao-faostat:fao_faostat",
+      "pipelineId": "factbook.fao-faostat",
+      "sourceId": "fao_faostat",
+      "source": {
+        "canonicalUrl": "https://fenixservices.fao.org/faostat/api/v1/",
+        "format": "json",
+        "upstreamVersion": "FAOSTAT API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured FAOSTAT indicators and available countries",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-fao-faostat-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.ibge-br:ibge_br",
+      "pipelineId": "factbook.ibge-br",
+      "sourceId": "ibge_br",
+      "source": {
+        "canonicalUrl": "https://servicodados.ibge.gov.br/api/",
+        "format": "json",
+        "upstreamVersion": "IBGE API response at retrieval",
+        "upstreamVintage": "observation time retained per value",
+        "expectedCoverage": "configured Brazil indicators",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-ibge-br-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.ilo-ilostat:ilo_ilostat",
+      "pipelineId": "factbook.ilo-ilostat",
+      "sourceId": "ilo_ilostat",
+      "source": {
+        "canonicalUrl": "https://rplumber.ilo.org/data/indicator/",
+        "format": "mixed",
+        "upstreamVersion": "ILOSTAT bulk/API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured labour indicators and available countries",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-ilo-ilostat-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.imf-weo:imf_weo",
+      "pipelineId": "factbook.imf-weo",
+      "sourceId": "imf_weo",
+      "source": {
+        "canonicalUrl": "https://www.imf.org/en/Publications/WEO/weo-database",
+        "format": "mixed",
+        "upstreamVersion": "named WEO edition",
+        "upstreamVintage": "edition and observation year retained per value",
+        "expectedCoverage": "configured WEO indicators and available economies",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-imf-weo-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.insee-fr:insee_fr",
+      "pipelineId": "factbook.insee-fr",
+      "sourceId": "insee_fr",
+      "source": {
+        "canonicalUrl": "https://www.bdm.insee.fr/series/sdmx/",
+        "format": "xml",
+        "upstreamVersion": "INSEE BDM SDMX response at retrieval",
+        "upstreamVintage": "observation time retained per value",
+        "expectedCoverage": "configured France indicators",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-insee-fr-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.oecd-stat:oecd_stat",
+      "pipelineId": "factbook.oecd-stat",
+      "sourceId": "oecd_stat",
+      "source": {
+        "canonicalUrl": "https://sdmx.oecd.org/public/rest/v1/",
+        "format": "mixed",
+        "upstreamVersion": "OECD SDMX response at retrieval",
+        "upstreamVintage": "observation time retained per value",
+        "expectedCoverage": "configured OECD indicators and available members",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-oecd-stat-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.officeholders:wikidata",
+      "pipelineId": "factbook.officeholders",
+      "sourceId": "wikidata",
+      "source": {
+        "canonicalUrl": "https://query.wikidata.org/sparql",
+        "format": "rdf-json",
+        "upstreamVersion": "Wikidata revision state at retrieval",
+        "upstreamVintage": "statement/reference dates plus retrieval date",
+        "expectedCoverage": "entities matched by the configured SPARQL query",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/__tests__/officeholders-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.ons-uk:ons_uk",
+      "pipelineId": "factbook.ons-uk",
+      "sourceId": "ons_uk",
+      "source": {
+        "canonicalUrl": "https://api.beta.ons.gov.uk/v1/",
+        "format": "json",
+        "upstreamVersion": "ONS API response at retrieval",
+        "upstreamVintage": "observation time retained per value",
+        "expectedCoverage": "configured United Kingdom indicators",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-ons-uk-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.statcan-ca:statcan_ca",
+      "pipelineId": "factbook.statcan-ca",
+      "sourceId": "statcan_ca",
+      "source": {
+        "canonicalUrl": "https://www150.statcan.gc.ca/t1/wds/rest/",
+        "format": "json",
+        "upstreamVersion": "Web Data Service response at retrieval",
+        "upstreamVintage": "observation time retained per value",
+        "expectedCoverage": "configured Canada indicators",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-statcan-ca-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.stats-sa:stats_sa",
+      "pipelineId": "factbook.stats-sa",
+      "sourceId": "stats_sa",
+      "source": {
+        "canonicalUrl": "https://www.statssa.gov.za/publications/",
+        "format": "pdf",
+        "upstreamVersion": "named Stats SA statistical release",
+        "upstreamVintage": "release period retained per value",
+        "expectedCoverage": "configured South Africa indicators extracted from publisher releases",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-stats-sa-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.un-data:un_data",
+      "pipelineId": "factbook.un-data",
+      "sourceId": "un_data",
+      "source": {
+        "canonicalUrl": "https://data.un.org/Handlers/DownloadHandler.ashx",
+        "format": "csv",
+        "upstreamVersion": "UNdata export response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured UNdata indicators and available countries",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-un-data-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.undp-hdi:undp_hdi",
+      "pipelineId": "factbook.undp-hdi",
+      "sourceId": "undp_hdi",
+      "source": {
+        "canonicalUrl": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+        "format": "csv",
+        "upstreamVersion": "2025 Human Development Report composite-indices time series",
+        "upstreamVintage": "report edition and observation year retained per value",
+        "expectedCoverage": "countries in the selected HDI series matched to Civica",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-undp-hdi-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.unesco-uis:unesco_uis",
+      "pipelineId": "factbook.unesco-uis",
+      "sourceId": "unesco_uis",
+      "source": {
+        "canonicalUrl": "https://api.uis.unesco.org/sdmx/data/",
+        "format": "mixed",
+        "upstreamVersion": "UIS SDMX response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured education indicators and available countries",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-unesco-uis-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.us-census:us_census",
+      "pipelineId": "factbook.us-census",
+      "sourceId": "us_census",
+      "source": {
+        "canonicalUrl": "https://api.census.gov/data/",
+        "format": "json",
+        "upstreamVersion": "Census API response at retrieval",
+        "upstreamVintage": "dataset year retained per value",
+        "expectedCoverage": "configured United States indicators",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-us-census-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.wdi:world_bank",
+      "pipelineId": "factbook.wdi",
+      "sourceId": "world_bank",
+      "source": {
+        "canonicalUrl": "https://api.worldbank.org/v2",
+        "format": "json",
+        "upstreamVersion": "World Bank Indicators API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured indicators and available economies",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-wdi-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.who-gho:who_gho",
+      "pipelineId": "factbook.who-gho",
+      "sourceId": "who_gho",
+      "source": {
+        "canonicalUrl": "https://ghoapi.azureedge.net/api/",
+        "format": "json",
+        "upstreamVersion": "GHO OData response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured health indicators and available countries",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-who-gho-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.wikidata:wikidata",
+      "pipelineId": "factbook.wikidata",
+      "sourceId": "wikidata",
+      "source": {
+        "canonicalUrl": "https://query.wikidata.org/sparql",
+        "format": "rdf-json",
+        "upstreamVersion": "Wikidata revision state at retrieval",
+        "upstreamVintage": "statement/reference dates plus retrieval date",
+        "expectedCoverage": "entities matched by the configured SPARQL query",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/wikidata-sync-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "factbook.wto-stats:wto_stats",
+      "pipelineId": "factbook.wto-stats",
+      "sourceId": "wto_stats",
+      "source": {
+        "canonicalUrl": "https://api.wto.org/timeseries/v1/",
+        "format": "json",
+        "upstreamVersion": "WTO Timeseries API response at retrieval",
+        "upstreamVintage": "observation year retained per value",
+        "expectedCoverage": "configured trade indicators and available members",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/factbook/reconcile/__tests__/sync-wto-stats-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "index.current-beta:freedom_house",
+      "pipelineId": "index.current-beta",
+      "sourceId": "freedom_house",
+      "source": {
+        "canonicalUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "Freedom in the World workbook through 2024",
+        "upstreamVintage": "2024 edition",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/ci/__tests__/atomic-ingestion.test.ts",
+        "src/lib/ci/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "index.current-beta:transparency_intl",
+      "pipelineId": "index.current-beta",
+      "sourceId": "transparency_intl",
+      "source": {
+        "canonicalUrl": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "CPI 2024 results workbook",
+        "upstreamVintage": "2024 edition",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/ci/__tests__/atomic-ingestion.test.ts",
+        "src/lib/ci/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "index.current-beta:vdem",
+      "pipelineId": "index.current-beta",
+      "sourceId": "vdem",
+      "source": {
+        "canonicalUrl": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip",
+        "format": "zip-csv",
+        "upstreamVersion": "V-Dem Country-Year Core v15",
+        "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/ci/__tests__/atomic-ingestion.test.ts",
+        "src/lib/ci/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "index.current-beta:worldbank_wgi",
+      "pipelineId": "index.current-beta",
+      "sourceId": "worldbank_wgi",
+      "source": {
+        "canonicalUrl": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx",
+        "format": "xlsx",
+        "upstreamVersion": "WGI 2025 revision",
+        "upstreamVintage": "2024 observations",
+        "expectedCoverage": "country rows matched to the Civica release universe",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/ci/__tests__/atomic-ingestion.test.ts",
+        "src/lib/ci/__tests__/ingest-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "pulse.v2.ingest:amnesty",
+      "pipelineId": "pulse.v2.ingest",
+      "sourceId": "amnesty",
+      "source": {
+        "canonicalUrl": "https://www.amnesty.org/en/feed/",
+        "format": "xml",
+        "upstreamVersion": "feed response at retrieval",
+        "upstreamVintage": "publication timestamps in feed",
+        "expectedCoverage": "eligible global news items returned by the active connector window",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/pulse/v2/ingest.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "pulse.v2.ingest:civicus_monitor",
+      "pipelineId": "pulse.v2.ingest",
+      "sourceId": "civicus_monitor",
+      "source": {
+        "canonicalUrl": "https://monitor.civicus.org/RSSFeed.xml",
+        "format": "xml",
+        "upstreamVersion": "feed response at retrieval",
+        "upstreamVintage": "publication timestamps in feed",
+        "expectedCoverage": "eligible monitored civic-space items in the active connector window",
+        "redistributionPosture": "open-share-alike"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/pulse/v2/ingest.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "pulse.v2.ingest:gdelt",
+      "pipelineId": "pulse.v2.ingest",
+      "sourceId": "gdelt",
+      "source": {
+        "canonicalUrl": "https://api.gdeltproject.org/api/v2/doc/doc",
+        "format": "json",
+        "upstreamVersion": "DOC 2.0 response at retrieval",
+        "upstreamVintage": "article timestamps in response",
+        "expectedCoverage": "eligible governance-related documents in the active query window",
+        "redistributionPosture": "open-with-attribution"
+      },
+      "publicExport": "pending-review",
+      "witnessTests": [
+        "src/lib/pulse/v2/ingest.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    },
+    {
+      "fixtureId": "pulse.v2.ingest:hrw",
+      "pipelineId": "pulse.v2.ingest",
+      "sourceId": "hrw",
+      "source": {
+        "canonicalUrl": "https://www.hrw.org/rss/news",
+        "format": "xml",
+        "upstreamVersion": "feed response at retrieval",
+        "upstreamVintage": "publication timestamps in feed",
+        "expectedCoverage": "eligible global news items returned by the active connector window",
+        "redistributionPosture": "restricted-no-redistribution"
+      },
+      "publicExport": "blocked",
+      "witnessTests": [
+        "src/lib/pulse/v2/ingest.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "blocked"
+        }
+      ]
+    }
+  ]
+}

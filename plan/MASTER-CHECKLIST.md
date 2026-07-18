@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 305
-- **Completed:** 212
+- **Total tasks:** 306
+- **Completed:** 213
 - **Remaining:** 93
-- **Progress:** 69.5%
-- **Priority mix:** P0 189 · P1 111 · P2 5
+- **Progress:** 69.6%
+- **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -72,6 +72,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-032** (P0) Freeze the complete candidate observation set, not only winners, for each reconciliation release. _Done when: every candidate row/source/hash/status used at the cut is version-associated, adapters archive or hash exact inputs, winner pointers cannot drift to changed mutable rows, and offline replay reproduces the release checksum without network access._
 - [x] **DAT-033** (P0) Make indicator/source lineage a first-class key rather than dimension-only metadata. _Done when: CI/Conditions/history observations and ingestions identify indicator ID, source, upstream release, artifact hash, temporal coverage, license URL, transformation, substitution reason, and method; uniqueness prevents one source/indicator silently overwriting another._
 - [ ] **DAT-034** (P1) Run a preregistered random-sample value-fidelity audit of published atlas facts against upstream publisher evidence. _Done when: a seeded, stratified sample of at least 300 published canonical facts spans source families and fact domains; each sampled value is independently re-verified against retained publisher bytes or the current official publisher surface; discrepancies are classified by cause and severity; the protocol, per-fact ledger, and a sampled error rate with an uncertainty interval are published on a methodology surface; and every confirmed defect becomes a tracked repair task._
+- [ ] **DAT-035** (P0) Reconcile the frozen Index release input and raw-retention metadata after adapter-version drift. _Done when: the checked source-input manifest, raw-retention manifest, release/change-control records, and reproduction validators agree on the exact code version behind `ci-beta-2024-Q4`; the change is classified as semantic or nonsemantic by the adopted control; no publisher bytes, release scores, or historical retrieval fields are invented or mutated._
 
 ## Area 04 — Civica Index Research Program and Design Tournament
 
@@ -295,7 +296,7 @@ Source: `plan/09-testing-qa-and-release.md`
 - [x] **QA-003** (P0) Create deterministic, legally shareable database fixtures for tests. _Done when: fixtures cover representative countries/entities, full/partial/missing/disputed/stale data, multiple sources, jurisdictions/statuses, constitutions/elections/organizations, Index candidates, Pulse negatives/clusters, and migrations without production credentials._
 - [x] **QA-004** (P0) Keep live-database tests explicitly read-only and separable from fixture tests. _Done when: `npm run test:db` refuses unsafe/mutable connection modes, executes documented read-only queries/invariants, reports the target environment/vintage safely, and no test can modify production._
 - [x] **QA-005** (P0) Add public/admin/cron API contract and authorization tests. _Done when: every PLT-008 route has success/validation/auth/rate/cache/error/version fixtures as applicable; responses validate schemas; mutations verify audit rows and idempotency; no internal field leaks._
-- [ ] **QA-006** (P0) Add ingestion/sync contract fixtures for every released source. _Done when: normal, empty, malformed, upstream-schema-change, partial, retry, dry-run, duplicate, and rights-blocked cases are tested; row counts/freshness/provenance/version outcomes match policy._
+- [x] **QA-006** (P0) Add ingestion/sync contract fixtures for every released source. _Done when: normal, empty, malformed, upstream-schema-change, partial, retry, dry-run, duplicate, and rights-blocked cases are tested; row counts/freshness/provenance/version outcomes match policy._
 - [x] **QA-007** (P0) Add deterministic golden tests for every published calculation and example. _Done when: normalization, reconciliation, conditions, taxonomy/peer lenses, all Index candidates, uncertainty/sensitivity, Pulse decay/classification metrics, and methodology worked examples reproduce versioned expected artifacts from fixtures._
 - [ ] **QA-008** (P0) Add statistical-analysis reproducibility tests. _Done when: fixed seeds/environments/input hashes recreate all tables/figures/threshold decisions within declared tolerances, randomized procedures log seeds, and a changed input/version cannot silently reuse old results._
 - [x] **QA-009** (P0) Establish the canonical Playwright/browser test harness and command. _Done when: one command starts/uses the real app predictably, captures console/network failures, supports theme/viewport/auth fixtures, cleans tabs/processes, saves evidence, and fails on a seeded route or asset error._
