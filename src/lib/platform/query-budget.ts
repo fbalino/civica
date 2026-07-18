@@ -108,6 +108,38 @@ export const QUERY_BUDGETS: readonly QueryBudget[] = [
     boundedReadShape:
       "Current events are jurisdiction-keyed, date-ordered, and request-capped; source attribution is fetched as one set for the selected event IDs.",
   },
+  {
+    id: "pulse-changelog-reader-page",
+    domain: "pulse",
+    reader: "/civica-index/pulse-changelog",
+    sourceFiles: [
+      "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
+      "src/app/(reader)/civica-index/pulse-changelog/query.ts",
+      "src/lib/db/queries-pulse-v2.ts",
+    ],
+    fixture: { label: "global changelog with review outcomes" },
+    requiredIndexes: ["idx_pulse_v2_published", "idx_pulse_v2_dimension"],
+    maxReturnedRows: 25,
+    executionP95BudgetMs: 500,
+    boundedReadShape:
+      "The reader requests one 25-event query page plus a cursor sentinel; URL filters are applied in SQL and the full ledger never crosses the RSC boundary.",
+  },
+  {
+    id: "public-disputes-reader-page",
+    domain: "country",
+    reader: "/country/methodology/reconciliation/disputes",
+    sourceFiles: [
+      "src/app/(reader)/country/methodology/reconciliation/disputes/page.tsx",
+      "src/app/(reader)/country/methodology/reconciliation/disputes/query.ts",
+      "src/lib/db/queries-data-disputes.ts",
+    ],
+    fixture: { label: "public reconciliation conflicts with all filters" },
+    requiredIndexes: ["idx_disputes_status_kind", "idx_disputes_factkey"],
+    maxReturnedRows: 50,
+    executionP95BudgetMs: 500,
+    boundedReadShape:
+      "SQL filters and ranks raw dispute pairs, then selects at most 50 consolidated fact conflicts for the reader page; aggregate counts and top-eight filter distributions are bounded metadata.",
+  },
 ] as const;
 
 const REQUIRED_DOMAINS: readonly QueryBudgetDomain[] = [

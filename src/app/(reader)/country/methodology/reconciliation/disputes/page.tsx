@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { BetaChip } from "@/components/editorial/BetaChip";
@@ -12,6 +13,13 @@ import {
 } from "@/lib/db/queries-data-disputes";
 import { reconciliation } from "@/lib/content/site-state";
 import { DisputesFilterClient } from "./DisputesFilterClient";
+import {
+  DISPUTES_PAGE_SIZE,
+  parsePublicDisputesPageQuery,
+  publicDisputesPageOffset,
+  publicDisputesSearch,
+  requireBoundedPublicDisputePage,
+} from "./query";
 
 export const revalidate = 0;
 
@@ -25,9 +33,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function PublicDisputesPage() {
-  let rows: Awaited<ReturnType<typeof getPublicDisputeFeed>>["rows"] = [];
+export default async function PublicDisputesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = parsePublicDisputesPageQuery(await searchParams);
+  let groups: Awaited<ReturnType<typeof getPublicDisputeFeed>>["groups"] = [];
+  let totalMatching = 0;
+  let totalGroups = 0;
   let totalAll = 0;
+  let feedLoaded = false;
   let distributions: DisputeFilterDistributions = {
     sourcePairs: [],
     factKeys: [],
@@ -35,14 +51,38 @@ export default async function PublicDisputesPage() {
 
   try {
     const [feed, distributionRows] = await Promise.all([
-      getPublicDisputeFeed({ limit: 2000 }),
+      getPublicDisputeFeed({
+        statusBucket: query.status,
+        disputeKind: query.kind,
+        factKey: query.factKey,
+        severityBucket: query.severity,
+        factGroup: query.group,
+        sourcePair: query.sourcePair,
+        ageBucket: query.age,
+        sort: query.sort,
+        limit: DISPUTES_PAGE_SIZE,
+        offset: publicDisputesPageOffset(query),
+      }),
       getPublicDisputeFilterDistributions({ topN: 8 }),
     ]);
-    rows = feed.rows;
+    groups = [...requireBoundedPublicDisputePage(feed.groups)];
+    totalMatching = feed.totalMatching;
+    totalGroups = feed.totalGroups;
     totalAll = feed.totalAll;
     distributions = distributionRows;
+    feedLoaded = true;
   } catch {
     // Keep the public methodology page renderable during DB outages.
+  }
+
+  const lastPage = Math.max(1, Math.ceil(totalGroups / DISPUTES_PAGE_SIZE));
+  if (feedLoaded && query.page > lastPage) {
+    redirect(
+      `/country/methodology/reconciliation/disputes${publicDisputesSearch({
+        ...query,
+        page: lastPage,
+      })}`,
+    );
   }
 
   return (
@@ -75,9 +115,12 @@ export default async function PublicDisputesPage() {
       </div>
 
       <DisputesFilterClient
-        disputes={rows}
+        groups={groups}
         distributions={distributions}
         totalAll={totalAll}
+        totalMatching={totalMatching}
+        totalGroups={totalGroups}
+        query={query}
       />
 
       <section

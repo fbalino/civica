@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
@@ -8,7 +7,6 @@ import { BetaChip } from "@/components/editorial/BetaChip";
 import { PageHero } from "@/components/PageHero";
 import {
   getPulseV2Changelog,
-  type PulseV2ChangelogRow,
 } from "@/lib/db/queries-pulse-v2";
 import { pulse } from "@/lib/content/site-state";
 import {
@@ -16,6 +14,12 @@ import {
   type PulseReviewSlaReport,
 } from "@/lib/pulse/v2/review-sla-store";
 import { PulseChangelogFilterClient } from "./PulseChangelogFilterClient";
+import {
+  PULSE_CHANGELOG_PAGE_SIZE,
+  parsePulseChangelogPageQuery,
+  pulseChangelogPageOffset,
+  requireBoundedPulseChangelogPage,
+} from "./query";
 
 export const revalidate = 0;
 
@@ -43,29 +47,38 @@ function formatAsOfDate(iso: string): string {
   });
 }
 
-export default async function PulseChangelogPage() {
+export default async function PulseChangelogPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = parsePulseChangelogPageQuery(await searchParams);
   let countries: Array<{ slug: string; name: string }> = [];
-  let events: PulseV2ChangelogRow[] = [];
+  let events: Awaited<ReturnType<typeof getPulseV2Changelog>>["rows"] = [];
+  let hasMore = false;
   let reviewSla: PulseReviewSlaReport | null = null;
 
   try {
-    const [countryRows, published, review, sla] = await Promise.all([
+    const [countryRows, changelog, sla] = await Promise.all([
       db
         .select({ slug: jurisdictions.slug, name: jurisdictions.name })
         .from(jurisdictions)
-        .orderBy(jurisdictions.name),
-      getPulseV2Changelog({ publishedOnly: true, limit: 2500 }),
-      getPulseV2Changelog({ publishedOnly: false, limit: 2500 }),
+        .orderBy(jurisdictions.name)
+        .limit(300),
+      getPulseV2Changelog({
+        country: query.country,
+        dimension: query.dimension,
+        severityTier: query.severity,
+        publishedOnly: !query.showReview,
+        limit: PULSE_CHANGELOG_PAGE_SIZE,
+        offset: pulseChangelogPageOffset(query),
+      }),
       loadPulseReviewSlaReport(),
     ]);
 
     countries = countryRows;
-    const seen = new Set<string>();
-    events = [...published.rows, ...review.rows].filter((row) => {
-      if (seen.has(row.id)) return false;
-      seen.add(row.id);
-      return true;
-    });
+    events = [...requireBoundedPulseChangelogPage(changelog.rows)];
+    hasMore = changelog.hasMore;
     reviewSla = sla;
   } catch {
     // Keep the public changelog shell renderable during DB outages.
@@ -79,8 +92,8 @@ export default async function PulseChangelogPage() {
     return !latest || e.eventDate > latest ? e.eventDate : latest;
   }, null);
   const freshnessNote = mostRecentEventDate
-    ? `The most recent classified event in this result set is dated ${formatAsOfDate(mostRecentEventDate)}.`
-    : "No classified-event date is available in the current result set.";
+    ? `The most recent classified event on this page is dated ${formatAsOfDate(mostRecentEventDate)}.`
+    : "No classified-event date is available on this page.";
   const reviewCompletenessNote = !reviewSla
     ? "Review-SLA state is unavailable, so daily completeness is not assessable."
     : reviewSla.dailyCompletenessEligible
@@ -133,9 +146,12 @@ export default async function PulseChangelogPage() {
           for the full pipeline.
         </div>
 
-        <Suspense fallback={null}>
-          <PulseChangelogFilterClient events={events} countries={countries} />
-        </Suspense>
+        <PulseChangelogFilterClient
+          events={events}
+          countries={countries}
+          query={query}
+          hasMore={hasMore}
+        />
 
         <footer className="editorial-footer-nav">
           <Link href="/civica-index/methodology/pulse">Pulse methodology</Link>
