@@ -2,7 +2,7 @@
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
     "plan/MASTER-CHECKLIST.md": "60e1aec2166195ae816addd921e081e1506e0569fd1ffc9a7011a283e824e9d9",
-    "plan/PROGRESS.md": "d2ac286b905b3206e4ccd3ca00a7513c763999341fb1bae287a5b99b60d5827a",
+    "plan/PROGRESS.md": "360841f8fa78da9e884771b196181a260dab88dcbdafd089d379b4db215eaa1a",
     "plan/MANUAL-CHECKS.md": "d02630caa3fc5f142b6b5c5b971d2d1ad52df3729efa3bd3bfde18529a674b75",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
@@ -208,9 +208,7 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [
-        "ATL-031: completion record missing"
-      ],
+      "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -281,7 +279,6 @@
         }
       ],
       "blockers": [
-        "ATL-031: completion record missing",
         "37 unchecked P0 tasks prevent a green report"
       ]
     },
@@ -476,9 +473,7 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [
-        "ATL-031: completion record missing"
-      ],
+      "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -556,7 +551,6 @@
         }
       ],
       "blockers": [
-        "ATL-031: completion record missing",
         "37 unchecked P0 tasks prevent a green report",
         "85 unchecked P0/P1 tasks prevent G4"
       ]
@@ -752,9 +746,7 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [
-        "ATL-031: completion record missing"
-      ],
+      "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -818,7 +810,6 @@
         }
       ],
       "blockers": [
-        "ATL-031: completion record missing",
         "37 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
@@ -1014,9 +1005,7 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [
-        "ATL-031: completion record missing"
-      ],
+      "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -1080,7 +1069,6 @@
         }
       ],
       "blockers": [
-        "ATL-031: completion record missing",
         "37 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
