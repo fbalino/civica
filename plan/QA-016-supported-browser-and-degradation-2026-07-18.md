@@ -54,3 +54,14 @@ The contract and its tests cover these exact reader promises:
 4. Verify the four production browsers/fixture paths, record screenshots and
    output under `plan/evidence/QA-016/`, then update the master/area plan only
    if the exact suite and affected validators pass.
+
+## Completion evidence
+
+Completed 2026-07-18. The reader support contract now fixes Playwright-managed
+Chromium, Firefox, and WebKit desktop critical journeys, with no-JavaScript
+reader rendering in each profile. The controlled Chromium simulations pass for
+external Atlas geometry, country-map initialization, Wikimedia portraits, and
+Ask Civica provider failure; existing Pulse observability fixtures prove source
+outages cannot become no-event or country-quality claims. The isolated
+production build passed; browser logs and inspected screenshots are in
+`plan/evidence/QA-016/`.
