@@ -30,6 +30,8 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{
   { path: "src/lib/ci/history-adapters.ts", category: "input" },
   { path: "src/lib/ci/ingest.ts", category: "input" },
   { path: "src/lib/ci/longitudinal-validation-inputs.ts", category: "input" },
+  { path: "src/lib/ci/index-analysis-inputs.ts", category: "input" },
+  { path: "src/lib/ci/subgroup-fairness-inputs.ts", category: "input" },
   { path: "src/lib/ci/source-utils.ts", category: "input" },
   { path: "src/lib/db/queries.ts", category: "input" },
   { path: "src/lib/db/queries-peer-grouping.ts", category: "input" },

@@ -440,7 +440,7 @@
 
 /* Inline links preserve an editorial accent as an underline while the text
    itself uses the readable foreground role on every banner surface. */
-.editorial-banner a,
+.editorial-banner a:not(.btn),
 .editorial-page :is(p, li, td, .editorial-tool-dek) a,
 .editorial-tool-page :is(p, li, td, .editorial-tool-dek) a,
 .editorial-footer-nav a,

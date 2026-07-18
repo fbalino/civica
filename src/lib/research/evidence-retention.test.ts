@@ -60,6 +60,10 @@ const conditionsReleaseMigration = readFileSync(
   "drizzle/authoritative/0042_grey_sally_floyd.sql",
   "utf8",
 );
+const pulseDriftMigration = readFileSync(
+  "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+  "utf8",
+);
 const classify = readFileSync("src/lib/pulse/v2/classify.ts", "utf8");
 const subscriptionApply = readFileSync(
   "scripts/pulse-apply-classifications.ts",
@@ -106,6 +110,7 @@ test("Pulse evidence ledgers are append-only", () => {
         absorptionMigration,
         informationEnvironmentMigration,
         partyIdentityMigration,
+        pulseDriftMigration,
       ].some((source) =>
         new RegExp(
           `CREATE\\s+TRIGGER\\s+[a-z0-9_]+_append_only[\\s\\S]{0,160}BEFORE\\s+UPDATE\\s+OR\\s+DELETE\\s+ON\\s+"?${relation}"?[\\s\\S]{0,160}EXECUTE\\s+FUNCTION`,

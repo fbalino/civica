@@ -101,8 +101,8 @@ test("the real registry covers every canonical route+method without structural o
     (total, mapping) => total + mapping.methods.length,
     0,
   );
-  assert.equal(ROUTE_INVENTORY.length, 100);
-  assert.equal(canonicalMethodCount, 159);
+  assert.equal(ROUTE_INVENTORY.length, 106);
+  assert.equal(canonicalMethodCount, 169);
   assert.equal(mappedMethodCount, canonicalMethodCount);
 });
 
@@ -129,8 +129,8 @@ test("the real registry has no planned, partial, or unverified route method", ()
   assert.equal(summary.planned, 0);
   assert.equal(summary.partial, 0);
   assert.equal(summary["external-required"], 0);
-  assert.equal(summary["external-verified"], 5);
-  assert.equal(summary["source-confirmed"], 154);
+  assert.equal(summary["external-verified"], 6);
+  assert.equal(summary["source-confirmed"], 163);
 });
 
 test("real platform policies match the checked all-path Vercel rule", () => {
@@ -138,7 +138,7 @@ test("real platform policies match the checked all-path Vercel rule", () => {
     (policy): policy is PlatformWafPolicyDefinition =>
       policy.kind === "platform-waf",
   );
-  assert.equal(policies.length, 3);
+  assert.equal(policies.length, 4);
   for (const policy of policies) {
     assert.equal(policy.limit, 600);
     assert.equal(policy.windowMs, 60_000);

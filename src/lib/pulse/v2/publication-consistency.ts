@@ -24,6 +24,12 @@ import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
 export const PULSE_SCORE_PUBLICATION_SCHEMA =
   "pulse-score-publication/v1" as const;
 
+/** The retained 2026-07-12 r2.15 publication used the exact v2.4 decay
+ * serialization. It remains readable as historical evidence, but no new
+ * stable-key release may use it after PUL-027 advanced the lifecycle. */
+const LEGACY_PULSE_SCORE_ALGORITHM_VERSION =
+  "pulse-delta/decay-window-v2.4+incident-resolution-v1+output-history-v1+absorption-evidence-v1";
+
 /**
  * Public component-level freshness contract for the country-dimensions API.
  * The score rows and their contributing IDs are immutable release data. Event
@@ -183,12 +189,23 @@ export function assertPulseScorePublication(
     ["methodology", PULSE_RUNTIME_METHOD_VERSION],
     ["ontology", PULSE_TAXONOMY_VERSION],
     ["pipeline", PULSE_PIPELINE_VERSION],
-    ["algorithm", PULSE_DELTA_ALGORITHM_VERSION],
   ] as const) {
     const ref = row.runVersions[axis];
     if (ref.state !== "versioned" || ref.id !== expected) {
       errors.push(`score-run ${axis} must be ${expected}`);
     }
+  }
+  const algorithm = row.runVersions.algorithm;
+  const historicAlgorithm =
+    algorithm.state === "versioned" &&
+    algorithm.id === LEGACY_PULSE_SCORE_ALGORITHM_VERSION;
+  if (
+    algorithm.state !== "versioned" ||
+    (algorithm.id !== PULSE_DELTA_ALGORITHM_VERSION && !historicAlgorithm)
+  ) {
+    errors.push(
+      `score-run algorithm must be ${PULSE_DELTA_ALGORITHM_VERSION}`,
+    );
   }
   if (row.runVersions.prompt.state !== "not_applicable") {
     errors.push("score-run prompt must be not applicable");
@@ -224,6 +241,9 @@ export function assertPulseScorePublication(
     }
   } catch (error) {
     errors.push(error instanceof Error ? error.message : "invalid run envelope");
+  }
+  if (historicAlgorithm && versionKeySerialization !== "legacy_insertion_order_json_v1") {
+    errors.push("historical score-run algorithm must use legacy serialization");
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(row.scoreAsOf)) {
     errors.push("scoreAsOf is not an ISO date");
