@@ -228,7 +228,10 @@
 }
 
 .conditions-release-component a {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: var(--space-1);
 }
 
 .conditions-country-panel {

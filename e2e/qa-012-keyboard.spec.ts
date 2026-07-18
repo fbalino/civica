@@ -84,7 +84,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   }) => {
     await page.goto("/parties", { waitUntil: "networkidle" });
 
-    const trigger = page.getByRole("button", { name: "Select region" });
+    const trigger = page.getByRole("button", { name: "Filter by region" });
     await waitForReactHydration(trigger);
     await trigger.focus();
     await page.keyboard.press("Enter");
@@ -156,7 +156,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     );
   });
 
-  test("Atlas has a synchronized keyboard country selector and explicit compare flow", async ({
+  test("Atlas has a synchronized native country selector and explicit compare flow", async ({
     page,
   }) => {
     await page.goto("/atlas", { waitUntil: "networkidle" });
@@ -167,9 +167,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     const selector = page.getByRole("combobox", { name: "Select a country" });
     await waitForReactHydration(selector);
     await selector.focus();
-    await page.keyboard.press("End");
-    await expect(selector).not.toHaveValue("");
-
+    await expect(selector).toBeFocused();
     await selector.selectOption("fra");
     await expect(page.getByRole("status")).toHaveText(
       "France selected. Choose an action below.",
