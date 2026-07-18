@@ -1,0 +1,26 @@
+{
+  "id": "qa-017-final-evidence-amendment",
+  "toVersion": "civica-index-pulse-conditions-reconciliation-v42-evidence",
+  "recordKind": "evidence",
+  "categories": [],
+  "evidence": {
+    "documentation": ["plan/QA-017-clean-checkout-2026-07-18.md"],
+    "registry": ["plan/evidence/QA-017/index-change-control.json"],
+    "release_note": ["plan/evidence/QA-017/index-change-control-evidence-amendment-release-note.md"],
+    "migration_plan": ["plan/evidence/QA-017/index-change-control-evidence-amendment-migration-plan.md"],
+    "golden_test": ["src/lib/ci/index-change-control.test.ts"],
+    "contract_test": ["src/lib/ci/index-change-control-nonsemantic.test.ts"]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-cron-recovery",
+    "validate:index-quarantine",
+    "validate:index-research-archive"
+  ]
+}
