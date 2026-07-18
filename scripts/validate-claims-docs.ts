@@ -81,7 +81,7 @@ const TEST_CREDENTIAL_KEYS = [
 ] as const;
 
 function cleanTestEnvironment(): NodeJS.ProcessEnv {
-  const env = {
+  const env: NodeJS.ProcessEnv = {
     ...process.env,
     NODE_ENV: "test",
     // npm lifecycle scripts can inherit production/omit configuration from
