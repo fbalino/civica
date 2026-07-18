@@ -23,10 +23,10 @@ const SHA256_DIGEST = /^sha256:[a-f0-9]{64}$/;
 const ATLAS_VINTAGE =
   /^Civica Atlas Reconciled v[^\s]+ — vintage \d{4}-Q[1-4]$/;
 
-const CI_RELEASE_IDS = new Set(
+const CI_RELEASE_IDS = new Set<string>(
   CI_RELEASE_QUERY_IDENTITIES.map((release) => release.releaseId),
 );
-const CI_METHODOLOGY_VERSIONS = new Set(
+const CI_METHODOLOGY_VERSIONS = new Set<string>(
   CI_RELEASE_QUERY_IDENTITIES.map((release) => release.methodologyVersion),
 );
 const CURRENT_CI_RELEASE = CI_RELEASE_QUERY_IDENTITIES.at(-1)!;
