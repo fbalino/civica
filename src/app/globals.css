@@ -357,7 +357,7 @@ html:root {
   --color-text-60: #c4bdae;
   --color-text-50: rgba(235, 230, 214, 0.64);
   --color-text-40: #aaa291; /* Steel — AA contrast on dark elevated surfaces */
-  --color-text-30: #aaa291; /* Opaque so compact labels clear AA on elevated dark surfaces */
+  --color-text-30: #b8b09f; /* Opaque so compact labels clear AA on elevated dark surfaces */
   --color-text-25: #b8b09f; /* Quiet text — opaque for reliable AA contrast */
   --color-text-20: rgba(235, 230, 214, 0.4);
 
