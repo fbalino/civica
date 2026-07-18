@@ -2,23 +2,33 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { Country } from "./data";
 import { AtlasWorldMap } from "./AtlasWorldMap";
 import { Button } from "@/components/editorial/Button";
 import { Banner } from "@/components/editorial/Banner";
+import { DataTable } from "@/components/editorial/DataTable";
+import { SourceDot } from "@/components/SourceDot";
 import { buildNeIdMap } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
 import { atlasIdToSlug } from "@/lib/atlas/ids";
-import type { AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
+import type { AtlasLayerSource, AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
 import {
   type AtlasLayerKey,
+  ATLAS_LAYER_DESCRIPTION,
+  ATLAS_LAYER_MISSINGNESS,
+  ATLAS_LAYER_TITLE,
   DEFAULT_LAYER,
+  NO_DATA_LABEL,
+  tooltipValueForLayer,
 } from "@/lib/atlas/map-layers";
 
 export interface AtlasStandaloneClientProps {
   countries: Country[];
   /** Per-iso3 data-layer values for the choropleth switcher. */
   layerData: Record<string, AtlasLayerValues>;
+  /** Per-layer publisher and vintage metadata for map/table provenance. */
+  layerSources: Record<AtlasLayerKey, AtlasLayerSource>;
   /** Layer selected by the `?layer=` URL param on first load (validated server-side). */
   initialLayer?: AtlasLayerKey;
 }
@@ -35,6 +45,7 @@ export interface AtlasStandaloneClientProps {
 export function AtlasStandaloneClient({
   countries,
   layerData,
+  layerSources,
   initialLayer = DEFAULT_LAYER,
 }: AtlasStandaloneClientProps) {
   const router = useRouter();
@@ -60,9 +71,18 @@ export function AtlasStandaloneClient({
     selectedCountry !== null &&
     !pinned.includes(selectedCountry.id) &&
     pinned.length < 2;
+  const activeLayerSource = layerSources[layer];
+  const activeLayerRows = useMemo(
+    () =>
+      countriesByName.map((country) => ({
+        country,
+        value: tooltipValueForLayer(layer, country, layerData[country.id]),
+      })),
+    [countriesByName, layer, layerData],
+  );
 
   // Update the ?layer= param for shareable views (replace, no scroll). The
-  // government default drops the param entirely to keep the URL clean.
+  // default Regime layer drops the param entirely to keep the URL clean.
   const onLayerChange = useCallback(
     (next: AtlasLayerKey) => {
       setLayer(next);
@@ -177,6 +197,7 @@ export function AtlasStandaloneClient({
           mapLoaded={mapLoaded}
           filteredCountryIds={countries.map((c) => c.id)}
           layerData={layerData}
+          layerSources={layerSources}
           layer={layer}
           onLayerChange={onLayerChange}
           pinned={pinned}
@@ -195,6 +216,63 @@ export function AtlasStandaloneClient({
           }}
         />
       </div>
+      <section
+        id="atlas-layer-table"
+        className="editorial-page editorial-page--full"
+        aria-labelledby="atlas-layer-table-heading"
+      >
+        <h2 id="atlas-layer-table-heading">Map layer table alternative</h2>
+        <p>
+          This table uses the same active variable and values as the map. It
+          is a keyboard-friendly alternative to pointer exploration.
+        </p>
+        <p>
+          <strong>{ATLAS_LAYER_TITLE[layer]}:</strong>{" "}
+          {ATLAS_LAYER_DESCRIPTION[layer]} {ATLAS_LAYER_MISSINGNESS[layer]}
+        </p>
+        <p>
+          <strong>Source and vintage:</strong>{" "}
+          {activeLayerSource.sourceUrl ? (
+            <a href={activeLayerSource.sourceUrl}>
+              {activeLayerSource.sourceName}
+            </a>
+          ) : (
+            activeLayerSource.sourceName
+          )}{" "}
+          <SourceDot
+            source={activeLayerSource.sourceId}
+            retrievedAt={activeLayerSource.lastSyncedAt}
+          />
+          {" · "}
+          {activeLayerSource.upstreamVintageLabel ??
+            "No active source vintage is recorded."}
+        </p>
+        <details>
+          <summary>Show every map-eligible country and its active layer value</summary>
+          <DataTable aria-label={`${ATLAS_LAYER_TITLE[layer]} table alternative`}>
+            <thead>
+              <tr>
+                <th scope="col">Country</th>
+                <th scope="col">{ATLAS_LAYER_TITLE[layer]}</th>
+                <th scope="col">Availability</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activeLayerRows.map(({ country, value }) => (
+                <tr key={country.id}>
+                  <th scope="row">
+                    <Link href={`/country/${atlasIdToSlug(country.id, countries)}`}>
+                      {country.name}
+                    </Link>
+                  </th>
+                  <td>{value}</td>
+                  <td>{value === NO_DATA_LABEL ? "No data" : "Observed"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
+        </details>
+      </section>
     </div>
   );
 }

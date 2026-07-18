@@ -1401,7 +1401,7 @@
         "jurisdiction status label and sources"
       ],
       "provenance": [
-        "Resolver-backed masthead facts carry source identity; map-layer definitions name source, unit, vintage, and availability; hover cards carry jurisdiction-status/v1 labels."
+        "Resolver-backed masthead facts carry source identity; source-native map layers name their publisher, retained upstream vintage, legend, and explicit missing-data behavior; hover cards carry jurisdiction-status/v1 labels."
       ],
       "coverage": [
         "The map explicitly limits itself to map-eligible sovereign_state entries; the scope note links to the full reference catalog. Per-layer coverage comes from loadAtlasLayerData."
@@ -1418,7 +1418,9 @@
       "tests": [
         "src/lib/ci/quarantine-contract.test.ts",
         "src/lib/atlas/atl-018-country-reader.test.ts",
-        "e2e/atl-018-data-states.spec.ts"
+        "src/lib/atlas/map-layers.test.ts",
+        "e2e/atl-018-data-states.spec.ts",
+        "e2e/atl-015-source-native-map.spec.ts"
       ],
       "testGap": null,
       "owner": "Atlas reference product",
@@ -2155,5 +2157,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "0ac1fa5793f0d7ab5e3ac9cd7d42ff775f96c1cf8bf16510999848a95904f761"
+  "semanticSha256": "371bb640b254971b4ca9159e66f5300cba5f56141e2987a516be63a5282793f6"
 }

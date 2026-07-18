@@ -15,9 +15,12 @@ import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
 import { Tooltip } from "@/components/editorial/Tooltip";
-import type { AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
+import { SourceDot } from "@/components/SourceDot";
+import type { AtlasLayerSource, AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
 import {
   type AtlasLayerKey,
+  ATLAS_LAYER_DESCRIPTION,
+  ATLAS_LAYER_MISSINGNESS,
   ATLAS_LAYER_OPTIONS,
   ATLAS_LAYER_TITLE,
   NO_DATA_FILL,
@@ -30,9 +33,8 @@ import {
 /* ----------------------------------------------------------------
  * Choropleth layer switcher (Wave 6)
  *
- * The map colors every country by one of four CATEGORICAL data layers —
- * government type, V-Dem regime, or World Bank income
- * group. The active `layer` is controlled by the parent (URL `?layer=`);
+ * The map colors every country by one publisher-native categorical layer.
+ * The active `layer` is controlled by the parent (URL `?layer=`);
  * all color-token + legend + tooltip logic lives in
  * `src/lib/atlas/map-layers.ts` so it stays in one documented place.
  * ---------------------------------------------------------------- */
@@ -50,6 +52,8 @@ export interface AtlasWorldMapProps {
   filteredCountryIds: string[];
   /** Per-iso3 (lower-case) data-layer values fetched server-side — no client DB access. */
   layerData: Record<string, AtlasLayerValues>;
+  /** Source and vintage retained for each source-native map layer. */
+  layerSources: Record<AtlasLayerKey, AtlasLayerSource>;
   /** The active choropleth layer (owned by the parent; synced to `?layer=`). */
   layer: AtlasLayerKey;
   /** Switch the active layer (parent updates state + URL). */
@@ -74,6 +78,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       mapLoaded,
       filteredCountryIds,
       layerData,
+      layerSources,
       layer,
       onLayerChange,
       pinned,
@@ -109,6 +114,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     // at least one mapped country falls back to the neutral no-data fill —
     // a country with a missing value must never inherit a real category.
     const legendEntries = useMemo(() => legendFor(layer), [layer]);
+    const activeLayerSource = layerSources[layer];
     const hasNoDataCountry = useMemo(
       () =>
         countries.some(
@@ -422,10 +428,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 />
               ))}
             </g>
-            {/* Country paths — categorical choropleth driven by the active
-                data layer (government / CI score / regime / income). Hover
-                signals via stroke change instead of fill so the layer color
-                stays visible while the cursor is over. */}
+            {/* Country paths — categorical choropleth driven only by the
+                active publisher-native layer. Hover signals via stroke
+                change instead of fill so the layer color stays visible. */}
             {mapPaths.map((p, i) => {
               const baseFill = p.country
                 ? fillForLayer(layer, p.country, layerData[p.country.id])
@@ -588,6 +593,30 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 </li>
               )}
             </ul>
+            <p className="atlas-indicator-scope">
+              <strong>Source:</strong>{" "}
+              {activeLayerSource.sourceUrl ? (
+                <a href={activeLayerSource.sourceUrl}>
+                  {activeLayerSource.sourceName}
+                </a>
+              ) : (
+                activeLayerSource.sourceName
+              )}{" "}
+              <SourceDot
+                source={activeLayerSource.sourceId}
+                retrievedAt={activeLayerSource.lastSyncedAt}
+              />
+              <br />
+              <strong>Vintage:</strong>{" "}
+              {activeLayerSource.upstreamVintageLabel ??
+                "No active source vintage is recorded."}
+            </p>
+            <p className="atlas-indicator-scope">
+              {ATLAS_LAYER_DESCRIPTION[layer]}
+            </p>
+            <p className="atlas-indicator-scope">
+              {ATLAS_LAYER_MISSINGNESS[layer]}
+            </p>
             <p className="atlas-indicator-scope">
               Map scope: map-eligible sovereign-state entries under
               jurisdiction-status/v1. <a href="/country">Browse the full reference catalog</a>.

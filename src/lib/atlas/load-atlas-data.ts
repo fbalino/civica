@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
-import { sql, desc, asc, and } from "drizzle-orm";
+import { sql, desc, asc, and, inArray } from "drizzle-orm";
 import {
   jurisdictions,
   governmentBodies,
@@ -901,11 +901,30 @@ export interface AtlasLayerValues {
   incomeGroup: string | null;
 }
 
+/**
+ * Provenance shared by every observation in one Atlas map layer. The client
+ * receives this alongside the values so a legend and its tabular equivalent
+ * can name the publisher and the exact retained source vintage rather than
+ * implying that a Civica-derived score is being mapped.
+ */
+export interface AtlasLayerSource {
+  sourceId: string;
+  sourceName: string;
+  sourceUrl: string | null;
+  lastSyncedAt: string | null;
+  upstreamVintageLabel: string | null;
+  asOf: string | null;
+  observedCountries: number;
+}
+
+export interface AtlasLayerData {
+  values: Record<string, AtlasLayerValues>;
+  sources: Record<"regime" | "income", AtlasLayerSource>;
+}
+
 export const loadAtlasLayerData = cache(_loadAtlasLayerData);
 
-async function _loadAtlasLayerData(): Promise<
-  Record<string, AtlasLayerValues>
-> {
+async function _loadAtlasLayerData(): Promise<AtlasLayerData> {
   // jurisdiction id → lower-case iso3 (atlas Country.id space)
   const juris = await db
     .select({ id: jurisdictions.id, iso3: jurisdictions.iso3 })
@@ -927,17 +946,65 @@ async function _loadAtlasLayerData(): Promise<
   // Missing regime or income observations remain explicit nulls.
   for (const jurisdiction of juris) ensure(jurisdiction.iso3!.toLowerCase());
 
+  const sourceRows = await db
+    .select({
+      id: sources.id,
+      name: sources.name,
+      baseUrl: sources.baseUrl,
+      lastSyncAt: sources.lastSyncAt,
+    })
+    .from(sources)
+    .where(inArray(sources.id, ["vdem", "world_bank"]));
+  const sourceById = new Map(sourceRows.map((source) => [source.id, source]));
+
+  const defaultSource = (
+    sourceId: "vdem" | "world_bank",
+    sourceName: string,
+    sourceUrl: string,
+  ): AtlasLayerSource => {
+    const source = sourceById.get(sourceId);
+    return {
+      sourceId,
+      sourceName: source?.name ?? sourceName,
+      sourceUrl: source?.baseUrl ?? sourceUrl,
+      lastSyncedAt: isoTimestamp(source?.lastSyncAt),
+      upstreamVintageLabel: null,
+      asOf: null,
+      observedCountries: 0,
+    };
+  };
+  const layerSources: Record<"regime" | "income", AtlasLayerSource> = {
+    regime: defaultSource(
+      "vdem",
+      "V-Dem",
+      "https://www.v-dem.net/data/the-v-dem-dataset/",
+    ),
+    income: defaultSource(
+      "world_bank",
+      "World Bank",
+      "https://api.worldbank.org/v2",
+    ),
+  };
+
   const factRows = await db
     .select({
       jurisdictionId: countryFacts.jurisdictionId,
       factKey: countryFacts.factKey,
       factValue: countryFacts.factValue,
+      sourceId: countryFacts.sourceId,
+      sourceUrl: countryFacts.sourceUrl,
+      upstreamVintageLabel: countryFacts.upstreamVintageLabel,
+      asOf: countryFacts.asOf,
     })
     .from(countryFacts)
     .where(
       and(
         sql`${countryFacts.status} = 'active'`,
-        sql`${countryFacts.factKey} IN ('world_bank_income_group', 'vdem_row')`,
+        sql`(
+          (${countryFacts.factKey} = 'vdem_row' AND ${countryFacts.sourceId} = 'vdem')
+          OR
+          (${countryFacts.factKey} = 'world_bank_income_group' AND ${countryFacts.sourceId} = 'world_bank')
+        )`,
       ),
     );
 
@@ -946,10 +1013,35 @@ async function _loadAtlasLayerData(): Promise<
     const iso3 = iso3ById.get(row.jurisdictionId);
     if (!iso3) continue;
     const entry = ensure(iso3);
-    if (row.factKey === "vdem_row") entry.regimeType = row.factValue;
-    else if (row.factKey === "world_bank_income_group")
-      entry.incomeGroup = row.factValue;
+    const layer =
+      row.factKey === "vdem_row"
+        ? "regime"
+        : row.factKey === "world_bank_income_group"
+          ? "income"
+          : null;
+    if (!layer) continue;
+
+    if (layer === "regime") entry.regimeType = row.factValue;
+    else entry.incomeGroup = row.factValue;
+
+    const source = sourceById.get(row.sourceId);
+    const layerSource = layerSources[layer];
+    layerSource.observedCountries += 1;
+    // A layer's active rows should share an upstream release. Keep the first
+    // non-empty value as the public layer descriptor; individual country
+    // rows remain available in their source-linked profile pages.
+    if (!layerSource.upstreamVintageLabel && row.upstreamVintageLabel) {
+      layerSource.upstreamVintageLabel = row.upstreamVintageLabel;
+    }
+    if (!layerSource.asOf && row.asOf) {
+      layerSource.asOf = isoTimestamp(row.asOf);
+    }
+    if (source) {
+      layerSource.sourceName = source.name;
+      layerSource.lastSyncedAt = isoTimestamp(source.lastSyncAt);
+    }
+    if (row.sourceUrl) layerSource.sourceUrl = row.sourceUrl;
   }
 
-  return out;
+  return { values: out, sources: layerSources };
 }

@@ -59,7 +59,8 @@ export default async function AtlasMapPage({
   return (
     <AtlasStandaloneClient
       countries={countries}
-      layerData={layerData}
+      layerData={layerData.values}
+      layerSources={layerData.sources}
       initialLayer={initialLayer}
     />
   );

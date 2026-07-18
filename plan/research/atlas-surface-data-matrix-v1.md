@@ -6,7 +6,7 @@
 
 **Machine-readable artifact:** `data/atlas-surface-data-matrix.v1.json`
 
-**Semantic SHA-256:** `0ac1fa5793f0d7ab5e3ac9cd7d42ff775f96c1cf8bf16510999848a95904f761`
+**Semantic SHA-256:** `371bb640b254971b4ca9159e66f5300cba5f56141e2987a516be63a5282793f6`
 
 ## Scope
 
@@ -69,6 +69,14 @@ The seven-state register is browser-tested at representative desktop/mobile and
 light/dark fixtures. Identity-resolution error classification remains governed
 by PLT-026 rather than this module-state contract. Rows with `testGap` still
 name route-level coverage that has not yet been added outside this scope.
+
+## Source-native map layers
+
+ATL-015 limits the `/atlas` choropleth to the retained V-Dem Regimes of the
+World and World Bank income-group variables. The route row records publisher,
+upstream vintage, legend, availability semantics, and the shared resolver used
+by map hover and the keyboard-accessible table alternative. Civica Index,
+Pulse, and the former Civica government classifier are not map layers.
 
 ## Maintenance rule
 

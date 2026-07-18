@@ -147,7 +147,8 @@ test.describe("atlas (QA-010)", () => {
       await page.goto("/atlas", { waitUntil: "domcontentloaded" });
       await page.waitForLoadState("load", { timeout: 20_000 }).catch(() => {});
 
-      // The choropleth SVG (not canvas/WebGL) — default layer is "government".
+      // The choropleth SVG (not canvas/WebGL) defaults to the source-native
+      // V-Dem regime layer.
       const map = page.getByRole("img", {
         name: /^World map colored by/,
       });
@@ -163,7 +164,7 @@ test.describe("atlas (QA-010)", () => {
       // control: switching layers proves the map is interactive.
       const layerSwitcher = page.getByRole("tablist", { name: "Map data layer" });
       await expect(layerSwitcher).toBeVisible();
-      await layerSwitcher.getByRole("tab", { name: "Regime" }).click();
+      await layerSwitcher.getByRole("tab", { name: "Regime (V-Dem)" }).click();
       await expect(
         page.getByRole("img", { name: "World map colored by Regime type (V-Dem)" }),
       ).toBeVisible();

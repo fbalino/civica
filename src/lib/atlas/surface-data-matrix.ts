@@ -151,7 +151,7 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "jurisdiction status label and sources",
     ],
     provenance: [
-      "Resolver-backed masthead facts carry source identity; map-layer definitions name source, unit, vintage, and availability; hover cards carry jurisdiction-status/v1 labels.",
+      "Resolver-backed masthead facts carry source identity; source-native map layers name their publisher, retained upstream vintage, legend, and explicit missing-data behavior; hover cards carry jurisdiction-status/v1 labels.",
     ],
     coverage: [
       "The map explicitly limits itself to map-eligible sovereign_state entries; the scope note links to the full reference catalog. Per-layer coverage comes from loadAtlasLayerData.",
@@ -164,7 +164,9 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     tests: [
       "src/lib/ci/quarantine-contract.test.ts",
       "src/lib/atlas/atl-018-country-reader.test.ts",
+      "src/lib/atlas/map-layers.test.ts",
       "e2e/atl-018-data-states.spec.ts",
+      "e2e/atl-015-source-native-map.spec.ts",
     ],
     testGap: null,
     owner: "Atlas reference product",
