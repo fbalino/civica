@@ -142,4 +142,39 @@ test.describe("QA-012 — keyboard journeys", () => {
       await bibtex.getAttribute("id") ?? "",
     );
   });
+
+  test("Atlas has a synchronized keyboard country selector and explicit compare flow", async ({
+    page,
+  }) => {
+    await page.goto("/atlas", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { name: "World Atlas" })).toBeVisible();
+
+    const controls = page.locator(".atlas-country-controls");
+    await controls.locator("summary").press("Enter");
+    const selector = page.getByRole("combobox", { name: "Select a country" });
+    await selector.focus();
+    await page.keyboard.press("End");
+    await expect(selector).not.toHaveValue("");
+
+    await selector.selectOption("fra");
+    await expect(page.getByRole("status")).toHaveText(
+      "France selected. Choose an action below.",
+    );
+    await expect(page.locator('path[data-id="fra"]').first()).toHaveAttribute(
+      "data-selected",
+      "1",
+    );
+
+    // Pointer selection writes back to the same native selector state.
+    await page.locator('path[data-id="jpn"]').first().click();
+    await expect(selector).toHaveValue("jpn");
+    await expect(page.getByRole("status")).toHaveText(
+      "Japan selected. Choose an action below.",
+    );
+
+    await page.getByRole("button", { name: "Add to comparison" }).click();
+    await selector.selectOption("fra");
+    await page.getByRole("button", { name: "Add to comparison" }).click();
+    await expect(page.getByRole("button", { name: "Open compare" })).toBeEnabled();
+  });
 });

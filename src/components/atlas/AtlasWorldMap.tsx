@@ -56,8 +56,10 @@ export interface AtlasWorldMapProps {
   onLayerChange: (layer: AtlasLayerKey) => void;
   /** Country IDs pinned for compare (up to 2). Shows the compare banner. */
   pinned: string[];
-  /** Called when a country path is clicked; `shift` mirrors e.shiftKey so the caller can route to pin vs open. */
-  onCountrySelect: (country: Country, modifiers: { shift: boolean }) => void;
+  /** Country selection is owned by the parent and shared with its accessible controls. */
+  onCountrySelect: (country: Country) => void;
+  /** The current selection, shown consistently on the map and in the control panel. */
+  selectedCountryId: string | null;
   /** Remove the pinned country at index i. */
   onUnpinAt: (index: number) => void;
   /** Transition into the compare view with the two pinned countries. */
@@ -76,6 +78,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       onLayerChange,
       pinned,
       onCountrySelect,
+      selectedCountryId,
       onUnpinAt,
       onOpenCompare,
     },
@@ -204,6 +207,13 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       }),
       [flyTo, animateTo],
     );
+
+    // The native country list and pointer/touch map share one selection state.
+    // Wait for the geometry to arrive before flying to a list-selected country.
+    useEffect(() => {
+      if (!selectedCountryId || !mapLoaded) return;
+      flyTo(selectedCountryId);
+    }, [flyTo, mapLoaded, selectedCountryId, mapPaths]);
 
     // Label sizing in TRUE screen pixels: 1 CSS px on screen = MAP_W/width
     // user units in the un-transformed label layer. Set once per mount/resize
@@ -426,8 +436,17 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                   data-id={p.id || undefined}
                   data-iso={p.neId}
                   data-base-fill={baseFill}
+                  data-selected={
+                    p.country?.id === selectedCountryId ? "1" : "0"
+                  }
                   style={{
                     cursor: p.country ? "pointer" : "default",
+                    strokeWidth:
+                      p.country?.id === selectedCountryId ? "2.4" : undefined,
+                    filter:
+                      p.country?.id === selectedCountryId
+                        ? "brightness(0.88)"
+                        : undefined,
                     opacity: p.country
                       ? filteredCountryIds.includes(p.id!)
                         ? 1
@@ -472,7 +491,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                       // A pan that started on this country ends with a click
                       // event — don't treat it as a selection.
                       if (dragRef.current.moved) return;
-                      onCountrySelect(p.country, { shift: e.shiftKey });
+                      onCountrySelect(p.country);
                     }
                   }}
                 />
@@ -594,7 +613,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               </span>
             ))}
             <button
+              type="button"
               className="go-btn"
+              disabled={pinned.length < 2}
               onClick={() => {
                 if (pinned.length < 2) return;
                 onOpenCompare();
@@ -611,13 +632,12 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             <div className="cta cta--desktop">
               <span className="k">Drag</span> to pan &middot;{" "}
               <span className="k">Scroll</span> to zoom &middot;{" "}
-              <span className="k">Click</span> a country &middot;{" "}
-              <span className="k">Shift-click</span> to compare
+              <span className="k">Click</span> a country to select it
             </div>
             <div className="cta cta--mobile">
               <span className="k">Pinch</span> to zoom &middot;{" "}
-              <span className="k">Tap</span> a country &middot;{" "}
-              <span className="k">Tap two</span> to compare
+              <span className="k">Tap</span> a country to select it &middot;{" "}
+              use Country controls to compare
             </div>
           </div>
           <div className="atlas-zoombar">
