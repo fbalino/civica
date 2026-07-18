@@ -26,7 +26,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     await expect(trigger).toBeFocused();
   });
 
-  test("mobile navigation traps focus and returns it to its trigger on Escape", async ({
+  test("mobile navigation drawer traps focus and returns it to its trigger on Escape", async ({
     page,
   }) => {
     await page.setViewportSize({ width: MOBILE.width, height: MOBILE.height });
@@ -100,6 +100,42 @@ test.describe("QA-012 — keyboard journeys", () => {
     await page.keyboard.press("Enter");
     await expect(listbox).toHaveCount(0);
     await expect(trigger).toBeFocused();
+  });
+
+  test("sortable data tables respond to Enter and expose their new sort direction", async ({
+    page,
+  }) => {
+    await page.goto("/rankings", { waitUntil: "networkidle" });
+
+    const countryHeader = page
+      .locator(".sortable-data-table th")
+      .filter({ hasText: "Country" });
+    const sortButton = countryHeader.getByRole("button");
+    await waitForReactHydration(sortButton);
+    await sortButton.focus();
+    await page.keyboard.press("Enter");
+
+    await expect(countryHeader).toHaveAttribute("aria-sort", "ascending");
+    await expect(sortButton).toBeFocused();
+  });
+
+  test("indicator trend charts expose their series toggles to the keyboard", async ({
+    page,
+  }) => {
+    await page.goto("/country/switzerland/civica-data?section=longitudinal", {
+      waitUntil: "networkidle",
+    });
+
+    const seriesToggle = page
+      .getByRole("group", { name: "Toggle indicator series" })
+      .getByRole("button")
+      .first();
+    await waitForReactHydration(seriesToggle);
+    await expect(seriesToggle).toHaveAttribute("aria-pressed", "true");
+    await seriesToggle.focus();
+    await page.keyboard.press("Space");
+    await expect(seriesToggle).toHaveAttribute("aria-pressed", "false");
+    await expect(seriesToggle).toBeFocused();
   });
 
   test("map and lightbox dialogs trap focus and restore their launchers", async ({
