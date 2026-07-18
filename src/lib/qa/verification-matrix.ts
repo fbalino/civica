@@ -131,7 +131,7 @@ function routeEntry(route: ProductionRouteSource): VerificationMatrixEntry {
           inventory?.exposure === "admin" ||
           inventory?.exposure === "cron" ||
           inventory?.exposure === "pulse-coding"
-            ? cell("planned", ["Isolated operator journey"], "QA-011")
+            ? cell("covered", ["npm run test:qa-011"])
             : na(),
       }),
     };
@@ -183,7 +183,7 @@ function routeEntry(route: ProductionRouteSource): VerificationMatrixEntry {
       database: cell("covered", ["npm run validate:fixture-database"]),
       browser: cell("partial", ["Canonical browser harness"], "QA-013"),
       manual: route.sourcePath.includes("/admin/")
-        ? cell("planned", ["Isolated admin/reviewer journey"], "QA-011")
+        ? cell("covered", ["npm run test:qa-011"])
         : na(),
     }),
   };
@@ -226,7 +226,7 @@ function pipelineEntries(): VerificationMatrixEntry[] {
         integration: cell("covered", integrationEvidence),
         database: cell("covered", ["npm run validate:fixture-database"]),
         browser: na(),
-        manual: cell("planned", ["Scheduled-data failure recovery journey"], "QA-011"),
+        manual: cell("covered", ["npm run test:qa-011"]),
       }),
     };
   });

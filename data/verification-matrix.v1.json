@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "e27fc5dcc3eb691752e350730189e467a6ebe38499ffe6dc159fe8d967ac608e",
+  "semanticHash": "38cca5eff1cb66e58ac573c82abcd59f716102188dbb0fdaa4f0360ac8e214de",
   "summary": {
-    "route": 173,
+    "route": 175,
     "pipeline": 50,
     "calculation": 8,
     "data_domain": 14,
@@ -1756,11 +1756,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -1803,11 +1803,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -1850,11 +1850,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -1897,11 +1897,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -1944,11 +1944,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -1991,11 +1991,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2038,11 +2038,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2085,11 +2085,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2132,11 +2132,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2179,11 +2179,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2226,11 +2226,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2273,11 +2273,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2320,11 +2320,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2367,11 +2367,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2414,11 +2414,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2461,11 +2461,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2507,11 +2507,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2554,11 +2554,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2601,11 +2601,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2648,11 +2648,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2695,11 +2695,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2742,11 +2742,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2789,11 +2789,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2836,11 +2836,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2883,11 +2883,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2930,11 +2930,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -2977,11 +2977,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3024,11 +3024,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3070,11 +3070,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3116,11 +3116,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3163,11 +3163,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3210,11 +3210,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3257,11 +3257,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3304,11 +3304,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3351,11 +3351,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3398,11 +3398,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3444,11 +3444,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3491,11 +3491,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3538,11 +3538,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3585,11 +3585,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3632,11 +3632,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3679,11 +3679,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3725,11 +3725,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3771,11 +3771,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3817,11 +3817,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3863,11 +3863,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3909,11 +3909,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -3956,11 +3956,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4002,11 +4002,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4048,11 +4048,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Scheduled-data failure recovery journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4095,11 +4095,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4142,11 +4142,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4189,11 +4189,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4236,11 +4236,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4283,11 +4283,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4330,11 +4330,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4377,11 +4377,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4424,11 +4424,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4471,11 +4471,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4518,11 +4518,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4565,11 +4565,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4612,11 +4612,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4659,11 +4659,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4706,11 +4706,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4753,11 +4753,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -4784,6 +4784,51 @@
             "npm run validate:atlas-surface-data-matrix"
           ],
           "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/(reader)/civica-conditions/methodology/page.tsx",
+      "kind": "route",
+      "title": "/civica-conditions/methodology reader page",
+      "source": "src/app/(reader)/civica-conditions/methodology/page.tsx",
+      "critical": true,
+      "owner": "Reader experience and Atlas product",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
         },
         "database": {
           "status": "covered",
@@ -6151,11 +6196,11 @@
           "gapTask": "QA-013"
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated admin/reviewer journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6241,11 +6286,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6286,11 +6331,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6331,11 +6376,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6376,11 +6421,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6421,11 +6466,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6466,11 +6511,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6511,11 +6556,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6556,11 +6601,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6601,11 +6646,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6646,11 +6691,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -6691,11 +6736,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7510,11 +7555,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7555,11 +7600,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7600,11 +7645,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7645,11 +7690,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7690,11 +7735,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7735,11 +7780,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7780,11 +7825,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7825,11 +7870,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7870,11 +7915,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7915,11 +7960,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -7960,11 +8005,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8005,11 +8050,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8050,11 +8095,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8095,11 +8140,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8140,11 +8185,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8185,11 +8230,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8230,11 +8275,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8275,11 +8320,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8320,11 +8365,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8365,11 +8410,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8410,11 +8455,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8455,11 +8500,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8500,11 +8545,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8545,11 +8590,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8590,11 +8635,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8635,11 +8680,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8680,11 +8725,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8725,11 +8770,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8770,11 +8815,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8815,11 +8860,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8860,11 +8905,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8905,11 +8950,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8950,11 +8995,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -8995,11 +9040,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9040,11 +9085,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9085,11 +9130,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9130,11 +9175,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9175,11 +9220,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9220,11 +9265,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9265,11 +9310,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9310,11 +9355,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9355,11 +9400,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9615,11 +9660,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9660,11 +9705,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9705,11 +9750,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9750,11 +9795,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9795,11 +9840,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9840,11 +9885,11 @@
           "gapTask": null
         },
         "manual": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Isolated operator journey"
+            "npm run test:qa-011"
           ],
-          "gapTask": "QA-011"
+          "gapTask": null
         }
       }
     },
@@ -9942,6 +9987,49 @@
       "critical": true,
       "owner": "Public API and platform",
       "fixture": "public-read route-inventory declaration for GET",
+      "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
+      "coverage": {
+        "unit": {
+          "status": "covered",
+          "evidence": [
+            "src/lib/api/route-inventory/__tests__/route-inventory.test.ts"
+          ],
+          "gapTask": null
+        },
+        "integration": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:route-io-policy"
+          ],
+          "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/api/v1/conditions/route.ts",
+      "kind": "route",
+      "title": "/api/v1/conditions API handler",
+      "source": "src/app/api/v1/conditions/route.ts",
+      "critical": true,
+      "owner": "Public API and platform",
+      "fixture": "public-read route-inventory declaration for GET, OPTIONS",
       "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
       "coverage": {
         "unit": {
