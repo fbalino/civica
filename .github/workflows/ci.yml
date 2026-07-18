@@ -43,8 +43,12 @@ jobs:
         run: npm run validate:module-coverage
       - name: Credential-free production build
         run: npm run build:ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install browser support profiles
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Supported-browser and graceful-degradation checks
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e:browser-support
       - name: Production browser and API smoke
         env:
           E2E_WEBSERVER_CMD: npm run start

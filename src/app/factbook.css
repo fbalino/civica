@@ -2280,6 +2280,20 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   width: 100%;
   height: 100%;
 }
+.country-map-canvas--unavailable {
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  background: var(--color-surface-secondary);
+}
+.country-map-unavailable {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  text-align: center;
+}
 /* Masthead tile */
 .country-map-tile {
   padding: 0;

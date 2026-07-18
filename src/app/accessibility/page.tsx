@@ -57,6 +57,38 @@ export default function AccessibilityPage() {
           </p>
         </section>
 
+        <section className="editorial-section" aria-labelledby="browser-support">
+          <div className="editorial-section-header">
+            <span className="editorial-eyebrow">Browser support</span>
+            <h2 id="browser-support">Reader journeys and graceful fallback.</h2>
+          </div>
+          <p>
+            Our automated reader checks run against the current Playwright-managed
+            desktop Chromium, Firefox, and WebKit profiles. This is a bounded
+            critical-journey commitment, not a claim that every historical browser
+            version, extension configuration, or branded browser build is supported.
+          </p>
+          <p>
+            Reader prose and primary landmarks remain available from server-rendered
+            HTML when JavaScript is unavailable. Search, maps, filters, and other
+            client-side controls are progressive enhancements; use a current browser
+            with JavaScript enabled for their full interaction.
+          </p>
+          <p>
+            If a map, image, or optional model service fails, the surrounding country
+            evidence remains available. Atlas retains its table alternative and local
+            geometry fallback; country maps disclose an unavailable state rather than
+            leaving a blank canvas; portraits fall back to a monogram; and Ask Civica
+            reports temporary unavailability without replacing source-linked facts.
+          </p>
+          <p>
+            A failed Pulse source basket is represented as a source-outage,
+            not-assessable state rather than a no-event or country-quality conclusion.
+            See the <Link href="/civica-index/methodology/pulse">Pulse methodology</Link>
+            for its observation limits.
+          </p>
+        </section>
+
         <section className="editorial-section" aria-labelledby="security">
           <div className="editorial-section-header">
             <span className="editorial-eyebrow">Responsible disclosure</span>
