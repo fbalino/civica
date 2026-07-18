@@ -429,6 +429,7 @@ const CRON_ROUTES = [
 ] as const;
 
 const V1_ROUTES = [
+  "api/v1/conditions/route.ts",
   "api/v1/countries/[code]/route.ts",
   "api/v1/countries/route.ts",
   "api/v1/elections/route.ts",

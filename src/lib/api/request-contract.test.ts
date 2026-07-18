@@ -85,6 +85,16 @@ test("query contracts apply defaults and typed transformations", () => {
       data: { version: "beta-r4" },
     },
   );
+  assert.deepEqual(
+    parseQueryContract(
+      request("?release=conditions-atlas-v1"),
+      "v1-conditions-query/v1",
+    ),
+    {
+      ok: true,
+      data: { release: "conditions-atlas-v1" },
+    },
+  );
 });
 
 test("repeatable query keys preserve order but scalar duplicates fail", async () => {
@@ -132,6 +142,7 @@ test("unknown keys, malformed encodings, invalid types, and ranges fail closed",
     ["v1-elections-query/v1", "?has_results=1"],
     ["metric-strip-query/v1", "?year=2024abc"],
     ["v1-index-rankings-query/v1", "?sort=other"],
+    ["v1-conditions-query/v1", "?release=conditions-Atlas-v1"],
     [
       "v1-index-methodology-query/v1",
       "?release=ci-beta-r5-2024-Q4&version=beta-r4",
@@ -179,7 +190,7 @@ test("OAuth and constitution-search contracts accept their bounded real shapes",
   });
 });
 
-test("all 21 declared GET query schemas accept their canonical minimum shape", () => {
+test("all 22 declared GET query schemas accept their canonical minimum shape", () => {
   const cases = [
     ["admin-advisory-queue-query/v1", ""],
     ["admin-contact-queue-query/v1", ""],
@@ -194,6 +205,7 @@ test("all 21 declared GET query schemas accept their canonical minimum shape", (
     ["metric-strip-query/v1", "?year=2024"],
     ["v1-country-detail-query/v1", "?as_of=live"],
     ["v1-countries-query/v1", "?as_of=live"],
+    ["v1-conditions-query/v1", ""],
     ["v1-elections-query/v1", ""],
     ["v1-index-history-query/v1", ""],
     ["v1-index-country-query/v1", ""],

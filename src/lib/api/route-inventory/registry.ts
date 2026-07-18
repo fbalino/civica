@@ -851,6 +851,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
+    filePath: "api/v1/conditions/route.ts",
+    exposure: "public-read",
+    methods: ["GET", "OPTIONS"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "public"],
+    note: "Public versioned Conditions release API; CORS-open, per-IP rate limited, and returns only one immutable release selected by its optional release id.",
+  },
+  {
     filePath: "api/v1/countries/[code]/route.ts",
     exposure: "public-read",
     methods: ["GET", "OPTIONS"],

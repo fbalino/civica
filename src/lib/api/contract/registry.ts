@@ -147,6 +147,31 @@ const exportRateLimit: RateLimitContract = {
 
 export const API_ROUTES: RouteContract[] = [
   {
+    id: "conditions",
+    docSectionId: "conditions",
+    method: "GET",
+    pathTemplate: "/api/v1/conditions",
+    filePath: "src/app/api/v1/conditions/route.ts",
+    versioned: true,
+    summary:
+      "One selected immutable Civica Conditions release, with source-native component values, reference years, source lineage, alignment outcomes, and coverage derived from that release's calculation rows. Economic Stability has no composite score.",
+    params: [
+      {
+        name: "release",
+        in: "query",
+        type: "string",
+        description:
+          "Optional exact Conditions release id (for example, conditions-atlas-v1). Omit to select the latest stored release deterministically.",
+      },
+    ],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [400, 404, 429, 503],
+    deprecation: null,
+    exampleId: "conditions",
+  },
+  {
     id: "countries",
     docSectionId: "countries",
     method: "GET",

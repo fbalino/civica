@@ -330,6 +330,16 @@ export const QUERY_CONTRACT_SCHEMAS = {
     schema: electionsQuerySchema,
     repeatableKeys: [],
   },
+  "v1-conditions-query/v1": {
+    schema: z
+      .object({
+        release: text(120, 1)
+          .regex(/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/)
+          .optional(),
+      })
+      .strict(),
+    repeatableKeys: [],
+  },
   "v1-index-history-query/v1": {
     schema: z.object({ release: defaultCiRelease }).strict(),
     repeatableKeys: [],

@@ -45,8 +45,14 @@ until ATL-028's frozen longitudinal study supplies a valid resolution.
 3. **Complete:** replace the generic-metric Conditions explorer read path and
    the country panel read path with this one selected release, including
    source/year/missingness disclosure.
-4. Add a public versioned Conditions API, its route contracts/docs/fixtures,
-   and browser fixtures against deterministic Conditions data.
+4. **In progress:** `/api/v1/conditions` now selects one stored release with
+   the same public model as the explorer and country panel. Its closed query
+   contract, response schema, registry, rate-limit/inventory policies, API
+   documentation, illustrative fixture, and negative schema fixtures are
+   checked by `npm run validate:api-docs` and
+   `npm run validate:route-io-policy`. Browser fixtures against deterministic
+   Conditions data remain pending a responsive server and an approved staging
+   release.
 5. After an isolated staging release is approved, verify page/API values
    against the stored release and preserve the evidence before marking ATL-029
    complete.

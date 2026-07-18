@@ -33,6 +33,7 @@ import {
   zIndexRankingsMeta,
   zCiSeriesProvenance,
   zPeerGroupingsData,
+  zConditionsReleaseResponse,
   zPulseDimensionsData,
   zPulseEventsData,
   zPulseChangelogRow,
@@ -50,6 +51,7 @@ import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
 import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
+import type { ConditionsPublicRelease } from "@/lib/conditions/public-release";
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries
@@ -253,6 +255,16 @@ export function shapePeerGroupingsData(
   input: z.infer<typeof zPeerGroupingsData>,
 ): z.infer<typeof zPeerGroupingsData> {
   return zPeerGroupingsData.parse(input);
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * /api/v1/conditions
+ * ──────────────────────────────────────────────────────────────── */
+
+export function shapeConditionsReleaseResponse(
+  input: ConditionsPublicRelease,
+): z.infer<typeof zConditionsReleaseResponse> {
+  return zConditionsReleaseResponse.parse({ data: input });
 }
 
 /* ────────────────────────────────────────────────────────────────

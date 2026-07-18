@@ -37,6 +37,7 @@ const BASE_URL = "https://civicaatlas.org/api/v1";
 const SECTIONS: ReaderSidebarItem[] = [
   { id: "overview", label: "Overview" },
   { id: "endpoints", label: "Endpoints" },
+  { id: "conditions", label: "Conditions release" },
   { id: "countries", label: "List countries" },
   { id: "country-detail", label: "Country detail" },
   { id: "elections", label: "Election research export" },
@@ -188,6 +189,7 @@ function docExample(exampleId: ExampleId): string {
 }
 
 export default function ApiDocsPage() {
+  const conditionsRoute = getRouteContract("conditions");
   const countriesRoute = getRouteContract("countries");
   const countryDetailRoute = getRouteContract("country-detail");
   const electionsRoute = getRouteContract("elections");
@@ -309,6 +311,16 @@ export default function ApiDocsPage() {
 
       <section id="endpoints" className="editorial-section">
         <h2>Endpoints</h2>
+
+        <EndpointSection
+          id="conditions"
+          routeId="conditions"
+          method="GET"
+          path={conditionsRoute.pathTemplate}
+          description={conditionsRoute.summary}
+          parameters={toDocParams(conditionsRoute.params)}
+          exampleResponse={docExample("conditions")}
+        />
 
         <EndpointSection
           id="countries"

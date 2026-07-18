@@ -27,6 +27,12 @@ import {
   STRUCTURAL_FAMILY_SUNSET_DATE_ISO,
   PEER_GROUPINGS_SUCCESSOR_HREF,
 } from "@/lib/api/deprecation";
+import {
+  CONDITIONS_ALIGNMENT_STATUSES,
+  CONDITIONS_COMPONENTS,
+  CONDITIONS_DIMENSIONS,
+  CONDITIONS_INCLUSION_DECISIONS,
+} from "@/lib/conditions/contract";
 
 /* ────────────────────────────────────────────────────────────────
  * Primitive enums (mirrored from their owning modules — these are
@@ -1276,6 +1282,185 @@ export const zPeerGroupingsResponse = z
       })
       .strict(),
   })
+  .strict();
+
+/* ────────────────────────────────────────────────────────────────
+ * /api/v1/conditions
+ * ──────────────────────────────────────────────────────────────── */
+
+const zConditionsDimension = z.enum(CONDITIONS_DIMENSIONS);
+const zConditionsAlignmentStatus = z.enum(CONDITIONS_ALIGNMENT_STATUSES);
+const zConditionsInclusionDecision = z.enum(CONDITIONS_INCLUSION_DECISIONS);
+const zConditionsComponentId = z.enum([
+  "hdi",
+  "global_peace_index",
+  "inflation",
+  "unemployment",
+  "gdp_growth",
+]);
+
+export const zConditionsPublicComponent = z
+  .object({
+    componentId: zConditionsComponentId,
+    nativeValue: z.number().nullable(),
+    nativeUnit: z.string(),
+    referenceYear: z.number().int().nullable(),
+    valueStatus: zDataValueStatus,
+    valueStatusReason: z.string().nullable(),
+    inclusionDecision: zConditionsInclusionDecision,
+    sourceId: z.string(),
+    sourceName: z.string().nullable(),
+    indicatorId: z.string(),
+    upstreamRelease: z.string(),
+    licenseUrl: z.string(),
+    transformationId: z.string(),
+  })
+  .strict();
+
+export const zConditionsPublicCalculation = z
+  .object({
+    releaseId: z.string().regex(/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/),
+    jurisdictionId: z.string(),
+    countryName: z.string(),
+    countrySlug: z.string(),
+    countryIso3: z.string().nullable(),
+    dimension: zConditionsDimension,
+    calculationKey: z
+      .string()
+      .regex(/^conditions-calculation\/v1\/sha256:[a-f0-9]{64}$/),
+    alignmentPolicy: z.literal("all-components-same-reference-year/v1"),
+    alignmentStatus: zConditionsAlignmentStatus,
+    referenceYear: z.number().int().nullable(),
+    normalizedScore: z.number().min(0).max(100).nullable(),
+    rawValue: z.number().nullable(),
+    scoreSourceId: z.string().nullable(),
+    scoreSourceName: z.string().nullable(),
+    scoreIndicatorId: z.string().nullable(),
+    scoreUpstreamRelease: z.string().nullable(),
+    scoreLicenseUrl: z.string().nullable(),
+    components: z.array(zConditionsPublicComponent),
+  })
+  .strict();
+
+export const zConditionsPublicRelease = z
+  .object({
+    contract: z.literal("civica-conditions-public-release/v1"),
+    release: z
+      .object({
+        releaseId: z.string().regex(/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/),
+        methodologyVersion: z.string(),
+        manifestSha256: z.string().regex(/^[a-f0-9]{64}$/),
+        createdAt: z.string(),
+      })
+      .strict(),
+    coverage: z.array(
+      z
+        .object({
+          dimension: zConditionsDimension,
+          calculations: z.number().int().nonnegative(),
+          aligned: z.number().int().nonnegative(),
+          scored: z.number().int().nonnegative(),
+          mixedYearRefused: z.number().int().nonnegative(),
+          missingComponent: z.number().int().nonnegative(),
+          components: z.number().int().nonnegative(),
+          observedComponents: z.number().int().nonnegative(),
+          unavailableComponents: z.number().int().nonnegative(),
+        })
+        .strict(),
+    ),
+    calculations: z.array(zConditionsPublicCalculation),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const report = (path: (string | number)[], message: string) =>
+      context.addIssue({ code: "custom", path, message });
+    const coverageByDimension = new Map(
+      value.coverage.map((coverage) => [coverage.dimension, coverage]),
+    );
+
+    if (coverageByDimension.size !== CONDITIONS_DIMENSIONS.length) {
+      report(["coverage"], "coverage must contain every Conditions dimension exactly once");
+    }
+
+    for (const dimension of CONDITIONS_DIMENSIONS) {
+      const coverage = coverageByDimension.get(dimension);
+      if (!coverage) continue;
+      const calculations = value.calculations.filter(
+        (calculation) => calculation.dimension === dimension,
+      );
+      const components = calculations.flatMap(
+        (calculation) => calculation.components,
+      );
+      const expected = {
+        calculations: calculations.length,
+        aligned: calculations.filter(
+          (calculation) => calculation.alignmentStatus === "aligned",
+        ).length,
+        scored: calculations.filter(
+          (calculation) => calculation.normalizedScore !== null,
+        ).length,
+        mixedYearRefused: calculations.filter(
+          (calculation) => calculation.alignmentStatus === "mixed_year_refused",
+        ).length,
+        missingComponent: calculations.filter(
+          (calculation) => calculation.alignmentStatus === "missing_component",
+        ).length,
+        components: components.length,
+        observedComponents: components.filter(
+          (component) => component.valueStatus === "observed",
+        ).length,
+        unavailableComponents: components.filter(
+          (component) => component.valueStatus !== "observed",
+        ).length,
+      };
+      for (const [key, expectedValue] of Object.entries(expected)) {
+        if (coverage[key as keyof typeof expected] !== expectedValue) {
+          report(["coverage"], `${dimension} coverage does not match its calculation rows`);
+          break;
+        }
+      }
+    }
+
+    for (const [index, calculation] of value.calculations.entries()) {
+      const path = ["calculations", index] as const;
+      if (calculation.releaseId !== value.release.releaseId) {
+        report([...path, "releaseId"], "calculation belongs to another release");
+      }
+      const expectedComponents = CONDITIONS_COMPONENTS[calculation.dimension];
+      const actualComponents = calculation.components
+        .map((component) => component.componentId)
+        .sort();
+      if (
+        actualComponents.length !== expectedComponents.length ||
+        actualComponents.some((component, componentIndex) =>
+          component !== [...expectedComponents].sort()[componentIndex],
+        )
+      ) {
+        report([...path, "components"], "calculation omits or adds a declared component");
+      }
+      if (
+        calculation.alignmentStatus === "aligned" &&
+        calculation.referenceYear === null
+      ) {
+        report([...path, "referenceYear"], "aligned calculation has no reference year");
+      }
+      if (
+        calculation.alignmentStatus !== "aligned" &&
+        (calculation.normalizedScore !== null || calculation.rawValue !== null)
+      ) {
+        report([...path], "unaligned calculation carries a score");
+      }
+      if (
+        calculation.dimension === "economic_stability" &&
+        (calculation.normalizedScore !== null || calculation.rawValue !== null)
+      ) {
+        report([...path], "economic stability must not publish a composite score");
+      }
+    }
+  });
+
+export const zConditionsReleaseResponse = z
+  .object({ data: zConditionsPublicRelease })
   .strict();
 
 /* ────────────────────────────────────────────────────────────────
