@@ -49,3 +49,7 @@ jobs:
         env:
           E2E_WEBSERVER_CMD: npm run start
         run: npm run test:e2e -- e2e/harness.selftest.spec.ts e2e/ci-smoke.spec.ts --workers=1 --retries=0
+      - name: Production reader performance budgets
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e:performance

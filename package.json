@@ -394,6 +394,7 @@
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "test:e2e": "playwright test",
     "test:e2e:a11y": "playwright test e2e/qa-012-accessibility.spec.ts e2e/qa-012-keyboard.spec.ts e2e/exp-033-atlas-accessibility.spec.ts e2e/exp-034-forms-keyboard.spec.ts",
+    "test:e2e:performance": "playwright test e2e/qa-014-performance.spec.ts --workers=1 --retries=0",
     "test:e2e:embed": "playwright test e2e/exp-030-retired-embed.spec.ts",
     "test:qa-011": "tsx scripts/run-qa-011.ts",
     "test:e2e:report": "playwright show-report output/playwright/report",
