@@ -32,7 +32,7 @@
  * peer-set marker — they never crash on missing data.
  */
 
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { jurisdictions, governmentTaxonomies } from "@/lib/db/schema";
@@ -57,9 +57,42 @@ export { DEFAULT_MIN_N };
 export type PeerSetFallbackReason =
   | "n_below_threshold"
   | "no_classification"
-  | "non_sovereign_or_uncovered";
+  | "non_sovereign_or_uncovered"
+  | "subject_not_observed";
+
+/** A peer lens is selected by the measure being compared, never by display
+ * preference. Material measures use World Bank classification; governance
+ * measures use V-Dem regime classification. */
+export type PeerMeasureDomain = "material" | "governance";
+
+/** The exact observed metric universe to which a cohort is restricted. */
+export interface PeerMeasureContext {
+  /** Stable metric/release identifier exposed with the cohort. */
+  metricId: string;
+  /** The value/release vintage of the compared measure, when known. */
+  metricVintage: string | null;
+}
+
+/** Async peer-set calls require a metric-observed sovereign universe. */
+export interface PeerSetOptions extends PeerMeasureContext {
+  eligibleJurisdictionIds: readonly string[];
+  minN?: number;
+}
 
 export interface PeerSetResult {
+  /** Domain of the measure being compared. This fixes the permitted lens. */
+  measureDomain: PeerMeasureDomain;
+  /** Identifier and vintage for the compared metric/release. */
+  metricId: string;
+  metricVintage: string | null;
+  /** Number of sovereign jurisdictions with an observed value for the metric. */
+  eligibleN: number;
+  /** Size of the requested cohort before any fallback. */
+  attemptedN: number;
+  /** Size of the cohort ultimately used for the comparison. */
+  finalN: number;
+  /** Pinned upstream vintage of the classification that formed the cohort. */
+  upstreamVintage: string | null;
   /** True when the peer set is usable for ranking display. */
   available: boolean;
   /** Lens used for the final result. May differ from the requested
@@ -144,12 +177,12 @@ async function fetchClassifications(
 
 /** Fetch the freshest retrievedAt + winning sourceId across the
  *  canonical rows for one jurisdiction × one fact-key. Returns
- *  `{ sourceId: null, retrievedAt: null }` when the fact has no
+ *  `{ sourceId: null, retrievedAt: null, upstreamVintage: null }` when the fact has no
  *  active row yet (Phase F hasn't synced it). */
 async function fetchProvenance(
   jurisdictionId: string,
   factKey: string,
-): Promise<{ sourceId: string | null; retrievedAt: string | null }> {
+): Promise<PeerProvenance> {
   const resolved = await getCanonicalFactsForJurisdictions(
     [jurisdictionId],
     [factKey],
@@ -158,19 +191,41 @@ async function fetchProvenance(
   return {
     sourceId: row?.sourceId ?? null,
     retrievedAt: row?.retrievedAt ?? null,
+    upstreamVintage: row?.upstreamVintageLabel ?? null,
   };
 }
 
-/** Read all (jurisdictionId, slug) pairs once. Civica has ~260 of
- *  these so this is a cheap full-table scan. The slug is needed by
- *  rank-within-cohort computations that key on slug. */
-async function readAllJurisdictionRefs(): Promise<
+/** Read an observed, eligible set of (jurisdictionId, slug) pairs. The caller
+ * has already established the metric/release universe; this function preserves
+ * it rather than silently widening to every jurisdiction in the database. */
+async function readEligibleJurisdictionRefs(
+  eligibleJurisdictionIds: readonly string[],
+): Promise<
   Array<{ id: string; slug: string }>
 > {
+  const ids = [...new Set(eligibleJurisdictionIds)];
+  if (ids.length === 0) return [];
   const rows = await db
     .select({ id: jurisdictions.id, slug: jurisdictions.slug })
-    .from(jurisdictions);
+    .from(jurisdictions)
+    .where(inArray(jurisdictions.id, ids));
   return rows;
+}
+
+function mergedMaterialProvenance(
+  region: PeerProvenance,
+  income: PeerProvenance,
+): PeerProvenance {
+  const vintages = [...new Set(
+    [region.upstreamVintage, income.upstreamVintage].filter(
+      (value): value is string => Boolean(value),
+    ),
+  )];
+  return {
+    sourceId: region.sourceId ?? income.sourceId,
+    retrievedAt: region.retrievedAt ?? income.retrievedAt,
+    upstreamVintage: vintages.length > 0 ? vintages.join(" · ") : null,
+  };
 }
 
 /** Map a list of jurisdictionIds to their (id, slug) tuples in
@@ -208,6 +263,26 @@ export interface JurisdictionRef {
 export interface PeerProvenance {
   sourceId: string | null;
   retrievedAt: string | null;
+  upstreamVintage?: string | null;
+}
+
+function peerSetMetadata(
+  measureDomain: PeerMeasureDomain,
+  refs: JurisdictionRef[],
+  attemptedN: number,
+  finalN: number,
+  provenance: PeerProvenance,
+  measure: PeerMeasureContext | undefined,
+) {
+  return {
+    measureDomain,
+    metricId: measure?.metricId ?? "unversioned_measure",
+    metricVintage: measure?.metricVintage ?? null,
+    eligibleN: refs.length,
+    attemptedN,
+    finalN,
+    upstreamVintage: provenance.upstreamVintage ?? null,
+  };
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -234,6 +309,7 @@ export function resolveMaterialPeerSet(args: {
   regionProvenance: PeerProvenance;
   incomeProvenance: PeerProvenance;
   minN: number;
+  measure?: PeerMeasureContext;
 }): MaterialPeerSet {
   const {
     subjectId,
@@ -243,6 +319,7 @@ export function resolveMaterialPeerSet(args: {
     regionProvenance,
     incomeProvenance,
     minN,
+    measure,
   } = args;
   const allIds = refs.map((r) => r.id);
   const subjectRegion = regionByJur[subjectId] ?? null;
@@ -253,8 +330,26 @@ export function resolveMaterialPeerSet(args: {
     incomeGroup: subjectIncome,
   };
 
+  if (!allIds.includes(subjectId)) {
+    return {
+      ...peerSetMetadata("material", refs, 0, 0, regionProvenance, measure),
+      ...baseSet,
+      available: false,
+      lensUsed: "global",
+      cohortValue: null,
+      cohortLabel: "Unavailable",
+      peerJurisdictionIds: [],
+      peerJurisdictionSlugs: [],
+      n: 0,
+      fallbackChain: ["subject_not_observed"],
+      sourceId: regionProvenance.sourceId ?? "world_bank",
+      retrievedAt: regionProvenance.retrievedAt,
+    };
+  }
+
   if (!subjectRegion && !subjectIncome) {
     return {
+      ...peerSetMetadata("material", refs, 0, 0, regionProvenance, measure),
       ...baseSet,
       available: false,
       lensUsed: "global",
@@ -271,15 +366,18 @@ export function resolveMaterialPeerSet(args: {
 
   // Tier 1: region+income.
   const fallbackChain: PeerSetFallbackReason[] = [];
+  let attemptedN = 0;
   if (subjectRegion && subjectIncome) {
     const peers = allIds.filter(
       (id) =>
         (regionByJur[id] ?? null) === subjectRegion &&
         (incomeByJur[id] ?? null) === subjectIncome,
     );
+    attemptedN = peers.length;
     if (peers.length >= minN) {
       const paired = pairWithSlugs(peers, refs);
       return {
+        ...peerSetMetadata("material", refs, attemptedN, peers.length, regionProvenance, measure),
         ...baseSet,
         available: true,
         lensUsed: "world_bank_region",
@@ -306,6 +404,7 @@ export function resolveMaterialPeerSet(args: {
     if (peers.length >= minN) {
       const paired = pairWithSlugs(peers, refs);
       return {
+        ...peerSetMetadata("material", refs, attemptedN, peers.length, regionProvenance, measure),
         ...baseSet,
         available: true,
         lensUsed: "world_bank_region",
@@ -330,6 +429,7 @@ export function resolveMaterialPeerSet(args: {
     if (peers.length >= minN) {
       const paired = pairWithSlugs(peers, refs);
       return {
+        ...peerSetMetadata("material", refs, attemptedN, peers.length, incomeProvenance, measure),
         ...baseSet,
         available: true,
         lensUsed: "world_bank_income_group",
@@ -349,6 +449,7 @@ export function resolveMaterialPeerSet(args: {
   // Tier 4: global.
   const paired = pairWithSlugs(allIds, refs);
   return {
+    ...peerSetMetadata("material", refs, attemptedN, allIds.length, regionProvenance, measure),
     ...baseSet,
     available: true,
     lensUsed: "global",
@@ -370,11 +471,13 @@ export function resolveMaterialPeerSet(args: {
  */
 export async function getMaterialPeerSet(
   jurisdictionId: string,
-  options: { minN?: number } = {},
+  options: PeerSetOptions,
 ): Promise<MaterialPeerSet> {
   const minN = options.minN ?? DEFAULT_MIN_N;
 
-  const allRefs = await readAllJurisdictionRefs();
+  const allRefs = await readEligibleJurisdictionRefs(
+    options.eligibleJurisdictionIds,
+  );
   const allIds = allRefs.map((r) => r.id);
   const facts = await fetchClassifications(allIds, [
     PEER_GROUPING_FACT_KEYS.worldBankRegion,
@@ -401,9 +504,16 @@ export async function getMaterialPeerSet(
     refs: allRefs,
     regionByJur,
     incomeByJur,
-    regionProvenance,
-    incomeProvenance,
+    regionProvenance: mergedMaterialProvenance(
+      regionProvenance,
+      incomeProvenance,
+    ),
+    incomeProvenance: mergedMaterialProvenance(
+      incomeProvenance,
+      regionProvenance,
+    ),
     minN,
+    measure: options,
   });
 }
 
@@ -432,13 +542,32 @@ export function resolveGovernancePeerSet(args: {
   vdemRowByJur: Record<string, string | null | undefined>;
   provenance: PeerProvenance;
   minN: number;
+  measure?: PeerMeasureContext;
 }): GovernancePeerSet {
-  const { subjectId, refs, vdemRowByJur, provenance, minN } = args;
+  const { subjectId, refs, vdemRowByJur, provenance, minN, measure } = args;
   const allIds = refs.map((r) => r.id);
   const subjectTier = vdemRowByJur[subjectId] ?? null;
 
+  if (!allIds.includes(subjectId)) {
+    return {
+      ...peerSetMetadata("governance", refs, 0, 0, provenance, measure),
+      vdemRowTier: null,
+      available: false,
+      lensUsed: "global",
+      cohortValue: null,
+      cohortLabel: "Unavailable",
+      peerJurisdictionIds: [],
+      peerJurisdictionSlugs: [],
+      n: 0,
+      fallbackChain: ["subject_not_observed"],
+      sourceId: provenance.sourceId ?? "vdem",
+      retrievedAt: provenance.retrievedAt,
+    };
+  }
+
   if (!subjectTier) {
     return {
+      ...peerSetMetadata("governance", refs, 0, 0, provenance, measure),
       vdemRowTier: null,
       available: false,
       lensUsed: "global",
@@ -460,6 +589,7 @@ export function resolveGovernancePeerSet(args: {
   if (peers.length >= minN) {
     const paired = pairWithSlugs(peers, refs);
     return {
+      ...peerSetMetadata("governance", refs, peers.length, peers.length, provenance, measure),
       vdemRowTier: subjectTier,
       available: true,
       lensUsed: "vdem_row",
@@ -476,6 +606,7 @@ export function resolveGovernancePeerSet(args: {
   fallbackChain.push("n_below_threshold");
   const paired = pairWithSlugs(allIds, refs);
   return {
+    ...peerSetMetadata("governance", refs, peers.length, allIds.length, provenance, measure),
     vdemRowTier: subjectTier,
     available: true,
     lensUsed: "global",
@@ -492,10 +623,12 @@ export function resolveGovernancePeerSet(args: {
 
 export async function getGovernancePeerSet(
   jurisdictionId: string,
-  options: { minN?: number } = {},
+  options: PeerSetOptions,
 ): Promise<GovernancePeerSet> {
   const minN = options.minN ?? DEFAULT_MIN_N;
-  const allRefs = await readAllJurisdictionRefs();
+  const allRefs = await readEligibleJurisdictionRefs(
+    options.eligibleJurisdictionIds,
+  );
   const allIds = allRefs.map((r) => r.id);
   const facts = await fetchClassifications(allIds, [
     PEER_GROUPING_FACT_KEYS.vdemRow,
@@ -515,6 +648,7 @@ export async function getGovernancePeerSet(
     vdemRowByJur,
     provenance,
     minN,
+    measure: options,
   });
 }
 
@@ -540,15 +674,40 @@ export interface RegimeAlternateLens extends PeerSetResult {
  * returns an explicit unavailable marker.
  */
 export function resolveRegimeAlternateLens(args: {
+  subjectId: string;
   refs: JurisdictionRef[];
   subjectCgv: string | null;
   cgvPeerIds: string[];
   minN: number;
+  measure?: PeerMeasureContext;
 }): RegimeAlternateLens {
-  const { refs, subjectCgv, cgvPeerIds, minN } = args;
+  const { subjectId, refs, subjectCgv, cgvPeerIds, minN, measure } = args;
+  const provenance: PeerProvenance = {
+    sourceId: "bjornskov_rode",
+    retrievedAt: null,
+    upstreamVintage: null,
+  };
+
+  if (!refs.some((ref) => ref.id === subjectId)) {
+    return {
+      ...peerSetMetadata("governance", refs, 0, 0, provenance, measure),
+      cgvType: null,
+      available: false,
+      lensUsed: "global",
+      cohortValue: null,
+      cohortLabel: "Unavailable",
+      peerJurisdictionIds: [],
+      peerJurisdictionSlugs: [],
+      n: 0,
+      fallbackChain: ["subject_not_observed"],
+      sourceId: "bjornskov_rode",
+      retrievedAt: null,
+    };
+  }
 
   if (!subjectCgv) {
     return {
+      ...peerSetMetadata("governance", refs, 0, 0, provenance, measure),
       cgvType: null,
       available: false,
       lensUsed: "global",
@@ -566,6 +725,7 @@ export function resolveRegimeAlternateLens(args: {
   if (cgvPeerIds.length >= minN) {
     const paired = pairWithSlugs(cgvPeerIds, refs);
     return {
+      ...peerSetMetadata("governance", refs, cgvPeerIds.length, cgvPeerIds.length, provenance, measure),
       cgvType: subjectCgv,
       available: true,
       lensUsed: "cgv_regime",
@@ -582,6 +742,7 @@ export function resolveRegimeAlternateLens(args: {
   const allIds = refs.map((r) => r.id);
   const paired = pairWithSlugs(allIds, refs);
   return {
+    ...peerSetMetadata("governance", refs, cgvPeerIds.length, allIds.length, provenance, measure),
     cgvType: subjectCgv,
     available: true,
     lensUsed: "global",
@@ -598,10 +759,12 @@ export function resolveRegimeAlternateLens(args: {
 
 export async function getRegimeAlternateLens(
   jurisdictionId: string,
-  options: { minN?: number } = {},
+  options: PeerSetOptions,
 ): Promise<RegimeAlternateLens> {
   const minN = options.minN ?? DEFAULT_MIN_N;
-  const allRefs = await readAllJurisdictionRefs();
+  const allRefs = await readEligibleJurisdictionRefs(
+    options.eligibleJurisdictionIds,
+  );
   const subjectRow = await db
     .select({ regimeTypeCgv: governmentTaxonomies.regimeTypeCgv })
     .from(governmentTaxonomies)
@@ -615,14 +778,35 @@ export async function getRegimeAlternateLens(
       .select({ jurisdictionId: governmentTaxonomies.jurisdictionId })
       .from(governmentTaxonomies)
       .where(eq(governmentTaxonomies.regimeTypeCgv, subjectCgv));
-    cgvPeerIds = peerRows.map((r) => r.jurisdictionId);
+    const eligible = new Set(allRefs.map((ref) => ref.id));
+    cgvPeerIds = peerRows
+      .map((r) => r.jurisdictionId)
+      .filter((id) => eligible.has(id));
   }
 
   return resolveRegimeAlternateLens({
+    subjectId: jurisdictionId,
     refs: allRefs,
     subjectCgv,
     cgvPeerIds,
     minN,
+    measure: options,
   });
 }
 
+/**
+ * Domain-locked entry point for product surfaces. A caller declares the
+ * measure being compared; the resolver selects the only permitted default
+ * lens and refuses the old "pick any peer lens for any measure" pattern.
+ */
+export async function getPeerSetForMeasure(
+  args: PeerSetOptions & {
+    jurisdictionId: string;
+    measureDomain: PeerMeasureDomain;
+  },
+): Promise<MaterialPeerSet | GovernancePeerSet> {
+  const { jurisdictionId, measureDomain, ...options } = args;
+  return measureDomain === "material"
+    ? getMaterialPeerSet(jurisdictionId, options)
+    : getGovernancePeerSet(jurisdictionId, options);
+}

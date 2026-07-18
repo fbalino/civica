@@ -3,6 +3,7 @@ import { eq, sql } from "drizzle-orm";
 import { buildGovTypeStripBands, getMetricStripData } from "@/lib/db/queries";
 import { db } from "@/lib/db";
 import { jurisdictions, metricDefinitions, sources } from "@/lib/db/schema";
+import { getMaterialMetricPeerCohort } from "@/lib/peer-grouping/material-metric-cohort";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import {
@@ -27,7 +28,7 @@ export async function GET(
     const query = parseQueryContract(req, "metric-strip-query/v1");
     if (!query.ok) return query.response;
     const { metricId } = path.data;
-    const { year, govTypes, regions, taxonomy } = query.data;
+    const { year, govTypes, regions, taxonomy, country } = query.data;
 
     const rawRows = await getMetricStripData(
       metricId,
@@ -80,6 +81,37 @@ export async function GET(
       ]),
     );
 
+    const peerCohort = country
+      ? await (async () => {
+          const subject = await db
+            .select({ id: jurisdictions.id })
+            .from(jurisdictions)
+            .where(eq(jurisdictions.slug, country))
+            .limit(1);
+          if (!subject[0]) return null;
+          const cohort = await getMaterialMetricPeerCohort({
+            jurisdictionId: subject[0].id,
+            metricId,
+            year,
+          });
+          if (!cohort) return null;
+          const { peerSet } = cohort;
+          return {
+            measureDomain: peerSet.measureDomain,
+            metricId: peerSet.metricId,
+            metricVintage: peerSet.metricVintage,
+            available: peerSet.available,
+            cohortLabel: peerSet.cohortLabel,
+            lensUsed: peerSet.lensUsed,
+            eligibleN: peerSet.eligibleN,
+            attemptedN: peerSet.attemptedN,
+            finalN: peerSet.finalN,
+            fallbackChain: peerSet.fallbackChain,
+            upstreamVintage: peerSet.upstreamVintage,
+          };
+        })()
+      : null;
+
     return NextResponse.json({
       metricId,
       year,
@@ -91,6 +123,10 @@ export async function GET(
         total: Number(coverageRows[0]?.total ?? 0),
         withData: rows.length,
       },
+      // `govTypeBands` are descriptive strata for the chart. A selected
+      // country receives the actual material peer cohort separately, with the
+      // observed universe, fallback, and upstream-vintage contract exposed.
+      peerCohort,
     });
   });
 }

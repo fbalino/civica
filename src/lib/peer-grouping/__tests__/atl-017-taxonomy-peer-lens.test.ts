@@ -272,6 +272,7 @@ test("governance: RoW tier cohort, then global fallback, then noncoverage", () =
 test("regime alternate (BR/CGV): cohort, global fallback, and unavailable", () => {
   const universe = refs(4);
   const cohort = resolveRegimeAlternateLens({
+    subjectId: "id-1",
     refs: universe,
     subjectCgv: "parliamentary_democracy",
     cgvPeerIds: ["id-1", "id-2", "id-3"],
@@ -283,6 +284,7 @@ test("regime alternate (BR/CGV): cohort, global fallback, and unavailable", () =
   assert.equal(cohort.sourceId, "bjornskov_rode");
 
   const global = resolveRegimeAlternateLens({
+    subjectId: "id-1",
     refs: universe,
     subjectCgv: "royal_dictatorship",
     cgvPeerIds: ["id-1"],
@@ -293,6 +295,7 @@ test("regime alternate (BR/CGV): cohort, global fallback, and unavailable", () =
   assert.deepEqual(global.fallbackChain, ["n_below_threshold"]);
 
   const unavailable = resolveRegimeAlternateLens({
+    subjectId: "id-1",
     refs: universe,
     subjectCgv: null,
     cgvPeerIds: [],
@@ -300,6 +303,66 @@ test("regime alternate (BR/CGV): cohort, global fallback, and unavailable", () =
   });
   assert.equal(unavailable.available, false);
   assert.deepEqual(unavailable.fallbackChain, ["non_sovereign_or_uncovered"]);
+});
+
+test("peer cohort contract retains observed universe, attempted/final n, and upstream vintage", () => {
+  const universe = refs(5);
+  const set = resolveMaterialPeerSet({
+    subjectId: "id-1",
+    refs: universe,
+    regionByJur: {
+      "id-1": "East Asia & Pacific",
+      "id-2": "East Asia & Pacific",
+      "id-3": "East Asia & Pacific",
+      "id-4": "East Asia & Pacific",
+      "id-5": "South Asia",
+    },
+    incomeByJur: {
+      "id-1": "High income",
+      "id-2": "High income",
+      "id-3": "Low income",
+      "id-4": "Low income",
+      "id-5": "Low income",
+    },
+    regionProvenance: {
+      sourceId: "world_bank",
+      retrievedAt: "2026-07-18T00:00:00.000Z",
+      upstreamVintage: "World Bank Country and Lending Groups 2026",
+    },
+    incomeProvenance: NO_PROV,
+    minN: 3,
+    measure: { metricId: "hdi", metricVintage: "2024" },
+  });
+  // The requested region+income cohort had two observations, so the resolver
+  // documented its fallback to the four observed countries in the region.
+  assert.equal(set.measureDomain, "material");
+  assert.equal(set.metricId, "hdi");
+  assert.equal(set.metricVintage, "2024");
+  assert.equal(set.eligibleN, 5);
+  assert.equal(set.attemptedN, 2);
+  assert.equal(set.finalN, 4);
+  assert.equal(set.n, set.finalN);
+  assert.equal(
+    set.upstreamVintage,
+    "World Bank Country and Lending Groups 2026",
+  );
+  assert.deepEqual(set.fallbackChain, ["n_below_threshold"]);
+});
+
+test("peer cohorts refuse a subject absent from the metric-observed universe", () => {
+  const set = resolveGovernancePeerSet({
+    subjectId: "id-1",
+    refs: refs(3).slice(1),
+    vdemRowByJur: { "id-1": "Liberal Democracy" },
+    provenance: NO_PROV,
+    minN: 2,
+    measure: { metricId: "ci-beta-r5", metricVintage: "2024-Q4" },
+  });
+  assert.equal(set.available, false);
+  assert.equal(set.eligibleN, 2);
+  assert.equal(set.attemptedN, 0);
+  assert.equal(set.finalN, 0);
+  assert.deepEqual(set.fallbackChain, ["subject_not_observed"]);
 });
 
 test("minimum-n boundary: exactly minN passes, minN-1 falls back", () => {

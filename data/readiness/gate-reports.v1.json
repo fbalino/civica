@@ -1,7 +1,7 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "20666e5d394dd076034d8435e84430817d3d09866c3a1c3b516607abdeb5e44a",
+    "plan/MASTER-CHECKLIST.md": "60e1aec2166195ae816addd921e081e1506e0569fd1ffc9a7011a283e824e9d9",
     "plan/PROGRESS.md": "d2ac286b905b3206e4ccd3ca00a7513c763999341fb1bae287a5b99b60d5827a",
     "plan/MANUAL-CHECKS.md": "d02630caa3fc5f142b6b5c5b971d2d1ad52df3729efa3bd3bfde18529a674b75",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
@@ -9,7 +9,7 @@
     "plan/03-data-provenance-and-reproducibility.md": "3fb5da3362a6361a477f89fd46993a12587ffebc086c3beccdb773ff770e7558",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
     "plan/05-pulse-event-ledger-and-validation.md": "2da9497d318e9476f0a956d102ec5d35a1b8d387f802b67af3463dc425c5cb7b",
-    "plan/06-atlas-content-and-research-features.md": "08a5b66246f0ee0585493ef09c4433e6e304f928ecfd91af6a5659501b030fe2",
+    "plan/06-atlas-content-and-research-features.md": "6a82f70bd15bafcabe97babd82eb7fc7bd03e240f0ec8532b59b2953b181a45e",
     "plan/07-design-system-assets-and-reader-experience.md": "15cab727d6a01e85a56ccb67d83a14cad0e0a996fb5a00918832adb95478b2c6",
     "plan/08-platform-security-performance-and-operations.md": "ac63ebd025faf1ed60521bb7d25a6f43568572758621558819aed00380cbbcb0",
     "plan/09-testing-qa-and-release.md": "d3215a082be2140d56eda64d5bf4c4aa936fe8236a56d560f9f8de8741a40a57",
@@ -23,12 +23,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 215,
-        "remaining": 91,
+        "completed": 216,
+        "remaining": 90,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 152
+            "completed": 153
           },
           "P1": {
             "total": 111,
@@ -42,7 +42,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 16
+            "completed": 17
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -88,7 +88,6 @@
         "ATL-027",
         "ATL-028",
         "ATL-029",
-        "ATL-031",
         "BRD-003",
         "BRD-007",
         "BRD-010",
@@ -136,7 +135,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "ATL-031",
         "BRD-001",
         "BRD-002",
         "BRD-003",
@@ -210,7 +208,9 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [],
+      "evidenceGaps": [
+        "ATL-031: completion record missing"
+      ],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -281,7 +281,8 @@
         }
       ],
       "blockers": [
-        "38 unchecked P0 tasks prevent a green report"
+        "ATL-031: completion record missing",
+        "37 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -290,12 +291,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 215,
-        "remaining": 91,
+        "completed": 216,
+        "remaining": 90,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 152
+            "completed": 153
           },
           "P1": {
             "total": 111,
@@ -309,7 +310,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 16
+            "completed": 17
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -355,7 +356,6 @@
         "ATL-027",
         "ATL-028",
         "ATL-029",
-        "ATL-031",
         "BRD-003",
         "BRD-007",
         "BRD-010",
@@ -403,7 +403,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "ATL-031",
         "BRD-001",
         "BRD-002",
         "BRD-003",
@@ -477,7 +476,9 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [],
+      "evidenceGaps": [
+        "ATL-031: completion record missing"
+      ],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -555,8 +556,9 @@
         }
       ],
       "blockers": [
-        "38 unchecked P0 tasks prevent a green report",
-        "86 unchecked P0/P1 tasks prevent G4"
+        "ATL-031: completion record missing",
+        "37 unchecked P0 tasks prevent a green report",
+        "85 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -565,12 +567,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 215,
-        "remaining": 91,
+        "completed": 216,
+        "remaining": 90,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 152
+            "completed": 153
           },
           "P1": {
             "total": 111,
@@ -584,7 +586,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 16
+            "completed": 17
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -630,7 +632,6 @@
         "ATL-027",
         "ATL-028",
         "ATL-029",
-        "ATL-031",
         "BRD-003",
         "BRD-007",
         "BRD-010",
@@ -678,7 +679,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "ATL-031",
         "BRD-001",
         "BRD-002",
         "BRD-003",
@@ -752,7 +752,9 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [],
+      "evidenceGaps": [
+        "ATL-031: completion record missing"
+      ],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -816,7 +818,8 @@
         }
       ],
       "blockers": [
-        "38 unchecked P0 tasks prevent a green report",
+        "ATL-031: completion record missing",
+        "37 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -826,12 +829,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 215,
-        "remaining": 91,
+        "completed": 216,
+        "remaining": 90,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 152
+            "completed": 153
           },
           "P1": {
             "total": 111,
@@ -845,7 +848,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 16
+            "completed": 17
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -891,7 +894,6 @@
         "ATL-027",
         "ATL-028",
         "ATL-029",
-        "ATL-031",
         "BRD-003",
         "BRD-007",
         "BRD-010",
@@ -939,7 +941,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "ATL-031",
         "BRD-001",
         "BRD-002",
         "BRD-003",
@@ -1013,7 +1014,9 @@
         "QA-018",
         "QA-019"
       ],
-      "evidenceGaps": [],
+      "evidenceGaps": [
+        "ATL-031: completion record missing"
+      ],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
@@ -1077,7 +1080,8 @@
         }
       ],
       "blockers": [
-        "38 unchecked P0 tasks prevent a green report",
+        "ATL-031: completion record missing",
+        "37 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }

@@ -44,7 +44,7 @@ test("query contracts apply defaults and typed transformations", () => {
 
   const metric = parseQueryContract(
     request(
-      "?year=2024&govTypes=Parliamentary%20republic,Constitutional%20monarchy&regions=Europe&taxonomy=structural",
+      "?year=2024&govTypes=Parliamentary%20republic,Constitutional%20monarchy&regions=Europe&taxonomy=structural&country=uruguay",
     ),
     "metric-strip-query/v1",
   );
@@ -55,6 +55,7 @@ test("query contracts apply defaults and typed transformations", () => {
       govTypes: ["Parliamentary republic", "Constitutional monarchy"],
       regions: ["Europe"],
       taxonomy: "structural",
+      country: "uruguay",
     },
   });
 

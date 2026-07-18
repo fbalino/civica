@@ -6,7 +6,7 @@ import { SourceDot } from "@/components/SourceDot";
  *
  * One row per indicator. Each row is ~44px tall and reads left-to-right:
  *
- *   Indicator label · range bar with peer-median tick + country dot · value · rank · peer position
+ *   Indicator label · material-peer range with median tick + country dot · value · rank · peer position
  *
  * The whole section fits ~10 indicators in the same vertical space the
  * legacy `<CountryOutcomeBars>` used for 2 — the user explicitly asked
@@ -45,6 +45,14 @@ interface PeerBand {
   peerMin: number;
   peerMedian: number;
   peerMax: number;
+  attemptedN: number;
+  finalN: number;
+  eligibleN: number;
+  cohortLabel: string;
+  fallbackChain: string[];
+  upstreamVintage: string | null;
+  sourceId: string;
+  retrievedAt: string | null;
 }
 
 function positionFromRank(rank: number, total: number): string {
@@ -168,7 +176,7 @@ export async function FactbookOutcomesGraph({
     <div className="factbook-outcomes-graph">
       <div className="factbook-outcomes-graph-head" role="presentation">
         <span>Indicator</span>
-        <span>Peer range</span>
+        <span>Material peer range</span>
         <span>Value</span>
         <span>Rank</span>
         <span>Position</span>
@@ -211,7 +219,7 @@ export async function FactbookOutcomesGraph({
               role="img"
               aria-label={
                 peer
-                  ? `${m.name}: country value ${m.value}, peer range ${peer.peerMin} to ${peer.peerMax}, peer median ${peer.peerMedian}`
+                  ? `${m.name}: country value ${m.value}, ${peer.cohortLabel} material peers, ${peer.attemptedN} attempted and ${peer.finalN} final from ${peer.eligibleN} observed eligible jurisdictions, peer range ${peer.peerMin} to ${peer.peerMax}, peer median ${peer.peerMedian}${peer.upstreamVintage ? `, classification vintage ${peer.upstreamVintage}` : ""}`
                   : `${m.name}: ${m.value} (no peer comparison)`
               }
             >
@@ -234,8 +242,13 @@ export async function FactbookOutcomesGraph({
 
             <div className="factbook-outcomes-value">
               {formatValue(m.value, m.unit)}
-              {m.isStale && (
-                <span className="factbook-outcomes-asof">{m.asOfYear}</span>
+              {(m.isStale || peer) && (
+                <span className="factbook-outcomes-asof">
+                  {m.asOfYear}
+                  {peer
+                    ? ` · n ${peer.attemptedN} → ${peer.finalN} · ${peer.upstreamVintage ?? "vintage not recorded"}`
+                    : ""}
+                </span>
               )}
             </div>
 
@@ -247,7 +260,10 @@ export async function FactbookOutcomesGraph({
 
             <div className="factbook-outcomes-position" aria-hidden={peerPosition == null}>
               {peerPosition ?? ""}
-              <SourceDot source="3rd-party indicator" retrievedAt={null} />
+              <SourceDot
+                source={peer?.sourceId ?? "3rd-party indicator"}
+                retrievedAt={peer?.retrievedAt ?? null}
+              />
             </div>
           </div>
         );

@@ -22,6 +22,10 @@ import {
 } from "@/lib/government-taxonomy";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import {
+  getMaterialMetricPeerCohort,
+  materialPeerBand,
+} from "@/lib/peer-grouping/material-metric-cohort";
+import {
   ELECTION_CORPUS_AUDIT,
   getElectionAuditRow,
   isAuditedProjection,
@@ -1250,44 +1254,35 @@ export async function getCountryOutcomes(jurisdictionId: string, year: number) {
     JOIN metric_definitions md ON cm.metric_id = md.id
     WHERE cm.jurisdiction_id = ${jurisdictionId}
       AND cm.year <= ${year}
+      AND cm.value_status = 'observed'
+      AND cm.value IS NOT NULL
     ORDER BY cm.metric_id, cm.year DESC
   `);
+  const rows = (Array.isArray(countryData)
+    ? countryData
+    : ((countryData as { rows?: unknown[] }).rows ?? [])) as Array<{
+    metricId: string;
+    value: number;
+  }>;
+  const metrics = rows.filter(
+    (row) => typeof row.metricId === "string" && Number.isFinite(row.value),
+  );
+  const cohorts = await Promise.all(
+    metrics.map((metric) =>
+      getMaterialMetricPeerCohort({
+        jurisdictionId,
+        metricId: metric.metricId,
+        year,
+      }),
+    ),
+  );
+  const peerBands = cohorts.flatMap((cohort) => {
+    if (!cohort) return [];
+    const band = materialPeerBand(cohort);
+    return band ? [{ metricId: cohort.metricId, ...band }] : [];
+  });
 
-  const jurisdictionRow = await db
-    .select({ governmentType: jurisdictions.governmentType })
-    .from(jurisdictions)
-    .where(eq(jurisdictions.id, jurisdictionId))
-    .limit(1);
-
-  const govType = jurisdictionRow[0]?.governmentType ?? null;
-
-  if (!govType) {
-    return { metrics: countryData, peerBands: [], govType: null };
-  }
-
-  const peerBands = await db.execute(sql`
-    WITH latest_per_country AS (
-      SELECT DISTINCT ON (cm.jurisdiction_id, cm.metric_id)
-        cm.metric_id,
-        cm.value
-      FROM country_metrics cm
-      JOIN jurisdictions j ON cm.jurisdiction_id = j.id
-      WHERE j.government_type = ${govType}
-        AND j.type = 'sovereign_state'
-        AND cm.year <= ${year}
-      ORDER BY cm.jurisdiction_id, cm.metric_id, cm.year DESC
-    )
-    SELECT
-      metric_id                                                           AS "metricId",
-      COUNT(*)::int                                                       AS "peerCount",
-      MIN(value)                                                          AS "peerMin",
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY value)                 AS "peerMedian",
-      MAX(value)                                                          AS "peerMax"
-    FROM latest_per_country
-    GROUP BY metric_id
-  `);
-
-  return { metrics: countryData, peerBands, govType };
+  return { metrics, peerBands, peerDomain: "material" as const };
 }
 
 // --- Civica Index queries ---

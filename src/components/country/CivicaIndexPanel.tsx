@@ -19,7 +19,7 @@ import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
 import { PeerLensPanel } from "@/components/peer-grouping/PeerLensPanel";
-import { getMaterialPeerSet, getGovernancePeerSet } from "@/lib/peer-grouping";
+import { getPeerSetForMeasure } from "@/lib/peer-grouping";
 import { dimensionColorVar } from "@/lib/ci/dimension-colors";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { V2_WEIGHTS } from "@/lib/ci/dimensions-v2";
@@ -506,12 +506,28 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
     }
   } catch {}
 
-  const [materialPeerSet, governancePeerSet] = detail
-    ? await Promise.all([
-        getMaterialPeerSet(detail.jurisdiction.id).catch(() => null),
-        getGovernancePeerSet(detail.jurisdiction.id).catch(() => null),
-      ])
-    : [null, null];
+  // A Civica Index score is a governance measure. Its comparison universe is
+  // the exact released, observed score population; material peer lenses are
+  // not meaningful here and must never be used to rank a governance score.
+  const governancePeerSet = detail
+    ? await getPeerSetForMeasure({
+        jurisdictionId: detail.jurisdiction.id,
+        measureDomain: "governance",
+        metricId: detail.composite?.releaseId ?? "civica-index-unreleased",
+        metricVintage: detail.composite?.vintageLabel ?? detail.composite?.quarter ?? null,
+        eligibleJurisdictionIds: (globalRankings as Array<{
+          jurisdictionId?: string | null;
+          score?: number | null;
+        }>)
+          .filter(
+            (row): row is { jurisdictionId: string; score: number } =>
+              typeof row.jurisdictionId === "string" &&
+              typeof row.score === "number" &&
+              Number.isFinite(row.score),
+          )
+          .map((row) => row.jurisdictionId),
+      }).catch(() => null)
+    : null;
 
   // Gate cleanly: no CI detail → the host page hides the whole section.
   if (!detail) return null;
@@ -617,7 +633,6 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
     ).filter((row) => row.slug && cohortSet.has(row.slug));
     return cohortRanked.length > 0 ? findRankInList(cohortRanked, slug) : null;
   };
-  const materialRank = rankInCohort(materialPeerSet?.peerJurisdictionSlugs);
   const governanceRank = rankInCohort(governancePeerSet?.peerJurisdictionSlugs);
   const rankedPeerSuggestions = (() => {
     const rankedRows = regionalRankings as Array<{
@@ -758,36 +773,20 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
               </p>
             )}
 
-            {materialPeerSet || governancePeerSet ? (
+            {governancePeerSet ? (
               <div className="ci-country-peer-lenses">
-                {materialPeerSet ? (
-                  <PeerLensPanel
-                    lens="world_bank_region"
-                    peerSet={materialPeerSet}
-                    rank={
-                      materialRank
-                        ? {
-                            position: materialRank.rank,
-                            total: materialRank.total,
-                          }
-                        : null
-                    }
-                  />
-                ) : null}
-                {governancePeerSet ? (
-                  <PeerLensPanel
-                    lens="vdem_row"
-                    peerSet={governancePeerSet}
-                    rank={
-                      governanceRank
-                        ? {
-                            position: governanceRank.rank,
-                            total: governanceRank.total,
-                          }
-                        : null
-                    }
-                  />
-                ) : null}
+                <PeerLensPanel
+                  lens="vdem_row"
+                  peerSet={governancePeerSet}
+                  rank={
+                    governanceRank
+                      ? {
+                          position: governanceRank.rank,
+                          total: governanceRank.total,
+                        }
+                      : null
+                  }
+                />
               </div>
             ) : null}
 

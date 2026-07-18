@@ -303,6 +303,7 @@ export const QUERY_CONTRACT_SCHEMAS = {
         govTypes: boundedCommaList.optional(),
         regions: boundedCommaList.optional(),
         taxonomy: taxonomy.default("raw"),
+        country: slug.optional(),
       })
       .strict(),
     repeatableKeys: [],

@@ -1,0 +1,13 @@
+{
+  "id": "atl-031-domain-locked-peer-cohorts",
+  "toVersion": "civica-index-peer-contract-v39",
+  "categories": ["input"],
+  "evidence": {
+    "documentation": ["content/methodology-peer-grouping.md"],
+    "registry": ["src/lib/peer-grouping/index.ts"],
+    "release_note": ["plan/evidence/ATL-031/release-note.md"],
+    "migration_plan": ["plan/ATL-031-peer-lens-contracts-2026-07-18.md"],
+    "golden_test": ["src/lib/peer-grouping/__tests__/atl-017-taxonomy-peer-lens.test.ts"],
+    "contract_test": ["src/lib/api/request-contract.test.ts"]
+  }
+}
