@@ -28,6 +28,7 @@ import {
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
+import { captureAtlasSurfaceQuery } from "@/lib/atlas/surface-query-state";
 
 export const revalidate = 0;
 
@@ -72,9 +73,9 @@ export default async function CountryFactbookTab({
   const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
-  const [sections, countryOptions, headerFacts, citeSources, allSources] =
+  const [sectionsResult, countryOptions, headerFacts, citeSources, allSources] =
     await Promise.all([
-      getFactbookSections(jurisdiction.id),
+      captureAtlasSurfaceQuery(() => getFactbookSections(jurisdiction.id)),
       getFactbookCountryOptions().catch(() => []),
       // Resolver batch feeding FactbookSection LeafRow (single-shot leaves
       // keyed off LABEL_TO_FACT_KEY + multi-year groups keyed off
@@ -118,19 +119,17 @@ export default async function CountryFactbookTab({
       ),
     ]);
 
+  const sections =
+    sectionsResult.status === "available" ? sectionsResult.value : [];
+
   const sectionDataMap = new Map(
     sections.map((s) => [s.sectionName, s.sectionData])
   );
 
-  const visibleSections = SECTION_PLAN.filter((s) => {
-    const data = sectionDataMap.get(s.sourceKey);
-    if (!data) return false;
-    if (typeof data !== "object") return false;
-    // Empty section objects (e.g. Space with only null-valued keys)
-    // produce zero renderable fields. Hide them rather than render a
-    // bare "No data available" stub.
-    return jsonbToFields(data).length > 0;
-  });
+  // Every documented Factbook module stays visible. A missing section or a
+  // structurally empty source object has an explicit coverage state below;
+  // it must not make a module silently disappear from the reader or sidebar.
+  const visibleSections = SECTION_PLAN;
 
   const sidebarItems: FactbookSidebarItem[] = [
     ...visibleSections.map((s) => ({ id: s.id, label: s.label })),
@@ -196,7 +195,14 @@ export default async function CountryFactbookTab({
         </div>
 
         <div className="factbook-main">
-        {visibleSections.map((section) => {
+        {sectionsResult.status === "unavailable" ? (
+          <Banner variant="warn">
+            Factbook sections are temporarily unavailable. Civica is keeping
+            this tab visible rather than presenting an outage as though
+            {jurisdiction.name} has no reference information.
+          </Banner>
+        ) : (
+          visibleSections.map((section) => {
           const data = sectionDataMap.get(section.sourceKey);
           const fields = data ? jsonbToFields(data) : [];
 
@@ -237,9 +243,18 @@ export default async function CountryFactbookTab({
                   resolverFacts={headerFacts}
                 />
               )}
+              {fields.length === 0 && (
+                <Banner variant="info">
+                  No source-backed {section.label.toLowerCase()} facts are
+                  currently compiled for {jurisdiction.name}. This is a
+                  coverage state, not a claim that the underlying subject does
+                  not exist.
+                </Banner>
+              )}
             </section>
           );
-        })}
+          })
+        )}
 
         {/* Per-country citation footer. */}
         <section

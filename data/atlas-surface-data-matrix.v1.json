@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-atlas-surface-data-matrix/v1",
-  "auditedAt": "2026-07-12",
+  "auditedAt": "2026-07-18",
   "scope": "Public data-bearing Atlas routes and every module rendered by the unified country reader.",
   "owner": "Civica Atlas",
   "release": {
@@ -39,22 +39,79 @@
         "Per-row legislative source id plus section freshness."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated bills country-module route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_surface_only",
       "releaseReason": "The current export excludes bill rows."
+    },
+    {
+      "id": "country.civica-data.conditions",
+      "kind": "country_module",
+      "route": "/country/[slug]/civica-data",
+      "renderer": "src/components/conditions/CivicaConditionsPanel.tsx",
+      "dataAccess": [
+        {
+          "symbol": "getConditionsPublicRelease",
+          "file": "src/lib/db/queries.ts"
+        },
+        {
+          "symbol": "getAllSources",
+          "file": "src/lib/db/queries.ts"
+        }
+      ],
+      "storage": [
+        "civica_conditions_releases",
+        "civica_conditions_calculations",
+        "civica_conditions_scores",
+        "civica_conditions_components",
+        "sources"
+      ],
+      "fields": [
+        "release identifier",
+        "component value state",
+        "reference year",
+        "source",
+        "alignment status",
+        "native unit"
+      ],
+      "provenance": [
+        "Every calculation keeps the selected release, component source, reference year, alignment state, and value-state reason visible."
+      ],
+      "coverage": [
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
+      ],
+      "states": {
+        "loading": "No route-level loading state; the server response waits for the query.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
+        "partial": "Independent modules may render when this row has no usable data.",
+        "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
+        "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
+        "noSource": "The module omits provenance only where the current renderer lacks source metadata."
+      },
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
+      "owner": "Country Civica Data",
+      "releaseRelation": "excluded_experimental",
+      "releaseReason": "Conditions remains a secondary research surface and is excluded from the frozen Atlas canonical-fact export."
     },
     {
       "id": "country.civica-data.evidence-coverage",
@@ -101,6 +158,8 @@
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts",
         "src/lib/provenance/country-evidence-coverage.test.ts"
       ],
       "testGap": null,
@@ -138,18 +197,20 @@
         "Per-row publisher/source metadata and SourceDot."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts",
         "src/lib/ci/governance-evidence.test.ts"
       ],
       "testGap": null,
@@ -188,19 +249,22 @@
         "Wikidata section source strip and last_sync_at."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated government country-module route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_surface_only",
       "releaseReason": "The current export excludes institution graph tables."
@@ -235,19 +299,22 @@
         "Wikidata section source strip and last_sync_at."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated leaders country-module route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_surface_only",
       "releaseReason": "The current export excludes offices, people, and term tables."
@@ -283,19 +350,22 @@
         "IPU Parline section source strip and last_sync_at."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated legislature country-module route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_restricted_source",
       "releaseReason": "IPU-derived rows are excluded from public bulk export."
@@ -347,6 +417,8 @@
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts",
         "src/lib/indicators/history-catalog.test.ts"
       ],
       "testGap": null,
@@ -383,19 +455,22 @@
         "Wikidata section source strip and last_sync_at."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated organizations country-module route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_surface_only",
       "releaseReason": "The current export excludes organizations and memberships."
@@ -434,19 +509,22 @@
         "Each row carries its named source id and the section source strip."
       ],
       "coverage": [
-        "The section appears only when its prefetch returns a usable row set."
+        "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
-        "error": "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+        "empty": "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
+        "error": "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated rankings country-module route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_experimental",
       "releaseReason": "Index/Conditions and restricted metric rows are excluded from DAT-017."
@@ -483,19 +561,21 @@
         "Constitute Project attribution, SourceDot, and source last_sync_at."
       ],
       "coverage": [
-        "One indexed constitution per matching jurisdiction; unindexed and database-error states currently share the same empty card."
+        "One indexed constitution per matching jurisdiction; an unindexed document and a database outage render separate named states."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
         "empty": "No indexed text renders a named country-specific empty state with Explorer and Factbook links.",
-        "error": "The query soft-fails to null, so database outage and genuine absence are currently indistinguishable on this tab.",
+        "error": "The query rethrows for this country reader, which renders a named temporarily-unavailable state rather than claiming the text is unindexed.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
-        "src/lib/db/queries-constitution-outage.test.ts"
+        "src/lib/db/queries-constitution-outage.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country constitutions",
@@ -532,12 +612,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -545,7 +625,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -582,12 +664,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -595,7 +677,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -632,12 +716,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -645,7 +729,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -682,12 +768,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -695,7 +781,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -732,12 +820,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -745,7 +833,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -782,12 +872,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -795,7 +885,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -832,12 +924,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -845,7 +937,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -882,12 +976,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -895,7 +989,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -932,12 +1028,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -945,7 +1041,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -1030,12 +1128,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -1043,7 +1141,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -1080,12 +1180,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -1093,7 +1193,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -1130,12 +1232,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -1143,7 +1245,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -1180,12 +1284,12 @@
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values."
       ],
       "coverage": [
-        "Module is visible only when jsonbToFields finds at least one renderable field."
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state."
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The section is hidden when missing, non-object, or structurally empty.",
-        "error": "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+        "empty": "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
+        "error": "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -1193,7 +1297,9 @@
       },
       "tests": [
         "src/lib/factbook/__tests__/read-selection.test.ts",
-        "src/lib/factbook/reconcile/__tests__/resolver.test.ts"
+        "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Country Factbook",
@@ -1302,7 +1408,7 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The map can render with no countries or no selected-layer values; no distinct catalog-outage state exists.",
+        "empty": "An empty map-eligible catalog renders a named coverage state; a selected layer with no values remains visibly available as a layer-coverage result.",
         "error": "Uncaught loader failures reach the route error boundary.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
@@ -1310,7 +1416,9 @@
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
-        "src/lib/ci/quarantine-contract.test.ts"
+        "src/lib/ci/quarantine-contract.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Atlas reference product",
@@ -1396,15 +1504,17 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "No selection renders the selector; individual empty sections state or omit unavailable data.",
-        "error": "The route catches the query or delegates to the nearest Next.js error boundary as recorded in source.",
-        "partial": "Independent modules may render when this row has no usable data.",
+        "empty": "No selection and an invalid requested selection render named next steps; governance, indicator, Conditions, chamber, election, and membership coverage remain visible by section.",
+        "error": "A country-catalog outage is named at the selector; independent section-query failures retain their sections and appear in a named temporarily-unavailable register.",
+        "partial": "Available comparison sections keep rendering when another independent query fails; the register identifies the unavailable section instead of substituting an empty result.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
-        "src/lib/ci/quarantine-contract.test.ts"
+        "src/lib/ci/quarantine-contract.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Atlas comparison",
@@ -1728,8 +1838,8 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "A database failure leaves search empty, renders an em dash count, and substitutes decorative feature art.",
-        "error": "The route catches the query or delegates to the nearest Next.js error boundary as recorded in source.",
+        "empty": "A catalog outage renders a named temporary-unavailable state; a healthy empty catalog still renders its distinct zero-result shell without a country-count claim.",
+        "error": "The home module preserves a catalog outage visibly instead of presenting it as a zero-country atlas.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
@@ -1737,7 +1847,9 @@
       },
       "tests": [
         "src/lib/ci/quarantine-contract.test.ts",
-        "src/lib/claims/__tests__/provenance-coverage.test.ts"
+        "src/lib/claims/__tests__/provenance-coverage.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Atlas reference product",
@@ -1834,15 +1946,18 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "The explorer receives empty rows/facets when queries fail and renders its no-results state.",
-        "error": "The route catches the query or delegates to the nearest Next.js error boundary as recorded in source.",
+        "empty": "A fulfilled empty party catalog renders a named coverage state rather than implying that no parties or legislatures exist.",
+        "error": "A rejected party/facet query renders a named temporarily-unavailable state rather than the empty catalog state.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
-      "tests": [],
-      "testGap": "No dedicated public Party Explorer route test exists.",
+      "tests": [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
+      ],
+      "testGap": null,
       "owner": "Atlas institutions",
       "releaseRelation": "excluded_surface_only",
       "releaseReason": "DAT-017 currently exports jurisdictions and canonical facts, not party or seat tables."
@@ -1924,15 +2039,17 @@
       ],
       "states": {
         "loading": "No route-level loading state; the server response waits for the query.",
-        "empty": "An empty matrix renders the table shell/no rows; there is no dedicated outage distinction.",
-        "error": "The route catches the query or delegates to the nearest Next.js error boundary as recorded in source.",
+        "empty": "A fulfilled empty matrix renders a named source-coverage state rather than implying that the underlying measures do not exist.",
+        "error": "A rejected matrix query renders a named temporarily-unavailable state rather than the empty matrix state.",
         "partial": "Independent modules may render when this row has no usable data.",
         "stale": "Source freshness is shown from sources.last_sync_at or a named frozen vintage where implemented.",
         "disputed": "Resolver-backed values expose dispute state; non-resolver datasets retain their own status only.",
         "noSource": "The module omits provenance only where the current renderer lacks source metadata."
       },
       "tests": [
-        "src/lib/ci/quarantine-contract.test.ts"
+        "src/lib/ci/quarantine-contract.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts"
       ],
       "testGap": null,
       "owner": "Atlas comparison",
@@ -2038,5 +2155,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "08b210beca427e8731196964648c7575235cf934905859a75f5cbfb792438b8c"
+  "semanticSha256": "0ac1fa5793f0d7ab5e3ac9cd7d42ff775f96c1cf8bf16510999848a95904f761"
 }

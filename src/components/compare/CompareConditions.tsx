@@ -12,6 +12,7 @@ export interface CompareConditionsProps {
     seriesColor: string;
   }>;
   release: ConditionsPublicRelease | null;
+  releaseUnavailable?: boolean;
 }
 
 /**
@@ -19,7 +20,11 @@ export interface CompareConditionsProps {
  * reuses the country panel so the comparison cannot drop component units,
  * reference years, source names, or missingness decisions.
  */
-export function CompareConditions({ countries, release }: CompareConditionsProps) {
+export function CompareConditions({
+  countries,
+  release,
+  releaseUnavailable = false,
+}: CompareConditionsProps) {
   if (countries.length === 0) return null;
 
   const releaseHref = release
@@ -34,9 +39,16 @@ export function CompareConditions({ countries, release }: CompareConditionsProps
           release. Reference years can differ across countries or conditions;
           Civica will not normalize, rank, or combine them here.
         </Banner>
-        <p className="editorial-empty">
-          No versioned Conditions release is currently available for comparison.
-        </p>
+        {releaseUnavailable ? (
+          <Banner variant="warn">
+            Conditions comparison is temporarily unavailable. A data outage
+            does not mean that no versioned release exists.
+          </Banner>
+        ) : (
+          <p className="editorial-empty">
+            No versioned Conditions release is currently available for comparison.
+          </p>
+        )}
       </>
     );
   }

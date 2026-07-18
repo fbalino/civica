@@ -39,3 +39,41 @@ test("constitution catalog query can preserve an outage signal", () => {
 
   assert.equal(run.status, 0, run.stderr || run.stdout);
 });
+
+test("country constitution query can preserve an outage signal", () => {
+  const code = [
+    'const mod = await import("./src/lib/db/queries-constitution.ts");',
+    "const getConstitutionWithArticles = mod.getConstitutionWithArticles ?? mod.default?.getConstitutionWithArticles;",
+    'if (typeof getConstitutionWithArticles !== "function") process.exit(3);',
+    "let rejected = false;",
+    "try {",
+    '  await getConstitutionWithArticles("argentina", { throwOnError: true });',
+    "} catch {",
+    "  rejected = true;",
+    "}",
+    "if (!rejected) process.exit(2);",
+  ].join("\n");
+
+  const run = spawnSync(
+    process.execPath,
+    [
+      "--conditions=react-server",
+      "--import",
+      "tsx",
+      "--input-type=module",
+      "--eval",
+      code,
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        DATABASE_URL: "postgresql://invalid:invalid@127.0.0.1:1/invalid",
+      },
+      timeout: 20_000,
+    },
+  );
+
+  assert.equal(run.status, 0, run.stderr || run.stdout);
+});

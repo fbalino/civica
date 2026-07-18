@@ -511,11 +511,8 @@ export function indexProtectedFileHash(
   }
   if (path === "src/app/(reader)/country/[slug]/civica-data/page.tsx") {
     normalized = normalized.replace(
-      "  // A valid zero-row result is itself meaningful: the Bills section explains\n" +
-        "  // unsupported coverage instead of silently disappearing. A failed lookup\n" +
-        "  // remains hidden so an outage is never mislabeled as a coverage gap.\n" +
-        "  const hasBills = !!billsResult;\n",
-      "  const hasBills = !!billsResult && billsResult.rows.length > 0;\n",
+      '  const hasBills = billsResult.status === "available";\n',
+      "  const hasBills = false;\n",
     );
   }
   return sha256(normalized);

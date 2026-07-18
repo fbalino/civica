@@ -14,6 +14,7 @@ import {
   HeroRevealItem,
 } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { Banner } from "@/components/editorial/Banner";
 
 const countryEngravingDir = join(process.cwd(), "public", "engravings", "countries");
 
@@ -79,6 +80,7 @@ export async function HomeGrid() {
   // Country list for the hero search (graceful empty on DB error).
   let countries: Parameters<typeof GlobalSearch>[0]["countries"] = [];
   let allJurisdictions: Awaited<ReturnType<typeof getAllReferenceJurisdictions>> = [];
+  let catalogAvailable = true;
   try {
     allJurisdictions = await getAllReferenceJurisdictions();
     const all = allJurisdictions;
@@ -91,7 +93,9 @@ export async function HomeGrid() {
       }).value,
       status: c.jurisdictionStatus,
     }));
-  } catch {}
+  } catch {
+    catalogAvailable = false;
+  }
 
   // Featured cards use the atlas jurisdiction spine, never a derived ranking.
   const findRow = (slug: string, iso3: string) =>
@@ -146,6 +150,12 @@ export async function HomeGrid() {
             <HeroRevealItem className="home-hero-search">
               <GlobalSearch countries={countries} />
             </HeroRevealItem>
+            {!catalogAvailable ? (
+              <Banner variant="warn">
+                The country catalog is temporarily unavailable. Civica is not
+                treating this as a zero-country atlas.
+              </Banner>
+            ) : null}
             <HeroRevealItem className="home-stats" role="group" aria-label="Coverage">
               {/* PROVENANCE_COVERAGE: home.catalog-count */}
               <div className="home-stat">

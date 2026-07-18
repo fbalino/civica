@@ -264,18 +264,18 @@ test("the Civica Data tab renders a Bills coverage state for valid zero-row juri
   const pageSource = read(CIVICA_DATA_PAGE);
   assert.match(
     pageSource,
-    /hasBills\s*=\s*!!billsResult;/,
-    "a successful zero-row lookup must keep the Bills section visible",
+    /hasBills\s*=\s*billsResult\.status === "available";/,
+    "a successful zero-row lookup must preserve the Bills query state",
   );
   assert.doesNotMatch(
     pageSource,
-    /hasBills\s*=\s*!!billsResult\s*&&\s*billsResult\.rows\.length\s*>\s*0/,
+    /billsResult\.value\.rows\.length\s*>\s*0/,
     "row count must not decide whether the coverage explanation exists",
   );
   assert.match(
     pageSource,
-    /case "bills":\s*\n\s*return hasBills;/,
-    "sidebar and content visibility must share the successful-lookup gate",
+    /const visibleSections = SECTION_PLAN;/,
+    "the Bills section stays visible even when its query is unavailable",
   );
 
   const rendererSource = read(FACTBOOK_BILLS);

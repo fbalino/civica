@@ -2,11 +2,11 @@
 
 **Version:** `civica-atlas-surface-data-matrix/v1`
 
-**Audited:** 2026-07-12
+**Audited:** 2026-07-18
 
 **Machine-readable artifact:** `data/atlas-surface-data-matrix.v1.json`
 
-**Semantic SHA-256:** `08b210beca427e8731196964648c7575235cf934905859a75f5cbfb792438b8c`
+**Semantic SHA-256:** `0ac1fa5793f0d7ab5e3ac9cd7d42ff775f96c1cf8bf16510999848a95904f761`
 
 ## Scope
 
@@ -16,13 +16,13 @@ tables and fields, provenance path, coverage rule, loading/empty/error/partial/
 stale/disputed/no-source behavior, existing tests or a named test gap, owner,
 and relation to the frozen Atlas export.
 
-The current artifact contains 39 rows:
+The current artifact contains 40 rows:
 
 - 14 top-level data routes;
 - the shared country masthead;
 - 13 Factbook sections;
 - the Factbook source and citation module;
-- nine Civica Data modules;
+- ten Civica Data modules (including Conditions);
 - the country constitution reader.
 
 Static policy, methodology, marketing, account, coding, and admin pages are not
@@ -50,26 +50,25 @@ fact observations, and their source-rights rows. It excludes Index, Pulse,
 alternate observations, restricted sources, images, constitution text, and
 publisher payloads.
 
-## Findings handed to later tasks
+## State hardening
 
-The matrix records current behavior; it does not relabel a weak state as
-acceptable. Four gaps require later repair:
+ATL-018 adds the common query-outcome contract and closes the identified
+reader-state gaps:
 
-1. The shared country layout converts both an unknown slug and a database
-   outage into `notFound()`.
-2. `getFactbookSections` is not soft-failed, so a section-table outage can take
-   down the Factbook tab.
-3. Most Civica Data modules turn query errors into empty arrays and disappear,
-   making “not available” indistinguishable from “temporarily unavailable.”
-   The evidence-coverage and longitudinal-history modules now implement the
-   target explicit-state behavior; ATL-018 still owns the shared repair for the
-   remaining modules.
-4. The country constitution tab uses one empty card for a genuinely unindexed
-   constitution and a database failure.
+1. The Factbook tab keeps every documented CIA section in the reader and shows
+   a named coverage state for a successful empty section or a named temporary
+   outage for the section-table query.
+2. Every Civica Data section, including Conditions, stays in the sidebar and
+   distinguishes fulfilled empty data from an unavailable independent query.
+3. The country Constitution tab distinguishes an unindexed document from a
+   database outage.
+4. The home catalog, Party Explorer, and Rankings table distinguish a rejected
+   query from a fulfilled empty result.
 
-ATL-018 owns the common state contract and representative browser fixtures.
-Rows with `testGap` name missing route-level coverage for the country index,
-Party Explorer, Conditions, organization detail, and several country modules.
+The seven-state register is browser-tested at representative desktop/mobile and
+light/dark fixtures. Identity-resolution error classification remains governed
+by PLT-026 rather than this module-state contract. Rows with `testGap` still
+name route-level coverage that has not yet been added outside this scope.
 
 ## Maintenance rule
 

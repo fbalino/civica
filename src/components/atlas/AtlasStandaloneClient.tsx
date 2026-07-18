@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Country } from "./data";
 import { AtlasWorldMap } from "./AtlasWorldMap";
 import { Button } from "@/components/editorial/Button";
+import { Banner } from "@/components/editorial/Banner";
 import { buildNeIdMap } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
 import { atlasIdToSlug } from "@/lib/atlas/ids";
@@ -158,6 +159,14 @@ export function AtlasStandaloneClient({
           </div>
         </details>
       </header>
+      {countries.length === 0 ? (
+        <div className="editorial-page editorial-page--full">
+          <Banner variant="warn">
+            No map-eligible country records are currently compiled. This is a
+            coverage state, not a claim that no countries exist.
+          </Banner>
+        </div>
+      ) : null}
       <div
         className="atlas-view"
         data-shell-route="atlas-map"

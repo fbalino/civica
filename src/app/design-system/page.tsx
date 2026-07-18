@@ -852,6 +852,58 @@ export default function DesignSystemPage() {
               </div>
             </div>
 
+            <div className="ds-comp ds-comp--wide" id="atlas-data-states">
+              <h4>Atlas reader data states</h4>
+              <p className="ds-component-note">
+                A fulfilled empty result, an unavailable query, partial data,
+                freshness, disputes, and missing provenance each keep their own
+                reader meaning. These examples reuse the canonical Banner,
+                DataValueState, and SourceDot primitives.
+              </p>
+              <div style={{ display: "grid", gap: "var(--space-3)" }}>
+                <div data-atlas-surface-state="loading" aria-busy="true">
+                  <Banner variant="info">
+                    Loading current source records…
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="empty">
+                  <Banner variant="info">
+                    No source-backed records are currently compiled. This is a
+                    coverage state, not a claim that the underlying institution
+                    or activity does not exist.
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="error">
+                  <Banner variant="warn">
+                    Source records are temporarily unavailable. Civica keeps
+                    the module visible rather than presenting an outage as an
+                    empty result.
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="partial">
+                  <Banner variant="warn">
+                    Some source records are available; the unavailable input is
+                    identified rather than omitted from the interpretation.
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="stale">
+                  <Banner variant="info">
+                    Frozen source vintage <SourceDot source="cia_factbook" retrievedAt="2026-01-23" />
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="disputed">
+                  <Banner variant="warn">
+                    Reported value <DataValueState status="disputed" reason="Source records conflict." />
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="no-source">
+                  <Banner variant="warn">
+                    Provenance <DataValueState status="unknown" reason="No usable source metadata is available." />
+                  </Banner>
+                </div>
+              </div>
+            </div>
+
             <div className="ds-comp ds-comp--wide">
               <h4 id="explore-concepts">Explore navigation concept study</h4>
               <p className="ds-component-note">

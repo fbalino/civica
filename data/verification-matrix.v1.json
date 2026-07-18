@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "38cca5eff1cb66e58ac573c82abcd59f716102188dbb0fdaa4f0360ac8e214de",
+  "semanticHash": "b09af8f5e103a44201ab4a001c1665b75dc7a029c92d37b7888fb39370a4abeb",
   "summary": {
     "route": 175,
     "pipeline": 50,
@@ -4774,7 +4774,9 @@
         "unit": {
           "status": "covered",
           "evidence": [
-            "src/lib/ci/quarantine-contract.test.ts"
+            "src/lib/ci/quarantine-contract.test.ts",
+            "src/lib/atlas/atl-018-country-reader.test.ts",
+            "e2e/atl-018-data-states.spec.ts"
           ],
           "gapTask": null
         },
@@ -10944,7 +10946,9 @@
         "unit": {
           "status": "covered",
           "evidence": [
-            "src/lib/ci/quarantine-contract.test.ts"
+            "src/lib/ci/quarantine-contract.test.ts",
+            "src/lib/atlas/atl-018-country-reader.test.ts",
+            "e2e/atl-018-data-states.spec.ts"
           ],
           "gapTask": null
         },
@@ -11700,18 +11704,19 @@
       "command": "npm run test:e2e",
       "coverage": {
         "unit": {
-          "status": "partial",
+          "status": "covered",
           "evidence": [
-            "Route/module registry"
+            "src/lib/atlas/atl-018-country-reader.test.ts",
+            "e2e/atl-018-data-states.spec.ts"
           ],
-          "gapTask": "QA-013"
+          "gapTask": null
         },
         "integration": {
-          "status": "partial",
+          "status": "covered",
           "evidence": [
-            "Route/module registry"
+            "npm run validate:atlas-surface-data-matrix"
           ],
-          "gapTask": "QA-013"
+          "gapTask": null
         },
         "database": {
           "status": "covered",
@@ -11792,7 +11797,9 @@
         "unit": {
           "status": "covered",
           "evidence": [
-            "src/lib/ci/quarantine-contract.test.ts"
+            "src/lib/ci/quarantine-contract.test.ts",
+            "src/lib/atlas/atl-018-country-reader.test.ts",
+            "e2e/atl-018-data-states.spec.ts"
           ],
           "gapTask": null
         },

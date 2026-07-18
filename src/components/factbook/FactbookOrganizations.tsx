@@ -5,6 +5,7 @@ import {
   type OrgMembershipDetail,
 } from "@/lib/db/queries-organizations";
 import { SourceDot } from "@/components/SourceDot";
+import { Banner } from "@/components/editorial/Banner";
 import "@/app/organizations-section.css";
 
 interface FactbookOrganizationsProps {
@@ -12,6 +13,8 @@ interface FactbookOrganizationsProps {
   countryName: string;
   /** Wikidata source last_sync_at (ISO) for the section's SourceDot. */
   retrievedAt?: string | null;
+  /** A route-level prefetch preserves an outage separately from no memberships. */
+  initialData?: CountryOrganizationsData | null;
 }
 
 const ORG_TYPE_LABELS: Record<string, string> = {
@@ -98,15 +101,34 @@ function membershipYear(joinDate: string | null): number | null {
 export async function FactbookOrganizations({
   jurisdictionId,
   countryName,
+  initialData,
 }: FactbookOrganizationsProps) {
-  const empty: CountryOrganizationsData = {
-    memberships: [],
-    coMembership: {},
-    hostsOrgs: [],
-  };
-  const { memberships, hostsOrgs } = await getCountryOrganizationsData(
-    jurisdictionId,
-  ).catch(() => empty);
+  let data: CountryOrganizationsData;
+  if (initialData === null) {
+    return (
+      <Banner variant="warn">
+        International-organization memberships are temporarily unavailable.
+        Civica is not treating this as evidence that {countryName} belongs to
+        no organizations.
+      </Banner>
+    );
+  }
+  if (initialData !== undefined) {
+    data = initialData;
+  } else {
+    try {
+      data = await getCountryOrganizationsData(jurisdictionId);
+    } catch {
+      return (
+        <Banner variant="warn">
+          International-organization memberships are temporarily unavailable.
+          Civica is not treating this as evidence that {countryName} belongs
+          to no organizations.
+        </Banner>
+      );
+    }
+  }
+  const { memberships, hostsOrgs } = data;
 
   if (memberships.length === 0) {
     return (

@@ -3,7 +3,7 @@
 **Status:** implemented coverage registry
 **Machine-readable artifact:** `data/verification-matrix.v1.json`
 **Schema:** `civica-verification-matrix/v1`
-**Semantic hash:** `38cca5eff1cb66e58ac573c82abcd59f716102188dbb0fdaa4f0360ac8e214de`
+**Semantic hash:** `b09af8f5e103a44201ab4a001c1665b75dc7a029c92d37b7888fb39370a4abeb`
 
 ## Purpose
 

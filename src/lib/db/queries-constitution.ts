@@ -82,7 +82,7 @@ export interface TopicExcerptCountry {
   }>;
 }
 
-interface ConstitutionQueryOptions {
+export interface ConstitutionQueryOptions {
   /** Re-throw database failures so an API route can return 503, not 200 + []. */
   throwOnError?: boolean;
 }
@@ -114,11 +114,14 @@ function coerceArticles(raw: unknown): ConstitutionArticle[] {
 
 /**
  * Full constitution for a country by civica slug, including parsed articles.
- * Returns null when the slug is unknown, the country has no ingested
- * constitution, or the DB is unreachable.
+ * Returns null when the slug is unknown or the country has no ingested
+ * constitution. By default a database failure also soft-fails to null for the
+ * standalone Explorer; country-reader callers may request the error so they
+ * can distinguish an outage from an unindexed document.
  */
 export async function getConstitutionWithArticles(
   slug: string,
+  options: ConstitutionQueryOptions = {},
 ): Promise<ConstitutionDetail | null> {
   try {
     const rows = await db
@@ -161,6 +164,7 @@ export async function getConstitutionWithArticles(
     };
   } catch (err) {
     console.error("[queries-constitution] getConstitutionWithArticles:", err);
+    if (options.throwOnError) throw err;
     return null;
   }
 }

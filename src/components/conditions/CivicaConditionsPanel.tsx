@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { DataValueState } from "@/components/DataValueState";
 import { Chip } from "@/components/editorial/Pill";
+import { Banner } from "@/components/editorial/Banner";
 import {
   type ConditionsPublicCalculation,
   type ConditionsPublicRelease,
@@ -90,11 +91,13 @@ function CountryConditionCard({
 export function CivicaConditionsPanel({
   jurisdictionId,
   release,
+  releaseStatus = "available",
   showHeading = true,
   stacked = false,
 }: {
   jurisdictionId: string;
   release: ConditionsPublicRelease | null;
+  releaseStatus?: "available" | "unavailable";
   showHeading?: boolean;
   stacked?: boolean;
 }) {
@@ -121,7 +124,12 @@ export function CivicaConditionsPanel({
           </Link>
         </div>
       ) : null}
-      {release === null ? (
+      {releaseStatus === "unavailable" ? (
+        <Banner variant="warn">
+          Conditions data is temporarily unavailable. Civica is not treating
+          this as evidence that this country has no material indicators.
+        </Banner>
+      ) : release === null ? (
         <p className="editorial-empty">
           No versioned Conditions release is available for this country yet.
         </p>

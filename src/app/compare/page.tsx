@@ -36,6 +36,7 @@ import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 import { CompareIndicatorHistory } from "@/components/compare/CompareIndicatorHistory";
 import { CompareConditions } from "@/components/compare/CompareConditions";
 import { SOURCE_RIGHTS } from "@/lib/rights/manifest";
+import { captureAtlasSurfaceQuery } from "@/lib/atlas/surface-query-state";
 
 export const revalidate = 0;
 
@@ -117,13 +118,11 @@ export default async function ComparePage({
 
   // Phase 1 — country list for the selector (also gives us jurisdiction IDs
   // for anything selected, avoiding a second round-trip)
-  let allCountries: Awaited<ReturnType<typeof getAllReferenceJurisdictions>> =
-    [];
-  try {
-    allCountries = await getAllReferenceJurisdictions();
-  } catch {
-    /* ignore — empty state will render */
-  }
+  const countryCatalogResult = await captureAtlasSurfaceQuery(
+    getAllReferenceJurisdictions,
+  );
+  const allCountries =
+    countryCatalogResult.status === "available" ? countryCatalogResult.value : [];
   const countryList = allCountries.map((c) => ({
     slug: c.slug,
     name: c.name,
@@ -157,18 +156,62 @@ export default async function ComparePage({
   let indicatorHistoryUnavailable = false;
   let conditionsRelease: Awaited<ReturnType<typeof getConditionsPublicRelease>> =
     null;
+  const unavailableSections: string[] = [];
 
-  if (validSlugs.length > 0) {
-    try {
-      [governanceEvidence, govStructures, chambersArr, memberships] =
-        await Promise.all([
-          Promise.all(validSlugs.map((slug) => getGovernanceEvidence(slug))),
-          Promise.all(ids.map((id) => getGovernmentStructure(id))),
-          Promise.all(ids.map((id) => getLegislatureComposition(id))),
-          getInternationalMembershipsBySlugs(ids),
-        ]);
-    } catch (err) {
-      console.error("[/compare] section data fetch failed:", err);
+  if (selectedJurisdictions.length > 0) {
+    const [
+      governanceEvidenceResult,
+      govStructuresResult,
+      chambersResult,
+      membershipsResult,
+      indicatorHistoriesResult,
+      conditionsReleaseResult,
+    ] = await Promise.all([
+      captureAtlasSurfaceQuery(() =>
+        Promise.all(selectedJurisdictions.map(({ slug }) => getGovernanceEvidence(slug))),
+      ),
+      captureAtlasSurfaceQuery(() =>
+        Promise.all(ids.map((id) => getGovernmentStructure(id))),
+      ),
+      captureAtlasSurfaceQuery(() =>
+        Promise.all(ids.map((id) => getLegislatureComposition(id))),
+      ),
+      captureAtlasSurfaceQuery(() => getInternationalMembershipsBySlugs(ids)),
+      captureAtlasSurfaceQuery(() =>
+        Promise.all(selectedJurisdictions.map(({ slug }) => getIndicatorHistoryForCountry(slug))),
+      ),
+      captureAtlasSurfaceQuery(getConditionsPublicRelease),
+    ]);
+    if (governanceEvidenceResult.status === "available") {
+      governanceEvidence = governanceEvidenceResult.value;
+    } else {
+      unavailableSections.push("governance evidence");
+    }
+    if (govStructuresResult.status === "available") {
+      govStructures = govStructuresResult.value;
+    } else {
+      unavailableSections.push("overview");
+    }
+    if (chambersResult.status === "available") {
+      chambersArr = chambersResult.value;
+    } else {
+      unavailableSections.push("chambers");
+    }
+    if (membershipsResult.status === "available") {
+      memberships = membershipsResult.value;
+    } else {
+      unavailableSections.push("international memberships");
+    }
+    if (indicatorHistoriesResult.status === "available") {
+      indicatorHistories = indicatorHistoriesResult.value;
+    } else {
+      indicatorHistoryUnavailable = true;
+      unavailableSections.push("longitudinal indicators");
+    }
+    if (conditionsReleaseResult.status === "available") {
+      conditionsRelease = conditionsReleaseResult.value;
+    } else {
+      unavailableSections.push("Conditions");
     }
     const electionResults = await Promise.allSettled(
       ids.map((id) => getElectionsByJurisdiction(id)),
@@ -183,18 +226,6 @@ export default async function ComparePage({
       );
       return { status: "temporarily_unavailable" };
     });
-    try {
-      indicatorHistories = await Promise.all(
-        validSlugs.map((slug) => getIndicatorHistoryForCountry(slug)),
-      );
-    } catch (err) {
-      indicatorHistoryUnavailable = true;
-      console.error("[/compare] indicator history fetch failed:", err);
-    }
-    conditionsRelease = await getConditionsPublicRelease().catch((err) => {
-      console.error("[/compare] Conditions release fetch failed:", err);
-      return null;
-    });
   }
 
   // Phase F.4 — multi-country resolver fetch. Pulls every in-scope
@@ -206,14 +237,21 @@ export default async function ComparePage({
     ReturnType<typeof getCanonicalFactsForJurisdictions>
   > = {};
   if (ids.length > 0) {
-    factsByJurisdiction = await getCanonicalFactsForJurisdictions(ids, [
+    const factsResult = await captureAtlasSurfaceQuery(() =>
+      getCanonicalFactsForJurisdictions(ids, [
       "population_total",
       "gdp_ppp_usd_billions",
       "area_total_km2",
       "capital",
       "official_languages",
       "currency_code",
-    ]).catch(() => ({}));
+      ]),
+    );
+    if (factsResult.status === "available") {
+      factsByJurisdiction = factsResult.value;
+    } else {
+      unavailableSections.push("canonical overview facts");
+    }
   }
 
   // Resolver-canonical population (canonical → legacy cache fallback),
@@ -323,7 +361,9 @@ export default async function ComparePage({
     (rights) => rights.publicExport === "allowed",
   ).map((rights) => rights.sourceId);
 
-  const hasEnough = validSlugs.length >= 2;
+  const hasEnough = selectedJurisdictions.length >= 2;
+  const hasInvalidSelection =
+    validSlugs.length > 0 && selectedJurisdictions.length !== validSlugs.length;
 
   return (
     <>
@@ -359,6 +399,20 @@ export default async function ComparePage({
           </Suspense>
         </section>
 
+        {countryCatalogResult.status === "unavailable" ? (
+          <Banner variant="warn">
+            The country catalog is temporarily unavailable. This does not mean
+            that Civica has no country records.
+          </Banner>
+        ) : null}
+
+        {hasInvalidSelection && countryCatalogResult.status === "available" ? (
+          <Banner variant="warn">
+            One or more requested country records are no longer available for
+            comparison. Choose two listed countries to continue.
+          </Banner>
+        ) : null}
+
         {validSlugs.length === 0 && (
           <div className="compare-empty">
             <p className="compare-empty-title">
@@ -384,6 +438,12 @@ export default async function ComparePage({
           <>
             <CompareSectionNav countryLabels={countryLabels} />
 
+            {unavailableSections.length > 0 ? (
+              <Banner variant="warn">
+                Some comparison data is temporarily unavailable: {unavailableSections.join(", ")}. This does not mean the selected countries have no records in those sections.
+              </Banner>
+            ) : null}
+
             <section id="overview" className="compare-section">
               <div className="compare-section-eyebrow">I · OVERVIEW</div>
               <h2 className="compare-section-heading">
@@ -403,7 +463,13 @@ export default async function ComparePage({
                 Each source keeps its native scale. Civica does not average the
                 rows or turn them into a country-quality ranking.
               </Banner>
-              {governanceEvidence.flatMap((evidence) =>
+              {governanceEvidence.length === 0 ? (
+                <div className="editorial-empty">
+                  No source-native governance observations are currently
+                  compiled for the selected countries. This is a coverage gap,
+                  not a country-quality finding.
+                </div>
+              ) : governanceEvidence.flatMap((evidence) =>
                 evidence
                   ? [
                       <div
@@ -452,10 +518,11 @@ export default async function ComparePage({
               <h2 className="compare-section-heading">
                 Material indicators, without a hidden composite.
               </h2>
-              <CompareConditions
-                countries={conditionsCountries}
-                release={conditionsRelease}
-              />
+                <CompareConditions
+                  countries={conditionsCountries}
+                  release={conditionsRelease}
+                  releaseUnavailable={unavailableSections.includes("Conditions")}
+                />
             </section>
 
             <section id="chambers" className="compare-section">

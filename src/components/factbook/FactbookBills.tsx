@@ -43,11 +43,14 @@ const STAGE_LABELS = BILLS_STAGE_LABELS;
 export interface FactbookBillsProps {
   countrySlug: string;
   countryName: string;
+  /** A route-level prefetch preserves an outage separately from no bill rows. */
+  initialResult?: Awaited<ReturnType<typeof getBillsForJurisdiction>> | null;
 }
 
 export async function FactbookBills({
   countrySlug,
   countryName,
+  initialResult,
 }: FactbookBillsProps) {
   if (!isBillsSupportedSlug(countrySlug)) {
     return (
@@ -63,15 +66,45 @@ export async function FactbookBills({
     );
   }
 
-  let result;
-  try {
-    result = await getBillsForJurisdiction(countrySlug, 20);
-  } catch {
-    // The parent visibility gate soft-fails on the same lookup, so this branch
-    // is defensive if the second request fails after the parent succeeded.
-    return null;
+  let result: Awaited<ReturnType<typeof getBillsForJurisdiction>>;
+  if (initialResult === null) {
+    return (
+      <div className="factbook-bills-list">
+        <Banner variant="warn" className="factbook-bill-coverage-note">
+          Bill records are temporarily unavailable. Civica is not treating this
+          as evidence that no legislation is being considered in {countryName}.
+        </Banner>
+      </div>
+    );
   }
-  if (!result || result.rows.length === 0) {
+  if (initialResult !== undefined) {
+    result = initialResult;
+  } else {
+    try {
+      result = await getBillsForJurisdiction(countrySlug, 20);
+    } catch {
+      return (
+        <div className="factbook-bills-list">
+          <Banner variant="warn" className="factbook-bill-coverage-note">
+            Bill records are temporarily unavailable. Civica is not treating
+            this as evidence that no legislation is being considered in
+            {" "}{countryName}.
+          </Banner>
+        </div>
+      );
+    }
+  }
+  if (!result) {
+    return (
+      <div className="factbook-bills-list">
+        <Banner variant="warn" className="factbook-bill-coverage-note">
+          Bill records are temporarily unavailable. Civica could not resolve
+          the country record for this source-backed module.
+        </Banner>
+      </div>
+    );
+  }
+  if (result.rows.length === 0) {
     return (
       <div className="factbook-bills-list">
         <Banner variant="warn" className="factbook-bill-coverage-note">

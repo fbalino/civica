@@ -3,6 +3,7 @@ import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { titleCaseTitle } from "@/lib/text/title-case";
 import { SourceDot } from "@/components/SourceDot";
 import { Chip } from "@/components/editorial/Pill";
+import { Banner } from "@/components/editorial/Banner";
 import {
   LeaderTenureTimeline,
   type TenureEntry,
@@ -41,6 +42,8 @@ import "./leaders.css";
  * absent.
  */
 
+type LeaderRow = Awaited<ReturnType<typeof getLeaderTimeline>>[number];
+
 interface FactbookLeadersProps {
   jurisdictionId: string;
   countryName: string;
@@ -48,9 +51,9 @@ interface FactbookLeadersProps {
   // last_sync_at it can pass it through. Without it the SourceDot still
   // renders, just with the "Not yet synced" tooltip.
   retrievedAt?: string | null;
+  /** A route-level prefetch preserves an outage separately from an empty roster. */
+  initialRows?: LeaderRow[] | null;
 }
-
-type LeaderRow = Awaited<ReturnType<typeof getLeaderTimeline>>[number];
 
 interface OfficeStint {
   officeName: string;
@@ -211,12 +214,43 @@ function groupByPerson(rows: LeaderRow[]): PersonGroup[] {
 
 export async function FactbookLeaders({
   jurisdictionId,
+  countryName,
   retrievedAt,
+  initialRows,
 }: FactbookLeadersProps) {
-  const rows = (await getLeaderTimeline(jurisdictionId).catch(
-    () => [] as LeaderRow[]
-  )) as LeaderRow[];
-  if (rows.length === 0) return null;
+  let rows: LeaderRow[];
+  if (initialRows === null) {
+    return (
+      <Banner variant="warn">
+        Leadership records are temporarily unavailable. Civica is not treating
+        this as evidence that {countryName} has no current officeholders.
+      </Banner>
+    );
+  }
+  if (initialRows !== undefined) {
+    rows = initialRows;
+  } else {
+    try {
+      rows = await getLeaderTimeline(jurisdictionId);
+    } catch {
+      return (
+        <Banner variant="warn">
+          Leadership records are temporarily unavailable. Civica is not
+          treating this as evidence that {countryName} has no current
+          officeholders.
+        </Banner>
+      );
+    }
+  }
+  if (rows.length === 0) {
+    return (
+      <Banner variant="info">
+        No source-backed current officeholder records have been compiled for
+        {countryName} yet. This is not a claim that the country has no
+        government.
+      </Banner>
+    );
+  }
 
   const nowYear = new Date().getUTCFullYear();
   const groups = groupByPerson(rows);
