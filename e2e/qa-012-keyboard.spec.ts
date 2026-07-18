@@ -9,6 +9,13 @@ import {
 const DESKTOP = VIEWPORTS.find((viewport) => viewport.name === "desktop")!;
 const MOBILE = VIEWPORTS.find((viewport) => viewport.name === "small-mobile")!;
 
+function requireControlledFixtureDatabase(): void {
+  test.skip(
+    process.env.E2E_PERFORMANCE_FIXTURE_DB !== "1",
+    "This representative route needs the controlled read-only fixture database.",
+  );
+}
+
 test.describe("QA-012 — keyboard journeys", () => {
   test("desktop Explore disclosure opens with Enter and restores focus on Escape", async ({
     page,
@@ -48,6 +55,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("country search supports option selection entirely from the keyboard", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/", { waitUntil: "networkidle" });
     const search = page.getByRole("combobox", {
       name: "Search countries and areas",
@@ -63,6 +71,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("segmented controls use roving focus and arrow-key selection", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.setViewportSize({ width: DESKTOP.width, height: DESKTOP.height });
     await page.goto("/atlas", { waitUntil: "networkidle" });
     const tablist = page.getByRole("tablist", { name: "Map data layer" });
@@ -82,6 +91,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("shared select menus support arrow navigation, selection, and focus return", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/parties", { waitUntil: "networkidle" });
 
     const trigger = page.getByRole("button", { name: "Filter by region" });
@@ -122,6 +132,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("indicator trend charts expose their series toggles to the keyboard", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/country/switzerland/civica-data?section=longitudinal", {
       waitUntil: "networkidle",
     });
@@ -141,6 +152,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("organization membership maps expose member countries as keyboard links", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/organizations/un", { waitUntil: "networkidle" });
 
     const map = page.locator(".org-mini-map");
@@ -156,6 +168,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("map and lightbox dialogs trap focus and restore their launchers", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/country/switzerland", { waitUntil: "networkidle" });
 
     const mapTrigger = page.getByRole("button", {
@@ -190,6 +203,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   });
 
   test("citation tabs use arrow-key roving focus", async ({ page }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/country/switzerland", { waitUntil: "networkidle" });
     await page.locator("summary.cite-accordion-summary").press("Enter");
 
@@ -210,6 +224,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("Atlas has a synchronized native country selector and explicit compare flow", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/atlas", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "World Atlas" })).toBeVisible();
 

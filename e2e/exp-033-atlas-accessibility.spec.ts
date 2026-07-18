@@ -17,6 +17,10 @@ for (const viewport of [DESKTOP, MOBILE]) {
       page,
       errors,
     }) => {
+      test.skip(
+        process.env.E2E_PERFORMANCE_FIXTURE_DB !== "1",
+        "This representative route needs the controlled read-only fixture database.",
+      );
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       // The map's geometry request may remain open after useful content has
       // loaded, so Atlas must not use a network-idle navigation boundary.

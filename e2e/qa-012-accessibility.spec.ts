@@ -14,15 +14,30 @@ import {
 
 const DESKTOP = VIEWPORTS.find((viewport) => viewport.name === "desktop")!;
 
-const SCENARIOS = [
+type AccessibilityScenario = {
+  name: string;
+  path: string;
+  requiresFixtureDatabase?: boolean;
+};
+
+const SCENARIOS: readonly AccessibilityScenario[] = [
   { name: "home", path: "/" },
-  { name: "country-factbook", path: "/country/switzerland" },
-  { name: "country-data", path: "/country/switzerland/civica-data" },
+  {
+    name: "country-factbook",
+    path: "/country/switzerland",
+    requiresFixtureDatabase: true,
+  },
+  {
+    name: "country-data",
+    path: "/country/switzerland/civica-data",
+    requiresFixtureDatabase: true,
+  },
   {
     name: "country-longitudinal-chart",
     path: "/country/switzerland/civica-data?section=longitudinal",
+    requiresFixtureDatabase: true,
   },
-  { name: "atlas", path: "/atlas" },
+  { name: "atlas", path: "/atlas", requiresFixtureDatabase: true },
   { name: "compare-selected", path: "/compare?c=france&c=japan" },
   { name: "rankings", path: "/rankings" },
   { name: "conditions", path: "/civica-conditions" },
@@ -35,7 +50,7 @@ const SCENARIOS = [
     path: "/admin/pulse-coding/sign-in?error=1",
   },
   { name: "not-found", path: "/__civica_probe_missing_route__" },
-] as const;
+];
 
 test.describe("QA-012 — WCAG AA audit matrix", () => {
   test.describe.configure({ mode: "parallel" });
@@ -46,6 +61,11 @@ test.describe("QA-012 — WCAG AA audit matrix", () => {
         page,
         errors,
       }, testInfo) => {
+        test.skip(
+          scenario.requiresFixtureDatabase === true &&
+            process.env.E2E_PERFORMANCE_FIXTURE_DB !== "1",
+          "This representative route needs the controlled read-only fixture database.",
+        );
         await page.setViewportSize({ width: DESKTOP.width, height: DESKTOP.height });
         await page.goto(scenario.path, { waitUntil: "domcontentloaded" });
         await setTheme(page, theme);
