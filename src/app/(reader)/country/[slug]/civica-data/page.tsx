@@ -10,6 +10,7 @@ import {
   getInternationalMembershipsBySlugs,
   getFactbookCountryOptions,
   getIndicatorHistoryForCountry,
+  getConditionsPublicRelease,
 } from "@/lib/db/queries";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
@@ -34,6 +35,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
 import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
+import { CivicaConditionsPanel } from "@/components/conditions/CivicaConditionsPanel";
 import {
   CountryEvidenceCoverage,
   COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
@@ -80,12 +82,13 @@ export async function generateMetadata({
 //   1. Evidence coverage — properties of Civica's evidence, never the country.
 //   2. Governance evidence — source-native publisher observations.
 //   3. Indicator history — longitudinal publisher-native observations.
-//   4. Government      — the "How power is organised" org chart.
-//   5. Legislature     — chamber / hemicycle.
-//   6. Leaders         — current officeholder timeline.
-//   7. Bills           — recent legislative actions.
-//   8. Organizations   — international memberships footprint.
-//   9. Rankings        — curated source-native measures.
+//   4. Civica Conditions — versioned, source-native material indicators.
+//   5. Government      — the "How power is organised" org chart.
+//   6. Legislature     — chamber / hemicycle.
+//   7. Leaders         — current officeholder timeline.
+//   8. Bills           — recent legislative actions.
+//   9. Organizations   — international memberships footprint.
+//  10. Rankings        — curated source-native measures.
 //
 // LAYOUT: a factbook-style stacked scroll (<CivicaDataSections>). Every visible
 // section renders one after another in a single scroll column — nothing hidden,
@@ -103,6 +106,7 @@ type SectionId =
   | "evidence-coverage"
   | "governance-evidence"
   | "longitudinal"
+  | "conditions"
   | "government"
   | "legislature"
   | "leaders"
@@ -116,6 +120,7 @@ const SECTION_PLAN: SectionPlan[] = [
   { id: "evidence-coverage", label: "Evidence Coverage" },
   { id: "governance-evidence", label: "Governance Evidence" },
   { id: "longitudinal", label: "Indicator History" },
+  { id: "conditions", label: "Civica Conditions" },
   { id: "government", label: "Government" },
   { id: "legislature", label: "Legislature" },
   { id: "leaders", label: "Leaders" },
@@ -189,6 +194,7 @@ export default async function CountryCivicaDataTab({
     wikidataSource,
     allSources,
     countryOptions,
+    conditionsRelease,
   ] = await Promise.all([
     getGovernanceEvidence(slug).catch(() => null),
     getCanonicalFactsForJurisdiction(
@@ -222,6 +228,10 @@ export default async function CountryCivicaDataTab({
     getFactbookCountryOptions().catch(
       () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
     ),
+    // Conditions remains visible when a release has not yet been promoted,
+    // so readers receive an explicit availability state rather than a
+    // silently missing section.
+    getConditionsPublicRelease().catch(() => null),
   ]);
 
   // Build the org chart once — reused for the gate and the render.
@@ -250,6 +260,8 @@ export default async function CountryCivicaDataTab({
       case "governance-evidence":
         return hasGovernanceEvidence;
       case "longitudinal":
+        return true;
+      case "conditions":
         return true;
       case "government":
         return hasGovernment;
@@ -380,6 +392,12 @@ export default async function CountryCivicaDataTab({
         embedded
         initialSeries={indicatorHistory}
         initialSources={allSources}
+      />
+    ),
+    conditions: (
+      <CivicaConditionsPanel
+        jurisdictionId={jurisdiction.id}
+        release={conditionsRelease}
       />
     ),
     government: orgChart ? (
