@@ -34,6 +34,10 @@ const subgroupInput = {
   path: "data/releases/index-subgroup-classifications-2026-07-11-v1/classifications.v1.json",
   sha256: "f21924d98095adf66ddf2d1383a3e0ed550843a828ec41736ae39f78ef3db6d4",
 } as const;
+const subgroupReplayInput = {
+  path: "data/releases/index-subgroup-fairness-v2/manifest.v1.json",
+  sha256: "2dae0be6056ddfe458058c16642351aa60db1c02c290bef49711f7464f691073",
+} as const;
 const dimensionalityResult = {
   path: "data/releases/index-dimensionality-analysis-v1/result.v1.json",
   sha256: "da3e54a515814e829287abb2600f52edd0eb02daf5920b1ebe2cc3aa63801e9f",
@@ -157,13 +161,13 @@ export const STATISTICAL_ANALYSIS_REPRODUCIBILITY: readonly StatisticalAnalysisR
   },
   {
     id: "subgroup-fairness",
-    resultPath: "data/releases/index-subgroup-fairness-v1/result.v1.json",
-    resultFileSha256: "1108c521d1fa6131fc379c6f3b60132eae5a77e0c97c33582b09694643e18a30",
-    resultSha256: "11ab6e662191099ef399f710a9ff15751dac25f87d7f1790c382338b1411ac1c",
+    resultPath: "data/releases/index-subgroup-fairness-v2/result.v1.json",
+    resultFileSha256: "9956b550c021e6b243850bf0b4f8a7941998539ea53f56abaeac10f40ed6605e",
+    resultSha256: "16bf9c74e82c1bfdb6d167885fee5630a50bb18c8b71889415c50d924aed42f4",
     resultIdentityKey: "releaseId",
     replayCommand: "validate:index-subgroup-fairness",
-    inputArtifacts: [panelInput, uncertaintyInput, subgroupInput],
-    methodArtifacts: [{ path: "scripts/generate-index-subgroup-fairness.ts", sha256: "65cfe26feead23244ef2ee949450360b819740312b2e7a38abaa3b2a57a974ae" }],
+    inputArtifacts: [panelInput, uncertaintyInput, subgroupInput, subgroupReplayInput],
+    methodArtifacts: [{ path: "scripts/generate-index-subgroup-fairness.ts", sha256: "ec21a12e95d8d9b967188384faf7a391fd6b7d7636b0a1dc57cc29139fae7f0f" }],
     seeds: [],
     tolerance: "byte_exact",
   },

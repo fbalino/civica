@@ -18,7 +18,7 @@ through a public route.
 
 For the longitudinal Index study, normal replay (`npm run
 validate:index-longitudinal`) reads only this cache and rejects a missing or
-mismatched byte stream. A deliberate recapture is explicit:
+mismatched publisher byte stream. A deliberate recapture is explicit:
 
 ```sh
 CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs \
@@ -28,3 +28,19 @@ CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs \
 That operation verifies each retrieved byte stream against the frozen SHA-256
 before retaining it. A changed publisher response fails; it cannot silently
 replace the released input.
+
+The cache also holds restricted *normalized* inputs when a statistical
+analysis depends on a frozen private database release or mutable jurisdiction
+metadata. These snapshots are likewise content-addressed and are never
+committed. Their explicit capture is read-only and records a new hash for a
+new analysis release:
+
+```sh
+CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs \
+  npm run generate:index-subgroup-fairness -- --capture-live-inputs
+```
+
+Normal `npm run validate:index-subgroup-fairness` opens neither the network
+nor a database connection. It reads only the hash named by the checked v2
+release manifest and fails closed if that exact cache entry is unavailable or
+changed.

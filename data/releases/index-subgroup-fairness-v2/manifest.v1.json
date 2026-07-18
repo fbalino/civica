@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "civica-index-subgroup-fairness-release/v1",
+  "releaseId": "index-subgroup-fairness-v2",
+  "supersedes": "index-subgroup-fairness-v1",
+  "supersessionReason": "v1 remains immutable historical evidence but cannot be replayed because its population, status, and regime strata were read from mutable live tables; v2 pins the exact normalized restricted inputs before analysis.",
+  "capturedAt": "2026-07-18T12:37:59Z",
+  "protectedInput": {
+    "schemaVersion": "civica-index-subgroup-fairness-inputs/v1",
+    "contentSha256": "d92c244f4e7d3f4468e2667ed0347da1fddf132be0a4817238dbfe77263bb1e6",
+    "valuesLocation": "protected_local_research_input_cache",
+    "publicValuesIncluded": false,
+    "scope": {
+      "panelRows": 1164,
+      "uncertaintyRows": 970,
+      "mediaRows": 172,
+      "sovereignMetadataRows": 194
+    }
+  },
+  "sourceReleases": [
+    {
+      "releaseId": "ci-research-panel-2000-2024-v3",
+      "rowSha256": "7da2d4cfd58b671957c0c88cd043467563edd2cda8e8fbd6442aae6201d4bb72"
+    },
+    {
+      "releaseId": "ci-k1-uncertainty-inputs-2024-v2",
+      "rowSha256": "58bac490cd025f12adbe175065275bc0c3498d6474725a64eb57585a6d8cf961"
+    },
+    {
+      "releaseId": "ci-k4-practice-panel-2000-2024-v1",
+      "outputSha256": "3be3e129be1bcbc711b61a550d4db60e45cb212d9a4f3b8b0abf9998b59f4092",
+      "valuesLocation": "private_reproducible_from_constitution_topic_excerpts_and_ci_research_panel_rows"
+    },
+    {
+      "releaseId": "index-subgroup-classifications-2026-07-11-v1",
+      "contentSha256": "f21924d98095adf66ddf2d1383a3e0ed550843a828ec41736ae39f78ef3db6d4"
+    }
+  ],
+  "replay": {
+    "command": "CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs npm run validate:index-subgroup-fairness",
+    "networkAccess": "disabled",
+    "databaseAccess": "disabled"
+  },
+  "rights": {
+    "posture": "private_internal_research_only_pending_mixed_source_terms",
+    "publicBulkValues": false
+  }
+}
