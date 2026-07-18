@@ -45,8 +45,9 @@ async function openNavigationState(
   const explore = page.getByRole("button", { name: "Explore", exact: true });
   if (await explore.isVisible()) {
     await waitForReactHydration(explore);
-    await explore.click();
-    await expect(page.locator(".explore-menu")).toHaveClass(/explore-menu--open/);
+    await explore.focus();
+    await page.keyboard.press("Enter");
+    await expect(explore).toHaveAttribute("aria-expanded", "true");
     return;
   }
 
