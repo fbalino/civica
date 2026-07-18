@@ -28,6 +28,10 @@ for (const viewport of [DESKTOP, MOBILE]) {
 
       // Pointer selection writes through to the same canonical native control.
       const brazilPath = page.locator('path[data-id="bra"]').first();
+      // On the narrow layout the map follows the reader intro, so the target
+      // can begin below the viewport. Bring the actual SVG path into view
+      // before calculating viewport-relative pointer coordinates.
+      await brazilPath.scrollIntoViewIfNeeded();
       const brazilBox = await brazilPath.boundingBox();
       if (!brazilBox) throw new Error("Brazil is missing from the visible Atlas map.");
       await page.mouse.click(
