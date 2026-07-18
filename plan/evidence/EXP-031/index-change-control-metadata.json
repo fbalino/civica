@@ -1,0 +1,19 @@
+{
+  "id": "exp-031-retired-embed-provenance-evidence",
+  "toVersion": "civica-index-retired-embed-provenance-evidence-v44",
+  "recordKind": "evidence",
+  "evidence": {
+    "documentation": ["plan/evidence/EXP-031/README.md"],
+    "registry": ["src/lib/ci/index-change-control.ts"],
+    "release_note": ["plan/evidence/EXP-031/index-change-control-release-note.md"],
+    "migration_plan": ["plan/evidence/EXP-031/index-change-control-migration-plan.md"],
+    "golden_test": ["src/lib/api/pulse-scalar-retirement.test.ts"],
+    "contract_test": ["e2e/exp-030-retired-embed.spec.ts"]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine"
+  ]
+}
