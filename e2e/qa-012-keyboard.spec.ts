@@ -1,5 +1,10 @@
 /** QA-012 — keyboard journeys for canonical shared controls. */
-import { test, expect, VIEWPORTS } from "./harness/fixtures";
+import {
+  test,
+  expect,
+  VIEWPORTS,
+  waitForReactHydration,
+} from "./harness/fixtures";
 
 const DESKTOP = VIEWPORTS.find((viewport) => viewport.name === "desktop")!;
 const MOBILE = VIEWPORTS.find((viewport) => viewport.name === "small-mobile")!;
@@ -9,9 +14,10 @@ test.describe("QA-012 — keyboard journeys", () => {
     page,
   }) => {
     await page.setViewportSize({ width: DESKTOP.width, height: DESKTOP.height });
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
 
     const trigger = page.getByRole("button", { name: "Explore" });
+    await waitForReactHydration(trigger);
     await trigger.focus();
     await page.keyboard.press("Enter");
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
@@ -29,6 +35,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     await page.goto("/", { waitUntil: "networkidle" });
 
     const trigger = page.getByRole("button", { name: "Open menu" });
+    await waitForReactHydration(trigger);
     await trigger.focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("dialog", { name: "Main menu" })).toBeVisible();
@@ -41,10 +48,11 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("country search supports option selection entirely from the keyboard", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
     const search = page.getByRole("combobox", {
       name: "Search countries and areas",
     });
+    await waitForReactHydration(search);
     await search.focus();
     await search.fill("Switzerland");
     await page.keyboard.press("ArrowDown");
@@ -56,11 +64,12 @@ test.describe("QA-012 — keyboard journeys", () => {
     page,
   }) => {
     await page.setViewportSize({ width: DESKTOP.width, height: DESKTOP.height });
-    await page.goto("/atlas", { waitUntil: "domcontentloaded" });
+    await page.goto("/atlas", { waitUntil: "networkidle" });
     const tablist = page.getByRole("tablist", { name: "Map data layer" });
     await expect(tablist).toBeVisible();
 
     const selectedBefore = tablist.getByRole("tab", { selected: true });
+    await waitForReactHydration(selectedBefore);
     const selectedName = await selectedBefore.getAttribute("aria-label") ?? await selectedBefore.textContent();
     await selectedBefore.focus();
     await page.keyboard.press("ArrowRight");
@@ -76,6 +85,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     await page.goto("/parties", { waitUntil: "networkidle" });
 
     const trigger = page.getByRole("button", { name: "Select region" });
+    await waitForReactHydration(trigger);
     await trigger.focus();
     await page.keyboard.press("Enter");
 
@@ -100,6 +110,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     const mapTrigger = page.getByRole("button", {
       name: "Explore the interactive map of Switzerland",
     });
+    await waitForReactHydration(mapTrigger);
     await mapTrigger.focus();
     await page.keyboard.press("Enter");
     const mapDialog = page.getByRole("dialog", { name: "Map of Switzerland" });
@@ -110,6 +121,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     await expect(mapTrigger).toBeFocused();
 
     const photoTrigger = page.getByRole("button", { name: /Open \d+ photos/ });
+    await waitForReactHydration(photoTrigger);
     await photoTrigger.focus();
     await page.keyboard.press("Enter");
     const photoDialog = page.getByRole("dialog", { name: "Photo gallery" });
@@ -131,6 +143,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     await page.locator("summary.cite-accordion-summary").press("Enter");
 
     const apa = page.getByRole("tab", { name: "APA" });
+    await waitForReactHydration(apa);
     await apa.focus();
     await page.keyboard.press("ArrowRight");
 
@@ -152,6 +165,7 @@ test.describe("QA-012 — keyboard journeys", () => {
     const controls = page.locator(".atlas-country-controls");
     await controls.locator("summary").press("Enter");
     const selector = page.getByRole("combobox", { name: "Select a country" });
+    await waitForReactHydration(selector);
     await selector.focus();
     await page.keyboard.press("End");
     await expect(selector).not.toHaveValue("");

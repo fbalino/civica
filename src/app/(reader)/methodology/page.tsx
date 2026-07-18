@@ -258,7 +258,7 @@ export default function MethodologyHubPage() {
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "var(--text-15)",
-                          color: "var(--color-text-50)",
+                          color: "var(--color-text-secondary)",
                           lineHeight: "var(--leading-normal)",
                           margin: 0,
                         }}

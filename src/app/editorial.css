@@ -38,7 +38,7 @@
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-13);
   letter-spacing: var(--tracking-wide);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   margin-bottom: var(--space-5);
   display: flex;
   align-items: center;
@@ -767,7 +767,7 @@
   font-size: var(--text-12);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
-  color: var(--color-text-25);
+  color: var(--color-text-secondary);
   margin: 0 0 var(--space-4);
   font-weight: 400;
 }
@@ -809,7 +809,7 @@
 .reader-sidebar-num {
   font-family: var(--font-mono);
   font-size: var(--text-12);
-  color: var(--color-text-30);
+  color: var(--color-text-secondary);
   align-self: center;
   min-width: 20px;
 }
@@ -1425,8 +1425,10 @@ legend.editorial-filter-label {
   line-height: 1.5;
 }
 .editorial-empty a {
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: var(--space-1);
 }
 
 /* ── Phase F: alternate-values panel ─────────────────────────────
@@ -1957,14 +1959,14 @@ legend.editorial-filter-label {
   font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
-  color: var(--color-text-30);
+  color: var(--color-text-secondary);
   min-width: 60px; /* 60px — no exact token; column rhythm */
 }
 .api-params__desc {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
-  color: var(--color-text-50);
+  color: var(--color-text-secondary);
 }
 .api-params--embed .api-params__name { min-width: 80px;  /* 80px — no exact token */ }
 .api-params--embed .api-params__type { min-width: 110px; /* 110px — no exact token */ }
@@ -1982,7 +1984,7 @@ legend.editorial-filter-label {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
-  color: var(--color-text-30);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   margin: 0 0 var(--space-3);
@@ -4132,8 +4134,10 @@ a.constitution-xref-card-country:hover {
   align-items: center;
 }
 .compare-page-footer a {
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: var(--space-1);
 }
 .compare-page-footer a:hover { text-decoration: underline; }
 .compare-footer-meta {

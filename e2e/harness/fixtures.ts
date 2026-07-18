@@ -12,7 +12,7 @@
  *     password; returns false (so callers skip) when creds are absent, so
  *     the harness never depends on committing a secret.
  */
-import { test as base, expect, type Page } from "@playwright/test";
+import { test as base, expect, type Locator, type Page } from "@playwright/test";
 
 export type ViewportSpec = { name: string; width: number; height: number };
 
@@ -97,6 +97,23 @@ export const test = base.extend<{ errors: CapturedErrors }>({
 });
 
 export { expect };
+
+/**
+ * A server-rendered control has its HTML before React attaches the event
+ * listener that gives it its interactive contract. Wait for that attachment
+ * before a keyboard journey sends its first key, rather than racing hydration
+ * and treating a no-op keypress as a product failure.
+ */
+export async function waitForReactHydration(locator: Locator) {
+  await expect
+    .poll(
+      () =>
+        locator.evaluate((element) =>
+          Object.keys(element).some((key) => key.startsWith("__reactProps$")),
+        ),
+    )
+    .toBe(true);
+}
 
 /** Emulate the given theme. The app reads `prefers-color-scheme` and a
  *  `data-theme` attribute on <html>; set both so the theme is stable
