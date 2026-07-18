@@ -989,7 +989,11 @@
 }
 
 .coding-signin-footnote a {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
 }
 
 .coding-dashboard-actions,
