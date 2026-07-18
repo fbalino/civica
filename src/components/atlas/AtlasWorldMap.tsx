@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { RotateCcw } from "lucide-react";
+import { useReducedMotion } from "motion/react";
 import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
@@ -93,6 +94,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     const contentRef = useRef<SVGGElement>(null);
     const labelsRef = useRef<SVGGElement>(null);
     const transformRef = useRef({ k: 1, x: 0, y: 0 });
+    const animationFrameRef = useRef<number | null>(null);
     const dragRef = useRef({
       dragging: false,
       moved: false, // true once the pointer travels past the click threshold
@@ -108,6 +110,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       x: number;
       y: number;
     } | null>(null);
+    const reduceMotion = useReducedMotion();
 
     // PROVENANCE_COVERAGE: atlas.choropleth-layer
     // Legend rows for the active layer, plus a trailing "No data" row when
@@ -152,8 +155,18 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       }
     }, []);
 
+    const stopMapAnimation = useCallback(() => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    }, []);
+
+    useEffect(() => stopMapAnimation, [stopMapAnimation]);
+
     const zoomAround = useCallback(
       (cx: number, cy: number, factor: number) => {
+        stopMapAnimation();
         const t = transformRef.current;
         const prevK = t.k;
         const nextK = Math.max(0.8, Math.min(12, prevK * factor));
@@ -163,13 +176,19 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
         t.k = nextK;
         applyTransform();
       },
-      [applyTransform],
+      [applyTransform, stopMapAnimation],
     );
 
     const animateTo = useCallback(
       (tx: number, ty: number, tk: number) => {
+        stopMapAnimation();
         const start = { ...transformRef.current };
         const end = { x: tx, y: ty, k: tk };
+        if (reduceMotion) {
+          transformRef.current = end;
+          applyTransform();
+          return;
+        }
         const t0 = performance.now();
         const DUR = 650;
         function frame(now: number) {
@@ -179,11 +198,15 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           transformRef.current.y = start.y + (end.y - start.y) * e;
           transformRef.current.k = start.k + (end.k - start.k) * e;
           applyTransform();
-          if (t < 1) requestAnimationFrame(frame);
+          if (t < 1) {
+            animationFrameRef.current = requestAnimationFrame(frame);
+          } else {
+            animationFrameRef.current = null;
+          }
         }
-        requestAnimationFrame(frame);
+        animationFrameRef.current = requestAnimationFrame(frame);
       },
-      [applyTransform],
+      [applyTransform, reduceMotion, stopMapAnimation],
     );
 
     const flyTo = useCallback(
@@ -352,6 +375,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       // report: the map could only be grabbed on water). Click-vs-drag is
       // disambiguated by the movement threshold below: a mouseup without
       // movement still selects the country (see the path onClick guard).
+      stopMapAnimation();
       dragRef.current = {
         dragging: true,
         moved: false,
