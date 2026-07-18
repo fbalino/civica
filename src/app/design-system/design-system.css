@@ -55,7 +55,12 @@
   background: var(--color-surface-elevated);
 }
 .ds-directive strong { color: var(--color-text-primary); }
-.ds-directive a { color: var(--color-accent); }
+.ds-directive a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-underline-offset: var(--space-1);
+}
 
 /* Sections */
 .ds-section { margin-bottom: var(--space-9); }
@@ -195,7 +200,12 @@
   border: 1px solid var(--color-border-default); background: var(--color-surface-elevated);
   padding: var(--space-2) var(--space-4); border-radius: var(--radius-chip); color: var(--color-text-secondary);
 }
-.ds-chip.on { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
+.ds-chip.on {
+  background: color-mix(in oklab, var(--color-accent) 16%, var(--color-page-bg));
+  color: var(--color-text-primary);
+  border-color: color-mix(in oklab, var(--color-accent) 40%, var(--color-card-border));
+  font-weight: var(--font-weight-semibold);
+}
 
 .ds-input {
   display: flex; align-items: center; gap: var(--space-3);

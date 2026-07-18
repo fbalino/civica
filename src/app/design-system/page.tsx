@@ -429,6 +429,7 @@ export default function DesignSystemPage() {
                     key={t.cssVar}
                     className="ds-ramp-cell-tip"
                     content={t.cssVar}
+                    ariaLabel={`Indicator ramp swatch ${t.cssVar}`}
                   >
                     <div
                       className="ds-ramp-cell"
@@ -812,7 +813,7 @@ export default function DesignSystemPage() {
                       fontFamily: "var(--font-body)",
                       fontSize: "var(--text-12)",
                       fontWeight: 600,
-                      color: `var(${v})`,
+                      color: "var(--color-text-primary)",
                       background: `color-mix(in oklab, var(${v}) 14%, transparent)`,
                       border: `1px solid color-mix(in oklab, var(${v}) 34%, transparent)`,
                       padding: "2px 8px",

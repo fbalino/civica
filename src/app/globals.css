@@ -764,10 +764,15 @@ a {
 }
 
 .btn:disabled,
-.btn[aria-disabled="true"],
-.btn.is-loading {
+.btn[aria-disabled="true"] {
   opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn.is-loading {
+  opacity: 1;
+  cursor: progress;
   pointer-events: none;
 }
 
