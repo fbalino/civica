@@ -94,7 +94,7 @@ export const READER_PERFORMANCE_FIXTURES: readonly ReaderPerformanceFixture[] = 
       htmlBytes: 1_100_000,
       javascriptBytes: 1_200_000,
       cssBytes: 500_000,
-      imageBytes: 4_500_000,
+      imageBytes: 1_500_000,
       requestCount: 110,
       serverResponseMs: 4_000,
       lcpMs: 4_000,
