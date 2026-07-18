@@ -442,6 +442,8 @@
    itself uses the readable foreground role on every banner surface. */
 .editorial-banner a,
 .editorial-page :is(p, li, td, .editorial-tool-dek) a,
+.editorial-tool-page :is(p, li, td, .editorial-tool-dek) a,
+.editorial-footer-nav a,
 .methodology-content :is(p, li, td) a {
   color: var(--color-text-primary);
   text-decoration: underline;
