@@ -23,6 +23,11 @@ const DESTINATIONS = [
 const DESKTOP = VIEWPORTS.find((viewport) => viewport.name === "desktop")!;
 const MOBILE = VIEWPORTS.find((viewport) => viewport.name === "small-mobile")!;
 const CAPTURE_DIR = process.env.EXP014_CAPTURE_DIR;
+const CONCEPT_IDS = [
+  "typography-first-scholarly-index",
+  "emblem-led-compact-menu",
+  "editorial-mega-menu",
+] as const;
 
 function isKnownDesignSystemHydrationArtifact(message: string): boolean {
   return (
@@ -45,11 +50,7 @@ for (const viewport of [DESKTOP, MOBILE]) {
       const mockups = page.getByTestId("explore-concept-mockups");
       await expect(mockups).toBeVisible();
 
-      for (const concept of [
-        "typography-first-scholarly-index",
-        "emblem-led-compact-menu",
-        "editorial-mega-menu",
-      ]) {
+      for (const concept of CONCEPT_IDS) {
         const section = mockups.locator(`[data-concept="${concept}"]`);
         await expect(section).toBeVisible();
         const hrefs = await section.locator("a").evaluateAll((links) =>
@@ -66,18 +67,21 @@ for (const viewport of [DESKTOP, MOBILE]) {
       expect(overflow.overflow, overflow.offenders.join("\n")).toBeLessThanOrEqual(1);
 
       if (CAPTURE_DIR) {
-        // The fixed global header is not part of the decision mockup. Hiding
-        // it only for the captured locator avoids it being stitched through a
-        // tall component screenshot while preserving normal browser behavior.
+        // Fixed headers are not part of the decision mockups. Hiding them only
+        // for evidence capture prevents a viewport-sticky strip from being
+        // stitched through a tall locator screenshot.
         await page.addStyleTag({
-          content: "#site-header { display: none !important; }",
+          content: "#site-header, .ds-top { display: none !important; }",
         });
-        await mockups.screenshot({
-          path: join(
-            CAPTURE_DIR,
-            `2026-07-18-explore-concepts-${viewport.name}-${theme}.png`,
-          ),
-        });
+        for (const concept of CONCEPT_IDS) {
+          const section = mockups.locator(`[data-concept="${concept}"]`);
+          await section.screenshot({
+            path: join(
+              CAPTURE_DIR,
+              `2026-07-18-${concept}-${viewport.name}-${theme}.png`,
+            ),
+          });
+        }
       }
 
       const unexpectedFailures = errors
