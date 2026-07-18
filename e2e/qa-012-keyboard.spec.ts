@@ -138,6 +138,21 @@ test.describe("QA-012 — keyboard journeys", () => {
     await expect(seriesToggle).toBeFocused();
   });
 
+  test("organization membership maps expose member countries as keyboard links", async ({
+    page,
+  }) => {
+    await page.goto("/organizations/un", { waitUntil: "networkidle" });
+
+    const map = page.locator(".org-mini-map");
+    await expect(map).toBeVisible();
+    const countryLink = map.getByRole("link").first();
+    await expect(countryLink).toHaveAttribute("href", /^\/country\//);
+    await countryLink.focus();
+    await expect(countryLink).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/country\//);
+  });
+
   test("map and lightbox dialogs trap focus and restore their launchers", async ({
     page,
   }) => {

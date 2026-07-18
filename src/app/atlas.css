@@ -1575,6 +1575,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .org-mini-map { width: 100%; max-height: 420px; display: block; }
 .org-mini-map path { transition: opacity 120ms; }
 .org-mini-map path.member:hover { opacity: 1 !important; }
+.org-mini-map a:focus-visible path {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
 
 /* Grouped memberships */
 .intl-mem-list { display: grid; gap: 22px; margin-top: 12px; }

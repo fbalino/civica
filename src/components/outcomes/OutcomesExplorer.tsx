@@ -407,6 +407,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
       {!isDesktop && (
         <div
           onClick={onClose}
+          aria-hidden
           style={{
             position: "fixed",
             inset: 0,

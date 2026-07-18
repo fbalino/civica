@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type Country, WORLD_PATHS } from "./data";
 import { buildNeIdMap, proj } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
@@ -59,7 +58,6 @@ export function OrgDetailPanel({
   detail: OrgDetail;
   countries: Country[];
 }) {
-  const router = useRouter();
   const neIdMap = useMemo(() => buildNeIdMap(countries), [countries]);
   const { mapPaths, mapLoaded } = useMapPaths(countries, neIdMap);
 
@@ -82,7 +80,7 @@ export function OrgDetailPanel({
   ).length;
 
   const memberIds = new Set(currentMembers.map((m) => m.id));
-  const memberBySlug = new Map(detail.members.map((m) => [m.slug, m]));
+  const memberById = new Map(currentMembers.map((m) => [m.id, m]));
   const highlightedCount = currentMembers.length;
   const mappedMemberIds = new Set(
     mapLoaded
@@ -113,12 +111,6 @@ export function OrgDetailPanel({
   const sortedMembers = [...detail.members].sort(
     (a, b) => (a.joinYear ?? 9999) - (b.joinYear ?? 9999),
   );
-
-  const goToCountry = (slug: string) => {
-    if (memberBySlug.get(slug)?.inAtlas) {
-      router.push(`/country/${slug}`);
-    }
-  };
 
   return (
     <>
@@ -197,9 +189,9 @@ export function OrgDetailPanel({
             {mapLoaded
               ? mapPaths.map((p, i) => {
                   const isMember = !!(p.id && memberIds.has(p.id));
-                  return (
+                  const member = p.id ? memberById.get(p.id) : undefined;
+                  const path = (
                     <path
-                      key={i}
                       d={p.d}
                       data-id={p.id || undefined}
                       className={isMember ? "member" : ""}
@@ -210,20 +202,25 @@ export function OrgDetailPanel({
                         opacity: isMember ? 0.9 : 0.4,
                         cursor: isMember && p.id ? "pointer" : "default",
                       }}
-                      onClick={() => {
-                        if (isMember && p.id) {
-                          const m = detail.members.find((mm) => mm.id === p.id);
-                          if (m) goToCountry(m.slug);
-                        }
-                      }}
                     />
+                  );
+                  return member?.inAtlas ? (
+                    <a
+                      key={i}
+                      href={`/country/${member.slug}`}
+                      aria-label={`Open ${member.name}`}
+                    >
+                      {path}
+                    </a>
+                  ) : (
+                    <g key={i}>{path}</g>
                   );
                 })
               : Object.entries(WORLD_PATHS).map(([id, data]) => {
                   const isMember = memberIds.has(id);
-                  return (
+                  const member = memberById.get(id);
+                  const path = (
                     <path
-                      key={id}
                       d={data.d}
                       style={{
                         fill: isMember ? typeVar : "var(--atlas-paper-3)",
@@ -232,13 +229,18 @@ export function OrgDetailPanel({
                         opacity: isMember ? 0.9 : 0.4,
                         cursor: isMember ? "pointer" : "default",
                       }}
-                      onClick={() => {
-                        if (isMember) {
-                          const m = detail.members.find((mm) => mm.id === id);
-                          if (m) goToCountry(m.slug);
-                        }
-                      }}
                     />
+                  );
+                  return member?.inAtlas ? (
+                    <a
+                      key={id}
+                      href={`/country/${member.slug}`}
+                      aria-label={`Open ${member.name}`}
+                    >
+                      {path}
+                    </a>
+                  ) : (
+                    <g key={id}>{path}</g>
                   );
                 })}
             <g className="org-map-markers" aria-hidden="true">
@@ -254,10 +256,7 @@ export function OrgDetailPanel({
                     fill: typeVar,
                     stroke: "var(--atlas-paper)",
                     strokeWidth: 3,
-                    cursor: m.inAtlas ? "pointer" : "default",
-                  }}
-                  onClick={() => {
-                    if (m.inAtlas) goToCountry(m.slug);
+                    cursor: "default",
                   }}
                 />
               ))}
