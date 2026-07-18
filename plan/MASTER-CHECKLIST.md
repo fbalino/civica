@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 305
-- **Completed:** 211
-- **Remaining:** 94
-- **Progress:** 69.2%
+- **Completed:** 212
+- **Remaining:** 93
+- **Progress:** 69.5%
 - **Priority mix:** P0 189 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -292,7 +292,7 @@ Source: `plan/09-testing-qa-and-release.md`
 
 - [x] **QA-001** (P0) Create a test/verification matrix from every production route, pipeline, research calculation, data domain, and failure state to its existing or required tests. _Done when: every item has unit/integration/DB/browser/manual coverage status, owner, fixture, command, and gap task; no critical surface is unregistered._
 - [x] **QA-002** (P1) Set meaningful module-level coverage requirements rather than one misleading global percentage. _Done when: Index, Pulse, reconciliation, source freshness, auth, API contracts, content templates, and critical UI state reducers have justified branch/behavior thresholds; seeded untested branches fail the relevant gate._
-- [ ] **QA-003** (P0) Create deterministic, legally shareable database fixtures for tests. _Done when: fixtures cover representative countries/entities, full/partial/missing/disputed/stale data, multiple sources, jurisdictions/statuses, constitutions/elections/organizations, Index candidates, Pulse negatives/clusters, and migrations without production credentials._
+- [x] **QA-003** (P0) Create deterministic, legally shareable database fixtures for tests. _Done when: fixtures cover representative countries/entities, full/partial/missing/disputed/stale data, multiple sources, jurisdictions/statuses, constitutions/elections/organizations, Index candidates, Pulse negatives/clusters, and migrations without production credentials._
 - [x] **QA-004** (P0) Keep live-database tests explicitly read-only and separable from fixture tests. _Done when: `npm run test:db` refuses unsafe/mutable connection modes, executes documented read-only queries/invariants, reports the target environment/vintage safely, and no test can modify production._
 - [x] **QA-005** (P0) Add public/admin/cron API contract and authorization tests. _Done when: every PLT-008 route has success/validation/auth/rate/cache/error/version fixtures as applicable; responses validate schemas; mutations verify audit rows and idempotency; no internal field leaks._
 - [ ] **QA-006** (P0) Add ingestion/sync contract fixtures for every released source. _Done when: normal, empty, malformed, upstream-schema-change, partial, retry, dry-run, duplicate, and rights-blocked cases are tested; row counts/freshness/provenance/version outcomes match policy._

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "f2e2af04b59fa345a55e7d0edb8527f3508fa69949b6bcb37fcde402a9b85516",
+  "semanticHash": "948c3b7e4ee94d030b25cad84751bcc35e84c8f4803b3435ea534791c781ad59",
   "summary": {
     "route": 173,
     "pipeline": 50,
@@ -380,11 +380,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -427,11 +427,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -474,11 +474,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -521,11 +521,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -568,11 +568,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -615,11 +615,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -662,11 +662,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -709,11 +709,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -756,11 +756,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -803,11 +803,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -850,11 +850,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -897,11 +897,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -944,11 +944,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -991,11 +991,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable domain fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -1038,11 +1038,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1083,11 +1083,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1128,11 +1128,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1173,11 +1173,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1218,11 +1218,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1263,11 +1263,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1308,11 +1308,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic state fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "planned",
@@ -1353,11 +1353,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic pipeline-alert fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1398,11 +1398,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic pipeline-alert fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1443,11 +1443,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic pipeline-alert fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1488,11 +1488,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic pipeline-alert fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1743,11 +1743,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1789,11 +1789,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1835,11 +1835,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1881,11 +1881,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1927,11 +1927,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -1973,11 +1973,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2019,11 +2019,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2065,11 +2065,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2111,11 +2111,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2157,11 +2157,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2203,11 +2203,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2249,11 +2249,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2295,11 +2295,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2341,11 +2341,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2387,11 +2387,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2433,11 +2433,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2479,11 +2479,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2525,11 +2525,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2571,11 +2571,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2617,11 +2617,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2663,11 +2663,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2709,11 +2709,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2755,11 +2755,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2801,11 +2801,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2847,11 +2847,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2893,11 +2893,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2939,11 +2939,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -2985,11 +2985,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3031,11 +3031,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3077,11 +3077,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3123,11 +3123,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3169,11 +3169,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3215,11 +3215,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3261,11 +3261,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3307,11 +3307,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3353,11 +3353,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3399,11 +3399,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3445,11 +3445,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3491,11 +3491,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3537,11 +3537,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3583,11 +3583,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3629,11 +3629,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3675,11 +3675,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3721,11 +3721,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3767,11 +3767,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3813,11 +3813,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3859,11 +3859,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3905,11 +3905,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3951,11 +3951,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -3997,11 +3997,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable pipeline fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -4042,11 +4042,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4089,11 +4089,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4136,11 +4136,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4183,11 +4183,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4230,11 +4230,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4277,11 +4277,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4324,11 +4324,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4371,11 +4371,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4418,11 +4418,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4465,11 +4465,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4512,11 +4512,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4559,11 +4559,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4606,11 +4606,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4653,11 +4653,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4700,11 +4700,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4747,11 +4747,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4792,11 +4792,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4837,11 +4837,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4882,11 +4882,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4927,11 +4927,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -4972,11 +4972,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5017,11 +5017,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5062,11 +5062,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5107,11 +5107,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5152,11 +5152,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5197,11 +5197,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5242,11 +5242,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5287,11 +5287,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5332,11 +5332,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5377,11 +5377,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5422,11 +5422,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5468,11 +5468,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5513,11 +5513,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5558,11 +5558,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5603,11 +5603,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5648,11 +5648,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5693,11 +5693,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5738,11 +5738,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5783,11 +5783,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5828,11 +5828,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5873,11 +5873,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5918,11 +5918,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -5963,11 +5963,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -6008,11 +6008,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -6053,11 +6053,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -6098,11 +6098,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -6145,11 +6145,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -6190,11 +6190,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6235,11 +6235,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6280,11 +6280,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6325,11 +6325,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6370,11 +6370,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6415,11 +6415,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6460,11 +6460,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6505,11 +6505,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6550,11 +6550,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6595,11 +6595,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6640,11 +6640,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6685,11 +6685,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6728,11 +6728,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6771,11 +6771,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6814,11 +6814,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6857,11 +6857,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6900,11 +6900,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6943,11 +6943,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -6986,11 +6986,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7029,11 +7029,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7072,11 +7072,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7115,11 +7115,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7158,11 +7158,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7201,11 +7201,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7244,11 +7244,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7287,11 +7287,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7330,11 +7330,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7373,11 +7373,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7416,11 +7416,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7459,11 +7459,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7504,11 +7504,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7549,11 +7549,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7594,11 +7594,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7639,11 +7639,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7684,11 +7684,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7729,11 +7729,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7774,11 +7774,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7819,11 +7819,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7864,11 +7864,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7909,11 +7909,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7954,11 +7954,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -7999,11 +7999,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8044,11 +8044,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8089,11 +8089,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8134,11 +8134,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8179,11 +8179,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8224,11 +8224,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8269,11 +8269,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8314,11 +8314,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8359,11 +8359,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8404,11 +8404,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8449,11 +8449,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8494,11 +8494,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8539,11 +8539,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8584,11 +8584,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8629,11 +8629,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8674,11 +8674,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8719,11 +8719,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8764,11 +8764,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8809,11 +8809,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8854,11 +8854,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8899,11 +8899,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8944,11 +8944,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -8989,11 +8989,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9034,11 +9034,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9079,11 +9079,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9124,11 +9124,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9169,11 +9169,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9214,11 +9214,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9259,11 +9259,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9304,11 +9304,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9349,11 +9349,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9392,11 +9392,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9435,11 +9435,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9478,11 +9478,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9521,11 +9521,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9564,11 +9564,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9609,11 +9609,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9654,11 +9654,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9699,11 +9699,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9744,11 +9744,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9789,11 +9789,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9834,11 +9834,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9877,11 +9877,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9920,11 +9920,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -9963,11 +9963,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10006,11 +10006,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10049,11 +10049,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10092,11 +10092,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10135,11 +10135,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10178,11 +10178,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10221,11 +10221,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10264,11 +10264,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10307,11 +10307,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10350,11 +10350,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10393,11 +10393,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10436,11 +10436,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10479,11 +10479,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10522,11 +10522,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10565,11 +10565,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10608,11 +10608,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10651,11 +10651,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -10694,11 +10694,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -10739,11 +10739,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -10784,11 +10784,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -10829,11 +10829,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -10874,11 +10874,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -10919,11 +10919,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -10964,11 +10964,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11009,11 +11009,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11054,11 +11054,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -11097,11 +11097,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -11144,11 +11144,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11189,11 +11189,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11234,11 +11234,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "not_applicable",
@@ -11363,11 +11363,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11409,11 +11409,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11454,11 +11454,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11542,11 +11542,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11587,11 +11587,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11632,11 +11632,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11677,11 +11677,11 @@
           "gapTask": null
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",
@@ -11722,11 +11722,11 @@
           "gapTask": "QA-013"
         },
         "database": {
-          "status": "planned",
+          "status": "covered",
           "evidence": [
-            "Deterministic legally shareable database fixture"
+            "npm run validate:fixture-database"
           ],
-          "gapTask": "QA-003"
+          "gapTask": null
         },
         "browser": {
           "status": "partial",

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "civica-qa-database-expected/v1",
+  "fixtureSha256": "834c2546a1e9836eadf7ac3b5ee3e5800b341bfa7f7aa489b539bf4df14a933e",
+  "rowCounts": {
+    "sources": 3,
+    "jurisdictions": 3,
+    "facts": 5,
+    "disputes": 1,
+    "constitutions": 1,
+    "elections": 2,
+    "organizations": 2,
+    "organizationMemberships": 2,
+    "indexCandidates": 2,
+    "pulseEvents": 2,
+    "pulseClusters": 1
+  },
+  "migration": {
+    "path": "drizzle/authoritative/0034_superb_the_fallen.sql",
+    "requiredRelations": [
+      "cron_job_attempts",
+      "cron_job_executions",
+      "cron_job_leases"
+    ]
+  },
+  "credentialsUsed": [],
+  "networkRequests": 0,
+  "tolerance": "exact fixture bytes and relational row counts"
+}

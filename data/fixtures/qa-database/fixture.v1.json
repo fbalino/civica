@@ -1,0 +1,207 @@
+{
+  "schemaVersion": "civica-qa-database-fixture/v1",
+  "rights": {
+    "classification": "synthetic_test_data",
+    "license": "CC0-1.0",
+    "statement": "Every row is invented test data authored for Civica. No publisher payload, personal data, production identifier, or restricted source text is included."
+  },
+  "referenceTime": "2026-07-18T00:00:00.000Z",
+  "sources": [
+    {
+      "id": "fixture_primary",
+      "label": "Fixture Primary",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "lastSyncAt": "2026-07-17T00:00:00.000Z"
+    },
+    {
+      "id": "fixture_secondary",
+      "label": "Fixture Secondary",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "lastSyncAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "fixture_tertiary",
+      "label": "Fixture Tertiary",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "lastSyncAt": "2026-07-16T00:00:00.000Z"
+    }
+  ],
+  "jurisdictions": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "slug": "asteria-fixture",
+      "name": "Asteria Fixture",
+      "iso3": "XAA",
+      "status": "sovereign_state"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "slug": "borealis-fixture",
+      "name": "Borealis Fixture",
+      "iso3": "XBB",
+      "status": "dependency_or_territory"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000003",
+      "slug": "caspia-fixture",
+      "name": "Caspia Fixture",
+      "iso3": "XCC",
+      "status": "disputed_or_limited_recognition"
+    }
+  ],
+  "facts": [
+    {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "factKey": "population_total",
+      "value": 123456,
+      "valueStatus": "observed",
+      "reason": null,
+      "sourceId": "fixture_primary",
+      "observedAt": "2026-01-01"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000002",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "factKey": "legislature_seats",
+      "value": 88,
+      "valueStatus": "observed",
+      "reason": null,
+      "sourceId": "fixture_secondary",
+      "observedAt": "2024-01-01"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000003",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000002",
+      "factKey": "internet_users_pct",
+      "value": null,
+      "valueStatus": "missing",
+      "reason": "Fixture partial-coverage state",
+      "sourceId": "fixture_secondary",
+      "observedAt": null
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000004",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000003",
+      "factKey": "population_total",
+      "value": 45678,
+      "valueStatus": "disputed",
+      "reason": "Fixture source disagreement",
+      "sourceId": "fixture_primary",
+      "observedAt": "2025-12-31"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000005",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000003",
+      "factKey": "military_personnel",
+      "value": null,
+      "valueStatus": "not_observed",
+      "reason": "Fixture source has no observation",
+      "sourceId": "fixture_tertiary",
+      "observedAt": null
+    }
+  ],
+  "disputes": [
+    {
+      "id": "20000000-0000-4000-8000-000000000001",
+      "factId": "10000000-0000-4000-8000-000000000004",
+      "status": "open",
+      "summary": "Fixture disagreement retained for disputed-value tests"
+    }
+  ],
+  "constitutions": [
+    {
+      "id": "30000000-0000-4000-8000-000000000001",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "title": "Constitution of Asteria Fixture",
+      "status": "in_force",
+      "sourceId": "fixture_primary"
+    }
+  ],
+  "elections": [
+    {
+      "id": "40000000-0000-4000-8000-000000000001",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "date": "2025-06-01",
+      "status": "completed",
+      "sourceId": "fixture_primary"
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000002",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000003",
+      "date": "2026-11-01",
+      "status": "scheduled",
+      "sourceId": "fixture_tertiary"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "50000000-0000-4000-8000-000000000001",
+      "slug": "fixture-council",
+      "name": "Fixture Council",
+      "sourceId": "fixture_primary"
+    },
+    {
+      "id": "50000000-0000-4000-8000-000000000002",
+      "slug": "fixture-observatory",
+      "name": "Fixture Observatory",
+      "sourceId": "fixture_tertiary"
+    }
+  ],
+  "organizationMemberships": [
+    {
+      "id": "60000000-0000-4000-8000-000000000001",
+      "organizationId": "50000000-0000-4000-8000-000000000001",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "status": "member",
+      "sourceId": "fixture_primary"
+    },
+    {
+      "id": "60000000-0000-4000-8000-000000000002",
+      "organizationId": "50000000-0000-4000-8000-000000000002",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000003",
+      "status": "observer",
+      "sourceId": "fixture_tertiary"
+    }
+  ],
+  "indexCandidates": [
+    {
+      "id": "70000000-0000-4000-8000-000000000001",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "candidate": "K1",
+      "state": "evaluated",
+      "score": 61.5
+    },
+    {
+      "id": "70000000-0000-4000-8000-000000000002",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000003",
+      "candidate": "K3",
+      "state": "insufficient_evidence",
+      "score": null
+    }
+  ],
+  "pulseEvents": [
+    {
+      "id": "80000000-0000-4000-8000-000000000001",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000001",
+      "sourceId": "fixture_primary",
+      "disposition": "non_governance",
+      "title": "Fixture non-governance negative"
+    },
+    {
+      "id": "80000000-0000-4000-8000-000000000002",
+      "jurisdictionId": "00000000-0000-4000-8000-000000000003",
+      "sourceId": "fixture_tertiary",
+      "disposition": "pending",
+      "title": "Fixture governance event"
+    }
+  ],
+  "pulseClusters": [
+    {
+      "id": "90000000-0000-4000-8000-000000000001",
+      "eventId": "80000000-0000-4000-8000-000000000002",
+      "state": "pending_classification",
+      "version": "pulse-fixture/v1"
+    }
+  ]
+}

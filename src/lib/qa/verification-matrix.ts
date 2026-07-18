@@ -125,7 +125,7 @@ function routeEntry(route: ProductionRouteSource): VerificationMatrixEntry {
       coverage: coverage({
         unit: cell("covered", [routeInventoryTest]),
         integration: cell("covered", [routeIoTest]),
-        database: cell("planned", ["Deterministic legally shareable database fixture"], "QA-003"),
+        database: cell("covered", ["npm run validate:fixture-database"]),
         browser: na(),
         manual:
           inventory?.exposure === "admin" ||
@@ -180,7 +180,7 @@ function routeEntry(route: ProductionRouteSource): VerificationMatrixEntry {
       integration: atlasSurface?.tests.length
         ? cell("covered", [atlasMatrixTest])
         : cell("partial", ["Route/module registry"], "QA-013"),
-      database: cell("planned", ["Deterministic legally shareable database fixture"], "QA-003"),
+      database: cell("covered", ["npm run validate:fixture-database"]),
       browser: cell("partial", ["Canonical browser harness"], "QA-013"),
       manual: route.sourcePath.includes("/admin/")
         ? cell("planned", ["Isolated admin/reviewer journey"], "QA-011")
@@ -215,7 +215,7 @@ function pipelineEntries(): VerificationMatrixEntry[] {
     coverage: coverage({
       unit: cell("covered", [pipelineTest]),
       integration: cell("covered", ["npm run validate:pipeline-observability", "npm run validate:production-adapters"]),
-      database: cell("planned", ["Deterministic legally shareable pipeline fixture"], "QA-003"),
+      database: cell("covered", ["npm run validate:fixture-database"]),
       browser: na(),
       manual: cell("planned", ["Scheduled-data failure recovery journey"], "QA-011"),
     }),
@@ -255,7 +255,7 @@ function dataDomainEntries(): VerificationMatrixEntry[] {
     coverage: coverage({
       unit: cell("covered", ["src/lib/provenance/domain-coverage.test.ts"]),
       integration: cell("covered", ["npm run validate:source-coverage"]),
-      database: cell("planned", ["Deterministic legally shareable domain fixture"], "QA-003"),
+      database: cell("covered", ["npm run validate:fixture-database"]),
       browser: cell("partial", ["Source-coverage reader surface"], "QA-013"),
       manual: cell("planned", ["Publisher-evidence value-fidelity audit"], "DAT-034"),
     }),
@@ -315,7 +315,7 @@ function failureStateEntries(): VerificationMatrixEntry[] {
     coverage: coverage({
       unit: cell("covered", ["src/lib/atlas/surface-data-matrix.test.ts"]),
       integration: cell("covered", [atlasMatrixTest]),
-      database: cell("planned", ["Deterministic state fixture"], "QA-003"),
+      database: cell("covered", ["npm run validate:fixture-database"]),
       browser: cell("planned", ["Representative state browser fixture"], "ATL-018"),
       manual: na(),
     }),
@@ -332,7 +332,7 @@ function failureStateEntries(): VerificationMatrixEntry[] {
     coverage: coverage({
       unit: cell("covered", [pipelineTest]),
       integration: cell("covered", ["npm run validate:pipeline-observability"]),
-      database: cell("planned", ["Deterministic pipeline-alert fixture"], "QA-003"),
+      database: cell("covered", ["npm run validate:fixture-database"]),
       browser: na(),
       manual: cell("covered", ["data/OPERATIONAL-RUNBOOKS.md"]),
     }),
