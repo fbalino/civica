@@ -7,8 +7,12 @@ import { expect, test } from "./harness/fixtures";
 const NAVIGATION_ART_PREFIX = "/engravings/navigation/spot-";
 const MAX_OPEN_MENU_ART_BYTES = 20_000;
 
-const NAVIGATION_ART_NAMES = EXPLORE_NAV_GROUPS.flatMap((group) =>
-  group.items.map((item) => item.engraving),
+const NAVIGATION_ART_NAMES = Array.from(
+  new Set(
+    EXPLORE_NAV_GROUPS.flatMap((group) =>
+      group.items.map((item) => item.engraving),
+    ),
+  ),
 ).sort();
 
 function localPath(url: string): string {

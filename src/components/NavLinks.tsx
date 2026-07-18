@@ -114,7 +114,7 @@ export function NavLinks() {
           }`}
           aria-haspopup="true"
           aria-expanded={exploreOpen}
-          onClick={() => setExploreOpen((v) => !v)}
+          onClick={openExplore}
         >
           Explore
           <ChevronDown
