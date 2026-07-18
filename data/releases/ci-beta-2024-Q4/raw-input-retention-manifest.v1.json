@@ -21,7 +21,7 @@
       "upstreamVersion": "Freedom in the World workbook through 2024",
       "upstreamVintage": "2024 edition",
       "format": "xlsx",
-      "adapterVersion": "sha256:686b2665c71eda0c4429e2fa467362d84e3b83be2c1e9d70617bed18e51bc966",
+      "adapterVersion": "sha256:419ad10a5ea53b8b8eb981a31eab85847efaa9ae9476b8638fcb03f19f2a9257",
       "redistributionPosture": "restricted-no-redistribution",
       "rights": {
         "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
@@ -47,7 +47,7 @@
       "upstreamVersion": "CPI 2024 results workbook",
       "upstreamVintage": "2024 edition",
       "format": "xlsx",
-      "adapterVersion": "sha256:686b2665c71eda0c4429e2fa467362d84e3b83be2c1e9d70617bed18e51bc966",
+      "adapterVersion": "sha256:419ad10a5ea53b8b8eb981a31eab85847efaa9ae9476b8638fcb03f19f2a9257",
       "redistributionPosture": "restricted-no-redistribution",
       "rights": {
         "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
@@ -73,7 +73,7 @@
       "upstreamVersion": "V-Dem Country-Year Core v15",
       "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
       "format": "zip-csv",
-      "adapterVersion": "sha256:686b2665c71eda0c4429e2fa467362d84e3b83be2c1e9d70617bed18e51bc966",
+      "adapterVersion": "sha256:419ad10a5ea53b8b8eb981a31eab85847efaa9ae9476b8638fcb03f19f2a9257",
       "redistributionPosture": "open-with-attribution",
       "rights": {
         "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
@@ -99,7 +99,7 @@
       "upstreamVersion": "WGI 2025 revision",
       "upstreamVintage": "2024 observations",
       "format": "xlsx",
-      "adapterVersion": "sha256:686b2665c71eda0c4429e2fa467362d84e3b83be2c1e9d70617bed18e51bc966",
+      "adapterVersion": "sha256:419ad10a5ea53b8b8eb981a31eab85847efaa9ae9476b8638fcb03f19f2a9257",
       "redistributionPosture": "open-with-attribution",
       "rights": {
         "licenseId": "CC-BY-4.0",
@@ -207,5 +207,5 @@
     ],
     "reconstructionRule": "Rebuild every declared dimension group from byte-verified inputs, verify each semantic checksum and row count, then run the release's recorded composite methodology and derivation-version envelope."
   },
-  "manifestSha256": "c1a8fe9bbb383192359b9e2ebdb36914abff62973c5244bcfb532a03faa2a517"
+  "manifestSha256": "7e0ea3900a1dac098887d71e0c6e1f9d0214c2527e0956d3c4230a6dc7db8823"
 }

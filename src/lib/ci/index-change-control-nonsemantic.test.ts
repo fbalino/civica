@@ -64,6 +64,16 @@ function withoutNonsemanticManifestAdditions(source: string): string {
       '  "operations.health-alerts":\n' +
         '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
       "",
+    )
+    .replace(
+      '  "operations.error-alerts":\n' +
+        '    "open content-free error-monitoring records retained for the active alert window",\n',
+      "",
+    )
+    .replace(
+      '  "operations.pipeline-alerts":\n' +
+        '    "retained production pipeline-run rows and the registered cron schedule contract",\n',
+      "",
     );
 }
 
@@ -86,7 +96,37 @@ function withoutNonsemanticAdapterAdditions(source: string): string {
     },
 `,
       "",
-    );
+    )
+    .replace(
+      `    {
+      id: "operations.error-alerts",
+      route: "/api/cron/operations/error-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/error-alerts/route.ts",
+        "src/lib/platform/error-monitoring.ts",
+      ],
+    },
+`,
+      "",
+    )
+    .replace(
+      `    {
+      id: "operations.pipeline-alerts",
+      route: "/api/cron/operations/pipeline-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/pipeline-alerts/route.ts",
+        "src/lib/platform/pipeline-observability.ts",
+      ],
+    },
+`,
+      "",
+    )
+    .replace(/  canonicalNpmScript: string;\n/g, "")
+    .replace(/      canonicalNpmScript: "[^"]+",\n/g, "");
 }
 
 test("current-party read guards are excluded from Index semantic drift", () => {
@@ -179,6 +219,26 @@ test("the platform-only health monitor adapter is excluded from Index semantic d
   assert.equal(
     indexProtectedFileHash(registryPath, currentRegistry),
     sha256(priorRegistry),
+  );
+});
+
+test("the serverless Index-ingest client is excluded from method drift", () => {
+  const ingestPath = "src/lib/ci/ingest.ts";
+  const currentIngest = readFileSync(ingestPath, "utf8");
+  const priorIngest = currentIngest
+    .replace('import { createServerlessSql } from "../db";\n', "")
+    .replace(
+      'import { writeFileSync } from "node:fs";\n',
+      'import { neon } from "@neondatabase/serverless";\nimport { writeFileSync } from "node:fs";\n',
+    )
+    .replace(
+      "const sqlClient = createServerlessSql(process.env.DATABASE_URL!);",
+      "const sqlClient = neon(process.env.DATABASE_URL!);",
+    );
+  assert.notEqual(currentIngest, priorIngest);
+  assert.equal(
+    indexProtectedFileHash(ingestPath, currentIngest),
+    sha256(priorIngest),
   );
 });
 

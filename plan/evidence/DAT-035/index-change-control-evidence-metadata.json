@@ -1,0 +1,18 @@
+{
+  "id": "dat-035-final-evidence-refresh",
+  "toVersion": "civica-index-pulse-stored-ensemble-v37-evidence",
+  "recordKind": "evidence",
+  "categories": [],
+  "evidence": {
+    "documentation": ["plan/evidence/DAT-035/README.md"],
+    "registry": ["src/lib/ci/index-change-control.ts"],
+    "release_note": ["plan/evidence/DAT-035/release-note-evidence-refresh.md"],
+    "migration_plan": ["plan/evidence/DAT-035/migration-plan-evidence-refresh.md"],
+    "golden_test": ["src/lib/ci/index-change-control-nonsemantic.test.ts"],
+    "contract_test": ["src/lib/ci/index-change-control-nonsemantic.test.ts"]
+  },
+  "validations": [
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition"
+  ]
+}

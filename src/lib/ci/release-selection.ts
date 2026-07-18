@@ -179,7 +179,7 @@ function betaRelease(
     compositeAlgorithmVersion,
     displayTransformVersion: "ci-display/fixed-native-bounds-v1",
     inputManifestSha256:
-      "dc74a651c96ec770cd8128cb22c61d663f0b8192f9441ce55ff44f24966602cc",
+      "10fbdb56f5b579c6578786ed937b022be06142415d83fe274a171e93196e3434",
     dimensionRowSet: Object.freeze({
       rows: 745,
       sha256: dimensionRowSetSha256,

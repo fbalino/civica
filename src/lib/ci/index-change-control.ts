@@ -324,8 +324,9 @@ export function sha256(value: string | Buffer): string {
  * Some protected shared files contain both Index behavior and unrelated Atlas
  * readers. Keep the Index snapshot sensitive to every byte except exact,
  * enumerated Atlas-only changes: ATL-011/012 relationship guards in
- * `queries.ts`, ATL-012 source/adapter registrations, and ATL-013's Bills
- * section visibility line. None changes an Index input, transform, weight,
+ * `queries.ts`, ATL-012 source/adapter registrations, ATL-013's Bills section
+ * visibility line, and PLT-023's serverless SQL-client centralization in the
+ * Index ingest adapter. None changes an Index input, transform, weight,
  * missingness rule, rank, or Index presentation.
  *
  * This deliberately narrow compatibility normalization restores the prior
@@ -424,6 +425,17 @@ export function indexProtectedFileHash(
         '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
       "",
     );
+    normalized = normalized
+      .replace(
+        '  "operations.error-alerts":\n' +
+          '    "open content-free error-monitoring records retained for the active alert window",\n',
+        "",
+      )
+      .replace(
+        '  "operations.pipeline-alerts":\n' +
+          '    "retained production pipeline-run rows and the registered cron schedule contract",\n',
+        "",
+      );
   }
   if (path === "src/lib/data/production-adapter-registry.ts") {
     normalized = normalized.replace(
@@ -444,6 +456,53 @@ export function indexProtectedFileHash(
 `,
       "",
     );
+    normalized = normalized
+      .replace(
+        `    {
+      id: "operations.error-alerts",
+      route: "/api/cron/operations/error-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/error-alerts/route.ts",
+        "src/lib/platform/error-monitoring.ts",
+      ],
+    },
+`,
+        "",
+      )
+      .replace(
+        `    {
+      id: "operations.pipeline-alerts",
+      route: "/api/cron/operations/pipeline-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/pipeline-alerts/route.ts",
+        "src/lib/platform/pipeline-observability.ts",
+      ],
+    },
+`,
+        "",
+      )
+      .replace(/  canonicalNpmScript: string;\n/g, "")
+      .replace(/      canonicalNpmScript: "[^"]+",\n/g, "");
+  }
+  if (path === "src/lib/ci/ingest.ts") {
+    // PLT-023 replaces the direct Neon factory with the shared, bounded
+    // serverless HTTP client. The source-input manifest still records the raw
+    // adapter hash, but this control-plane snapshot deliberately treats the
+    // transport-only replacement as nonsemantic for the frozen Index method.
+    normalized = normalized
+      .replace('import { createServerlessSql } from "../db";\n', "")
+      .replace(
+        'import { writeFileSync } from "node:fs";\n',
+        'import { neon } from "@neondatabase/serverless";\nimport { writeFileSync } from "node:fs";\n',
+      )
+      .replace(
+        "const sqlClient = createServerlessSql(process.env.DATABASE_URL!);",
+        "const sqlClient = neon(process.env.DATABASE_URL!);",
+      );
   }
   if (path === "src/app/(reader)/country/[slug]/civica-data/page.tsx") {
     normalized = normalized.replace(
