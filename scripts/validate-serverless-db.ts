@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import ts from "typescript";
 
 const files = {
   transport: "src/lib/db/serverless.ts",
@@ -23,6 +24,28 @@ function sourceFiles(root: string): string[] {
     if (entry.isDirectory()) return sourceFiles(path);
     return /\.(?:ts|tsx)$/.test(entry.name) ? [path] : [];
   });
+}
+
+function hasDirectNeonCall(source: string): boolean {
+  // Tokenization ignores comments, strings, and regex literals. That keeps a
+  // control-plane fixture snapshot from being mistaken for request-serving
+  // source while still catching an executable `neon(...)` call.
+  const scanner = ts.createScanner(
+    ts.ScriptTarget.Latest,
+    true,
+    ts.LanguageVariant.Standard,
+    source,
+  );
+  for (let token = scanner.scan(); token !== ts.SyntaxKind.EndOfFileToken; token = scanner.scan()) {
+    if (
+      token === ts.SyntaxKind.Identifier &&
+      scanner.getTokenText() === "neon" &&
+      scanner.scan() === ts.SyntaxKind.OpenParenToken
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 if (!errors.length) {
@@ -79,7 +102,7 @@ if (!errors.length) {
 
   const directNeon = ["src/app", "src/lib"].flatMap(sourceFiles).filter((path) => {
     if (path === files.database || path.endsWith(".test.ts")) return false;
-    return /\bneon\s*\(/.test(read(path));
+    return hasDirectNeonCall(read(path));
   });
   if (directNeon.length) {
     errors.push(`request-serving source bypasses createServerlessSql: ${directNeon.join(", ")}`);
