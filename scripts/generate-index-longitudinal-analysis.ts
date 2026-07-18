@@ -1,8 +1,6 @@
-import { config } from "dotenv";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { neon } from "@neondatabase/serverless";
 import {
   fetchBuffer,
   forEachCsvRow,
@@ -11,9 +9,9 @@ import {
 import { LONGITUDINAL_VALIDATION_INPUTS } from "../src/lib/ci/longitudinal-validation-inputs";
 import {
   LONGITUDINAL_VALIDATION_RELEASE_ID,
-  CI_TOURNAMENT_PANEL_V3_RELEASE_ID,
   researchPanelHash,
 } from "../src/lib/ci/research-panel";
+import { readIndexAnalysisReplayInputs } from "../src/lib/ci/index-analysis-inputs";
 import {
   runK1TournamentCandidate,
   type K1PanelInput,
@@ -29,9 +27,6 @@ import {
   quantile,
   type LongitudinalDatum,
 } from "../src/lib/ci/longitudinal-analysis";
-config({ path: ".env.local" });
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL required");
-const sql = neon(process.env.DATABASE_URL);
 const sha = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 function selectiveCsv(text: string, columns: string[]) {
   let idx: number[] | null = null;
@@ -109,8 +104,16 @@ const eventSet = (rows: Record<string, string>[]) => {
   return { events, minYear: Math.min(...years), maxYear: Math.max(...years) };
 };
 export async function buildIndexLongitudinalAnalysis() {
-  const panel =
-    (await sql`SELECT p.jurisdiction_id::text AS "jurisdictionId",j.iso3,p.period_year AS "periodYear",p.dimension,p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${CI_TOURNAMENT_PANEL_V3_RELEASE_ID} AND (p.source_id||':'||p.indicator_id)=ANY(${["vdem:v2x_libdem", "worldbank_wgi:va.est", "worldbank_wgi:rl.est", "freedom_house:pr_cl_total", "transparency_intl:score"]}) ORDER BY j.iso3,p.period_year,p.source_id,p.indicator_id`) as unknown as K1PanelInput[];
+  const replayInputs = readIndexAnalysisReplayInputs();
+  const panel = replayInputs.panel.filter((row) =>
+    [
+      "vdem:v2x_libdem",
+      "worldbank_wgi:va.est",
+      "worldbank_wgi:rl.est",
+      "freedom_house:pr_cl_total",
+      "transparency_intl:score",
+    ].includes(`${row.sourceId}:${row.indicatorId}`),
+  ) as K1PanelInput[];
   const normalized = panel.map((r) => ({
     ...r,
     value: r.value === null ? null : Number(r.value),
@@ -159,12 +162,7 @@ export async function buildIndexLongitudinalAnalysis() {
     changeLag1: pearson(changePairs),
     changePairs: changePairs.length,
   };
-  const labels =
-    (await sql`SELECT j.iso3,p.period_year AS year,p.value FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${LONGITUDINAL_VALIDATION_RELEASE_ID} AND p.value_status='observed' ORDER BY j.iso3,p.period_year`) as unknown as {
-      iso3: string;
-      year: number;
-      value: number;
-    }[];
+  const labels = replayInputs.longitudinalLabels;
   const labelBy = new Map<string, { year: number; value: number }[]>();
   for (const r of labels)
     labelBy.set(r.iso3, [

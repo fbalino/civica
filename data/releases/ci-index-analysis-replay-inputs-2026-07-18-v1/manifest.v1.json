@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "civica-index-analysis-replay-inputs/v1",
+  "releaseId": "ci-index-analysis-replay-inputs-2026-07-18-v1",
+  "capturedAt": "2026-07-18T09:43:20Z",
+  "protectedInput": {
+    "schemaVersion": "civica-index-analysis-inputs/v1",
+    "contentSha256": "9720d0f5d60f6e1c79af854c0308a1a838f76cc72f00de3de2deeacc10ed6f83",
+    "valuesLocation": "protected_local_research_input_cache",
+    "publicValuesIncluded": false,
+    "scope": {
+      "panelRows": 29100,
+      "uncertaintyRows": 970,
+      "longitudinalLabelRows": 4357,
+      "sovereignMetadataRows": 194
+    }
+  },
+  "sourceReleases": [
+    {
+      "releaseId": "ci-research-panel-2000-2024-v3",
+      "rowSha256": "7da2d4cfd58b671957c0c88cd043467563edd2cda8e8fbd6442aae6201d4bb72"
+    },
+    {
+      "releaseId": "ci-k1-uncertainty-inputs-2024-v2",
+      "rowSha256": "58bac490cd025f12adbe175065275bc0c3498d6474725a64eb57585a6d8cf961"
+    },
+    {
+      "releaseId": "ci-longitudinal-validation-labels-2000-2022-v2",
+      "rowSha256": "1a4e1cc444f18ce0f61d373dc8dfc601cad22f5e74b209f57d97bb7232a022ec"
+    }
+  ],
+  "mutableMetadata": {
+    "fields": ["jurisdictions.continent", "government_taxonomies.regime_type_cgv"],
+    "treatment": "captured as normalized protected input rows; later live values cannot affect replay"
+  },
+  "replay": {
+    "networkAccess": "disabled",
+    "databaseAccess": "disabled"
+  },
+  "rights": {
+    "posture": "private_internal_research_only_pending_mixed_source_terms",
+    "publicBulkValues": false
+  }
+}

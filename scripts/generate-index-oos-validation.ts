@@ -1,8 +1,5 @@
-import { config } from "dotenv";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { neon } from "@neondatabase/serverless";
 import {
-  CI_TOURNAMENT_PANEL_V3_RELEASE_ID,
   researchPanelHash,
 } from "../src/lib/ci/research-panel";
 import {
@@ -19,9 +16,7 @@ import {
   type LongitudinalDatum,
   quantile,
 } from "../src/lib/ci/longitudinal-analysis";
-config({ path: ".env.local" });
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL required");
-const sql = neon(process.env.DATABASE_URL);
+import { readIndexAnalysisReplayInputs } from "../src/lib/ci/index-analysis-inputs";
 const read = (p: string) => JSON.parse(readFileSync(p, "utf8"));
 export async function buildIndexOosValidation() {
   const baseline = read("data/releases/ci-index-baselines-v3/manifest.v3.json"),
@@ -40,8 +35,10 @@ export async function buildIndexOosValidation() {
     k5 = read(
       "data/releases/k5-institutional-relation-candidates-v1/manifest.v1.json",
     );
-  const rows =
-    (await sql`SELECT p.jurisdiction_id::text AS "jurisdictionId",j.iso3,p.period_year AS "periodYear",p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value,p.native_min AS "nativeMin",p.native_max AS "nativeMax",p.is_inverted AS "isInverted" FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${CI_TOURNAMENT_PANEL_V3_RELEASE_ID} AND (p.source_id||':'||p.indicator_id)=ANY(${[...K2_RATERS]}) ORDER BY p.period_year,j.iso3,p.source_id,p.indicator_id`) as unknown as K2PanelInput[];
+  const replayInputs = readIndexAnalysisReplayInputs();
+  const rows = replayInputs.panel.filter((row) =>
+    K2_RATERS.includes(`${row.sourceId}:${row.indicatorId}` as (typeof K2_RATERS)[number]),
+  ) as K2PanelInput[];
   const outputs = runK2Concordance(
     rows.map((r) => ({
       ...r,
@@ -78,12 +75,7 @@ export async function buildIndexOosValidation() {
   });
   const changeRate =
     stability.reduce((s, r) => s + r.value, 0) / stability.length;
-  const spine =
-    (await sql`SELECT j.iso3,j.continent AS region,gt.regime_type_cgv AS regime FROM jurisdictions j LEFT JOIN LATERAL(SELECT regime_type_cgv FROM government_taxonomies g WHERE g.jurisdiction_id=j.id ORDER BY g.regime_year DESC NULLS LAST,g.updated_at DESC NULLS LAST LIMIT 1)gt ON true WHERE j.type='sovereign_state' AND j.iso3 IS NOT NULL ORDER BY j.iso3`) as unknown as {
-      iso3: string;
-      region: string | null;
-      regime: string | null;
-    }[];
+  const spine = replayInputs.metadata;
   const geoFinal = spine.filter(
     (r) => geographicTournamentBucket(r.iso3) === 9,
   );

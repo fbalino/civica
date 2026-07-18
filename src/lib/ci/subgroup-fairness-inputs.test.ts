@@ -49,7 +49,7 @@ test("subgroup fairness replay accepts only the exact retained protected input",
 
 test("subgroup fairness replay fails closed without a protected input cache", () => {
   assert.throws(
-    () => readProtectedSubgroupFairnessInputs("a".repeat(64), undefined),
+    () => readProtectedSubgroupFairnessInputs("a".repeat(64), ""),
     /Missing protected subgroup fairness input cache/,
   );
 });

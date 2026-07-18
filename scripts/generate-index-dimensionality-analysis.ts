@@ -1,15 +1,27 @@
-import { config } from "dotenv";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { neon } from "@neondatabase/serverless";
 import { DIMENSION_FEATURES, runDimensionalityAnalysis, type DimensionProfile } from "../src/lib/ci/dimensionality-analysis";
 import { CI_TOURNAMENT_PANEL_V3_RELEASE_ID } from "../src/lib/ci/research-panel";
+import { readIndexAnalysisReplayInputs } from "../src/lib/ci/index-analysis-inputs";
 
-config({ path: ".env.local" }); if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required"); const sql = neon(process.env.DATABASE_URL);
 type Input = { iso3: string; year: number; region: string | null; regime: string | null; dimension: string; sourceId: string; indicatorId: string; value: number | null; nativeMin: number; nativeMax: number; isInverted: boolean };
 
-export async function buildIndexDimensionalityAnalysis() {
-  const rows = await sql`SELECT j.iso3,p.period_year AS year,j.continent AS region,gt.regime_type_cgv AS regime,p.dimension,p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value,p.native_min AS "nativeMin",p.native_max AS "nativeMax",p.is_inverted AS "isInverted" FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id LEFT JOIN LATERAL (SELECT regime_type_cgv FROM government_taxonomies g WHERE g.jurisdiction_id=j.id ORDER BY g.regime_year DESC NULLS LAST,g.updated_at DESC NULLS LAST LIMIT 1) gt ON true WHERE p.release_id=${CI_TOURNAMENT_PANEL_V3_RELEASE_ID} ORDER BY j.iso3,p.period_year,p.source_id,p.indicator_id` as unknown as Input[];
+export function buildIndexDimensionalityAnalysis() {
+  const inputs = readIndexAnalysisReplayInputs();
+  const metadata = new Map(inputs.metadata.map((row) => [row.iso3, row]));
+  const rows: Input[] = inputs.panel.map((row) => ({
+    iso3: row.iso3,
+    year: row.periodYear,
+    region: metadata.get(row.iso3)?.region ?? null,
+    regime: metadata.get(row.iso3)?.regime ?? null,
+    dimension: row.dimension,
+    sourceId: row.sourceId,
+    indicatorId: row.indicatorId,
+    value: row.value,
+    nativeMin: row.nativeMin,
+    nativeMax: row.nativeMax,
+    isInverted: row.isInverted,
+  }));
   const groups = new Map<string, Input[]>(); for (const row of rows) groups.set(`${row.iso3}:${row.year}`, [...(groups.get(`${row.iso3}:${row.year}`) ?? []), row]);
   const profiles: DimensionProfile[] = [...groups.values()].flatMap((group) => { const byIdentity = new Map(group.map((row) => [`${row.sourceId}:${row.indicatorId}`, row])); const democratic = byIdentity.get("vdem:v2x_libdem")?.value !== null && byIdentity.get("vdem:v2x_libdem")?.value !== undefined ? byIdentity.get("vdem:v2x_libdem") : byIdentity.get("worldbank_wgi:va.est"); const selected = [democratic, byIdentity.get("worldbank_wgi:rl.est"), byIdentity.get("freedom_house:pr_cl_total"), byIdentity.get("transparency_intl:score")]; if (!selected.every((row) => row?.value !== null && row?.value !== undefined)) return []; const first = selected[0]!; return [{ iso3: first.iso3, year: Number(first.year), region: first.region, regime: first.regime, values: selected.map((row) => { const bounded = (Number(row!.value) - Number(row!.nativeMin)) / (Number(row!.nativeMax) - Number(row!.nativeMin)); return (row!.isInverted ? 1 - bounded : bounded) * 100; }) }]; });
   const analysis = runDimensionalityAnalysis(profiles); return { schemaVersion: "civica-index-dimensionality-result/v1", releaseId: "index-dimensionality-analysis-v1", panelReleaseId: CI_TOURNAMENT_PANEL_V3_RELEASE_ID, holdoutOpenedAt: "2026-07-11", holdoutPrerequisite: "K0-K5 implementations and shared interface frozen at commit 4e15744", confirmatoryLabelsUsed: false, ...analysis };

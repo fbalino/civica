@@ -1,6 +1,4 @@
-import { config } from "dotenv";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { neon } from "@neondatabase/serverless";
 import {
   CI_TOURNAMENT_PANEL_V3_RELEASE_ID,
   researchPanelHash,
@@ -24,9 +22,7 @@ import {
   INDEX_VALIDITY_PREREGISTRATION,
   INDEX_VALIDITY_PROTOCOL_VERSION,
 } from "../src/lib/ci/validity-preregistration";
-config({ path: ".env.local" });
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL required");
-const sql = neon(process.env.DATABASE_URL);
+import { readIndexAnalysisReplayInputs } from "../src/lib/ci/index-analysis-inputs";
 type Panel = K2PanelInput & { dimension: string };
 const byKey = <T extends { iso3: string; periodYear: number }>(
   rows: readonly T[],
@@ -61,8 +57,7 @@ const annualMedian = (rows: readonly ValidityPair[]) =>
       .map((year) => spearman(rows.filter((r) => r.year === year))),
   );
 export async function buildIndexValidityAnalysis() {
-  const rows =
-    (await sql`SELECT p.jurisdiction_id::text AS "jurisdictionId",j.iso3,p.period_year AS "periodYear",p.dimension,p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value,p.native_min AS "nativeMin",p.native_max AS "nativeMax",p.is_inverted AS "isInverted" FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${CI_TOURNAMENT_PANEL_V3_RELEASE_ID} ORDER BY j.iso3,p.period_year,p.source_id,p.indicator_id`) as unknown as Panel[];
+  const rows = readIndexAnalysisReplayInputs().panel as Panel[];
   const normalized = rows.map((r) => ({
     ...r,
     value: r.value === null ? null : Number(r.value),

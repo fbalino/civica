@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "civica-qa-008-replay-environment/v1",
+  "recordedAt": "2026-07-18T12:47:55Z",
+  "baseCommit": "93d02b3d177f904cd9aa56b903aff36eed2163bd",
+  "runtime": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "node": "25.4.0",
+    "npm": "11.7.0",
+    "v8": "14.1.146.11-node.15",
+    "openssl": "3.6.1",
+    "packageLockSha256": "3dd23dfb35d626d88997f6198ad9631737897d59c520a3ede0d0b579bc33469c"
+  },
+  "protectedInputs": [
+    {
+      "manifest": "data/releases/ci-index-analysis-replay-inputs-2026-07-18-v1/manifest.v1.json",
+      "manifestSha256": "16e3dc49b49a3a6b1c7915bb353fe6f4a1efb80b4ca32f3d05c592b92afe5099",
+      "contentSha256": "9720d0f5d60f6e1c79af854c0308a1a838f76cc72f00de3de2deeacc10ed6f83"
+    },
+    {
+      "manifest": "data/releases/index-subgroup-fairness-v2/manifest.v1.json",
+      "manifestSha256": "2dae0be6056ddfe458058c16642351aa60db1c02c290bef49711f7464f691073",
+      "contentSha256": "d92c244f4e7d3f4468e2667ed0347da1fddf132be0a4817238dbfe77263bb1e6"
+    }
+  ],
+  "command": "CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs npm run validate:statistical-replay",
+  "replayBoundary": {
+    "databaseUrl": "removed by the replay runner",
+    "network": "disabled during ordinary replay; retained publisher/cache bytes fail closed when absent or changed",
+    "tolerance": "byte_exact"
+  },
+  "result": {
+    "registeredAnalyses": 9,
+    "outcome": "pass"
+  }
+}
