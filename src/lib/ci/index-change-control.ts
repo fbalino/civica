@@ -241,6 +241,9 @@ const INDEX_CHANGE_CONTROL_EXCLUSIONS = new Set([
   "governance-evidence-review-packet.ts",
   "index-change-control.ts",
   "index-research-archive.ts",
+  // Edge-only parser adapter; its exact parity with release-selection.ts is
+  // enforced by release-query-identities.test.ts.
+  "release-query-identities.ts",
 ]);
 
 export function unclassifiedIndexSemanticFiles(): string[] {
