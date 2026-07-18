@@ -24,7 +24,9 @@ test.describe("QA-012 — keyboard journeys", () => {
     page,
   }) => {
     await page.setViewportSize({ width: MOBILE.width, height: MOBILE.height });
-    await page.goto("/");
+    // The interaction is client-owned. Waiting for network idle lets React
+    // hydrate its delegated keyboard handler before we exercise it.
+    await page.goto("/", { waitUntil: "networkidle" });
 
     const trigger = page.getByRole("button", { name: "Open menu" });
     await trigger.focus();
