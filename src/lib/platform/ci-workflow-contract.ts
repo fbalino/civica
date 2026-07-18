@@ -31,6 +31,7 @@ export const REQUIRED_CI_COMMANDS = [
   "npm run test:e2e:a11y",
   "npm run test:e2e -- e2e/harness.selftest.spec.ts e2e/ci-smoke.spec.ts --workers=1 --retries=0",
   "npm run test:e2e:performance",
+  "npm run test:e2e:navigation-assets",
 ] as const;
 
 const CANONICAL_LINES = [
@@ -97,6 +98,10 @@ const CANONICAL_LINES = [
   "        env:",
   "          E2E_WEBSERVER_CMD: npm run start",
   "        run: npm run test:e2e:performance",
+  "      - name: Navigation and hero asset-transfer budget",
+  "        env:",
+  "          E2E_WEBSERVER_CMD: npm run start",
+  "        run: npm run test:e2e:navigation-assets",
 ] as const;
 
 export const CANONICAL_CI_WORKFLOW_SOURCE = `${CANONICAL_LINES.join("\n")}\n`;
