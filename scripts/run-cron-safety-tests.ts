@@ -5,7 +5,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 
 function testEnvironment(): NodeJS.ProcessEnv {
-  const env = { ...process.env, NODE_ENV: "test" };
+  const env: NodeJS.ProcessEnv = { ...process.env, NODE_ENV: "test" };
   // The production build can supply a nonempty DATABASE_URL solely to satisfy
   // environment validation. These focused fixture tests must never inherit it:
   // their route seams deliberately use disposable in-process stores instead.

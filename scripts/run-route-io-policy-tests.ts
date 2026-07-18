@@ -5,7 +5,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 
 function testEnvironment(): NodeJS.ProcessEnv {
-  const env = { ...process.env, NODE_ENV: "test" };
+  const env: NodeJS.ProcessEnv = { ...process.env, NODE_ENV: "test" };
   // The production build supplies DATABASE_URL to validate runtime setup;
   // these DB-free route fixtures must exercise their in-process seams only.
   delete env.DATABASE_URL;
