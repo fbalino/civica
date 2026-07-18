@@ -1,5 +1,6 @@
-/** EXP-030 — retired embed documents remain semantic at legacy frame sizes. */
+/** EXP-030/031 — retired embeds remain semantic and contain no published data fields. */
 import { test, expect } from "@playwright/test";
+import { RIGHTS_REGISTRY_URL } from "@/lib/claims/reuse-rights";
 
 const LEGACY_PRESETS = [
   { name: "small", width: 320, height: 240 },
@@ -26,12 +27,17 @@ for (const theme of ["light", "dark"] as const) {
         "content",
         "noindex, nofollow",
       );
+      await expect(page.locator('meta[name="civica:rights"]')).toHaveAttribute(
+        "content",
+        RIGHTS_REGISTRY_URL,
+      );
 
       const main = page.getByRole("main");
       await expect(main.getByRole("heading", { level: 1 })).toHaveText(
         "Civica Index embed retired",
       );
       await expect(main).toContainText("without a composite country score or rank");
+      await expect(main).not.toContainText(/Pulse|taxonomy|dimension/i);
       await expect(
         main.getByRole("link", { name: "Open Governance Evidence" }),
       ).toHaveAttribute("target", "_top");
@@ -39,6 +45,7 @@ for (const theme of ["light", "dark"] as const) {
         "target",
         "_top",
       );
+      await expect(page.locator("table, dl, ul, ol, style, script")).toHaveCount(0);
 
       const dimensions = await page.evaluate(() => ({
         scrollHeight: document.documentElement.scrollHeight,

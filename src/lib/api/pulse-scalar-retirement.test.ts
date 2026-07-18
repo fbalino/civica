@@ -11,6 +11,7 @@ import {
   GET as getRetiredEmbed,
   OPTIONS as optionsRetiredEmbed,
 } from "@/app/embed/[slug]/route";
+import { RIGHTS_REGISTRY_URL } from "@/lib/claims/reuse-rights";
 
 function assertNeverCached(response: Response) {
   assert.equal(response.headers.get("Cache-Control"), "no-store");
@@ -67,7 +68,7 @@ test("rankings keeps unknown sort values distinct from retired cp", async () => 
   assert.notEqual((await parsed.response.json()).code, "pulse_scalar_retired");
 });
 
-test("legacy embed variants are gone and cannot enter browser or CDN caches", async () => {
+test("legacy embed variants contain only the retired notice and its point-of-use rights pointer", async () => {
   for (const include of ["cp", "ci", "cp,ci", "capital"]) {
     const response = await getRetiredEmbed(
       new Request(
@@ -79,6 +80,13 @@ test("legacy embed variants are gone and cannot enter browser or CDN caches", as
     assertNeverCached(response);
     assert.equal(response.headers.get("X-Robots-Tag"), "noindex, nofollow");
     const html = await response.text();
+    assert.ok(
+      html.includes(`<meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}">`),
+    );
+    assert.ok(
+      html.includes('<a href="/licensing#reuse" target="_top">Rights and reuse</a>'),
+    );
+    assert.doesNotMatch(html, /<(?:style|script|table|dl|ul|ol)\\b/i);
     assert.match(html, /<h1 id="embed-retired-title">Civica Index embed retired<\/h1>/);
     assert.match(html, /<main aria-labelledby="embed-retired-title">/);
     assert.match(html, /<meta name="robots" content="noindex, nofollow">/);
