@@ -59,8 +59,45 @@ function proveSeededFixtures(): void {
   );
 }
 
+const TEST_CREDENTIAL_KEYS = [
+  "DATABASE_URL",
+  "ANTHROPIC_API_KEY",
+  "ANTHROPIC_API_KEY_CHAT",
+  "ANTHROPIC_API_KEY_PULSE_CLASSIFIER",
+  "ANTHROPIC_API_KEY_PULSE_SUMMARIZE",
+  "ANTHROPIC_API_KEY_BILLS_SUMMARIZE",
+  "ANTHROPIC_API_KEY_RECONCILIATION",
+  "DEEPSEEK_API_KEY",
+  "GLM_API_KEY",
+  "OPENAI_API_KEY",
+  "ADMIN_PASSWORD_HASH",
+  "ADMIN_SESSION_SECRET",
+  "CRON_SECRET",
+  "RATE_LIMIT_KEY_SECRET",
+  "PULSE_CODING_SESSION_SECRET",
+  "GOOGLE_CLIENT_SECRET",
+  "CONGRESS_API_KEY",
+  "BUNDESTAG_API_KEY",
+] as const;
+
+function cleanTestEnvironment(): NodeJS.ProcessEnv {
+  const env = { ...process.env, NODE_ENV: "test" };
+  for (const key of TEST_CREDENTIAL_KEYS) delete env[key];
+  return env;
+}
+
 function runCheck(npmScript: string): boolean {
-  const result = spawnSync("npm", ["run", npmScript], { stdio: "inherit" });
+  // The production build invokes this aggregate gate, but the embedded unit
+  // suite deliberately disables its disposable cron fixtures in production.
+  // Keep the parent build in production mode and run only the `test` child in
+  // its documented test mode.
+  const result = spawnSync("npm", ["run", npmScript], {
+    env:
+      npmScript === "test"
+        ? cleanTestEnvironment()
+        : process.env,
+    stdio: "inherit",
+  });
   return result.status === 0;
 }
 
