@@ -389,10 +389,7 @@ export default async function PulseReviewQueuePage({
             </thead>
             <tbody>
               {rows.map((event) => (
-                <AdminRow
-                  key={event.id}
-                  href={`/admin/pulse-review/${event.id}`}
-                >
+                <AdminRow key={event.id}>
                   <td>
                     <Link
                       href={`/admin/pulse-review/${event.id}`}

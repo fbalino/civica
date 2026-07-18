@@ -168,7 +168,7 @@ export default async function MessagesQueuePage({ searchParams }: PageProps) {
                   ? (msg.status as Status)
                   : "new";
                 return (
-                  <AdminRow key={msg.id} href={`/admin/messages/${msg.id}`}>
+                  <AdminRow key={msg.id}>
                     <td>
                       <Link
                         href={`/admin/messages/${msg.id}`}

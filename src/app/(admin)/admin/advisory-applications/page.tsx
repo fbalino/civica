@@ -178,7 +178,7 @@ export default async function AdvisoryApplicationsQueuePage({
                   ? (app.status as Status)
                   : "new";
                 return (
-                  <AdminRow key={app.id} href={`/admin/advisory-applications/${app.id}`}>
+                  <AdminRow key={app.id}>
                     <td>
                       <Link
                         href={`/admin/advisory-applications/${app.id}`}

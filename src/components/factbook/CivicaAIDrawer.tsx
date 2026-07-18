@@ -203,91 +203,79 @@ export function CivicaAIDrawer({
       {/* Handle — shown whenever there are messages, even when collapsed */}
       {!isEmpty && (
         <div
-          role="button"
-          tabIndex={0}
-          aria-expanded={!collapsed}
-          aria-controls="civica-ai-drawer-body"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest("button")) return;
-            setCollapsed((c) => !c);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              if ((e.target as HTMLElement).closest("button")) return;
-              e.preventDefault();
-              setCollapsed((c) => !c);
-            }
-          }}
           style={{
             display: "flex",
             alignItems: "center",
             gap: "var(--space-3)",
             padding: "var(--space-4) var(--space-5)",
             borderBottom: showBody ? "1px solid var(--color-stat-border)" : "none",
-            cursor: "pointer",
-            userSelect: "none",
             flexShrink: 0,
           }}
         >
-          <span
-            aria-hidden
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: streaming
-                ? "var(--color-warn)"
-                : "var(--color-source-live)",
-              boxShadow: streaming
-                ? "0 0 0 3px color-mix(in srgb, var(--color-warn) 30%, transparent)"
-                : "0 0 0 3px color-mix(in oklab, var(--color-success) 20%, transparent)",
-            }}
-          />
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              textTransform: "uppercase",
-              letterSpacing: "var(--tracking-wider)",
-              color: "var(--color-text-40)",
-            }}
-          >
-            Civica AI
-          </span>
-          <span
-            style={{
-              fontSize: "var(--text-13)",
-              color: "var(--color-text-60)",
-              flex: 1,
-            }}
-          >
-            {streaming
-              ? `Thinking about ${countryName}…`
-              : `Conversation about ${countryName} · ${messages.length} message${messages.length === 1 ? "" : "s"}`}
-          </span>
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setCollapsed((c) => !c);
-            }}
-            aria-label={collapsed ? "Expand" : "Minimize"}
+            onClick={() => setCollapsed((c) => !c)}
+            aria-expanded={!collapsed}
+            aria-controls="civica-ai-drawer-body"
+            aria-label={
+              collapsed
+                ? "Expand Civica AI conversation"
+                : "Minimize Civica AI conversation"
+            }
             style={{
-              background: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-3)",
+              minWidth: 0,
+              flex: 1,
               border: "none",
+              background: "none",
               cursor: "pointer",
-              padding: "var(--space-2)",
-              color: "var(--color-text-60)",
-              fontSize: "var(--text-15)",
-              lineHeight: 1,
+              padding: 0,
+              textAlign: "left",
             }}
           >
-            {collapsed ? "▴" : "▾"}
+            <span
+              aria-hidden
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: streaming
+                  ? "var(--color-warn)"
+                  : "var(--color-source-live)",
+                boxShadow: streaming
+                  ? "0 0 0 3px color-mix(in srgb, var(--color-warn) 30%, transparent)"
+                  : "0 0 0 3px color-mix(in oklab, var(--color-success) 20%, transparent)",
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-12)",
+                textTransform: "uppercase",
+                letterSpacing: "var(--tracking-wider)",
+                color: "var(--color-text-40)",
+              }}
+            >
+              Civica AI
+            </span>
+            <span
+              style={{
+                fontSize: "var(--text-13)",
+                color: "var(--color-text-60)",
+                flex: 1,
+              }}
+            >
+              {streaming
+                ? `Thinking about ${countryName}…`
+                : `Conversation about ${countryName} · ${messages.length} message${messages.length === 1 ? "" : "s"}`}
+            </span>
+            <span aria-hidden>{collapsed ? "▴" : "▾"}</span>
           </button>
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               setMessages([]);
               setCollapsed(false);
             }}

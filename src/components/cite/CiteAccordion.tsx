@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState, type KeyboardEvent } from "react";
 import { Copy, Check, Download } from "lucide-react";
 import {
   formatAPA,
@@ -74,6 +74,7 @@ export function CiteAccordion({
 }: CiteAccordionProps) {
   const [active, setActive] = useState<Format>("apa");
   const [copied, setCopied] = useState(false);
+  const tabIdPrefix = useId();
 
   // Resolved at render time on the client, so SSR doesn't ship a stale
   // "today". Fall back to a fixed string if window is undefined (e.g.
@@ -138,6 +139,32 @@ export function CiteAccordion({
     }
   };
 
+  const handleTabKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    const formats = Object.keys(FORMAT_LABEL) as Format[];
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (index + 1) % formats.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (index - 1 + formats.length) % formats.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = formats.length - 1;
+    }
+    if (nextIndex === null) return;
+
+    event.preventDefault();
+    const nextFormat = formats[nextIndex];
+    setActive(nextFormat);
+    setCopied(false);
+    requestAnimationFrame(() => {
+      document.getElementById(`${tabIdPrefix}-tab-${nextFormat}`)?.focus();
+    });
+  };
+
   return (
     <details className="cite-accordion">
       <summary className="cite-accordion-summary">
@@ -152,23 +179,35 @@ export function CiteAccordion({
 
       <div className="cite-accordion-body">
         <div className="cite-format-tabs" role="tablist">
-          {(Object.keys(FORMAT_LABEL) as Format[]).map((f) => (
+          {(Object.keys(FORMAT_LABEL) as Format[]).map((f, index) => (
             <button
               key={f}
+              id={`${tabIdPrefix}-tab-${f}`}
+              type="button"
               role="tab"
               aria-selected={active === f}
+              aria-controls={`${tabIdPrefix}-panel`}
+              tabIndex={active === f ? 0 : -1}
               className={`cite-format-tab${active === f ? " on" : ""}`}
               onClick={() => {
                 setActive(f);
                 setCopied(false);
               }}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
               {FORMAT_LABEL[f]}
             </button>
           ))}
         </div>
 
-        <pre className="cite-text" aria-live="polite" suppressHydrationWarning>
+        <pre
+          id={`${tabIdPrefix}-panel`}
+          className="cite-text"
+          role="tabpanel"
+          aria-labelledby={`${tabIdPrefix}-tab-${active}`}
+          aria-live="polite"
+          suppressHydrationWarning
+        >
           {text || "—"}
         </pre>
 

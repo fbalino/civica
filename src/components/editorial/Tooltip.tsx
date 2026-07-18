@@ -235,9 +235,19 @@ export function Tooltip({
     else show();
   }, [open, hide, show]);
 
-  if (!isValidElement(children)) return children;
+  const focusableChild =
+    isValidElement(children) && childIsFocusable(children);
+  const onTriggerKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLSpanElement>) => {
+      if (focusableChild) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      onClick();
+    },
+    [focusableChild, onClick],
+  );
 
-  const focusableChild = childIsFocusable(children);
+  if (!isValidElement(children)) return children;
 
   const wrapperClass = ["editorial-tooltip-trigger", className]
     .filter(Boolean)
@@ -300,6 +310,7 @@ export function Tooltip({
       onFocus={show}
       onBlur={hide}
       onClick={onClick}
+      onKeyDown={onTriggerKeyDown}
     >
       {renderedChild}
       {bubble}

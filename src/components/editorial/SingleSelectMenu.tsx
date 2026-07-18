@@ -16,7 +16,13 @@
  * a time") and outside-click / Escape dismissal.
  */
 
-import type { CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from "react";
 
 export interface SingleSelectItem {
   value: string;
@@ -53,6 +59,95 @@ export function SingleSelectMenu({
 }: SingleSelectMenuProps) {
   const selected = items.find((item) => item.value === value);
   const summary = selected?.label ?? "Select";
+  const selectedIndex = Math.max(
+    0,
+    items.findIndex((item) => item.value === value),
+  );
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const openFocusIndexRef = useRef<number | null>(null);
+  const wasOpenRef = useRef(false);
+  const [focusedIndex, setFocusedIndex] = useState(selectedIndex);
+
+  const focusOption = (index: number) => {
+    setFocusedIndex(index);
+    requestAnimationFrame(() => optionRefs.current[index]?.focus());
+  };
+
+  const closeAndRestoreTrigger = () => {
+    onOpenChange(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  };
+
+  useEffect(() => {
+    if (!open) {
+      wasOpenRef.current = false;
+      return;
+    }
+    if (wasOpenRef.current) return;
+
+    wasOpenRef.current = true;
+    const index = openFocusIndexRef.current ?? selectedIndex;
+    openFocusIndexRef.current = null;
+    focusOption(index);
+  }, [open, selectedIndex]);
+
+  const selectItem = (item: SingleSelectItem) => {
+    onSelect(item.value);
+    closeAndRestoreTrigger();
+  };
+
+  const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === "Escape" && open) {
+      event.preventDefault();
+      closeAndRestoreTrigger();
+      return;
+    }
+
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    event.preventDefault();
+
+    if (open) {
+      focusOption(focusedIndex);
+      return;
+    }
+
+    openFocusIndexRef.current = selectedIndex;
+    onOpenChange(true);
+  };
+
+  const handleOptionKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      closeAndRestoreTrigger();
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectItem(items[index]);
+      return;
+    }
+
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowDown") {
+      nextIndex = (index + 1) % items.length;
+    } else if (event.key === "ArrowUp") {
+      nextIndex = (index - 1 + items.length) % items.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = items.length - 1;
+    }
+
+    if (nextIndex === null) return;
+    event.preventDefault();
+    focusOption(nextIndex);
+  };
 
   return (
     <div style={{ position: "relative", minWidth }}>
@@ -70,8 +165,10 @@ export function SingleSelectMenu({
         {label}
       </div>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => onOpenChange(!open)}
+        onKeyDown={handleTriggerKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
@@ -139,18 +236,20 @@ export function SingleSelectMenu({
               overflowY: "auto",
             }}
           >
-            {items.map((item) => {
+            {items.map((item, index) => {
               const active = item.value === value;
               return (
                 <button
                   key={item.value}
+                  ref={(element) => {
+                    optionRefs.current[index] = element;
+                  }}
                   type="button"
                   role="option"
                   aria-selected={active}
-                  onClick={() => {
-                    onSelect(item.value);
-                    onOpenChange(false);
-                  }}
+                  tabIndex={index === focusedIndex ? 0 : -1}
+                  onClick={() => selectItem(item)}
+                  onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   style={{
                     display: "flex",
                     alignItems: "center",

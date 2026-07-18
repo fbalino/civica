@@ -35,6 +35,7 @@ export function FactbookLightbox({
   const [idx, setIdx] = useState(initialIndex);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   const next = useCallback(
     (delta: number) => {
@@ -51,10 +52,6 @@ export function FactbookLightbox({
   // Keyboard nav + focus management.
   useEffect(() => {
     if (!open) return;
-
-    // Move focus to the close button on open. Trapping focus within
-    // the dialog with a Tab cycle.
-    closeBtnRef.current?.focus();
 
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -86,6 +83,25 @@ export function FactbookLightbox({
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [open, images.length, next, onClose]);
+
+  // Preserve the control that launched the dialog. A lightbox is shared by
+  // both map and photo tiles, so restore here rather than depending on every
+  // caller to remember the accessibility contract.
+  useEffect(() => {
+    if (!open) return;
+
+    const activeElement = document.activeElement;
+    returnFocusRef.current =
+      activeElement instanceof HTMLElement ? activeElement : null;
+    requestAnimationFrame(() => closeBtnRef.current?.focus());
+
+    return () => {
+      const returnFocus = returnFocusRef.current;
+      requestAnimationFrame(() => {
+        if (returnFocus?.isConnected) returnFocus.focus();
+      });
+    };
+  }, [open]);
 
   // Lock body scroll while open.
   useEffect(() => {

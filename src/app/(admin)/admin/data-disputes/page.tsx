@@ -436,7 +436,7 @@ export default async function DataDisputesQueuePage({
                 const lead = g.lead;
                 const pairs = g.members.length;
                 return (
-                  <AdminRow key={g.key} href={`/admin/data-disputes/${lead.id}`}>
+                  <AdminRow key={g.key}>
                     <td>
                       <Link
                         href={`/admin/data-disputes/${lead.id}`}

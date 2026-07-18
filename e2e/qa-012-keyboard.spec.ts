@@ -69,4 +69,77 @@ test.describe("QA-012 — keyboard journeys", () => {
     await expect(selectedAfter).toBeFocused();
     await expect(selectedAfter).not.toHaveText(selectedName ?? "");
   });
+
+  test("shared select menus support arrow navigation, selection, and focus return", async ({
+    page,
+  }) => {
+    await page.goto("/parties", { waitUntil: "networkidle" });
+
+    const trigger = page.getByRole("button", { name: "Select region" });
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+
+    const listbox = page.getByRole("listbox", { name: "Select region" });
+    await expect(listbox).toBeVisible();
+    await expect(listbox.getByRole("option", { selected: true })).toBeFocused();
+
+    await page.keyboard.press("ArrowDown");
+    const nextOption = listbox.getByRole("option").nth(1);
+    await expect(nextOption).toBeFocused();
+
+    await page.keyboard.press("Enter");
+    await expect(listbox).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+  });
+
+  test("map and lightbox dialogs trap focus and restore their launchers", async ({
+    page,
+  }) => {
+    await page.goto("/country/switzerland", { waitUntil: "networkidle" });
+
+    const mapTrigger = page.getByRole("button", {
+      name: "Explore the interactive map of Switzerland",
+    });
+    await mapTrigger.focus();
+    await page.keyboard.press("Enter");
+    const mapDialog = page.getByRole("dialog", { name: "Map of Switzerland" });
+    await expect(mapDialog).toBeVisible();
+    await expect(page.getByRole("button", { name: "Close map" })).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(mapDialog).toHaveCount(0);
+    await expect(mapTrigger).toBeFocused();
+
+    const photoTrigger = page.getByRole("button", { name: /Open \d+ photos/ });
+    await photoTrigger.focus();
+    await page.keyboard.press("Enter");
+    const photoDialog = page.getByRole("dialog", { name: "Photo gallery" });
+    await expect(photoDialog).toBeVisible();
+    await expect(page.getByRole("button", { name: "Close" })).toBeFocused();
+
+    // Close is first in the dialog; Shift+Tab must wrap to its final thumbnail.
+    await page.keyboard.press("Shift+Tab");
+    await expect(
+      page.getByRole("button", { name: /Photo \d+/ }).last(),
+    ).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(photoDialog).toHaveCount(0);
+    await expect(photoTrigger).toBeFocused();
+  });
+
+  test("citation tabs use arrow-key roving focus", async ({ page }) => {
+    await page.goto("/country/switzerland", { waitUntil: "networkidle" });
+    await page.locator("summary.cite-accordion-summary").press("Enter");
+
+    const apa = page.getByRole("tab", { name: "APA" });
+    await apa.focus();
+    await page.keyboard.press("ArrowRight");
+
+    const bibtex = page.getByRole("tab", { name: "BibTeX" });
+    await expect(bibtex).toBeFocused();
+    await expect(bibtex).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tabpanel")).toHaveAttribute(
+      "aria-labelledby",
+      await bibtex.getAttribute("id") ?? "",
+    );
+  });
 });
