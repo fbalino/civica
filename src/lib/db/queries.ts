@@ -13,6 +13,13 @@ import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parseDataValueStatus } from "@/lib/data/value-state";
 import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "@/lib/conditions/contract";
 import {
+  buildConditionsPublicRelease,
+  selectConditionsPublicRelease,
+  type ConditionsPublicCalculation,
+  type ConditionsPublicComponent,
+  type ConditionsPublicReleaseHeader,
+} from "@/lib/conditions/public-release";
+import {
   buildGovernmentClassificationMap,
   type JurisdictionTaxonomyInput,
 } from "./government-taxonomy";
@@ -2146,6 +2153,126 @@ export async function getCivicaConditionsForJurisdiction(
     alignmentStatus: "aligned";
     sourceName: string | null;
   }>;
+}
+
+/**
+ * ATL-029 public Conditions read. Every row is selected through one immutable
+ * release header; callers never mix the latest score of each dimension.
+ * Components stay attached to their calculation so absent/refused inputs are
+ * visible instead of disappearing behind a generic country-metric fallback.
+ */
+export async function getConditionsPublicRelease(
+  requestedReleaseId?: string | null,
+) {
+  const releaseResult = await db.execute(sql`
+    SELECT id AS "releaseId", methodology_version AS "methodologyVersion",
+      manifest_sha256 AS "manifestSha256", created_at AS "createdAt"
+    FROM civica_conditions_releases
+    ORDER BY created_at DESC, id DESC
+  `);
+  const releaseRows = (Array.isArray(releaseResult)
+    ? releaseResult
+    : ((releaseResult as { rows?: unknown[] }).rows ?? [])) as Array<{
+    releaseId: string;
+    methodologyVersion: string;
+    manifestSha256: string;
+    createdAt: string | Date;
+  }>;
+  const releases: ConditionsPublicReleaseHeader[] = releaseRows.map((row) => {
+    const createdAt = toIso(row.createdAt);
+    if (!createdAt) {
+      throw new Error(`Conditions release ${row.releaseId} has an invalid creation time`);
+    }
+    return { ...row, createdAt };
+  });
+  const release = selectConditionsPublicRelease(releases, requestedReleaseId);
+  if (!release) return null;
+
+  const [calculationResult, componentResult] = await Promise.all([
+    db.execute(sql`
+      SELECT
+        calculation.calculation_key AS "calculationKey",
+        calculation.release_id AS "releaseId",
+        calculation.jurisdiction_id AS "jurisdictionId",
+        jurisdiction.name AS "countryName",
+        jurisdiction.slug AS "countrySlug",
+        jurisdiction.iso3 AS "countryIso3",
+        calculation.dimension,
+        calculation.alignment_policy AS "alignmentPolicy",
+        calculation.alignment_status AS "alignmentStatus",
+        calculation.reference_year AS "referenceYear",
+        score.normalized_score AS "normalizedScore",
+        score.raw_value AS "rawValue",
+        score.source_id AS "scoreSourceId",
+        scoreSource.name AS "scoreSourceName",
+        score.indicator_id AS "scoreIndicatorId",
+        score.upstream_release AS "scoreUpstreamRelease",
+        score.license_url AS "scoreLicenseUrl"
+      FROM civica_conditions_calculations calculation
+      INNER JOIN jurisdictions jurisdiction
+        ON jurisdiction.id = calculation.jurisdiction_id
+      LEFT JOIN civica_conditions_scores score
+        ON score.calculation_key = calculation.calculation_key
+        AND score.release_id = ${release.releaseId}
+      LEFT JOIN sources scoreSource ON scoreSource.id = score.source_id
+      WHERE calculation.release_id = ${release.releaseId}
+        AND jurisdiction.type = 'sovereign_state'
+      ORDER BY jurisdiction.name, calculation.dimension
+    `),
+    db.execute(sql`
+      SELECT
+        component.calculation_key AS "calculationKey",
+        component.component_id AS "componentId",
+        component.native_value AS "nativeValue",
+        component.native_unit AS "nativeUnit",
+        component.reference_year AS "referenceYear",
+        component.value_status AS "valueStatus",
+        component.value_status_reason AS "valueStatusReason",
+        component.inclusion_decision AS "inclusionDecision",
+        component.source_id AS "sourceId",
+        source.name AS "sourceName",
+        component.indicator_id AS "indicatorId",
+        component.upstream_release AS "upstreamRelease",
+        component.license_url AS "licenseUrl",
+        component.transformation_id AS "transformationId"
+      FROM civica_conditions_components component
+      INNER JOIN civica_conditions_calculations calculation
+        ON calculation.calculation_key = component.calculation_key
+      LEFT JOIN sources source ON source.id = component.source_id
+      INNER JOIN jurisdictions jurisdiction
+        ON jurisdiction.id = calculation.jurisdiction_id
+      WHERE calculation.release_id = ${release.releaseId}
+        AND jurisdiction.type = 'sovereign_state'
+      ORDER BY component.calculation_key, component.component_id
+    `),
+  ]);
+
+  const calculationRows = (Array.isArray(calculationResult)
+    ? calculationResult
+    : ((calculationResult as { rows?: unknown[] }).rows ?? [])) as Array<
+    Omit<ConditionsPublicCalculation, "components">
+  >;
+  const componentRows = (Array.isArray(componentResult)
+    ? componentResult
+    : ((componentResult as { rows?: unknown[] }).rows ?? [])) as Array<
+    ConditionsPublicComponent & { calculationKey: string }
+  >;
+  const componentsByCalculation = new Map<string, ConditionsPublicComponent[]>();
+  for (const component of componentRows) {
+    const { calculationKey, ...publicComponent } = component;
+    componentsByCalculation.set(calculationKey, [
+      ...(componentsByCalculation.get(calculationKey) ?? []),
+      publicComponent,
+    ]);
+  }
+
+  return buildConditionsPublicRelease({
+    release,
+    calculations: calculationRows.map((calculation) => ({
+      ...calculation,
+      components: componentsByCalculation.get(calculation.calculationKey) ?? [],
+    })),
+  });
 }
 
 /**
