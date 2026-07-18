@@ -1,6 +1,6 @@
 # QA-008 evidence — statistical reproducibility
 
-## Verified partial milestones
+## Verified replay contract
 
 - `npm run validate:statistical-reproducibility` pins nine checked result
   files, result identities, registered inputs, analysis entrypoints, derived
@@ -15,19 +15,26 @@
   `d92c244f4e7d3f4468e2667ed0347da1fddf132be0a4817238dbfe77263bb1e6`.
   Its ordinary validator does not initialize a database client or use the
   network; missing or modified retained bytes fail closed.
+- `ci-index-analysis-replay-inputs-2026-07-18-v1` binds the protected panel,
+  uncertainty, longitudinal-label, and jurisdiction-metadata input used by
+  dimensionality, validity, incremental-information, longitudinal,
+  out-of-sample, and sensitivity analysis. Each validator reproduces its
+  frozen result with `DATABASE_URL` removed.
+- `npm run validate:statistical-replay` runs the static registry plus all nine
+  registered analysis validators in that database-free mode. The isolated
+  runtime/package-lock record is `replay-environment.v1.json`.
 
 ## Commands
 
 ```sh
-npx tsx --test src/lib/ci/subgroup-fairness-inputs.test.ts
-CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs npm run validate:index-subgroup-fairness
-CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs npm run validate:index-longitudinal
-npm run validate:statistical-reproducibility
+CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs npm run validate:statistical-replay
 ```
 
-## Open closure work
+## Deliberate-drift controls
 
-QA-008 remains open. The other database-backed analysis generators must adopt
-the same offline protected-input replay contract, then all registered
-validators need an isolated read-only execution record with tool versions and
-deliberate input/method drift evidence.
+`src/lib/ci/longitudinal-input-cache.test.ts`,
+`src/lib/ci/index-analysis-inputs.test.ts`, and
+`src/lib/ci/subgroup-fairness-inputs.test.ts` each corrupt a retained cache
+entry and prove replay fails. `src/lib/qa/statistical-reproducibility.test.ts`
+proves altered input, result, seed, method, or replay registration cannot reuse
+the prior artifact.

@@ -44,3 +44,17 @@ Normal `npm run validate:index-subgroup-fairness` opens neither the network
 nor a database connection. It reads only the hash named by the checked v2
 release manifest and fails closed if that exact cache entry is unavailable or
 changed.
+
+The remaining Index analysis suite (dimensionality, validity, incremental
+information, longitudinal, out-of-sample, and sensitivity) shares a second
+protected snapshot. Capture it explicitly:
+
+```sh
+CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs \
+  npm run capture:index-analysis-inputs
+```
+
+The checked `ci-index-analysis-replay-inputs-2026-07-18-v1` manifest pins its
+content hash and source release-row hashes. `npm run validate:statistical-replay`
+runs every registered analysis with `DATABASE_URL` removed; normal replay must
+not query a database or fetch a publisher URL.

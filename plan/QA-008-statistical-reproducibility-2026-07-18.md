@@ -2,9 +2,9 @@
 
 ## Status
 
-In progress. The Index analysis release already stores result hashes, declared
-seeds, environment metadata, and release-input manifests. The replay audit on
-2026-07-18 closed two concrete gaps: longitudinal validation no longer fetches
+Completed 2026-07-18. The Index analysis release stores result hashes,
+declared seeds, environment metadata, and release-input manifests. The replay
+audit closed two concrete gaps: longitudinal validation no longer fetches
 publisher bytes during replay, and subgroup fairness v2 no longer reads live
 jurisdiction metadata or private release rows during replay. The audit also
 proved that subgroup-fairness v1 cannot be represented as reproducible: its
@@ -37,13 +37,23 @@ restricted normalized input snapshot is retained only at
 The checked manifest records that hash, the v2 result records it, and ordinary
 replay has neither database nor network access.
 
-## Remaining closure work
+The remaining six database-backed analyses share
+`ci-index-analysis-replay-inputs-2026-07-18-v1`, a protected normalized
+snapshot of the 29,100-row panel, 970 uncertainty rows, 4,357 longitudinal
+labels, and 194 metadata rows. Their ordinary generators now read that exact
+cache entry only. The shared manifest binds its source-release row hashes; the
+analysis validators reproduce their existing frozen results byte-exactly.
 
-1. Apply the same retained-input replay contract to every analytical generator
-   still querying a frozen private release directly, including its exact
-   protected row hash.
-2. Execute the registered validators in an isolated, read-only environment,
-   record the environment metadata and tolerances, and demonstrate a changed
-   input or method version cannot reuse an old result.
-3. Preserve the successful commands, environment metadata, and deliberate
-   drift fixtures under `plan/evidence/QA-008/` before checking the task.
+## Completion evidence
+
+`CIVICA_RESEARCH_INPUT_DIR=/protected/civica-research-inputs npm run
+validate:statistical-replay` runs the static registry plus all nine registered
+analysis validators with `DATABASE_URL` removed. The 2026-07-18 isolated
+execution passed; its runtime and package-lock identity are recorded in
+`plan/evidence/QA-008/replay-environment.v1.json`.
+
+The static registry pins each result, result identity, input manifest,
+analysis-entrypoint bytes, derived table/figure bytes, replay command, and
+randomized seed. Deliberate cache-byte drift is rejected by the protected-input
+tests; deliberate method/input/replay/seed drift is rejected by the registry
+fixtures. The tolerance for every registered analysis is byte-exact.
