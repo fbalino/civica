@@ -438,6 +438,17 @@
   border-color: var(--color-status-info);
 }
 
+/* Inline links preserve an editorial accent as an underline while the text
+   itself uses the readable foreground role on every banner surface. */
+.editorial-banner a,
+.editorial-page :is(p, li, td, .editorial-tool-dek) a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
+}
+
 /* ── Content sections ───────────────────────────────────────────── */
 
 .editorial-section {
@@ -960,50 +971,49 @@ legend.editorial-filter-label {
 }
 
 /* ── Tonal chip modifiers (component spec v1 §2) ────────────────────
-   Subtle wash on the paper bg, same-hue low-alpha border, darkened-hue
-   text. Mirrors the <Chip> React component recipe so CSS-driven filter
-   chips can carry the same tones. Hover keeps the tint (no flat reset). */
+   Subtle wash on the paper bg, same-hue low-alpha border, and the role-text
+   foreground. Mirrors the <Chip> recipe so CSS-driven filter chips stay AA
+   legible in both themes. */
 .editorial-chip--sage {
   background: color-mix(in oklab, var(--color-status-success) 16%, var(--color-page-bg));
   border-color: color-mix(in oklab, var(--color-status-success) 32%, transparent);
-  color: color-mix(in oklab, var(--color-status-success), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--sand {
   background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
   border-color: color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--rose {
   background: color-mix(in oklab, var(--color-status-danger) 16%, var(--color-page-bg));
   border-color: color-mix(in oklab, var(--color-status-danger) 32%, transparent);
-  color: color-mix(in oklab, var(--color-status-danger), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--blue {
   background: color-mix(in oklab, var(--color-status-info) 16%, var(--color-page-bg));
   border-color: color-mix(in oklab, var(--color-status-info) 32%, transparent);
-  color: color-mix(in oklab, var(--color-status-info), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--accent {
   background: color-mix(in oklab, var(--color-accent) 16%, var(--color-page-bg));
   border-color: color-mix(in oklab, var(--color-accent) 32%, transparent);
-  color: color-mix(in oklab, var(--color-accent), black 32%);
+  color: var(--color-text-primary);
 }
-/* Tonal chips keep their own darkened-hue text on hover (the neutral
-   .editorial-chip:hover would otherwise flip them to navy). */
+/* Tonal chips keep their readable foreground on hover. */
 .editorial-chip--sage:hover {
-  color: color-mix(in oklab, var(--color-status-success), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--sand:hover {
-  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--rose:hover {
-  color: color-mix(in oklab, var(--color-status-danger), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--blue:hover {
-  color: color-mix(in oklab, var(--color-status-info), black 32%);
+  color: var(--color-text-primary);
 }
 .editorial-chip--accent:hover {
-  color: color-mix(in oklab, var(--color-accent), black 32%);
+  color: var(--color-text-primary);
 }
 
 /* Country/select submit form inside an editorial filter row */

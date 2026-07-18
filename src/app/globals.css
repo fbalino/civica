@@ -169,14 +169,9 @@
   --color-text-85: rgba(11, 27, 45, 0.88);
   --color-text-60: #2a3648; /* Slate */
   --color-text-50: #44505f;
-  --color-text-40: #6a7688; /* Steel */
+  --color-text-40: #5c6b7a; /* Steel — AA contrast on ivory paper */
   --color-text-30: #5c6b7a; /* Mist — darkened for WCAG AA on ivory (contrast ≥4.5:1) */
-  --color-text-25: rgba(
-    11,
-    27,
-    45,
-    0.6
-  ); /* darkened alpha for WCAG AA on ivory */
+  --color-text-25: #44505f; /* Quiet text — opaque for reliable AA contrast */
   --color-text-20: rgba(11, 27, 45, 0.32);
 
   --color-accent: #b7512b; /* Terracotta — editorial signal */
@@ -361,19 +356,14 @@ html:root {
   --color-text-85: rgba(235, 230, 214, 0.88);
   --color-text-60: #c4bdae;
   --color-text-50: rgba(235, 230, 214, 0.64);
-  --color-text-40: #8a8370;
+  --color-text-40: #aaa291; /* Steel — AA contrast on dark elevated surfaces */
   --color-text-30: rgba(
     235,
     230,
     214,
     0.55
   ); /* bumped alpha for WCAG AA on dark bg */
-  --color-text-25: rgba(
-    235,
-    230,
-    214,
-    0.52
-  ); /* bumped alpha for WCAG AA on dark bg */
+  --color-text-25: #b8b09f; /* Quiet text — opaque for reliable AA contrast */
   --color-text-20: rgba(235, 230, 214, 0.4);
 
   --color-accent: oklch(67% 0.13 45); /* Terracotta, lightened for dark */
@@ -448,7 +438,7 @@ html:root {
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);
   --color-branch-monarchy-bg: rgba(180, 139, 255, 0.15);
 
-  --color-badge-get: oklch(55% 0.12 145);
+  --color-badge-get: #267747;
   --color-badge-post: oklch(52% 0.1 240);
   --color-badge-text: #ebe6d6;
 
@@ -1501,9 +1491,8 @@ a {
   line-height: 1;
   letter-spacing: -0.015em;
   text-transform: uppercase;
-  /* Very low contrast: a whisper of ink mixed into the paper. Flips with
-     the theme automatically since both tokens are role tokens. */
-  color: color-mix(in oklab, var(--color-text-primary) 7%, var(--color-bg));
+  /* Decorative wordmark still meets the large-text contrast floor. */
+  color: var(--color-text-40);
 }
 
 /* ── Responsive ─────────────────────────────────────────────────── */

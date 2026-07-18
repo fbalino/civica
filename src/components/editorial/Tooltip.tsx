@@ -124,6 +124,10 @@ interface TooltipProps {
    * the wrapper (the Tooltip positions against `triggerRef.getBoundingClientRect()`).
    */
   triggerStyle?: CSSProperties;
+  /** Accessible label for a non-native tooltip trigger. */
+  ariaLabel?: string;
+  /** Semantic role for a non-native trigger. Data-only hover regions use img. */
+  triggerRole?: "button" | "img";
 }
 
 export function Tooltip({
@@ -132,6 +136,8 @@ export function Tooltip({
   placement = "top",
   className,
   triggerStyle,
+  ariaLabel,
+  triggerRole = "button",
 }: TooltipProps) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<TooltipCoords | null>(null);
@@ -284,7 +290,8 @@ export function Tooltip({
         ? {}
         : {
             tabIndex: 0,
-            role: "button",
+            role: triggerRole,
+            "aria-label": ariaLabel,
             "aria-describedby": describedBy,
           })}
       onPointerDown={onPointerDown}

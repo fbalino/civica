@@ -2324,6 +2324,9 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   line-height: var(--leading-tight);
 }
 .country-map-attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-6);
   color: var(--color-text-60);
   text-decoration: none;
 }

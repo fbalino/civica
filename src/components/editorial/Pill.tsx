@@ -8,13 +8,13 @@ import type { CSSProperties, ReactNode } from "react";
  * never mono.
  *
  * Tonal recipe (per spec): a subtle wash on the paper bg, a same-hue low-alpha
- * border, and darkened-hue text for AA contrast. Computed with
+ * border, and role-text foreground for AA contrast. Computed with
  * color-mix(in oklab, …) so every tone stays theme-safe (light + dark inherit
  * the same tokens). On white card surfaces the same recipe reads fine.
  *
  *   background: color-mix(in oklab, <hue> 16%, var(--color-page-bg))
  *   border:     1px solid color-mix(in oklab, <hue> 32%, transparent)
- *   color:      color-mix(in oklab, <hue>, black 32%)
+ *   color:      var(--color-text-primary)
  *
  * `neutral` is the one exception: it uses the explicit hairline/page tokens
  * rather than a tint, matching the spec's default chip.
@@ -102,7 +102,7 @@ function chipStyle(tone: ChipTone, size: ChipSize) {
     ...base,
     background: `color-mix(in oklab, ${hue} 16%, var(--color-page-bg))`,
     border: `1px solid color-mix(in oklab, ${hue} 32%, transparent)`,
-    color: `color-mix(in oklab, ${hue}, black 32%)`,
+    color: "var(--color-text-primary)",
   };
 }
 

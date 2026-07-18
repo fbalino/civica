@@ -508,6 +508,8 @@ export function IndicatorTrendChart({
                 key={`hz-${year}`}
                 content={hoverTooltip(year)}
                 className="indicator-trend-hover-col"
+                triggerRole="img"
+                ariaLabel={`${year} indicator observation`}
                 triggerStyle={{
                   left: `${r2(leftPct - widthPct / 2)}%`,
                   width: `${r2(widthPct)}%`,
