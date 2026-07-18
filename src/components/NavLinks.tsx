@@ -8,6 +8,7 @@ import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
 import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 import { EXPLORE_NAV_GROUPS } from "@/components/exploreNavItems";
 import { EDITORIAL_NAV_ITEMS } from "@/components/editorialNavItems";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import {
   isExploreGroupActive,
   isGovernanceEvidenceGroupActive,
@@ -20,25 +21,23 @@ const EXPLORE_HREFS = EXPLORE_NAV_GROUPS.flatMap((g) =>
   g.items.map((i) => i.href),
 );
 
-/** A spot engraving with its dark-mode counterpart; the site-wide
- * `theme-engraving-*` classes swap them by theme. */
-function ExploreEngraving({ engraving }: { engraving: string }) {
+/** Menu art is mounted only after the disclosure opens, then resolves exactly
+ * one active-theme asset instead of transferring a hidden counterpart. */
+function ExploreEngraving({
+  engraving,
+  shouldLoad,
+}: {
+  engraving: string;
+  shouldLoad: boolean;
+}) {
   return (
     <span className="explore-item__engraving" aria-hidden="true">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="theme-engraving-light"
-        src={`/engravings/spot-${engraving}.webp`}
-        alt=""
-        aria-hidden="true"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="theme-engraving-dark"
-        src={`/engravings/spot-${engraving}-dark.webp`}
-        alt=""
-        aria-hidden="true"
-      />
+      {shouldLoad ? (
+        <ThemedDecorativeImage
+          src={`/engravings/navigation/spot-${engraving}.webp`}
+          darkSrc={`/engravings/navigation/spot-${engraving}-dark.webp`}
+        />
+      ) : null}
     </span>
   );
 }
@@ -91,6 +90,7 @@ export function NavLinks() {
       <div
         className="nav-dropdown"
         onMouseEnter={openExplore}
+        onFocus={openExplore}
         onMouseLeave={closeExploreSoon}
         onBlur={(e) => {
           // Close only when focus leaves the whole dropdown (trigger + panel).
@@ -145,7 +145,10 @@ export function NavLinks() {
                     isActiveHref(item.href) ? "explore-item--active" : ""
                   }`}
                 >
-                  <ExploreEngraving engraving={item.engraving} />
+                  <ExploreEngraving
+                    engraving={item.engraving}
+                    shouldLoad={exploreOpen}
+                  />
                   <span className="explore-item__body">
                     <span className="explore-item__name">{item.label}</span>
                     <span className="explore-item__desc">

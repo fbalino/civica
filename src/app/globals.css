@@ -540,6 +540,29 @@ body {
   display: block !important;
 }
 
+/* A decorative asset should not be duplicated as light + dark <img> nodes:
+   hidden images remain eligible for transfer. This shared renderer resolves
+   exactly one background image from the active color scheme instead. The
+   media-query branch covers the server's pre-hydration, system-theme paint;
+   ThemeProvider then stamps data-theme for explicit user choices. */
+.civica-themed-image {
+  display: block;
+  background-image: var(--civica-themed-image-light);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+[data-theme="dark"] .civica-themed-image {
+  background-image: var(--civica-themed-image-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .civica-themed-image {
+    background-image: var(--civica-themed-image-dark);
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -1123,7 +1146,7 @@ a {
   overflow: hidden;
 }
 
-.explore-item__engraving img {
+.explore-item__engraving :is(img, .civica-themed-image) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1165,8 +1188,8 @@ a {
   outline: none;
 }
 
-.explore-item:hover .explore-item__engraving img,
-.explore-item:focus-visible .explore-item__engraving img {
+.explore-item:hover .explore-item__engraving :is(img, .civica-themed-image),
+.explore-item:focus-visible .explore-item__engraving :is(img, .civica-themed-image) {
   transform: translateY(-2px) scale(1.03);
 }
 
@@ -1183,11 +1206,11 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .explore-item__engraving img {
+  .explore-item__engraving :is(img, .civica-themed-image) {
     transition: none;
   }
-  .explore-item:hover .explore-item__engraving img,
-  .explore-item:focus-visible .explore-item__engraving img {
+  .explore-item:hover .explore-item__engraving :is(img, .civica-themed-image),
+  .explore-item:focus-visible .explore-item__engraving :is(img, .civica-themed-image) {
     transform: none;
   }
 }
@@ -4014,7 +4037,7 @@ a {
   mask-image: linear-gradient(to left, black 35%, transparent 92%);
   animation: civ-menu-art-enter var(--motion-slower) var(--motion-ease-out) both;
 }
-.mobile-menu__art img {
+.mobile-menu__art :is(img, .civica-themed-image) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -4180,13 +4203,13 @@ a {
   overflow: hidden;
   border-radius: var(--radius-md);
 }
-.mobile-menu__spot img {
+.mobile-menu__spot :is(img, .civica-themed-image) {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform var(--motion-slow) var(--motion-ease-out);
 }
-.mobile-menu__explore-link:hover .mobile-menu__spot img {
+.mobile-menu__explore-link:hover .mobile-menu__spot :is(img, .civica-themed-image) {
   transform: scale(1.06) translateX(var(--space-1));
 }
 .mobile-menu__explore-copy {
@@ -4433,7 +4456,7 @@ a {
     animation: none;
   }
   .mobile-menu__explore-link,
-  .mobile-menu__spot img,
+  .mobile-menu__spot :is(img, .civica-themed-image),
   .mobile-menu__close,
   .mobile-menu-trigger__lines span {
     transition: none;

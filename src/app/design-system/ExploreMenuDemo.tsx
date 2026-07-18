@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EXPLORE_NAV_GROUPS } from "@/components/exploreNavItems";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 
 /**
  * Static, always-open rendering of the "Explore" megamenu panel for the
@@ -23,10 +24,10 @@ export function ExploreMenuDemo() {
               className="explore-item"
             >
               <span className="explore-item__engraving" aria-hidden="true">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="theme-engraving-light" src={`/engravings/spot-${item.engraving}.webp`} alt="" aria-hidden="true" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="theme-engraving-dark" src={`/engravings/spot-${item.engraving}-dark.webp`} alt="" aria-hidden="true" />
+                <ThemedDecorativeImage
+                  src={`/engravings/navigation/spot-${item.engraving}.webp`}
+                  darkSrc={`/engravings/navigation/spot-${item.engraving}-dark.webp`}
+                />
               </span>
               <span className="explore-item__body">
                 <span className="explore-item__name">{item.label}</span>

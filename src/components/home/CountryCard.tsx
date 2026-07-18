@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Chip } from "@/components/editorial/Pill";
 import { CountryFlag } from "@/components/CountryFlag";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 
 /*
  * CountryCard (component spec v1 §7) — the recurring rich country data
@@ -55,10 +56,6 @@ export function CountryCard({
 }: CountryCardProps) {
   // PROVENANCE_COVERAGE: home.country-card
   const engraving = iso3 ? `/engravings/countries/${iso3}.webp` : null;
-  const lightClassName = engravingDarkSrc
-    ? "country-card-img theme-engraving-light"
-    : "country-card-img";
-
   return (
     <div className="country-card">
       <div className="country-card-body">
@@ -95,17 +92,11 @@ export function CountryCard({
 
       {engraving ? (
         <div className="country-card-img-wrap">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={lightClassName} src={engraving} alt="" aria-hidden="true" />
-          {engravingDarkSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              className="country-card-img theme-engraving-dark"
-              src={engravingDarkSrc}
-              alt=""
-              aria-hidden="true"
-            />
-          ) : null}
+          <ThemedDecorativeImage
+            className="country-card-img"
+            src={engraving}
+            darkSrc={engravingDarkSrc}
+          />
         </div>
       ) : null}
 

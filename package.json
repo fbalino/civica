@@ -395,6 +395,7 @@
     "test:e2e": "playwright test",
     "test:e2e:a11y": "playwright test e2e/qa-012-accessibility.spec.ts e2e/qa-012-keyboard.spec.ts e2e/exp-033-atlas-accessibility.spec.ts e2e/exp-034-forms-keyboard.spec.ts",
     "test:e2e:browser-support": "playwright test e2e/qa-016-browser-degradation.spec.ts --workers=1 --retries=0",
+    "test:e2e:navigation-assets": "playwright test e2e/exp-017-navigation-asset-budget.spec.ts --workers=1 --retries=0",
     "test:e2e:performance": "playwright test e2e/qa-014-performance.spec.ts --workers=1 --retries=0",
     "test:e2e:visual": "playwright test e2e/qa-013-visual-regression.spec.ts --workers=1 --retries=0",
     "update:e2e:visual": "tsx scripts/capture-visual-baseline-candidate.ts",

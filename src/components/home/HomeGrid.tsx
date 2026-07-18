@@ -15,6 +15,7 @@ import {
 } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { Banner } from "@/components/editorial/Banner";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 
 const countryEngravingDir = join(process.cwd(), "public", "engravings", "countries");
 
@@ -32,12 +33,7 @@ function SpotEngraving({
   darkSrc: string;
 }) {
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="theme-engraving-light" src={src} alt="" aria-hidden="true" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="theme-engraving-dark" src={darkSrc} alt="" aria-hidden="true" />
-    </>
+    <ThemedDecorativeImage src={src} darkSrc={darkSrc} />
   );
 }
 

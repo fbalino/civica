@@ -33,11 +33,12 @@
   margin: 0 0 var(--space-6);
 }
 
-.not-found__engraving img {
+.not-found__engraving :is(img, .civica-themed-image) {
   width: 128px;
   height: auto;
   opacity: 0.85;
 }
+.not-found__engraving .civica-themed-image { aspect-ratio: 1; }
 
 /* ── Header block ───────────────────────────────────────────────────── */
 
