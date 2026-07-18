@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
 import { cronExecutionKeyFromRequest, withCronJob } from "@/lib/api/cron-job";
-import * as schema from "@/lib/db/schema";
+import { getDb } from "@/lib/db";
 import { classifyClusters } from "@/lib/pulse/v2/classify";
 import {
   providerKeyEnvName,
@@ -86,8 +84,7 @@ async function handler(request: Request) {
     );
   }
 
-  const sqlClient = neon(process.env.DATABASE_URL!);
-  const db = drizzle({ client: sqlClient, schema });
+  const db = getDb();
   const summary = await classifyClusters(db, {
     limit: 200,
     dryRun,

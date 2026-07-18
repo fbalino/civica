@@ -1,4 +1,3 @@
-import { neon } from "@neondatabase/serverless";
 import { writeFileSync } from "node:fs";
 import { drizzle } from "drizzle-orm/neon-http";
 import { sql as dsql } from "drizzle-orm";
@@ -17,9 +16,10 @@ import { buildIndicatorLineage, frozenCiPublisherHash } from "@/lib/indicators/l
 import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
 import { CURRENT_CI_RELEASE_ID } from "./current-release";
 import { resolveCiRelease } from "./release-selection";
+import { createServerlessSql } from "../db";
 
 export function createDb() {
-  const sqlClient = neon(process.env.DATABASE_URL!);
+  const sqlClient = createServerlessSql(process.env.DATABASE_URL!);
   return drizzle({ client: sqlClient });
 }
 

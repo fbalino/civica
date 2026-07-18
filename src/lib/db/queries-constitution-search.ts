@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { createServerlessSql } from "@/lib/db";
 import { isKnownConstitutionTopic } from "@/lib/constitute/topic-keys";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import {
@@ -49,14 +49,14 @@ type SearchCursor = {
   passageId: string;
 };
 
-let searchSql: ReturnType<typeof neon> | null = null;
+let searchSql: ReturnType<typeof createServerlessSql> | null = null;
 
-function getSearchSql(): ReturnType<typeof neon> {
+function getSearchSql(): ReturnType<typeof createServerlessSql> {
   if (!searchSql) {
     if (!process.env.DATABASE_URL) {
       throw new Error("DATABASE_URL is not set");
     }
-    searchSql = neon(process.env.DATABASE_URL);
+    searchSql = createServerlessSql(process.env.DATABASE_URL);
   }
   return searchSql;
 }

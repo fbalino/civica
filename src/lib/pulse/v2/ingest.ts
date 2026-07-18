@@ -12,9 +12,9 @@
  * empty success.
  */
 
-import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "@/lib/db/schema";
+import { createServerlessSql } from "@/lib/db";
 import { buildJurisdictionMap } from "./country-resolver";
 import {
   upsertRawEvents,
@@ -41,7 +41,7 @@ import {
 } from "./pipeline-version";
 
 export function createDb() {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = createServerlessSql(process.env.DATABASE_URL!);
   return drizzle({ client: sql, schema });
 }
 export type Db = ReturnType<typeof createDb>;

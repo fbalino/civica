@@ -1,8 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, and, sql as dsql } from "drizzle-orm";
 import { pulseEvents } from "../db/schema";
+import { createServerlessSql } from "../db";
 
 export type ClassificationCategory =
   | "armed_conflict"
@@ -74,7 +74,7 @@ Respond with a JSON array where each element corresponds to the input event at t
 Only output the JSON array, no other text.`;
 
 export function createDb() {
-  const sqlClient = neon(process.env.DATABASE_URL!);
+  const sqlClient = createServerlessSql(process.env.DATABASE_URL!);
   return drizzle({ client: sqlClient });
 }
 

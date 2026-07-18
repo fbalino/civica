@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
 import { cronExecutionKeyFromRequest, withCronJob } from "@/lib/api/cron-job";
-import * as schema from "@/lib/db/schema";
+import { getDb } from "@/lib/db";
 import { corroborateEvents } from "@/lib/pulse/v2/corroborate";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 
@@ -14,8 +12,7 @@ async function handler(request: Request) {
   const started = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
   const cronExecutionKey = cronExecutionKeyFromRequest(request);
-  const sqlClient = neon(process.env.DATABASE_URL!);
-  const db = drizzle({ client: sqlClient, schema });
+  const db = getDb();
   const corroboration = await corroborateEvents(db, {
     dryRun,
     cronExecutionKey,
