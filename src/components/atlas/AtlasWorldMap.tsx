@@ -118,6 +118,8 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     // a country with a missing value must never inherit a real category.
     const legendEntries = useMemo(() => legendFor(layer), [layer]);
     const activeLayerSource = layerSources[layer];
+    const mapTitle = `World map colored by ${ATLAS_LAYER_TITLE[layer]}`;
+    const mapDescription = `${ATLAS_LAYER_DESCRIPTION[layer]} ${ATLAS_LAYER_MISSINGNESS[layer]} The synchronized map-layer table after the map provides every map-eligible country, its active value, and its availability.`;
     const hasNoDataCountry = useMemo(
       () =>
         countries.some(
@@ -394,9 +396,11 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           viewBox={`0 0 ${MAP_W} ${MAP_H}`}
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label={`World map colored by ${ATLAS_LAYER_TITLE[layer]}`}
+          aria-labelledby="atlas-world-map-title atlas-world-map-description"
           onMouseDown={handleSvgMouseDown}
         >
+          <title id="atlas-world-map-title">{mapTitle}</title>
+          <desc id="atlas-world-map-description">{mapDescription}</desc>
           <defs>
             <pattern
               id="dots"

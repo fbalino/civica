@@ -8,7 +8,7 @@ import { AtlasWorldMap } from "./AtlasWorldMap";
 import { Button } from "@/components/editorial/Button";
 import { Banner } from "@/components/editorial/Banner";
 import { DataTable } from "@/components/editorial/DataTable";
-import { SourceDot } from "@/components/SourceDot";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import { buildNeIdMap } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
 import { atlasIdToSlug } from "@/lib/atlas/ids";
@@ -230,25 +230,26 @@ export function AtlasStandaloneClient({
           <strong>{ATLAS_LAYER_TITLE[layer]}:</strong>{" "}
           {ATLAS_LAYER_DESCRIPTION[layer]} {ATLAS_LAYER_MISSINGNESS[layer]}
         </p>
-        <p>
-          <strong>Source and vintage:</strong>{" "}
-          {activeLayerSource.sourceUrl ? (
-            <a href={activeLayerSource.sourceUrl}>
-              {activeLayerSource.sourceName}
-            </a>
-          ) : (
-            activeLayerSource.sourceName
-          )}{" "}
-          <SourceDot
-            source={activeLayerSource.sourceId}
-            retrievedAt={activeLayerSource.lastSyncedAt}
-          />
-          {" · "}
-          {activeLayerSource.upstreamVintageLabel ??
-            "No active source vintage is recorded."}
-        </p>
-        <details>
-          <summary>Show every map-eligible country and its active layer value</summary>
+        <ResearchVisualizationDisclosure
+          title={`${ATLAS_LAYER_TITLE[layer]} map`}
+          description="The map is a geographic view of the active source-native layer. The table below is the complete nonvisual equivalent."
+          sources={[
+            {
+              id: activeLayerSource.sourceId,
+              label: activeLayerSource.sourceName,
+              href: activeLayerSource.sourceUrl ?? undefined,
+              retrievedAt: activeLayerSource.lastSyncedAt,
+              upstreamVintage: activeLayerSource.upstreamVintageLabel,
+            },
+          ]}
+          missingData={ATLAS_LAYER_MISSINGNESS[layer]}
+          dataAccess={{
+            kind: "download",
+            href: "/downloads/civica-atlas-2026-07-11.json.gz",
+            label: "Download the permitted Atlas release (JSON gzip)",
+          }}
+          tableLabel="Show every map-eligible country and its active layer value"
+        >
           <DataTable aria-label={`${ATLAS_LAYER_TITLE[layer]} table alternative`}>
             <thead>
               <tr>
@@ -271,7 +272,7 @@ export function AtlasStandaloneClient({
               ))}
             </tbody>
           </DataTable>
-        </details>
+        </ResearchVisualizationDisclosure>
       </section>
     </div>
   );

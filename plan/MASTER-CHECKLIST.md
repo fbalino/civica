@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 232
-- **Remaining:** 74
-- **Progress:** 75.8%
+- **Completed:** 233
+- **Remaining:** 73
+- **Progress:** 76.1%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -235,7 +235,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-024** (P1) Resolve map, media, control, caption, and sticky-layer stacking conflicts systematically. _Done when: a documented z-layer/token model replaces accidental equal z-index/DOM-order behavior, overlays/menus/tooltips/lightboxes/maps work together, and a collision test suite passes across routes/viewports._
 - [ ] **EXP-025** (P1) Add stable screenshot/visual-regression coverage for canonical modules. _Done when: approved baselines cover `/design-system`, home, country tabs, atlas, compare, Index, Pulse ledger, methodology, constitution, elections, Record, API docs, advisory board, errors, embeds, menus, and representative data states in both themes/major viewports; review tooling distinguishes intentional updates._
 - [ ] **EXP-026** (P1) Establish reader-page visual performance budgets. _Done when: LCP/CLS/INP, JS, CSS, image/font bytes, request count, map initialization, and long-task budgets are declared for representative routes, measured in CI or scheduled runs, and seeded regressions fail._
-- [ ] **EXP-027** (P1) Verify charts/maps/tables have accessible nonvisual equivalents and export paths. _Done when: every research visualization exposes title/description/source/vintage, keyboard interaction where applicable, tabular or textual equivalent, missing-data semantics, and downloadable underlying data consistent with the display._
+- [x] **EXP-027** (P1) Verify charts/maps/tables have accessible nonvisual equivalents and export paths. _Done when: every research visualization exposes title/description/source/vintage, keyboard interaction where applicable, tabular or textual equivalent, missing-data semantics, and downloadable underlying data consistent with the display._
 - [ ] **EXP-028** (P0) Run a final module-led blind visual audit after fixes. _Done when: finders receive only canonical invariants, enumerate every module, adversarial verifiers confirm findings, sealed known issues are all independently found or proven fixed, negative controls stay absent, and the confirmed ledger has zero open P0/P1 items before G4._
 - [ ] **EXP-029** (P1) Define English-only and internationalization/localization readiness explicitly. _Done when: language scope is disclosed, country/person/office/party names preserve native/source forms where appropriate, locale-aware dates/numbers/collation and right-to-left/long-text stress fixtures pass, source-language/translation labels are visible, and no UI implies translations the project does not provide._
 - [x] **EXP-030** (P0) Repair published embed presets and document semantics. _Done when: small/medium/large/custom outer dimensions exactly match advertised iframe dimensions in light/dark without clipping visible fields/footer, generated documents have a meaningful title/H1/landmarks/robots policy and concise accessible name, and browser fixtures cover every preset._

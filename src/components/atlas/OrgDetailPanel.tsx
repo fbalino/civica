@@ -13,6 +13,7 @@ import {
   ORG_TYPE_LABEL,
 } from "./organizations";
 import { SourceDot } from "@/components/SourceDot";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import "@/app/organizations-section.css";
 
 const ORG_MAP_MARKER_COORDS: Record<string, [number, number]> = {
@@ -107,6 +108,8 @@ export function OrgDetailPanel({
   const foundedLine = o.foundedYear ? `FOUNDED ${o.foundedYear}` : null;
   const hqLine = o.hqCountry ? `HQ ${o.hqCountry.toUpperCase()}` : null;
   const eyebrowTail = [foundedLine, hqLine].filter(Boolean).join(" · ");
+  const membershipMapTitle = `${o.name} current membership map`;
+  const membershipMapDescription = `${highlightedCount} current members are highlighted. The full member list below supplies the country, join-year, role, and withdrawn-membership information without requiring map use.`;
 
   const sortedMembers = [...detail.members].sort(
     (a, b) => (a.joinYear ?? 9999) - (b.joinYear ?? 9999),
@@ -185,7 +188,11 @@ export function OrgDetailPanel({
             viewBox="0 100 2000 800"
             preserveAspectRatio="xMidYMid meet"
             className="org-mini-map"
+            role="img"
+            aria-labelledby="organization-membership-map-title organization-membership-map-description"
           >
+            <title id="organization-membership-map-title">{membershipMapTitle}</title>
+            <desc id="organization-membership-map-description">{membershipMapDescription}</desc>
             {mapLoaded
               ? mapPaths.map((p, i) => {
                   const isMember = !!(p.id && memberIds.has(p.id));
@@ -397,6 +404,29 @@ export function OrgDetailPanel({
             {detail.membershipSource.license}.
           </span>
         </div>
+        <ResearchVisualizationDisclosure
+          title={`${o.name} membership map`}
+          description="The highlighted map is a geographic index of the roster. The full member list above is the complete nonvisual equivalent."
+          sources={[
+            {
+              id: "civica_organization_roster_v1",
+              label: detail.membershipSource.label,
+              href: detail.membershipSource.url,
+              retrievedAt: detail.membershipSource.retrievedAt,
+              upstreamVintage: "organization-membership-release/2026-07-v1",
+            },
+          ]}
+          missingData={
+            detail.membershipSource.coverage === "complete"
+              ? "This checked release covers the organization roster; unmapped microstates are represented by markers when coordinates are available."
+              : "This is a selected checked roster. An absent country is not a non-membership claim."
+          }
+          dataAccess={{
+            kind: "withheld",
+            reason:
+              "Publisher roster terms permit factual reference but not public redistribution of the compiled membership rows.",
+          }}
+        />
       </div>
     </>
   );

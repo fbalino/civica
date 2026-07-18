@@ -5,6 +5,8 @@ import {
 } from "@/lib/db/queries-legislature";
 import { SourceDot } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
+import { DataTable } from "@/components/editorial/DataTable";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import { FactbookLegislatureChart } from "./FactbookLegislatureChart";
 import "./legislature.css";
 
@@ -254,6 +256,68 @@ export async function FactbookLegislature({
           />
         </>
       )}
+
+      {data ? (
+        <ResearchVisualizationDisclosure
+          title="Legislature composition"
+          description="The hemicycle is a visual reading of the exact chamber-party rows in the table below. Party browser controls provide a second native-document route to the same composition."
+          sources={[
+            {
+              id: "ipu_parline",
+              label: "IPU Parline composition release",
+              retrievedAt: context?.partySyncAt ?? null,
+            },
+          ]}
+          missingData="A chamber with no compiled composition is called out as an ingest gap; no empty hemicycle is used to imply zero seats."
+          dataAccess={{
+            kind: "withheld",
+            reason:
+              "Composition-row downloads remain unavailable until the source-specific redistribution terms are verified.",
+          }}
+          tableLabel="Show legislature composition table"
+        >
+          <DataTable aria-label={`${countryName} legislature composition data table`}>
+            <thead>
+              <tr>
+                <th scope="col">Chamber</th>
+                <th scope="col">Party</th>
+                <th scope="col">Seats</th>
+                <th scope="col">Seat share</th>
+                <th scope="col">Coalition state</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[data.lower, ...(data.upper ? [data.upper] : [])].flatMap(
+                (chamber) => {
+                  const coalition = coalitionByBody.get(chamber.id);
+                  const coalitionNames = new Set(
+                    coalition?.coalitionPartyNames ?? [],
+                  );
+                  return chamber.parties.map((party) => (
+                    <tr key={`${chamber.id}-${party.id}`}>
+                      <th scope="row">{chamber.name}</th>
+                      <td>{party.name}</td>
+                      <td>{party.seats}</td>
+                      <td>
+                        {chamber.total > 0
+                          ? `${((party.seats / chamber.total) * 100).toFixed(1)}%`
+                          : "Not recorded"}
+                      </td>
+                      <td>
+                        {coalition
+                          ? coalitionNames.has(party.name.toLowerCase().trim())
+                            ? "Governing coalition"
+                            : "Opposition / cross-bench"
+                          : "Not recorded"}
+                      </td>
+                    </tr>
+                  ));
+                },
+              )}
+            </tbody>
+          </DataTable>
+        </ResearchVisualizationDisclosure>
+      ) : null}
 
       {/* Coalition + next-election ribbon, only when at least one signal
           exists. Sits below both chambers so it applies to the whole

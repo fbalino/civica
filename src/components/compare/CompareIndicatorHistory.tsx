@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 
 import { DataValueState } from "@/components/DataValueState";
 import { Button } from "@/components/editorial/Button";
+import { DataTable } from "@/components/editorial/DataTable";
 import { IndicatorTrendChart } from "@/components/ci/IndicatorTrendChart";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import { SourceDot } from "@/components/SourceDot";
 import type { IndicatorHistorySeries } from "@/lib/db/queries";
 import {
@@ -100,6 +102,13 @@ export function CompareIndicatorHistory({
   );
   const exportAllowed = downloadableSourceIds.includes(selected.sourceId);
   const sourceRetrievedAt = sourceFreshness?.[selected.sourceId];
+  const sourceVintages = [
+    ...new Set(
+      selectedByCountry.flatMap(({ series }) =>
+        series?.lineage.map((lineage) => lineage.upstreamRelease) ?? [],
+      ),
+    ),
+  ];
   const exportHref = (
     country: CompareIndicatorHistoryCountry,
     format: "json" | "csv",
@@ -166,6 +175,60 @@ export function CompareIndicatorHistory({
         series={chartSeries}
         title={`${catalog?.label ?? selected.indicator} comparison`}
       />
+
+      <ResearchVisualizationDisclosure
+        title={`${catalog?.label ?? selected.indicator} comparison`}
+        description="The line chart keeps source-native values in the table below; its shared visual index is only a comparison aid."
+        sources={[
+          {
+            id: selected.sourceId,
+            label: sourceLabel(selected.sourceId),
+            retrievedAt: sourceRetrievedAt,
+            upstreamVintage:
+              sourceVintages.length > 0
+                ? sourceVintages.join(", ")
+                : null,
+          },
+        ]}
+        missingData="Years without a published observation stay absent from the line and table; they never become zero or no change."
+        dataAccess={
+          exportAllowed && selectedByCountry[0]
+            ? {
+                kind: "download",
+                href: exportHref(selectedByCountry[0].country, "csv"),
+                label: `Download ${selectedByCountry[0].country.name} CSV`,
+              }
+            : {
+                kind: "withheld",
+                reason:
+                  "Observation downloads are unavailable while this source's redistribution terms remain pending.",
+              }
+        }
+        tableLabel="Show source-native observation table"
+      >
+        <DataTable aria-label={`${catalog?.label ?? selected.indicator} comparison data table`}>
+          <thead>
+            <tr>
+              <th scope="col">Country</th>
+              <th scope="col">Year</th>
+              <th scope="col">Published value</th>
+              <th scope="col">Captured release</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedByCountry.flatMap(({ country, series }) =>
+              (series?.points ?? []).map((point) => (
+                <tr key={`${country.slug}-${point.year}`}>
+                  <th scope="row">{country.name}</th>
+                  <td>{point.year}</td>
+                  <td>{point.value}</td>
+                  <td>{series?.lineage[0]?.upstreamRelease ?? "Release not recorded"}</td>
+                </tr>
+              )),
+            )}
+          </tbody>
+        </DataTable>
+      </ResearchVisualizationDisclosure>
 
       <div className="compare-indicator-history-coverage">
         {selectedByCountry.map(({ country, series }) => {

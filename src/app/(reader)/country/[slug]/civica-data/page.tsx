@@ -403,6 +403,7 @@ export default async function CountryCivicaDataTab({
         <FactbookLeaders
           jurisdictionId={jurisdiction.id}
           countryName={jurisdiction.name}
+          countrySlug={slug}
           retrievedAt={wikidataRetrievedAt}
           initialRows={leadersRows}
         />

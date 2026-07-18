@@ -1,3 +1,6 @@
+import { DataTable } from "@/components/editorial/DataTable";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
+
 /**
  * Inline SVG eigenvalue / scree chart for the PCA appendix.
  *
@@ -102,6 +105,21 @@ export function EigenvalueChart({
       return `${i === 0 ? "M" : "L"}${cx.toFixed(2)} ${cy.toFixed(2)}`;
     })
     .join(" ");
+  const csvHref = `data:text/csv;charset=utf-8,${encodeURIComponent(
+    [
+      "principal_component,eigenvalue,cumulative_variance",
+      ...data.map(
+        (datum) =>
+          `${datum.pc},${datum.eigenvalue},${datum.cumulative}`,
+      ),
+    ].join("\n"),
+  )}`;
+  const chartDescription = `Bar chart of eigenvalues per principal component, with a cumulative-variance line overlaid and a dashed reference rule at the Kaiser threshold of ${kaiserThreshold.toFixed(1)}.${data
+    .map(
+      (datum) =>
+        ` ${datum.pc}: eigenvalue ${datum.eigenvalue.toFixed(3)}, cumulative ${(datum.cumulative * 100).toFixed(1)} percent.`,
+    )
+    .join("")}`;
 
   return (
     <figure className="meth-figure">
@@ -112,19 +130,7 @@ export function EigenvalueChart({
         className="meth-eigenvalue-chart"
       >
         <title id={titleId}>{title}</title>
-        <desc id={descId}>
-          Bar chart of eigenvalues per principal component, with a
-          cumulative-variance line overlaid and a dashed reference rule
-          at the Kaiser threshold of 1.0.
-          {data
-            .map(
-              (d) =>
-                ` ${d.pc}: eigenvalue ${d.eigenvalue.toFixed(3)}, cumulative ${(
-                  d.cumulative * 100
-                ).toFixed(1)} percent.`,
-            )
-            .join("")}
-        </desc>
+        <desc id={descId}>{chartDescription}</desc>
 
         {/* ─── Plot frame (subtle paper-tone fill) ──────────────── */}
         <rect
@@ -379,6 +385,44 @@ export function EigenvalueChart({
         sits above it. Source:{" "}
         <code>analysis/phase-5-3/eigenvalues.csv</code>.
       </figcaption>
+      <ResearchVisualizationDisclosure
+        title="PCA eigenvalue scree figure"
+        description="The bars and cumulative line are rendered directly from the archived PCA result. The table and CSV below carry the exact values used in the figure."
+        sources={[
+          {
+            label: "Archived PCA output",
+            href: "/civica-index/methodology/pca-appendix#kaiser",
+            retrievedAt: null,
+            upstreamVintage: "analysis/phase-5-3/eigenvalues.csv",
+          },
+        ]}
+        missingData="The figure is omitted when its archived component rows are unavailable; it does not imply a retained component or a zero eigenvalue."
+        dataAccess={{
+          kind: "download",
+          href: csvHref,
+          label: "Download PCA figure CSV",
+        }}
+        tableLabel="Show PCA figure data table"
+      >
+        <DataTable aria-label="PCA eigenvalue scree figure data table">
+          <thead>
+            <tr>
+              <th scope="col">Principal component</th>
+              <th scope="col">Eigenvalue</th>
+              <th scope="col">Cumulative variance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((datum) => (
+              <tr key={datum.pc}>
+                <th scope="row">{datum.pc}</th>
+                <td>{datum.eigenvalue.toFixed(3)}</td>
+                <td>{(datum.cumulative * 100).toFixed(1)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </DataTable>
+      </ResearchVisualizationDisclosure>
     </figure>
   );
 }

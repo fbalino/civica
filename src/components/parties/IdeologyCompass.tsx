@@ -156,6 +156,8 @@ export function IdeologyCompass({
 }: IdeologyCompassProps) {
   // Hovered dot id, so we can lift it above its neighbours and ring it.
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const svgTitleId = "party-ideology-compass-title";
+  const svgDescId = "party-ideology-compass-description";
 
   // Precompute plot coordinates once. Larger dots drawn first so small dots
   // stay clickable on top; the hovered dot is always lifted last.
@@ -171,6 +173,7 @@ export function IdeologyCompass({
   }, [parties, scaleBySeatShare]);
 
   const centerX = xAt(0);
+  const svgDescription = `${dots.length} parties plotted. Horizontal position is the source-published economic left-right estimate; vertical position is the source-published anti-pluralism index. Dot area indicates recorded chamber-seat share. Parties without a displayable position are not plotted and remain explicit in the adjacent table.`;
 
   // Soft-fail: nothing matched → render nothing (the page shows its own empty
   // state); never draw an empty frame.
@@ -186,9 +189,11 @@ export function IdeologyCompass({
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           width="100%"
           role="img"
-          aria-label={`${title}. ${dots.length} parties plotted.`}
+          aria-labelledby={`${svgTitleId} ${svgDescId}`}
           className="ideology-compass-svg"
         >
+          <title id={svgTitleId}>{title}</title>
+          <desc id={svgDescId}>{svgDescription}</desc>
           {/* Plot field (subtle paper-tone fill). */}
           <rect
             x={PLOT_X}

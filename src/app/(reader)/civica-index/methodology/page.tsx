@@ -6,6 +6,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import {
   getCIMethodology,
 } from "@/lib/db/queries";
@@ -236,6 +237,25 @@ export default async function MethodologyPage() {
           </tbody>
           </table>
         </div>
+
+        <ResearchVisualizationDisclosure
+          title="Historical Civica Index dimension weights"
+          description="The weight bar is a compact view of the archived research-beta formula. The dimension table immediately above is the complete nonvisual equivalent."
+          sources={[
+            {
+              label: "Civica Index methodology and source-input record",
+              href: "/civica-index/methodology",
+              retrievedAt: civicaIndex.lastRevisionIso,
+              upstreamVintage: civicaIndex.lastRevision,
+            },
+          ]}
+          missingData="Only adopted historical Beta components appear. A candidate or unavailable component is not silently assigned a zero weight."
+          dataAccess={{
+            kind: "download",
+            href: "/api/v1/index/methodology",
+            label: "Download the methodology weights as JSON",
+          }}
+        />
 
         <p>
           <strong>The archived Beta weights are PCA-informed.</strong>{" "}

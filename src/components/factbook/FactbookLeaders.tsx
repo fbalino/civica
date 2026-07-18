@@ -4,6 +4,8 @@ import { titleCaseTitle } from "@/lib/text/title-case";
 import { SourceDot } from "@/components/SourceDot";
 import { Chip } from "@/components/editorial/Pill";
 import { Banner } from "@/components/editorial/Banner";
+import { DataTable } from "@/components/editorial/DataTable";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import {
   LeaderTenureTimeline,
   type TenureEntry,
@@ -47,6 +49,7 @@ type LeaderRow = Awaited<ReturnType<typeof getLeaderTimeline>>[number];
 interface FactbookLeadersProps {
   jurisdictionId: string;
   countryName: string;
+  countrySlug: string;
   // Optional — when the orchestrator already fetched the wikidata source's
   // last_sync_at it can pass it through. Without it the SourceDot still
   // renders, just with the "Not yet synced" tooltip.
@@ -215,6 +218,7 @@ function groupByPerson(rows: LeaderRow[]): PersonGroup[] {
 export async function FactbookLeaders({
   jurisdictionId,
   countryName,
+  countrySlug,
   retrievedAt,
   initialRows,
 }: FactbookLeadersProps) {
@@ -500,6 +504,45 @@ export async function FactbookLeaders({
         <section className="lead-block">
           <h3 className="lead-eyebrow">Time in office</h3>
           <LeaderTenureTimeline entries={timelineEntries} nowYear={nowYear} />
+          <ResearchVisualizationDisclosure
+            title="Current-officeholder tenure"
+            description="The bars only visualize each current officeholder's recorded current-term start. The table gives the same names, offices, dates, and elapsed years without relying on bar length."
+            sources={[
+              {
+                id: "wikidata",
+                label: "Wikidata current-officeholder records",
+                retrievedAt,
+              },
+            ]}
+            missingData="Officeholders without a recorded current-term start remain in the roster but are not assigned a made-up tenure bar."
+            dataAccess={{
+              kind: "download",
+              href: `/api/countries/${encodeURIComponent(countrySlug)}/leaders`,
+              label: "Download current-officeholder rows as JSON",
+            }}
+            tableLabel="Show tenure timeline table"
+          >
+            <DataTable aria-label={`${countryName} current-officeholder tenure data table`}>
+              <thead>
+                <tr>
+                  <th scope="col">Officeholder</th>
+                  <th scope="col">Current office</th>
+                  <th scope="col">Current term began</th>
+                  <th scope="col">Elapsed years</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timelineEntries.map((entry) => (
+                  <tr key={`${entry.personName}-${entry.officeLabel}`}>
+                    <th scope="row">{entry.personName}</th>
+                    <td>{entry.officeLabel}</td>
+                    <td>{entry.startYear}</td>
+                    <td>{Math.max(0, nowYear - entry.startYear)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </DataTable>
+          </ResearchVisualizationDisclosure>
         </section>
       )}
 

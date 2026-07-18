@@ -2276,6 +2276,76 @@ legend.editorial-filter-label {
   border-radius: var(--radius-sm);
 }
 
+/* ─── Research visualization disclosure ──────────────────────────────── */
+
+.research-viz-disclosure {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-grid-cell);
+}
+
+.research-viz-disclosure__description {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-55);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+}
+
+.research-viz-disclosure__facts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-13);
+  line-height: var(--leading-relaxed);
+}
+
+.research-viz-disclosure__facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.research-viz-disclosure__facts dt {
+  color: var(--color-text-40);
+  font-weight: var(--font-weight-medium);
+}
+
+.research-viz-disclosure__facts dd {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.research-viz-disclosure__facts a,
+.research-viz-disclosure__table summary {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.research-viz-disclosure__table {
+  margin-top: var(--space-3);
+}
+
+.research-viz-disclosure__table summary {
+  cursor: pointer;
+  font-size: var(--text-13);
+  font-weight: var(--font-weight-medium);
+}
+
+.research-viz-disclosure__table .editorial-table-scroll {
+  margin-top: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .research-viz-disclosure__facts > div {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+}
+
 /* The /about page now uses the canonical full-bleed engraving hero — it
    reuses the shared .factbook-hero-* class family (factbook.css), matching the
    homepage and /country. The former bespoke .about-hero* rules were removed. */

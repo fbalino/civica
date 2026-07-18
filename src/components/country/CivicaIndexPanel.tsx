@@ -25,6 +25,8 @@ import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { V2_WEIGHTS } from "@/lib/ci/dimensions-v2";
 import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
+import { DataTable } from "@/components/editorial/DataTable";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import { assessCiCompleteness } from "@/lib/ci/missingness-policy";
 
@@ -166,14 +168,18 @@ function HistoryChart({
     xLabelIndices.add(Math.round(history.length / 3));
     xLabelIndices.add(Math.round((2 * history.length) / 3));
   }
+  const chartDescription = `Archived quarterly research estimates from ${formatQuarterLong(history[0]!.quarter)} through ${formatQuarterLong(history[history.length - 1]!.quarter)}. The quarterly table after the chart gives the exact estimates and recorded ranks.`;
 
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
       width="100%"
       style={{ display: "block", overflow: "visible" }}
-      aria-label="Historical CI score chart"
+      role="img"
+      aria-labelledby="ci-history-chart-title ci-history-chart-description"
     >
+      <title id="ci-history-chart-title">Historical Civica Index research estimates</title>
+      <desc id="ci-history-chart-description">{chartDescription}</desc>
       <defs>
         <linearGradient id="ci-area-grad" x1="0" y1="0" x2="0" y2="1">
           <stop
@@ -692,6 +698,30 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
               ciChangeText={ciChangeText}
               dimensionCount={renderedDimensionCount}
             />
+            {ciScoreData ? (
+              <ResearchVisualizationDisclosure
+                title={`${jurisdiction.name} Civica Index estimate`}
+                description="The neutral position marker is a visual placement of the displayed research estimate, including its archived input-variation range where recorded. The score card itself is the complete text equivalent."
+                sources={[
+                  {
+                    label: "Civica Index methodology and source-input record",
+                    href: "/civica-index/methodology",
+                    retrievedAt: null,
+                    upstreamVintage: ciScoreData.quarter,
+                  },
+                ]}
+                missingData={
+                  ciScoreData.completenessFlag === "partial"
+                    ? "This estimate has named missing governance dimensions and is not directly comparable with a full estimate."
+                    : "No score is displayed when the required research inputs are insufficient."
+                }
+                dataAccess={{
+                  kind: "download",
+                  href: `/api/v1/index/${encodeURIComponent(slug)}/history`,
+                  label: "Download this country’s quarterly research history as JSON",
+                }}
+              />
+            ) : null}
             {pulseV2 ? <PulseDimensionalDeltas data={pulseV2} /> : null}
           </div>
         ) : (
@@ -745,6 +775,49 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
                     )}
                   </span>
                 </div>
+                <ResearchVisualizationDisclosure
+                  title={`${jurisdiction.name} Civica Index history`}
+                  description="The chart is a visual view of the archived quarterly research estimates. The table below is the exact nonvisual equivalent."
+                  sources={[
+                    {
+                      label: "Civica Index methodology and source-input record",
+                      href: "/civica-index/methodology",
+                      retrievedAt: null,
+                      upstreamVintage:
+                        composite?.vintageLabel ?? composite?.quarter ?? null,
+                    },
+                  ]}
+                  missingData="Only published quarters appear. A missing quarter is not interpolated and does not imply no change."
+                  dataAccess={{
+                    kind: "download",
+                    href: `/api/v1/index/${encodeURIComponent(slug)}/history`,
+                    label: "Download this country history as JSON",
+                  }}
+                  tableLabel="Show quarterly history table"
+                >
+                  <DataTable aria-label={`${jurisdiction.name} Civica Index history data table`}>
+                    <thead>
+                      <tr>
+                        <th scope="col">Quarter</th>
+                        <th scope="col">Research estimate</th>
+                        <th scope="col">Rank</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {typedHistory.map((point) => (
+                        <tr key={point.quarter}>
+                          <th scope="row">{formatQuarterLong(point.quarter)}</th>
+                          <td>{point.score.toFixed(1)}</td>
+                          <td>
+                            {point.rank != null && point.totalRanked != null
+                              ? `${point.rank} of ${point.totalRanked}`
+                              : "Not recorded"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </DataTable>
+                </ResearchVisualizationDisclosure>
               </>
             ) : (
               <p className="ci-country-panel-copy">

@@ -42,14 +42,15 @@ for (const viewport of [DESKTOP, MOBILE]) {
       await expect
         .poll(() => map.locator("path[data-id]").count(), { timeout: 20_000 })
         .toBeGreaterThan(0);
-      await expect(page.getByText("Source:", { exact: true })).toBeVisible();
-      await expect(page.getByText("Vintage:", { exact: true })).toBeVisible();
+      await expect(page.getByText("Source and vintage", { exact: true })).toBeVisible();
       await expect(
         page
+          .getByRole("region", {
+            name: "Income group (World Bank) map data disclosure",
+          })
           .getByText(
             /No data means no active World Bank income-group observation/,
           )
-          .first(),
       ).toBeVisible();
       if (process.env.ATL015_CAPTURE_DIR) {
         await page.screenshot({
