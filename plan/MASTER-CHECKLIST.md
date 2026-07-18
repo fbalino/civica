@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 217
-- **Remaining:** 89
-- **Progress:** 70.9%
+- **Completed:** 218
+- **Remaining:** 88
+- **Progress:** 71.2%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -301,7 +301,7 @@ Source: `plan/09-testing-qa-and-release.md`
 - [x] **QA-008** (P0) Add statistical-analysis reproducibility tests. _Done when: fixed seeds/environments/input hashes recreate all tables/figures/threshold decisions within declared tolerances, randomized procedures log seeds, and a changed input/version cannot silently reuse old results._
 - [x] **QA-009** (P0) Establish the canonical Playwright/browser test harness and command. _Done when: one command starts/uses the real app predictably, captures console/network failures, supports theme/viewport/auth fixtures, cleans tabs/processes, saves evidence, and fails on a seeded route or asset error._
 - [x] **QA-010** (P0) Cover critical reader journeys end to end. _Done when: home/search→country tabs, source/provenance, atlas, compare, indicator history, constitution/search, elections, organizations, Record, methodology/citation, API docs, download/export, licensing/contact/advisory, 404/error, and embed journeys pass at required viewports/themes._
-- [ ] **QA-011** (P0) Cover admin/reviewer and scheduled-data journeys end to end in isolated fixtures. _Done when: login/session, queues, double coding/adjudication, disputes/corrections, safe mutation, audit logs, cron auth/idempotency, alerts, and failure recovery pass without production writes or paid external calls._
+- [x] **QA-011** (P0) Cover admin/reviewer and scheduled-data journeys end to end in isolated fixtures. _Done when: login/session, queues, double coding/adjudication, disputes/corrections, safe mutation, audit logs, cron auth/idempotency, alerts, and failure recovery pass without production writes or paid external calls._
 - [ ] **QA-012** (P1) Add automated accessibility testing plus scripted keyboard journeys. _Done when: axe or equivalent covers canonical routes/states/themes, keyboard scripts exercise all control classes, focus/labels/semantics/contrast results are archived, and violations block relevant changes._
 - [ ] **QA-013** (P1) Add visual-regression testing tied to the design-system baselines. _Done when: EXP-025 baselines are deterministic, fonts/assets/data fixtures are stable, diffs have approval workflow, theme/viewport/state coverage is documented, and a one-token seeded drift is detected._
 - [ ] **QA-014** (P1) Add performance and payload regression tests. _Done when: route HTML/RSC/JS/CSS/image/font/request/LCP/CLS/INP/server/query budgets are measured on stable fixtures, constitution/map/art heavy paths are represented, and a seeded budget breach fails._
