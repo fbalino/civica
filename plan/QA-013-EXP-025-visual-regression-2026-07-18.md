@@ -46,8 +46,11 @@ read-only test database; the test report must make that boundary visible.
    Playwright diffs only under ignored `output/playwright/`.
 2. A candidate update must be generated explicitly with
    `npm run update:e2e:visual -- --author=<name> --reason=<rationale>`;
-   normal test/CI commands never rewrite expected artifacts. The command writes
-   a candidate manifest only after the complete 68-case matrix succeeds.
+   normal test/CI commands never rewrite expected artifacts. First run it
+   against a credential-free production build, then against the declared
+   fixture build (`E2E_PERFORMANCE_FIXTURE_DB=1`). Each phase only writes its
+   own cases; the second phase writes a candidate manifest only after the
+   complete 68-case matrix exists.
 3. A reviewer inspects the candidate images and promotes it explicitly with
    `VISUAL_BASELINE_APPROVE=1 npm run approve:e2e:visual -- --reviewer=<name>
    --reason=<review rationale>`. Approval verifies every image hash and writes

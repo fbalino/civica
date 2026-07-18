@@ -69,6 +69,8 @@ async function openNavigationState(
 }
 
 test.describe("QA-013 / EXP-025 — canonical visual baselines", () => {
+  const usesFixtureDatabase = process.env.E2E_PERFORMANCE_FIXTURE_DB === "1";
+
   for (const scenario of VISUAL_REGRESSION_SCENARIOS) {
     for (const theme of VISUAL_REGRESSION_THEMES) {
       for (const viewport of VISUAL_REGRESSION_VIEWPORTS) {
@@ -77,9 +79,10 @@ test.describe("QA-013 / EXP-025 — canonical visual baselines", () => {
           browser,
         }, testInfo) => {
           test.skip(
-            scenario.requiresFixtureDatabase === true &&
-              process.env.E2E_PERFORMANCE_FIXTURE_DB !== "1",
-            FIXTURE_REASON,
+            Boolean(scenario.requiresFixtureDatabase) !== usesFixtureDatabase,
+            usesFixtureDatabase
+              ? "This credential-free surface is captured without the fixture database."
+              : FIXTURE_REASON,
           );
           if (testInfo.config.updateSnapshots !== "none") {
             expect(
