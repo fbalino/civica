@@ -115,6 +115,7 @@ test.describe("QA-012 — keyboard journeys", () => {
   test("sortable data tables respond to Enter and expose their new sort direction", async ({
     page,
   }) => {
+    requireControlledFixtureDatabase();
     await page.goto("/rankings", { waitUntil: "networkidle" });
 
     const countryHeader = page
