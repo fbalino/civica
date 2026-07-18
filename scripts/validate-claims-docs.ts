@@ -81,7 +81,15 @@ const TEST_CREDENTIAL_KEYS = [
 ] as const;
 
 function cleanTestEnvironment(): NodeJS.ProcessEnv {
-  const env = { ...process.env, NODE_ENV: "test" };
+  const env = {
+    ...process.env,
+    NODE_ENV: "test",
+    // npm lifecycle scripts can inherit production/omit configuration from
+    // the parent build even when NODE_ENV is overridden. Clear both so the
+    // nested `npm run test` sees its declared test environment.
+    npm_config_production: "false",
+    npm_config_omit: "",
+  };
   for (const key of TEST_CREDENTIAL_KEYS) delete env[key];
   return env;
 }
