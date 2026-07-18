@@ -10,6 +10,9 @@ show component-level provenance, or report the actual Conditions coverage.
 The configured database was checked read-only on 2026-07-18 and does not yet
 contain `civica_conditions_releases`; the authored migrations must be applied
 to the isolated staging database before a real release/page/API verification.
+The existing local Next development process was also observed stuck in a
+Turbopack rebuild on 2026-07-18, so the browser screenshot for the new honest
+unavailable state remains pending a responsive local or staging server.
 
 ## Adopted public-read contract
 

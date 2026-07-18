@@ -172,6 +172,71 @@
   margin: 0 0 var(--space-8);
 }
 
+/* ── Versioned Conditions release reader ─────────────────────────── */
+
+.conditions-release-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+.conditions-release-stat {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+}
+
+.conditions-release-stat span {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.conditions-release-stat strong {
+  overflow-wrap: anywhere;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.conditions-release-components {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conditions-release-component {
+  display: grid;
+  gap: var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.conditions-release-component strong {
+  color: var(--color-text-primary);
+}
+
+.conditions-release-component a {
+  color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+  .conditions-release-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Tokenized inline filter select ─────────────────────────────────
  *   Canonical native <select> for compact filter controls inside a
  *   tool/editorial surface (year, metric, lens, etc.). Sans font,
