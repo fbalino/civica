@@ -441,7 +441,8 @@
 /* Inline links preserve an editorial accent as an underline while the text
    itself uses the readable foreground role on every banner surface. */
 .editorial-banner a,
-.editorial-page :is(p, li, td, .editorial-tool-dek) a {
+.editorial-page :is(p, li, td, .editorial-tool-dek) a,
+.methodology-content :is(p, li, td) a {
   color: var(--color-text-primary);
   text-decoration: underline;
   text-decoration-color: var(--color-accent);
@@ -4087,7 +4088,7 @@ a.constitution-xref-card-country:hover {
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-text-primary);
   padding: 2px 6px;
   border: 1px solid var(--color-accent);
   border-radius: var(--radius-sm);
@@ -4097,6 +4098,12 @@ a.constitution-xref-card-country:hover {
   font-family: var(--font-mono);
   font-size: var(--text-12);
   color: var(--color-text-primary);
+}
+.compare-intl-member a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: var(--space-1);
 }
 .compare-intl-nonmember {
   color: var(--color-text-25);

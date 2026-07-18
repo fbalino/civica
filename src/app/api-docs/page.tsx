@@ -64,7 +64,11 @@ const SECTIONS: ReaderSidebarItem[] = [
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 function CodeBlock({ children }: { children: string }) {
-  return <pre className="api-code-block">{children}</pre>;
+  return (
+    <pre className="api-code-block" tabIndex={0}>
+      {children}
+    </pre>
+  );
 }
 
 /** Every endpoint's parameter table renders from `RouteContract.params`

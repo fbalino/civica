@@ -52,7 +52,14 @@ test.describe("QA-012 — WCAG AA audit matrix", () => {
           audit.violations,
           formatA11yViolations(audit.violations),
         ).toEqual([]);
-        expect(errors.hardFailures(), errors.hardFailures().join("\n")).toEqual([]);
+        const unexpectedHardFailures = errors.hardFailures().filter(
+          (failure) =>
+            scenario.name !== "not-found" || !failure.startsWith("404 "),
+        );
+        expect(
+          unexpectedHardFailures,
+          unexpectedHardFailures.join("\n"),
+        ).toEqual([]);
       });
     }
   }

@@ -409,6 +409,28 @@ html:root {
   --color-status-danger: var(--color-danger);
   --color-status-info: var(--color-info);
 
+  /* Government hues need readable dark-surface foregrounds rather than the
+     light theme's deeper editorial signals. */
+  --color-gov-presidential: var(--color-accent);
+  --color-gov-parliamentary: var(--color-status-info);
+  --color-gov-semi-presidential: var(--series-b);
+  --color-gov-theocratic: var(--color-status-success);
+  --color-gov-absolute: var(--color-status-warning);
+  --color-gov-other: var(--color-text-muted);
+  --gov-parl: var(--color-status-info);
+  --gov-pres: var(--color-accent);
+  --gov-semi: var(--series-b);
+  --gov-mon: var(--color-status-warning);
+  --gov-abs: var(--color-status-danger);
+  --gov-theo: var(--color-status-success);
+  --gov-one: var(--color-text-secondary);
+  --gov-mil: var(--color-text-secondary);
+  --gov-other: var(--color-text-muted);
+  --color-branch-executive: var(--color-accent);
+  --color-branch-legislative: var(--color-status-info);
+  --color-branch-judicial: var(--color-status-success);
+  --color-branch-monarchy: var(--series-b);
+
   --color-status-active: #5caa6e;
   --color-status-idle: #c4bdae;
   --color-status-warn: #d4a04a;

@@ -519,7 +519,6 @@ export function IndicatorTrendChart({
               >
                 <span
                   className="indicator-trend-hover-hit"
-                  aria-label={`${year} values`}
                   onMouseEnter={() => setHoverYear(year)}
                   onMouseLeave={() => setHoverYear(null)}
                   onFocus={() => setHoverYear(year)}
