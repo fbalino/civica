@@ -28,6 +28,7 @@ export const REQUIRED_CI_COMMANDS = [
   "npm run build:ci",
   "npx playwright install --with-deps chromium firefox webkit",
   "npm run test:e2e:browser-support",
+  "npm run test:e2e:a11y",
   "npm run test:e2e -- e2e/harness.selftest.spec.ts e2e/ci-smoke.spec.ts --workers=1 --retries=0",
   "npm run test:e2e:performance",
 ] as const;
@@ -84,6 +85,10 @@ const CANONICAL_LINES = [
   "        env:",
   "          E2E_WEBSERVER_CMD: npm run start",
   "        run: npm run test:e2e:browser-support",
+  "      - name: WCAG AA and keyboard journeys",
+  "        env:",
+  "          E2E_WEBSERVER_CMD: npm run start",
+  "        run: npm run test:e2e:a11y",
   "      - name: Production browser and API smoke",
   "        env:",
   "          E2E_WEBSERVER_CMD: npm run start",
