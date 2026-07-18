@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T11:18:17.311Z",
+  "generatedAt": "2026-07-18T14:20:42.293Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -1213,6 +1213,69 @@
         "civica_conditions_releases": "missing",
         "civica_conditions_scores": 331,
         "research_evidence_history": 79465
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0043_pulse_decay_lifecycle",
+      "artifact": "drizzle/authoritative/0043_pulse_decay_lifecycle.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "7c8bbe2d0a71a14f72fe6602feaf25bab66bfa06a7f034e0488f4b23f8853892",
+      "affectedRelations": [
+        "pulse_dimensional_delta_history",
+        "pulse_dimensional_deltas"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0043_pulse_decay_lifecycle-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0043_pulse_decay_lifecycle --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_dimensional_delta_history": 1625,
+        "pulse_dimensional_deltas": 325
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0044_pulse_drift_monitoring",
+      "artifact": "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "d1b3b5b47ff1de45ef2854756d6834aee16b057272093b730add8e618fab7469",
+      "affectedRelations": [
+        "pulse_drift_alerts",
+        "pulse_drift_baselines",
+        "pulse_drift_observations"
+      ],
+      "statementCount": 14,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0044_pulse_drift_monitoring-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0044_pulse_drift_monitoring --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_drift_alerts": "missing",
+        "pulse_drift_baselines": "missing",
+        "pulse_drift_observations": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0045_pulse_evaluation_workspace_reconciliation",
+      "artifact": "drizzle/authoritative/0045_pulse_evaluation_workspace_reconciliation.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "78deee17328f6931c5cc0aaf1cb7885b85047eeefc1e8968efb33f4013ed1caf",
+      "affectedRelations": [
+        "pulse_coding_studies"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0045_pulse_evaluation_workspace_reconciliation-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0045_pulse_evaluation_workspace_reconciliation --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_coding_studies": 4
       },
       "writesPerformed": 0
     },
