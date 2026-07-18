@@ -44,6 +44,8 @@ const TONE_HUE: Record<ChipTone, string | null> = {
   accent: "var(--color-accent)",
 };
 
+const CHIP_FOREGROUND = "var(--color-text-primary)";
+
 /** Normalise legacy variant names to canonical tones. */
 const VARIANT_TONE: Record<ChipVariant, ChipTone> = {
   // canonical tones map to themselves
@@ -102,7 +104,7 @@ function chipStyle(tone: ChipTone, size: ChipSize) {
     ...base,
     background: `color-mix(in oklab, ${hue} 16%, var(--color-page-bg))`,
     border: `1px solid color-mix(in oklab, ${hue} 32%, transparent)`,
-    color: "var(--color-text-primary)",
+    color: CHIP_FOREGROUND,
   };
 }
 

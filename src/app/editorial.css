@@ -503,11 +503,14 @@
    Without the :not(.btn) guard this class+type selector outspecifies
    .btn--primary and recolors button text to the accent (red-on-navy). */
 .editorial-section a:not(.btn) {
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
 }
 .editorial-section a:not(.btn):hover {
-  text-decoration: underline;
+  color: var(--color-accent);
 }
 .editorial-section code {
   font-family: var(--font-code);

@@ -148,7 +148,7 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
   margin-bottom: var(--space-3);
 }
 .home-feature-title {
@@ -172,10 +172,21 @@
   font-family: var(--font-body);
   font-size: var(--text-14);
   font-weight: var(--font-weight-medium);
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
 }
-.home-feature-link:hover { text-decoration: underline; }
+.home-feature-link:hover { color: var(--color-accent); }
+
+.home-feature .btn--text {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
+}
 
 /* Feature visual slot — holds a CountryCard / Index table (which bring
    their own surface) or the .home-feature-visual fallback box. */

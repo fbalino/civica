@@ -45,6 +45,7 @@
   /* .editorial-eyebrow already sets the small-caps Inter register; this only
      centers the eyebrow's implicit block box within the column. */
   margin-inline: auto;
+  color: var(--color-text-primary);
 }
 
 /* Scoped under .not-found so this out-ranks the shared `.editorial-page h1`
@@ -98,7 +99,7 @@
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--color-text-40);
+  color: var(--color-text-primary);
   margin: 0 0 var(--space-5);
 }
 
@@ -164,7 +165,7 @@
   font-family: var(--font-body);
   font-size: var(--text-13);
   line-height: var(--leading-normal);
-  color: var(--color-text-50);
+  color: var(--color-text-primary);
 }
 
 /* ── Small print ────────────────────────────────────────────────────── */
