@@ -290,7 +290,10 @@
   --z-rule: 5;
   --z-sticky: 20;
   --z-popover: 40;
-  --z-overlay: 60;
+  --z-tooltip: 50;
+  --z-overlay-backdrop: 60;
+  --z-overlay: 70;
+  --z-modal-backdrop: 90;
   --z-modal: 100;
   --z-toast: 200;
 
@@ -649,7 +652,7 @@ a {
   border: 1px solid var(--color-tooltip-border);
   pointer-events: none;
   transition: none;
-  z-index: 50;
+  z-index: var(--z-tooltip);
   min-width: max-content;
   max-width: min(24rem, calc(100vw - var(--space-8)));
   text-align: center;
@@ -991,7 +994,7 @@ a {
   transition:
     opacity 140ms ease,
     transform 140ms ease;
-  z-index: 120;
+  z-index: var(--z-popover);
 }
 
 /* When the menu contains group wrappers (legacy layout), use the
@@ -3181,7 +3184,7 @@ a {
   height: 2px;
   background: var(--color-accent);
   width: 0;
-  z-index: 200;
+  z-index: var(--z-toast);
   transition: width 80ms linear;
   pointer-events: none;
 }
@@ -4857,7 +4860,7 @@ a {
 
 .ghc-hover-card {
   position: fixed;
-  z-index: 100;
+  z-index: var(--z-tooltip);
   width: 280px;
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-hover-border);

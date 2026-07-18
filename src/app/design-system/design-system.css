@@ -13,7 +13,7 @@
 /* Top bar */
 .ds-top {
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   z-index: var(--z-sticky);
   display: flex;
   align-items: center;
@@ -139,6 +139,41 @@
    wrapper takes the flex-1 role so cells still divide the ramp evenly. */
 .ds-ramp-cell-tip { flex: 1; display: flex; }
 .ds-ramp-cell { flex: 1; height: 56px; }
+
+/* Stacking contract */
+.ds-layer-dek {
+  max-width: 64ch;
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+}
+.ds-layer-scale {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ds-layer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-4);
+  align-items: baseline;
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: var(--border-hairline) solid var(--color-accent);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+}
+.ds-layer-row code {
+  color: var(--color-text-primary);
+  font-family: var(--font-code);
+  font-size: var(--text-13);
+}
 
 /* Type scale */
 .ds-type-row {

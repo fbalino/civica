@@ -288,7 +288,7 @@
   line-height: var(--leading-normal);
   white-space: normal;
   text-align: left;
-  z-index: 70;
+  z-index: var(--z-tooltip);
   pointer-events: none;
 }
 .factbook-meta-pill-help:hover::after,
@@ -536,7 +536,7 @@
   box-shadow:
     0 12px 32px color-mix(in oklab, var(--color-text-primary) 14%, transparent),
     0 4px 8px color-mix(in oklab, var(--color-text-primary) 6%, transparent);
-  z-index: 40;
+  z-index: var(--z-popover);
   display: flex;
   flex-direction: column;
   /* iOS Safari: keep the drawer above the bottom UI */
@@ -699,7 +699,7 @@
   .factbook-mobile-subheader {
     position: sticky;
     top: 56px;
-    z-index: 30;
+    z-index: var(--z-sticky);
     display: none;
     align-items: center;
     justify-content: space-between;
@@ -1394,7 +1394,7 @@
   position: absolute;
   top: calc(100% + var(--space-2));
   left: 0;
-  z-index: 30;
+  z-index: var(--z-popover);
   min-width: 240px;
   padding: var(--space-2);
   border: 1px solid var(--color-border-default);
@@ -1749,7 +1749,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 /* Hover tooltip — positioned via clientX/clientY in the component */
 .factbook-legislature-tip {
   pointer-events: none;
-  z-index: 50;
+  z-index: var(--z-tooltip);
   background: var(--color-text-primary);
   color: var(--color-bg);
   padding: var(--space-2) var(--space-3);
@@ -2365,7 +2365,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 .map-explorer-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;

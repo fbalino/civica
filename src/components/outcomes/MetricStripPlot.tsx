@@ -718,7 +718,7 @@ export function MetricStripPlot({
                 top: `${pctY}%`,
                 transform: "translateY(-50%)",
                 pointerEvents: "none",
-                zIndex: 10,
+                zIndex: "var(--z-tooltip)",
                 background: "var(--color-tooltip-bg)",
                 border: "1px solid var(--color-tooltip-border)",
                 borderRadius: "var(--radius-sm)",

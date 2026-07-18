@@ -1811,7 +1811,7 @@ legend.editorial-filter-label {
 .fact-value-panel-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 39;
+  z-index: var(--z-overlay-backdrop);
   background: transparent;
 }
 
@@ -2458,7 +2458,7 @@ legend.editorial-filter-label {
   position: absolute;
   top: calc(100% + var(--space-2));
   left: 0;
-  z-index: 30;
+  z-index: var(--z-popover);
   width: 300px;
   max-width: min(300px, 90vw);
   padding: var(--space-2);
@@ -3652,7 +3652,7 @@ a.constitution-xref-card-country:hover {
      this bar's, the bar rendered completely hidden underneath the header on
      scroll instead of appearing below it. */
   top: var(--header-height);
-  z-index: 40;
+  z-index: var(--z-sticky);
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-card-border);
   margin: var(--space-6) 0 var(--space-7);
@@ -4598,7 +4598,7 @@ a.constitution-xref-card-country:hover {
 
 .editorial-tooltip {
   position: fixed;
-  z-index: var(--z-toast);
+  z-index: var(--z-tooltip);
   max-width: 280px;
   margin: 0;
   padding: var(--space-2) var(--space-3);

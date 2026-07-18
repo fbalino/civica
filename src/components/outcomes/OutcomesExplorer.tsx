@@ -184,7 +184,7 @@ function FilterMenu({
             position: "absolute",
             top: "calc(100% + 6px)",
             left: 0,
-            zIndex: 50,
+            zIndex: "var(--z-popover)",
             minWidth: "100%",
             maxWidth: 320,
             background: "var(--color-card-bg)",
@@ -381,7 +381,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
         borderBottom: "1px solid var(--color-card-border)",
         borderRadius: "var(--radius-md) 0 0 var(--radius-md)",
         padding: "24px 20px",
-        zIndex: 100,
+        zIndex: "var(--z-modal)",
         boxShadow: "var(--shadow-hard-lg)",
         animation: "slideInRight 200ms ease",
       }
@@ -396,7 +396,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
         borderTop: "1px solid var(--color-card-border)",
         borderRadius: "var(--radius-md) var(--radius-md) 0 0",
         padding: "20px 20px 32px",
-        zIndex: 100,
+        zIndex: "var(--z-modal)",
         boxShadow: "var(--shadow-hard-lg)",
         animation: "slideInUp 200ms ease",
       };
@@ -412,7 +412,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
             position: "fixed",
             inset: 0,
             background: "color-mix(in oklab, var(--color-text-primary) 40%, transparent)",
-            zIndex: 99,
+            zIndex: "var(--z-modal-backdrop)",
           }}
         />
       )}

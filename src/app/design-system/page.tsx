@@ -179,6 +179,19 @@ const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
   ),
 ];
 
+const STACKING_LAYERS = [
+  { token: "--z-base", purpose: "Document content and local artwork" },
+  { token: "--z-rule", purpose: "Local rules and anchored controls" },
+  { token: "--z-sticky", purpose: "Persistent headers and sticky rails" },
+  { token: "--z-popover", purpose: "Menus, selects, and transient drawers" },
+  { token: "--z-tooltip", purpose: "Focused or pointer-following detail" },
+  { token: "--z-overlay-backdrop", purpose: "Non-modal overlay backdrops" },
+  { token: "--z-overlay", purpose: "Non-modal overlay panels" },
+  { token: "--z-modal-backdrop", purpose: "Modal backdrops" },
+  { token: "--z-modal", purpose: "Modal dialogs and lightboxes" },
+  { token: "--z-toast", purpose: "System-wide transient notices" },
+] as const;
+
 const groupById = (id: string): DesignTokenGroup | undefined =>
   DESIGN_TOKEN_GROUPS.find((group) => group.id === id);
 
@@ -551,6 +564,21 @@ export default function DesignSystemPage() {
               </div>
             ))}
           </div>
+
+          <h3 className="ds-sub">Layer order</h3>
+          <p className="ds-layer-dek">
+            Lower layers cannot cover a higher layer. Use local artwork ordering
+            only inside a component; every document-level floating surface uses
+            this shared scale.
+          </p>
+          <ol className="ds-layer-scale" aria-label="Document layer order">
+            {STACKING_LAYERS.map((layer) => (
+              <li key={layer.token} className="ds-layer-row">
+                <code>{layer.token}</code>
+                <span>{layer.purpose}</span>
+              </li>
+            ))}
+          </ol>
 
           <h3 className="ds-sub">Motion</h3>
           <div

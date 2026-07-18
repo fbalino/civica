@@ -732,7 +732,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               position: "fixed",
               left: hoverCard.x,
               top: hoverCard.y,
-              zIndex: 60,
+              zIndex: "var(--z-tooltip)",
               pointerEvents: "none",
               width: 360,
             }}

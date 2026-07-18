@@ -132,7 +132,7 @@ export function FactbookLightbox({
         position: "fixed",
         inset: 0,
         background: OVERLAY_BG,
-        zIndex: 1000,
+        zIndex: "var(--z-modal)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

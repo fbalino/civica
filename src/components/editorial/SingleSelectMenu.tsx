@@ -218,7 +218,7 @@ export function SingleSelectMenu({
             position: "absolute",
             top: "calc(100% + 6px)",
             left: 0,
-            zIndex: 50,
+            zIndex: "var(--z-popover)",
             minWidth: "100%",
             maxWidth: 320,
             background: "var(--color-card-bg)",
