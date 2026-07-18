@@ -17,7 +17,7 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 ## Owner judgment
 
 - Approve the representative engraving color-grade pilot before any corpus-wide transformation.
-- Select one of three design-system-compliant Explore navigation concepts before new artwork or final implementation.
+- Select one of three design-system-compliant Explore navigation concepts before new artwork or final implementation; review `plan/EXP-014-explore-navigation-concepts-2026-07-18.md` and its dated browser mockups first.
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.

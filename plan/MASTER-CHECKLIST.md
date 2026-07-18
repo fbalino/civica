@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 223
-- **Remaining:** 83
-- **Progress:** 72.9%
+- **Completed:** 224
+- **Remaining:** 82
+- **Progress:** 73.2%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -222,7 +222,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-011** (P0) Add `validate:country-engravings` and include it in CI. _Done when: validation checks exact pair coverage, WebP/fallback policy, dimensions/aspect, file-size bounds, caption/manifest coverage, duplicate/missing files, color-family thresholds, and raw PNG fallback risk; seeded failures are caught._
 - [x] **EXP-012** (P0) Integrate the editorial-illustration disclosure into captions, licensing, metadata, and accessible descriptions. _Done when: representative country/page/territory routes identify art as illustrative/non-documentary, captions remain concise, licensing links to the policy/manifest, screen-reader text is accurate, and no generated image is mistaken for source evidence._
 - [x] **EXP-013** (P0) Move the country hero caption into valid, collision-free structure. _Done when: caption semantics are valid, desktop hero reserves a content row/region rather than relying on hardcoded offsets, it never overlaps Map/Images controls across the supported width/text matrix, and screenshot/geometry tests include 769px and 1440px._
-- [ ] **EXP-014** (P0) Create three design-system-compliant Explore navigation concepts before implementation: typography-first scholarly index, emblem-led compact menu, and true editorial mega menu. _Done when: each concept includes hierarchy, information architecture, keyboard/focus behavior, desktop/mobile relationship, performance budget, asset plan, light/dark states, and browser-rendered mockups under the dated mockup convention._
+- [x] **EXP-014** (P0) Create three design-system-compliant Explore navigation concepts before implementation: typography-first scholarly index, emblem-led compact menu, and true editorial mega menu. _Done when: each concept includes hierarchy, information architecture, keyboard/focus behavior, desktop/mobile relationship, performance budget, asset plan, light/dark states, and browser-rendered mockups under the dated mockup convention._
 - [ ] **EXP-015** (P0) Select and canonize one Explore concept. _Done when: owner decision is recorded, `DESIGN.md`, `/design-system`, shared component contract, tokens/assets, and acceptance screenshots are updated before the production navigation consumes the pattern._
 - [ ] **EXP-016** (P1) Implement the selected Explore navigation with semantically distinct destination identity. _Done when: hierarchy communicates “start here” and research tools, all eight destinations are unambiguous, desktop/mobile share one data/identity model, focus/Escape/hover/touch behavior passes, and no decorative art substitutes for meaning._
 - [ ] **EXP-017** (P1) Enforce a navigation/hero asset loading budget. _Done when: unopened menu assets and inactive theme variants do not incur the current full transfer cost, displayed 40px art is appropriately sized/compressed or sprite-based, active hero strategy is measured, and route-level image bytes meet the declared budget._
