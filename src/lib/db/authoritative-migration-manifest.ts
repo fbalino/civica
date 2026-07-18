@@ -259,4 +259,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "7c8bbe2d0a71a14f72fe6602feaf25bab66bfa06a7f034e0488f4b23f8853892",
     baseline: false,
   },
+  {
+    id: "0044_pulse_drift_monitoring",
+    path: "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+    sha256: "d1b3b5b47ff1de45ef2854756d6834aee16b057272093b730add8e618fab7469",
+    baseline: false,
+  },
 ] as const;

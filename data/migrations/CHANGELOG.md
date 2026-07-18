@@ -258,6 +258,16 @@ creates separately versioned 730-day projections/history. Recovery is an
 isolated pre-change backup or reviewed forward compensation; never rewrite the
 retained output ledger to make prior runs appear to use the newer window.
 
+`0044_pulse_drift_monitoring` adds PUL-024's append-only baseline,
+observation, and alert ledgers. A baseline stores only aggregate, bounded
+distribution snapshots for one explicit method/window. Score-run observations
+record whether comparison was unavailable, insufficient, within threshold, or
+alerting; alert rows name a metric, aggregate shares, bounded affected-row
+identifiers, and the remediation runbook path. No source payload, reviewer
+notes, prompt, or model response is copied. Recovery is an isolated pre-change
+backup or a reviewed forward compensation; never update a baseline or erase a
+prior alert to hide a distribution change.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

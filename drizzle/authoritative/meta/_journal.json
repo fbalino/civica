@@ -302,6 +302,13 @@
       "when": 1784381344000,
       "tag": "0043_pulse_decay_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1784382167000,
+      "tag": "0044_pulse_drift_monitoring",
+      "breakpoints": true
     }
   ]
 }

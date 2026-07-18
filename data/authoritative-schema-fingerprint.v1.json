@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-18T13:33:31.000Z",
-  "sha256": "01d0ff69c2b10cfcab623693081a259e27610cc51cbca236d4315ae1e3b118ab",
+  "generatedAt": "2026-07-18T13:46:01.869Z",
+  "sha256": "e64ecf0298f7460fbe111775f52043306eed0a8c5582d355139f040a652cc8e7",
   "schema": {
     "columns": [
       {
@@ -9068,6 +9068,294 @@
         "position": 12
       },
       {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_drift_alerts",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "alert_key",
+        "type": "text",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "observation_id",
+        "type": "uuid",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "baseline_id",
+        "type": "uuid",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "metric",
+        "type": "text",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "reason",
+        "type": "text",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "jsonb",
+        "name": "comparison",
+        "type": "jsonb",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "jsonb",
+        "name": "affected_row_refs",
+        "type": "jsonb",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "remediation_path",
+        "type": "text",
+        "table": "pulse_drift_alerts",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_alerts",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_drift_baselines",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_drift_baselines",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "baseline_key",
+        "type": "text",
+        "table": "pulse_drift_baselines",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "runtime_method_version",
+        "type": "text",
+        "table": "pulse_drift_baselines",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "timestamp",
+        "name": "window_start",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_baselines",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "timestamp",
+        "name": "window_end",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_baselines",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "jsonb",
+        "name": "snapshot",
+        "type": "jsonb",
+        "table": "pulse_drift_baselines",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_baselines",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_drift_observations",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "schema_version",
+        "type": "text",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "observation_key",
+        "type": "text",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "score_run_id",
+        "type": "uuid",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "uuid",
+        "name": "baseline_id",
+        "type": "uuid",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "YES",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "runtime_method_version",
+        "type": "text",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "timestamp",
+        "name": "window_start",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "window_end",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "jsonb",
+        "name": "snapshot",
+        "type": "jsonb",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "standing",
+        "type": "text",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "int4",
+        "name": "alert_count",
+        "type": "integer",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "observed_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_observations",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_drift_observations",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 13
+      },
+      {
         "udt": "text",
         "name": "evidence_kind",
         "type": "text",
@@ -13537,6 +13825,61 @@
         "definition": "CREATE UNIQUE INDEX pulse_dimensional_deltas_pkey ON public.pulse_dimensional_deltas USING btree (id)"
       },
       {
+        "name": "idx_pulse_drift_alert_metric_created",
+        "table": "pulse_drift_alerts",
+        "definition": "CREATE INDEX idx_pulse_drift_alert_metric_created ON public.pulse_drift_alerts USING btree (metric, created_at)"
+      },
+      {
+        "name": "idx_pulse_drift_alert_observation",
+        "table": "pulse_drift_alerts",
+        "definition": "CREATE INDEX idx_pulse_drift_alert_observation ON public.pulse_drift_alerts USING btree (observation_id)"
+      },
+      {
+        "name": "pulse_drift_alerts_alert_key_unique",
+        "table": "pulse_drift_alerts",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_alerts_alert_key_unique ON public.pulse_drift_alerts USING btree (alert_key)"
+      },
+      {
+        "name": "pulse_drift_alerts_pkey",
+        "table": "pulse_drift_alerts",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_alerts_pkey ON public.pulse_drift_alerts USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_drift_baseline_method_created",
+        "table": "pulse_drift_baselines",
+        "definition": "CREATE INDEX idx_pulse_drift_baseline_method_created ON public.pulse_drift_baselines USING btree (runtime_method_version, created_at)"
+      },
+      {
+        "name": "pulse_drift_baselines_baseline_key_unique",
+        "table": "pulse_drift_baselines",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_baselines_baseline_key_unique ON public.pulse_drift_baselines USING btree (baseline_key)"
+      },
+      {
+        "name": "pulse_drift_baselines_pkey",
+        "table": "pulse_drift_baselines",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_baselines_pkey ON public.pulse_drift_baselines USING btree (id)"
+      },
+      {
+        "name": "idx_pulse_drift_observation_method_time",
+        "table": "pulse_drift_observations",
+        "definition": "CREATE INDEX idx_pulse_drift_observation_method_time ON public.pulse_drift_observations USING btree (runtime_method_version, observed_at)"
+      },
+      {
+        "name": "pulse_drift_observations_observation_key_unique",
+        "table": "pulse_drift_observations",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_observations_observation_key_unique ON public.pulse_drift_observations USING btree (observation_key)"
+      },
+      {
+        "name": "pulse_drift_observations_pkey",
+        "table": "pulse_drift_observations",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_observations_pkey ON public.pulse_drift_observations USING btree (id)"
+      },
+      {
+        "name": "pulse_drift_observations_score_run_id_unique",
+        "table": "pulse_drift_observations",
+        "definition": "CREATE UNIQUE INDEX pulse_drift_observations_score_run_id_unique ON public.pulse_drift_observations USING btree (score_run_id)"
+      },
+      {
         "name": "idx_pulse_event_absorptions_event_as_of",
         "table": "pulse_event_absorptions",
         "definition": "CREATE INDEX idx_pulse_event_absorptions_event_as_of ON public.pulse_event_absorptions USING btree (event_id, as_of, decided_at)"
@@ -14921,6 +15264,21 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_dimensional_deltas FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "pulse_drift_alerts_append_only",
+        "table": "pulse_drift_alerts",
+        "definition": "CREATE TRIGGER pulse_drift_alerts_append_only BEFORE DELETE OR UPDATE ON pulse_drift_alerts FOR EACH ROW EXECUTE FUNCTION civica_reject_research_evidence_history_mutation()"
+      },
+      {
+        "name": "pulse_drift_baselines_append_only",
+        "table": "pulse_drift_baselines",
+        "definition": "CREATE TRIGGER pulse_drift_baselines_append_only BEFORE DELETE OR UPDATE ON pulse_drift_baselines FOR EACH ROW EXECUTE FUNCTION civica_reject_research_evidence_history_mutation()"
+      },
+      {
+        "name": "pulse_drift_observations_append_only",
+        "table": "pulse_drift_observations",
+        "definition": "CREATE TRIGGER pulse_drift_observations_append_only BEFORE DELETE OR UPDATE ON pulse_drift_observations FOR EACH ROW EXECUTE FUNCTION civica_reject_research_evidence_history_mutation()"
+      },
+      {
         "name": "pulse_event_absorptions_append_only",
         "table": "pulse_event_absorptions",
         "definition": "CREATE TRIGGER pulse_event_absorptions_append_only BEFORE DELETE OR UPDATE ON pulse_event_absorptions FOR EACH ROW EXECUTE FUNCTION civica_reject_pulse_event_absorptions_mutation()"
@@ -15450,6 +15808,21 @@
       {
         "kind": "r",
         "name": "pulse_dimensional_deltas",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_drift_alerts",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_drift_baselines",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_drift_observations",
         "definition": null
       },
       {
@@ -17448,6 +17821,90 @@
         "type": "c",
         "table": "pulse_dimensional_deltas",
         "definition": "CHECK ((window_days = ANY (ARRAY[365, 730])) AND window_start = (score_as_of - window_days))"
+      },
+      {
+        "name": "pulse_drift_alerts_alert_key_unique",
+        "type": "u",
+        "table": "pulse_drift_alerts",
+        "definition": "UNIQUE (alert_key)"
+      },
+      {
+        "name": "pulse_drift_alerts_baseline_id_pulse_drift_baselines_id_fk",
+        "type": "f",
+        "table": "pulse_drift_alerts",
+        "definition": "FOREIGN KEY (baseline_id) REFERENCES pulse_drift_baselines(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_drift_alerts_contract_check",
+        "type": "c",
+        "table": "pulse_drift_alerts",
+        "definition": "CHECK (schema_version = 'pulse-drift-alert/v1'::text AND alert_key ~ '^pulse-drift-alert/sha256:[a-f0-9]{64}$'::text AND (metric = ANY (ARRAY['source_mix'::text, 'language_mix'::text, 'model_versions'::text, 'taxonomy_labels'::text, 'corroboration_weight'::text, 'abstention'::text, 'review_overturns'::text])) AND (reason = ANY (ARRAY['distribution_shift'::text, 'novel_model_version'::text])) AND jsonb_typeof(comparison) = 'object'::text AND jsonb_typeof(affected_row_refs) = 'array'::text AND jsonb_array_length(affected_row_refs) > 0 AND btrim(remediation_path) <> ''::text)"
+      },
+      {
+        "name": "pulse_drift_alerts_observation_id_pulse_drift_observations_id_f",
+        "type": "f",
+        "table": "pulse_drift_alerts",
+        "definition": "FOREIGN KEY (observation_id) REFERENCES pulse_drift_observations(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_drift_alerts_pkey",
+        "type": "p",
+        "table": "pulse_drift_alerts",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_drift_baselines_baseline_key_unique",
+        "type": "u",
+        "table": "pulse_drift_baselines",
+        "definition": "UNIQUE (baseline_key)"
+      },
+      {
+        "name": "pulse_drift_baselines_contract_check",
+        "type": "c",
+        "table": "pulse_drift_baselines",
+        "definition": "CHECK (schema_version = 'pulse-drift-baseline/v1'::text AND baseline_key ~ '^pulse-drift-baseline/sha256:[a-f0-9]{64}$'::text AND btrim(runtime_method_version) <> ''::text AND window_end > window_start AND jsonb_typeof(snapshot) = 'object'::text)"
+      },
+      {
+        "name": "pulse_drift_baselines_pkey",
+        "type": "p",
+        "table": "pulse_drift_baselines",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_drift_observations_baseline_id_pulse_drift_baselines_id_f",
+        "type": "f",
+        "table": "pulse_drift_observations",
+        "definition": "FOREIGN KEY (baseline_id) REFERENCES pulse_drift_baselines(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_drift_observations_contract_check",
+        "type": "c",
+        "table": "pulse_drift_observations",
+        "definition": "CHECK (schema_version = 'pulse-drift-observation/v1'::text AND observation_key ~ '^pulse-drift-observation/sha256:[a-f0-9]{64}$'::text AND btrim(runtime_method_version) <> ''::text AND window_end > window_start AND jsonb_typeof(snapshot) = 'object'::text AND (standing = ANY (ARRAY['no_baseline'::text, 'insufficient_evidence'::text, 'within_threshold'::text, 'alerts_open'::text])) AND alert_count >= 0 AND (standing = 'no_baseline'::text AND baseline_id IS NULL AND alert_count = 0 OR standing = 'insufficient_evidence'::text AND baseline_id IS NOT NULL AND alert_count = 0 OR standing = 'within_threshold'::text AND baseline_id IS NOT NULL AND alert_count = 0 OR standing = 'alerts_open'::text AND baseline_id IS NOT NULL AND alert_count > 0))"
+      },
+      {
+        "name": "pulse_drift_observations_observation_key_unique",
+        "type": "u",
+        "table": "pulse_drift_observations",
+        "definition": "UNIQUE (observation_key)"
+      },
+      {
+        "name": "pulse_drift_observations_pkey",
+        "type": "p",
+        "table": "pulse_drift_observations",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_drift_observations_score_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_drift_observations",
+        "definition": "FOREIGN KEY (score_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_drift_observations_score_run_id_unique",
+        "type": "u",
+        "table": "pulse_drift_observations",
+        "definition": "UNIQUE (score_run_id)"
       },
       {
         "name": "pulse_event_absorptions_absorption_key_unique",

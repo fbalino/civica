@@ -2,14 +2,14 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "09b1fd253d99c72aad8eabab92738b45754fb2defafc17f0e6aac0b7069030d9",
+  "schemaFingerprint": "90d45ac23056b3c11e869c1d829ec2d92fe9bf15ec579a84eb763c1307ffedd1",
   "summary": {
-    "tables": 98,
-    "columns": 1349,
+    "tables": 101,
+    "columns": 1381,
     "publicAtlasTables": 22,
     "researchBetaTables": 32,
     "supportTables": 11,
-    "internalTables": 31,
+    "internalTables": 34,
     "privateTables": 2,
     "legacyTables": 1
   },
@@ -27021,6 +27021,868 @@
           "cadence": "Daily after classification/corroboration and on rescore.",
           "vintageSemantics": "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
           "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_drift_alerts",
+      "exportName": "pulseDriftAlerts",
+      "definition": "Append-only operational warnings for a Pulse distribution shift or a novel production model version.",
+      "rowGrain": "One triggered metric/reason within one immutable drift observation.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+      "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+      "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+      "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "affected_row_refs",
+          "propertyName": "affectedRowRefs",
+          "definition": "Affected row refs recorded for the triggered metric/reason within one immutable drift observation.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "alert_key",
+          "propertyName": "alertKey",
+          "definition": "Alert key recorded for the triggered metric/reason within one immutable drift observation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "baseline_id",
+          "propertyName": "baselineId",
+          "definition": "Baseline id; relational link to pulse_drift_baselines.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_drift_baselines.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_drift_baselines.id; substantive provenance follows this table's source contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "comparison",
+          "propertyName": "comparison",
+          "definition": "Comparison recorded for the triggered metric/reason within one immutable drift observation.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_drift_alert_metric_created"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "metric",
+          "propertyName": "metric",
+          "definition": "Metric recorded for the triggered metric/reason within one immutable drift observation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_drift_alert_metric_created"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observation_id",
+          "propertyName": "observationId",
+          "definition": "Observation id; relational link to pulse_drift_observations.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_drift_observations.id",
+            "indexGroups": [
+              "idx_pulse_drift_alert_observation"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_drift_observations.id; substantive provenance follows this table's source contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reason",
+          "propertyName": "reason",
+          "definition": "Recorded reason for the associated action or decision.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "remediation_path",
+          "propertyName": "remediationPath",
+          "definition": "Remediation path recorded for the triggered metric/reason within one immutable drift observation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the triggered metric/reason within one immutable drift observation.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+          "cadence": "Only when an observation exceeds its metric threshold or contains a novel model version.",
+          "vintageSemantics": "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+          "rights": "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_drift_baselines",
+      "exportName": "pulseDriftBaselines",
+      "definition": "Immutable, explicit reference distributions for Pulse operational drift monitoring.",
+      "rowGrain": "One manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+      "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+      "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+      "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "baseline_key",
+          "propertyName": "baselineKey",
+          "definition": "Baseline key recorded for the manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_drift_baseline_method_created"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "runtime_method_version",
+          "propertyName": "runtimeMethodVersion",
+          "definition": "Runtime method version recorded for the manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_drift_baseline_method_created"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "snapshot",
+          "propertyName": "snapshot",
+          "definition": "Snapshot recorded for the manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "window_end",
+          "propertyName": "windowEnd",
+          "definition": "Window end recorded for the manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "window_start",
+          "propertyName": "windowStart",
+          "definition": "Window start recorded for the manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+          "cadence": "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+          "vintageSemantics": "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+          "rights": "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_drift_observations",
+      "exportName": "pulseDriftObservations",
+      "definition": "Immutable post-score assessment of current Pulse operational distributions against one explicit baseline.",
+      "rowGrain": "One completed score run and trailing monitoring window.",
+      "releaseScope": "internal_operational",
+      "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+      "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+      "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+      "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "alert_count",
+          "propertyName": "alertCount",
+          "definition": "Alert count recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "baseline_id",
+          "propertyName": "baselineId",
+          "definition": "Baseline id; relational link to pulse_drift_baselines.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "pulse_drift_baselines.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_drift_baselines.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observation_key",
+          "propertyName": "observationKey",
+          "definition": "Observation key recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "observed_at",
+          "propertyName": "observedAt",
+          "definition": "Observed at recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_drift_observation_method_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "Observed at follows this table contract. observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "runtime_method_version",
+          "propertyName": "runtimeMethodVersion",
+          "definition": "Runtime method version recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_drift_observation_method_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "schema_version",
+          "propertyName": "schemaVersion",
+          "definition": "Schema version recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "score_run_id",
+          "propertyName": "scoreRunId",
+          "definition": "Score run id; relational link to pulse_pipeline_runs.id.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "dimensionless; scale defined by the linked methodology or source",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": false,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "snapshot",
+          "propertyName": "snapshot",
+          "definition": "Snapshot recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "standing",
+          "propertyName": "standing",
+          "definition": "Standing recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "window_end",
+          "propertyName": "windowEnd",
+          "definition": "Window end recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "window_start",
+          "propertyName": "windowStart",
+          "definition": "Window start recorded for the completed score run and trailing monitoring window.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+          "cadence": "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+          "vintageSemantics": "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+          "rights": "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
           "deprecation": {
             "status": "active"
           }

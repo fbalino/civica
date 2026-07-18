@@ -68,6 +68,10 @@ const conditionsReleaseMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0042_grey_sally_floyd.sql"),
   "utf8",
 );
+const pulseDriftMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0044_pulse_drift_monitoring.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -112,6 +116,7 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
       conditionsReleaseMigration,
     ) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(pulseDriftMigration) &&
     !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
       constitutionPassageMigration,
     ) &&
@@ -131,6 +136,7 @@ for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
     absorptionMigration,
     informationEnvironmentMigration,
     partyIdentityMigration,
+    pulseDriftMigration,
   ];
   const guarded = sources.some((source) =>
     new RegExp(
@@ -280,6 +286,9 @@ async function main() {
               ('pulse_event_information_environment_pins', 'pulse_event_information_environment_pins_append_only'),
               ('pulse_information_environment_releases', 'pulse_information_environment_releases_append_only'),
               ('pulse_information_environment_values', 'pulse_information_environment_values_append_only'),
+              ('pulse_drift_baselines', 'pulse_drift_baselines_append_only'),
+              ('pulse_drift_observations', 'pulse_drift_observations_append_only'),
+              ('pulse_drift_alerts', 'pulse_drift_alerts_append_only'),
               ('pulse_review_sla_events', 'pulse_review_sla_events_append_only')
             )`,
       sql`SELECT count(*)::int AS n FROM pg_constraint

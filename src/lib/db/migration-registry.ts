@@ -327,6 +327,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0044_pulse_drift_monitoring",
+    "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

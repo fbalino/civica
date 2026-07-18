@@ -58,6 +58,9 @@ export const APPEND_ONLY_EVIDENCE_RELATIONS = [
   "pulse_dimensional_delta_history",
   "pulse_event_absorptions",
   "pulse_event_information_environment_pins",
+  "pulse_drift_baselines",
+  "pulse_drift_observations",
+  "pulse_drift_alerts",
   "pulse_event_decisions",
   "pulse_incident_assignments",
   "pulse_incident_resolutions",
@@ -96,6 +99,12 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     relations: ["route_performance_observations"],
     exemption:
       "short-lived privacy-bounded operational telemetry is not research evidence",
+  },
+  {
+    path: "src/lib/platform/error-monitoring.ts",
+    relations: ["error_monitoring_events"],
+    exemption:
+      "short-lived scrubbed operational error signatures are not research evidence",
   },
 ] as const;
 

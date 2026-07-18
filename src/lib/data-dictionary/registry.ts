@@ -1160,6 +1160,50 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
     deprecation: active,
   },
+  pulse_drift_baselines: {
+    definition:
+      "Immutable, explicit reference distributions for Pulse operational drift monitoring.",
+    rowGrain:
+      "One manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+    cadence:
+      "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+    vintageSemantics:
+      "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+    rights:
+      "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+    deprecation: active,
+  },
+  pulse_drift_observations: {
+    definition:
+      "Immutable post-score assessment of current Pulse operational distributions against one explicit baseline.",
+    rowGrain: "One completed score run and trailing monitoring window.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+    cadence: "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+    vintageSemantics:
+      "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+    rights:
+      "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+    deprecation: active,
+  },
+  pulse_drift_alerts: {
+    definition:
+      "Append-only operational warnings for a Pulse distribution shift or a novel production model version.",
+    rowGrain: "One triggered metric/reason within one immutable drift observation.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+    cadence: "Only when an observation exceeds its metric threshold or contains a novel model version.",
+    vintageSemantics:
+      "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+    rights:
+      "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
+    deprecation: active,
+  },
   pulse_review_audit_log: {
     definition: "Append-only history of Pulse review and status changes.",
     rowGrain: "One review action on one Pulse v2 event.",

@@ -23,6 +23,7 @@ import type {
   PulseCodingPacketSnapshot,
   PulseCodingSubmissionEnvelope,
 } from "@/lib/pulse/v2/coding-workspace";
+import type { PulseDriftSnapshot } from "@/lib/pulse/v2/drift-monitor";
 import {
   pgTable,
   uuid,
@@ -3523,6 +3524,121 @@ export const pulseDimensionalDeltaHistory = pgTable(
     check(
       "pulse_dimensional_delta_history_window_check",
       dsql`${table.windowDays} IN (365, 730) AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
+  ],
+);
+
+/**
+ * PUL-024 — an immutable, explicit reference distribution for operational
+ * Pulse drift monitoring. Baselines are never moved by a scheduled job; a
+ * later method or source-basket change receives a separately captured row.
+ */
+export const pulseDriftBaselines = pgTable(
+  "pulse_drift_baselines",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    baselineKey: text("baseline_key").notNull().unique(),
+    runtimeMethodVersion: text("runtime_method_version").notNull(),
+    windowStart: timestamp("window_start").notNull(),
+    windowEnd: timestamp("window_end").notNull(),
+    snapshot: jsonb("snapshot").$type<PulseDriftSnapshot>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_drift_baseline_method_created").on(
+      table.runtimeMethodVersion,
+      table.createdAt,
+    ),
+    check(
+      "pulse_drift_baselines_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-drift-baseline/v1' AND ${table.baselineKey} ~ '^pulse-drift-baseline/sha256:[a-f0-9]{64}$' AND btrim(${table.runtimeMethodVersion}) <> '' AND ${table.windowEnd} > ${table.windowStart} AND jsonb_typeof(${table.snapshot}) = 'object'`,
+    ),
+  ],
+);
+
+/** One immutable monitoring outcome for a completed Pulse score run. */
+export const pulseDriftObservations = pgTable(
+  "pulse_drift_observations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    observationKey: text("observation_key").notNull().unique(),
+    scoreRunId: uuid("score_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    baselineId: uuid("baseline_id").references(() => pulseDriftBaselines.id, {
+      onDelete: "restrict",
+    }),
+    runtimeMethodVersion: text("runtime_method_version").notNull(),
+    windowStart: timestamp("window_start").notNull(),
+    windowEnd: timestamp("window_end").notNull(),
+    snapshot: jsonb("snapshot").$type<PulseDriftSnapshot>().notNull(),
+    standing: text("standing")
+      .$type<
+        "no_baseline" | "insufficient_evidence" | "within_threshold" | "alerts_open"
+      >()
+      .notNull(),
+    alertCount: integer("alert_count").notNull(),
+    observedAt: timestamp("observed_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_drift_observation_method_time").on(
+      table.runtimeMethodVersion,
+      table.observedAt,
+    ),
+    check(
+      "pulse_drift_observations_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-drift-observation/v1' AND ${table.observationKey} ~ '^pulse-drift-observation/sha256:[a-f0-9]{64}$' AND btrim(${table.runtimeMethodVersion}) <> '' AND ${table.windowEnd} > ${table.windowStart} AND jsonb_typeof(${table.snapshot}) = 'object' AND ${table.standing} IN ('no_baseline','insufficient_evidence','within_threshold','alerts_open') AND ${table.alertCount} >= 0 AND ((${table.standing} = 'no_baseline' AND ${table.baselineId} IS NULL AND ${table.alertCount} = 0) OR (${table.standing} = 'insufficient_evidence' AND ${table.baselineId} IS NOT NULL AND ${table.alertCount} = 0) OR (${table.standing} = 'within_threshold' AND ${table.baselineId} IS NOT NULL AND ${table.alertCount} = 0) OR (${table.standing} = 'alerts_open' AND ${table.baselineId} IS NOT NULL AND ${table.alertCount} > 0))`,
+    ),
+  ],
+);
+
+/** An append-only alert with only aggregate shares and bounded row references. */
+export const pulseDriftAlerts = pgTable(
+  "pulse_drift_alerts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    alertKey: text("alert_key").notNull().unique(),
+    observationId: uuid("observation_id")
+      .references(() => pulseDriftObservations.id, { onDelete: "restrict" })
+      .notNull(),
+    baselineId: uuid("baseline_id")
+      .references(() => pulseDriftBaselines.id, { onDelete: "restrict" })
+      .notNull(),
+    metric: text("metric")
+      .$type<
+        | "source_mix"
+        | "language_mix"
+        | "model_versions"
+        | "taxonomy_labels"
+        | "corroboration_weight"
+        | "abstention"
+        | "review_overturns"
+      >()
+      .notNull(),
+    reason: text("reason")
+      .$type<"distribution_shift" | "novel_model_version">()
+      .notNull(),
+    comparison: jsonb("comparison").$type<Record<string, unknown>>().notNull(),
+    affectedRowRefs: jsonb("affected_row_refs")
+      .$type<Array<Record<string, unknown>>>()
+      .notNull(),
+    remediationPath: text("remediation_path").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_drift_alert_observation").on(table.observationId),
+    index("idx_pulse_drift_alert_metric_created").on(
+      table.metric,
+      table.createdAt,
+    ),
+    check(
+      "pulse_drift_alerts_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-drift-alert/v1' AND ${table.alertKey} ~ '^pulse-drift-alert/sha256:[a-f0-9]{64}$' AND ${table.metric} IN ('source_mix','language_mix','model_versions','taxonomy_labels','corroboration_weight','abstention','review_overturns') AND ${table.reason} IN ('distribution_shift','novel_model_version') AND jsonb_typeof(${table.comparison}) = 'object' AND jsonb_typeof(${table.affectedRowRefs}) = 'array' AND jsonb_array_length(${table.affectedRowRefs}) > 0 AND btrim(${table.remediationPath}) <> ''`,
     ),
   ],
 );
