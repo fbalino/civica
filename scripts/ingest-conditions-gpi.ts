@@ -13,13 +13,17 @@ import {
   conditionCalculationKey,
   type ConditionScoreInput,
 } from "../src/lib/conditions/contract";
-import { writeConditionScores } from "../src/lib/conditions/ingest";
+import { writeConditionsRelease } from "../src/lib/conditions/ingest";
+import { buildFixedBoundReferenceSets } from "../src/lib/conditions/release";
 
 const SOURCE_ID = "global_peace_index";
 const CI_DIMENSION = "stability_security";
 const SOURCE_METHODOLOGY_VERSION = "v1.0";
 const CONDITIONS_DIMENSION = "peace_security" as const;
 const DRY_RUN = process.argv.includes("--dry-run");
+const RELEASE_ID = process.argv.find((arg) => arg.startsWith("--release-id="))?.slice(
+  "--release-id=".length,
+);
 
 function referenceYear(quarter: string): number | null {
   const match = /^(\d{4})-Q[1-4]$/.exec(quarter);
@@ -58,6 +62,7 @@ function conditionRow(
     methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
   };
   const base = {
+    releaseId: RELEASE_ID!,
     jurisdictionId: row.jurisdictionId,
     dimension: CONDITIONS_DIMENSION,
     quarter: observed ? row.quarter : null,
@@ -85,6 +90,9 @@ function conditionRow(
 
 async function main() {
   console.log("=== Civica Conditions — Peace & Security component ledger ===\n");
+  if (!RELEASE_ID) {
+    throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
+  }
   const sourceRows = await db
     .select()
     .from(ciDimensionScores)
@@ -100,9 +108,20 @@ async function main() {
   }
 
   const rows = sourceRows.map(conditionRow);
-  const summary = await writeConditionScores(db, rows, { dryRun: DRY_RUN });
+  const summary = await writeConditionsRelease(db, {
+    releaseId: RELEASE_ID,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceSets: buildFixedBoundReferenceSets({
+      calculations: rows,
+      componentId: "global_peace_index",
+      direction: "lower_is_better",
+      transformationId: "conditions-gpi-fixed-bound/v2",
+      lowerBound: 1,
+      upperBound: 5,
+    }),
+  }, rows, { dryRun: DRY_RUN });
   console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? rows.length : summary.componentsWritten} component rows.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
+  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
 }
 
 main().catch((error) => {

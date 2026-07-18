@@ -10,7 +10,7 @@ const report = JSON.parse(readFileSync(resolve(root, "plan/evidence/DAT-013/pref
 };
 const errors: string[] = [];
 const byId = new Map(report.plans.map((plan) => [plan.id, plan]));
-for (const entry of MIGRATION_ARTIFACTS) {
+for (const [entryIndex, entry] of MIGRATION_ARTIFACTS.entries()) {
   const plan = byId.get(entry.id);
   if (!plan) { errors.push(`missing preflight: ${entry.id}`); continue; }
   const hash = createHash("sha256").update(readFileSync(resolve(root, entry.path))).digest("hex");
@@ -30,7 +30,19 @@ for (const entry of MIGRATION_ARTIFACTS) {
     ).test(source);
     const appliedDestructivePostState =
       dropsRelation && report.appliedAuthoritativeMigrationIds?.includes(entry.id);
-    if (count === "missing" && !createsRelation && !appliedDestructivePostState) {
+    const createdByUnappliedPredecessor = MIGRATION_ARTIFACTS.slice(
+      0,
+      entryIndex,
+    ).some((predecessor) => {
+      if (report.appliedAuthoritativeMigrationIds?.includes(predecessor.id)) {
+        return false;
+      }
+      return new RegExp(
+        `CREATE\\s+TABLE(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"?(?:public\\.)?${relation}"?\\b`,
+        "i",
+      ).test(readFileSync(resolve(root, predecessor.path), "utf8"));
+    });
+    if (count === "missing" && !createsRelation && !appliedDestructivePostState && !createdByUnappliedPredecessor) {
       errors.push(`${entry.id}/${relation} is unexpectedly missing before migration`);
     } else if (count !== "missing" && (!Number.isSafeInteger(count) || count < 0)) {
       errors.push(`${entry.id}/${relation} lacks a valid live row count`);

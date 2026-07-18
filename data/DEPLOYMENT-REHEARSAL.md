@@ -7,7 +7,7 @@
 This is the mandatory order for schema, data release, application deployment,
 and recovery. It closes the gap between the configured production database,
 whose authoritative ledger ends at `0032_sparkling_genesis`, and the additive
-PLT/ATL migrations `0033` through `0040`.
+PLT/ATL migrations `0033` through `0042`.
 
 ## Non-negotiable boundaries
 

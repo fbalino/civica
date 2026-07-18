@@ -6,11 +6,19 @@ import {
   conditionCalculationKey,
   type ConditionScoreInput,
 } from "../contract";
-import { buildEconomicConditionsCalculations } from "../economic";
+import {
+  buildEconomicConditionsCalculations,
+  buildEconomicReferenceSets,
+} from "../economic";
 import { writeConditionScores } from "../ingest";
+import {
+  conditionsReleaseErrors,
+  conditionsReleaseManifestSha256,
+} from "../release";
 
 function oneInput(): ConditionScoreInput {
   const base = {
+    releaseId: "conditions-fixture-v1",
     jurisdictionId: "jurisdiction-1",
     dimension: "human_development" as const,
     quarter: "2024-Q4",
@@ -138,6 +146,7 @@ function economicLineages() {
 
 test("Economic Conditions refuses mixed-year component inputs instead of labelling by the newest year", () => {
   const rows = buildEconomicConditionsCalculations({
+    releaseId: "conditions-fixture-v1",
     methodologyVersion: "conditions-components/v1",
     lineages: economicLineages(),
     observations: [{
@@ -159,6 +168,7 @@ test("Economic Conditions refuses mixed-year component inputs instead of labelli
 
 test("Economic Conditions retains an absent component and withholds the score", () => {
   const rows = buildEconomicConditionsCalculations({
+    releaseId: "conditions-fixture-v1",
     methodologyVersion: "conditions-components/v1",
     lineages: economicLineages(),
     observations: [{
@@ -172,4 +182,67 @@ test("Economic Conditions retains an absent component and withholds the score", 
   assert.equal(rows[0].normalizedScore, null);
   assert.equal(rows[0].components[1].valueStatus, "not_observed");
   assert.equal(rows[0].components[1].valueStatusReason, "No published value");
+});
+
+test("Economic Conditions freezes separate reference populations and z-score parameters per year", () => {
+  const observations = [
+    {
+      jurisdictionId: "y2023-a",
+      inflation: { value: 2, referenceYear: 2023, valueStatus: "observed" as const, valueStatusReason: null },
+      unemployment: { value: 4, referenceYear: 2023, valueStatus: "observed" as const, valueStatusReason: null },
+      gdpGrowth: { value: 1, referenceYear: 2023, valueStatus: "observed" as const, valueStatusReason: null },
+    },
+    {
+      jurisdictionId: "y2023-b",
+      inflation: { value: 6, referenceYear: 2023, valueStatus: "observed" as const, valueStatusReason: null },
+      unemployment: { value: 8, referenceYear: 2023, valueStatus: "observed" as const, valueStatusReason: null },
+      gdpGrowth: { value: 3, referenceYear: 2023, valueStatus: "observed" as const, valueStatusReason: null },
+    },
+    {
+      jurisdictionId: "y2024-a",
+      inflation: { value: 20, referenceYear: 2024, valueStatus: "observed" as const, valueStatusReason: null },
+      unemployment: { value: 10, referenceYear: 2024, valueStatus: "observed" as const, valueStatusReason: null },
+      gdpGrowth: { value: 5, referenceYear: 2024, valueStatus: "observed" as const, valueStatusReason: null },
+    },
+  ];
+  const referenceSets = buildEconomicReferenceSets(observations);
+  assert.deepEqual(referenceSets.map((set) => set.referencePeriod), ["2023-Q4", "2024-Q4"]);
+  assert.deepEqual(referenceSets[0].jurisdictionIds, ["y2023-a", "y2023-b"]);
+  assert.deepEqual(referenceSets[1].jurisdictionIds, ["y2024-a"]);
+  assert.equal(referenceSets[0].parameters.find((parameter) => parameter.componentId === "inflation")?.mean, 4);
+  assert.equal(referenceSets[1].parameters.find((parameter) => parameter.componentId === "inflation")?.mean, 20);
+});
+
+test("Conditions release manifest is order-independent and rejects an unbound calculation", () => {
+  const observations = [
+    {
+      jurisdictionId: "release-fixture",
+      inflation: { value: 3, referenceYear: 2024, valueStatus: "observed" as const, valueStatusReason: null },
+      unemployment: { value: 5, referenceYear: 2024, valueStatus: "observed" as const, valueStatusReason: null },
+      gdpGrowth: { value: 2, referenceYear: 2024, valueStatus: "observed" as const, valueStatusReason: null },
+    },
+  ];
+  const calculations = buildEconomicConditionsCalculations({
+    releaseId: "conditions-economic-fixture-v1",
+    methodologyVersion: "conditions-components/v1",
+    lineages: economicLineages(),
+    observations,
+  });
+  const release = {
+    releaseId: "conditions-economic-fixture-v1",
+    methodologyVersion: "conditions-components/v1",
+    referenceSets: buildEconomicReferenceSets(observations),
+  } as const;
+  assert.deepEqual(conditionsReleaseErrors(release, calculations), []);
+  assert.equal(
+    conditionsReleaseManifestSha256(release, calculations),
+    conditionsReleaseManifestSha256(release, [...calculations].reverse()),
+  );
+  assert.match(
+    conditionsReleaseErrors(
+      release,
+      calculations.map((calculation) => ({ ...calculation, releaseId: "conditions-other-v1" })),
+    ).join(" "),
+    /releaseId does not match/,
+  );
 });

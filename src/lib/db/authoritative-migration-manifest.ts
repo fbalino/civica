@@ -247,4 +247,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "467fbe0f8e9d7b4e4149fcaf60e730db9e5a2d54f65d6782294ad2bf5cab51a9",
     baseline: false,
   },
+  {
+    id: "0042_grey_sally_floyd",
+    path: "drizzle/authoritative/0042_grey_sally_floyd.sql",
+    sha256: "3661572663a1fdb881892b345b3a508f8be1fb4a590d3c1ed5979e85e356a769",
+    baseline: false,
+  },
 ] as const;

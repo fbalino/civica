@@ -65,6 +65,7 @@ export interface ConditionsComponentInput extends IndicatorLineage {
 
 export interface ConditionScoreInput extends IndicatorLineage {
   calculationKey: string;
+  releaseId: string;
   jurisdictionId: string;
   dimension: ConditionsDimension;
   quarter: string | null;
@@ -80,6 +81,7 @@ export interface ConditionScoreInput extends IndicatorLineage {
 }
 
 export function conditionCalculationKey(input: {
+  releaseId: string;
   jurisdictionId: string;
   dimension: ConditionsDimension;
   methodologyVersion: string;
@@ -88,6 +90,7 @@ export function conditionCalculationKey(input: {
   components: readonly ConditionsComponentInput[];
 }): string {
   const payload = {
+    releaseId: input.releaseId,
     jurisdictionId: input.jurisdictionId,
     dimension: input.dimension,
     methodologyVersion: input.methodologyVersion,
@@ -120,6 +123,9 @@ function requiredComponents(dimension: ConditionsDimension): readonly string[] {
 
 export function conditionCalculationErrors(input: ConditionScoreInput): string[] {
   const errors: string[] = [];
+  if (!/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/.test(input.releaseId)) {
+    errors.push("releaseId is invalid");
+  }
   if (!input.jurisdictionId.trim()) errors.push("jurisdictionId is blank");
   if (!input.methodologyVersion.trim()) errors.push("methodologyVersion is blank");
   if (!/^conditions-calculation\/v1\/sha256:[a-f0-9]{64}$/.test(input.calculationKey)) {

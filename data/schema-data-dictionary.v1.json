@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "59f4501efda1c0a4cba42ece2aa4ca5a056eb4a5f6b4d8ed00a993bcf08604a7",
+  "schemaFingerprint": "09b1fd253d99c72aad8eabab92738b45754fb2defafc17f0e6aac0b7069030d9",
   "summary": {
-    "tables": 95,
-    "columns": 1322,
+    "tables": 98,
+    "columns": 1349,
     "publicAtlasTables": 22,
-    "researchBetaTables": 29,
+    "researchBetaTables": 32,
     "supportTables": 11,
     "internalTables": 31,
     "privateTables": 2,
@@ -6746,6 +6746,33 @@
           "deprecation": {
             "status": "active"
           }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to civica_conditions_releases.id.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "civica_conditions_releases.id",
+            "indexGroups": [
+              "idx_conditions_calculation_jurisdiction"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream ingestion run and revised methodology version.",
+          "vintageSemantics": "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+          "rights": "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+          "deprecation": {
+            "status": "active"
+          }
         }
       ]
     },
@@ -7278,6 +7305,679 @@
       ]
     },
     {
+      "name": "civica_conditions_normalization_parameters",
+      "exportName": "civicaConditionsNormalizationParameters",
+      "definition": "Frozen transformation and direction parameters for one Conditions reference set component.",
+      "rowGrain": "One Conditions release, dimension, reference period, and component.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+      "cadence": "Written once with its immutable Conditions reference set.",
+      "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+      "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "component_id",
+          "propertyName": "componentId",
+          "definition": "Stable identifier of one declared native input within a Conditions dimension.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension",
+          "propertyName": "dimension",
+          "definition": "Dimension; relational link to civica_conditions_reference_sets.dimension.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "civica_conditions_reference_sets.dimension",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_reference_sets.dimension; substantive provenance follows this table's source contract.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "direction",
+          "propertyName": "direction",
+          "definition": "Direction recorded for the Conditions release, dimension, reference period, and component.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "lower_bound",
+          "propertyName": "lowerBound",
+          "definition": "Lower bound recorded for the Conditions release, dimension, reference period, and component.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "mean",
+          "propertyName": "mean",
+          "definition": "Mean recorded for the Conditions release, dimension, reference period, and component.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reference_period",
+          "propertyName": "referencePeriod",
+          "definition": "Reference period; relational link to civica_conditions_reference_sets.reference_period.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "civica_conditions_reference_sets.reference_period",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_reference_sets.reference_period; substantive provenance follows this table's source contract.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to civica_conditions_reference_sets.release_id.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "civica_conditions_reference_sets.release_id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_reference_sets.release_id; substantive provenance follows this table's source contract.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "standard_deviation",
+          "propertyName": "standardDeviation",
+          "definition": "Standard deviation recorded for the Conditions release, dimension, reference period, and component.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transformation_id",
+          "propertyName": "transformationId",
+          "definition": "Transformation id recorded for the Conditions release, dimension, reference period, and component.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upper_bound",
+          "propertyName": "upperBound",
+          "definition": "Upper bound recorded for the Conditions release, dimension, reference period, and component.",
+          "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time normalization calculation or adopted fixed bound.",
+          "cadence": "Written once with its immutable Conditions reference set.",
+          "vintageSemantics": "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+          "rights": "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "civica_conditions_reference_sets",
+      "exportName": "civicaConditionsReferenceSets",
+      "definition": "Frozen per-dimension, per-period Conditions reference populations, components, and missingness counts.",
+      "rowGrain": "One Conditions release, dimension, and reference period.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+      "cadence": "Written once with its immutable Conditions release.",
+      "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+      "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "aligned_count",
+          "propertyName": "alignedCount",
+          "definition": "Aligned count recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "candidate_count",
+          "propertyName": "candidateCount",
+          "definition": "Candidate count recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "Candidate count follows this table contract. reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "dimension",
+          "propertyName": "dimension",
+          "definition": "Dimension recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "included_components",
+          "propertyName": "includedComponents",
+          "definition": "Included components recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "jurisdiction_ids",
+          "propertyName": "jurisdictionIds",
+          "definition": "Jurisdiction ids recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "missing_component_count",
+          "propertyName": "missingComponentCount",
+          "definition": "Missing component count recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "missingness_policy",
+          "propertyName": "missingnessPolicy",
+          "definition": "Missingness policy recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "mixed_year_refused_count",
+          "propertyName": "mixedYearRefusedCount",
+          "definition": "Mixed year refused count recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "integer",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "count",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "population_sha256",
+          "propertyName": "populationSha256",
+          "definition": "Population sha256 recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reference_period",
+          "propertyName": "referencePeriod",
+          "definition": "Reference period recorded for the Conditions release, dimension, and reference period.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Deterministic release-time selection over decomposable Conditions calculations.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to civica_conditions_releases.id.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "civica_conditions_releases.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "Written once with its immutable Conditions release.",
+          "vintageSemantics": "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+          "rights": "Civica-derived selection metadata; each included component retains its own source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "civica_conditions_releases",
+      "exportName": "civicaConditionsReleases",
+      "definition": "Immutable Conditions release headers bound to a canonical manifest hash.",
+      "rowGrain": "One named Conditions release.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Civica release-control metadata generated from frozen Conditions calculations and reference sets.",
+      "cadence": "Only when a new, explicitly named Conditions release is created.",
+      "vintageSemantics": "id and manifest_sha256 identify the immutable release; created_at is storage time, not an observation date.",
+      "rights": "Civica-derived metadata; component-level source rights remain controlling for underlying values.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica release-control metadata generated from frozen Conditions calculations and reference sets.",
+          "cadence": "Only when a new, explicitly named Conditions release is created.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Civica-derived metadata; component-level source rights remain controlling for underlying values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Only when a new, explicitly named Conditions release is created.",
+          "vintageSemantics": "id and manifest_sha256 identify the immutable release; created_at is storage time, not an observation date.",
+          "rights": "Civica-derived metadata; component-level source rights remain controlling for underlying values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "manifest_sha256",
+          "propertyName": "manifestSha256",
+          "definition": "Manifest sha256 recorded for the named Conditions release.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica release-control metadata generated from frozen Conditions calculations and reference sets.",
+          "cadence": "Only when a new, explicitly named Conditions release is created.",
+          "vintageSemantics": "id and manifest_sha256 identify the immutable release; created_at is storage time, not an observation date.",
+          "rights": "Civica-derived metadata; component-level source rights remain controlling for underlying values.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_version",
+          "propertyName": "methodologyVersion",
+          "definition": "Version of the Civica method that produced or interprets this row.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica release-control metadata generated from frozen Conditions calculations and reference sets.",
+          "cadence": "Only when a new, explicitly named Conditions release is created.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-derived metadata; component-level source rights remain controlling for underlying values.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
       "name": "civica_conditions_scores",
       "exportName": "civicaConditionsScores",
       "definition": "Country-level descriptive Conditions indicators and display positions.",
@@ -7433,10 +8133,11 @@
             "indexed": true,
             "foreignKey": null,
             "indexGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique",
+              "idx_conditions_release"
             ],
             "uniqueGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ]
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
@@ -7487,10 +8188,10 @@
             "indexed": true,
             "foreignKey": null,
             "indexGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ],
             "uniqueGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ]
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
@@ -7516,11 +8217,11 @@
             "indexed": true,
             "foreignKey": "jurisdictions.id",
             "indexGroups": [
-              "idx_conditions_unique",
+              "idx_conditions_release_unique",
               "idx_conditions_jurisdiction"
             ],
             "uniqueGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ]
           },
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
@@ -7596,10 +8297,10 @@
             "indexed": true,
             "foreignKey": null,
             "indexGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ],
             "uniqueGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ]
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
@@ -7650,11 +8351,11 @@
             "indexed": true,
             "foreignKey": null,
             "indexGroups": [
-              "idx_conditions_unique",
+              "idx_conditions_release_unique",
               "idx_conditions_quarter"
             ],
             "uniqueGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ]
           },
           "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
@@ -7691,6 +8392,36 @@
           }
         },
         {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id; relational link to civica_conditions_releases.id.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "civica_conditions_releases.id",
+            "indexGroups": [
+              "idx_conditions_release_unique",
+              "idx_conditions_release"
+            ],
+            "uniqueGroups": [
+              "idx_conditions_release_unique"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing civica_conditions_releases.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "source_id",
           "propertyName": "sourceId",
           "definition": "Identifier of the registered source responsible for this observation or record.",
@@ -7705,10 +8436,10 @@
             "indexed": true,
             "foreignKey": "sources.id",
             "indexGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ],
             "uniqueGroups": [
-              "idx_conditions_unique"
+              "idx_conditions_release_unique"
             ]
           },
           "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",

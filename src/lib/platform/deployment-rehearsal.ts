@@ -18,6 +18,7 @@ export const STAGED_MIGRATION_IDS = [
   "0038_heavy_slyde",
   "0039_living_clea",
   "0040_closed_young_avengers",
+  "0042_grey_sally_floyd",
 ] as const;
 
 export type DeploymentScope = "staging" | "production" | "recovery";

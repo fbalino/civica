@@ -315,6 +315,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "mixed",
     "journaled",
   ),
+  shared(
+    "0042_grey_sally_floyd",
+    "drizzle/authoritative/0042_grey_sally_floyd.sql",
+    "mixed",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

@@ -10,6 +10,8 @@ const economic = read("src/lib/conditions/economic.ts");
 const writer = read("src/lib/conditions/ingest.ts");
 const schema = read("src/lib/db/schema.ts");
 const migration = read("drizzle/authoritative/0040_closed_young_avengers.sql");
+const releaseMigration = read("drizzle/authoritative/0042_grey_sally_floyd.sql");
+const release = read("src/lib/conditions/release.ts");
 const query = read("src/lib/db/queries.ts");
 const economicScript = read("scripts/ingest-conditions-economic.ts");
 const hdiScript = read("scripts/ingest-conditions-hdi.ts");
@@ -24,6 +26,26 @@ for (const token of [
   "conditionCalculationErrors",
 ]) {
   if (!contract.includes(token)) errors.push(`Conditions contract omits ${token}`);
+}
+for (const token of [
+  "civica_conditions_releases",
+  "civica_conditions_reference_sets",
+  "civica_conditions_normalization_parameters",
+  "release_id",
+  "idx_conditions_release_unique",
+]) {
+  if (!schema.includes(token)) errors.push(`release schema omits ${token}`);
+  if (!releaseMigration.includes(token)) errors.push(`release migration omits ${token}`);
+}
+for (const token of [
+  "conditionsReleaseManifestSha256",
+  "conditionsReleaseErrors",
+  "buildEconomicReferenceSets",
+  "writeConditionsRelease",
+]) {
+  if (!release.includes(token) && !writer.includes(token) && !economic.includes(token)) {
+    errors.push(`Conditions release contract omits ${token}`);
+  }
 }
 for (const table of [
   "civica_conditions_calculations",
@@ -82,5 +104,5 @@ if (errors.length) {
 }
 
 console.log(
-  "PASS — conditions-components/v1 retains exact inputs, explicit missing/refused decisions, and aligned-only scores.",
+  "PASS — Conditions retain exact inputs, explicit missing/refused decisions, aligned-only scores, and immutable release parameters.",
 );

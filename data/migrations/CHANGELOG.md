@@ -241,6 +241,15 @@ updates/deletes enter the research-evidence history ledger. Recovery is a
 reviewed forward correction or isolated pre-change backup; never invent a
 component observation or rewrite retained evidence as ordinary rollback.
 
+`0042_grey_sally_floyd` adds ATL-027's immutable Conditions release contract.
+Each explicitly named release stores its manifest hash, the exact per-period
+eligible population and hash, declared components, missingness counts, and
+component direction/normalization parameters. Calculation and score rows retain
+their release identity, so a successor release cannot overwrite a cited prior
+release. The migration retains history for the release, reference-set, and
+parameter relations. Recovery is a forward successor release or isolated
+pre-change backup; never change a frozen population or parameter in place.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

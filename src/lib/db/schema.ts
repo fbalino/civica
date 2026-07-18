@@ -2162,6 +2162,94 @@ export const organizationMemberships = pgTable(
 
 // --- Phase 5.2 — Civica Conditions companion layer ---
 
+/** Immutable release header for one Conditions dimension or release bundle. */
+export const civicaConditionsReleases = pgTable(
+  "civica_conditions_releases",
+  {
+    id: text("id").primaryKey(),
+    methodologyVersion: text("methodology_version").notNull(),
+    manifestSha256: text("manifest_sha256").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "conditions_release_identity_check",
+      dsql`${table.id} ~ '^conditions-[a-z0-9-]+-v[1-9][0-9]*$' AND btrim(${table.methodologyVersion}) <> '' AND ${table.manifestSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+  ],
+);
+
+/** Exact eligible population, components, and missingness rule per period. */
+export const civicaConditionsReferenceSets = pgTable(
+  "civica_conditions_reference_sets",
+  {
+    releaseId: text("release_id")
+      .references(() => civicaConditionsReleases.id)
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    referencePeriod: text("reference_period").notNull(),
+    jurisdictionIds: jsonb("jurisdiction_ids").$type<string[]>().notNull(),
+    populationSha256: text("population_sha256").notNull(),
+    candidateCount: integer("candidate_count").notNull(),
+    alignedCount: integer("aligned_count").notNull(),
+    mixedYearRefusedCount: integer("mixed_year_refused_count").notNull(),
+    missingComponentCount: integer("missing_component_count").notNull(),
+    includedComponents: jsonb("included_components").$type<string[]>().notNull(),
+    missingnessPolicy: text("missingness_policy").notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "civica_conditions_reference_sets_pk",
+      columns: [table.releaseId, table.dimension, table.referencePeriod],
+    }),
+    check(
+      "conditions_reference_set_shape_check",
+      dsql`${table.referencePeriod} ~ '^[0-9]{4}-Q[1-4]$' AND jsonb_typeof(${table.jurisdictionIds}) = 'array' AND jsonb_array_length(${table.jurisdictionIds}) > 0 AND ${table.populationSha256} ~ '^[a-f0-9]{64}$' AND ${table.candidateCount} >= ${table.alignedCount} AND ${table.alignedCount} > 0 AND ${table.mixedYearRefusedCount} >= 0 AND ${table.missingComponentCount} >= 0 AND jsonb_typeof(${table.includedComponents}) = 'array' AND jsonb_array_length(${table.includedComponents}) > 0 AND ${table.missingnessPolicy} = 'no-imputation-all-declared-components-observed-same-reference-year/v1'`,
+    ),
+  ],
+);
+
+/** Frozen parameter rows used to normalize a Conditions reference set. */
+export const civicaConditionsNormalizationParameters = pgTable(
+  "civica_conditions_normalization_parameters",
+  {
+    releaseId: text("release_id").notNull(),
+    dimension: text("dimension").notNull(),
+    referencePeriod: text("reference_period").notNull(),
+    componentId: text("component_id").notNull(),
+    direction: text("direction").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    mean: real("mean"),
+    standardDeviation: real("standard_deviation"),
+    lowerBound: real("lower_bound"),
+    upperBound: real("upper_bound"),
+  },
+  (table) => [
+    primaryKey({
+      name: "civica_conditions_normalization_parameters_pk",
+      columns: [
+        table.releaseId,
+        table.dimension,
+        table.referencePeriod,
+        table.componentId,
+      ],
+    }),
+    foreignKey({
+      name: "conditions_normalization_reference_set_fk",
+      columns: [table.releaseId, table.dimension, table.referencePeriod],
+      foreignColumns: [
+        civicaConditionsReferenceSets.releaseId,
+        civicaConditionsReferenceSets.dimension,
+        civicaConditionsReferenceSets.referencePeriod,
+      ],
+    }).onDelete("restrict"),
+    check(
+      "conditions_normalization_parameter_shape_check",
+      dsql`${table.direction} IN ('higher_is_better','lower_is_better') AND btrim(${table.transformationId}) <> '' AND (${table.standardDeviation} IS NULL OR ${table.standardDeviation} > 0) AND ((${table.lowerBound} IS NULL AND ${table.upperBound} IS NULL) OR (${table.lowerBound} < ${table.upperBound}))`,
+    ),
+  ],
+);
+
 /**
  * One declared Conditions calculation, including refused/missing candidates
  * that do not produce a score. Component rows join through calculationKey.
@@ -2170,6 +2258,8 @@ export const civicaConditionsCalculations = pgTable(
   "civica_conditions_calculations",
   {
     calculationKey: text("calculation_key").primaryKey(),
+    /** Null only for an intervening legacy deployment before release freezing. */
+    releaseId: text("release_id").references(() => civicaConditionsReleases.id),
     jurisdictionId: uuid("jurisdiction_id")
       .references(() => jurisdictions.id)
       .notNull(),
@@ -2186,6 +2276,7 @@ export const civicaConditionsCalculations = pgTable(
       table.jurisdictionId,
       table.dimension,
       table.methodologyVersion,
+      table.releaseId,
     ),
     check(
       "conditions_calculation_contract_check",
@@ -2232,6 +2323,8 @@ export const civicaConditionsScores = pgTable(
     datasetYear: integer("dataset_year").notNull(),
     /** Methodology version tag — "beta" during the v2 rebuild */
     methodologyVersion: text("methodology_version").notNull(),
+    /** Null only for legacy rows that predate Conditions release freezing. */
+    releaseId: text("release_id").references(() => civicaConditionsReleases.id),
     /**
      * Required for decomposition-aware scores. Historic rows remain null and
      * are deliberately excluded from the decomposable read path.
@@ -2242,17 +2335,19 @@ export const civicaConditionsScores = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_conditions_unique").on(
+    uniqueIndex("idx_conditions_release_unique").on(
       table.jurisdictionId,
       table.dimension,
       table.quarter,
       table.methodologyVersion,
       table.sourceId,
       table.indicatorId,
+      table.releaseId,
     ),
     index("idx_conditions_quarter").on(table.quarter),
     index("idx_conditions_jurisdiction").on(table.jurisdictionId),
     index("idx_conditions_calculation").on(table.calculationKey),
+    index("idx_conditions_release").on(table.releaseId, table.dimension),
     check(
       "civica_conditions_scores_lineage_check",
       dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,

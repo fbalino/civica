@@ -6,6 +6,10 @@ import {
   type ConditionScoreInput,
   type ConditionsComponentId,
 } from "./contract";
+import {
+  CONDITIONS_MISSINGNESS_POLICY,
+  type ConditionsReferenceSet,
+} from "./release";
 
 export interface EconomicComponentObservation {
   value: number | null;
@@ -54,6 +58,130 @@ function normalCdf(z: number): number {
     (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) *
       Math.exp(-x * x);
   return 0.5 * (1.0 + sign * y);
+}
+
+type EconomicStats = {
+  inflationMean: number;
+  inflationStddev: number;
+  unemploymentMean: number;
+  unemploymentStddev: number;
+  gdpGrowthMean: number;
+  gdpGrowthStddev: number;
+};
+
+function alignedReferenceYear(observation: EconomicObservation): number | null {
+  const components = [
+    observation.inflation,
+    observation.unemployment,
+    observation.gdpGrowth,
+  ];
+  if (!components.every((component) => component.valueStatus === "observed")) {
+    return null;
+  }
+  const years = new Set(components.map((component) => component.referenceYear));
+  return years.size === 1 ? observation.inflation.referenceYear : null;
+}
+
+function economicStats(observations: readonly EconomicObservation[]): EconomicStats {
+  const inflationValues = observations.map((observation) => observation.inflation.value!);
+  const unemploymentValues = observations.map((observation) => observation.unemployment.value!);
+  const gdpGrowthValues = observations.map((observation) => observation.gdpGrowth.value!);
+  const inflationMean = mean(inflationValues);
+  const unemploymentMean = mean(unemploymentValues);
+  const gdpGrowthMean = mean(gdpGrowthValues);
+  return {
+    inflationMean,
+    inflationStddev: stddev(inflationValues, inflationMean),
+    unemploymentMean,
+    unemploymentStddev: stddev(unemploymentValues, unemploymentMean),
+    gdpGrowthMean,
+    gdpGrowthStddev: stddev(gdpGrowthValues, gdpGrowthMean),
+  };
+}
+
+function groupAlignedObservations(
+  observations: readonly EconomicObservation[],
+): Map<number, EconomicObservation[]> {
+  const byYear = new Map<number, EconomicObservation[]>();
+  for (const observation of observations) {
+    const year = alignedReferenceYear(observation);
+    if (year === null) continue;
+    const group = byYear.get(year) ?? [];
+    group.push(observation);
+    byYear.set(year, group);
+  }
+  return byYear;
+}
+
+/**
+ * The frozen cross-country reference sets for economic normalization. Each
+ * period has its own population and parameters: values from a newer period
+ * cannot move an earlier period's distribution.
+ */
+export function buildEconomicReferenceSets(
+  observations: readonly EconomicObservation[],
+): ConditionsReferenceSet[] {
+  const groups = groupAlignedObservations(observations);
+  const mixedYearRefusedCount = observations.filter((observation) => {
+    const components = [
+      observation.inflation,
+      observation.unemployment,
+      observation.gdpGrowth,
+    ];
+    return (
+      components.every((component) => component.valueStatus === "observed") &&
+      new Set(components.map((component) => component.referenceYear)).size > 1
+    );
+  }).length;
+  const missingComponentCount = observations.length -
+    [...groups.values()].reduce((count, group) => count + group.length, 0) -
+    mixedYearRefusedCount;
+
+  return [...groups.entries()]
+    .map(([year, group]) => {
+      const statistics = economicStats(group);
+      return {
+        dimension: "economic_stability" as const,
+        referencePeriod: `${year}-Q4`,
+        jurisdictionIds: group.map((observation) => observation.jurisdictionId).sort(),
+        candidateCount: observations.length,
+        alignedCount: group.length,
+        mixedYearRefusedCount,
+        missingComponentCount,
+        includedComponents: ["inflation", "unemployment", "gdp_growth"] as const,
+        missingnessPolicy: CONDITIONS_MISSINGNESS_POLICY,
+        parameters: [
+          {
+            componentId: "inflation" as const,
+            direction: "lower_is_better" as const,
+            transformationId: "conditions-economic-aligned-z-cdf/v2",
+            mean: statistics.inflationMean,
+            standardDeviation: statistics.inflationStddev,
+            lowerBound: null,
+            upperBound: null,
+          },
+          {
+            componentId: "unemployment" as const,
+            direction: "lower_is_better" as const,
+            transformationId: "conditions-economic-aligned-z-cdf/v2",
+            mean: statistics.unemploymentMean,
+            standardDeviation: statistics.unemploymentStddev,
+            lowerBound: null,
+            upperBound: null,
+          },
+          {
+            componentId: "gdp_growth" as const,
+            direction: "higher_is_better" as const,
+            transformationId: "conditions-economic-aligned-z-cdf/v2",
+            mean: statistics.gdpGrowthMean,
+            standardDeviation: statistics.gdpGrowthStddev,
+            lowerBound: null,
+            upperBound: null,
+          },
+        ],
+      } satisfies ConditionsReferenceSet;
+    })
+    .sort((left, right) => left.referencePeriod.localeCompare(right.referencePeriod));
 }
 
 function component(
@@ -108,6 +236,7 @@ function draftComponents(
 
 function unavailableCalculation(
   observation: EconomicObservation,
+  releaseId: string,
   methodologyVersion: string,
   lineages: EconomicLineages,
 ): ConditionScoreInput {
@@ -136,6 +265,7 @@ function unavailableCalculation(
       : "excluded_missing",
   );
   const base = {
+    releaseId,
     jurisdictionId: observation.jurisdictionId,
     dimension: "economic_stability" as const,
     quarter: null,
@@ -163,32 +293,16 @@ function unavailableCalculation(
  */
 export function buildEconomicConditionsCalculations(input: {
   observations: readonly EconomicObservation[];
+  releaseId: string;
   methodologyVersion: string;
   lineages: EconomicLineages;
 }): ConditionScoreInput[] {
-  const aligned = input.observations.filter((observation) => {
-    const components = [
-      observation.inflation,
-      observation.unemployment,
-      observation.gdpGrowth,
-    ];
-    return (
-      components.every((component) => component.valueStatus === "observed") &&
-      new Set(components.map((component) => component.referenceYear)).size === 1
-    );
-  });
-
-  const inflationValues = aligned.map((observation) => observation.inflation.value!);
-  const unemploymentValues = aligned.map((observation) => observation.unemployment.value!);
-  const gdpGrowthValues = aligned.map((observation) => observation.gdpGrowth.value!);
-  const inflationMean = aligned.length ? mean(inflationValues) : 0;
-  const unemploymentMean = aligned.length ? mean(unemploymentValues) : 0;
-  const gdpGrowthMean = aligned.length ? mean(gdpGrowthValues) : 0;
-  const inflationStddev = aligned.length ? stddev(inflationValues, inflationMean) : 1;
-  const unemploymentStddev = aligned.length
-    ? stddev(unemploymentValues, unemploymentMean)
-    : 1;
-  const gdpGrowthStddev = aligned.length ? stddev(gdpGrowthValues, gdpGrowthMean) : 1;
+  const statsByYear = new Map(
+    [...groupAlignedObservations(input.observations)].map(([year, group]) => [
+      year,
+      economicStats(group),
+    ]),
+  );
 
   return input.observations.map((observation) => {
     const components = [
@@ -203,16 +317,21 @@ export function buildEconomicConditionsCalculations(input: {
     if (!allObserved || years.size !== 1) {
       return unavailableCalculation(
         observation,
+        input.releaseId,
         input.methodologyVersion,
         input.lineages,
       );
     }
 
     const referenceYear = observation.inflation.referenceYear!;
+    const statistics = statsByYear.get(referenceYear);
+    if (!statistics) {
+      throw new Error(`Missing frozen economic reference set for ${referenceYear}`);
+    }
     const compositeZ = mean([
-      -(observation.inflation.value! - inflationMean) / inflationStddev,
-      -(observation.unemployment.value! - unemploymentMean) / unemploymentStddev,
-      (observation.gdpGrowth.value! - gdpGrowthMean) / gdpGrowthStddev,
+      -(observation.inflation.value! - statistics.inflationMean) / statistics.inflationStddev,
+      -(observation.unemployment.value! - statistics.unemploymentMean) / statistics.unemploymentStddev,
+      (observation.gdpGrowth.value! - statistics.gdpGrowthMean) / statistics.gdpGrowthStddev,
     ]);
     const normalizedScore = Math.round(normalCdf(compositeZ) * 1000) / 10;
     const rawValue = Math.round(compositeZ * 1000) / 1000;
@@ -222,6 +341,7 @@ export function buildEconomicConditionsCalculations(input: {
       "included",
     );
     const base = {
+      releaseId: input.releaseId,
       jurisdictionId: observation.jurisdictionId,
       dimension: "economic_stability" as const,
       quarter: `${referenceYear}-Q4`,

@@ -19,15 +19,19 @@ import {
 } from "../src/lib/conditions/contract";
 import {
   buildEconomicConditionsCalculations,
+  buildEconomicReferenceSets,
   type EconomicComponentObservation,
   type EconomicObservation,
 } from "../src/lib/conditions/economic";
-import { writeConditionScores } from "../src/lib/conditions/ingest";
+import { writeConditionsRelease } from "../src/lib/conditions/ingest";
 import { buildIndicatorLineage } from "../src/lib/indicators/lineage";
 
 const SOURCE_ID = "worldbank_economic";
 const CONDITIONS_DIMENSION = "economic_stability";
 const DRY_RUN = process.argv.includes("--dry-run");
+const RELEASE_ID = process.argv.find((arg) => arg.startsWith("--release-id="))?.slice(
+  "--release-id=".length,
+);
 
 const WB_BASE = "https://api.worldbank.org/v2";
 const DATE_RANGE = "2020:2024";
@@ -151,6 +155,9 @@ function economicLineages(observations: readonly EconomicObservation[]) {
 
 async function main() {
   console.log("=== Civica Conditions — Economic Stability inputs ===\n");
+  if (!RELEASE_ID) {
+    throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
+  }
   const jurisdictionsWithIso2 = await db
     .select({ id: jurisdictions.id, iso2: jurisdictions.iso2 })
     .from(jurisdictions)
@@ -174,10 +181,15 @@ async function main() {
 
   const rows = buildEconomicConditionsCalculations({
     observations,
+    releaseId: RELEASE_ID,
     methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
     lineages: economicLineages(observations),
   });
-  const summary = await writeConditionScores(db, rows, { dryRun: DRY_RUN });
+  const summary = await writeConditionsRelease(db, {
+    releaseId: RELEASE_ID,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceSets: buildEconomicReferenceSets(observations),
+  }, rows, { dryRun: DRY_RUN });
   const aligned = rows.filter((row) => row.alignmentStatus === "aligned").length;
   const mixedYear = rows.filter(
     (row) => row.alignmentStatus === "mixed_year_refused",
@@ -188,7 +200,7 @@ async function main() {
 
   console.log(`\n${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.calculationsWritten || summary.proposed} calculation ledgers and ${summary.componentsWritten || rows.length * 3} component rows.`);
   console.log(`Scores available: ${aligned}; mixed-year refused: ${mixedYear}; missing component: ${missing}.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
+  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
 }
 
 main().catch((error) => {

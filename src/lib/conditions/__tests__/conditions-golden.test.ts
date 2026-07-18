@@ -17,6 +17,7 @@ function fixture(
     ? "hdi"
     : "global_peace_index";
   const base = {
+    releaseId: "conditions-golden-v1",
     jurisdictionId: "j-golden",
     dimension,
     quarter: "2024-Q4",
