@@ -3,6 +3,11 @@ import { z } from "zod";
 import { apiProblem } from "@/lib/api/problem";
 import { CI_RELEASE_QUERY_IDENTITIES } from "@/lib/ci/release-query-identities";
 import { JURISDICTION_STATUS_TYPES } from "@/lib/jurisdictions/status-taxonomy";
+import { DATA_VALUE_STATUSES } from "@/lib/data/value-state";
+import {
+  ATLAS_QUERY_COLUMNS,
+  ATLAS_QUERY_TABLES,
+} from "@/lib/exports/atlas-query";
 
 const MAX_RAW_QUERY_BYTES = 16_384;
 const MAX_QUERY_PAIRS = 64;
@@ -139,6 +144,10 @@ const boundedCommaList = text(4_096, 1)
     ),
   );
 
+const boundedIdentifierList = boundedCommaList.refine((values) =>
+  values.every((value) => IDENTIFIER.test(value)),
+);
+
 const adminAdvisoryQueueSchema = z
   .object({
     limit: canonicalInteger(1, 200, 50),
@@ -210,6 +219,60 @@ const electionsQuerySchema = z
   })
   .strict()
   .refine((value) => !value.from || !value.to || value.from <= value.to);
+
+const atlasQuerySchema = z
+  .object({
+    table: z.enum(ATLAS_QUERY_TABLES).default("facts"),
+    fields: boundedIdentifierList.optional(),
+    jurisdiction: boundedCommaList.optional(),
+    fact_key: boundedIdentifierList.optional(),
+    source: boundedIdentifierList.optional(),
+    status: boundedIdentifierList.optional(),
+    value_status: boundedIdentifierList.optional(),
+    year_from: canonicalInteger(1800, 2200).optional(),
+    year_to: canonicalInteger(1800, 2200).optional(),
+    limit: canonicalInteger(1, 1_000, 100),
+    offset: canonicalInteger(0, 1_000_000, 0),
+    format: z.enum(["json", "csv"]).default("json"),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.year_from && value.year_to && value.year_from > value.year_to) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["year_from"],
+        message: "year_from must be less than or equal to year_to",
+      });
+    }
+    const allowedFields = new Set<string>(ATLAS_QUERY_COLUMNS[value.table]);
+    for (const field of value.fields ?? []) {
+      if (!allowedFields.has(field)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["fields"],
+          message: `unknown ${value.table} field: ${field}`,
+        });
+      }
+    }
+    for (const status of value.status ?? []) {
+      if (!JURISDICTION_STATUS_TYPES.includes(status as never)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: `unknown jurisdiction status: ${status}`,
+        });
+      }
+    }
+    for (const status of value.value_status ?? []) {
+      if (!DATA_VALUE_STATUSES.includes(status as never)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["value_status"],
+          message: `unknown data value status: ${status}`,
+        });
+      }
+    }
+  });
 
 const pulseDimensions = [
   "democratic_quality",
@@ -333,6 +396,10 @@ export const QUERY_CONTRACT_SCHEMAS = {
   },
   "v1-elections-query/v1": {
     schema: electionsQuerySchema,
+    repeatableKeys: [],
+  },
+  "v1-atlas-query/v1": {
+    schema: atlasQuerySchema,
     repeatableKeys: [],
   },
   "v1-conditions-query/v1": {

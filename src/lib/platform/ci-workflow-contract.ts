@@ -14,7 +14,7 @@ export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
 /** SHA-256 of the complete credential-free production build command. */
 export const BUILD_CORE_SHA256 =
-  "b13c0fc67333a3da2782fd18ceb6dff315119a2f66524d978527a1e737e7d860";
+  "d9fdcfc335522bae3fec6e452ef6feff3f90c6641f40bd1fe0393d635bb2a500";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",

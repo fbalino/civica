@@ -47,6 +47,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/policies", changeFrequency: "monthly", priority: 0.5 },
   { path: "/methodology/approach", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/methodology/case-studies", changeFrequency: "monthly", priority: 0.6 },
   { path: "/methodology/provenance-coverage", changeFrequency: "weekly", priority: 0.6 },
   { path: "/methodology/source-coverage", changeFrequency: "weekly", priority: 0.6 },
   { path: "/country/methodology/reconciliation", changeFrequency: "monthly", priority: 0.6 },

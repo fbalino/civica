@@ -39,6 +39,7 @@ import {
   zPulseDimensionsResponse,
   zPulseEventsResponse,
   zPulseChangelogResponse,
+  zAtlasQueryResponse,
   zCountryExportJson,
   zElectionResearchExport,
   type GovernmentClassificationShape,
@@ -1765,6 +1766,134 @@ const countryExportJsonExample = zCountryExportJson.parse({
   rights: { manifest: "/api/rights-manifest", policy: "source-row-filtered" },
 });
 
+const atlasQueryExample = zAtlasQueryResponse.parse({
+  schemaVersion: "civica-atlas-query/v1",
+  release: {
+    id: "atlas-2026-07-11",
+    date: "2026-07-11",
+    vintageLabel: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+    cutoffAt: "2026-05-05 19:54:22.775",
+    exportSchemaVersion: "civica-atlas-export/v3",
+    semanticSha256:
+      "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+    bulkDownload: "/downloads/civica-atlas-2026-07-11.json.gz",
+    manifestDownload:
+      "/downloads/civica-atlas-2026-07-11.manifest.json",
+  },
+  query: {
+    table: "facts",
+    fields: [
+      "jurisdiction_id",
+      "fact_key",
+      "fact_value_numeric",
+      "fact_unit",
+      "source_id",
+      "observation_reference_year",
+    ],
+    filters: {
+      jurisdiction: ["FRA"],
+      factKey: ["population"],
+      source: [],
+      status: [],
+      valueStatus: ["observed"],
+      yearFrom: null,
+      yearTo: null,
+    },
+  },
+  data: [
+    {
+      jurisdiction_id: "example-france-id",
+      fact_key: "population",
+      fact_value_numeric: 68170000,
+      fact_unit: "people",
+      source_id: "world_bank",
+      observation_reference_year: 2024,
+    },
+  ],
+  meta: {
+    total: 1,
+    limit: 100,
+    offset: 0,
+    hasMore: false,
+    nextOffset: null,
+    previousOffset: null,
+  },
+  schema: {
+    table: "facts",
+    columns: {
+      jurisdiction_id: "Foreign key to jurisdictions.id.",
+      fact_key: "Stable Civica fact identifier.",
+      fact_value_numeric: "Numeric form when available; zero is observed, not missing.",
+      fact_unit: "Unit attached to the value.",
+      source_id: "Foreign key to sources.sourceId.",
+      observation_reference_year:
+        "Year the observation describes; never an ingestion or release year.",
+    },
+    joins: {
+      "facts.jurisdiction_id": "jurisdictions.id",
+      "facts.source_id": "sources.sourceId",
+    },
+    ordering: "jurisdiction_id, fact_key, source_id, id ascending",
+  },
+  rights: {
+    manifest: "/api/rights-manifest",
+    policy: "frozen-release-allowlist",
+    note:
+      "Every source represented on this fact page has a matching frozen source-rights row below.",
+    sources: [
+      {
+        sourceId: "world_bank",
+        licenseId: "CC-BY-4.0",
+        termsUrl: "https://datacatalog.worldbank.org/public-licenses",
+        reviewStatus: "verified",
+        reviewedAt: "2026-07-10",
+        publicExport: "allowed",
+        commercialUse: true,
+        derivatives: true,
+        attributionRequired: true,
+        shareAlikeRequired: false,
+        restrictions: [
+          "Dataset-specific catalog terms override the default license",
+          "Indicate changes",
+          "Do not imply World Bank endorsement",
+        ],
+      },
+    ],
+  },
+  exclusions: [
+    {
+      id: "civica-index",
+      reason:
+        "The Civica Index is a separate research experiment and is not part of the frozen Atlas reference export.",
+    },
+    {
+      id: "civica-pulse",
+      reason:
+        "Pulse event evidence and experimental numeric outputs are outside the Atlas release.",
+    },
+    {
+      id: "alternate-and-rejected-observations",
+      reason:
+        "The checked Q1 release retained canonical selections only; alternates, projections, and rejected rows are not reconstructed.",
+    },
+    {
+      id: "restricted-sources",
+      reason:
+        "Rows whose source-specific rights do not permit public bulk export are excluded rather than reassigned.",
+    },
+    {
+      id: "images-and-constitution-text",
+      reason:
+        "Images and constitution full text have separate rights and display contracts and are not redistributed here.",
+    },
+    {
+      id: "raw-publisher-payloads",
+      reason:
+        "Raw publisher payloads are retained only where permitted and never enter this normalized public query surface.",
+    },
+  ],
+});
+
 const electionResearchExample = zElectionResearchExport.parse({
   schemaVersion: "election-research-export/v1",
   generatedAt: "2026-07-12T00:00:00.000Z",
@@ -1870,6 +1999,7 @@ export const EXAMPLES = {
   pulseDimensions: pulseDimensionsExampleResponse,
   pulseEvents: pulseEventsExampleResponse,
   pulseChangelog: pulseChangelogExampleResponse,
+  atlasQuery: atlasQueryExample,
   countryExport: countryExportJsonExample,
   elections: electionResearchExample,
 } as const;

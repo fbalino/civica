@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "49e1ba36a8970766846d79a79f598773c9dbc201a02bb2ae74b106da4dbaef99",
+  "semanticHash": "8605dc1ebca0d5810a7f4090e959d70c7e7e49982a993040423623ff92955a63",
   "summary": {
-    "route": 176,
+    "route": 178,
     "pipeline": 50,
     "calculation": 8,
     "data_domain": 14,
@@ -5712,6 +5712,51 @@
       }
     },
     {
+      "id": "route:src/app/(reader)/methodology/case-studies/page.tsx",
+      "kind": "route",
+      "title": "/methodology/case-studies reader page",
+      "source": "src/app/(reader)/methodology/case-studies/page.tsx",
+      "critical": true,
+      "owner": "Reader experience and Atlas product",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
       "id": "route:src/app/(reader)/methodology/page.tsx",
       "kind": "route",
       "title": "/methodology reader page",
@@ -10034,6 +10079,49 @@
       "critical": true,
       "owner": "Public API and platform",
       "fixture": "public-read route-inventory declaration for GET",
+      "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
+      "coverage": {
+        "unit": {
+          "status": "covered",
+          "evidence": [
+            "src/lib/api/route-inventory/__tests__/route-inventory.test.ts"
+          ],
+          "gapTask": null
+        },
+        "integration": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:route-io-policy"
+          ],
+          "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/api/v1/atlas/query/route.ts",
+      "kind": "route",
+      "title": "/api/v1/atlas/query API handler",
+      "source": "src/app/api/v1/atlas/query/route.ts",
+      "critical": true,
+      "owner": "Public API and platform",
+      "fixture": "public-read route-inventory declaration for GET, OPTIONS",
       "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
       "coverage": {
         "unit": {

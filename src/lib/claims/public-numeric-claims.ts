@@ -655,6 +655,25 @@ function exemptClaim(
   return { id, file, surface, fragment, disposition: "exempt", source };
 }
 
+function frozenClaim(
+  id: string,
+  file: string,
+  surface: string,
+  fragment: string,
+  source: string,
+  release: string,
+): PublicNumericClaimRegistration {
+  return {
+    id,
+    file,
+    surface,
+    fragment,
+    disposition: "frozen",
+    source,
+    release,
+  };
+}
+
 export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
   [
     runtimeClaim(
@@ -943,6 +962,21 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       "/api-docs",
       'Illustrative Example Response: {"schemaVersion":"election-research-export/v1"',
       "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    exemptClaim(
+      "api-docs.atlas-query-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"schemaVersion":"civica-atlas-query/v1"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    frozenClaim(
+      "atlas-case-studies.recipe-input-rows",
+      "src/app/(reader)/methodology/case-studies/page.tsx",
+      "/methodology/case-studies",
+      "{recipe.inputRowCount.toLocaleString()} input rows frozen in release {artifact.release.id}",
+      "checked case-studies.v1.json generated from the frozen Atlas release",
+      "atlas-2026-07-11",
     ),
     runtimeClaim(
       "rankings.live-row-count",

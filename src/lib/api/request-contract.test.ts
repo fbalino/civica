@@ -211,7 +211,7 @@ test("OAuth and constitution-search contracts accept their bounded real shapes",
   });
 });
 
-test("all 22 declared GET query schemas accept their canonical minimum shape", () => {
+test("all declared GET query schemas accept their canonical minimum shape", () => {
   const cases = [
     ["admin-advisory-queue-query/v1", ""],
     ["admin-contact-queue-query/v1", ""],
@@ -229,6 +229,7 @@ test("all 22 declared GET query schemas accept their canonical minimum shape", (
     ["v1-countries-query/v1", "?as_of=live"],
     ["v1-conditions-query/v1", ""],
     ["v1-elections-query/v1", ""],
+    ["v1-atlas-query/v1", ""],
     ["v1-index-history-query/v1", ""],
     ["v1-index-country-query/v1", ""],
     ["v1-index-group-query/v1", ""],

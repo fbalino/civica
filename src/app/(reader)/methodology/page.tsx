@@ -63,6 +63,12 @@ const SECTIONS: MethodologySection[] = [
           "The full specification of how the resolver works. Source taxonomy, the canonical-fact layer, freshness rules, editorial assertions, the dispute system, forecast vs measurement, multi-canonical with scope predicate.",
         beta: true,
       },
+      {
+        href: "/methodology/case-studies",
+        title: "Reproducible Atlas case studies",
+        blurb:
+          "Frozen examples with exact API recipes, input rows, decision trails, source rights, limitations, regenerated tables, and stable citations.",
+      },
     ],
   },
   {

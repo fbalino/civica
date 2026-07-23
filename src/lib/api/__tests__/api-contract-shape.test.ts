@@ -30,6 +30,7 @@ import { API_ROUTES, type RouteContract } from "../contract/registry";
 import { EXAMPLES, type ExampleId } from "../contract/examples";
 import {
   zCountriesListResponse,
+  zAtlasQueryResponse,
   zCountryDetailResponse,
   zElectionResearchExport,
   zGovernmentTypesResponse,
@@ -60,6 +61,7 @@ import {
  * fixtures in `contract.test.ts` and DAT-027 evidence.
  */
 const RESPONSE_SCHEMA_BY_ROUTE_ID: Record<string, z.ZodTypeAny> = {
+  "atlas-query": zAtlasQueryResponse,
   conditions: zConditionsReleaseResponse,
   countries: zCountriesListResponse,
   "country-detail": zCountryDetailResponse,

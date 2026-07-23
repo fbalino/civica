@@ -2518,6 +2518,108 @@ export const zCountryExportJson = z
   })
   .strict();
 
+/* /api/v1/atlas/query — bounded projection of the frozen Atlas release. */
+export const zAtlasQueryResponse = z
+  .object({
+    schemaVersion: z.literal("civica-atlas-query/v1"),
+    release: z
+      .object({
+        id: z.literal("atlas-2026-07-11"),
+        date: z.literal("2026-07-11"),
+        vintageLabel: z.string(),
+        cutoffAt: z.string(),
+        exportSchemaVersion: z.literal("civica-atlas-export/v3"),
+        semanticSha256: z.string().regex(/^[a-f0-9]{64}$/),
+        bulkDownload: z.literal(
+          "/downloads/civica-atlas-2026-07-11.json.gz",
+        ),
+        manifestDownload: z.literal(
+          "/downloads/civica-atlas-2026-07-11.manifest.json",
+        ),
+      })
+      .strict(),
+    query: z
+      .object({
+        table: z.enum(["jurisdictions", "facts", "sources"]),
+        fields: z.array(z.string()).min(1),
+        filters: z
+          .object({
+            jurisdiction: z.array(z.string()),
+            factKey: z.array(z.string()),
+            source: z.array(z.string()),
+            status: z.array(z.string()),
+            valueStatus: z.array(z.string()),
+            yearFrom: z.number().int().nullable(),
+            yearTo: z.number().int().nullable(),
+          })
+          .strict(),
+      })
+      .strict(),
+    data: z.array(z.record(z.string(), z.unknown())),
+    meta: z
+      .object({
+        total: z.number().int().nonnegative(),
+        limit: z.number().int().min(1).max(1_000),
+        offset: z.number().int().nonnegative(),
+        hasMore: z.boolean(),
+        nextOffset: z.number().int().nonnegative().nullable(),
+        previousOffset: z.number().int().nonnegative().nullable(),
+      })
+      .strict(),
+    schema: z
+      .object({
+        table: z.enum(["jurisdictions", "facts", "sources"]),
+        columns: z.record(z.string(), z.string()),
+        joins: z.record(z.string(), z.string()),
+        ordering: z.string(),
+      })
+      .strict(),
+    rights: z
+      .object({
+        manifest: z.literal("/api/rights-manifest"),
+        policy: z.literal("frozen-release-allowlist"),
+        note: z.string().min(1),
+        sources: z.array(z.record(z.string(), z.unknown())),
+      })
+      .strict(),
+    exclusions: z.array(
+      z
+        .object({
+          id: z.string(),
+          reason: z.string(),
+        })
+        .strict(),
+    ),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.query.table !== value.schema.table) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["schema", "table"],
+        message: "schema table differs from query table",
+      });
+    }
+    if (
+      value.query.fields.some(
+        (field) => !(field in value.schema.columns),
+      )
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["schema", "columns"],
+        message: "selected fields are missing from schema metadata",
+      });
+    }
+    if (value.data.length > value.meta.limit) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["data"],
+        message: "page exceeds declared limit",
+      });
+    }
+  });
+
 /* /api/v1/elections — qualified, rights-filtered election research export. */
 export const zElectionResearchExport = z
   .object({

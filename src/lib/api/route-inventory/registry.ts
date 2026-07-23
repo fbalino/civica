@@ -221,6 +221,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "ATL-020 public, field-safe release-history projection keyed by ATL-019 stable entity identity; never returns raw retained snapshots.",
   },
   {
+    filePath: "api/v1/atlas/query/route.ts",
+    exposure: "public-read",
+    methods: ["GET", "OPTIONS"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "input-validation", "public"],
+    note: "ATL-021 rights-aware query projection over the checked frozen Atlas release; bounded fields, filters, pagination, and CSV/JSON output.",
+  },
+  {
     filePath: "api/civica-index/corrections/route.ts",
     exposure: "public-mutation",
     methods: ["POST"],

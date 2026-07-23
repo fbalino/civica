@@ -86,6 +86,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
         label: "Data Reconciliation",
         href: "/country/methodology/reconciliation",
       },
+      { label: "Atlas Case Studies", href: "/methodology/case-studies" },
       {
         label: "Peer Grouping",
         href: "/civica-index/methodology/peer-grouping",

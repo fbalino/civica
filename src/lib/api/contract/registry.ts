@@ -172,6 +172,100 @@ export const API_ROUTES: RouteContract[] = [
     exampleId: "conditions",
   },
   {
+    id: "atlas-query",
+    docSectionId: "atlas-query",
+    method: "GET",
+    pathTemplate: "/api/v1/atlas/query",
+    filePath: "src/app/api/v1/atlas/query/route.ts",
+    versioned: true,
+    summary:
+      "Queries a bounded projection of the frozen Atlas release with stable pagination, schema metadata, source-rights rows, and explicit excluded-corpus reasons.",
+    params: [
+      {
+        name: "table",
+        in: "query",
+        type: "string",
+        description:
+          '"facts" (default), "jurisdictions", or "sources".',
+      },
+      {
+        name: "fields",
+        in: "query",
+        type: "comma-separated string",
+        description:
+          "Optional allowlisted columns for the selected table. Unknown fields fail closed.",
+      },
+      {
+        name: "jurisdiction",
+        in: "query",
+        type: "comma-separated string",
+        description:
+          "Jurisdiction UUID, slug, ISO alpha-2, or ISO alpha-3 filter for facts or jurisdictions.",
+      },
+      {
+        name: "fact_key",
+        in: "query",
+        type: "comma-separated string",
+        description: "Fact-key filter for the facts table.",
+      },
+      {
+        name: "source",
+        in: "query",
+        type: "comma-separated string",
+        description: "Source-id filter for facts or sources.",
+      },
+      {
+        name: "status",
+        in: "query",
+        type: "comma-separated string",
+        description:
+          "jurisdiction-status/v1 filter for facts or jurisdictions.",
+      },
+      {
+        name: "value_status",
+        in: "query",
+        type: "comma-separated string",
+        description: "data-value-state/v1 filter for facts.",
+      },
+      {
+        name: "year_from",
+        in: "query",
+        type: "integer",
+        description: "Minimum observation/reference year for facts.",
+      },
+      {
+        name: "year_to",
+        in: "query",
+        type: "integer",
+        description: "Maximum observation/reference year for facts.",
+      },
+      {
+        name: "limit",
+        in: "query",
+        type: "integer",
+        description: "Page size (default 100, max 1000).",
+      },
+      {
+        name: "offset",
+        in: "query",
+        type: "integer",
+        description: "Stable row offset (default 0).",
+      },
+      {
+        name: "format",
+        in: "query",
+        type: "string",
+        description: '"json" (default) or "csv".',
+      },
+    ],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [400, 429, 500, 503],
+    deprecation: null,
+    exampleId: "atlasQuery",
+  },
+  {
     id: "countries",
     docSectionId: "countries",
     method: "GET",

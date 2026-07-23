@@ -3,7 +3,7 @@
  *
  * Two halves, mirroring `src/lib/api/contract/__tests__/contract.test.ts`:
  *
- *   1. Positive: the real `registry.ts` has an entry for all 107 real
+ *   1. Positive: the real `registry.ts` has an entry for all 108 real
  *      `route.ts` files under src/app, declares the same HTTP methods
  *      those files actually export, and the pure checks report zero
  *      phantom routes / zero stale entries / zero UNDOCUMENTED
@@ -61,10 +61,10 @@ async function findRepositoryRouteFilesOnDisk(): Promise<string[]> {
 // Positive: the real registry is internally consistent and complete
 // ─────────────────────────────────────────────────────────────────────
 
-test("the real registry has exactly 107 entries, one per real route.ts file", async () => {
+test("the real registry has exactly 108 entries, one per real route.ts file", async () => {
   const diskFiles = await findRepositoryRouteFilesOnDisk();
-  assert.equal(diskFiles.length, 107, "expected exactly 107 route.ts files under src/app");
-  assert.equal(ROUTE_INVENTORY.length, 107);
+  assert.equal(diskFiles.length, 108, "expected exactly 108 route.ts files under src/app");
+  assert.equal(ROUTE_INVENTORY.length, 108);
 });
 
 test("no duplicate filePath entries in the registry", () => {

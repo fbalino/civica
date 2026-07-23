@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 238
-- **Remaining:** 68
-- **Progress:** 77.8%
+- **Completed:** 240
+- **Remaining:** 66
+- **Progress:** 78.4%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -192,9 +192,9 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-018** (P0) Standardize loading, empty, error, partial, stale, disputed, and no-source states across all atlas modules. _Done when: ATL-001 lists and tests each applicable state, no module silently disappears on missing data, and desktop/mobile/light/dark browser fixtures cover representative states._
 - [x] **ATL-019** (P1) Create stable fact, institution, office, person, election, constitution-passage, organization, and indicator identifiers/citations. _Done when: exported/stable URLs or IDs survive display-name changes, citations resolve to release/version/source, and identifier round-trip tests pass._
 - [ ] **ATL-020** (P1) Add release-to-release change and correction histories for primary atlas entities. _Done when: users can inspect what value/record changed, old/new source/vintage, reason, method/version, release, and correction status; ordinary refreshes and substantive revisions are distinguishable._
-- [ ] **ATL-021** (P1) Build a research-friendly bulk/query access path within source rights and operational limits. _Done when: permitted atlas data can be selected/downloaded with schema/source/rights metadata, pagination/rate limits are documented, restricted fields are excluded with reasons, and examples reproduce published case studies._
+- [x] **ATL-021** (P1) Build a research-friendly bulk/query access path within source rights and operational limits. _Done when: permitted atlas data can be selected/downloaded with schema/source/rights metadata, pagination/rate limits are documented, restricted fields are excluded with reasons, and examples reproduce published case studies._
 - [ ] **ATL-022** (P2) Create a source-native governance-change explorer only after ATL-003. _Done when: “movers/backsliding” views use declared external series and time windows, show uncertainty/revisions and sensitivity to start/end dates, avoid Civica letter grades, and allow no-ranking when comparability is insufficient._
-- [ ] **ATL-023** (P1) Publish at least three reproducible reconciliation or institutional-data case studies. _Done when: each case has a research question, frozen input rows, decision trail, code/notebook, output, source rights, limitations, stable citation, and a test that regenerates its tables/figures._
+- [x] **ATL-023** (P1) Publish at least three reproducible reconciliation or institutional-data case studies. _Done when: each case has a research question, frozen input rows, decision trail, code/notebook, output, source rights, limitations, stable citation, and a test that regenerates its tables/figures._
 - [ ] **ATL-024** (P1) Add an evidence-backed data-error/report-correction flow. _Done when: a reader can report a precise entity/field/release/source issue; submissions are authenticated against abuse, acknowledged, triaged, linked to corrections, and covered by privacy/retention policy and delivery tests._
 - [x] **ATL-025** (P1) Reconcile every older roadmap/mockup promise with the atlas-first release. _Done when: each existing dated plan/mockup is tagged imported/completed/superseded/deferred/post-release with evidence and any still-valid open work has a task ID in this master plan; no active pointer targets a noncanonical plan._
 - [ ] **ATL-026** (P0) Persist every Civica Conditions component value, reference year, source, missingness, and inclusion decision. _Done when: economic/HDI/security rows can be decomposed into exact components and years, mixed-year inputs follow an adopted alignment rule or are refused/flagged, and no composite is labelled solely with the newest component year._

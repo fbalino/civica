@@ -131,6 +131,7 @@ function endpoint(
 }
 
 const V1_OPTIONS_ROUTES = [
+  "api/v1/atlas/query/route.ts",
   "api/v1/conditions/route.ts",
   "api/v1/countries/[code]/route.ts",
   "api/v1/countries/route.ts",
@@ -417,6 +418,11 @@ export const REQUEST_CONTRACT_MAPPINGS: readonly RequestContractMapping[] = [
       "v1-country-code-params/v1",
     ],
     ["v1/countries-v1", "api/v1/countries/route.ts", "v1-countries-query/v1"],
+    [
+      "v1/atlas-query-v1",
+      "api/v1/atlas/query/route.ts",
+      "v1-atlas-query/v1",
+    ],
     ["v1/conditions-v1", "api/v1/conditions/route.ts", "v1-conditions-query/v1"],
     ["v1/elections-v1", "api/v1/elections/route.ts", "v1-elections-query/v1"],
     [

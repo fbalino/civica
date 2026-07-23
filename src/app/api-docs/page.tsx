@@ -15,6 +15,7 @@ import {
   renderCountryExportCsvExample,
   type ExampleId,
 } from "@/lib/api/contract/examples";
+import { ATLAS_CASE_STUDY_REPORT } from "@/lib/atlas/case-studies-runtime";
 
 export const revalidate = 0;
 
@@ -38,6 +39,7 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "overview", label: "Overview" },
   { id: "endpoints", label: "Endpoints" },
   { id: "conditions", label: "Conditions release" },
+  { id: "atlas-query", label: "Frozen Atlas query" },
   { id: "countries", label: "List countries" },
   { id: "country-detail", label: "Country detail" },
   { id: "elections", label: "Election research export" },
@@ -194,6 +196,7 @@ function docExample(exampleId: ExampleId): string {
 
 export default function ApiDocsPage() {
   const conditionsRoute = getRouteContract("conditions");
+  const atlasQueryRoute = getRouteContract("atlas-query");
   const countriesRoute = getRouteContract("countries");
   const countryDetailRoute = getRouteContract("country-detail");
   const electionsRoute = getRouteContract("elections");
@@ -324,6 +327,16 @@ export default function ApiDocsPage() {
           description={conditionsRoute.summary}
           parameters={toDocParams(conditionsRoute.params)}
           exampleResponse={docExample("conditions")}
+        />
+
+        <EndpointSection
+          id="atlas-query"
+          routeId="atlas-query"
+          method="GET"
+          path={atlasQueryRoute.pathTemplate}
+          description={atlasQueryRoute.summary}
+          parameters={toDocParams(atlasQueryRoute.params)}
+          exampleResponse={docExample("atlasQuery")}
         />
 
         <EndpointSection
@@ -506,19 +519,33 @@ export default function ApiDocsPage() {
         <h3 className="api-example-heading">curl</h3>
         <CodeBlock>{`curl "${BASE_URL}/countries?continent=Europe&limit=10"
 curl "${BASE_URL}/countries/us"
-curl "${BASE_URL}/peer-groupings"            # peer-lens metadata`}</CodeBlock>
+curl "${BASE_URL}/peer-groupings"            # peer-lens metadata
+curl "${BASE_URL}/atlas/query?jurisdiction=FRA&fact_key=population&fields=fact_key,fact_value_numeric,fact_unit,source_id,observation_reference_year"`}</CodeBlock>
 
         <h3 className="api-example-heading">JavaScript (fetch)</h3>
-        <CodeBlock>{`const res = await fetch("${BASE_URL}/countries/fr");
-const { data } = await res.json();
-console.log(data.government.executive);`}</CodeBlock>
+        <CodeBlock>{`const params = new URLSearchParams({
+  table: "facts",
+  jurisdiction: "FRA,DEU",
+  fact_key: "population",
+  fields: "jurisdiction_id,fact_value_numeric,fact_unit,source_id,observation_reference_year",
+});
+const res = await fetch(\`${BASE_URL}/atlas/query?\${params}\`);
+const { data, rights, exclusions } = await res.json();
+console.log(data, rights.sources, exclusions);`}</CodeBlock>
 
         <h3 className="api-example-heading">Python (requests)</h3>
         <CodeBlock>{`import requests
 
-resp = requests.get("${BASE_URL}/countries", params={"government_type": "monarchy"})
-for country in resp.json()["data"]:
-    print(country["name"], country["population"])`}</CodeBlock>
+resp = requests.get("${BASE_URL}/atlas/query", params={
+    "table": "facts",
+    "fact_key": "world_bank_region,world_bank_income_group",
+    "status": "sovereign_state",
+    "fields": "jurisdiction_id,fact_key,fact_value,source_id,observation_reference_year",
+    "limit": 1000,
+})
+resp.raise_for_status()
+for row in resp.json()["data"]:
+    print(row["jurisdiction_id"], row["fact_key"], row["fact_value"])`}</CodeBlock>
       </section>
 
       <hr className="api-section-divider" />
@@ -536,6 +563,53 @@ for country in resp.json()["data"]:
           sources, images, constitution text, and raw publisher payloads are
           excluded.
         </p>
+
+        <h3 className="api-example-heading">Bounded frozen-release queries</h3>
+        <p className="api-info-card__body">
+          <code>/api/v1/atlas/query</code> selects only from the checked
+          release&apos;s <code>jurisdictions</code>, <code>facts</code>, and{" "}
+          <code>sources</code> tables. JSON responses carry selected-column
+          definitions, join and ordering rules, release hashes, source-rights
+          rows where applicable, a rights-scope note, pagination, and
+          machine-readable exclusion reasons. CSV uses the same filtered page
+          and exposes release/schema/rights/total metadata in response headers.
+          Unknown fields, filters that do not apply to the selected table, and
+          out-of-range pagination fail before the artifact is read.
+        </p>
+
+        <Banner variant="info">
+          The query route is a projection of one immutable release, not a live
+          database browser. Use the release and semantic hash in every saved
+          analysis, follow <code>meta.nextOffset</code> until{" "}
+          <code>meta.hasMore</code> is false, and inspect{" "}
+          <code>exclusions</code> before interpreting noncoverage.
+        </Banner>
+
+        <h3 className="api-example-heading">
+          Published case-study recipes
+        </h3>
+        <p className="api-info-card__body">
+          The{" "}
+          <Link href="/methodology/case-studies">
+            reproducible Atlas case studies
+          </Link>{" "}
+          run these exact API paths. Their checked artifact embeds every
+          selected input row and rebuilds each published table byte-for-byte.
+        </p>
+        {ATLAS_CASE_STUDY_REPORT.cases.flatMap((study) =>
+          study.recipes.map((recipe) => (
+            <div key={`${study.id}-${recipe.id}`}>
+              <p className="api-info-card__body">
+                <Link href={`/methodology/case-studies#${study.id}`}>
+                  {study.title}
+                </Link>
+                {" — "}
+                {recipe.label}
+              </p>
+              <CodeBlock>{`curl "${BASE_URL.replace("/api/v1", "")}${recipe.path}"`}</CodeBlock>
+            </div>
+          )),
+        )}
 
         <p>
           <a
