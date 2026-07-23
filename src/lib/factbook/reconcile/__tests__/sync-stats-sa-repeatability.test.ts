@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import type { FetchedPdf, StatsSaExtraction } from "../sync-stats-sa";
 import { syncStatsSa } from "../sync-stats-sa";
@@ -30,7 +31,10 @@ function harness() {
     }) }),
     select: () => ({ from: (table: unknown) => ({ where: () => ({ limit: async () => table === factSnapshots ? [{ id: [...snapshots.values()][0]?.id }] : [] }) }) }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return { db: db as never, facts, writeFact, writes: () => writes };
 }
 
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
@@ -44,7 +48,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
   });
 }
 
-function fixtureOptions() {
+function fixtureOptions(writeFact: CountryFactHistoryWriter) {
   return {
     factKey: "population_total",
     jurisdiction,
@@ -53,12 +57,14 @@ function fixtureOptions() {
     extractPdf: async () => extraction,
     persistDisputes: noDisputes as never,
     markSynced: (async () => ["stats_sa"]) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact,
   };
 }
 
 test("Stats SA fixture applications converge on one canonical fact", async () => {
   const state = harness();
-  const options = fixtureOptions();
+  const options = fixtureOptions(state.writeFact);
   await syncStatsSa(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
   await syncStatsSa(state.db, options);
@@ -68,7 +74,7 @@ test("Stats SA fixture applications converge on one canonical fact", async () =>
 
 test("Stats SA dry-run is stable and performs zero database writes", async () => {
   const state = harness();
-  const options = { ...fixtureOptions(), dryRun: true };
+  const options = { ...fixtureOptions(state.writeFact), dryRun: true };
   const first = await syncStatsSa(state.db, options);
   const second = await syncStatsSa(state.db, options);
   assert.deepEqual(first.countersByFactKey, second.countersByFactKey);
@@ -80,7 +86,7 @@ test("Stats SA upstream failure is loud and cannot stamp freshness", async () =>
   const stampedRows: number[] = [];
   await assert.rejects(
     syncStatsSa(state.db, {
-      ...fixtureOptions(),
+      ...fixtureOptions(state.writeFact),
       fetchPdf: async () => { throw new Error("upstream PDF changed"); },
       markSynced: (async (_ids: unknown, options: { rowsWritten: number }) => { stampedRows.push(options.rowsWritten); return []; }) as never,
     }),

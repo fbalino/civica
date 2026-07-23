@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import { syncFactbookWikidata } from "../wikidata-sync";
 import { WIKIDATA_FACT_MAPPING } from "../wikidata-fact-mapping";
@@ -44,7 +45,10 @@ function harness(options: { snapshotFailures?: number } = {}) {
     }) }),
     select: () => ({ from: (table: unknown) => ({ where: () => ({ limit: async () => table === factSnapshots ? [{ id: [...snapshots.values()][0]?.id }] : [] }) }) }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return { db: db as never, facts, writeFact, writes: () => writes };
 }
 
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
@@ -58,19 +62,21 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
   });
 }
 
-function fixtureOptions() {
+function fixtureOptions(writeFact: CountryFactHistoryWriter) {
   return {
     factKey: "population_total",
     jurisdictions: [jurisdiction],
     getClaims: async () => [claim],
     persistDisputes: noDisputes as never,
     markSynced: (async () => ["wikidata"]) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact,
   };
 }
 
 test("Wikidata fixture applications converge on one canonical fact", async () => {
   const state = harness();
-  const options = fixtureOptions();
+  const options = fixtureOptions(state.writeFact);
   await syncFactbookWikidata(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
   await syncFactbookWikidata(state.db, options);
@@ -80,7 +86,7 @@ test("Wikidata fixture applications converge on one canonical fact", async () =>
 
 test("Wikidata dry-run is stable and performs zero writes", async () => {
   const state = harness();
-  const options = { ...fixtureOptions(), dryRun: true };
+  const options = { ...fixtureOptions(state.writeFact), dryRun: true };
   const first = await syncFactbookWikidata(state.db, options);
   const second = await syncFactbookWikidata(state.db, options);
   assert.deepEqual(first.factCountersByKey, second.factCountersByKey);
@@ -91,7 +97,7 @@ test("Wikidata upstream failure is reported and cannot stamp freshness", async (
   const state = harness();
   const stamped: number[] = [];
   const result = await syncFactbookWikidata(state.db, {
-    ...fixtureOptions(),
+    ...fixtureOptions(state.writeFact),
     getClaims: async () => { throw new Error("SPARQL schema changed"); },
     markSynced: (async (_ids: unknown, options: { rowsWritten: number }) => { stamped.push(options.rowsWritten); return []; }) as never,
   });
@@ -105,7 +111,7 @@ test("Wikidata dispute failure blocks freshness and a successful retry stamps on
   const stamps: Array<{ sourceIds: unknown; rowsWritten: number }> = [];
   let rejectDisputes = true;
   const options = {
-    ...fixtureOptions(),
+    ...fixtureOptions(state.writeFact),
     persistDisputes: (async () => {
       if (rejectDisputes) throw new Error("dispute ledger unavailable");
       return noDisputes();
@@ -135,7 +141,7 @@ test("Wikidata returned dispute errors block freshness", async () => {
   const state = harness();
   let stampCalls = 0;
   const result = await syncFactbookWikidata(state.db, {
-    ...fixtureOptions(),
+    ...fixtureOptions(state.writeFact),
     persistDisputes: (async () => ({
       ...(await noDisputes()),
       errors: ["dispute insert rejected"],
@@ -154,7 +160,7 @@ test("Wikidata snapshot failure makes a mixed write partial and withholds freshn
   const state = harness({ snapshotFailures: 1 });
   let stampCalls = 0;
   const result = await syncFactbookWikidata(state.db, {
-    ...fixtureOptions(),
+    ...fixtureOptions(state.writeFact),
     jurisdictions: [
       jurisdiction,
       {
@@ -183,7 +189,7 @@ test("Wikidata registry drift makes a mixed write partial and withholds freshnes
     ({ factKey }) => factKey === "population_total",
   )!;
   const result = await syncFactbookWikidata(state.db, {
-    ...fixtureOptions(),
+    ...fixtureOptions(state.writeFact),
     factMappings: [
       population,
       { factKey: "missing_registry_key", pid: "P999999" },

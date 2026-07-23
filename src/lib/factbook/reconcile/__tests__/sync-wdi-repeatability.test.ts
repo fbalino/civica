@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import type { WbDataPoint } from "../sync-wdi";
 import { syncWorldBankWdi } from "../sync-wdi";
 
@@ -67,6 +68,25 @@ function harness() {
   return { db: db as never, facts, writes: () => writes };
 }
 
+const fixtureFactWriter: CountryFactHistoryWriter = async (database, write) => {
+  const fixtureDb = database as unknown as {
+    insert: (table: unknown) => {
+      values: (value: Record<string, unknown>) => {
+        onConflictDoUpdate: () => Promise<unknown>;
+      };
+    };
+  };
+  await fixtureDb
+    .insert(countryFacts)
+    .values(write.values as Record<string, unknown>)
+    .onConflictDoUpdate();
+};
+
+const historyOptions = {
+  atlasReleaseId: "atlas-test",
+  writeFact: fixtureFactWriter,
+};
+
 const noDisputes = async () => ({
   jurisdictionsScanned: 1,
   pairsScanned: 1,
@@ -89,6 +109,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 test("WDI fixture applications converge on one canonical fact", async () => {
   const state = harness();
   const options = {
+    ...historyOptions,
     factKey: "inflation_rate",
     wbCode: "FP.CPI.TOTL.ZG",
     jurisdictions: [jurisdiction],
@@ -101,6 +122,32 @@ test("WDI fixture applications converge on one canonical fact", async () => {
   await syncWorldBankWdi(state.db, options);
   assert.deepEqual(canonicalFacts(state.facts), first);
   assert.equal(state.facts.size, 1);
+});
+
+test("WDI rejects missing release context before any database write", async () => {
+  const state = harness();
+  const previousReleaseId = process.env.CIVICA_ATLAS_RELEASE_ID;
+  delete process.env.CIVICA_ATLAS_RELEASE_ID;
+  try {
+    await assert.rejects(
+      syncWorldBankWdi(state.db, {
+        factKey: "inflation_rate",
+        wbCode: "FP.CPI.TOTL.ZG",
+        jurisdictions: [jurisdiction],
+        fetchIndicator: async () => [observation],
+        persistDisputes: noDisputes as never,
+        markSynced: (async () => ["world_bank"]) as never,
+      }),
+      /named Atlas release/,
+    );
+    assert.equal(state.writes(), 0);
+  } finally {
+    if (previousReleaseId === undefined) {
+      delete process.env.CIVICA_ATLAS_RELEASE_ID;
+    } else {
+      process.env.CIVICA_ATLAS_RELEASE_ID = previousReleaseId;
+    }
+  }
 });
 
 test("WDI dry-run is stable and performs zero database writes", async () => {
@@ -125,6 +172,7 @@ test("WDI upstream failure reports loudly and cannot stamp freshness", async () 
   const state = harness();
   const stampedRows: number[] = [];
   const result = await syncWorldBankWdi(state.db, {
+    ...historyOptions,
     factKey: "inflation_rate",
     wbCode: "FP.CPI.TOTL.ZG",
     jurisdictions: [jurisdiction],
@@ -223,6 +271,7 @@ test("WDI dispute failure blocks freshness and a successful retry stamps once", 
   const stamps: Array<{ sourceIds: unknown; rowsWritten: number }> = [];
   let rejectDisputes = true;
   const options = {
+    ...historyOptions,
     factKey: "inflation_rate",
     wbCode: "FP.CPI.TOTL.ZG",
     jurisdictions: [jurisdiction],
@@ -256,6 +305,7 @@ test("WDI returned dispute errors block freshness", async () => {
   const state = harness();
   let stampCalls = 0;
   const result = await syncWorldBankWdi(state.db, {
+    ...historyOptions,
     factKey: "inflation_rate",
     wbCode: "FP.CPI.TOTL.ZG",
     jurisdictions: [jurisdiction],

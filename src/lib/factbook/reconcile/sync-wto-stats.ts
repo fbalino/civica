@@ -23,8 +23,8 @@
  * for each measurement rather than reconciling them through the
  * resolver. Per `~/civica/plan/trade-aggregate-fact-keys-v1.md`
  * (ADOPTED 2026-05-04). The WB rows for `*_total_usd` were renamed
- * to `*_goods_services_usd` in-band with R.12's first sync run via
- * the migration helper below; WB's `civicaRole` flipped from
+ * to `*_goods_services_usd` during the historical R.12 migration;
+ * WB's `civicaRole` flipped from
  * `'alternate'` to `'canonical'` at the same time (WB is canonical
  * for the goods+services aggregate; WTO is canonical for the
  * merchandise-only aggregate; they don't compete).
@@ -69,19 +69,12 @@
  * CKAN package metadata at `data.wto.org/api/3/action/package_show?id=commerchandise`.
  * Commercial use OK with attribution AND share-alike. Per-row
  * `references[].license = 'ODbL-1.0'` mirrors the R.4 WHO + R.7 OECD
- * + R.8 FAO precedent. The R.12 sync also tightens the
- * `sources.license` field for `wto_stats` from
- * `'open_data_attribution'` to `'ODbL-1.0'` on each run (idempotent
- * UPSERT). Per `~/civica/plan/wto-stats-resolution-v1.md` §2i + §6
- * Q2.
+ * + R.8 FAO precedent. The historical R.12 migration tightened the
+ * `sources.license` field for `wto_stats` to `'ODbL-1.0'`.
  *
- * Migration of legacy fact-keys: R.12's first run also performs an
- * idempotent rename migration of the four legacy trade-aggregate
- * fact-keys (`exports_total_usd`, `imports_total_usd`,
- * `exports_total`, `imports_total`) into the two `_goods_services_usd`
- * fact-keys. The migration is gated by a `WHERE fact_key = '<old>'`
- * filter that no-ops on subsequent runs. Per
- * `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d steps 1-3.
+ * The historical R.12 cleanup is intentionally not part of this recurring
+ * source refresh. Data/schema migrations use the authoritative migration path;
+ * a scheduled sync must not perform unrelated raw writes.
  *
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §2 / §3.3
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.12
@@ -91,7 +84,13 @@
 import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
-import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
@@ -300,19 +299,14 @@ export interface WtoStatsSyncSummary {
    *  written to `data_disputes` after the sync completes. Null on
    *  dry runs. */
   disputes: PersistDisputeSummary | null;
-  /** R.12 migration step — count of rows renamed from legacy
-   *  trade-aggregate fact-keys (`*_total_usd`, `*_total`) into the
-   *  two `*_goods_services_usd` fact-keys. Reported separately so
-   *  post-implementation reality (§3a in the resolution) can record
-   *  the actual count. */
+  /** Compatibility summary for callers that previously reported R.12 cleanup.
+   *  Cleanup is retired from recurring syncs and therefore reports zero writes. */
   legacyMigration: {
     expectedFactKeysRemoved: string[];
     rowsMigrated: number;
     rowsRoleFlipped: number;
-    /** Whether the `sources.license` field for `wto_stats` was
-     *  tightened to `'ODbL-1.0'` this run (idempotent UPSERT;
-     *  always returns true on the first run, false on subsequent). */
     licenseTightened: boolean;
+    retiredFromRecurringSync: true;
   };
   errors: string[];
   dryRun: boolean;
@@ -326,11 +320,12 @@ export interface WtoStatsSyncOptions {
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
   /** Deterministic fixture seams; production callers omit these. */
-  runMigration?: typeof runLegacyMigration;
   fetchArchive?: typeof fetchAndParseMerchandiseCsv;
   jurisdictions?: WtoStatsJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface WtoStatsJurisdiction {
@@ -507,188 +502,18 @@ function pickLatestPerCountry(
   return { latestByIso3, observationCount };
 }
 
-/**
- * R.12 migration helper — rename rows on the four legacy
- * trade-aggregate fact-keys into the two `*_goods_services_usd`
- * fact-keys, flip WB role from alternate to canonical, and tighten
- * the `sources.license` field for `wto_stats`. Idempotent: each
- * UPDATE is a no-op on subsequent runs because the `WHERE` clauses
- * filter on the legacy fact-key names that no longer match.
- *
- * Per `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d steps 1-3
- * + `~/civica/plan/wto-stats-resolution-v1.md` §3 step 11.
- */
-async function runLegacyMigration(
-  db: Db,
-  log: (line: string) => void,
-  dryRun: boolean,
-): Promise<{
-  expectedFactKeysRemoved: string[];
-  rowsMigrated: number;
-  rowsRoleFlipped: number;
-  licenseTightened: boolean;
-}> {
-  const expectedFactKeysRemoved = [
+const RETIRED_LEGACY_MIGRATION: WtoStatsSyncSummary["legacyMigration"] = {
+  expectedFactKeysRemoved: [
     "exports_total_usd",
     "imports_total_usd",
     "exports_total",
     "imports_total",
-  ];
-
-  if (dryRun) {
-    // Still report counts for visibility.
-    const result = await db.execute(sql`
-      SELECT fact_key, source_id, COUNT(*)::int AS n
-      FROM country_facts
-      WHERE fact_key IN ('exports_total_usd', 'imports_total_usd', 'exports_total', 'imports_total')
-      GROUP BY fact_key, source_id
-      ORDER BY fact_key, source_id`);
-    const rows =
-      (
-        result as unknown as {
-          rows?: Array<{ fact_key: string; source_id: string; n: number }>;
-        }
-      ).rows ?? [];
-    let toMigrate = 0;
-    for (const r of rows) {
-      log(
-        `  [DRY] would migrate ${r.n} rows from ${r.fact_key} (${r.source_id})`,
-      );
-      toMigrate += Number(r.n);
-    }
-    return {
-      expectedFactKeysRemoved,
-      rowsMigrated: toMigrate,
-      rowsRoleFlipped: 0,
-      licenseTightened: false,
-    };
-  }
-
-  // Step 1 — rename WB and CIA rows for exports.
-  // CIA reports goods+services in its Factbook prose per CIA's
-  // glossary; routing CIA into `_goods_services_usd` matches the
-  // intended denominator. `fact_unit` is updated from '$' to 'USD'
-  // for CIA rows (the new fact-key declares unit USD); WB rows
-  // already carry unit USD.
-  const renameExportsWb = await db.execute(sql`
-    UPDATE country_facts
-    SET fact_key = 'exports_goods_services_usd',
-        fact_unit = 'USD',
-        updated_at = NOW()
-    WHERE fact_key = 'exports_total_usd' AND source_id = 'world_bank'`);
-  const renameExportsCia = await db.execute(sql`
-    UPDATE country_facts
-    SET fact_key = 'exports_goods_services_usd',
-        fact_unit = 'USD',
-        updated_at = NOW()
-    WHERE fact_key = 'exports_total' AND source_id = 'cia_factbook'`);
-
-  // Step 2 — same for imports.
-  const renameImportsWb = await db.execute(sql`
-    UPDATE country_facts
-    SET fact_key = 'imports_goods_services_usd',
-        fact_unit = 'USD',
-        updated_at = NOW()
-    WHERE fact_key = 'imports_total_usd' AND source_id = 'world_bank'`);
-  const renameImportsCia = await db.execute(sql`
-    UPDATE country_facts
-    SET fact_key = 'imports_goods_services_usd',
-        fact_unit = 'USD',
-        updated_at = NOW()
-    WHERE fact_key = 'imports_total' AND source_id = 'cia_factbook'`);
-
-  // Drizzle's neon-http driver returns row counts via `rowCount` in
-  // an SQL execute result; defensive access since the type signature
-  // varies across Drizzle versions.
-  const rc = (r: unknown): number => {
-    if (typeof r === "object" && r !== null) {
-      const o = r as { rowCount?: number; rows?: unknown[] };
-      if (typeof o.rowCount === "number") return o.rowCount;
-      if (Array.isArray(o.rows)) return o.rows.length;
-    }
-    return 0;
-  };
-
-  const rowsMigrated =
-    rc(renameExportsWb) +
-    rc(renameExportsCia) +
-    rc(renameImportsWb) +
-    rc(renameImportsCia);
-
-  if (rowsMigrated > 0) {
-    log(
-      `  legacy fact-key migration: renamed ${rowsMigrated} rows ` +
-        `(WB exports ${rc(renameExportsWb)} + CIA exports ${rc(renameExportsCia)} + ` +
-        `WB imports ${rc(renameImportsWb)} + CIA imports ${rc(renameImportsCia)})`,
-    );
-  } else {
-    log(
-      `  legacy fact-key migration: 0 rows (already migrated; idempotent no-op)`,
-    );
-  }
-
-  // Step 3 — flip WB role from 'alternate' to 'canonical' on the
-  // newly-renamed goods+services rows. WB is the canonical publisher
-  // of the goods+services aggregate post-R.12 (it's no longer a
-  // deferred-canonical handoff to WTO since the two-fact-key split
-  // means WB and WTO no longer compete on the same fact-key).
-  // Per `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d step 3.
-  const flipExports = await db.execute(sql`
-    UPDATE country_facts
-    SET "references" = jsonb_set(
-          "references"::jsonb,
-          '{0,civicaRole}',
-          '"canonical"'::jsonb,
-          true
-        ),
-        updated_at = NOW()
-    WHERE fact_key = 'exports_goods_services_usd'
-      AND source_id = 'world_bank'
-      AND "references"::jsonb -> 0 ->> 'civicaRole' = 'alternate'`);
-  const flipImports = await db.execute(sql`
-    UPDATE country_facts
-    SET "references" = jsonb_set(
-          "references"::jsonb,
-          '{0,civicaRole}',
-          '"canonical"'::jsonb,
-          true
-        ),
-        updated_at = NOW()
-    WHERE fact_key = 'imports_goods_services_usd'
-      AND source_id = 'world_bank'
-      AND "references"::jsonb -> 0 ->> 'civicaRole' = 'alternate'`);
-
-  const rowsRoleFlipped = rc(flipExports) + rc(flipImports);
-  if (rowsRoleFlipped > 0) {
-    log(
-      `  WB civicaRole flipped alternate→canonical on ${rowsRoleFlipped} rows`,
-    );
-  }
-
-  // Step 4 — tighten `sources.license` for `wto_stats` from
-  // `'open_data_attribution'` to `'ODbL-1.0'`. Idempotent: only fires
-  // when the license is still the loose pre-R.12 value. Note: the
-  // `sources` table has no `updated_at` column (verified live in
-  // schema.ts) — the per-row `last_sync_at` timestamp is what
-  // sync orchestrators stamp at end-of-run.
-  const licenseUpdate = await db.execute(sql`
-    UPDATE sources
-    SET license = 'ODbL-1.0'
-    WHERE id = 'wto_stats' AND license = 'open_data_attribution'`);
-  const licenseTightened = rc(licenseUpdate) > 0;
-  if (licenseTightened) {
-    log(
-      `  sources.license for wto_stats tightened from 'open_data_attribution' → 'ODbL-1.0'`,
-    );
-  }
-
-  return {
-    expectedFactKeysRemoved,
-    rowsMigrated,
-    rowsRoleFlipped,
-    licenseTightened,
-  };
-}
+  ],
+  rowsMigrated: 0,
+  rowsRoleFlipped: 0,
+  licenseTightened: false,
+  retiredFromRecurringSync: true,
+};
 
 /**
  * Run the WTO Stats sync end-to-end. Idempotent — re-running on the
@@ -703,6 +528,10 @@ export async function syncWtoStats(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const targets = WTO_STATS_INDICATORS.filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
@@ -724,33 +553,15 @@ export async function syncWtoStats(
         rowsMigrated: 0,
         rowsRoleFlipped: 0,
         licenseTightened: false,
+        retiredFromRecurringSync: true,
       },
       errors: ["no WTO Stats indicators matched the filter"],
       dryRun: options.dryRun ?? false,
     };
   }
 
-  // Run the legacy fact-key migration first. Idempotent and gated by
-  // `WHERE fact_key = '<old>'` filters; subsequent runs no-op.
-  log("→ R.12 legacy trade-aggregate fact-key migration…");
-  let legacyMigration: WtoStatsSyncSummary["legacyMigration"];
-  try {
-    legacyMigration = await (options.runMigration ?? runLegacyMigration)(
-      db,
-      log,
-      options.dryRun ?? false,
-    );
-  } catch (err) {
-    errors.push(
-      `legacy migration failed: ${err instanceof Error ? err.message : err}`,
-    );
-    legacyMigration = {
-      expectedFactKeysRemoved: [],
-      rowsMigrated: 0,
-      rowsRoleFlipped: 0,
-      licenseTightened: false,
-    };
-  }
+  const legacyMigration = RETIRED_LEGACY_MIGRATION;
+  log("→ R.12 legacy cleanup is retired from the recurring WTO sync.");
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
   const allJurisdictions =
@@ -958,58 +769,34 @@ export async function syncWtoStats(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "wto_stats",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: WTO_STATS_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-            valueType,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: WTO_STATS_VINTAGE,
-              snapshotId,
-              updatedAt: new Date(),
-              valueType,
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "wto_stats",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: WTO_STATS_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+          valueType,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);

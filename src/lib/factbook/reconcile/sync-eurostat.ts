@@ -81,7 +81,13 @@
  */
 import { sql } from "drizzle-orm";
 
-import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
@@ -434,6 +440,8 @@ export interface EurostatSyncOptions {
   jurisdictions?: EurostatJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface EurostatJurisdiction {
@@ -735,6 +743,10 @@ export async function syncEurostat(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const targets = EUROSTAT_INDICATORS.filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
@@ -976,63 +988,34 @@ export async function syncEurostat(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "eurostat",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: EUROSTAT_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-            valueType,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            //
-            // Bug 1 — `valueType` IS included in the set clause so
-            // per-row tag updates land on subsequent syncs (e.g. a
-            // year that was projected in 2026 becomes measured when
-            // 2027 rolls over).
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: EUROSTAT_VINTAGE,
-              snapshotId,
-              valueType,
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "eurostat",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: EUROSTAT_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+          valueType,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);

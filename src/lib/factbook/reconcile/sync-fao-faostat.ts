@@ -77,8 +77,14 @@
 import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
-import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -333,6 +339,8 @@ export interface FaoFaostatSyncOptions {
   jurisdictions?: FaoFaostatJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface FaoFaostatJurisdiction {
@@ -580,6 +588,10 @@ export async function syncFaoFaostat(
       dryRun: options.dryRun ?? false,
     };
   }
+  const atlasReleaseId = options.dryRun
+    ? undefined
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
   const allJurisdictions =
@@ -787,63 +799,34 @@ export async function syncFaoFaostat(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "fao_faostat",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: FAO_FAOSTAT_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-            valueType,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            //
-            // `valueType` IS included in the set clause for forward-
-            // compatibility (see Bug 1 / IMF precedent). For FAO it
-            // always evaluates to 'measured' since FAOSTAT doesn't
-            // ship forecasts.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: FAO_FAOSTAT_VINTAGE,
-              snapshotId,
-              updatedAt: new Date(),
-              valueType,
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "fao_faostat",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: FAO_FAOSTAT_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+          valueType,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);

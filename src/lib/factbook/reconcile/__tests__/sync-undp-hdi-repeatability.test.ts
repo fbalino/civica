@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { syncUndpHdi } from "../sync-undp-hdi";
 
 const jurisdiction = { id: "11111111-1111-4111-8111-111111111111", slug: "fixtureland", iso3: "FIX" };
@@ -30,6 +31,19 @@ function harness() {
   return { db: db as never, facts, writes: () => writes };
 }
 
+const fixtureFactWriter: CountryFactHistoryWriter = async (database, write) => {
+  const fixtureDb = database as unknown as {
+    insert: (table: unknown) => {
+      values: (value: Record<string, unknown>) => {
+        onConflictDoUpdate: () => Promise<unknown>;
+      };
+    };
+  };
+  await fixtureDb.insert(countryFacts).values(write.values as Record<string, unknown>).onConflictDoUpdate();
+};
+
+const historyOptions = { atlasReleaseId: "atlas-test", writeFact: fixtureFactWriter };
+
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
 const fetchCsv = async () => ({ columnIndex: new Map([["iso3", 0], ["hdi_2023", 1]]), countryRows: [["FIX", "0.91"]] });
 
@@ -45,6 +59,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 test("UNDP HDI fixture applications converge on one canonical fact", async () => {
   const state = harness();
   const options = {
+    ...historyOptions,
     factKey: "hdi_score",
     undpCode: "hdi",
     jurisdictions: [jurisdiction],
@@ -80,6 +95,7 @@ test("UNDP HDI upstream failure is loud before freshness", async () => {
   const state = harness();
   let stampCalls = 0;
   const result = await syncUndpHdi(state.db, {
+    ...historyOptions,
     factKey: "hdi_score",
     undpCode: "hdi",
     jurisdictions: [jurisdiction],

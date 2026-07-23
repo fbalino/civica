@@ -46,8 +46,14 @@
  */
 import { sql } from "drizzle-orm";
 
-import { countryFacts, factSnapshots, jurisdictions } from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -308,6 +314,8 @@ export interface ImfWeoSyncOptions {
   jurisdictions?: ImfWeoJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface ImfWeoJurisdiction {
@@ -468,6 +476,10 @@ export async function syncImfWeo(
       dryRun: options.dryRun ?? false,
     };
   }
+  const atlasReleaseId = options.dryRun
+    ? undefined
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   // Discover live vintage label from /indicators metadata. Falls
   // back to the constant if the catalog fetch fails — sync still
@@ -690,65 +702,34 @@ export async function syncImfWeo(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "imf_weo",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: vintageLabel,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-            valueType,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            //
-            // Bug 1 — `valueType` IS included in the set clause. As
-            // the calendar year advances, IMF rows that were forecasts
-            // become measurements (e.g. a 2026 row written in April
-            // 2026 is a forecast; the same year-key row in 2027 is a
-            // measurement). Re-sync must reflect the current
-            // year-vs-fact_year relationship.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: vintageLabel,
-              snapshotId,
-              updatedAt: new Date(),
-              valueType,
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "imf_weo",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: vintageLabel,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+          valueType,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);

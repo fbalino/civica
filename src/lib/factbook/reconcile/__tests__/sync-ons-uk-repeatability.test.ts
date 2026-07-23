@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import type { OnsYearPoint } from "../sync-ons-uk";
 import { ONS_INDICATORS, syncOnsUk } from "../sync-ons-uk";
@@ -58,7 +59,15 @@ function harness() {
       }),
     }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return {
+    db: db as never,
+    facts,
+    writeFact,
+    writes: () => writes,
+  };
 }
 
 const noDisputes = async () => ({
@@ -95,6 +104,8 @@ test("ONS fixture applications converge on one canonical fact", async () => {
     fetchIndicator: fetchIndicator as never,
     persistDisputes: noDisputes as never,
     markSynced: (async () => ["ons_uk"]) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   };
   await syncOnsUk(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
@@ -135,6 +146,8 @@ test("ONS upstream failure cannot stamp freshness", async () => {
       stampedRows.push(options.rowsWritten);
       return [];
     }) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
   assert.deepEqual(stampedRows, []);

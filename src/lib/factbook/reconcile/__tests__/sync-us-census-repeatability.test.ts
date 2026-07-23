@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import { syncUsCensus, US_CENSUS_INDICATORS } from "../sync-us-census";
 
@@ -52,7 +53,15 @@ function harness() {
       }),
     }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return {
+    db: db as never,
+    facts,
+    writeFact,
+    writes: () => writes,
+  };
 }
 
 const noDisputes = async () => ({
@@ -82,6 +91,8 @@ test("US Census fixture applications converge on one canonical fact", async () =
     fetchValues: async () => [340000000],
     persistDisputes: noDisputes as never,
     markSynced: (async () => ["us_census"]) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   };
   await syncUsCensus(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
@@ -120,6 +131,8 @@ test("US Census upstream failure cannot stamp freshness", async () => {
       stampedRows.push(options.rowsWritten);
       return [];
     }) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
   assert.deepEqual(stampedRows, []);

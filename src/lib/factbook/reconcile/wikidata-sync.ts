@@ -15,11 +15,16 @@ import { createHash } from "node:crypto";
 import { isNotNull, sql } from "drizzle-orm";
 
 import {
-  countryFacts,
   factSnapshots,
   jurisdictions,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import {
   getClaimsForEntity,
   groupClaimsByStatement,
@@ -55,6 +60,8 @@ export interface WikidataSyncOptions {
   markSynced?: typeof markSourcesSynced;
   /** Registry-drift fixture seam; production uses the canonical mapping. */
   factMappings?: readonly WikidataFactConfig[];
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface WikidataJurisdiction {
@@ -315,6 +322,10 @@ export async function syncFactbookWikidata(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const allJurisdictions = options.jurisdictions ?? await db
     .select({
@@ -499,36 +510,10 @@ export async function syncFactbookWikidata(
         sourceNote: null,
       };
 
-      await db
-        .insert(countryFacts)
-        .values(factRow)
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          set: {
-            factValue: factRow.factValue,
-            factValueNumeric: factRow.factValueNumeric,
-            factUnit: factRow.factUnit,
-            factYear: factRow.factYear,
-            asOf: factRow.asOf,
-            sourceUrl: factRow.sourceUrl,
-            wikidataPid: factRow.wikidataPid,
-            wikidataRank: factRow.wikidataRank,
-            references: factRow.references,
-            sourceHash: factRow.sourceHash,
-            retrievedAt: factRow.retrievedAt,
-            snapshotId: factRow.snapshotId,
-            updatedAt: new Date(),
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision. The same invariant applies to every
-            // country_facts upsert in this codebase.
-          },
-        });
+      await writeFact(db, {
+        values: factRow,
+        history: routineCountryFactHistory(factRow, atlasReleaseId!),
+      });
 
       counters.admitted++;
       touchedPairs.add(`${j.id}|${config.factKey}`);

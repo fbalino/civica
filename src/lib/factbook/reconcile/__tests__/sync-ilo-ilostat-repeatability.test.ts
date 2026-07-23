@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import type { IloDataRow, IloIndicatorTocRow } from "../sync-ilo-ilostat";
 import { syncIloIlostat } from "../sync-ilo-ilostat";
 
@@ -33,6 +34,19 @@ function harness() {
   return { db: db as never, facts, writes: () => writes };
 }
 
+const fixtureFactWriter: CountryFactHistoryWriter = async (database, write) => {
+  const fixtureDb = database as unknown as {
+    insert: (table: unknown) => {
+      values: (value: Record<string, unknown>) => {
+        onConflictDoUpdate: () => Promise<unknown>;
+      };
+    };
+  };
+  await fixtureDb.insert(countryFacts).values(write.values as Record<string, unknown>).onConflictDoUpdate();
+};
+
+const historyOptions = { atlasReleaseId: "atlas-test", writeFact: fixtureFactWriter };
+
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
 const fetchToc = async () => new Map([[tocRow.id, tocRow]]);
 
@@ -47,7 +61,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 
 test("ILO fixture applications converge on one canonical fact", async () => {
   const state = harness();
-  const options = { factKey: "unemployment_rate_pct", iloCode: observation.indicator, jurisdictions: [jurisdiction], fetchToc, fetchIndicator: async () => [observation], persistDisputes: noDisputes as never, markSynced: (async () => ["ilo_ilostat"]) as never };
+  const options = { ...historyOptions, factKey: "unemployment_rate_pct", iloCode: observation.indicator, jurisdictions: [jurisdiction], fetchToc, fetchIndicator: async () => [observation], persistDisputes: noDisputes as never, markSynced: (async () => ["ilo_ilostat"]) as never };
   await syncIloIlostat(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
   await syncIloIlostat(state.db, options);
@@ -68,6 +82,7 @@ test("ILO upstream failure cannot stamp freshness", async () => {
   const state = harness();
   const stampedRows: number[] = [];
   const result = await syncIloIlostat(state.db, {
+    ...historyOptions,
     factKey: "unemployment_rate_pct",
     iloCode: observation.indicator,
     jurisdictions: [jurisdiction],

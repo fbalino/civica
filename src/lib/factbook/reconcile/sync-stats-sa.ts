@@ -95,12 +95,17 @@ import Anthropic from "@anthropic-ai/sdk";
 import { PDFDocument } from "pdf-lib";
 
 import {
-  countryFacts,
   factSnapshots,
   jurisdictions,
   sources,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import {
   assertModelOperationRequest,
   modelOperationVersion,
@@ -466,6 +471,8 @@ export interface StatsSaSyncOptions {
   extractPdf?: typeof extractFromPdf;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface StatsSaJurisdiction {
@@ -1125,6 +1132,10 @@ export async function syncStatsSa(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const targets = STATS_SA_INDICATORS.filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
@@ -1469,69 +1480,35 @@ export async function syncStatsSa(
         .limit(1);
       const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-      await db
-        .insert(countryFacts)
-        .values({
-          jurisdictionId: jurisdiction.id,
-          factKey: config.factKey,
-          factGroup: factKeyDef.group,
-          category: factKeyDef.category,
-          sourceId: STATS_SA_SOURCE_ID,
-          sourceUrl: pdf.url,
-          references: referencesPayload,
-          sourceHash: hash,
-          factValue: String(numericValue),
-          factValueNumeric: numericValue,
-          factUnit: factKeyDef.unit ?? null,
-          factYear,
-          valueJson: null,
-          asOf,
-          retrievedAt: new Date(),
-          upstreamVintageLabel: STATS_SA_VINTAGE,
-          methodologyVersion: "v0.1-beta",
-          status: "active",
-          statusReason: null,
-          snapshotId,
-          sourceNote: config.sourceNote ?? null,
-          valueType,
-          growthMethodology,
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          // F.5.1 invariant: do NOT add `status` or `statusReason` to
-          // this set clause. Reviewer-demoted rows must survive a
-          // re-sync so the resolver continues to honour the human
-          // decision.
-          //
-          // Bug 1 — `valueType` IS included in the set clause so
-          // per-row tag updates land on subsequent syncs (e.g. a year
-          // that was projected in 2026 becomes measured when 2027
-          // rolls over).
-          //
-          // `sourceNote` IS included so future R.19 updates that
-          // refine methodology notes land cleanly.
-          set: {
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            asOf,
-            sourceUrl: pdf.url,
-            references: referencesPayload,
-            sourceHash: hash,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: STATS_SA_VINTAGE,
-            snapshotId,
-            sourceNote: config.sourceNote ?? null,
-            valueType,
-            growthMethodology,
-            updatedAt: new Date(),
-          },
-        });
+      const values = {
+        jurisdictionId: jurisdiction.id,
+        factKey: config.factKey,
+        factGroup: factKeyDef.group,
+        category: factKeyDef.category,
+        sourceId: STATS_SA_SOURCE_ID,
+        sourceUrl: pdf.url,
+        references: referencesPayload,
+        sourceHash: hash,
+        factValue: String(numericValue),
+        factValueNumeric: numericValue,
+        factUnit: factKeyDef.unit ?? null,
+        factYear,
+        valueJson: null,
+        asOf,
+        retrievedAt: new Date(),
+        upstreamVintageLabel: STATS_SA_VINTAGE,
+        methodologyVersion: "v0.1-beta",
+        status: "active",
+        statusReason: null,
+        snapshotId,
+        sourceNote: config.sourceNote ?? null,
+        valueType,
+        growthMethodology,
+      };
+      await writeFact(db, {
+        values,
+        history: routineCountryFactHistory(values, atlasReleaseId!),
+      });
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${jurisdiction.id}|${config.factKey}`);

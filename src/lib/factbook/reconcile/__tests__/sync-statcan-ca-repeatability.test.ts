@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import type { StatCanObservation } from "../sync-statcan-ca";
 import { STATCAN_INDICATORS, syncStatCanCa } from "../sync-statcan-ca";
@@ -60,7 +61,15 @@ function harness() {
       }),
     }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return {
+    db: db as never,
+    facts,
+    writeFact,
+    writes: () => writes,
+  };
 }
 
 const noDisputes = async () => ({
@@ -90,6 +99,8 @@ test("StatCan fixture applications converge on one canonical fact", async () => 
     fetchObservations: async () => [observation],
     persistDisputes: noDisputes as never,
     markSynced: (async () => ["statcan_ca"]) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   };
   await syncStatCanCa(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
@@ -128,6 +139,8 @@ test("StatCan upstream failure cannot stamp freshness", async () => {
       stampedRows.push(options.rowsWritten);
       return [];
     }) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
   assert.deepEqual(stampedRows, []);

@@ -95,11 +95,16 @@
 import { eq, sql } from "drizzle-orm";
 
 import {
-  countryFacts,
   factSnapshots,
   jurisdictions,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -305,6 +310,8 @@ export interface InseeSyncOptions {
   fetchIndicator?: typeof fetchIndicator;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface InseeJurisdiction {
@@ -575,6 +582,10 @@ export async function syncInseeFr(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const targets = INSEE_INDICATORS.filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
@@ -812,65 +823,34 @@ export async function syncInseeFr(
         .limit(1);
       const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-      await db
-        .insert(countryFacts)
-        .values({
-          jurisdictionId: jurisdiction.id,
-          factKey: config.factKey,
-          factGroup: factKeyDef.group,
-          category: factKeyDef.category,
-          sourceId: "insee_fr",
-          sourceUrl: config.docUrl,
-          references: referencesPayload,
-          sourceHash: hash,
-          factValue: String(numericValue),
-          factValueNumeric: numericValue,
-          factUnit: factKeyDef.unit ?? null,
-          factYear,
-          valueJson: null,
-          asOf,
-          retrievedAt: new Date(),
-          upstreamVintageLabel: INSEE_VINTAGE,
-          methodologyVersion: "v0.1-beta",
-          status: "active",
-          statusReason: null,
-          snapshotId,
-          sourceNote: config.sourceNote ?? null,
-          valueType,
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          // F.5.1 invariant: do NOT add `status` or `statusReason`
-          // to this set clause. Reviewer-demoted rows must survive
-          // a re-sync so the resolver continues to honour the
-          // human decision.
-          //
-          // Bug 1 — `valueType` IS included in the set clause so
-          // per-row tag updates land on subsequent syncs.
-          //
-          // `sourceNote` IS included so a future R.15 update that
-          // refines the Mayotte caveat lands cleanly.
-          set: {
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            asOf,
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: INSEE_VINTAGE,
-            snapshotId,
-            sourceNote: config.sourceNote ?? null,
-            valueType,
-            updatedAt: new Date(),
-          },
-        });
+      const values = {
+        jurisdictionId: jurisdiction.id,
+        factKey: config.factKey,
+        factGroup: factKeyDef.group,
+        category: factKeyDef.category,
+        sourceId: "insee_fr",
+        sourceUrl: config.docUrl,
+        references: referencesPayload,
+        sourceHash: hash,
+        factValue: String(numericValue),
+        factValueNumeric: numericValue,
+        factUnit: factKeyDef.unit ?? null,
+        factYear,
+        valueJson: null,
+        asOf,
+        retrievedAt: new Date(),
+        upstreamVintageLabel: INSEE_VINTAGE,
+        methodologyVersion: "v0.1-beta",
+        status: "active",
+        statusReason: null,
+        snapshotId,
+        sourceNote: config.sourceNote ?? null,
+        valueType,
+      };
+      await writeFact(db, {
+        values,
+        history: routineCountryFactHistory(values, atlasReleaseId!),
+      });
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${jurisdiction.id}|${config.factKey}`);
