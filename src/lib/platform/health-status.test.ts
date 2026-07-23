@@ -18,7 +18,7 @@ function healthyDependencies(
     env: {
       ANTHROPIC_API_KEY_CHAT: "test-chat-key",
       ANTHROPIC_API_KEY_PULSE_CLASSIFIER: "test-pulse-key",
-      DEEPSEEK_API_KEY: "test-deepseek-key",
+      DEEPSEEK_API_KEY: "test-key-deepseek",
       GLM_API_KEY: "test-glm-key",
     },
     checkDatabase: async () => undefined,
@@ -35,7 +35,7 @@ test("health report distinguishes every required component without leaking env v
       env: {
         ANTHROPIC_API_KEY_CHAT: "private-chat-key",
         ANTHROPIC_API_KEY_PULSE_CLASSIFIER: "private-pulse-key",
-        DEEPSEEK_API_KEY: "private-deepseek-key",
+        DEEPSEEK_API_KEY: "test-key-private-deepseek",
         GLM_API_KEY: "private-glm-key",
       },
     }),

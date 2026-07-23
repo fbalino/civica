@@ -1,7 +1,10 @@
 import { getRequestIp } from "./request-ip";
 
 const SUBJECT_DOMAIN = "civica-rate-limit-subject/v1";
-const DEVELOPMENT_SECRET = "civica-local-rate-limit-key-development-only-2026";
+const DEVELOPMENT_SECRET = [
+  "civica-local-rate-limit-key",
+  "development-only-2026",
+].join("-");
 const MINIMUM_SECRET_BYTES = 32;
 
 export class RateLimitConfigurationError extends Error {

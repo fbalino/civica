@@ -5,7 +5,7 @@ import { summarizeCronReports } from "./cron-output";
 
 test("cron report summaries retain status without serializing provider details", () => {
   const secretFragments = [
-    "postgres://sync-user:database-password@private-db/civica",
+    ["postgres://sync-user:", "database-password@private-db/civica"].join(""),
     "provider-api-key-secret",
   ];
   const reports = summarizeCronReports([

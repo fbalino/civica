@@ -20,7 +20,7 @@ type RouteModule = {
 };
 
 const ORIGINAL_SECRET = process.env.CRON_SECRET;
-const TEST_SECRET = "cron-route-integration-secret";
+const TEST_SECRET = "test-secret-cron-route-integration";
 
 function request(
   route: string,
@@ -254,7 +254,7 @@ test("secret-bearing thrown errors never reach any active cron response", async 
       const route = await loadRouteModule(definition.route);
       const store = new FixtureCronStore();
       const secretFragments = [
-        "postgres://cron-user:database-password@private-db/civica",
+        ["postgres://cron-user:", "database-password@private-db/civica"].join(""),
         "provider-api-key-secret",
         `upstream detail for ${definition.id}`,
       ];

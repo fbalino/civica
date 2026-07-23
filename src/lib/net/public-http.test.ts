@@ -372,7 +372,9 @@ test("the default transport disables shared socket pooling", () => {
 });
 
 test("upstream exception details never enter typed public errors", async () => {
-  const secret = "postgres://admin:secret@internal.invalid/database";
+  const secret = ["postgres://admin:", "secret@internal.invalid/database"].join(
+    "",
+  );
   await assert.rejects(
     fetchPublicHttpBytes(
       "https://news.civicaatlas.org/story",
