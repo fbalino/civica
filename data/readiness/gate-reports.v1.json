@@ -1,18 +1,18 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "8903f2cada8ec029623cd0f59fcea0f840b6f6a448ec7454868011c825861c93",
-    "plan/PROGRESS.md": "360841f8fa78da9e884771b196181a260dab88dcbdafd089d379b4db215eaa1a",
-    "plan/MANUAL-CHECKS.md": "0543258bb5e2a9c4f5031676f84885a158b4a24e3a8e5f4b51a0c10535af099c",
+    "plan/MASTER-CHECKLIST.md": "957995714154cf935b34b5e4b7139cc26f24e2bce20e7e1ea78075de61a7eb45",
+    "plan/PROGRESS.md": "5879683f9697e9e81972ccfb23f4a92d23f12cb043ec5644379aaa1ed2cf0f16",
+    "plan/MANUAL-CHECKS.md": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "3fb5da3362a6361a477f89fd46993a12587ffebc086c3beccdb773ff770e7558",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
     "plan/05-pulse-event-ledger-and-validation.md": "2da9497d318e9476f0a956d102ec5d35a1b8d387f802b67af3463dc425c5cb7b",
-    "plan/06-atlas-content-and-research-features.md": "6a82f70bd15bafcabe97babd82eb7fc7bd03e240f0ec8532b59b2953b181a45e",
-    "plan/07-design-system-assets-and-reader-experience.md": "15cab727d6a01e85a56ccb67d83a14cad0e0a996fb5a00918832adb95478b2c6",
-    "plan/08-platform-security-performance-and-operations.md": "ac63ebd025faf1ed60521bb7d25a6f43568572758621558819aed00380cbbcb0",
-    "plan/09-testing-qa-and-release.md": "d3215a082be2140d56eda64d5bf4c4aa936fe8236a56d560f9f8de8741a40a57",
+    "plan/06-atlas-content-and-research-features.md": "33bcce71336954e9a00e5823b2313d0503571948b2e8cab7b3b106a285cb8553",
+    "plan/07-design-system-assets-and-reader-experience.md": "b5bdbe878f579b63cad96e4bb7c6ead350d290df3f7602c8c11e145d9ac4aa87",
+    "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
+    "plan/09-testing-qa-and-release.md": "cc6ef6a056bcb0bd279fa4dcffba3d9939a9267b5a7538ab1b5f44f555be69e6",
     "plan/10-academic-governance-review-and-outreach.md": "3737814fb2cd220a1600dd12d54474b2eabefcbeb325e0a3723cd224f8228e8e",
     "plan/11-brand-legal-and-licensing.md": "bea54252573cf8c99d363ad5468daee4eec25b683b3c85b590704fd9b9170b1a"
   },
@@ -23,16 +23,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 216,
-        "remaining": 90,
+        "completed": 238,
+        "remaining": 68,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 153
+            "completed": 162
           },
           "P1": {
             "total": 111,
-            "completed": 63
+            "completed": 76
           },
           "P2": {
             "total": 5,
@@ -42,7 +42,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 17
+            "completed": 20
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -58,7 +58,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 43,
-            "completed": 22
+            "completed": 35
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -70,7 +70,7 @@
           },
           "08-platform-security-performance-and-operations.md": {
             "total": 29,
-            "completed": 26
+            "completed": 27
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
@@ -78,12 +78,11 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 20,
-            "completed": 11
+            "completed": 16
           }
         }
       },
       "openP0": [
-        "ATL-018",
         "ATL-026",
         "ATL-027",
         "ATL-028",
@@ -94,13 +93,8 @@
         "BRD-012",
         "BRD-016",
         "EXP-001",
-        "EXP-014",
         "EXP-015",
-        "EXP-020",
         "EXP-028",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
         "GOV-015",
         "GOV-016",
         "GOV-018",
@@ -116,16 +110,10 @@
         "PUL-029",
         "PUL-030",
         "PUL-043",
-        "QA-008",
-        "QA-011",
-        "QA-017",
         "QA-018"
       ],
       "openP0P1": [
-        "ATL-014",
-        "ATL-015",
         "ATL-016",
-        "ATL-018",
         "ATL-020",
         "ATL-021",
         "ATL-023",
@@ -145,24 +133,11 @@
         "BRD-016",
         "DAT-034",
         "EXP-001",
-        "EXP-003",
-        "EXP-014",
         "EXP-015",
         "EXP-016",
-        "EXP-017",
-        "EXP-020",
-        "EXP-021",
-        "EXP-022",
-        "EXP-024",
         "EXP-025",
-        "EXP-026",
-        "EXP-027",
         "EXP-028",
         "EXP-029",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
-        "EXP-035",
         "EXP-038",
         "GOV-003",
         "GOV-012",
@@ -182,7 +157,6 @@
         "GOV-028",
         "IDX-022",
         "PLT-025",
-        "PLT-028",
         "PLT-029",
         "PUL-018",
         "PUL-019",
@@ -198,13 +172,8 @@
         "PUL-030",
         "PUL-040",
         "PUL-043",
-        "QA-008",
-        "QA-011",
         "QA-012",
         "QA-013",
-        "QA-014",
-        "QA-016",
-        "QA-017",
         "QA-018",
         "QA-019"
       ],
@@ -212,12 +181,13 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "0543258bb5e2a9c4f5031676f84885a158b4a24e3a8e5f4b51a0c10535af099c",
+        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
         "linkedTaskIds": [
           "BRD-014",
           "DAT-021",
           "EXP-006",
           "EXP-009",
+          "EXP-014",
           "EXP-030",
           "EXP-031",
           "GOV-003",
@@ -279,7 +249,7 @@
         }
       ],
       "blockers": [
-        "37 unchecked P0 tasks prevent a green report"
+        "28 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -288,16 +258,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 216,
-        "remaining": 90,
+        "completed": 238,
+        "remaining": 68,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 153
+            "completed": 162
           },
           "P1": {
             "total": 111,
-            "completed": 63
+            "completed": 76
           },
           "P2": {
             "total": 5,
@@ -307,7 +277,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 17
+            "completed": 20
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -323,7 +293,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 43,
-            "completed": 22
+            "completed": 35
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -335,7 +305,7 @@
           },
           "08-platform-security-performance-and-operations.md": {
             "total": 29,
-            "completed": 26
+            "completed": 27
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
@@ -343,12 +313,11 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 20,
-            "completed": 11
+            "completed": 16
           }
         }
       },
       "openP0": [
-        "ATL-018",
         "ATL-026",
         "ATL-027",
         "ATL-028",
@@ -359,13 +328,8 @@
         "BRD-012",
         "BRD-016",
         "EXP-001",
-        "EXP-014",
         "EXP-015",
-        "EXP-020",
         "EXP-028",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
         "GOV-015",
         "GOV-016",
         "GOV-018",
@@ -381,16 +345,10 @@
         "PUL-029",
         "PUL-030",
         "PUL-043",
-        "QA-008",
-        "QA-011",
-        "QA-017",
         "QA-018"
       ],
       "openP0P1": [
-        "ATL-014",
-        "ATL-015",
         "ATL-016",
-        "ATL-018",
         "ATL-020",
         "ATL-021",
         "ATL-023",
@@ -410,24 +368,11 @@
         "BRD-016",
         "DAT-034",
         "EXP-001",
-        "EXP-003",
-        "EXP-014",
         "EXP-015",
         "EXP-016",
-        "EXP-017",
-        "EXP-020",
-        "EXP-021",
-        "EXP-022",
-        "EXP-024",
         "EXP-025",
-        "EXP-026",
-        "EXP-027",
         "EXP-028",
         "EXP-029",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
-        "EXP-035",
         "EXP-038",
         "GOV-003",
         "GOV-012",
@@ -447,7 +392,6 @@
         "GOV-028",
         "IDX-022",
         "PLT-025",
-        "PLT-028",
         "PLT-029",
         "PUL-018",
         "PUL-019",
@@ -463,13 +407,8 @@
         "PUL-030",
         "PUL-040",
         "PUL-043",
-        "QA-008",
-        "QA-011",
         "QA-012",
         "QA-013",
-        "QA-014",
-        "QA-016",
-        "QA-017",
         "QA-018",
         "QA-019"
       ],
@@ -477,12 +416,13 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "0543258bb5e2a9c4f5031676f84885a158b4a24e3a8e5f4b51a0c10535af099c",
+        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
         "linkedTaskIds": [
           "BRD-014",
           "DAT-021",
           "EXP-006",
           "EXP-009",
+          "EXP-014",
           "EXP-030",
           "EXP-031",
           "GOV-003",
@@ -551,8 +491,8 @@
         }
       ],
       "blockers": [
-        "37 unchecked P0 tasks prevent a green report",
-        "85 unchecked P0/P1 tasks prevent G4"
+        "28 unchecked P0 tasks prevent a green report",
+        "63 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -561,16 +501,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 216,
-        "remaining": 90,
+        "completed": 238,
+        "remaining": 68,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 153
+            "completed": 162
           },
           "P1": {
             "total": 111,
-            "completed": 63
+            "completed": 76
           },
           "P2": {
             "total": 5,
@@ -580,7 +520,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 17
+            "completed": 20
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -596,7 +536,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 43,
-            "completed": 22
+            "completed": 35
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -608,7 +548,7 @@
           },
           "08-platform-security-performance-and-operations.md": {
             "total": 29,
-            "completed": 26
+            "completed": 27
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
@@ -616,12 +556,11 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 20,
-            "completed": 11
+            "completed": 16
           }
         }
       },
       "openP0": [
-        "ATL-018",
         "ATL-026",
         "ATL-027",
         "ATL-028",
@@ -632,13 +571,8 @@
         "BRD-012",
         "BRD-016",
         "EXP-001",
-        "EXP-014",
         "EXP-015",
-        "EXP-020",
         "EXP-028",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
         "GOV-015",
         "GOV-016",
         "GOV-018",
@@ -654,16 +588,10 @@
         "PUL-029",
         "PUL-030",
         "PUL-043",
-        "QA-008",
-        "QA-011",
-        "QA-017",
         "QA-018"
       ],
       "openP0P1": [
-        "ATL-014",
-        "ATL-015",
         "ATL-016",
-        "ATL-018",
         "ATL-020",
         "ATL-021",
         "ATL-023",
@@ -683,24 +611,11 @@
         "BRD-016",
         "DAT-034",
         "EXP-001",
-        "EXP-003",
-        "EXP-014",
         "EXP-015",
         "EXP-016",
-        "EXP-017",
-        "EXP-020",
-        "EXP-021",
-        "EXP-022",
-        "EXP-024",
         "EXP-025",
-        "EXP-026",
-        "EXP-027",
         "EXP-028",
         "EXP-029",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
-        "EXP-035",
         "EXP-038",
         "GOV-003",
         "GOV-012",
@@ -720,7 +635,6 @@
         "GOV-028",
         "IDX-022",
         "PLT-025",
-        "PLT-028",
         "PLT-029",
         "PUL-018",
         "PUL-019",
@@ -736,13 +650,8 @@
         "PUL-030",
         "PUL-040",
         "PUL-043",
-        "QA-008",
-        "QA-011",
         "QA-012",
         "QA-013",
-        "QA-014",
-        "QA-016",
-        "QA-017",
         "QA-018",
         "QA-019"
       ],
@@ -750,12 +659,13 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "0543258bb5e2a9c4f5031676f84885a158b4a24e3a8e5f4b51a0c10535af099c",
+        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
         "linkedTaskIds": [
           "BRD-014",
           "DAT-021",
           "EXP-006",
           "EXP-009",
+          "EXP-014",
           "EXP-030",
           "EXP-031",
           "GOV-003",
@@ -810,7 +720,7 @@
         }
       ],
       "blockers": [
-        "37 unchecked P0 tasks prevent a green report",
+        "28 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -820,16 +730,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 216,
-        "remaining": 90,
+        "completed": 238,
+        "remaining": 68,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 153
+            "completed": 162
           },
           "P1": {
             "total": 111,
-            "completed": 63
+            "completed": 76
           },
           "P2": {
             "total": 5,
@@ -839,7 +749,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 17
+            "completed": 20
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -855,7 +765,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 43,
-            "completed": 22
+            "completed": 35
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -867,7 +777,7 @@
           },
           "08-platform-security-performance-and-operations.md": {
             "total": 29,
-            "completed": 26
+            "completed": 27
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
@@ -875,12 +785,11 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 20,
-            "completed": 11
+            "completed": 16
           }
         }
       },
       "openP0": [
-        "ATL-018",
         "ATL-026",
         "ATL-027",
         "ATL-028",
@@ -891,13 +800,8 @@
         "BRD-012",
         "BRD-016",
         "EXP-001",
-        "EXP-014",
         "EXP-015",
-        "EXP-020",
         "EXP-028",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
         "GOV-015",
         "GOV-016",
         "GOV-018",
@@ -913,16 +817,10 @@
         "PUL-029",
         "PUL-030",
         "PUL-043",
-        "QA-008",
-        "QA-011",
-        "QA-017",
         "QA-018"
       ],
       "openP0P1": [
-        "ATL-014",
-        "ATL-015",
         "ATL-016",
-        "ATL-018",
         "ATL-020",
         "ATL-021",
         "ATL-023",
@@ -942,24 +840,11 @@
         "BRD-016",
         "DAT-034",
         "EXP-001",
-        "EXP-003",
-        "EXP-014",
         "EXP-015",
         "EXP-016",
-        "EXP-017",
-        "EXP-020",
-        "EXP-021",
-        "EXP-022",
-        "EXP-024",
         "EXP-025",
-        "EXP-026",
-        "EXP-027",
         "EXP-028",
         "EXP-029",
-        "EXP-030",
-        "EXP-031",
-        "EXP-033",
-        "EXP-035",
         "EXP-038",
         "GOV-003",
         "GOV-012",
@@ -979,7 +864,6 @@
         "GOV-028",
         "IDX-022",
         "PLT-025",
-        "PLT-028",
         "PLT-029",
         "PUL-018",
         "PUL-019",
@@ -995,13 +879,8 @@
         "PUL-030",
         "PUL-040",
         "PUL-043",
-        "QA-008",
-        "QA-011",
         "QA-012",
         "QA-013",
-        "QA-014",
-        "QA-016",
-        "QA-017",
         "QA-018",
         "QA-019"
       ],
@@ -1009,12 +888,13 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "0543258bb5e2a9c4f5031676f84885a158b4a24e3a8e5f4b51a0c10535af099c",
+        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
         "linkedTaskIds": [
           "BRD-014",
           "DAT-021",
           "EXP-006",
           "EXP-009",
+          "EXP-014",
           "EXP-030",
           "EXP-031",
           "GOV-003",
@@ -1069,7 +949,7 @@
         }
       ],
       "blockers": [
-        "37 unchecked P0 tasks prevent a green report",
+        "28 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }
