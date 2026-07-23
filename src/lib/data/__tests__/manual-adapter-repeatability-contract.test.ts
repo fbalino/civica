@@ -38,6 +38,8 @@ test("direct-write manual scripts retain retry-safe identity guards", () => {
     "scripts/sync-organization-memberships.ts": [
       /neonSql\.transaction/,
       /markSourcesSyncedTransactionQuery/,
+      /atlas_entity_change_history/,
+      /resolveAtlasReleaseId/,
       /DRY_RUN/,
     ],
   };
