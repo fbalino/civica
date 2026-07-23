@@ -73,6 +73,10 @@ const pulseDriftMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0044_pulse_drift_monitoring.sql"),
   "utf8",
 );
+const entityNameFormsMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0048_entity_name_forms.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -154,7 +158,8 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
       constitutionPassageMigration,
     ) &&
-    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(partyIdentityMigration)
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(partyIdentityMigration) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(entityNameFormsMigration)
   ) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }

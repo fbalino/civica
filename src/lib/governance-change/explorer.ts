@@ -1,3 +1,5 @@
+import { comparePublicLabels } from "@/lib/i18n/presentation";
+
 export const GOVERNANCE_CHANGE_CONTRACT =
   "source-native-governance-change/v1" as const;
 export const GOVERNANCE_CHANGE_MIN_COMPARABLE = 30;
@@ -159,10 +161,10 @@ export function buildGovernanceChangeResult(input: {
         ? rows.sort(
             (a, b) =>
               b.publisherAlignedDelta - a.publisherAlignedDelta ||
-              a.jurisdictionName.localeCompare(b.jurisdictionName),
+              comparePublicLabels(a.jurisdictionName, b.jurisdictionName),
           )
         : rows.sort((a, b) =>
-            a.jurisdictionName.localeCompare(b.jurisdictionName),
+            comparePublicLabels(a.jurisdictionName, b.jurisdictionName),
           ),
   };
 }

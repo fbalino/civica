@@ -105,6 +105,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Advisory Board", href: "/about/advisory-board" },
       { label: "Contact", href: "/contact" },
       { label: "Accessibility", href: "/accessibility" },
+      { label: "Language", href: "/about#language" },
       { label: "Licensing", href: "/licensing" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },

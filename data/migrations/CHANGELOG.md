@@ -299,6 +299,16 @@ event links back to it. Apply only after the read-only legacy-row preflight;
 recovery is an isolated pre-change backup or reviewed forward compensation,
 never deletion or rewriting of a submitted correction report.
 
+`0048_entity_name_forms` adds EXP-029's versioned source/native/official/
+transliterated names for jurisdictions, people, offices, and political
+parties. Every row carries an explicit BCP 47 language tag, optional ISO 15924
+script, source URL and vintage, and closed translation/transliteration states;
+none of those properties may be inferred from the string. The migration is
+additive and creates an empty relation. Updates and retirement are captured
+by the research-evidence history trigger. Production population requires an
+authorized source refresh and preserves existing English display names until
+reviewed source-form rows are available.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

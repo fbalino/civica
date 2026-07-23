@@ -64,6 +64,10 @@ const pulseDriftMigration = readFileSync(
   "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
   "utf8",
 );
+const entityNameFormsMigration = readFileSync(
+  "drizzle/authoritative/0048_entity_name_forms.sql",
+  "utf8",
+);
 const classify = readFileSync("src/lib/pulse/v2/classify.ts", "utf8");
 const subscriptionApply = readFileSync(
   "scripts/pulse-apply-classifications.ts",
@@ -89,7 +93,8 @@ test("every protected relation receives a synchronous retention trigger", () => 
         conditionsReleaseMigration.includes(`ON "${relation}"`) ||
         // Drizzle emits the quoted identifier form in 0030.
         constitutionPassageMigration.includes(`ON "${relation}"`) ||
-        partyIdentityMigration.includes(`ON ${relation}`),
+        partyIdentityMigration.includes(`ON ${relation}`) ||
+        entityNameFormsMigration.includes(`ON ${relation}`),
     );
   }
   assert.match(migration, /BEFORE UPDATE OR DELETE/);

@@ -351,6 +351,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0048_entity_name_forms",
+    "drizzle/authoritative/0048_entity_name_forms.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

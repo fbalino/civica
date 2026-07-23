@@ -29,6 +29,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "data_facts_audit_log",
   "election_results",
   "elections",
+  "entity_name_forms",
   "government_bodies",
   "government_taxonomies",
   "indicator_history",

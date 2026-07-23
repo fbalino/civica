@@ -1313,6 +1313,88 @@ export const sources = pgTable("sources", {
   lastSyncAt: timestamp("last_sync_at"),
 });
 
+/**
+ * Versioned source/native/official/transliterated name forms. The polymorphic
+ * entity key is closed by entity_type and deliberately does not infer a
+ * language, script, translation, or transliteration status from the string.
+ */
+export const entityNameForms = pgTable(
+  "entity_name_forms",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractVersion: text("contract_version").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    value: text("value").notNull(),
+    languageTag: text("language_tag").notNull(),
+    scriptCode: text("script_code"),
+    nameRole: text("name_role").notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    sourceUrl: text("source_url").notNull(),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    upstreamVintage: text("upstream_vintage").notNull(),
+    translationStatus: text("translation_status").notNull(),
+    transliterationStatus: text("transliteration_status").notNull(),
+    isCurrent: boolean("is_current").notNull().default(true),
+    supersededAt: timestamp("superseded_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("entity_name_forms_current_identity_idx")
+      .on(
+        table.entityType,
+        table.entityId,
+        table.nameRole,
+        table.languageTag,
+        table.sourceId,
+      )
+      .where(dsql`${table.isCurrent} = true`),
+    index("entity_name_forms_entity_idx").on(
+      table.entityType,
+      table.entityId,
+      table.isCurrent,
+    ),
+    check(
+      "entity_name_forms_contract_check",
+      dsql`${table.contractVersion} = 'civica-entity-name-form/v1'`,
+    ),
+    check(
+      "entity_name_forms_entity_type_check",
+      dsql`${table.entityType} IN ('jurisdiction','person','office','political_party')`,
+    ),
+    check(
+      "entity_name_forms_role_check",
+      dsql`${table.nameRole} IN ('english_display','source','native','official','transliterated')`,
+    ),
+    check(
+      "entity_name_forms_language_check",
+      dsql`${table.languageTag} ~ '^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$'`,
+    ),
+    check(
+      "entity_name_forms_script_check",
+      dsql`${table.scriptCode} IS NULL OR ${table.scriptCode} ~ '^[A-Z][a-z]{3}$'`,
+    ),
+    check(
+      "entity_name_forms_translation_check",
+      dsql`${table.translationStatus} IN ('not_translated','publisher_supplied_translation','civica_translation','unknown')`,
+    ),
+    check(
+      "entity_name_forms_transliteration_check",
+      dsql`${table.transliterationStatus} IN ('not_transliterated','publisher_supplied_transliteration','civica_transliteration','unknown')`,
+    ),
+    check(
+      "entity_name_forms_https_source_check",
+      dsql`${table.sourceUrl} ~ '^https://'`,
+    ),
+    check(
+      "entity_name_forms_lifecycle_check",
+      dsql`(${table.isCurrent} = true AND ${table.supersededAt} IS NULL) OR (${table.isCurrent} = false AND ${table.supersededAt} IS NOT NULL)`,
+    ),
+  ],
+);
+
 export const governmentTaxonomies = pgTable(
   "government_taxonomies",
   {

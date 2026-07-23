@@ -400,6 +400,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "license is descriptive source metadata; authoritative reuse decisions come from the rights manifest.",
     deprecation: active,
   },
+  entity_name_forms: {
+    definition:
+      "Versioned source, native, official, transliterated, and English display forms for canonical Atlas entities.",
+    rowGrain:
+      "One entity, name role, language tag, and source observation version.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+    cadence:
+      "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+    vintageSemantics:
+      "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+    rights:
+      "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+    deprecation: active,
+  },
   government_taxonomies: {
     definition:
       "Source and derived government-system classifications by jurisdiction and reference year.",

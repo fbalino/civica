@@ -12,6 +12,10 @@ import {
 import { SearchField } from "@/components/editorial/SearchField";
 import { SourceDot } from "@/components/SourceDot";
 import type { LeaderDirectoryRow } from "@/lib/leaders/directory";
+import {
+  comparePublicLabels,
+  formatPublicDate,
+} from "@/lib/i18n/presentation";
 
 function roleLabel(role: LeaderDirectoryRow["officeType"]) {
   return role === "head_of_state" ? "Head of state" : "Head of government";
@@ -19,12 +23,11 @@ function roleLabel(role: LeaderDirectoryRow["officeType"]) {
 
 function formatDate(value: string | null) {
   if (!value) return null;
-  return new Intl.DateTimeFormat("en", {
+  return formatPublicDate(value, {
     year: "numeric",
     month: "short",
     day: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(value));
+  });
 }
 
 export function WorldLeadersDirectoryClient({
@@ -40,7 +43,7 @@ export function WorldLeadersDirectoryClient({
   const continents = useMemo(
     () =>
       [...new Set(rows.map((row) => row.continent).filter(Boolean) as string[])]
-        .sort((a, b) => a.localeCompare(b)),
+        .sort(comparePublicLabels),
     [rows],
   );
   const filtered = useMemo(() => {

@@ -284,4 +284,11 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
       "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
     baseline: false,
   },
+  {
+    id: "0048_entity_name_forms",
+    path: "drizzle/authoritative/0048_entity_name_forms.sql",
+    sha256:
+      "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0",
+    baseline: false,
+  },
 ] as const;

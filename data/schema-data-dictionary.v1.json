@@ -2,11 +2,11 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "edfe797bcccb8d06e7414a3b789b22987ad7327b4f45af4e7d86c177bf8d82a6",
+  "schemaFingerprint": "898e929c1f83610fe4ad98490283aec4e2429aeaf825518015a574b870608762",
   "summary": {
-    "tables": 102,
-    "columns": 1411,
-    "publicAtlasTables": 22,
+    "tables": 103,
+    "columns": 1428,
+    "publicAtlasTables": 23,
     "researchBetaTables": 32,
     "supportTables": 12,
     "internalTables": 34,
@@ -16276,6 +16276,471 @@
           "cadence": "Scheduled source sync and post-election updates.",
           "vintageSemantics": "election_date is the event date; date_confidence distinguishes source-confirmed values from estimates.",
           "rights": "Mixed by contributing source; IPU/IDEA records require source-specific export checks.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "entity_name_forms",
+      "exportName": "entityNameForms",
+      "definition": "Versioned source, native, official, transliterated, and English display forms for canonical Atlas entities.",
+      "rowGrain": "One entity, name role, language tag, and source observation version.",
+      "releaseScope": "atlas_public",
+      "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+      "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+      "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+      "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "contract_version",
+          "propertyName": "contractVersion",
+          "definition": "Contract version recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "created_at",
+          "propertyName": "createdAt",
+          "definition": "Timestamp when Civica created this row.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_id",
+          "propertyName": "entityId",
+          "definition": "Entity id recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "entity_name_forms_current_identity_idx",
+              "entity_name_forms_entity_idx"
+            ],
+            "uniqueGroups": [
+              "entity_name_forms_current_identity_idx"
+            ]
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_type",
+          "propertyName": "entityType",
+          "definition": "Entity type recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "entity_name_forms_current_identity_idx",
+              "entity_name_forms_entity_idx"
+            ],
+            "uniqueGroups": [
+              "entity_name_forms_current_identity_idx"
+            ]
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "is_current",
+          "propertyName": "isCurrent",
+          "definition": "Is current recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "boolean",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "entity_name_forms_entity_idx"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "language_tag",
+          "propertyName": "languageTag",
+          "definition": "Language tag recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "entity_name_forms_current_identity_idx"
+            ],
+            "uniqueGroups": [
+              "entity_name_forms_current_identity_idx"
+            ]
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "name_role",
+          "propertyName": "nameRole",
+          "definition": "Name role recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "entity_name_forms_current_identity_idx"
+            ],
+            "uniqueGroups": [
+              "entity_name_forms_current_identity_idx"
+            ]
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "retrieved_at",
+          "propertyName": "retrievedAt",
+          "definition": "Timestamp when Civica retrieved the upstream material.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "Civica retrieval/processing time; distinct from source observation and release vintage.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "script_code",
+          "propertyName": "scriptCode",
+          "definition": "Script code recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_id",
+          "propertyName": "sourceId",
+          "definition": "Identifier of the registered source responsible for this observation or record.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "sources.id",
+            "indexGroups": [
+              "entity_name_forms_current_identity_idx"
+            ],
+            "uniqueGroups": [
+              "entity_name_forms_current_identity_idx"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "source_url",
+          "propertyName": "sourceUrl",
+          "definition": "Direct upstream URL captured for this record when available.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Captured source-lineage metadata. Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "superseded_at",
+          "propertyName": "supersededAt",
+          "definition": "Superseded at recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "Superseded at follows this table contract. retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "translation_status",
+          "propertyName": "translationStatus",
+          "definition": "Translation status recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transliteration_status",
+          "propertyName": "transliterationStatus",
+          "definition": "Transliteration status recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_vintage",
+          "propertyName": "upstreamVintage",
+          "definition": "Upstream vintage recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "Upstream vintage follows this table contract. retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value",
+          "propertyName": "value",
+          "definition": "Value recorded for the entity, name role, language tag, and source observation version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+          "cadence": "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+          "vintageSemantics": "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+          "rights": "Each name form inherits the linked source's rights posture and retains its exact source URL.",
           "deprecation": {
             "status": "active"
           }

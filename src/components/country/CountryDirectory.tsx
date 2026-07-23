@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal } from "@/components/motion/Reveal";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { comparePublicLabels } from "@/lib/i18n/presentation";
 
 export interface CountryDirectoryEntry {
   id?: string | number;
@@ -67,14 +68,16 @@ export function CountryDirectory({
 }: CountryDirectoryProps) {
   const byLetter = new Map<string, CountryDirectoryEntry[]>();
   for (const country of [...countries].sort((a, b) =>
-    a.name.localeCompare(b.name),
+    comparePublicLabels(a.name, b.name),
   )) {
     const letter = indexLetter(country.name);
     const bucket = byLetter.get(letter);
     if (bucket) bucket.push(country);
     else byLetter.set(letter, [country]);
   }
-  const groups = [...byLetter.entries()].sort(([a], [b]) => a.localeCompare(b));
+  const groups = [...byLetter.entries()].sort(([a], [b]) =>
+    comparePublicLabels(a, b),
+  );
 
   const rows = groups.map(([letter, entries]) => (
     <section

@@ -1,7 +1,8 @@
 # EXP-029 — English-first and localization readiness
 
-**Status:** blocked on a versioned source-language/name-form contract; the
-product must not be described as localization-ready yet.
+**Status:** agent preparation complete; production activation pending. The
+product is explicitly English-first and must not be described as translated or
+localization-ready.
 
 ## Scope tested
 
@@ -32,43 +33,35 @@ rendering, and labels for source language and translation provenance.
   files are requested with the Latin subset, so other scripts depend on a
   browser fallback without a tested layout contract.
 
+## What changed on 2026-07-23
+
+- `/about#language` publishes the English-interface and no-translated-interface
+  boundary.
+- `civica-public-english-collation/v1` fixes deterministic `en-US` dates,
+  numbers, and display-name collation for reader presentation.
+- `civica-entity-name-form/v1` and authoritative migration
+  `0048_entity_name_forms` define versioned, source-backed jurisdiction,
+  person, office, and political-party forms with explicit language, script,
+  role, source, vintage, translation, and transliteration fields.
+- The writer/read adapter is repeat-safe, history-preserving, and uses the
+  sanctioned source-freshness path only after committed writes.
+- `<SourceText>` renders source strings through `<bdi dir="auto" lang="…">`
+  with visible status labels.
+- Real Chromium passed Arabic/Hebrew/Japanese/Spanish and long-text fixtures at
+  desktop/mobile widths in both themes. Evidence:
+  `plan/evidence/EXP-029/`.
+
 ## Why EXP-029 remains unchecked
 
-An English page shell and a correctly qualified constitution corpus do not
-establish that all entity names retain their source form, nor that the product
-can distinguish publisher text from a Civica translation. Adding a blanket
-English-only statement now would be useful disclosure but would not cure the
-missing data contract or prove right-to-left behavior. Calling the product
-internationalized or translated would be inaccurate.
-
-## Required completion path
-
-1. Publish a concise English-first scope notice: interface and editorial copy
-   are English; the site offers no translated interface; upstream text is not a
-   Civica translation unless a visible record says otherwise.
-2. Adopt a versioned display-name relation for jurisdictions, people, offices,
-   and parties. Each relation needs the rendered string, BCP 47 language tag,
-   script when known, name role (source/native/official/transliterated/English
-   display), source row or URL, retrieval/vintage, and an explicit
-   translation/transliteration status. Do not infer any of those from text.
-3. Write/read that relation through the relevant source adapters and expose a
-   name-form choice that preserves the source string while retaining an
-   accessible English navigation label where necessary. Absent records must be
-   visibly absent, not fabricated.
-4. Create one shared English presentation contract for public dates, numbers,
-   and display-name collation, and migrate reader surfaces to it. Stable
-   machine/release ordering remains bytewise and must not be changed by a UI
-   locale.
-5. Add `dir="auto"`/`bdi` handling where source-form text can be displayed and
-   add browser fixtures with Arabic/Hebrew right-to-left strings, CJK text,
-   accented names, and long unbroken source titles at the supported viewport
-   matrix.
-6. Replace hard-coded constitutional wording with labels derived from the
-   source-language/translation fields, then add equivalent labels for other
-   multilingual source text such as bills and source documents.
+The production database does not yet contain `entity_name_forms`. Applying
+0048 and refreshing publisher data are production mutations requiring owner
+authority. Until those happen, no representative stored source forms can be
+verified on country/person/office/party reader surfaces, and the existing
+English display names remain in place. No language, script, native-name,
+translation, or transliteration property may be inferred to fill the gap.
 
 ## Safety boundary
 
-This assessment ran only source-code and contract inspection on 2026-07-18.
-No source refresh, migration, content translation, or production database write
-was performed.
+The live database action in this work was a zero-write migration plan. No
+source refresh, content translation, or production database write was
+performed.

@@ -1,0 +1,64 @@
+{
+  "contract": "exp-029-browser-verification/v1",
+  "checkedAt": "2026-07-23T09:32:54.899Z",
+  "baseUrl": "http://localhost:3000",
+  "results": [
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleSourceForms": 4,
+      "directions": {
+        "ar": "rtl",
+        "he": "rtl",
+        "ja": "ltr",
+        "es-UY": "ltr"
+      },
+      "screenshot": "output/playwright/EXP-029/design-system-desktop-light.png"
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleSourceForms": 4,
+      "directions": {
+        "ar": "rtl",
+        "he": "rtl",
+        "ja": "ltr",
+        "es-UY": "ltr"
+      },
+      "screenshot": "output/playwright/EXP-029/design-system-desktop-dark.png"
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleSourceForms": 4,
+      "directions": {
+        "ar": "rtl",
+        "he": "rtl",
+        "ja": "ltr",
+        "es-UY": "ltr"
+      },
+      "screenshot": "output/playwright/EXP-029/design-system-mobile-light.png"
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleSourceForms": 4,
+      "directions": {
+        "ar": "rtl",
+        "he": "rtl",
+        "ja": "ltr",
+        "es-UY": "ltr"
+      },
+      "screenshot": "output/playwright/EXP-029/design-system-mobile-dark.png"
+    }
+  ],
+  "languageDisclosure": {
+    "route": "/about#language",
+    "visible": true,
+    "translatedInterfaceClaim": false
+  }
+}

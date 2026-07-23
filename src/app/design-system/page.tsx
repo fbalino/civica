@@ -18,6 +18,7 @@ import { ExploreConceptDemos } from "./ExploreConceptDemos";
 import { CountryDirectory } from "@/components/country/CountryDirectory";
 import { MobileNav } from "@/components/MobileNav";
 import { SearchField } from "@/components/editorial/SearchField";
+import { SourceText } from "@/components/editorial/SourceText";
 
 import "./design-system.css";
 
@@ -1225,6 +1226,41 @@ export default function DesignSystemPage() {
                 landscape, where dual executives share the stage in an exciting
                 political dance!&rdquo;
               </p>
+            </div>
+          </div>
+          <div className="ds-comp ds-comp--wide">
+            <h4>Source-form text and bidirectional stress fixture</h4>
+            <p>
+              The interface is English. Recorded source text keeps its language
+              and automatic direction; the adjacent label states what is known
+              without implying a Civica translation.
+            </p>
+            <div className="ds-row">
+              <SourceText
+                languageTag="ar"
+                label="Official source form · Arabic · not translated"
+              >
+                الجمهورية التونسية
+              </SourceText>
+              <SourceText
+                languageTag="he"
+                label="Official source form · Hebrew · not translated"
+              >
+                מדינת ישראל
+              </SourceText>
+              <SourceText
+                languageTag="ja"
+                label="Official source form · Japanese · not translated"
+              >
+                日本国
+              </SourceText>
+              <SourceText
+                languageTag="es-UY"
+                label="Official source form · Spanish · not translated"
+              >
+                República Oriental del Uruguay — denominación oficial
+                conservada exactamente como fue publicada por la fuente
+              </SourceText>
             </div>
           </div>
         </section>

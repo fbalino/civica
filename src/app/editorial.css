@@ -1939,6 +1939,20 @@ legend.editorial-filter-label {
   margin: 0;
 }
 
+.source-text {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-width: 100%;
+}
+
+.source-text__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  unicode-bidi: isolate;
+}
+
 /* ── API documentation surface ──────────────────────────────────
  * Used exclusively by /api-docs. Companion to <MethodologyLayout>
  * with contentClassName="methodology-content--wide" — the wide

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
+import { comparePublicLabels } from "@/lib/i18n/presentation";
 
 /**
  * Reusable sortable data table. Extends the `DataTable` primitive family by
@@ -79,7 +80,7 @@ export function SortableDataTable<Row>({
       if (typeof av === "number" && typeof bv === "number") {
         return (av - bv) * dir;
       }
-      return String(av).localeCompare(String(bv)) * dir;
+      return comparePublicLabels(String(av), String(bv)) * dir;
     });
   }, [columns, rows, sort]);
 

@@ -13,6 +13,7 @@ import { buildNeIdMap } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
 import { atlasIdToSlug } from "@/lib/atlas/ids";
 import type { AtlasLayerSource, AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
+import { comparePublicLabels } from "@/lib/i18n/presentation";
 import {
   type AtlasLayerKey,
   ATLAS_LAYER_DESCRIPTION,
@@ -61,7 +62,8 @@ export function AtlasStandaloneClient({
     [countries],
   );
   const countriesByName = useMemo(
-    () => [...countries].sort((a, b) => a.name.localeCompare(b.name)),
+    () =>
+      [...countries].sort((a, b) => comparePublicLabels(a.name, b.name)),
     [countries],
   );
   const selectedCountry = selectedCountryId
