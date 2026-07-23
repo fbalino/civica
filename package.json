@@ -336,6 +336,7 @@
     "validate:ingestion-contract-fixtures": "node --import tsx --test src/lib/qa/ingestion-contract-fixtures.test.ts && tsx scripts/validate-ingestion-contract-fixtures.ts",
     "validate:verification-matrix": "node --import tsx --test src/lib/qa/verification-matrix.test.ts && tsx scripts/validate-verification-matrix.ts && npm run validate:fixture-database",
     "validate:readiness-reports": "node --import tsx --test src/lib/qa/readiness-reports.test.ts && tsx scripts/generate-readiness-reports.ts --check",
+    "validate:remaining-work-report": "node --import tsx scripts/validate-remaining-work-report.ts",
     "run:readiness-reports": "tsx scripts/generate-readiness-reports.ts --execute",
     "validate:public-claims": "tsx scripts/validate-public-claims.ts",
     "validate:sync-freshness": "tsx scripts/validate-sync-freshness.ts",

@@ -12,10 +12,10 @@ and P1 operational finding below is closed.
 
 ## Route and exposure inventory
 
-- `npm run validate:route-inventory` passed against 108 repository-owned
-  `route.ts` files and 108 registry entries: zero phantom routes, zero stale
+- `npm run validate:route-inventory` passed against 109 repository-owned
+  `route.ts` files and 109 registry entries: zero phantom routes, zero stale
   entries, and zero method drift.
-- Exposure counts are 11 admin, 1 chat, 42 cron, 1 embed, 3 export, 4 public
+- Exposure counts are 12 admin, 1 chat, 42 cron, 1 embed, 3 export, 4 public
   mutation, 40 public read, and 6 Pulse coding routes.
 - One documented non-blocking warning remains: Pulse coding sign-out is
   intentionally callable without an active session so it can clear an
@@ -27,7 +27,7 @@ and P1 operational finding below is closed.
 ## Security and access controls
 
 - The current tracked tree passes `npm run validate:secrets` with zero
-  findings across 3,723 files.
+  findings across 3,826 files.
 - The history scanner distinguishes 28 exact non-secret historical fixture
   hashes from the one real historical Neon connection-string exposure. The
   latter remains recoverable from Git history and must be rotated by the owner;
@@ -47,8 +47,8 @@ and P1 operational finding below is closed.
   the production build, and passed the fixture-only test suite.
 - Hosted pull-request/main runs and branch-protection enforcement have not been
   observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 244 of 306 tasks complete, 27 open P0 tasks,
-  57 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
+- The current G4 readiness record reports 245 of 307 tasks complete, 27 open P0 tasks,
+  58 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 
 ## Jobs, freshness, and error monitoring

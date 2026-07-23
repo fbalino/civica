@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "civica-remaining-work/v1",
+  "reviewedAt": "2026-07-23",
+  "checklist": {
+    "total": 307,
+    "completed": 245,
+    "remaining": 62,
+    "progressPercent": 79.8
+  },
+  "agentExecutableNow": [],
+  "categories": [
+    {
+      "id": "direct-human-owner-professional",
+      "label": "Direct human, owner, or professional review",
+      "count": 15,
+      "taskIds": [
+        "BRD-003",
+        "BRD-010",
+        "BRD-012",
+        "EXP-001",
+        "EXP-009",
+        "EXP-015",
+        "EXP-025",
+        "EXP-038",
+        "GOV-003",
+        "GOV-012",
+        "IDX-022",
+        "IDX-034",
+        "PLT-029",
+        "QA-012",
+        "QA-013"
+      ],
+      "nextStep": "Obtain the owner facts/decisions, qualified visual or accessibility review, counsel/privacy review, or qualified research participants named in the prepared packets."
+    },
+    {
+      "id": "production-staging-external-authority",
+      "label": "Production, staging, or external-system authority",
+      "count": 16,
+      "taskIds": [
+        "ATL-010",
+        "ATL-016",
+        "ATL-020",
+        "ATL-024",
+        "ATL-026",
+        "ATL-027",
+        "ATL-029",
+        "ATL-030",
+        "DAT-036",
+        "EXP-029",
+        "PUL-024",
+        "PUL-027",
+        "PUL-040",
+        "PUL-043",
+        "QA-018",
+        "QA-019"
+      ],
+      "nextStep": "Authorize and run the checked migration, source refresh, isolated staging deployment, provider configuration, scheduled pipeline, or recovery drill; then capture the required bounded live evidence."
+    },
+    {
+      "id": "external-evidence-unavailable",
+      "label": "Required external evidence unavailable",
+      "count": 1,
+      "taskIds": [
+        "DAT-034"
+      ],
+      "nextStep": "Obtain the exact retained CIA publisher bytes or equivalent official evidence for the frozen sample; do not substitute easier rows or publish a full-sample error estimate without them."
+    },
+    {
+      "id": "calendar-bound-observation",
+      "label": "Calendar-bound observation",
+      "count": 1,
+      "taskIds": [
+        "PUL-026"
+      ],
+      "nextStep": "After PUL-040 starts a compliant, non-backdated window, retain the locked pipeline outputs for 90 consecutive UTC days before opening labels or evaluating results."
+    },
+    {
+      "id": "dependency-blocked-downstream",
+      "label": "Downstream work blocked by an earlier gate",
+      "count": 29,
+      "taskIds": [
+        "ATL-028",
+        "BRD-005",
+        "BRD-016",
+        "EXP-016",
+        "EXP-028",
+        "GOV-015",
+        "GOV-016",
+        "GOV-017",
+        "GOV-018",
+        "GOV-019",
+        "GOV-020",
+        "GOV-021",
+        "GOV-022",
+        "GOV-023",
+        "GOV-024",
+        "GOV-025",
+        "GOV-026",
+        "GOV-027",
+        "GOV-028",
+        "PLT-025",
+        "PUL-018",
+        "PUL-019",
+        "PUL-020",
+        "PUL-021",
+        "PUL-022",
+        "PUL-023",
+        "PUL-028",
+        "PUL-029",
+        "PUL-030"
+      ],
+      "nextStep": "Do not execute out of dependency order. Resume each task only after its named design, staging, gold-data, prospective-evaluation, G4, G5, DOI, counsel, or disposition prerequisite is real."
+    }
+  ]
+}

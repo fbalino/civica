@@ -6,7 +6,7 @@ open because G4 is blocked.
 The canonical report is `data/OPERATIONS-READINESS.md`. On 2026-07-23, the
 following current-state validators passed:
 
-- route inventory: 108/108 registered route files, no phantom/stale/method
+- route inventory: 109/109 registered route files, no phantom/stale/method
   drift, one documented sign-out warning;
 - current-tree secret scan: zero findings across 3,723 tracked files;
 - history secret scan: no new secret, 28 exact non-secret historical fixture
@@ -16,8 +16,8 @@ following current-state validators passed:
 - backup/restore checked-artifact integrity; and
 - the nine-migration local deployment/recovery rehearsal contract.
 
-The generated G4 report remains blocked at 244/306 tasks, with 27 open P0 and
-57 open P0/P1 tasks, no evidence gaps, no master-mirror errors, and zero
+The generated G4 report remains blocked at 245/307 tasks, with 27 open P0 and
+58 open P0/P1 tasks, no evidence gaps, no master-mirror errors, and zero
 waivers. The operations memo enumerates the exact external, owner, staging,
 rollback, provider, recovery, telemetry, and visual/release blockers.
 
