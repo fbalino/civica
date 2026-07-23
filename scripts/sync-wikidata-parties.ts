@@ -112,12 +112,16 @@ SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
         ) ?? (legs.length === 1 ? legs[0] : null);
 
         if (match) {
-          await db
-            .update(governmentBodies)
-            .set({ wikidataQid: match.qid })
-            .where(eq(governmentBodies.id, body.id));
+          if (!DRY_RUN) {
+            await db
+              .update(governmentBodies)
+              .set({ wikidataQid: match.qid })
+              .where(eq(governmentBodies.id, body.id));
+          }
           body.wikidata_qid = match.qid;
-          console.log(`  Linked ${body.country_name} ${body.name} -> ${match.qid} (${match.name})`);
+          console.log(
+            `  ${DRY_RUN ? "Would link" : "Linked"} ${body.country_name} ${body.name} -> ${match.qid} (${match.name})`,
+          );
         }
       }
     } catch (err) {

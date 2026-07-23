@@ -33,6 +33,11 @@ test("direct-write manual scripts retain retry-safe identity guards", () => {
     ],
     "scripts/sync-elections-turnout-idea.ts": [/existingStmt/, /DRY_RUN/],
     "scripts/sync-elections-wikidata.ts": [/writeElection/, /DRY_RUN/],
+    "scripts/sync-wikidata-parties.ts": [
+      /if \(!DRY_RUN\)/,
+      /writeLegislatureComposition/,
+      /DRY_RUN/,
+    ],
     "scripts/ingest-vparty-positions.ts": [/writePartyPositions/, /DRY_RUN/],
     "scripts/ingest-indicator-history.ts": [/writeIndicatorHistory/, /dryRun/],
     "scripts/sync-organization-memberships.ts": [
