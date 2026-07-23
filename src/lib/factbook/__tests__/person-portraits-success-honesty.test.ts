@@ -39,6 +39,7 @@ const plan: PersonPortraitPlan = {
 
 function options(markCalls: number[]) {
   return {
+    atlasReleaseId: "atlas-test",
     loadCandidates: async () => [candidate],
     computePlan: async () => plan,
     markSynced: (async () => {
@@ -50,19 +51,12 @@ function options(markCalls: number[]) {
 
 test("a row write failure reports partial and cannot stamp Wikidata freshness", async () => {
   const markCalls: number[] = [];
-  const db = {
-    update: () => ({
-      set: () => ({
-        where: async () => {
-          throw new Error("seeded row failure");
-        },
-      }),
-    }),
-  };
-
   const summary = await enrichPersonPortraits({
     ...options(markCalls),
-    db: db as never,
+    db: {} as never,
+    writePerson: async () => {
+      throw new Error("seeded row failure");
+    },
   });
 
   assert.equal(summary.status, "partial");
@@ -74,15 +68,10 @@ test("a row write failure reports partial and cannot stamp Wikidata freshness", 
 
 test("a complete applied pass delegates one eligible freshness claim", async () => {
   const markCalls: number[] = [];
-  const db = {
-    update: () => ({
-      set: () => ({ where: async () => ({ rowCount: 1 }) }),
-    }),
-  };
-
   const summary = await enrichPersonPortraits({
     ...options(markCalls),
-    db: db as never,
+    db: {} as never,
+    writePerson: async () => "person-1",
   });
 
   assert.equal(summary.status, "completed");
@@ -90,4 +79,20 @@ test("a complete applied pass delegates one eligible freshness claim", async () 
   assert.equal(summary.portraitsWritten, 1);
   assert.equal(summary.freshnessStamped, true);
   assert.deepEqual(markCalls, [1]);
+});
+
+test("an applied portrait pass fails before mutation without a named release", async () => {
+  let writes = 0;
+  await assert.rejects(
+    enrichPersonPortraits({
+      ...options([]),
+      atlasReleaseId: "release with spaces",
+      db: {} as never,
+      writePerson: async () => {
+        writes++;
+      },
+    }),
+    /named Atlas release/,
+  );
+  assert.equal(writes, 0);
 });

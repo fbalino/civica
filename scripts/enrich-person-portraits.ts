@@ -38,6 +38,9 @@ function parseLimit(): number | undefined {
 const DRY_RUN =
   process.argv.includes("--dry-run") || process.env.DRY_RUN === "1";
 const LIMIT = parseLimit();
+const ATLAS_RELEASE_ID = process.argv
+  .find((arg) => arg.startsWith("--release-id="))
+  ?.slice("--release-id=".length);
 
 async function main() {
   console.log("=== Person-portrait enrichment (P18 + P569) ===");
@@ -48,6 +51,7 @@ async function main() {
   );
 
   const summary = await enrichPersonPortraits({
+    atlasReleaseId: ATLAS_RELEASE_ID,
     dryRun: DRY_RUN,
     limit: LIMIT,
     onProgress: (line) => {

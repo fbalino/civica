@@ -57,6 +57,9 @@ const DRY_RUN =
 const APPLY = process.argv.includes("--apply") || process.env.APPLY === "1";
 const BACKFILL_QIDS = process.argv.includes("--backfill-qids");
 const SAMPLE = process.argv.includes("--sample");
+const ATLAS_RELEASE_ID = process.argv
+  .find((arg) => arg.startsWith("--release-id="))
+  ?.slice("--release-id=".length);
 
 /**
  * Optional `--limit=<n>` arg. In `--apply` mode it caps the CIA slug list (a
@@ -144,6 +147,7 @@ async function runApply() {
   );
 
   const summary = await syncCiaCabinets({
+    atlasReleaseId: ATLAS_RELEASE_ID,
     slugs,
     crawlDelayMs: crawlDelayFromArgs(),
     onProgress: (line) => {
@@ -167,6 +171,7 @@ async function runBackfill() {
   console.log("Resumable — re-run to continue where this batch left off.\n");
 
   const summary = await backfillCabinetQids({
+    atlasReleaseId: ATLAS_RELEASE_ID,
     limit,
     dryRun: DRY_RUN,
     onProgress: (line) => {

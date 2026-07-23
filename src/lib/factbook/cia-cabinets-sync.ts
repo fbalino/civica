@@ -48,19 +48,24 @@
  * the section boundary by `parseCountryHtml`.
  */
 import dns from "node:dns";
+import { randomUUID } from "node:crypto";
 
-import { and, eq, ilike, inArray, isNull, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
-  governmentBodies,
-  offices,
   persons,
   terms,
   statements,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
+import {
+  governmentEntityHistoryWriters,
+  type GovernmentEntityHistoryContext,
+  type GovernmentEntityHistoryWriters,
+} from "@/lib/factbook/government-entity-history-writer";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -253,6 +258,8 @@ export interface CabinetSyncOptions {
   dryRun?: boolean;
   plan?: CabinetPlan;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  entityWriters?: GovernmentEntityHistoryWriters;
   /** Database-free fixture seam for HTTP/status/schema regression tests. */
   fetchCountryPage?: (slug: string) => Promise<CabinetCountryFetchResult>;
   /** Fixture seam that avoids real retry backoff waits. */
@@ -746,6 +753,8 @@ export interface PlannedPosition {
    * jurisdiction/person resolution already ran once in `computeCabinetPlan`).
    */
   personId: string | null;
+  /** Stable office UUID when the read plan matched an existing exact title. */
+  officeId?: string | null;
 }
 
 export interface PlannedCountry {
@@ -852,7 +861,7 @@ export async function computeCabinetPlan(
 
   // Dedup person proposals across the whole sample (a human held once, many
   // offices). Keyed by lowercased normalized name.
-  const seenNewNames = new Set<string>();
+  const stableIdByNewName = new Map<string, string>();
   const recordCountryFailure = (slug: string, reason: string) => {
     plan.stats.countriesSkipped++;
     plan.failed.push({ slug, reason });
@@ -987,10 +996,13 @@ export async function computeCabinetPlan(
         else {
           plan.stats.personNew++;
           const key = resolution.name.toLowerCase();
-          if (!seenNewNames.has(key)) {
-            seenNewNames.add(key);
+          let stableId = stableIdByNewName.get(key);
+          if (!stableId) {
+            stableId = randomUUID();
+            stableIdByNewName.set(key, stableId);
             plan.stats.distinctNewPersons++;
           }
+          planned.personId = stableId;
         }
 
         country.positions.push(planned);
@@ -1265,27 +1277,17 @@ async function upsertExecutiveBody(
   db: CabinetSyncDb,
   jurisdictionId: string,
   countryName: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: governmentBodies.id })
-    .from(governmentBodies)
-    .where(
-      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = ${"executive"}`,
-    )
-    .limit(1);
-  if (existing.length > 0) return existing[0].id;
-
-  const inserted = await db
-    .insert(governmentBodies)
-    .values({
-      jurisdictionId,
-      name: `Executive of ${countryName}`,
-      bodyType: "cabinet",
-      branch: "executive",
-      hierarchyLevel: 0,
-    })
-    .returning({ id: governmentBodies.id });
-  return inserted[0].id;
+  return writers.upsertBody(db, {
+    jurisdictionId,
+    name: `Executive of ${countryName}`,
+    bodyType: "cabinet",
+    branch: "executive",
+    hierarchyLevel: 0,
+    history,
+  });
 }
 
 /**
@@ -1301,32 +1303,20 @@ async function upsertCabinetOffice(
   name: string,
   officeType: string,
   displayOrder: number,
+  stableId: string | null | undefined,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: offices.id })
-    .from(offices)
-    .where(sql`${offices.bodyId} = ${bodyId} AND ${offices.name} = ${name}`)
-    .limit(1);
-
-  if (existing.length > 0) {
-    await db
-      .update(offices)
-      .set({ officeType, displayOrder })
-      .where(eq(offices.id, existing[0].id));
-    return existing[0].id;
-  }
-
-  const inserted = await db
-    .insert(offices)
-    .values({
-      bodyId,
-      name,
-      officeType,
-      isElected: false,
-      displayOrder,
-    })
-    .returning({ id: offices.id });
-  return inserted[0].id;
+  return writers.upsertOffice(db, {
+    bodyId,
+    stableId,
+    name,
+    officeType,
+    isElected: false,
+    displayOrder,
+    identityMode: "exact_title",
+    history,
+  });
 }
 
 /**
@@ -1340,39 +1330,33 @@ async function upsertCabinetOffice(
 async function persistPerson(
   db: CabinetSyncDb,
   resolution: PersonResolution,
+  stableId: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
   if (resolution.path === "existing" && resolution.personId) {
     return resolution.personId;
   }
 
   if (resolution.path === "qid" && resolution.qid) {
-    const byQid = await db
-      .select({ id: persons.id })
-      .from(persons)
-      .where(eq(persons.wikidataQid, resolution.qid))
-      .limit(1);
-    if (byQid.length > 0) return byQid[0].id;
-    const inserted = await db
-      .insert(persons)
-      .values({ name: resolution.name, wikidataQid: resolution.qid })
-      .returning({ id: persons.id });
-    return inserted[0].id;
+    return writers.mutatePerson(db, {
+      stableId,
+      identityQid: resolution.qid,
+      insertName: resolution.name,
+      values: { name: resolution.name, wikidataQid: resolution.qid },
+      history,
+    });
   }
 
-  // path 'new' — create ID-less. Guard against a same-run duplicate by an
-  // exact-name re-check (two offices can list the same unmatched person).
-  const byName = await db
-    .select({ id: persons.id })
-    .from(persons)
-    .where(ilike(persons.name, resolution.name))
-    .limit(1);
-  if (byName.length > 0) return byName[0].id;
-
-  const inserted = await db
-    .insert(persons)
-    .values({ name: resolution.name, wikidataQid: null })
-    .returning({ id: persons.id });
-  return inserted[0].id;
+  // QID-less names are mutable display text, never an identity key. The plan
+  // must carry/reuse an explicit UUID (or this apply allocates one once per
+  // normalized name) before the atomic mutation boundary is entered.
+  return writers.mutatePerson(db, {
+    stableId,
+    insertName: resolution.name,
+    values: { name: resolution.name, wikidataQid: null },
+    history,
+  });
 }
 
 /**
@@ -1537,6 +1521,7 @@ export async function syncCiaCabinets(
 ): Promise<CiaCabinetSyncSummary> {
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
+  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
@@ -1604,6 +1589,14 @@ export async function syncCiaCabinets(
     summary.durationMs = finishedAtMs - startedAtMs;
     return summary;
   }
+  const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
+  const history: GovernmentEntityHistoryContext = {
+    changeKind: "routine_refresh",
+    reason: "CIA World Leaders government roster refresh",
+    methodologyVersion: "cia-world-leaders-sync/v1",
+    releaseId: atlasReleaseId,
+  };
+  const qidlessStableIds = new Map<string, string>();
 
   log(`=== Applying — persisting offices / persons / terms / statements ===`);
   for (const country of plan.countries) {
@@ -1625,6 +1618,8 @@ export async function syncCiaCabinets(
             db,
             country.jurisdictionId as string,
             country.jurisdictionName ?? country.countryName ?? country.slug,
+            writers,
+            history,
           ),
         { log, label: `upsertBody(${country.slug})` },
       );
@@ -1640,7 +1635,16 @@ export async function syncCiaCabinets(
 
         const officeId = await withDbRetry(
           () =>
-            upsertCabinetOffice(db, bodyId, pos.title, pos.officeType, pos.order),
+            upsertCabinetOffice(
+              db,
+              bodyId,
+              pos.title,
+              pos.officeType,
+              pos.order,
+              pos.officeId,
+              writers,
+              history,
+            ),
           { log, label: `upsertOffice(${country.slug})` },
         );
         summary.officesWritten++;
@@ -1655,13 +1659,20 @@ export async function syncCiaCabinets(
         // Reuse the plan's already-computed person resolution (jurisdiction +
         // person resolution ran once in computeCabinetPlan) — no re-query.
         const personId = await withDbRetry(
-          () =>
-            persistPerson(db, {
+          () => {
+            const normalizedKey = (pos.normalizedName as string).toLowerCase();
+            const stableId =
+              pos.personId ??
+              qidlessStableIds.get(normalizedKey) ??
+              randomUUID();
+            qidlessStableIds.set(normalizedKey, stableId);
+            return persistPerson(db, {
               path: pos.personPath as PersonPath,
               personId: pos.personId,
               qid: pos.qid,
               name: pos.normalizedName as string,
-            }),
+            }, stableId, writers, history);
+          },
           { log, label: `persistPerson(${country.slug})` },
         );
         if (pos.personPath === "existing") summary.personsExisting++;
@@ -1783,6 +1794,8 @@ export interface BackfillQidsOptions {
    * When true, resolve QIDs and report what WOULD attach, but write nothing.
    */
   dryRun?: boolean;
+  atlasReleaseId?: string;
+  entityWriters?: GovernmentEntityHistoryWriters;
 }
 
 export interface BackfillQidsSummary {
@@ -1877,6 +1890,18 @@ export async function backfillCabinetQids(
   const limit = options.limit ?? BACKFILL_DEFAULT_BATCH;
   const throttle = options.throttleMs ?? BACKFILL_THROTTLE_MS;
   const dryRun = options.dryRun ?? false;
+  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
+  const atlasReleaseId = dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const history: GovernmentEntityHistoryContext | null = atlasReleaseId
+    ? {
+        changeKind: "routine_refresh",
+        reason: "CIA cabinet person Wikidata identity backfill",
+        methodologyVersion: "cia-person-qid-backfill/v1",
+        releaseId: atlasReleaseId,
+      }
+    : null;
 
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
@@ -1934,10 +1959,13 @@ export async function backfillCabinetQids(
       continue;
     }
 
-    await db
-      .update(persons)
-      .set({ wikidataQid: qid })
-      .where(inArray(persons.id, [person.id]));
+    await writers.mutatePerson(db, {
+      stableId: person.id,
+      identityQid: qid,
+      insertName: person.name,
+      values: { wikidataQid: qid },
+      history: history!,
+    });
     summary.attached++;
     log(`  ✓ ${person.name}: attached ${qid}`);
   }

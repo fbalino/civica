@@ -23,7 +23,6 @@ import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
   governmentBodies,
-  offices,
   persons,
   terms,
   statements,
@@ -31,6 +30,12 @@ import {
 } from "@/lib/db/schema";
 import { sparqlQuery, extractQid } from "@/lib/data/wikidata";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
+import {
+  governmentEntityHistoryWriters,
+  type GovernmentEntityHistoryContext,
+  type GovernmentEntityHistoryWriters,
+} from "@/lib/factbook/government-entity-history-writer";
 import {
   chunk,
   mediaQuery,
@@ -59,6 +64,8 @@ export interface OfficeholderSyncOptions {
   enrichmentPlan?: EnrichmentPlan;
   enrichPersons?: typeof enrichPersonPortraits;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  entityWriters?: GovernmentEntityHistoryWriters;
 }
 
 export interface OfficeholderSyncSummary {
@@ -263,55 +270,37 @@ async function resolveQidLabel(qid: string): Promise<string | null> {
 async function upsertPerson(
   db: OfficeholderSyncDb,
   name: string,
-  qid: string
+  qid: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: persons.id, name: persons.name })
-    .from(persons)
-    .where(eq(persons.wikidataQid, qid))
-    .limit(1);
-
-  if (existing.length > 0) {
-    if (existing[0].name !== name && !name.match(/^Q\d+$/)) {
-      await db.update(persons).set({ name }).where(eq(persons.id, existing[0].id));
-    }
-    return existing[0].id;
-  }
-
-  const inserted = await db
-    .insert(persons)
-    .values({ name, wikidataQid: qid })
-    .returning({ id: persons.id });
-  return inserted[0].id;
+  return writers.mutatePerson(db, {
+    identityQid: qid,
+    insertName: name,
+    values: {
+      ...(name.match(/^Q\d+$/) ? {} : { name }),
+      wikidataQid: qid,
+    },
+    history,
+  });
 }
 
 async function upsertBody(
   db: OfficeholderSyncDb,
   jurisdictionId: string,
   name: string,
-  branch: string
+  branch: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: governmentBodies.id })
-    .from(governmentBodies)
-    .where(
-      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = ${branch}`
-    )
-    .limit(1);
-
-  if (existing.length > 0) return existing[0].id;
-
-  const inserted = await db
-    .insert(governmentBodies)
-    .values({
-      jurisdictionId,
-      name,
-      bodyType: branch === "executive" ? "cabinet" : "parliament",
-      branch,
-      hierarchyLevel: 0,
-    })
-    .returning({ id: governmentBodies.id });
-  return inserted[0].id;
+  return writers.upsertBody(db, {
+    jurisdictionId,
+    name,
+    bodyType: branch === "executive" ? "cabinet" : "parliament",
+    branch,
+    hierarchyLevel: 0,
+    history,
+  });
 }
 
 async function upsertOffice(
@@ -319,29 +308,19 @@ async function upsertOffice(
   bodyId: string,
   name: string,
   officeType: string,
-  qid?: string
+  qid: string | undefined,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: offices.id })
-    .from(offices)
-    .where(
-      sql`${offices.bodyId} = ${bodyId} AND ${offices.officeType} = ${officeType}`
-    )
-    .limit(1);
-
-  if (existing.length > 0) return existing[0].id;
-
-  const inserted = await db
-    .insert(offices)
-    .values({
-      bodyId,
-      name,
-      officeType,
-      isElected: true,
-      wikidataQid: qid,
-    })
-    .returning({ id: offices.id });
-  return inserted[0].id;
+  return writers.upsertOffice(db, {
+    bodyId,
+    name,
+    officeType,
+    isElected: true,
+    wikidataQid: qid,
+    identityMode: "office_type",
+    history,
+  });
 }
 
 async function upsertTerm(
@@ -559,6 +538,7 @@ interface EnrichmentRow {
   jurisdictionId: string;
   country: string;
   countryQid: string | null;
+  bodyId: string;
   officeId: string;
   officeType: "head_of_state" | "head_of_government";
   officeName: string;
@@ -576,6 +556,7 @@ interface EnrichmentRow {
 interface ProposedTitle {
   country: string;
   role: string;
+  bodyId: string;
   officeId: string;
   oldName: string;
   newName: string;
@@ -669,7 +650,7 @@ export async function computeEnrichmentPlan(
   // title step re-checks GENERIC_OFFICE_NAMES per row.
   const spineRows = (await db.execute(sql`
     SELECT j.id AS jurisdiction_id, j.name AS country, j.wikidata_qid AS country_qid,
-           o.id AS office_id, o.office_type, o.name AS office_name,
+           gb.id AS body_id, o.id AS office_id, o.office_type, o.name AS office_name,
            p.id AS person_id, p.name AS person_name, p.wikidata_qid AS person_qid,
            p.photo_url AS current_photo, p.date_of_birth AS current_dob,
            t.id AS term_id, (t.party_name IS NOT NULL) AS has_party
@@ -689,6 +670,7 @@ export async function computeEnrichmentPlan(
     jurisdictionId: String(r.jurisdiction_id),
     country: String(r.country),
     countryQid: r.country_qid ? String(r.country_qid) : null,
+    bodyId: String(r.body_id),
     officeId: String(r.office_id),
     officeType: String(r.office_type) as "head_of_state" | "head_of_government",
     officeName: String(r.office_name),
@@ -903,6 +885,7 @@ export async function computeEnrichmentPlan(
         plan.titles.push({
           country: row.country,
           role: row.officeType,
+          bodyId: row.bodyId,
           officeId: row.officeId,
           oldName: row.officeName,
           newName: chosen.title,
@@ -1157,6 +1140,7 @@ export async function syncFactbookOfficeholders(
 ): Promise<OfficeholderSyncSummary> {
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
+  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
@@ -1179,6 +1163,17 @@ export async function syncFactbookOfficeholders(
       "Wikidata officeholder primary feed returned no usable leadership bindings",
     );
   }
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const history: GovernmentEntityHistoryContext | null = atlasReleaseId
+    ? {
+        changeKind: "routine_refresh",
+        reason: "Wikidata officeholder source refresh",
+        methodologyVersion: "wikidata-officeholder-sync/v1",
+        releaseId: atlasReleaseId,
+      }
+    : null;
 
   let synced = 0;
   let skipped = 0;
@@ -1228,7 +1223,9 @@ export async function syncFactbookOfficeholders(
       db,
       jurisdictionId,
       `Executive of ${stateName}`,
-      "executive"
+      "executive",
+      writers,
+      history!,
     );
 
     // Head of State
@@ -1237,12 +1234,21 @@ export async function syncFactbookOfficeholders(
       const hosName = binding.headOfStateLabel?.value ?? hosQid;
       const hosStart = binding.hosStart?.value?.split("T")[0] ?? null;
 
-      const personId = await upsertPerson(db, hosName, hosQid);
+      const personId = await upsertPerson(
+        db,
+        hosName,
+        hosQid,
+        writers,
+        history!,
+      );
       const officeId = await upsertOffice(
         db,
         execBody,
         "Head of State",
-        "head_of_state"
+        "head_of_state",
+        undefined,
+        writers,
+        history!,
       );
       const termId = await upsertTerm(db, officeId, personId, hosStart);
       await upsertStatement(db, termId, "head_of_state", hosName, stateQid);
@@ -1254,12 +1260,21 @@ export async function syncFactbookOfficeholders(
       const hogName = binding.headOfGovLabel?.value ?? hogQid;
       const hogStart = binding.hogStart?.value?.split("T")[0] ?? null;
 
-      const personId = await upsertPerson(db, hogName, hogQid);
+      const personId = await upsertPerson(
+        db,
+        hogName,
+        hogQid,
+        writers,
+        history!,
+      );
       const officeId = await upsertOffice(
         db,
         execBody,
         "Head of Government",
-        "head_of_government"
+        "head_of_government",
+        undefined,
+        writers,
+        history!,
       );
       const termId = await upsertTerm(db, officeId, personId, hogStart);
       await upsertStatement(db, termId, "head_of_government", hogName, stateQid);
@@ -1294,7 +1309,13 @@ export async function syncFactbookOfficeholders(
       const qid = person.wikidataQid ?? person.name;
       const realName = await resolveQidLabel(qid);
       if (realName) {
-        await db.update(persons).set({ name: realName }).where(eq(persons.id, person.id));
+        await writers.mutatePerson(db, {
+          stableId: person.id,
+          identityQid: qid,
+          insertName: realName,
+          values: { name: realName },
+          history: history!,
+        });
         qidNamesResolved++;
         log(`  ✓ ${qid} → ${realName}`);
       } else {
@@ -1316,7 +1337,16 @@ export async function syncFactbookOfficeholders(
       titlesWritten++;
       continue;
     }
-    await db.update(offices).set({ name: t.newName }).where(eq(offices.id, t.officeId));
+    await writers.upsertOffice(db, {
+      stableId: t.officeId,
+      bodyId: t.bodyId,
+      name: t.newName,
+      officeType: t.role,
+      isElected: true,
+      wikidataQid: t.positionQid,
+      identityMode: "office_type",
+      history: history!,
+    });
     titlesWritten++;
   }
 
@@ -1346,10 +1376,16 @@ export async function syncFactbookOfficeholders(
       portraitsWritten++;
       continue;
     }
-    await db
-      .update(persons)
-      .set({ photoUrl: p.file, photoLicense: p.license, photoCredit: p.credit })
-      .where(eq(persons.id, p.personId));
+    await writers.mutatePerson(db, {
+      stableId: p.personId,
+      insertName: p.person,
+      values: {
+        photoUrl: p.file,
+        photoLicense: p.license,
+        photoCredit: p.credit,
+      },
+      history: history!,
+    });
     portraitsWritten++;
   }
 
@@ -1360,10 +1396,12 @@ export async function syncFactbookOfficeholders(
       birthdatesWritten++;
       continue;
     }
-    await db
-      .update(persons)
-      .set({ dateOfBirth: b.dob })
-      .where(eq(persons.id, b.personId));
+    await writers.mutatePerson(db, {
+      stableId: b.personId,
+      insertName: b.person,
+      values: { dateOfBirth: b.dob },
+      history: history!,
+    });
     birthdatesWritten++;
   }
 
@@ -1389,6 +1427,8 @@ export async function syncFactbookOfficeholders(
   try {
     const personPass = options.dryRun ? null : await (options.enrichPersons ?? enrichPersonPortraits)({
       db,
+      atlasReleaseId: atlasReleaseId!,
+      writePerson: writers.mutatePerson,
       // The delta pass owns its own freshness stamp normally, but here the
       // officeholder sync stamps once at the end, so run it as a non-stamping
       // apply by folding its counts in and stamping below. It still writes.

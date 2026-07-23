@@ -1,6 +1,8 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
+import { pathToFileURL } from "node:url";
+
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, sql, and } from "drizzle-orm";
@@ -10,14 +12,46 @@ import {
 } from "../src/lib/db/schema";
 import { writeLegislatureComposition, type PartyCompositionRow } from "../src/lib/legislatures/composition-writer";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
-
-const neonSql = neon(process.env.DATABASE_URL!);
-const db = drizzle({ client: neonSql });
+import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
+import {
+  upsertGovernmentBodyWithHistory,
+  type GovernmentBodyHistoryWrite,
+} from "../src/lib/factbook/government-entity-history-writer";
 
 const IPU_BASE = "https://api.data.ipu.org/v1";
 const PAGE_SIZE = 50;
 const SOURCE_ID = "ipu_parline";
 const DRY_RUN = process.argv.includes("--dry-run");
+const EXPLICIT_RELEASE_ID = process.argv
+  .find((arg) => arg.startsWith("--release-id="))
+  ?.slice("--release-id=".length);
+
+type GovernmentBodyHistoryDatabase = Parameters<
+  typeof upsertGovernmentBodyWithHistory
+>[0];
+type GovernmentBodyHistoryWriter = typeof upsertGovernmentBodyWithHistory;
+
+export async function writeIpuGovernmentBody(
+  database: GovernmentBodyHistoryDatabase,
+  input: Omit<GovernmentBodyHistoryWrite, "history">,
+  options: {
+    dryRun?: boolean;
+    atlasReleaseId?: string | null;
+    writer?: GovernmentBodyHistoryWriter;
+  } = {},
+): Promise<string | null> {
+  if (options.dryRun) return input.stableId ?? null;
+  const releaseId = resolveAtlasReleaseId(options.atlasReleaseId);
+  return (options.writer ?? upsertGovernmentBodyWithHistory)(database, {
+    ...input,
+    history: {
+      changeKind: "routine_refresh",
+      reason: "IPU Parline legislature metadata routine refresh",
+      methodologyVersion: "ipu-parline-legislature-sync/v1",
+      releaseId,
+    },
+  });
+}
 
 interface IpuValue<T> {
   value: T;
@@ -139,6 +173,12 @@ function electionIdFromChamberAndDate(
 }
 
 async function main() {
+  const atlasReleaseId = DRY_RUN
+    ? null
+    : resolveAtlasReleaseId(EXPLICIT_RELEASE_ID);
+  const neonSql = neon(process.env.DATABASE_URL!);
+  const db = drizzle({ client: neonSql });
+
   console.log("=== IPU Parline Sync ===\n");
 
   // 1. Fetch all political parties for name lookup
@@ -221,19 +261,27 @@ async function main() {
         )
       );
 
-    let bodyId: string;
+    let bodyId: string | null;
     if (existingBodies.length > 0) {
-      bodyId = existingBodies[0].id;
-      await db
-        .update(governmentBodies)
-        .set({
+      const existingBody = existingBodies[0];
+      bodyId = await writeIpuGovernmentBody(
+        db,
+        {
+          stableId: existingBody.id,
+          jurisdictionId: jurisdiction.id,
           name: chamberName,
-          totalSeats: seatCount,
+          bodyType: existingBody.bodyType,
           chamberType,
+          totalSeats: seatCount,
+          branch: existingBody.branch ?? "legislative",
+          wikidataQid: existingBody.wikidataQid,
+          ipuParlineId: chamberCode,
+          hierarchyLevel: existingBody.hierarchyLevel,
           electoralSystemFamily,
           electoralSubsystem,
-        })
-        .where(eq(governmentBodies.id, bodyId));
+        },
+        { dryRun: DRY_RUN, atlasReleaseId },
+      );
     } else {
       // Check if there's already a legislative body with similar name
       const similarBodies = await db
@@ -253,21 +301,28 @@ async function main() {
       );
 
       if (matchingBody) {
-        bodyId = matchingBody.id;
-        await db
-          .update(governmentBodies)
-          .set({
-            ipuParlineId: chamberCode,
-            totalSeats: seatCount ?? matchingBody.totalSeats,
+        bodyId = await writeIpuGovernmentBody(
+          db,
+          {
+            stableId: matchingBody.id,
+            jurisdictionId: jurisdiction.id,
+            name: matchingBody.name,
+            bodyType: matchingBody.bodyType,
             chamberType: chamberType ?? matchingBody.chamberType,
+            totalSeats: seatCount ?? matchingBody.totalSeats,
+            branch: matchingBody.branch ?? "legislative",
+            wikidataQid: matchingBody.wikidataQid,
+            ipuParlineId: chamberCode,
+            hierarchyLevel: matchingBody.hierarchyLevel,
             electoralSystemFamily,
             electoralSubsystem,
-          })
-          .where(eq(governmentBodies.id, bodyId));
+          },
+          { dryRun: DRY_RUN, atlasReleaseId },
+        );
       } else {
-        const inserted = await db
-          .insert(governmentBodies)
-          .values({
+        bodyId = await writeIpuGovernmentBody(
+          db,
+          {
             jurisdictionId: jurisdiction.id,
             name: chamberName,
             bodyType: "legislature",
@@ -278,9 +333,10 @@ async function main() {
             hierarchyLevel: chamberType === "upper" ? 1 : 2,
             electoralSystemFamily,
             electoralSubsystem,
-          })
-          .returning({ id: governmentBodies.id });
-        bodyId = inserted[0].id;
+            identityMode: "exact_name",
+          },
+          { dryRun: DRY_RUN, atlasReleaseId },
+        );
       }
     }
 
@@ -325,7 +381,9 @@ async function main() {
           });
         }
         if (proposed.length > 0) {
-          await writeLegislatureComposition(db as never, { bodyId, jurisdictionId: jurisdiction.id, parties: proposed, sourceId: SOURCE_ID, sourceUrl: `${IPU_BASE}/elections/${electionId}`, sourceLicense: "CC-BY-NC-SA-4.0", rawPayload: partyResults }, { dryRun: DRY_RUN, stampFreshness: false });
+          if (bodyId) {
+            await writeLegislatureComposition(db as never, { bodyId, jurisdictionId: jurisdiction.id, parties: proposed, sourceId: SOURCE_ID, sourceUrl: `${IPU_BASE}/elections/${electionId}`, sourceLicense: "CC-BY-NC-SA-4.0", rawPayload: partyResults }, { dryRun: DRY_RUN, stampFreshness: false });
+          }
           partiesInserted += proposed.length;
         }
       }
@@ -358,7 +416,12 @@ async function main() {
   console.log(`  Elections not found: ${electionsFailed}`);
 }
 
-main().catch((err) => {
-  console.error("IPU sync failed:", err);
-  process.exit(1);
-});
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main().catch((err) => {
+    console.error("IPU sync failed:", err);
+    process.exit(1);
+  });
+}

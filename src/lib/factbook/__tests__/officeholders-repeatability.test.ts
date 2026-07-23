@@ -42,7 +42,83 @@ function harness() {
       const first = rows.get(table)?.[0]; if (first) Object.assign(first, structuredClone(value)); writes++;
     } }) }),
   };
-  return { db: db as never, rows, writes: () => writes };
+  const entityWriters = {
+    upsertBody: async (_db: never, input: Record<string, unknown>) => {
+      const list = rows.get(governmentBodies)!;
+      let row = list.find(
+        (candidate) =>
+          candidate.jurisdictionId === input.jurisdictionId &&
+          candidate.branch === input.branch,
+      );
+      if (!row) {
+        row = insert(governmentBodies, {
+          id: "10000000-0000-4000-8000-000000000001",
+          jurisdictionId: input.jurisdictionId,
+          name: input.name,
+          bodyType: input.bodyType,
+          branch: input.branch,
+          hierarchyLevel: input.hierarchyLevel,
+        });
+      }
+      return row.id as string;
+    },
+    upsertOffice: async (_db: never, input: Record<string, unknown>) => {
+      const list = rows.get(offices)!;
+      let row = list.find(
+        (candidate) =>
+          candidate.id === input.stableId ||
+          (candidate.bodyId === input.bodyId &&
+            candidate.officeType === input.officeType),
+      );
+      if (!row) {
+        row = insert(offices, {
+          id: "20000000-0000-4000-8000-000000000001",
+          bodyId: input.bodyId,
+          name: input.name,
+          officeType: input.officeType,
+          isElected: input.isElected,
+          wikidataQid: input.wikidataQid,
+        });
+      } else {
+        Object.assign(row, {
+          name: input.name,
+          officeType: input.officeType,
+          isElected: input.isElected,
+          ...(input.wikidataQid ? { wikidataQid: input.wikidataQid } : {}),
+        });
+      }
+      return row.id as string;
+    },
+    mutatePerson: async (_db: never, input: {
+      stableId?: string;
+      identityQid?: string;
+      insertName: string;
+      values: Record<string, unknown>;
+    }) => {
+      const list = rows.get(persons)!;
+      let row = list.find(
+        (candidate) =>
+          candidate.id === input.stableId ||
+          candidate.wikidataQid === input.identityQid,
+      );
+      if (!row) {
+        row = insert(persons, {
+          id: input.stableId ?? "30000000-0000-4000-8000-000000000001",
+          name: input.insertName,
+          ...structuredClone(input.values),
+        });
+      } else {
+        Object.assign(row, structuredClone(input.values));
+      }
+      return row.id as string;
+    },
+  };
+  return {
+    db: db as never,
+    entityWriters: entityWriters as never,
+    rows,
+    writes: () => writes,
+  };
 }
 
 function semantic(rows: Map<unknown, Array<Record<string, unknown>>>) {
@@ -56,13 +132,13 @@ const personPass = async () => ({
   birthdatesWritten: 0,
   writeFailures: 0,
 });
-const options = { bindings: [binding] as never, findJurisdictionId: async () => "jurisdiction-1", enrichmentPlan: emptyPlan, enrichPersons: personPass as never, markSynced: (async () => ["wikidata"]) as never };
+const options = { bindings: [binding] as never, findJurisdictionId: async () => "jurisdiction-1", enrichmentPlan: emptyPlan, enrichPersons: personPass as never, markSynced: (async () => ["wikidata"]) as never, atlasReleaseId: "atlas-test" };
 
 test("officeholder fixture applications create no duplicate canonical rows", async () => {
   const state = harness();
-  await syncFactbookOfficeholders({ ...options, db: state.db });
+  await syncFactbookOfficeholders({ ...options, db: state.db, entityWriters: state.entityWriters });
   const first = semantic(state.rows);
-  await syncFactbookOfficeholders({ ...options, db: state.db });
+  await syncFactbookOfficeholders({ ...options, db: state.db, entityWriters: state.entityWriters });
   assert.deepEqual(semantic(state.rows), first);
   assert.equal(state.rows.get(persons)?.length, 1);
   assert.equal(state.rows.get(terms)?.length, 1);
@@ -73,16 +149,32 @@ test("officeholder fixture applications create no duplicate canonical rows", asy
 
 test("officeholder dry-run is stable and performs zero writes", async () => {
   const state = harness();
-  const first = await syncFactbookOfficeholders({ ...options, db: state.db, dryRun: true });
-  const second = await syncFactbookOfficeholders({ ...options, db: state.db, dryRun: true });
+  const first = await syncFactbookOfficeholders({ ...options, db: state.db, entityWriters: state.entityWriters, dryRun: true });
+  const second = await syncFactbookOfficeholders({ ...options, db: state.db, entityWriters: state.entityWriters, dryRun: true });
   assert.deepEqual({ countries: first.countriesSynced, rows: first.totalRowsWritten }, { countries: second.countriesSynced, rows: second.totalRowsWritten });
   assert.equal(state.writes(), 0);
+});
+
+test("officeholder apply fails closed before entity writes without a named release", async () => {
+  const state = harness();
+  await assert.rejects(
+    syncFactbookOfficeholders({
+      ...options,
+      atlasReleaseId: "release with spaces",
+      db: state.db,
+      entityWriters: state.entityWriters,
+    }),
+    /named Atlas release/,
+  );
+  assert.equal(state.rows.get(governmentBodies)?.length, 0);
+  assert.equal(state.rows.get(offices)?.length, 0);
+  assert.equal(state.rows.get(persons)?.length, 0);
 });
 
 test("malformed officeholder input fails before freshness", async () => {
   const state = harness();
   const stamped: number[] = [];
-  await assert.rejects(syncFactbookOfficeholders({ ...options, db: state.db, bindings: [{}] as never, markSynced: (async (_id: unknown, value: { rowsWritten: number }) => { stamped.push(value.rowsWritten); return []; }) as never }));
+  await assert.rejects(syncFactbookOfficeholders({ ...options, db: state.db, entityWriters: state.entityWriters, bindings: [{}] as never, markSynced: (async (_id: unknown, value: { rowsWritten: number }) => { stamped.push(value.rowsWritten); return []; }) as never }));
   assert.deepEqual(stamped, []);
 });
 
@@ -93,12 +185,14 @@ test("an empty officeholder primary feed fails before enrichment or freshness", 
     syncFactbookOfficeholders({
       ...options,
       db: state.db,
+      entityWriters: state.entityWriters,
       bindings: [],
       enrichmentPlan: {
         ...emptyPlan,
         titles: [
           {
             officeId: "existing-office",
+            bodyId: "existing-body",
             country: "Canada",
             role: "head_of_government",
             oldName: "Head of Government",
@@ -131,12 +225,14 @@ test("state-only officeholder bindings fail before enrichment or freshness", asy
     syncFactbookOfficeholders({
       ...options,
       db: state.db,
+      entityWriters: state.entityWriters,
       bindings: [stateOnly] as never,
       enrichmentPlan: {
         ...emptyPlan,
         titles: [
           {
             officeId: "existing-office",
+            bodyId: "existing-body",
             country: "Canada",
             role: "head_of_government",
             oldName: "Head of Government",
@@ -164,12 +260,14 @@ test("unmapped leadership cannot be masked by enrichment writes", async () => {
     syncFactbookOfficeholders({
       ...options,
       db: state.db,
+      entityWriters: state.entityWriters,
       findJurisdictionId: async () => null,
       enrichmentPlan: {
         ...emptyPlan,
         titles: [
           {
             officeId: "existing-office",
+            bodyId: "existing-body",
             country: "Canada",
             role: "head_of_government",
             oldName: "Head of Government",
@@ -206,6 +304,7 @@ test("a failed wider person backfill reports partial and never advances freshnes
   const summary = await syncFactbookOfficeholders({
     ...options,
     db: state.db,
+    entityWriters: state.entityWriters,
     enrichPersons: (async () => {
       throw new Error("portrait provider unavailable");
     }) as never,
