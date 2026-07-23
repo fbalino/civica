@@ -25,6 +25,12 @@ export interface CountryFactHistoryWrite {
   preserveReviewStatus?: boolean;
 }
 
+export interface CountryFactDemotionHistoryWrite {
+  factId: string;
+  statusReason: string;
+  history: CountryFactHistoryContext;
+}
+
 export type CountryFactHistoryWriter = (
   database: Pick<CivicaDb, "execute">,
   input: CountryFactHistoryWrite,
@@ -299,6 +305,113 @@ export async function upsertCountryFactWithHistory(
   input: CountryFactHistoryWrite,
 ): Promise<void> {
   await database.execute(buildCountryFactHistoryStatement(input));
+}
+
+export function buildCountryFactDemotionHistoryStatement(
+  input: CountryFactDemotionHistoryWrite,
+) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      input.factId,
+    )
+  ) {
+    throw new Error("Country fact demotion requires a stable fact UUID");
+  }
+  const statusReason = input.statusReason.trim();
+  if (!statusReason) {
+    throw new Error("Country fact demotion requires a public status reason");
+  }
+  const descriptor = validateAtlasChangeDescriptor({
+    ...input.history,
+    operation: "update",
+  });
+
+  return sql`
+    WITH before_row AS MATERIALIZED (
+      SELECT *
+      FROM country_facts
+      WHERE id = ${input.factId}::uuid
+        AND status = 'active'
+      FOR UPDATE
+    ),
+    updated AS (
+      UPDATE country_facts
+      SET
+        status = 'demoted',
+        status_reason = ${statusReason},
+        updated_at = NOW()
+      WHERE id IN (SELECT id FROM before_row)
+      RETURNING *
+    ),
+    change_payload AS (
+      SELECT
+        u.id,
+        (
+          CASE WHEN b.status IS DISTINCT FROM u.status
+            THEN jsonb_build_array(jsonb_build_object('field', 'status', 'before', b.status, 'after', u.status))
+            ELSE '[]'::jsonb END
+          ||
+          CASE WHEN b.status_reason IS DISTINCT FROM u.status_reason
+            THEN jsonb_build_array(jsonb_build_object('field', 'status_reason', 'before', b.status_reason, 'after', u.status_reason))
+            ELSE '[]'::jsonb END
+        ) AS changes
+      FROM updated u
+      INNER JOIN before_row b ON b.id = u.id
+    ),
+    history_event AS (
+      INSERT INTO atlas_entity_change_history (
+        entity_type,
+        entity_id,
+        entity_table,
+        operation,
+        change_kind,
+        changes,
+        reason,
+        methodology_version,
+        release_id,
+        correction_log_id,
+        correction_status
+      )
+      SELECT
+        'fact',
+        id::text,
+        'country_facts',
+        'update',
+        ${descriptor.changeKind},
+        changes,
+        ${descriptor.reason},
+        ${descriptor.methodologyVersion},
+        ${descriptor.releaseId},
+        ${descriptor.correctionLogId}::uuid,
+        ${descriptor.correctionStatus}
+      FROM change_payload
+      WHERE jsonb_array_length(changes) > 0
+      RETURNING id
+    )
+    SELECT
+      count(*)::integer AS demoted_count,
+      count(*) = (SELECT count(*) FROM history_event) AS history_complete
+    FROM updated
+  `;
+}
+
+export async function demoteCountryFactWithHistory(
+  database: Pick<CivicaDb, "execute">,
+  input: CountryFactDemotionHistoryWrite,
+): Promise<number> {
+  const result = await database.execute(
+    buildCountryFactDemotionHistoryStatement(input),
+  );
+  const rows = (
+    Array.isArray(result)
+      ? result
+      : ((result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [])
+  ) as Record<string, unknown>[];
+  const summary = rows[0] ?? {};
+  if (summary.history_complete === false) {
+    throw new Error("Country fact demotion history append was incomplete");
+  }
+  return Number(summary.demoted_count ?? 0);
 }
 
 function normalizeCountryFactInsert(values: CountryFactInsert) {

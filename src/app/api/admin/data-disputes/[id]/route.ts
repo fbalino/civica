@@ -32,9 +32,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { countryFacts, dataDisputes } from "@/lib/db/schema";
+import { dataDisputes } from "@/lib/db/schema";
+import {
+  demoteCountryFactWithHistory,
+  resolveAtlasReleaseId,
+} from "@/lib/factbook/country-fact-history-writer";
 import {
   disputeLoserId,
   OPEN_DISPUTE_STATUSES,
@@ -220,25 +224,18 @@ async function mutateDataDispute(
     // Unary disputes (e.g. plausibility_envelope) carry no fact_id_b, so
     // there is no losing peer to demote — record the decision, demote nothing.
     if (loserId) {
-      const demoteResult = await db
-        .update(countryFacts)
-        .set({
-          status: "demoted",
-          // Status reason carries the dispute id so the audit trail can
-          // be reconstructed even if data_disputes evolves later.
-          statusReason: `demoted_by_dispute_${id}`,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(countryFacts.id, loserId),
-            // Keep the active predicate so a re-run / already-demoted loser
-            // is a safe no-op rather than a redundant write.
-            eq(countryFacts.status, "active"),
-          ),
-        )
-        .returning({ id: countryFacts.id });
-      demotedCount = demoteResult.length;
+      demotedCount = await demoteCountryFactWithHistory(db, {
+        factId: loserId,
+        // Status reason carries the dispute id so the audit trail can be
+        // reconstructed even if data_disputes evolves later.
+        statusReason: `demoted_by_dispute_${id}`,
+        history: {
+          changeKind: "substantive_revision",
+          reason: `Reviewer resolution of data dispute ${id} demoted the losing source row`,
+          methodologyVersion: "fact-reconciliation-dispute-review/v1",
+          releaseId: resolveAtlasReleaseId(),
+        },
+      });
     }
   }
 

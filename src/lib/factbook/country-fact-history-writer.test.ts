@@ -4,6 +4,7 @@ import test from "node:test";
 import { PgDialect } from "drizzle-orm/pg-core";
 
 import {
+  buildCountryFactDemotionHistoryStatement,
   buildCountryFactHistoryStatement,
   resolveAtlasReleaseId,
   routineCountryFactHistory,
@@ -66,4 +67,24 @@ test("Atlas release identity fails closed", () => {
   assert.throws(() => resolveAtlasReleaseId(""), /named Atlas release/);
   assert.throws(() => resolveAtlasReleaseId("release with spaces"), /named Atlas release/);
   assert.equal(resolveAtlasReleaseId("atlas-2026-07"), "atlas-2026-07");
+});
+
+test("reviewer demotion updates the fact and appends its event in one statement", () => {
+  const query = new PgDialect().sqlToQuery(
+    buildCountryFactDemotionHistoryStatement({
+      factId: "323e4567-e89b-42d3-a456-426614174000",
+      statusReason: "demoted_by_dispute_fixture",
+      history: {
+        changeKind: "substantive_revision",
+        reason: "Reviewer selected the competing source row",
+        methodologyVersion: "fact-reconciliation-dispute-review/v1",
+        releaseId: "atlas-2026-07",
+      },
+    }),
+  );
+  assert.match(query.sql, /before_row AS MATERIALIZED/i);
+  assert.match(query.sql, /UPDATE country_facts/i);
+  assert.match(query.sql, /status = 'demoted'/i);
+  assert.match(query.sql, /INSERT INTO atlas_entity_change_history/i);
+  assert.match(query.sql, /history_complete/i);
 });
