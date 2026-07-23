@@ -30,7 +30,7 @@ test("route I/O policy covers exactly every registered route-method", () => {
     stale: [],
     duplicates: [],
   });
-  assert.equal(ROUTE_IO_POLICY.length, 169);
+  assert.equal(ROUTE_IO_POLICY.length, 170);
   assert.deepEqual(policyDefinitionErrors(ROUTE_IO_POLICY), []);
 });
 

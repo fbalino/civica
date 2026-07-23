@@ -212,6 +212,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "ATL-019 stable-entity citation resolver; shared public-dynamic-read budget, no PII, and no authentication required by design.",
   },
   {
+    filePath: "api/citations/[entityType]/[id]/history/route.ts",
+    exposure: "public-read",
+    methods: ["GET"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "public"],
+    note: "ATL-020 public, field-safe release-history projection keyed by ATL-019 stable entity identity; never returns raw retained snapshots.",
+  },
+  {
     filePath: "api/civica-index/corrections/route.ts",
     exposure: "public-mutation",
     methods: ["POST"],

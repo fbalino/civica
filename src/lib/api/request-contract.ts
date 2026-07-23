@@ -283,6 +283,10 @@ export const QUERY_CONTRACT_SCHEMAS = {
       .strict(),
     repeatableKeys: [],
   },
+  "atlas-entity-history-query/v1": {
+    schema: z.object({ limit: canonicalInteger(1, 100, 50), offset: canonicalInteger(0, 1_000_000, 0) }).strict(),
+    repeatableKeys: [],
+  },
   "governance-evidence-query/v1": {
     schema: z
       .object({

@@ -109,6 +109,13 @@ test("query contracts apply defaults and typed transformations", () => {
       },
     },
   );
+  assert.deepEqual(
+    parseQueryContract(
+      request("?limit=25&offset=50"),
+      "atlas-entity-history-query/v1",
+    ),
+    { ok: true, data: { limit: 25, offset: 50 } },
+  );
 });
 
 test("repeatable query keys preserve order but scalar duplicates fail", async () => {
@@ -215,6 +222,7 @@ test("all 22 declared GET query schemas accept their canonical minimum shape", (
     ["constitution-search-query/v1", "?q=rule+of+law"],
     ["country-export-query/v1", "?as_of=live"],
     ["indicator-history-query/v1", ""],
+    ["atlas-entity-history-query/v1", ""],
     ["governance-evidence-query/v1", ""],
     ["metric-strip-query/v1", "?year=2024"],
     ["v1-country-detail-query/v1", "?as_of=live"],
