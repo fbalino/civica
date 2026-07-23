@@ -36,6 +36,10 @@ export const PUBLIC_HISTORY_FIELDS: Record<AtlasHistoryEntityType, readonly stri
   indicator: ["value", "value_status", "value_status_reason", "rank", "total_ranked", "source_id", "source_url", "year"],
 };
 
+export const ATLAS_HISTORY_ENTITY_TABLES: Record<AtlasHistoryEntityType, string> = {
+  fact: "country_facts", institution: "government_bodies", office: "offices", person: "persons", election: "elections", "constitution-passage": "constitution_passages", organization: "organizations", indicator: "country_metrics",
+};
+
 export interface PublicHistoryFieldChange {
   field: string;
   before: unknown;
