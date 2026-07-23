@@ -1,0 +1,170 @@
+{
+  "schema": "brand-registry-search/v1",
+  "retrievedAt": "2026-07-23",
+  "legalConclusion": null,
+  "clearanceClaim": false,
+  "professionalReviewRequired": true,
+  "projectUse": {
+    "name": "Civica Atlas",
+    "posture": "non-commercial current posture",
+    "surfaces": [
+      "governance reference website",
+      "country and institutional profiles",
+      "source-linked data",
+      "APIs",
+      "downloads",
+      "publications and citation",
+      "research and teaching assets"
+    ]
+  },
+  "candidateNiceClasses": [
+    9,
+    16,
+    35,
+    38,
+    41,
+    42,
+    45
+  ],
+  "records": [
+    {
+      "registry": "UKIPO",
+      "recordId": "UK00002285308",
+      "url": "https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00002285308",
+      "mark": "CIVICA",
+      "markType": "Word",
+      "statusAsDisplayed": "Registered",
+      "owner": "Civica UK Limited",
+      "filingDate": "2001-11-13",
+      "renewalDateAsDisplayed": "2031-11-13",
+      "niceClasses": [
+        9,
+        16,
+        35,
+        41,
+        42
+      ],
+      "captureSha256": "436aa28f4bd9a3bab5a8084804cfa914c520da112b5cd441303bb4f4b250ef14"
+    },
+    {
+      "registry": "UKIPO",
+      "recordId": "owner-1312891",
+      "url": "https://trademarks.ipo.gov.uk/ipo-tmowner/page/search?id=1312891&domain=1&app=0&mark=UK00002285308",
+      "owner": "Civica UK Limited",
+      "resultCountAsDisplayed": 14,
+      "notableMarks": [
+        "CIVICA",
+        "civica digital",
+        "CIVICAPAY",
+        "CIVICAPAYMENTS",
+        "CIVICA ESTORE",
+        "CIVICA PAYMENTS",
+        "CIVICA ideas into action"
+      ],
+      "captureSha256": "e246cbcd0bd93cd38753cb1a74cca1cb44fd2989bc9bcc1918db7eeb0d8571c3"
+    },
+    {
+      "registry": "UKIPO",
+      "recordId": "UK00003201410",
+      "url": "https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003201410",
+      "mark": "civica digital",
+      "markType": "Figurative",
+      "statusAsDisplayed": "Registered",
+      "owner": "Civica UK Limited",
+      "filingDate": "2016-12-09",
+      "renewalDateAsDisplayed": "2026-12-09",
+      "niceClasses": [
+        9,
+        35,
+        38,
+        41,
+        42,
+        45
+      ],
+      "captureSha256": "849b5c9f3e8b5aa34795fbfcdae3cce9754bb7952f720bbda9077798139ffa8e"
+    },
+    {
+      "registry": "WIPO Madrid Monitor",
+      "recordId": "1560925",
+      "url": "https://www3.wipo.int/madrid/monitor/en/showData.jsp?ID=ROM.1560925",
+      "mark": "CIVICA ideas into action",
+      "markType": "Figurative",
+      "statusAsDisplayed": "Active",
+      "holder": "Civica UK Limited",
+      "registrationDate": "2020-09-29",
+      "expirationDateAsDisplayed": "2030-09-29",
+      "niceClasses": [
+        9,
+        35,
+        38,
+        41,
+        42,
+        45
+      ],
+      "designations": [
+        "AU",
+        "CA",
+        "IE",
+        "NZ",
+        "SG",
+        "US"
+      ],
+      "designationStatusCaveat": "Country-specific transaction history must be professionally reviewed; top-level Active does not prove protection in every designation.",
+      "captureSha256": "f4e783334d65b3cc9c46eda33ec5f8800b03bb2b0e871fe9503d83497dd4e711"
+    },
+    {
+      "registry": "UK Companies House",
+      "recordId": "01628868",
+      "url": "https://find-and-update.company-information.service.gov.uk/company/01628868",
+      "name": "CIVICA UK LIMITED",
+      "statusAsDisplayed": "Active",
+      "incorporated": "1982-04-14",
+      "sic": "62090",
+      "captureSha256": "68571fc64a033fe72fb07a4b6397e6f5fa9254f5ab1eb35aaf9c994424ed8cd8"
+    },
+    {
+      "registry": "Verisign RDAP",
+      "recordId": "CIVICA.COM",
+      "url": "https://rdap.verisign.com/com/v1/domain/CIVICA.COM",
+      "registrationDate": "1998-12-18",
+      "expirationDateAsDisplayed": "2028-12-18",
+      "ownershipConclusion": null,
+      "captureSha256": "2531f8132c7259ee5f65b742c07f0c55f9a7560ae8b2a3ff3c8f5ed461d63a53"
+    },
+    {
+      "registry": "Public Interest Registry RDAP",
+      "recordId": "civicaatlas.org",
+      "url": "https://rdap.publicinterestregistry.org/rdap/domain/civicaatlas.org",
+      "registrationDate": "2026-04-16",
+      "expirationDateAsDisplayed": "2027-04-16",
+      "ownershipConclusion": null,
+      "captureSha256": "11e66a753ebc0ce4548fda21a13111138b4173fe2731ac3a2e1b02d40019b670"
+    }
+  ],
+  "accessLimitations": [
+    {
+      "registry": "USPTO Trademark Search and TSDR",
+      "status": "official entry points reached; durable exact result set not retrieved",
+      "interpretation": "unknown, not no-results",
+      "manualLeads": [
+        "79298217",
+        "87939287"
+      ]
+    },
+    {
+      "registry": "EUIPO eSearch",
+      "status": "official entry point reached; durable exact result set not retrieved",
+      "interpretation": "unknown, not no-results"
+    },
+    {
+      "registry": "WIPO Global Brand Database",
+      "status": "bot challenge prevented a durable exact/variant result set; known-record Madrid Monitor access worked",
+      "interpretation": "global search incomplete"
+    },
+    {
+      "registry": "Uruguay DNPI",
+      "status": "official public-search service identified; durable interactive exact-name result not retrieved",
+      "interpretation": "unknown, not no-results"
+    }
+  ]
+}

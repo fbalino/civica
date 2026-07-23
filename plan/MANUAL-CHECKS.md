@@ -4,7 +4,19 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 
 ## Legal and brand
 
-- Professional trademark/confusion review of the final project name, marks, domains, and relevant jurisdictions/classes.
+- **BRD-003 · Owner/counsel:** review
+  `plan/research/brand-confusion-landscape-2026-07-23.md`,
+  `plan/evidence/BRD-002/official-registry-records-2026-07-23.md`, and the
+  BRD-004 decision rubric before broad launch. First confirm the intended
+  geography, legal owner/entity, first-use evidence, current and planned
+  services, commercial posture, exact verbal/visual marks, and migration cost.
+  Counsel must validate the incomplete US/EU/Uruguay searches and the national
+  effect of WIPO designations; assess the registered UK `CIVICA` word mark and
+  other common-law/registry rights; determine whether adding `Atlas`, the
+  non-commercial posture, disclaimers, or coexistence options change the
+  analysis; and give a written recommendation or privileged decision summary.
+  The owner then records keep/constraint/rename disposition. No namesake
+  contact, filing, domain purchase, or rename is authorized by this queue item.
 - Professional review of code licensing, database rights, source-specific redistribution terms, AI-assisted illustration disclosure, privacy, and terms before the DOI release.
 
 ## Academic review

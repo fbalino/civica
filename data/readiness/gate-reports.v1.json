@@ -1,9 +1,9 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "90b0f9b6de51dab9ba7aa6f423a38f02bbd338887ad1b4aa953a7f23e3447990",
-    "plan/PROGRESS.md": "24a5fa72e0f31f3d0cdf92052ee98bfa8ba8be872d7c905cbf798c9e5ab5a251",
-    "plan/MANUAL-CHECKS.md": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
+    "plan/MASTER-CHECKLIST.md": "cbabde615dcc98c901f71eb7d4f3778eab3bafa9835391ebad7cb0448777b7ba",
+    "plan/PROGRESS.md": "dcc60ae9383c0c6d7a0f8602ea33faa2892c6613ab9f101b41d9403a7d39efde",
+    "plan/MANUAL-CHECKS.md": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "3fb5da3362a6361a477f89fd46993a12587ffebc086c3beccdb773ff770e7558",
@@ -14,7 +14,7 @@
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
     "plan/09-testing-qa-and-release.md": "cc6ef6a056bcb0bd279fa4dcffba3d9939a9267b5a7538ab1b5f44f555be69e6",
     "plan/10-academic-governance-review-and-outreach.md": "3737814fb2cd220a1600dd12d54474b2eabefcbeb325e0a3723cd224f8228e8e",
-    "plan/11-brand-legal-and-licensing.md": "bea54252573cf8c99d363ad5468daee4eec25b683b3c85b590704fd9b9170b1a"
+    "plan/11-brand-legal-and-licensing.md": "214b2beb72ee041dd8d04d82ac10a5cea000dfe78825b3c5f50d4be46a0a2248"
   },
   "reports": [
     {
@@ -23,8 +23,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 240,
-        "remaining": 66,
+        "completed": 242,
+        "remaining": 64,
         "byPriority": {
           "P0": {
             "total": 190,
@@ -32,7 +32,7 @@
           },
           "P1": {
             "total": 111,
-            "completed": 78
+            "completed": 80
           },
           "P2": {
             "total": 5,
@@ -46,7 +46,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 7
+            "completed": 9
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -121,8 +121,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "BRD-001",
-        "BRD-002",
         "BRD-003",
         "BRD-006",
         "BRD-007",
@@ -179,8 +177,11 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
+        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
         "linkedTaskIds": [
+          "BRD-002",
+          "BRD-003",
+          "BRD-004",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -256,8 +257,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 240,
-        "remaining": 66,
+        "completed": 242,
+        "remaining": 64,
         "byPriority": {
           "P0": {
             "total": 190,
@@ -265,7 +266,7 @@
           },
           "P1": {
             "total": 111,
-            "completed": 78
+            "completed": 80
           },
           "P2": {
             "total": 5,
@@ -279,7 +280,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 7
+            "completed": 9
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -354,8 +355,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "BRD-001",
-        "BRD-002",
         "BRD-003",
         "BRD-006",
         "BRD-007",
@@ -412,8 +411,11 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
+        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
         "linkedTaskIds": [
+          "BRD-002",
+          "BRD-003",
+          "BRD-004",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -488,7 +490,7 @@
       ],
       "blockers": [
         "28 unchecked P0 tasks prevent a green report",
-        "61 unchecked P0/P1 tasks prevent G4"
+        "59 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -497,8 +499,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 240,
-        "remaining": 66,
+        "completed": 242,
+        "remaining": 64,
         "byPriority": {
           "P0": {
             "total": 190,
@@ -506,7 +508,7 @@
           },
           "P1": {
             "total": 111,
-            "completed": 78
+            "completed": 80
           },
           "P2": {
             "total": 5,
@@ -520,7 +522,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 7
+            "completed": 9
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -595,8 +597,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "BRD-001",
-        "BRD-002",
         "BRD-003",
         "BRD-006",
         "BRD-007",
@@ -653,8 +653,11 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
+        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
         "linkedTaskIds": [
+          "BRD-002",
+          "BRD-003",
+          "BRD-004",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -724,8 +727,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 240,
-        "remaining": 66,
+        "completed": 242,
+        "remaining": 64,
         "byPriority": {
           "P0": {
             "total": 190,
@@ -733,7 +736,7 @@
           },
           "P1": {
             "total": 111,
-            "completed": 78
+            "completed": 80
           },
           "P2": {
             "total": 5,
@@ -747,7 +750,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 7
+            "completed": 9
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -822,8 +825,6 @@
         "ATL-028",
         "ATL-029",
         "ATL-030",
-        "BRD-001",
-        "BRD-002",
         "BRD-003",
         "BRD-006",
         "BRD-007",
@@ -880,8 +881,11 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "575bbaea9cc4703d6a8e64b6db6f344434feaceb6c9d4d78dc57315c95418ef3",
+        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
         "linkedTaskIds": [
+          "BRD-002",
+          "BRD-003",
+          "BRD-004",
           "BRD-014",
           "DAT-021",
           "EXP-006",
