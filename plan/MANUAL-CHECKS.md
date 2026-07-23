@@ -78,6 +78,13 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   for private admin/reviewer routes and never retain credentials or personal
   data in screenshots.
 - Approve the representative engraving color-grade pilot before any corpus-wide transformation.
+- **EXP-009 · Qualified visual reviewer:** inspect the four hash-pinned
+  France/United Kingdom candidates in `plan/evidence/EXP-009/` against the
+  adopted engraving contract, intended desktop/mobile hero crops, landmark
+  sources, and light/dark relationship. Record approve/reject/revise for each
+  pair with reviewer, date, exact hashes, and reason. Approval authorizes only
+  a later checked asset replacement; it is not itself a production change or
+  a source-evidence claim.
 - Select one of three design-system-compliant Explore navigation concepts before new artwork or final implementation; review `plan/EXP-014-explore-navigation-concepts-2026-07-18.md` and its dated browser mockups first.
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.

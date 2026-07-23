@@ -374,6 +374,7 @@
     "validate:alt-text-policy": "tsx scripts/validate-alt-text-policy.ts",
     "validate:landmarks": "tsx scripts/validate-landmarks.ts",
     "validate:engraving-color-contract": "tsx scripts/validate-engraving-color-contract.ts",
+    "validate:exp-009-candidates": "node --import tsx scripts/validate-exp-009-candidates.ts",
     "grade:engravings": "tsx scripts/grade-engravings.ts",
     "validate:engraving-grader": "node --import tsx --test src/lib/illustrations/engraving-grade.test.ts",
     "generate:illustration-manifest": "tsx scripts/generate-illustration-manifest.ts --write",
