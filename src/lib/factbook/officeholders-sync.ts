@@ -17,18 +17,23 @@
  * run stamps `sources.last_sync_at` via `markSourcesSynced("wikidata", …)` —
  * the one sanctioned path — and only when rows were actually written.
  */
-import { eq, sql, ilike } from "drizzle-orm";
+import { and, eq, ilike, notInArray, sql } from "drizzle-orm";
 
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
   governmentBodies,
+  offices,
   persons,
   terms,
   statements,
   legislatureParties,
 } from "@/lib/db/schema";
-import { sparqlQuery, extractQid } from "@/lib/data/wikidata";
+import {
+  sparqlQuery,
+  extractQid,
+  type SparqlBinding,
+} from "@/lib/data/wikidata";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
 import {
@@ -66,6 +71,7 @@ export interface OfficeholderSyncOptions {
   markSynced?: typeof markSourcesSynced;
   atlasReleaseId?: string;
   entityWriters?: GovernmentEntityHistoryWriters;
+  retirePrincipalTerms?: typeof retireUnselectedPrincipalTerms;
 }
 
 export interface OfficeholderSyncSummary {
@@ -78,6 +84,8 @@ export interface OfficeholderSyncSummary {
   countriesSynced: number;
   /** Countries seen in Wikidata but not matched to a jurisdiction. */
   countriesSkipped: number;
+  /** Previously-current principal terms retired after full-set reconciliation. */
+  termsRetired: number;
   /** Unresolved `Q…`-as-name persons that were resolved to real labels. */
   qidNamesResolved: number;
   /** Real office titles (P39) written over generic names. */
@@ -106,30 +114,184 @@ export interface OfficeholderSyncSummary {
 // of these, so it is never clobbered.
 const GENERIC_OFFICE_NAMES = new Set(["Head of State", "Head of Government"]);
 
-const QUERY = `
+export const OFFICEHOLDER_QUERY = `
 SELECT ?state ?stateLabel ?iso2 ?iso3 ?shortName
-       ?headOfState ?headOfStateLabel ?hosStart
-       ?headOfGov ?headOfGovLabel ?hogStart
+       ?headOfState ?headOfStateLabel ?hosStart ?hosRank
+       ?headOfGov ?headOfGovLabel ?hogStart ?hogRank
 WHERE {
   ?state wdt:P31 wd:Q3624078 .
   OPTIONAL { ?state wdt:P297 ?iso2 . }
   OPTIONAL { ?state wdt:P298 ?iso3 . }
   OPTIONAL { ?state wdt:P1813 ?shortName . FILTER(LANG(?shortName) = "en") }
   OPTIONAL {
+    ?state wdt:P35 ?headOfState .
     ?state p:P35 ?hosStatement .
     ?hosStatement ps:P35 ?headOfState .
+    ?hosStatement wikibase:rank ?hosRank .
     OPTIONAL { ?hosStatement pq:P580 ?hosStart . }
     FILTER NOT EXISTS { ?hosStatement pq:P582 ?hosEnd . }
   }
   OPTIONAL {
+    ?state wdt:P6 ?headOfGov .
     ?state p:P6 ?hogStatement .
     ?hogStatement ps:P6 ?headOfGov .
+    ?hogStatement wikibase:rank ?hogRank .
     OPTIONAL { ?hogStatement pq:P580 ?hogStart . }
     FILTER NOT EXISTS { ?hogStatement pq:P582 ?hogEnd . }
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 `;
+
+export type PrincipalOfficeholderRole =
+  | "head_of_state"
+  | "head_of_government";
+
+export interface ResolvedOfficeholderCandidate {
+  personQid: string;
+  personName: string;
+  startDate: string | null;
+  rank: "preferred" | "normal";
+}
+
+export interface ResolvedOfficeholderState {
+  stateQid: string;
+  stateName: string;
+  iso2: string | null;
+  iso3: string | null;
+  shortName: string | null;
+  headOfState: ResolvedOfficeholderCandidate[];
+  headOfGovernment: ResolvedOfficeholderCandidate[];
+  ambiguousRoles: PrincipalOfficeholderRole[];
+}
+
+function statementRank(
+  value: string | undefined,
+): "preferred" | "normal" | "deprecated" {
+  if (value?.endsWith("#PreferredRank")) return "preferred";
+  if (value?.endsWith("#DeprecatedRank")) return "deprecated";
+  return "normal";
+}
+
+function addCandidate(
+  target: Map<string, ResolvedOfficeholderCandidate>,
+  binding: SparqlBinding,
+  role: "hos" | "hog",
+) {
+  const personValue =
+    role === "hos" ? binding.headOfState?.value : binding.headOfGov?.value;
+  if (!personValue) return;
+  const rank = statementRank(
+    role === "hos" ? binding.hosRank?.value : binding.hogRank?.value,
+  );
+  if (rank === "deprecated") return;
+  const personQid = extractQid(personValue);
+  const personName =
+    (role === "hos"
+      ? binding.headOfStateLabel?.value
+      : binding.headOfGovLabel?.value) ?? personQid;
+  const startDate =
+    (role === "hos" ? binding.hosStart?.value : binding.hogStart?.value)
+      ?.split("T")[0] ?? null;
+  const candidate = { personQid, personName, startDate, rank };
+  const current = target.get(personQid);
+  if (
+    !current ||
+    (current.rank === "normal" && rank === "preferred") ||
+    (current.rank === rank &&
+      (candidate.startDate ?? "") > (current.startDate ?? ""))
+  ) {
+    target.set(personQid, candidate);
+  }
+}
+
+function selectCurrentCandidates(
+  candidates: Map<string, ResolvedOfficeholderCandidate>,
+): {
+  rows: ResolvedOfficeholderCandidate[];
+  ambiguous: boolean;
+} {
+  const all = [...candidates.values()];
+  const preferred = all.filter((row) => row.rank === "preferred");
+  if (preferred.length) {
+    return {
+      rows: preferred.sort((a, b) =>
+        a.personQid.localeCompare(b.personQid),
+      ),
+      ambiguous: false,
+    };
+  }
+  if (all.length <= 1) {
+    return {
+      rows: all.sort((a, b) => a.personQid.localeCompare(b.personQid)),
+      ambiguous: false,
+    };
+  }
+  // A normal rank is neutral and does not assert currency. Multiple
+  // un-ended normal statements are therefore unresolved source ambiguity,
+  // not evidence of co-leadership.
+  return { rows: [], ambiguous: true };
+}
+
+/**
+ * Converts the SPARQL cross-product into one deterministic state record.
+ * Preferred statements win; multiple preferred statements remain explicit
+ * co-leadership. Multiple un-ended normal statements fail closed.
+ */
+export function resolveOfficeholderBindings(
+  bindings: SparqlBinding[],
+): ResolvedOfficeholderState[] {
+  const states = new Map<
+    string,
+    {
+      state: Omit<
+        ResolvedOfficeholderState,
+        "headOfState" | "headOfGovernment" | "ambiguousRoles"
+      >;
+      hos: Map<string, ResolvedOfficeholderCandidate>;
+      hog: Map<string, ResolvedOfficeholderCandidate>;
+    }
+  >();
+  for (const binding of bindings) {
+    if (!binding.state?.value) continue;
+    const stateQid = extractQid(binding.state.value);
+    const row =
+      states.get(stateQid) ??
+      {
+        state: {
+          stateQid,
+          stateName: binding.stateLabel?.value ?? stateQid,
+          iso2: binding.iso2?.value ?? null,
+          iso3: binding.iso3?.value ?? null,
+          shortName: binding.shortName?.value ?? null,
+        },
+        hos: new Map<string, ResolvedOfficeholderCandidate>(),
+        hog: new Map<string, ResolvedOfficeholderCandidate>(),
+      };
+    addCandidate(row.hos, binding, "hos");
+    addCandidate(row.hog, binding, "hog");
+    states.set(stateQid, row);
+  }
+  return [...states.values()]
+    .map(({ state, hos, hog }) => {
+      const headOfState = selectCurrentCandidates(hos);
+      const headOfGovernment = selectCurrentCandidates(hog);
+      return {
+        ...state,
+        headOfState: headOfState.rows,
+        headOfGovernment: headOfGovernment.rows,
+        ambiguousRoles: [
+          ...(headOfState.ambiguous
+            ? (["head_of_state"] as const)
+            : []),
+          ...(headOfGovernment.ambiguous
+            ? (["head_of_government"] as const)
+            : []),
+        ],
+      };
+    })
+    .sort((a, b) => a.stateQid.localeCompare(b.stateQid));
+}
 
 const WIKIDATA_TO_SLUG: Record<string, string> = {
   "People's Republic of China": "china",
@@ -342,15 +504,11 @@ async function upsertTerm(
     )
     .limit(1);
 
-  // 2. Mark every other term on this office as not current — the new one
-  //    (or the existing match) is the only current incumbent.
+  // 2. Keep the matching term current. Other current terms are reconciled
+  //    only after the complete source candidate set for this jurisdiction and
+  //    role has been resolved; deactivating here would erase legitimate
+  //    multiple-preferred co-leadership.
   if (existing.length > 0) {
-    await db
-      .update(terms)
-      .set({ isCurrent: false })
-      .where(
-        sql`${terms.officeId} = ${officeId} AND ${terms.id} <> ${existing[0].id} AND ${terms.isCurrent} = true`
-      );
     if (!existing[0].isCurrent) {
       await db
         .update(terms)
@@ -360,17 +518,40 @@ async function upsertTerm(
     return existing[0].id;
   }
 
-  await db
-    .update(terms)
-    .set({ isCurrent: false })
-    .where(
-      sql`${terms.officeId} = ${officeId} AND ${terms.isCurrent} = true`
-    );
-
   const inserted = await db.insert(terms).values({
     officeId, personId, startDate, isCurrent: true,
   }).returning({ id: terms.id });
   return inserted[0].id;
+}
+
+async function retireUnselectedPrincipalTerms(
+  db: OfficeholderSyncDb,
+  jurisdictionId: string,
+  officeType: PrincipalOfficeholderRole,
+  selectedTermIds: string[],
+): Promise<number> {
+  const scope = sql`${terms.officeId} IN (
+    SELECT ${offices.id}
+    FROM ${offices}
+    INNER JOIN ${governmentBodies}
+      ON ${offices.bodyId} = ${governmentBodies.id}
+    WHERE ${governmentBodies.jurisdictionId} = ${jurisdictionId}
+      AND ${offices.officeType} = ${officeType}
+  )`;
+  const retired = await db
+    .update(terms)
+    .set({ isCurrent: false })
+    .where(
+      and(
+        eq(terms.isCurrent, true),
+        scope,
+        selectedTermIds.length
+          ? notInArray(terms.id, selectedTermIds)
+          : undefined,
+      ),
+    )
+    .returning({ id: terms.id });
+  return retired.length;
 }
 
 async function upsertStatement(
@@ -1147,16 +1328,20 @@ export async function syncFactbookOfficeholders(
   log("=== Wikidata Officeholder Sync ===");
   log("Querying Wikidata SPARQL endpoint...");
 
-  const bindings = options.bindings ?? await sparqlQuery(QUERY);
+  const bindings =
+    options.bindings ?? (await sparqlQuery(OFFICEHOLDER_QUERY));
   log(`Got ${bindings.length} results`);
   if (bindings.length === 0) {
     throw new Error(
       "Wikidata officeholder primary feed returned no usable bindings",
     );
   }
+  const resolvedStates = resolveOfficeholderBindings(bindings);
   if (
-    !bindings.some(
-      (binding) => binding.headOfState?.value || binding.headOfGov?.value,
+    !resolvedStates.some(
+      (state) =>
+        state.headOfState.length > 0 ||
+        state.headOfGovernment.length > 0,
     )
   ) {
     throw new Error(
@@ -1177,17 +1362,18 @@ export async function syncFactbookOfficeholders(
 
   let synced = 0;
   let skipped = 0;
-  const seen = new Set<string>();
+  let retiredTerms = 0;
 
-  for (const binding of bindings) {
-    const stateQid = extractQid(binding.state.value);
-    if (seen.has(stateQid)) continue;
-    seen.add(stateQid);
-
-    const stateName = binding.stateLabel?.value ?? stateQid;
-    const iso2 = binding.iso2?.value ?? null;
-    const iso3 = binding.iso3?.value ?? null;
-    const shortName = binding.shortName?.value ?? null;
+  for (const state of resolvedStates) {
+    const {
+      stateQid,
+      stateName,
+      iso2,
+      iso3,
+      shortName,
+      headOfState,
+      headOfGovernment,
+    } = state;
 
     const jurisdictionId = await (options.findJurisdictionId ?? findJurisdiction)(
       db,
@@ -1198,10 +1384,16 @@ export async function syncFactbookOfficeholders(
     );
     if (!jurisdictionId) {
       skipped++;
-      if (binding.headOfState?.value || binding.headOfGov?.value) {
+      if (headOfState.length || headOfGovernment.length) {
         log(`! Skipped ${stateName} (${stateQid}) — no DB match, has leadership data`);
       }
       continue;
+    }
+
+    for (const role of state.ambiguousRoles) {
+      log(
+        `! ${stateName}: multiple un-ended normal-rank ${role} statements; failing closed instead of selecting by endpoint order`,
+      );
     }
 
     if (options.dryRun) {
@@ -1228,19 +1420,8 @@ export async function syncFactbookOfficeholders(
       history!,
     );
 
-    // Head of State
-    if (binding.headOfState?.value) {
-      const hosQid = extractQid(binding.headOfState.value);
-      const hosName = binding.headOfStateLabel?.value ?? hosQid;
-      const hosStart = binding.hosStart?.value?.split("T")[0] ?? null;
-
-      const personId = await upsertPerson(
-        db,
-        hosName,
-        hosQid,
-        writers,
-        history!,
-      );
+    const headOfStateTermIds: string[] = [];
+    if (headOfState.length) {
       const officeId = await upsertOffice(
         db,
         execBody,
@@ -1250,23 +1431,36 @@ export async function syncFactbookOfficeholders(
         writers,
         history!,
       );
-      const termId = await upsertTerm(db, officeId, personId, hosStart);
-      await upsertStatement(db, termId, "head_of_state", hosName, stateQid);
+      for (const candidate of headOfState) {
+        const personId = await upsertPerson(
+          db,
+          candidate.personName,
+          candidate.personQid,
+          writers,
+          history!,
+        );
+        const termId = await upsertTerm(
+          db,
+          officeId,
+          personId,
+          candidate.startDate,
+        );
+        await upsertStatement(
+          db,
+          termId,
+          "head_of_state",
+          candidate.personName,
+          stateQid,
+        );
+        headOfStateTermIds.push(termId);
+      }
     }
+    retiredTerms += await (
+      options.retirePrincipalTerms ?? retireUnselectedPrincipalTerms
+    )(db, jurisdictionId, "head_of_state", headOfStateTermIds);
 
-    // Head of Government
-    if (binding.headOfGov?.value) {
-      const hogQid = extractQid(binding.headOfGov.value);
-      const hogName = binding.headOfGovLabel?.value ?? hogQid;
-      const hogStart = binding.hogStart?.value?.split("T")[0] ?? null;
-
-      const personId = await upsertPerson(
-        db,
-        hogName,
-        hogQid,
-        writers,
-        history!,
-      );
+    const headOfGovernmentTermIds: string[] = [];
+    if (headOfGovernment.length) {
       const officeId = await upsertOffice(
         db,
         execBody,
@@ -1276,9 +1470,33 @@ export async function syncFactbookOfficeholders(
         writers,
         history!,
       );
-      const termId = await upsertTerm(db, officeId, personId, hogStart);
-      await upsertStatement(db, termId, "head_of_government", hogName, stateQid);
+      for (const candidate of headOfGovernment) {
+        const personId = await upsertPerson(
+          db,
+          candidate.personName,
+          candidate.personQid,
+          writers,
+          history!,
+        );
+        const termId = await upsertTerm(
+          db,
+          officeId,
+          personId,
+          candidate.startDate,
+        );
+        await upsertStatement(
+          db,
+          termId,
+          "head_of_government",
+          candidate.personName,
+          stateQid,
+        );
+        headOfGovernmentTermIds.push(termId);
+      }
     }
+    retiredTerms += await (
+      options.retirePrincipalTerms ?? retireUnselectedPrincipalTerms
+    )(db, jurisdictionId, "head_of_government", headOfGovernmentTermIds);
 
     synced++;
     log(`  ✓ ${stateName}`);
@@ -1287,6 +1505,7 @@ export async function syncFactbookOfficeholders(
   log(`=== Base Sync Complete ===`);
   log(`Synced:  ${synced}`);
   log(`Skipped: ${skipped}`);
+  log(`Retired stale principal terms: ${retiredTerms}`);
 
   // Leadership bindings that cannot be mapped to even one Civica
   // jurisdiction are a failed primary stage. Do not let unrelated title,
@@ -1462,6 +1681,7 @@ export async function syncFactbookOfficeholders(
   // covers the base sync plus the enrichment writes.
   const totalRowsWritten =
     synced +
+    retiredTerms +
     titlesWritten +
     partiesWritten +
     portraitsWritten +
@@ -1489,6 +1709,7 @@ export async function syncFactbookOfficeholders(
     durationMs: finishedAtMs - startedAtMs,
     countriesSynced: synced,
     countriesSkipped: skipped,
+    termsRetired: retiredTerms,
     qidNamesResolved,
     titlesWritten,
     partiesWritten,

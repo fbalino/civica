@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { governmentBodies, jurisdictions, offices, persons, statements, terms } from "@/lib/db/schema";
-import { syncFactbookOfficeholders, type EnrichmentPlan } from "../officeholders-sync";
+import {
+  resolveOfficeholderBindings,
+  syncFactbookOfficeholders,
+  type EnrichmentPlan,
+} from "../officeholders-sync";
 
 const binding = {
   state: { type: "uri", value: "http://www.wikidata.org/entity/Q16" },
@@ -132,7 +136,106 @@ const personPass = async () => ({
   birthdatesWritten: 0,
   writeFailures: 0,
 });
-const options = { bindings: [binding] as never, findJurisdictionId: async () => "jurisdiction-1", enrichmentPlan: emptyPlan, enrichPersons: personPass as never, markSynced: (async () => ["wikidata"]) as never, atlasReleaseId: "atlas-test" };
+const options = {
+  bindings: [binding] as never,
+  findJurisdictionId: async () => "jurisdiction-1",
+  enrichmentPlan: emptyPlan,
+  enrichPersons: personPass as never,
+  markSynced: (async () => ["wikidata"]) as never,
+  retirePrincipalTerms: async () => 0,
+  atlasReleaseId: "atlas-test",
+};
+
+const rank = (name: "PreferredRank" | "NormalRank" | "DeprecatedRank") => ({
+  type: "uri",
+  value: `http://wikiba.se/ontology#${name}`,
+});
+
+test("officeholder resolution is order-independent and preferred rank wins", () => {
+  const stale = {
+    ...binding,
+    headOfState: {
+      type: "uri",
+      value: "http://www.wikidata.org/entity/Q-old",
+    },
+    headOfStateLabel: { type: "literal", value: "Old officeholder" },
+    hosRank: rank("NormalRank"),
+  };
+  const current = {
+    ...binding,
+    headOfState: {
+      type: "uri",
+      value: "http://www.wikidata.org/entity/Q-new",
+    },
+    headOfStateLabel: { type: "literal", value: "Current officeholder" },
+    hosRank: rank("PreferredRank"),
+  };
+  const forward = resolveOfficeholderBindings([stale, current] as never);
+  const reverse = resolveOfficeholderBindings([current, stale] as never);
+  assert.deepEqual(forward, reverse);
+  assert.deepEqual(
+    forward[0].headOfState.map((row) => row.personName),
+    ["Current officeholder"],
+  );
+});
+
+test("multiple preferred officeholders remain explicit co-leadership", () => {
+  const first = {
+    ...binding,
+    headOfState: {
+      type: "uri",
+      value: "http://www.wikidata.org/entity/Q100",
+    },
+    headOfStateLabel: { type: "literal", value: "Co-leader A" },
+    hosRank: rank("PreferredRank"),
+  };
+  const second = {
+    ...binding,
+    headOfState: {
+      type: "uri",
+      value: "http://www.wikidata.org/entity/Q200",
+    },
+    headOfStateLabel: { type: "literal", value: "Co-leader B" },
+    hosRank: rank("PreferredRank"),
+  };
+  const [resolved] = resolveOfficeholderBindings([second, first] as never);
+  assert.deepEqual(
+    resolved.headOfState.map((row) => row.personName),
+    ["Co-leader A", "Co-leader B"],
+  );
+  assert.deepEqual(resolved.ambiguousRoles, []);
+});
+
+test("multiple normal-rank current claims fail closed", () => {
+  const first = {
+    ...binding,
+    headOfState: {
+      type: "uri",
+      value: "http://www.wikidata.org/entity/Q100",
+    },
+    hosRank: rank("NormalRank"),
+  };
+  const second = {
+    ...binding,
+    headOfState: {
+      type: "uri",
+      value: "http://www.wikidata.org/entity/Q200",
+    },
+    hosRank: rank("NormalRank"),
+  };
+  const [resolved] = resolveOfficeholderBindings([first, second] as never);
+  assert.deepEqual(resolved.headOfState, []);
+  assert.deepEqual(resolved.ambiguousRoles, ["head_of_state"]);
+});
+
+test("deprecated officeholder statements never enter the resolved set", () => {
+  const deprecated = {
+    ...binding,
+    hosRank: rank("DeprecatedRank"),
+  };
+  const [resolved] = resolveOfficeholderBindings([deprecated] as never);
+  assert.deepEqual(resolved.headOfState, []);
+});
 
 test("officeholder fixture applications create no duplicate canonical rows", async () => {
   const state = harness();

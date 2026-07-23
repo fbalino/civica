@@ -1,0 +1,1251 @@
+{
+  "schemaVersion": "civica-leader-directory-refresh-plan/v1",
+  "taskId": "ATL-010",
+  "generatedAt": "2026-07-23T08:32:43.769Z",
+  "mode": "zero_write",
+  "officialRankSemanticsVerifiedAt": "2026-07-23",
+  "officialRankSemanticsUrl": "https://www.wikidata.org/wiki/Help:Ranking",
+  "queryContract": "Wikidata truthy-rank P35/P6 statements with no P582 end qualifier; multiple preferred statements retained, multiple un-ended normal statements fail closed",
+  "retainedReleaseId": "leaders-2026-07-23",
+  "sourceBindings": 213,
+  "sourceStates": 200,
+  "sourceSelectedRecordCount": 391,
+  "retainedRecordCount": 314,
+  "discrepancyCount": 89,
+  "ambiguousRoleCount": 1,
+  "currentRowsWithoutSourceIdentityCount": 0,
+  "releaseReady": false,
+  "requiredAction": "Owner-authorized production run of sync:wikidata with a named Atlas release, followed by recapture, live directory validation, browser QA, and publication-status activation.",
+  "discrepancies": [
+    {
+      "stateQid": "Q1005",
+      "jurisdiction": "The Gambia",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Adama Barrow"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q27917049"
+      ]
+    },
+    {
+      "stateQid": "Q1014",
+      "jurisdiction": "Liberia",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Joseph Boakai"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q2630483"
+      ]
+    },
+    {
+      "stateQid": "Q1016",
+      "jurisdiction": "Libya",
+      "role": "head_of_state",
+      "retainedPeople": [
+        "Aguila Saleh Issa"
+      ],
+      "retainedPersonQids": [
+        "Q17485808"
+      ],
+      "sourceSelectedPeople": [
+        "Mohamed al-Menfi"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q105319610"
+      ]
+    },
+    {
+      "stateQid": "Q1032",
+      "jurisdiction": "Niger",
+      "role": "head_of_state",
+      "retainedPeople": [
+        "Hassoumi Massoudou"
+      ],
+      "retainedPersonQids": [
+        "Q5680106"
+      ],
+      "sourceSelectedPeople": [
+        "Abdourahamane Tchiani"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q120965176"
+      ]
+    },
+    {
+      "stateQid": "Q1033",
+      "jurisdiction": "Nigeria",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Bola Ahmed Tinubu"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q3510872"
+      ]
+    },
+    {
+      "stateQid": "Q1041",
+      "jurisdiction": "Senegal",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Bassirou Diomaye Faye"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q124382437"
+      ]
+    },
+    {
+      "stateQid": "Q1042",
+      "jurisdiction": "Seychelles",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Patrick Herminie"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q16190544"
+      ]
+    },
+    {
+      "stateQid": "Q114",
+      "jurisdiction": "Kenya",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "William Ruto"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q195725"
+      ]
+    },
+    {
+      "stateQid": "Q145",
+      "jurisdiction": "United Kingdom",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Q269909"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q269909"
+      ]
+    },
+    {
+      "stateQid": "Q145",
+      "jurisdiction": "United Kingdom",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q148",
+      "jurisdiction": "People's Republic of China",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Xi Jinping"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q15031"
+      ]
+    },
+    {
+      "stateQid": "Q155",
+      "jurisdiction": "Brazil",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Luiz Inácio Lula da Silva"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q37181"
+      ]
+    },
+    {
+      "stateQid": "Q16",
+      "jurisdiction": "Canada",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q191",
+      "jurisdiction": "Estonia",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Kaja Kallas"
+      ],
+      "retainedPersonQids": [
+        "Q11869065"
+      ],
+      "sourceSelectedPeople": [
+        "Kristen Michal"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q1789192"
+      ]
+    },
+    {
+      "stateQid": "Q217",
+      "jurisdiction": "Moldova",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Alexandru Munteanu"
+      ],
+      "retainedPersonQids": [
+        "Q136489383"
+      ],
+      "sourceSelectedPeople": [
+        "Vasile Tofan"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q140480413"
+      ]
+    },
+    {
+      "stateQid": "Q225",
+      "jurisdiction": "Bosnia and Herzegovina",
+      "role": "head_of_state",
+      "retainedPeople": [
+        "Željko Komšić"
+      ],
+      "retainedPersonQids": [
+        "Q297825"
+      ],
+      "sourceSelectedPeople": [
+        "Denis Bećirović",
+        "Željka Cvijanović",
+        "Željko Komšić"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q13081568",
+        "Q297825",
+        "Q5528031"
+      ]
+    },
+    {
+      "stateQid": "Q228",
+      "jurisdiction": "Andorra",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Xavier Espot Zamora"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q21001195"
+      ]
+    },
+    {
+      "stateQid": "Q228",
+      "jurisdiction": "Andorra",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Emmanuel Macron",
+        "Josep-Lluís Serrano Pentinat"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q3052772",
+        "Q93244592"
+      ]
+    },
+    {
+      "stateQid": "Q229",
+      "jurisdiction": "Cyprus",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Nikos Anastasiades"
+      ],
+      "retainedPersonQids": [
+        "Q2112764"
+      ],
+      "sourceSelectedPeople": [
+        "Nicos Christodoulides"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q48905549"
+      ]
+    },
+    {
+      "stateQid": "Q235",
+      "jurisdiction": "Monaco",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Philippe Mettoux"
+      ],
+      "retainedPersonQids": [
+        "Q33181566"
+      ],
+      "sourceSelectedPeople": [
+        "Christophe Mirmand"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q29934395"
+      ]
+    },
+    {
+      "stateQid": "Q238",
+      "jurisdiction": "San Marino",
+      "role": "head_of_state",
+      "retainedPeople": [
+        "Maria Luisa Berti"
+      ],
+      "retainedPersonQids": [
+        "Q289413"
+      ],
+      "sourceSelectedPeople": [
+        "Denise Bronzetti",
+        "Italo Righi"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q1353628",
+        "Q57546"
+      ]
+    },
+    {
+      "stateQid": "Q242",
+      "jurisdiction": "Belize",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q252",
+      "jurisdiction": "Indonesia",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Prabowo Subianto"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q2107268"
+      ]
+    },
+    {
+      "stateQid": "Q258",
+      "jurisdiction": "South Africa",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Cyril Ramaphosa"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q1148669"
+      ]
+    },
+    {
+      "stateQid": "Q262",
+      "jurisdiction": "Algeria",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Abdelmadjid Tebboune"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q2821166"
+      ]
+    },
+    {
+      "stateQid": "Q28",
+      "jurisdiction": "Hungary",
+      "role": "head_of_state",
+      "retainedPeople": [
+        "Tamás Sulyok"
+      ],
+      "retainedPersonQids": [
+        "Q28599854"
+      ],
+      "sourceSelectedPeople": [
+        "Forsthoffer Ágnes"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q136408471"
+      ]
+    },
+    {
+      "stateQid": "Q298",
+      "jurisdiction": "Chile",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "José Antonio Kast"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q5937916"
+      ]
+    },
+    {
+      "stateQid": "Q30",
+      "jurisdiction": "United States",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Donald Trump"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q22686"
+      ]
+    },
+    {
+      "stateQid": "Q32",
+      "jurisdiction": "Luxembourg",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Léon Kauffman"
+      ],
+      "retainedPersonQids": [
+        "Q975968"
+      ],
+      "sourceSelectedPeople": [
+        "Luc Frieden"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q592101"
+      ]
+    },
+    {
+      "stateQid": "Q334",
+      "jurisdiction": "Singapore",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Lawrence Wong"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q6504758"
+      ]
+    },
+    {
+      "stateQid": "Q347",
+      "jurisdiction": "Liechtenstein",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Daniel Risch"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q30882650"
+      ]
+    },
+    {
+      "stateQid": "Q39",
+      "jurisdiction": "Switzerland",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Swiss Federal Council"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q30917"
+      ]
+    },
+    {
+      "stateQid": "Q408",
+      "jurisdiction": "Australia",
+      "role": "head_of_state",
+      "retainedPeople": [
+        "Peter Cosgrove"
+      ],
+      "retainedPersonQids": [
+        "Q976974"
+      ],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q414",
+      "jurisdiction": "Argentina",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Javier Milei"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q52395487"
+      ]
+    },
+    {
+      "stateQid": "Q419",
+      "jurisdiction": "Peru",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "José María Balcázar"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q108414587"
+      ]
+    },
+    {
+      "stateQid": "Q43",
+      "jurisdiction": "Turkey",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Bülent Ulusu"
+      ],
+      "retainedPersonQids": [
+        "Q375687"
+      ],
+      "sourceSelectedPeople": [
+        "Recep Tayyip Erdoğan"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q39259"
+      ]
+    },
+    {
+      "stateQid": "Q664",
+      "jurisdiction": "New Zealand",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Christopher Luxon"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q74370310"
+      ]
+    },
+    {
+      "stateQid": "Q664",
+      "jurisdiction": "New Zealand",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q668",
+      "jurisdiction": "India",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Narendra Modi"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q1058"
+      ]
+    },
+    {
+      "stateQid": "Q672",
+      "jurisdiction": "Tuvalu",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q683",
+      "jurisdiction": "Samoa",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Fiamē Naomi Mataʻafa"
+      ],
+      "retainedPersonQids": [
+        "Q5446290"
+      ],
+      "sourceSelectedPeople": [],
+      "sourceSelectedPersonQids": []
+    },
+    {
+      "stateQid": "Q685",
+      "jurisdiction": "Solomon Islands",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q691",
+      "jurisdiction": "Papua New Guinea",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "James Marape"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q6138903"
+      ]
+    },
+    {
+      "stateQid": "Q695",
+      "jurisdiction": "Palau",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Surangel Whipps Jr."
+      ],
+      "sourceSelectedPersonQids": [
+        "Q26703072"
+      ]
+    },
+    {
+      "stateQid": "Q697",
+      "jurisdiction": "Nauru",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Derog Gioura"
+      ],
+      "retainedPersonQids": [
+        "Q888033"
+      ],
+      "sourceSelectedPeople": [
+        "David Adeang"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q58096"
+      ]
+    },
+    {
+      "stateQid": "Q702",
+      "jurisdiction": "Federated States of Micronesia",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Wesley Simina"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q7984081"
+      ]
+    },
+    {
+      "stateQid": "Q709",
+      "jurisdiction": "Marshall Islands",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Hilda Heine"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q20090884"
+      ]
+    },
+    {
+      "stateQid": "Q710",
+      "jurisdiction": "Kiribati",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Taneti Maamau"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q23034482"
+      ]
+    },
+    {
+      "stateQid": "Q710",
+      "jurisdiction": "Kiribati",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Taneti Maamau"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q23034482"
+      ]
+    },
+    {
+      "stateQid": "Q730",
+      "jurisdiction": "Suriname",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Jennifer Geerlings-Simons"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q440403"
+      ]
+    },
+    {
+      "stateQid": "Q733",
+      "jurisdiction": "Paraguay",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Santiago Peña Palacios"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q22695687"
+      ]
+    },
+    {
+      "stateQid": "Q736",
+      "jurisdiction": "Ecuador",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Daniel Noboa"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q112075625"
+      ]
+    },
+    {
+      "stateQid": "Q739",
+      "jurisdiction": "Colombia",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Gustavo Petro"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q704022"
+      ]
+    },
+    {
+      "stateQid": "Q750",
+      "jurisdiction": "Bolivia",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Rodrigo Paz Pereira"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q110520817"
+      ]
+    },
+    {
+      "stateQid": "Q757",
+      "jurisdiction": "Saint Vincent and the Grenadines",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q760",
+      "jurisdiction": "Saint Lucia",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q763",
+      "jurisdiction": "Saint Kitts and Nevis",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q766",
+      "jurisdiction": "Jamaica",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q769",
+      "jurisdiction": "Grenada",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Dickon Mitchell"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q112679881"
+      ]
+    },
+    {
+      "stateQid": "Q769",
+      "jurisdiction": "Grenada",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q77",
+      "jurisdiction": "Uruguay",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Yamandú Orsi"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q19946921"
+      ]
+    },
+    {
+      "stateQid": "Q774",
+      "jurisdiction": "Guatemala",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Bernardo Arévalo de León"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q107254030"
+      ]
+    },
+    {
+      "stateQid": "Q778",
+      "jurisdiction": "The Bahamas",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q781",
+      "jurisdiction": "Antigua and Barbuda",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Gaston Browne"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q17177542"
+      ]
+    },
+    {
+      "stateQid": "Q781",
+      "jurisdiction": "Antigua and Barbuda",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Charles III"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q43274"
+      ]
+    },
+    {
+      "stateQid": "Q783",
+      "jurisdiction": "Honduras",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Nasry Asfura"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q16146159"
+      ]
+    },
+    {
+      "stateQid": "Q786",
+      "jurisdiction": "Dominican Republic",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Luis Abinader"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q16594097"
+      ]
+    },
+    {
+      "stateQid": "Q792",
+      "jurisdiction": "El Salvador",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Nayib Bukele"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q17712353"
+      ]
+    },
+    {
+      "stateQid": "Q800",
+      "jurisdiction": "Costa Rica",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Laura Fernández Delgado"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q114705150"
+      ]
+    },
+    {
+      "stateQid": "Q804",
+      "jurisdiction": "Panama",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "José Raúl Mulino"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q108454869"
+      ]
+    },
+    {
+      "stateQid": "Q811",
+      "jurisdiction": "Nicaragua",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Daniel Ortega"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q57402"
+      ]
+    },
+    {
+      "stateQid": "Q813",
+      "jurisdiction": "Kyrgyzstan",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Adylbek Kasymaliev"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q112703041"
+      ]
+    },
+    {
+      "stateQid": "Q826",
+      "jurisdiction": "Maldives",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Mohamed Muizzu"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q116293030"
+      ]
+    },
+    {
+      "stateQid": "Q833",
+      "jurisdiction": "Malaysia",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Anwar Ibrahim"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q299574"
+      ]
+    },
+    {
+      "stateQid": "Q842",
+      "jurisdiction": "Oman",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Haitham bin Tarik Al Said"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q12250314"
+      ]
+    },
+    {
+      "stateQid": "Q851",
+      "jurisdiction": "Saudi Arabia",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Salman bin Abdulaziz Al Saud"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q367825"
+      ]
+    },
+    {
+      "stateQid": "Q854",
+      "jurisdiction": "Sri Lanka",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Anura Kurankan Dissanayake"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q4777855"
+      ]
+    },
+    {
+      "stateQid": "Q865",
+      "jurisdiction": "Taiwan",
+      "role": "head_of_government",
+      "retainedPeople": [
+        "Frank Hsieh"
+      ],
+      "retainedPersonQids": [
+        "Q472310"
+      ],
+      "sourceSelectedPeople": [
+        "Cho Jung-tai"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q5116472"
+      ]
+    },
+    {
+      "stateQid": "Q874",
+      "jurisdiction": "Turkmenistan",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Serdar Berdimuhamedow"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q51874548"
+      ]
+    },
+    {
+      "stateQid": "Q884",
+      "jurisdiction": "South Korea",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Lee Jae Myung"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q12612463"
+      ]
+    },
+    {
+      "stateQid": "Q916",
+      "jurisdiction": "Angola",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "João Lourenço"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q28650390"
+      ]
+    },
+    {
+      "stateQid": "Q921",
+      "jurisdiction": "Brunei",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Hassanal Bolkiah I of Brunei"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q57327"
+      ]
+    },
+    {
+      "stateQid": "Q924",
+      "jurisdiction": "Tanzania",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Samia Suluhu Hassan"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q16193885"
+      ]
+    },
+    {
+      "stateQid": "Q928",
+      "jurisdiction": "Philippines",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Bongbong Marcos"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q983324"
+      ]
+    },
+    {
+      "stateQid": "Q954",
+      "jurisdiction": "Zimbabwe",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Emmerson Mnangagwa"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q510523"
+      ]
+    },
+    {
+      "stateQid": "Q958",
+      "jurisdiction": "South Sudan",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Salva Kiir Mayardit"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q57315"
+      ]
+    },
+    {
+      "stateQid": "Q96",
+      "jurisdiction": "Mexico",
+      "role": "head_of_government",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Q5771800"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q5771800"
+      ]
+    },
+    {
+      "stateQid": "Q970",
+      "jurisdiction": "Comoros",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Azali Assoumani"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q515602"
+      ]
+    },
+    {
+      "stateQid": "Q986",
+      "jurisdiction": "Eritrea",
+      "role": "head_of_state",
+      "retainedPeople": [],
+      "retainedPersonQids": [],
+      "sourceSelectedPeople": [
+        "Isaias Afwerki"
+      ],
+      "sourceSelectedPersonQids": [
+        "Q57348"
+      ]
+    }
+  ],
+  "ambiguousRoles": [
+    {
+      "stateQid": "Q683",
+      "jurisdiction": "Samoa",
+      "role": "head_of_government"
+    }
+  ],
+  "currentRowsWithoutSourceIdentity": [],
+  "semanticSha256": "3cbf046d06cb09edc95e6e6aef696aea4f97c62d945e76bbd1400970fa2a26d2"
+}

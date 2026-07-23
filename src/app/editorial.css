@@ -909,6 +909,42 @@
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-md);
 }
+.editorial-search-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-search);
+  background: var(--color-page-bg);
+}
+.editorial-search-field:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 var(--space-1)
+    color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.editorial-search-field__icon {
+  width: var(--space-5);
+  height: var(--space-5);
+  flex: 0 0 auto;
+  color: var(--color-text-40);
+}
+.editorial-search-field input {
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--space-8) - var(--space-2));
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+}
+.editorial-search-field input::placeholder {
+  color: var(--color-text-40);
+}
 .editorial-filter-row {
   display: flex;
   align-items: center;

@@ -17,6 +17,7 @@ import { ExploreMenuDemo } from "./ExploreMenuDemo";
 import { ExploreConceptDemos } from "./ExploreConceptDemos";
 import { CountryDirectory } from "@/components/country/CountryDirectory";
 import { MobileNav } from "@/components/MobileNav";
+import { SearchField } from "@/components/editorial/SearchField";
 
 import "./design-system.css";
 
@@ -710,6 +711,10 @@ export default function DesignSystemPage() {
                 ariaLabel="Search"
                 showShortcut
                 showFilterIcon
+              />
+              <SearchField
+                label="Directory search demonstration"
+                placeholder="Search a research directory…"
               />
             </div>
 
