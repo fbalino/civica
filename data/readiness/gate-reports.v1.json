@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "d2bff3c262eb8fba625f8e69001d984689d30b40c32cb46494bd8aa10fe4122e",
-    "plan/PROGRESS.md": "b6403a71482b1cf271cde6578ba3141d4cf4af1c56e9f2269389612fc2f45b93",
+    "plan/MASTER-CHECKLIST.md": "e8b8b18fe0d894b369506b024f3236cd99cf253fd3dbff9f224b185435fe02e0",
+    "plan/PROGRESS.md": "03734708736d14420c163d1b100cec0356b3677546c8b8e8e654ee56dfaf2b40",
     "plan/MANUAL-CHECKS.md": "41e25d14c7c28017d15a6f734b84dfcff9b44867d95af286e5197a1dc9c3cabc",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
@@ -12,7 +12,7 @@
     "plan/06-atlas-content-and-research-features.md": "60e9abc26b789fda0ff1390bf3b82cd054fa0a34569c91fdc33dc442d631bfe3",
     "plan/07-design-system-assets-and-reader-experience.md": "b5bdbe878f579b63cad96e4bb7c6ead350d290df3f7602c8c11e145d9ac4aa87",
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
-    "plan/09-testing-qa-and-release.md": "cc6ef6a056bcb0bd279fa4dcffba3d9939a9267b5a7538ab1b5f44f555be69e6",
+    "plan/09-testing-qa-and-release.md": "22c47ad1c88fdae67061cbc107ba2d5bab76517549dc4754ef69b48ee5457b00",
     "plan/10-academic-governance-review-and-outreach.md": "3737814fb2cd220a1600dd12d54474b2eabefcbeb325e0a3723cd224f8228e8e",
     "plan/11-brand-legal-and-licensing.md": "7c3989aa13da0480d17780fef6701811dd717f37dd5f216dca45f8f5a286d52b"
   },
@@ -22,13 +22,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 307,
-        "completed": 245,
+        "total": 308,
+        "completed": 246,
         "remaining": 62,
         "byPriority": {
           "P0": {
-            "total": 190,
-            "completed": 163
+            "total": 191,
+            "completed": 164
           },
           "P1": {
             "total": 112,
@@ -77,8 +77,8 @@
             "completed": 29
           },
           "09-testing-qa-and-release.md": {
-            "total": 20,
-            "completed": 16
+            "total": 21,
+            "completed": 17
           }
         }
       },
@@ -264,13 +264,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 307,
-        "completed": 245,
+        "total": 308,
+        "completed": 246,
         "remaining": 62,
         "byPriority": {
           "P0": {
-            "total": 190,
-            "completed": 163
+            "total": 191,
+            "completed": 164
           },
           "P1": {
             "total": 112,
@@ -319,8 +319,8 @@
             "completed": 29
           },
           "09-testing-qa-and-release.md": {
-            "total": 20,
-            "completed": 16
+            "total": 21,
+            "completed": 17
           }
         }
       },
@@ -514,13 +514,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 307,
-        "completed": 245,
+        "total": 308,
+        "completed": 246,
         "remaining": 62,
         "byPriority": {
           "P0": {
-            "total": 190,
-            "completed": 163
+            "total": 191,
+            "completed": 164
           },
           "P1": {
             "total": 112,
@@ -569,8 +569,8 @@
             "completed": 29
           },
           "09-testing-qa-and-release.md": {
-            "total": 20,
-            "completed": 16
+            "total": 21,
+            "completed": 17
           }
         }
       },
@@ -750,13 +750,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 307,
-        "completed": 245,
+        "total": 308,
+        "completed": 246,
         "remaining": 62,
         "byPriority": {
           "P0": {
-            "total": 190,
-            "completed": 163
+            "total": 191,
+            "completed": 164
           },
           "P1": {
             "total": 112,
@@ -805,8 +805,8 @@
             "completed": 29
           },
           "09-testing-qa-and-release.md": {
-            "total": 20,
-            "completed": 16
+            "total": 21,
+            "completed": 17
           }
         }
       },

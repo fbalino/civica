@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 307
-- **Completed:** 245
+- **Total tasks:** 308
+- **Completed:** 246
 - **Remaining:** 62
-- **Progress:** 79.8%
-- **Priority mix:** P0 190 · P1 112 · P2 5
+- **Progress:** 79.9%
+- **Priority mix:** P0 191 · P1 112 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -327,6 +327,7 @@ Source: `plan/09-testing-qa-and-release.md`
 - [ ] **QA-018** (P0) Create a release-candidate staging and smoke-test protocol. _Done when: exact commit/data/method versions deploy to a nonproduction environment, migrations/jobs/assets/caches run in order, all critical smoke/browser/API/data checks pass, and sign-off identifies remaining manual checks._
 - [ ] **QA-019** (P1) Rehearse rollback/forward-fix and correction publication. _Done when: a deliberately bad staged app/data/method release is detected, contained, rolled back or forward-fixed, caches/artifacts/version metadata are consistent, and correction/status/changelog flows match policy._
 - [x] **QA-020** (P0) Generate machine-readable G2/G4/G5/G6 readiness reports from evidence. _Done when: reports calculate checked/total tasks by area/priority, execute required gates, link artifacts/manual checks/waivers, reject missing evidence or master/area mismatch, and cannot report green with an open P0 or failed command._
+- [x] **QA-021** (P0) Repair the local G4 verification matrix after discovered drift. _Done when: every authoritative migration has a current zero-write preflight, ESLint has zero errors, deterministic review/protocol artifacts match tracked inputs, the production build and fixed G4 command matrix pass, and non-semantic Index lint changes cannot bypass future methodology drift detection._
 
 ## Area 10 — Academic Governance, Human Review, and Outreach
 

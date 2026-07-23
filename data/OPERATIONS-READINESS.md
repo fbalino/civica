@@ -47,7 +47,7 @@ and P1 operational finding below is closed.
   the production build, and passed the fixture-only test suite.
 - Hosted pull-request/main runs and branch-protection enforcement have not been
   observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 245 of 307 tasks complete, 27 open P0 tasks,
+- The current G4 readiness record reports 246 of 308 tasks complete, 27 open P0 tasks,
   58 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 

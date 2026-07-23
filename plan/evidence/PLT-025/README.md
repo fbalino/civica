@@ -16,7 +16,7 @@ following current-state validators passed:
 - backup/restore checked-artifact integrity; and
 - the nine-migration local deployment/recovery rehearsal contract.
 
-The generated G4 report remains blocked at 245/307 tasks, with 27 open P0 and
+The generated G4 report remains blocked at 246/308 tasks, with 27 open P0 and
 58 open P0/P1 tasks, no evidence gaps, no master-mirror errors, and zero
 waivers. The operations memo enumerates the exact external, owner, staging,
 rollback, provider, recovery, telemetry, and visual/release blockers.

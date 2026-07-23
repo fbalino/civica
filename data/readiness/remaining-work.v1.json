@@ -2,10 +2,10 @@
   "schemaVersion": "civica-remaining-work/v1",
   "reviewedAt": "2026-07-23",
   "checklist": {
-    "total": 307,
-    "completed": 245,
+    "total": 308,
+    "completed": 246,
     "remaining": 62,
-    "progressPercent": 79.8
+    "progressPercent": 79.9
   },
   "agentExecutableNow": [],
   "categories": [
