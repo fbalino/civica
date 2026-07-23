@@ -1,14 +1,1 @@
-{
-  "src/app/atlas.css": 5,
-  "src/app/civica-index-detail.css": 4,
-  "src/components/atlas/data.ts": 2,
-  "src/components/ci/GovernmentTypesAccordionExplorer.tsx": 1,
-  "src/lib/data/government-category.ts": 3,
-  "src/lib/data/party-colors.ts": 68,
-  "src/lib/factbook/cia-cabinets-sync.ts": 1,
-  "src/lib/factbook/reconcile/fact-keys.ts": 1,
-  "src/lib/factbook/reconcile/sync-undp-hdi.ts": 1,
-  "src/lib/government-taxonomy/index.ts": 32,
-  "src/lib/map/civica-map-style.ts": 16,
-  "src/lib/peer-grouping/lens-metadata.ts": 42
-}
+{}

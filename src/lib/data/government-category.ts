@@ -67,7 +67,7 @@ const CATEGORIES: { matchers: RegExp[]; cat: GovernmentCategory }[] = [
     cat: {
       key: "communist",
       label: "Communist",
-      color: "#E44040",
+      color: "var(--color-danger)",
     },
   },
   {
@@ -75,7 +75,7 @@ const CATEGORIES: { matchers: RegExp[]; cat: GovernmentCategory }[] = [
     cat: {
       key: "military",
       label: "Military",
-      color: "#9B6DC6",
+      color: "var(--gov-mil)",
     },
   },
   {
@@ -83,7 +83,7 @@ const CATEGORIES: { matchers: RegExp[]; cat: GovernmentCategory }[] = [
     cat: {
       key: "one-party",
       label: "One-party",
-      color: "#C4764E",
+      color: "var(--gov-one)",
     },
   },
   {

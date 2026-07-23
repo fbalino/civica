@@ -368,7 +368,7 @@ function decodeEntities(s: string): string {
     .replace(/&#x27;/g, "'")
     .replace(/&nbsp;/g, " ")
     .replace(/&rsquo;/g, "’")
-    .replace(/&#8217;/g, "’")
+    .replace(/&#x2019;/g, "’")
     .replace(/&eacute;/g, "é")
     .replace(/&aacute;/g, "á")
     .replace(/&iacute;/g, "í")

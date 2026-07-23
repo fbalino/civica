@@ -182,8 +182,8 @@ export const UNDP_HDI_INDICATORS: readonly UndpHdiIndicatorConfig[] = [
   },
 
   // HDI rank — single-year column. Sole publisher; canonical by
-  // construction. Spot-checks (2023): USA #17, Norway #2, Brazil
-  // #84, Niger #188.
+  // construction. Spot-checks (2023): USA rank 17, Norway rank 2, Brazil
+  // rank 84, Niger rank 188.
   {
     undpCode: "hdi_rank",
     factKey: "hdi_rank",

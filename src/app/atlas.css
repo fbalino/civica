@@ -1430,11 +1430,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
    three-pane .atlas-root wrapper. */
 .atlas-root,
 .org-standalone {
-  --cat-security: #C25D3A;   /* Terracotta */
-  --cat-regional: #2D6CDF;   /* Azure */
-  --cat-trade:    #4C9F6E;   /* Leaf */
-  --cat-un:       #7C59C9;   /* Violet */
-  --cat-cultural: #64748B;   /* Stone */
+  --cat-security: var(--gov-pres);
+  --cat-regional: var(--gov-parl);
+  --cat-trade: var(--color-success);
+  --cat-un: var(--gov-semi);
+  --cat-cultural: var(--color-text-secondary);
 }
 
 /* ============================================

@@ -62,9 +62,7 @@ type VisibleRow = {
   depth: 0 | 1;
 };
 
-// Shades are theme-adaptive color-mix() expressions keyed by token name only (no hex
-// fallback in the key). The lookup helper strips any ", #fallback" suffix from
-// row.colorVar before matching so callers can keep the "var(--gov-*, #fallback)" form.
+// Shades are theme-adaptive color-mix() expressions keyed by token name only.
 // color-mix(in oklab, ...) resolves in the browser at paint time and inherits the
 // current --gov-* value, so dark/light mode flip works automatically.
 function getGovShades(govVar: string): string[] {
@@ -86,10 +84,9 @@ const SUBTYPE_SHADES: Record<string, string[]> = {
   "var(--gov-theo)": getGovShades("var(--gov-theo)"),
 };
 
-/** Strip the optional ", #fallback" from a CSS var() reference so keys match SUBTYPE_SHADES. */
+/** Normalize an inherited color token so keys match SUBTYPE_SHADES. */
 function normalizeColorVar(colorVar: string): string {
-  // "var(--gov-parl, #4E8BD4)" → "var(--gov-parl)"
-  return colorVar.replace(/,\s*[^)]+\)$/, ")");
+  return colorVar;
 }
 
 function toneFor(row: VisibleRow, familyIndex: number, subtypeIndex: number): string {

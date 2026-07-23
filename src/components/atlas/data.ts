@@ -7,9 +7,7 @@
 //   green  → var(--gov-theo)    theocracy green (also matches --color-source-live)
 //   yellow → var(--gov-mon)     monarchy gold
 //   purple → var(--gov-semi)    semi-presidential purple
-//   teal   → kept as oklch — no teal token exists in globals.css; nearest is
-//             --color-info which is oklch(68% 0.10 240) (blue-hued, not teal).
-//             Keeping the original value is the correct exception here.
+//   teal   → var(--tier-exceptional) deep-teal state token
 //   gray   → var(--color-text-40)  muted neutral, flips with theme
 //   orange → var(--gov-mil)     military orange-brick
 //   black  → var(--color-text-primary)  inverts to cream on dark bg, fixing
@@ -20,7 +18,7 @@ export const PARTY_COLORS: Record<string, string> = {
   green:  "var(--gov-theo)",
   yellow: "var(--gov-mon)",
   purple: "var(--gov-semi)",
-  teal:   "oklch(58% 0.10 195)",  // known-exception: no teal token in globals.css
+  teal:   "var(--tier-exceptional)",
   gray:   "var(--color-text-40)",
   orange: "var(--gov-mil)",
   black:  "var(--color-text-primary)",
