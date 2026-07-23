@@ -30,6 +30,19 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   privileged decision summary and any required corrections. Until then the
   repository remains non-open; this queue item does not authorize an
   open-source grant or third-party reuse.
+- **BRD-012 · Owner/privacy professional — pending:** review
+  `data/PRIVACY-DATA-HANDLING.md`, the public `/privacy` notice, and
+  `civica-privacy-data-handling/v1` for operator identity, applicable
+  jurisdictions/lawful bases, contextual consent, rights-request handling,
+  retention, security, subprocessors, and cross-border transfers. First run
+  `npm run plan:legacy-private-identifiers`; only after Fernando explicitly
+  authorizes the production mutation, rerun it with `--apply` and the exact
+  confirmation flag and record aggregate before/after counts only. Both legacy
+  IP counts must become zero. Separately verify the actual Vercel log
+  plan/settings, Anthropic organization retention arrangement, configured
+  PMTiles host, and current FlagCDN/OpenFreeMap/Mapbox boundaries. No
+  production purge, provider-setting change, agreement, or professional
+  clearance is claimed by the local preparation.
 - Professional review of database rights, source-specific redistribution
   terms, AI-assisted illustration disclosure, privacy, and terms before the
   DOI release.

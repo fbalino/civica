@@ -14,7 +14,7 @@ export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
 /** SHA-256 of the complete credential-free production build command. */
 export const BUILD_CORE_SHA256 =
-  "d9fdcfc335522bae3fec6e452ef6feff3f90c6641f40bd1fe0393d635bb2a500";
+  "1fe8e5d4546968c4366d772eeb0b459376bbcdaec006ace598da1e657e53afb4";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
@@ -243,6 +243,8 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
       "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",
     "validate:route-performance-telemetry":
       "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring && npm run validate:health-status && npm run validate:ask-civica && npm run validate:model-operations && npm run validate:serverless-db",
+    "validate:privacy-data-handling":
+      "node --import tsx --test src/lib/privacy/data-handling.test.ts src/lib/api/request-body-schemas.test.ts && node --import tsx scripts/validate-privacy-data-handling.ts",
     "validate:error-monitoring":
       "node --import tsx --test src/lib/platform/error-monitoring.test.ts && tsx scripts/validate-error-monitoring.ts",
     "validate:build-prereqs":
@@ -268,6 +270,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "npm run validate:index-change-control",
     "npm run validate:query-budgets",
     "npm run validate:route-performance-telemetry",
+    "npm run validate:privacy-data-handling",
     "npm run validate:verification-matrix",
     "npm run validate:atlas-change-history-writers",
     "npm run validate:claims-docs",

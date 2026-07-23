@@ -4,8 +4,10 @@
  * POST /api/admin/messages/[id]
  *
  * Form body or JSON:
- *   status     'new' | 'read' | 'archived'   (required)
- *   redirect   post-success redirect path     (default: messages queue)
+ *   intent     'status' | 'delete'            (status is the default)
+ *   status     'new' | 'read' | 'archived'    (required for status)
+ *   confirm    'delete'                        (required for delete)
+ *   redirect   post-success redirect path      (default: messages queue)
  *
  * Flips a contact submission's triage status so the Messages queue's filter
  * chips (New / Read / Archived) reflect reality. This is the smallest honest
@@ -71,6 +73,29 @@ async function mutateMessage(
   const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
   id = parsedId.data;
 
+  if (body.intent === "delete") {
+    if (body.confirm !== "delete")
+      return adminMutationProblem(
+        "DELETION_CONFIRMATION_REQUIRED",
+        "deletion confirmation required",
+        400,
+      );
+    const deleted = await db
+      .delete(contactSubmissions)
+      .where(eq(contactSubmissions.id, id))
+      .returning({ id: contactSubmissions.id });
+    if (deleted.length === 0)
+      return adminMutationProblem("MESSAGE_NOT_FOUND", "message not found", 404);
+    if (isForm)
+      return NextResponse.redirect(new URL("/admin/messages", request.url), 303);
+    return NextResponse.json({
+      ok: true,
+      id,
+      deleted: true,
+      reviewerId: auth.reviewerId,
+    });
+  }
+
   if (!isStatus(body.status)) {
     return adminMutationProblem("INVALID_STATUS", "invalid status", 400);
   }
@@ -106,7 +131,7 @@ export async function POST(
     request,
     {
       route: "/api/admin/messages/[id]",
-      action: "contact_submission.update",
+      action: "contact_submission.mutate",
       targetType: "contact_submission",
       targetId: id,
     },

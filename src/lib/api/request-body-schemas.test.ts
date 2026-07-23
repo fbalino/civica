@@ -265,6 +265,36 @@ test("form schemas preserve empty optional-field semantics", () => {
   );
 });
 
+test("contact-message deletion requires an explicit confirmed intent", () => {
+  assert.deepEqual(
+    adminMessageStatusBodySchema.parse({
+      intent: "delete",
+      confirm: "delete",
+    }),
+    { intent: "delete", confirm: "delete" },
+  );
+  assert.equal(
+    adminMessageStatusBodySchema.safeParse({ intent: "delete" }).success,
+    false,
+  );
+  assert.equal(
+    adminMessageStatusBodySchema.safeParse({
+      intent: "delete",
+      confirm: "delete",
+      status: "archived",
+    }).success,
+    false,
+  );
+  assert.equal(
+    adminMessageStatusBodySchema.safeParse({
+      status: "read",
+      confirm: "delete",
+    }).success,
+    false,
+  );
+  assert.equal(adminMessageStatusBodySchema.safeParse({}).success, false);
+});
+
 test("schema collection ceilings reject oversized structured input", () => {
   assert.equal(
     chatBodySchema.safeParse({

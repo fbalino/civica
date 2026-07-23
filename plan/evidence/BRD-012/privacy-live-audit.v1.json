@@ -1,0 +1,15 @@
+{
+  "contract": "civica-privacy-live-audit/v1",
+  "checkedOn": "2026-07-23",
+  "mode": "read_only_aggregate",
+  "contactSubmissions": {
+    "totalRows": 1,
+    "rowsWithLegacyIp": 1
+  },
+  "advisoryApplications": {
+    "totalRows": 0,
+    "rowsWithLegacyIp": 0
+  },
+  "sensitiveValuesRetainedInEvidence": false,
+  "productionMutationPerformed": false
+}

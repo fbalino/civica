@@ -110,16 +110,76 @@ export type AdminDataDisputeBody = z.infer<typeof adminDataDisputeBodySchema>;
 
 export const adminMessageStatusBodySchema = z
   .object({
-    status: z.enum(["new", "read", "archived"]),
+    intent: z.enum(["status", "delete"]).optional(),
+    status: z.enum(["new", "read", "archived"]).optional(),
+    confirm: z.literal("delete").optional(),
     redirect,
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.intent === "delete") {
+      if (value.confirm !== "delete")
+        ctx.addIssue({
+          code: "custom",
+          path: ["confirm"],
+          message: "deletion confirmation is required",
+        });
+      if (value.status)
+        ctx.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: "status is not allowed for deletion",
+        });
+    } else if (!value.status) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["status"],
+        message: "status is required",
+      });
+    } else if (value.confirm) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirm"],
+        message: "deletion confirmation is not allowed for status changes",
+      });
+    }
+  });
 export const adminMessageStatusFormSchema = z
   .object({
-    status: z.enum(["new", "read", "archived"]),
+    intent: z.enum(["status", "delete"]).optional(),
+    status: z.enum(["new", "read", "archived"]).optional(),
+    confirm: z.literal("delete").optional(),
     redirect: formRedirect,
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.intent === "delete") {
+      if (value.confirm !== "delete")
+        ctx.addIssue({
+          code: "custom",
+          path: ["confirm"],
+          message: "deletion confirmation is required",
+        });
+      if (value.status)
+        ctx.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: "status is not allowed for deletion",
+        });
+    } else if (!value.status) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["status"],
+        message: "status is required",
+      });
+    } else if (value.confirm) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirm"],
+        message: "deletion confirmation is not allowed for status changes",
+      });
+    }
+  });
 export type AdminMessageStatusBody = z.infer<
   typeof adminMessageStatusBodySchema
 >;

@@ -974,7 +974,7 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       "atlas-case-studies.recipe-input-rows",
       "src/app/(reader)/methodology/case-studies/page.tsx",
       "/methodology/case-studies",
-      "{recipe.inputRowCount.toLocaleString()} input rows frozen in release {artifact.release.id}",
+      "{recipe.inputRowCount.toLocaleString()} input rows frozen in release {report.release.id}",
       "checked case-studies.v1.json generated from the frozen Atlas release",
       "atlas-2026-07-11",
     ),

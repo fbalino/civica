@@ -6,7 +6,6 @@ import {
   rateLimitResponse,
 } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
-import { getRequestIp } from "@/lib/api/request-ip";
 import {
   JSON_MEDIA_TYPE,
   parseBoundedRequestBody,
@@ -50,11 +49,6 @@ export async function POST(req: NextRequest) {
           "Too many submissions. Please wait before trying again.",
       });
     }
-
-    // This separately resolved canonical address is retained with the contact
-    // row under the existing privacy contract. The limiter receives only its
-    // domain-separated HMAC subject through checkRequestRateLimit().
-    const ip = getRequestIp(req);
 
     const parsed = await parseBoundedRequestBody<ContactBody>(req, {
       maxBytes: REQUEST_BODY_LIMITS.contact,
@@ -112,7 +106,10 @@ export async function POST(req: NextRequest) {
       email: email.trim().toLowerCase(),
       subject: subject.trim(),
       message: message.trim(),
-      ipAddress: ip,
+      // The shared limiter already uses an expiring HMAC identity. Retaining a
+      // second raw IP with the message is unnecessary and prohibited by the
+      // privacy inventory.
+      ipAddress: null,
     });
 
     // Email notification: no transactional email provider is configured.

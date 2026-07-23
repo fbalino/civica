@@ -1371,6 +1371,7 @@ export const contactSubmissions = pgTable("contact_submissions", {
   email: text("email").notNull(),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
+  /** Legacy nullable column. New submissions do not retain sender IPs. */
   ipAddress: text("ip_address"),
   /**
    * Triage lifecycle for the admin Messages surface: new → read → archived.

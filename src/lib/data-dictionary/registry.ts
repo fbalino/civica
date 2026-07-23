@@ -419,8 +419,9 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rowGrain: "One submitted contact message.",
     releaseScope: "private_submission",
     sourceOrDerivation:
-      "Direct user submission plus Civica processing metadata.",
-    cadence: "On form submission and administrative processing.",
+      "Direct user submission plus Civica processing metadata. New submissions exclude raw request IP addresses; the nullable ip_address column is legacy-only pending the authorized minimization purge.",
+    cadence:
+      "On form submission and administrative processing; retained messages can be permanently deleted through the authenticated owner-admin detail surface.",
     vintageSemantics:
       "created_at is submission time; processed_at is workflow time.",
     rights:
@@ -796,8 +797,9 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rowGrain: "One submitted application.",
     releaseScope: "private_submission",
     sourceOrDerivation:
-      "Direct applicant submission plus administrative review fields.",
-    cadence: "On submission and review action.",
+      "Direct applicant submission plus administrative review fields. New submissions exclude raw request IP addresses; the nullable ip_address column is legacy-only.",
+    cadence:
+      "On submission and review action; applications are deleted within the declared 18-month window or earlier on an approved request.",
     vintageSemantics:
       "created/updated timestamps describe application workflow.",
     rights:

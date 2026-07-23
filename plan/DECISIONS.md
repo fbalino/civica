@@ -1208,3 +1208,26 @@ packages and preserves their package/file terms, including Mapbox product terms
 and MPL file-level obligations. Professional review remains queued for
 contributor ownership, generated-material treatment, and any future reuse
 license; this decision is an accurate interim posture, not legal clearance.
+
+### APR-D170 — Privacy claims follow a closed current-behavior inventory
+
+**Decision:** Adopt `civica-privacy-data-handling/v1` as the canonical inventory
+for browser preferences, voluntary submissions, Ask Civica, remote reader
+resources, hosting logs, content-free telemetry, HMAC rate limits, owner-admin
+security evidence, reviewer workflows, and scrubbed error monitoring. Public
+notice rows render from that registry. New contact and advisory submissions do
+not retain raw IP addresses; authenticated deletion exists for both submission
+types. A guarded maintenance command reports aggregate legacy-IP counts by
+default and may mutate production only with explicit owner authority and two
+confirmation flags. Provider-controlled retention and currently unbounded
+internal retention are disclosed as such rather than converted into invented
+guarantees.
+
+**Why:** Privacy alignment is a behavior contract, not a prose-only legal
+exercise. One typed inventory makes data, purpose, destination, access,
+retention, deletion, safeguards, providers, and source paths testable together.
+Removing unnecessary raw identifiers prevents future accumulation, while the
+separate production authorization preserves control over legacy data. Account
+settings and legal sufficiency still require owner and professional review;
+the repository can prepare and enforce the facts but cannot fabricate those
+external outcomes.

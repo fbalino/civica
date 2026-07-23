@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Banner } from "@/components/editorial/Banner";
+import { DataTable } from "@/components/editorial/DataTable";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import {
   ReaderSidebar,
@@ -9,6 +10,12 @@ import {
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { withOg } from "@/lib/og";
+import {
+  PRIVACY_DATA_FLOWS,
+  PRIVACY_DATA_HANDLING_EFFECTIVE_ON,
+  PRIVACY_DATA_HANDLING_VERSION,
+  PUBLIC_PRIVACY_DATA_FLOWS,
+} from "@/lib/privacy/data-handling";
 import { ADVISORY_APPLICATION_POLICY } from "@/lib/research/advisory-application";
 
 export const revalidate = 0;
@@ -32,7 +39,9 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "messages", label: "What you send us" },
   { id: "ask-civica", label: "Ask Civica" },
   { id: "applications", label: "Board applications" },
+  { id: "remote-services", label: "Remote maps & flags" },
   { id: "servers", label: "Hosting & logs" },
+  { id: "inventory", label: "Data-flow inventory" },
   { id: "data-licensing", label: "About the data" },
   { id: "contact", label: "Questions" },
 ];
@@ -45,7 +54,7 @@ export default function PrivacyPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Privacy Policy</h1>
-        <p className="editorial-page-meta">Last updated: July 16, 2026</p>
+        <p className="editorial-page-meta">Last updated: July 23, 2026</p>
         <p className="editorial-page-subtitle">
           Civica Atlas is a public reference site. There are no visitor
           accounts, no sign-up, and no advertising or analytics trackers. This
@@ -127,9 +136,10 @@ export default function PrivacyPage() {
             <li>
               <strong>Contact form.</strong> If you use the{" "}
               <Link href="/contact">contact form</Link>, the details you type
-              there (such as your message and any email address you provide)
-              are stored in the Civica project database so Fernando Balino can
-              read and respond. They are not used for advertising or sold.
+              there (name, email, subject, and message) are stored in the
+              Civica project database so Fernando Balino can read and respond.
+              New messages do not retain your raw IP address. They are not used
+              for advertising or sold.
             </li>
             <li>
               <strong>Advisory-board application.</strong> The{" "}
@@ -207,6 +217,24 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section id="remote-services" className="editorial-section">
+          <SectionHeader
+            eyebrow="Maps and flags"
+            title="Some visual resources come from remote services"
+            dek="Those hosts receive the ordinary connection metadata needed to return the requested file or map."
+          />
+
+          <p>
+            Country flags may load from FlagCDN. The two-dimensional map can
+            use OpenFreeMap or a configured PMTiles host. Mapbox loads only if
+            it is configured and you explicitly open the optional 3D view.
+            Those providers can receive standard connection metadata such as
+            your IP address, request headers, requested resource, and time.
+            Their own terms govern their logs. Civica does not use these
+            requests as behavioral analytics.
+          </p>
+        </section>
+
         <section id="servers" className="editorial-section">
           <SectionHeader
             eyebrow="Infrastructure"
@@ -227,6 +255,89 @@ export default function PrivacyPage() {
             A separate sign-in cookie exists only for internal editorial staff
             who review data corrections. It is never set for ordinary visitors
             reading the site.
+          </p>
+
+          <p>
+            Civica also keeps a self-hosted, content-free performance ledger
+            for 30 days and scrubbed error records for 90 days. Those records
+            use route templates, bounded status/timing fields, release IDs, and
+            closed error codes. They do not contain raw paths or parameters,
+            queries, cookies, IP addresses, user agents, request bodies,
+            account identifiers, exception messages, stacks, or chat content.
+            Separate short-lived abuse counters use a secret-keyed digest
+            rather than the raw request identity and expire with their fixed
+            window.
+          </p>
+        </section>
+
+        <section id="inventory" className="editorial-section">
+          <SectionHeader
+            eyebrow="Current contract"
+            title="Data-flow, retention, and access inventory"
+            dek="This table states current behavior, including places where a provider controls retention or no automatic deletion period exists."
+          />
+
+          <DataTable>
+            <caption>Reader and voluntary-submission data flows</caption>
+            <thead>
+              <tr>
+                <th>Flow</th>
+                <th>Data and purpose</th>
+                <th>Destination and access</th>
+                <th>Retention and deletion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PUBLIC_PRIVACY_DATA_FLOWS.map((flow) => (
+                <tr key={flow.id}>
+                  <td>{flow.label}</td>
+                  <td>
+                    {flow.data} {flow.purpose}
+                  </td>
+                  <td>
+                    {flow.destinations} {flow.access}
+                  </td>
+                  <td>
+                    {flow.retention} {flow.deletion}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
+
+          <h3>Internal operational and reviewer records</h3>
+          <DataTable>
+            <caption>Internal operational and reviewer data flows</caption>
+            <thead>
+              <tr>
+                <th>Flow</th>
+                <th>Purpose and safeguards</th>
+                <th>Retention and deletion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PRIVACY_DATA_FLOWS.filter((flow) => !flow.publicSummary).map(
+                (flow) => (
+                  <tr key={flow.id}>
+                    <td>{flow.label}</td>
+                    <td>
+                      {flow.purpose} {flow.safeguards}
+                    </td>
+                    <td>
+                      {flow.retention} {flow.deletion}
+                    </td>
+                  </tr>
+                ),
+              )}
+            </tbody>
+          </DataTable>
+
+          <p className="editorial-page-meta">
+            Inventory {PRIVACY_DATA_HANDLING_VERSION}; effective{" "}
+            {PRIVACY_DATA_HANDLING_EFFECTIVE_ON}. Infrastructure and external
+            service providers currently named by the registry are Vercel,
+            Neon, Anthropic, Google for optional owner sign-in, FlagCDN,
+            OpenFreeMap, a configured PMTiles host, and Mapbox.
           </p>
         </section>
 
