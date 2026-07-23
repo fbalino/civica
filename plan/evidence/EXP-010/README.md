@@ -7,14 +7,14 @@
 
 ## Coverage
 
-- 538 tracked WebP assets.
+- 550 tracked WebP assets.
 - 394 country assets (197 exact light/dark pairs).
 - 112 territory/special-jurisdiction assets (56 exact pairs).
 - 14 page assets (7 exact pairs).
-- 18 shared assets (9 exact pairs).
+- 30 shared assets (15 exact pairs).
 - Zero missing partners and zero missing intended-subject captions.
 
-Each row records an entity identifier, route(s), intended subject/caption, theme partner, URL, byte count, dimensions, aspect ratio, color space, SHA-256, first tracked Git commit/time, known edit history, imagery disclosure/policy, source-evidence prohibition, and file/caption/color/semantic QA state.
+Each row records an entity identifier, route(s), intended subject/caption, theme partner, URL, byte count, dimensions, aspect ratio, color space, SHA-256, first tracked Git commit/time, known edit history, imagery disclosure/policy, source-evidence prohibition, and file/caption/color/semantic QA state. The manifest also binds the corpus to the BRD-010 rights policy and its Git/frozen-release retention rule.
 
 ## Honest provenance limit
 

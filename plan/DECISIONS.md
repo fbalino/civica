@@ -1231,3 +1231,27 @@ separate production authorization preserves control over legacy data. Account
 settings and legal sufficiency still require owner and professional review;
 the repository can prepare and enforce the facts but cannot fabricate those
 external outcomes.
+
+### APR-D171 — Editorial imagery fails closed on rights and provenance
+
+**Decision:** Adopt `civica-editorial-illustration-rights/v1` for every
+AI-assisted, generated, edited, or photographic-treatment image released by
+Civica. Human selection, arrangement, captions, edits, and release decisions
+are distinguished from provider technology, upstream references, landmarks,
+marks, likenesses, and machine-generated elements Civica may not own. Every
+new or materially replaced asset must retain provider terms, generation and
+reference records, transformations, five-domain subject screening, exact file
+identity, review, release, and correction history before release. Historical
+unknowns remain unknown. The manifest and frozen releases preserve superseded
+or withdrawn history. Civica authorizes site display but grants no separate
+third-party reuse license; complaints use BRD-015's evidence-preserving
+containment and decision process.
+
+**Why:** A visible AI-assisted disclosure and complete file inventory do not
+answer whether a reference was authorized, a modern building can be depicted
+in a launch jurisdiction, a logo or likeness implies endorsement, or the human
+contribution is protectable. A forward-only fail-closed record prevents new
+provenance debt without inventing historical facts. Professional review still
+decides the legal sufficiency of the historical corpus, provider terms,
+screening rules, and public rights language; the repository can enforce the
+questions and evidence but cannot supply that legal judgment.

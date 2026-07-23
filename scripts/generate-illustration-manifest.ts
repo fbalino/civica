@@ -11,6 +11,11 @@ import {
   DARK_TERRITORY_ENGRAVING_CAPTIONS,
   TERRITORY_ENGRAVING_CAPTIONS,
 } from "../src/lib/data/territory-engraving-captions";
+import {
+  EDITORIAL_ILLUSTRATION_RIGHTS_EFFECTIVE_ON,
+  EDITORIAL_ILLUSTRATION_RIGHTS_POLICY,
+  EDITORIAL_ILLUSTRATION_RIGHTS_VERSION,
+} from "../src/lib/illustrations/rights-policy";
 
 const root = process.cwd();
 const assetRoot = path.join(root, "public/engravings");
@@ -173,6 +178,18 @@ async function buildManifest() {
     contract: "civica-editorial-illustration-manifest/v1",
     releaseDate: "2026-07-12",
     scope: "Every tracked WebP below public/engravings; README and non-WebP source files are excluded.",
+    rightsPolicy: {
+      version: EDITORIAL_ILLUSTRATION_RIGHTS_VERSION,
+      effectiveOn: EDITORIAL_ILLUSTRATION_RIGHTS_EFFECTIVE_ON,
+      operatorPolicy: "data/EDITORIAL-ILLUSTRATION-RIGHTS.md",
+      publicDisclosure: "/licensing#imagery",
+      thirdPartyReuse: EDITORIAL_ILLUSTRATION_RIGHTS_POLICY.thirdPartyReuse,
+    },
+    retention: {
+      history: "git-and-frozen-release-snapshots",
+      replacement: "superseding-record-or-tombstone",
+      publicSecretsOrUnlicensedReferenceBytes: "prohibited",
+    },
     limitations: [
       "Original generation sessions did not retain model, tool, prompt, seed, or source-reference metadata; those fields remain unknown rather than inferred.",
       "A caption identifies intended subject matter but is not evidence that every depicted landmark detail has been independently verified.",

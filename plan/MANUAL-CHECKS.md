@@ -30,6 +30,19 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   privileged decision summary and any required corrections. Until then the
   repository remains non-open; this queue item does not authorize an
   open-source grant or third-party reuse.
+- **BRD-010 · Owner/counsel — pending:** review
+  `data/EDITORIAL-ILLUSTRATION-RIGHTS.md`,
+  `civica-editorial-illustration-rights/v1`, the checked illustration
+  manifest, the historical missing-session posture, the AI-use disclosure,
+  BRD-011 asset inventory, and BRD-015 complaint flow. Confirm the intended
+  launch jurisdictions; generation-provider output terms; the scope of any
+  human copyright claim; reference-image/derivative-work evidence;
+  architecture/freedom-of-panorama, trademark/insignia, and
+  personality/likeness screening; manifest/evidence retention; complaint and
+  containment procedure; and no-separate-reuse-license wording. Record written
+  advice or a privileged decision summary plus Fernando's
+  accept/change/withhold disposition. Uncommitted image trials remain outside
+  the checked release manifest and are not cleared by this queue item.
 - **BRD-012 · Owner/privacy professional — pending:** review
   `data/PRIVACY-DATA-HANDLING.md`, the public `/privacy` notice, and
   `civica-privacy-data-handling/v1` for operator identity, applicable

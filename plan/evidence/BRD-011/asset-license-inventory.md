@@ -5,7 +5,7 @@ required attribution, and enforcement.
 
 | Class | Source | License / basis | Attribution | Enforcement |
 |---|---|---|---|---|
-| **Editorial engravings** (539, `public/engravings/`) | AI-assisted generation, Civica-directed | Non-documentary editorial illustration; **no third-party reuse license granted** pending BRD-010 review | Every masthead says "Editorial engraving · AI-assisted illustration"; /licensing#imagery | `validate:country-engravings` (EXP-011) + illustration manifest (EXP-010) + disclosure (EXP-012) |
+| **Editorial engravings** (550, `public/engravings/`) | AI-assisted generation, Civica-directed | Non-documentary editorial illustration; **no third-party reuse license granted** pending BRD-010 review | Every masthead says "Editorial engraving · AI-assisted illustration"; /licensing#imagery | `validate:country-engravings` (EXP-011) + illustration manifest (EXP-010) + disclosure (EXP-012) |
 | **Record/blog images** (57, `public/blog/`) | AI-assisted generation | Same as engravings | Same disclosure | Same manifest/gate |
 | **Country flags** | `https://flagcdn.com/<code>.svg` (external CDN), emoji fallback (Unicode) | Flag designs are public-domain government insignia; flagcdn serves them freely; emoji are system glyphs | None required | CSP `img-src` now allowlists `flagcdn.com` |
 | **Leader portraits** | Wikimedia Commons, hotlinked via `Special:FilePath` (`wikimediaUrl`) | Per-file CC-BY-SA / CC-BY / public domain | **Surfaced** as the required `credit` line beneath each portrait (`LeaderPortrait`) | CSP `img-src` now allowlists `commons.wikimedia.org` + `upload.wikimedia.org`; per-file credit stored on the person row |

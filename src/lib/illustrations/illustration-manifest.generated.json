@@ -2,20 +2,32 @@
   "contract": "civica-editorial-illustration-manifest/v1",
   "releaseDate": "2026-07-12",
   "scope": "Every tracked WebP below public/engravings; README and non-WebP source files are excluded.",
+  "rightsPolicy": {
+    "version": "civica-editorial-illustration-rights/v1",
+    "effectiveOn": "2026-07-23",
+    "operatorPolicy": "data/EDITORIAL-ILLUSTRATION-RIGHTS.md",
+    "publicDisclosure": "/licensing#imagery",
+    "thirdPartyReuse": "No separate copyright, trademark, personality-right, or other third-party reuse license is granted for editorial imagery. Public file access, attribution, citation, or a screenshot does not create such a license; applicable-law rights remain unaffected."
+  },
+  "retention": {
+    "history": "git-and-frozen-release-snapshots",
+    "replacement": "superseding-record-or-tombstone",
+    "publicSecretsOrUnlicensedReferenceBytes": "prohibited"
+  },
   "limitations": [
     "Original generation sessions did not retain model, tool, prompt, seed, or source-reference metadata; those fields remain unknown rather than inferred.",
     "A caption identifies intended subject matter but is not evidence that every depicted landmark detail has been independently verified.",
     "Git introduction records first repository capture, not the image-generation time."
   ],
   "summary": {
-    "assetCount": 538,
+    "assetCount": 550,
     "countryAssets": 394,
     "territoryAssets": 112,
     "pageAssets": 14,
-    "sharedAssets": 18,
+    "sharedAssets": 30,
     "missingPairs": 0,
     "missingCaptions": 0,
-    "irrecoverableGenerationSessions": 536
+    "irrecoverableGenerationSessions": 548
   },
   "assets": [
     {
@@ -20694,6 +20706,600 @@
         "provenanceStatus": "partial-irrecoverable-generation-session",
         "firstTrackedCommit": "a8229853009e6a5032e9e016fc5bb666210bd51f",
         "firstTrackedAt": "2026-06-28T20:34:15-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-column:dark",
+      "path": "public/engravings/navigation/spot-column-dark.webp",
+      "publicUrl": "/engravings/navigation/spot-column-dark.webp",
+      "category": "shared",
+      "theme": "dark",
+      "pairId": "shared:spot-column:light",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-column"
+      },
+      "routes": [
+        "/",
+        "explore-navigation"
+      ],
+      "subject": "Classical column editorial motif",
+      "caption": "Classical column editorial motif",
+      "file": {
+        "sha256": "58a23501c6de27becc85696a772ddfcc83f9efac2fb65721fc6b6dbcca4fad30",
+        "bytes": 1032,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-column:light",
+      "path": "public/engravings/navigation/spot-column.webp",
+      "publicUrl": "/engravings/navigation/spot-column.webp",
+      "category": "shared",
+      "theme": "light",
+      "pairId": "shared:spot-column:dark",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-column"
+      },
+      "routes": [
+        "/",
+        "explore-navigation"
+      ],
+      "subject": "Classical column editorial motif",
+      "caption": "Classical column editorial motif",
+      "file": {
+        "sha256": "d10c8316269ebadd070de44dfe28fd35c98a38d0fd94d70f21d0ca9badcd314c",
+        "bytes": 758,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-compass:dark",
+      "path": "public/engravings/navigation/spot-compass-dark.webp",
+      "publicUrl": "/engravings/navigation/spot-compass-dark.webp",
+      "category": "shared",
+      "theme": "dark",
+      "pairId": "shared:spot-compass:light",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-compass"
+      },
+      "routes": [
+        "/not-found",
+        "explore-navigation"
+      ],
+      "subject": "Compass editorial motif",
+      "caption": "Compass editorial motif",
+      "file": {
+        "sha256": "361b5d767e10d29dac4f070c7f228250ecb71d15fa152c2a4db116b634ec9e2c",
+        "bytes": 842,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-compass:light",
+      "path": "public/engravings/navigation/spot-compass.webp",
+      "publicUrl": "/engravings/navigation/spot-compass.webp",
+      "category": "shared",
+      "theme": "light",
+      "pairId": "shared:spot-compass:dark",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-compass"
+      },
+      "routes": [
+        "/not-found",
+        "explore-navigation"
+      ],
+      "subject": "Compass editorial motif",
+      "caption": "Compass editorial motif",
+      "file": {
+        "sha256": "e82003fdc26c58de0a19f322bee3fb90721cbf90bf64a44d6bf9328a16f3e73e",
+        "bytes": 1368,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-globe:dark",
+      "path": "public/engravings/navigation/spot-globe-dark.webp",
+      "publicUrl": "/engravings/navigation/spot-globe-dark.webp",
+      "category": "shared",
+      "theme": "dark",
+      "pairId": "shared:spot-globe:light",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-globe"
+      },
+      "routes": [
+        "/",
+        "explore-navigation"
+      ],
+      "subject": "Globe editorial motif",
+      "caption": "Globe editorial motif",
+      "file": {
+        "sha256": "4c71da8a44b3b08aa678f6167589746d45f42a52abb3a9f5fca28c9d520a4fa3",
+        "bytes": 1072,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-globe:light",
+      "path": "public/engravings/navigation/spot-globe.webp",
+      "publicUrl": "/engravings/navigation/spot-globe.webp",
+      "category": "shared",
+      "theme": "light",
+      "pairId": "shared:spot-globe:dark",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-globe"
+      },
+      "routes": [
+        "/",
+        "explore-navigation"
+      ],
+      "subject": "Globe editorial motif",
+      "caption": "Globe editorial motif",
+      "file": {
+        "sha256": "055a7e4357842f84b894dc82e3517bcb9c8aa81ad47c15b65102f82582b148a8",
+        "bytes": 1262,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-laurel:dark",
+      "path": "public/engravings/navigation/spot-laurel-dark.webp",
+      "publicUrl": "/engravings/navigation/spot-laurel-dark.webp",
+      "category": "shared",
+      "theme": "dark",
+      "pairId": "shared:spot-laurel:light",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-laurel"
+      },
+      "routes": [
+        "explore-navigation"
+      ],
+      "subject": "Laurel editorial motif",
+      "caption": "Laurel editorial motif",
+      "file": {
+        "sha256": "597ebef6a4f6df519a596cf7315856f44fa69736b1a38d939313747237e7ce23",
+        "bytes": 1260,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-laurel:light",
+      "path": "public/engravings/navigation/spot-laurel.webp",
+      "publicUrl": "/engravings/navigation/spot-laurel.webp",
+      "category": "shared",
+      "theme": "light",
+      "pairId": "shared:spot-laurel:dark",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-laurel"
+      },
+      "routes": [
+        "explore-navigation"
+      ],
+      "subject": "Laurel editorial motif",
+      "caption": "Laurel editorial motif",
+      "file": {
+        "sha256": "108d8dcc557a9194f0db4978581b7644bea8ca1b9e85a11ed3ed67182895cc4a",
+        "bytes": 980,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-mountains:dark",
+      "path": "public/engravings/navigation/spot-mountains-dark.webp",
+      "publicUrl": "/engravings/navigation/spot-mountains-dark.webp",
+      "category": "shared",
+      "theme": "dark",
+      "pairId": "shared:spot-mountains:light",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-mountains"
+      },
+      "routes": [
+        "explore-navigation"
+      ],
+      "subject": "Mountain landscape editorial motif",
+      "caption": "Mountain landscape editorial motif",
+      "file": {
+        "sha256": "bdfec61b5f5cf36d526e23ac299160409a8a0df7a20d8e6da8e42be46ac64c58",
+        "bytes": 820,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-mountains:light",
+      "path": "public/engravings/navigation/spot-mountains.webp",
+      "publicUrl": "/engravings/navigation/spot-mountains.webp",
+      "category": "shared",
+      "theme": "light",
+      "pairId": "shared:spot-mountains:dark",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-mountains"
+      },
+      "routes": [
+        "explore-navigation"
+      ],
+      "subject": "Mountain landscape editorial motif",
+      "caption": "Mountain landscape editorial motif",
+      "file": {
+        "sha256": "35b205c25c4e243dc8e56bfa41df4cd868c9845d653ffd792a60a2c43b931d2b",
+        "bytes": 1416,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-ship:dark",
+      "path": "public/engravings/navigation/spot-ship-dark.webp",
+      "publicUrl": "/engravings/navigation/spot-ship-dark.webp",
+      "category": "shared",
+      "theme": "dark",
+      "pairId": "shared:spot-ship:light",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-ship"
+      },
+      "routes": [
+        "explore-navigation"
+      ],
+      "subject": "Historical ship editorial motif",
+      "caption": "Historical ship editorial motif",
+      "file": {
+        "sha256": "da9782a961f1663f8b4b15ca7b69d155e5179ae93dbf06502f9ba13ca5b44111",
+        "bytes": 612,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
+      },
+      "editHistory": [],
+      "rights": {
+        "disclosure": "AI-assisted illustration; illustrative and non-documentary",
+        "policy": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "qa": {
+        "fileIntegrity": "pass",
+        "captionCoverage": "pass",
+        "colorContract": "not-applicable-or-not-yet-audited",
+        "semanticLandmarkReview": "not-systematically-reverified"
+      }
+    },
+    {
+      "id": "shared:spot-ship:light",
+      "path": "public/engravings/navigation/spot-ship.webp",
+      "publicUrl": "/engravings/navigation/spot-ship.webp",
+      "category": "shared",
+      "theme": "light",
+      "pairId": "shared:spot-ship:dark",
+      "entity": {
+        "type": "shared-component",
+        "idScheme": "civica-illustration-key",
+        "id": "spot-ship"
+      },
+      "routes": [
+        "explore-navigation"
+      ],
+      "subject": "Historical ship editorial motif",
+      "caption": "Historical ship editorial motif",
+      "file": {
+        "sha256": "c08b6aec9737c12a49360f986761eb1f6ded9237aa778682a5095e41db812302",
+        "bytes": 1072,
+        "format": "webp",
+        "width": 96,
+        "height": 96,
+        "aspectRatio": 1,
+        "colorSpace": "srgb"
+      },
+      "origin": {
+        "classification": "ai-assisted-editorial-illustration",
+        "model": "unknown-not-retained",
+        "tool": "unknown-not-retained",
+        "prompt": "unknown-not-retained",
+        "sourceReferences": "unknown-not-retained",
+        "provenanceStatus": "partial-irrecoverable-generation-session",
+        "firstTrackedCommit": "86e048d339cf035a47280cea79a2c319ca7ced39",
+        "firstTrackedAt": "2026-07-18T18:17:26-03:00"
       },
       "editHistory": [],
       "rights": {
