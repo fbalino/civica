@@ -46,6 +46,7 @@ import { sql } from "drizzle-orm";
 import { jurisdictions } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
 import { writeElection } from "../src/lib/elections/writer";
 
 const neonSql = neon(process.env.DATABASE_URL!);
@@ -56,6 +57,13 @@ const SOURCE_LICENSE = "CC0";
 const RETRIEVED_AT = new Date();
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const ATLAS_RELEASE_ID = DRY_RUN
+  ? null
+  : resolveAtlasReleaseId(
+      process.argv
+        .find((arg) => arg.startsWith("--release-id="))
+        ?.slice("--release-id=".length)
+    );
 const LIMIT = (() => {
   const i = process.argv.indexOf("--limit");
   if (i !== -1 && process.argv[i + 1]) {
@@ -324,7 +332,34 @@ async function main() {
       election_type: r.type,
       date_precision: r.precision,
     });
-    const outcome = await writeElection(db as never, { election: { jurisdictionId: r.jurisdictionId, electionDate: r.date, electionType: r.type, electionName, wikidataQid: r.qid, dateConfidence: "confirmed" }, provenance: { predicate: "wikidata_election_date", objectValue: stmtValue, sourceId: SOURCE_ID, sourceUrl, sourceLicense: SOURCE_LICENSE } });
+    const outcome = await writeElection(
+      db as never,
+      {
+        election: {
+          jurisdictionId: r.jurisdictionId,
+          electionDate: r.date,
+          electionType: r.type,
+          electionName,
+          wikidataQid: r.qid,
+          dateConfidence: "confirmed",
+        },
+        provenance: {
+          predicate: "wikidata_election_date",
+          objectValue: stmtValue,
+          sourceId: SOURCE_ID,
+          sourceUrl,
+          sourceLicense: SOURCE_LICENSE,
+        },
+      },
+      {
+        history: {
+          changeKind: "routine_refresh",
+          reason: "Wikidata national-election refresh",
+          methodologyVersion: "elections-wikidata-sync/v1",
+          releaseId: ATLAS_RELEASE_ID!,
+        },
+      }
+    );
     inserted += outcome.inserted;
     updated += outcome.updated;
   }

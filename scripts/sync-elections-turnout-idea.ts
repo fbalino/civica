@@ -53,10 +53,12 @@ config({ path: ".env.local" });
 import { readFileSync } from "fs";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { unzipSync, strFromU8 } from "fflate";
-import { jurisdictions, elections, statements, sources } from "../src/lib/db/schema";
+import { jurisdictions, elections, sources } from "../src/lib/db/schema";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
+import { updateElectionTurnoutWithHistory } from "../src/lib/elections/writer";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
@@ -73,6 +75,13 @@ const MATCH_TOLERANCE_DAYS = 45;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const ATLAS_RELEASE_ID = DRY_RUN
+  ? null
+  : resolveAtlasReleaseId(
+      process.argv
+        .find((arg) => arg.startsWith("--release-id="))
+        ?.slice("--release-id=".length)
+    );
 const LIMIT = (() => {
   const i = process.argv.indexOf("--limit");
   if (i !== -1 && process.argv[i + 1]) {
@@ -324,17 +333,8 @@ async function main() {
         ? best.totalVote
         : null;
 
-    await db
-      .update(elections)
-      .set({
-        turnoutPercent: best.turnoutPercent,
-        ...(registeredVoters != null ? { registeredVoters } : {}),
-        ...(totalValidVotes != null ? { totalValidVotes } : {}),
-      })
-      .where(eq(elections.id, e.id));
-    updated++;
-
-    // Provenance statement (idempotent upsert by subject+predicate).
+    // Election, provenance, and its bounded ATL-020 history event share one
+    // PostgreSQL statement and therefore one commit boundary.
     const stmtValue = JSON.stringify({
       idea_election_date: best.date,
       voter_turnout_percent: best.turnoutPercent,
@@ -342,42 +342,29 @@ async function main() {
       registration: best.registration,
       matched_within_days: Math.round(bestDiffDays),
     });
-    const existingStmt = await db
-      .select({ id: statements.id })
-      .from(statements)
-      .where(
-        and(
-          eq(statements.subjectTable, "elections"),
-          eq(statements.subjectId, e.id),
-          eq(statements.predicate, "idea_voter_turnout"),
-          eq(statements.sourceId, SOURCE_ID),
-        )
-      )
-      .limit(1);
-    if (existingStmt.length > 0) {
-      await db
-        .update(statements)
-        .set({
-          objectValue: stmtValue,
-          sourceId: SOURCE_ID,
-          sourceUrl: SOURCE_PAGE,
-          sourceLicense: SOURCE_LICENSE,
-          retrievedAt: RETRIEVED_AT,
-        })
-        .where(eq(statements.id, existingStmt[0].id));
-    } else {
-      await db.insert(statements).values({
-        subjectTable: "elections",
-        subjectId: e.id,
+    const outcome = await updateElectionTurnoutWithHistory(
+      db,
+      {
+        electionId: e.id,
+        turnoutPercent: best.turnoutPercent,
+        registeredVoters,
+        totalValidVotes,
+      },
+      {
         predicate: "idea_voter_turnout",
         objectValue: stmtValue,
         sourceId: SOURCE_ID,
         sourceUrl: SOURCE_PAGE,
         sourceLicense: SOURCE_LICENSE,
-        retrievedAt: RETRIEVED_AT,
-        confidence: 1.0,
-      });
-    }
+      },
+      {
+        changeKind: "routine_refresh",
+        reason: "International IDEA voter-turnout refresh",
+        methodologyVersion: "elections-turnout-idea/v1",
+        releaseId: ATLAS_RELEASE_ID!,
+      }
+    );
+    updated += outcome.updated;
   }
 
   // Freshness — single sanctioned path, only on a non-dry run that wrote rows.

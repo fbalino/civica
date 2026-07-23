@@ -28,11 +28,21 @@ test("direct-write manual scripts retain retry-safe identity guards", () => {
     "scripts/seed-from-factbook.ts": [/writeAtlasCountry/, /DRY_RUN/],
     "scripts/sync-elections-ipu.ts": [
       /writeElection/,
-      /existingEstStmt/,
+      /upsertEstimatedElectionWithHistory/,
+      /deleteEstimatedElectionWithHistory/,
+      /resolveAtlasReleaseId/,
       /DRY_RUN/,
     ],
-    "scripts/sync-elections-turnout-idea.ts": [/existingStmt/, /DRY_RUN/],
-    "scripts/sync-elections-wikidata.ts": [/writeElection/, /DRY_RUN/],
+    "scripts/sync-elections-turnout-idea.ts": [
+      /updateElectionTurnoutWithHistory/,
+      /resolveAtlasReleaseId/,
+      /DRY_RUN/,
+    ],
+    "scripts/sync-elections-wikidata.ts": [
+      /writeElection/,
+      /resolveAtlasReleaseId/,
+      /DRY_RUN/,
+    ],
     "scripts/sync-wikidata-parties.ts": [
       /if \(!DRY_RUN\)/,
       /writeLegislatureComposition/,

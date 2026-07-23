@@ -60,10 +60,15 @@ import {
   jurisdictions,
   governmentBodies,
   elections,
-  statements,
 } from "../src/lib/db/schema";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
-import { writeElection, type ElectionResultInput } from "../src/lib/elections/writer";
+import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
+import {
+  deleteEstimatedElectionWithHistory,
+  upsertEstimatedElectionWithHistory,
+  writeElection,
+  type ElectionResultInput,
+} from "../src/lib/elections/writer";
 import {
   IPU_SUBTYPE_LABEL,
   IPU_FAMILY_LABEL,
@@ -79,6 +84,13 @@ const SOURCE_LICENSE = "CC-BY-NC-SA-4.0";
 const RETRIEVED_AT = new Date();
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const ATLAS_RELEASE_ID = DRY_RUN
+  ? null
+  : resolveAtlasReleaseId(
+      process.argv
+        .find((arg) => arg.startsWith("--release-id="))
+        ?.slice("--release-id=".length)
+    );
 const NO_ESTIMATES = process.argv.includes("--no-estimates");
 const LIMIT = (() => {
   const i = process.argv.indexOf("--limit");
@@ -403,7 +415,36 @@ async function main() {
       electoral_system: subsystem ?? family,
       seats_per_parties: partyResults ?? [],
     });
-    const outcome = await writeElection(db as never, { election: { jurisdictionId: body.jurisdictionId, bodyId: body.bodyId, electionDate, electionType: "legislative", electionName, electoralSystem: systemLabel, dateConfidence: "confirmed" }, results: resultRows, provenance: { predicate: "ipu_last_election", objectValue: stmtValue, sourceId: SOURCE_ID, sourceUrl, sourceLicense: SOURCE_LICENSE } });
+    const outcome = await writeElection(
+      db as never,
+      {
+        election: {
+          jurisdictionId: body.jurisdictionId,
+          bodyId: body.bodyId,
+          electionDate,
+          electionType: "legislative",
+          electionName,
+          electoralSystem: systemLabel,
+          dateConfidence: "confirmed",
+        },
+        results: resultRows,
+        provenance: {
+          predicate: "ipu_last_election",
+          objectValue: stmtValue,
+          sourceId: SOURCE_ID,
+          sourceUrl,
+          sourceLicense: SOURCE_LICENSE,
+        },
+      },
+      {
+        history: {
+          changeKind: "routine_refresh",
+          reason: "IPU Parline election and party-result refresh",
+          methodologyVersion: "elections-ipu-sync/v1",
+          releaseId: ATLAS_RELEASE_ID!,
+        },
+      }
+    );
     electionsInserted += outcome.inserted;
     electionsUpdated += outcome.updated;
     electionsUpserted += outcome.written;
@@ -430,6 +471,7 @@ async function main() {
   // One estimated row per (jurisdictionId, bodyId): replaced deterministically
   // each run, so re-runs never duplicate.
   let estimatesWritten = 0;
+  let estimatesDeleted = 0;
   let estimatesSkippedPast = 0;
   let estimatesSkippedConfirmed = 0;
   const estimateSamples: string[] = [];
@@ -470,15 +512,21 @@ async function main() {
         estimatesSkippedConfirmed++;
         // Clean up a now-superseded estimate we may have written on a prior run.
         if (!DRY_RUN) {
-          await db
-            .delete(elections)
-            .where(
-              and(
-                eq(elections.jurisdictionId, est.jurisdictionId),
-                eq(elections.bodyId, est.bodyId),
-                eq(elections.dateConfidence, "estimated")
-              )
-            );
+          const deleted = await deleteEstimatedElectionWithHistory(
+            db,
+            {
+              jurisdictionId: est.jurisdictionId,
+              bodyId: est.bodyId,
+            },
+            {
+              changeKind: "substantive_revision",
+              reason:
+                "Source-confirmed upcoming election superseded the Civica estimate",
+              methodologyVersion: "elections-ipu-estimate/v1",
+              releaseId: ATLAS_RELEASE_ID!,
+            }
+          );
+          estimatesDeleted += deleted.deleted;
         }
         continue;
       }
@@ -495,49 +543,6 @@ async function main() {
       }
 
       const estimatedName = `Next ${est.chamberName} election (estimated)`;
-      // Idempotent: match the single estimated row for this (jurisdiction, body).
-      const existingEst = await db
-        .select({ id: elections.id })
-        .from(elections)
-        .where(
-          and(
-            eq(elections.jurisdictionId, est.jurisdictionId),
-            eq(elections.bodyId, est.bodyId),
-            eq(elections.dateConfidence, "estimated")
-          )
-        )
-        .limit(1);
-
-      let estRowId: string;
-      if (existingEst.length > 0) {
-        estRowId = existingEst[0].id;
-        await db
-          .update(elections)
-          .set({
-            electionDate: estimatedDate,
-            electionType: "legislative",
-            electionName: estimatedName,
-            electoralSystem: est.systemLabel,
-            dateConfidence: "estimated",
-          })
-          .where(eq(elections.id, estRowId));
-      } else {
-        const ins = await db
-          .insert(elections)
-          .values({
-            jurisdictionId: est.jurisdictionId,
-            bodyId: est.bodyId,
-            electionDate: estimatedDate,
-            electionType: "legislative",
-            electionName: estimatedName,
-            electoralSystem: est.systemLabel,
-            dateConfidence: "estimated",
-          })
-          .returning({ id: elections.id });
-        estRowId = ins[0].id;
-      }
-      estimatesWritten++;
-
       // Provenance: the estimate derives from IPU's own last_election + term,
       // but is a Civica computation — record it as such (predicate makes the
       // derivation explicit; it is NOT an IPU-asserted next date).
@@ -548,48 +553,40 @@ async function main() {
         estimated_next_election: estimatedDate,
         note: "Civica-computed estimate, not a source-confirmed date.",
       });
-      const existingEstStmt = await db
-        .select({ id: statements.id })
-        .from(statements)
-        .where(
-          and(
-            eq(statements.subjectTable, "elections"),
-            eq(statements.subjectId, estRowId),
-            eq(statements.predicate, "civica_estimated_next_election"),
-            eq(statements.sourceId, SOURCE_ID),
-          )
-        )
-        .limit(1);
-      if (existingEstStmt.length > 0) {
-        await db
-          .update(statements)
-          .set({
-            objectValue: estStmtValue,
-            sourceId: SOURCE_ID,
-            sourceUrl: `${IPU_BASE}/chambers`,
-            sourceLicense: SOURCE_LICENSE,
-            retrievedAt: RETRIEVED_AT,
-          })
-          .where(eq(statements.id, existingEstStmt[0].id));
-      } else {
-        await db.insert(statements).values({
-          subjectTable: "elections",
-          subjectId: estRowId,
+      const estimateOutcome = await upsertEstimatedElectionWithHistory(
+        db,
+        {
+          jurisdictionId: est.jurisdictionId,
+          bodyId: est.bodyId,
+          electionDate: estimatedDate,
+          electionType: "legislative",
+          electionName: estimatedName,
+          electoralSystem: est.systemLabel,
+        },
+        {
           predicate: "civica_estimated_next_election",
           objectValue: estStmtValue,
           sourceId: SOURCE_ID,
           sourceUrl: `${IPU_BASE}/chambers`,
           sourceLicense: SOURCE_LICENSE,
-          retrievedAt: RETRIEVED_AT,
           confidence: 0.5,
-        });
-      }
+        },
+        {
+          changeKind: "routine_refresh",
+          reason:
+            "Civica recomputed the estimated next election from IPU term data",
+          methodologyVersion: "elections-ipu-estimate/v1",
+          releaseId: ATLAS_RELEASE_ID!,
+        }
+      );
+      estimatesWritten += estimateOutcome.inserted + estimateOutcome.updated;
     }
   }
 
   // Freshness — single sanctioned path, only on a non-dry-run that wrote rows.
   const stamped = await markSourcesSynced(SOURCE_ID, {
-    rowsWritten: DRY_RUN ? 0 : electionsUpserted + estimatesWritten,
+    rowsWritten:
+      DRY_RUN ? 0 : electionsUpserted + estimatesWritten + estimatesDeleted,
     at: RETRIEVED_AT,
   });
 
@@ -605,6 +602,7 @@ async function main() {
   console.log(`  Election records 404: ${electionsFailed}`);
   if (!NO_ESTIMATES) {
     console.log(`  Estimated next rows:  ${estimatesWritten}`);
+    console.log(`    · deleted (confirmed wins): ${estimatesDeleted}`);
     console.log(`    · skipped (past-due):        ${estimatesSkippedPast}`);
     console.log(`    · skipped (confirmed wins):  ${estimatesSkippedConfirmed}`);
   }

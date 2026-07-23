@@ -83,12 +83,14 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     relations: ["government_bodies", "offices", "persons", "terms"],
   },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },
-  { path: "scripts/sync-elections-ipu.ts", relations: ["elections"] },
   {
     path: "src/lib/constitute/sync-constitutions.ts",
     relations: ["constitution_topic_excerpts"],
   },
-  { path: "src/lib/elections/writer.ts", relations: ["election_results"] },
+  {
+    path: "src/lib/elections/writer.ts",
+    relations: ["election_results", "elections", "statements"],
+  },
   {
     path: "src/lib/api/rate-limit.ts",
     relations: ["rate_limits"],
