@@ -69,6 +69,14 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 
 ## Owner judgment
 
+- **EXP-001 · Qualified visual reviewer:** use the checked
+  `data/rendered-module-ledger.v1.json` and
+  `data/rendered-module-evidence.v1.json` registry to locate each exact source
+  module in desktop/mobile and light/dark browser evidence. Record an exact
+  module-source disposition as clean, finding, or not observed; route-wide
+  QA-013 candidate context cannot be promoted automatically. Use safe fixtures
+  for private admin/reviewer routes and never retain credentials or personal
+  data in screenshots.
 - Approve the representative engraving color-grade pilot before any corpus-wide transformation.
 - Select one of three design-system-compliant Explore navigation concepts before new artwork or final implementation; review `plan/EXP-014-explore-navigation-concepts-2026-07-18.md` and its dated browser mockups first.
 - Approve any shortlist of replacement names before legal clearance or migration work.

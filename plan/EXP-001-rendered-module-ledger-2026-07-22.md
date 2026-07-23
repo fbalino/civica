@@ -1,6 +1,7 @@
 # EXP-001 — rendered-module ledger plan
 
-**Status:** active implementation plan  
+**Status:** source discovery and durable evidence plumbing complete; exact
+module-level browser review remains open
 **Scope:** the P0 rendered-module audit only; it does not approve, replace, or
 alter the separate QA-013 / EXP-025 visual-baseline workflow.
 
@@ -44,6 +45,21 @@ still making the boundary auditable.
    evidence policy, then leave its concrete defects to the owning follow-up
    tasks; EXP-028 remains the final blind visual audit and requires zero open
    P0/P1 confirmed findings before G4.
+
+## Implementation update — 2026-07-23
+
+The checked ledger now discovers the Git-indexed source graph, including the
+standalone rendered `/embed/[slug]` document and distinct error, global-error,
+and not-found surfaces. Durable review records live separately in
+`data/rendered-module-evidence.v1.json`, so regeneration cannot erase completed
+review. Duplicate, stale, missing-screenshot, and route-wide `clean` claims
+fail closed.
+
+The 64 unapproved QA-013 screenshot records are retained only as route context:
+they remain `not_observed` with finding
+`EXP-001-CANDIDATE-NOT-REVIEWED`. They do not become visual approval and do not
+mark any module clean. CI regenerates and compares the source graph on every
+push or pull request.
 
 ## Boundaries
 

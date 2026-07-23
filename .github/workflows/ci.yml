@@ -31,6 +31,8 @@ jobs:
         run: npm run validate:ci-workflow
       - name: Validate master plan
         run: node plan/tools/validate-master-plan.mjs
+      - name: Validate rendered-module ledger
+        run: npm run validate:rendered-module-ledger
       - name: Scan repository for secrets
         run: npm run validate:secrets
       - name: Audit production dependencies

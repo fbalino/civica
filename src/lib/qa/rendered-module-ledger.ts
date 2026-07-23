@@ -11,7 +11,12 @@ export const VISUAL_VARIANTS = [
 ] as const;
 
 export type VisualVariant = (typeof VISUAL_VARIANTS)[number];
-export type RenderedModuleRole = "page" | "layout" | "error_boundary" | "component";
+export type RenderedModuleRole =
+  | "page"
+  | "layout"
+  | "error_boundary"
+  | "document"
+  | "component";
 export type RenderedModuleDisposition = "clean" | "finding" | "not_observed";
 
 export interface RenderedModuleEvidence {
@@ -34,10 +39,22 @@ export interface RenderedModuleLedger {
   entries: readonly RenderedModuleLedgerEntry[];
 }
 
+export interface RenderedModuleEvidenceRecord {
+  route: string;
+  moduleSource: string | "*";
+  variant: VisualVariant;
+  evidence: RenderedModuleEvidence;
+}
+
+export interface RenderedModuleEvidenceRegistry {
+  schemaVersion: "civica-rendered-module-evidence/v1";
+  records: readonly RenderedModuleEvidenceRecord[];
+}
+
 export interface RouteRenderSource {
   route: string;
   sourcePath: string;
-  kind: "page" | "error_boundary";
+  kind: "page" | "error_boundary" | "document";
 }
 
 // The ledger is about source-rendered modules. Keep helper/data `.ts` imports
@@ -132,9 +149,12 @@ export function buildRenderedModuleLedger(
   );
   const entries = routes.flatMap((route) => {
     const routeDirectory = path.posix.dirname(route.sourcePath);
-    const applicableLayouts = [...layoutPaths].filter((layout) =>
-      routeDirectory.startsWith(path.posix.dirname(layout)),
-    );
+    const applicableLayouts =
+      route.kind === "document"
+        ? []
+        : [...layoutPaths].filter((layout) =>
+            routeDirectory.startsWith(path.posix.dirname(layout)),
+          );
     return reachableModules(
       [route.sourcePath, ...applicableLayouts],
       sourceByPath,
@@ -150,6 +170,64 @@ export function buildRenderedModuleLedger(
   return {
     schemaVersion: RENDERED_MODULE_LEDGER_SCHEMA_VERSION,
     entries: entries.sort((left, right) => left.id.localeCompare(right.id)),
+  };
+}
+
+/**
+ * Applies durable browser-review evidence after source discovery. Route-level
+ * records may attach candidate context to every reachable module, but may not
+ * mark those modules clean: clean evidence must name the exact module source
+ * that the reviewer actually located in the screenshot.
+ */
+export function applyRenderedModuleEvidence(
+  ledger: RenderedModuleLedger,
+  registry: RenderedModuleEvidenceRegistry,
+): RenderedModuleLedger {
+  if (registry.schemaVersion !== "civica-rendered-module-evidence/v1") {
+    throw new Error("Expected civica-rendered-module-evidence/v1.");
+  }
+
+  const entries = ledger.entries.map((entry) => ({
+    ...entry,
+    visual: Object.fromEntries(
+      VISUAL_VARIANTS.map((variant) => [variant, { ...entry.visual[variant] }]),
+    ) as Record<VisualVariant, RenderedModuleEvidence>,
+  }));
+  const seen = new Set<string>();
+
+  for (const record of registry.records) {
+    const recordKey = `${record.route}:${record.moduleSource}:${record.variant}`;
+    if (seen.has(recordKey)) {
+      throw new Error(`Duplicate rendered-module evidence record ${recordKey}.`);
+    }
+    seen.add(recordKey);
+
+    if (
+      record.moduleSource === "*" &&
+      record.evidence.disposition === "clean"
+    ) {
+      throw new Error(
+        `${recordKey} cannot mark a whole route clean; name an exact module source.`,
+      );
+    }
+
+    const matches = entries.filter(
+      (entry) =>
+        entry.route === record.route &&
+        (record.moduleSource === "*" ||
+          entry.moduleSource === record.moduleSource),
+    );
+    if (matches.length === 0) {
+      throw new Error(`Rendered-module evidence target ${recordKey} is stale.`);
+    }
+    for (const entry of matches) {
+      entry.visual[record.variant] = { ...record.evidence };
+    }
+  }
+
+  return {
+    ...ledger,
+    entries,
   };
 }
 

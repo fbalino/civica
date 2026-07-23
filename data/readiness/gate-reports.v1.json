@@ -2,8 +2,8 @@
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
     "plan/MASTER-CHECKLIST.md": "430283fc171ba4bfa7314602e52208d1db6f4d4b3b856e913ce4d9183108a49b",
-    "plan/PROGRESS.md": "066f738cd89a1e9ae64ccecc4fb49e3c72a9496655948da7baf1fd22bab45e5f",
-    "plan/MANUAL-CHECKS.md": "fce37f4348743e33238d7724db8477426bd1a3b0796a676a16ccab76380677ec",
+    "plan/PROGRESS.md": "8ca209716ed6f341a68241600932c92943dcbb470f7e584d06c677ece7f9133c",
+    "plan/MANUAL-CHECKS.md": "785bac420215a97f8cf3610c1976fb1c3fe9e4acaaccadef92ffe6574fba77df",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "3fb5da3362a6361a477f89fd46993a12587ffebc086c3beccdb773ff770e7558",
@@ -174,7 +174,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "fce37f4348743e33238d7724db8477426bd1a3b0796a676a16ccab76380677ec",
+        "sha256": "785bac420215a97f8cf3610c1976fb1c3fe9e4acaaccadef92ffe6574fba77df",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
@@ -186,6 +186,7 @@
           "BRD-014",
           "BRD-015",
           "DAT-021",
+          "EXP-001",
           "EXP-006",
           "EXP-009",
           "EXP-014",
@@ -208,7 +209,8 @@
           "PLT-022",
           "PUL-039",
           "PUL-040",
-          "PUL-041"
+          "PUL-041",
+          "QA-013"
         ]
       },
       "waivers": [],
@@ -410,7 +412,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "fce37f4348743e33238d7724db8477426bd1a3b0796a676a16ccab76380677ec",
+        "sha256": "785bac420215a97f8cf3610c1976fb1c3fe9e4acaaccadef92ffe6574fba77df",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
@@ -422,6 +424,7 @@
           "BRD-014",
           "BRD-015",
           "DAT-021",
+          "EXP-001",
           "EXP-006",
           "EXP-009",
           "EXP-014",
@@ -444,7 +447,8 @@
           "PLT-022",
           "PUL-039",
           "PUL-040",
-          "PUL-041"
+          "PUL-041",
+          "QA-013"
         ]
       },
       "waivers": [],
@@ -654,7 +658,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "fce37f4348743e33238d7724db8477426bd1a3b0796a676a16ccab76380677ec",
+        "sha256": "785bac420215a97f8cf3610c1976fb1c3fe9e4acaaccadef92ffe6574fba77df",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
@@ -666,6 +670,7 @@
           "BRD-014",
           "BRD-015",
           "DAT-021",
+          "EXP-001",
           "EXP-006",
           "EXP-009",
           "EXP-014",
@@ -688,7 +693,8 @@
           "PLT-022",
           "PUL-039",
           "PUL-040",
-          "PUL-041"
+          "PUL-041",
+          "QA-013"
         ]
       },
       "waivers": [],
@@ -884,7 +890,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "fce37f4348743e33238d7724db8477426bd1a3b0796a676a16ccab76380677ec",
+        "sha256": "785bac420215a97f8cf3610c1976fb1c3fe9e4acaaccadef92ffe6574fba77df",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
@@ -896,6 +902,7 @@
           "BRD-014",
           "BRD-015",
           "DAT-021",
+          "EXP-001",
           "EXP-006",
           "EXP-009",
           "EXP-014",
@@ -918,7 +925,8 @@
           "PLT-022",
           "PUL-039",
           "PUL-040",
-          "PUL-041"
+          "PUL-041",
+          "QA-013"
         ]
       },
       "waivers": [],
