@@ -277,4 +277,11 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "78c86331e815fbd799fdcfc51e6d2f569bf66f06ac97c771edde226365eb75cb",
     baseline: false,
   },
+  {
+    id: "0047_atlas_data_error_reports",
+    path: "drizzle/authoritative/0047_atlas_data_error_reports.sql",
+    sha256:
+      "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
+    baseline: false,
+  },
 ] as const;

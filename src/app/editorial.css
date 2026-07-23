@@ -1930,7 +1930,7 @@ legend.editorial-filter-label {
   padding: var(--space-2);
   overflow-wrap: anywhere;
 }
-.atlas-change-history__event .editorial-data-table a {
+.atlas-change-history__event .editorial-data-table a:not(.btn) {
   color: var(--color-text-60);
   text-decoration: underline;
   text-underline-offset: var(--space-1);

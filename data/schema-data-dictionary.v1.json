@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "9ef40261670dc877ec34d35f18c591ab4f998ec5246adf90831d55cae871b53a",
+  "schemaFingerprint": "edfe797bcccb8d06e7414a3b789b22987ad7327b4f45af4e7d86c177bf8d82a6",
   "summary": {
     "tables": 102,
-    "columns": 1396,
+    "columns": 1411,
     "publicAtlasTables": 22,
     "researchBetaTables": 32,
     "supportTables": 12,
@@ -10254,6 +10254,85 @@
       },
       "columns": [
         {
+          "name": "acknowledged_at",
+          "propertyName": "acknowledgedAt",
+          "definition": "Acknowledged at recorded for the correction action for one affected artifact/record.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "Acknowledged at follows this table contract. created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "acknowledgment_code",
+          "propertyName": "acknowledgmentCode",
+          "definition": "Acknowledgment code recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_correction_log_acknowledgment_code"
+            ],
+            "uniqueGroups": [
+              "idx_correction_log_acknowledgment_code"
+            ]
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "affected_release_id",
+          "propertyName": "affectedReleaseId",
+          "definition": "Affected release id recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "category",
           "propertyName": "category",
           "definition": "Category recorded for the correction action for one affected artifact/record.",
@@ -10379,6 +10458,110 @@
           }
         },
         {
+          "name": "entity_id",
+          "propertyName": "entityId",
+          "definition": "Entity id recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_correction_log_entity"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_type",
+          "propertyName": "entityType",
+          "definition": "Entity type recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_correction_log_entity"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "evidence_url",
+          "propertyName": "evidenceUrl",
+          "definition": "Evidence url recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "field_path",
+          "propertyName": "fieldPath",
+          "definition": "Field path recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "id",
           "propertyName": "id",
           "definition": "Stable row identifier.",
@@ -10454,6 +10637,156 @@
           }
         },
         {
+          "name": "notice_accepted_at",
+          "propertyName": "noticeAcceptedAt",
+          "definition": "Notice accepted at recorded for the correction action for one affected artifact/record.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "Notice accepted at follows this table contract. created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "notice_version",
+          "propertyName": "noticeVersion",
+          "definition": "Notice version recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "proposed_value",
+          "propertyName": "proposedValue",
+          "definition": "Proposed value recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "published_value",
+          "propertyName": "publishedValue",
+          "definition": "Published value recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reported_source_id",
+          "propertyName": "reportedSourceId",
+          "definition": "Reported source id recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reported_source_url",
+          "propertyName": "reportedSourceUrl",
+          "definition": "Reported source url recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "resolved_at",
           "propertyName": "resolvedAt",
           "definition": "Resolved at recorded for the correction action for one affected artifact/record.",
@@ -10479,6 +10812,31 @@
           }
         },
         {
+          "name": "reviewer_id",
+          "propertyName": "reviewerId",
+          "definition": "Reviewer id recorded for the correction action for one affected artifact/record.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "status",
           "propertyName": "status",
           "definition": "Current workflow or record status under this table's declared contract.",
@@ -10490,9 +10848,11 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": false,
+            "indexed": true,
             "foreignKey": null,
-            "indexGroups": [],
+            "indexGroups": [
+              "idx_correction_log_status_submitted"
+            ],
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
@@ -10515,9 +10875,11 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": false,
+            "indexed": true,
             "foreignKey": null,
-            "indexGroups": [],
+            "indexGroups": [
+              "idx_correction_log_status_submitted"
+            ],
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica editorial/governance action with before/after and notification metadata.",
@@ -10598,6 +10960,31 @@
           "sourceOrDerivation": "Civica editorial/governance action with before/after and notification metadata.",
           "cadence": "Event-driven when a correction decision is recorded.",
           "vintageSemantics": "created/published timestamps describe correction history; affected_version identifies the corrected release.",
+          "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "triaged_at",
+          "propertyName": "triagedAt",
+          "definition": "Triaged at recorded for the correction action for one affected artifact/record.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Civica editorial/governance action with before/after and notification metadata.",
+          "cadence": "Event-driven when a correction decision is recorded.",
+          "vintageSemantics": "Triaged at follows this table contract. created/published timestamps describe correction history; affected_version identifies the corrected release.",
           "rights": "Civica-authored metadata; quoted or embedded source values retain source rights.",
           "deprecation": {
             "status": "active"

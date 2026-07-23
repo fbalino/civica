@@ -27,6 +27,7 @@ const NAV_HREFS = [
   "/admin/data-disputes",
   "/admin/advisory-applications",
   "/admin/messages",
+  "/admin/corrections",
   "/admin/pulse-coding",
   "/admin/data-disputes/audit",
 ];
@@ -78,6 +79,12 @@ export function AdminNav({ counts }: { counts: AdminCounts }) {
       href: "/admin/data-disputes",
       label: "Data disputes",
       count: counts.disputesOpen,
+      attention: true,
+    },
+    {
+      href: "/admin/corrections",
+      label: "Atlas corrections",
+      count: counts.correctionsOpen,
       attention: true,
     },
     {

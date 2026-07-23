@@ -14,6 +14,7 @@ export const PRIVACY_DATA_HANDLING_EFFECTIVE_ON = "2026-07-23";
 export const PRIVACY_FLOW_IDS = [
   "browser-preferences",
   "contact-messages",
+  "data-error-reports",
   "advisory-applications",
   "ask-civica",
   "remote-reader-resources",
@@ -93,6 +94,35 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
       "src/app/api/contact/route.ts",
       "src/app/api/admin/messages/[id]/route.ts",
       "src/app/(admin)/admin/messages/[id]/page.tsx",
+      "src/lib/db/schema.ts",
+    ],
+    publicSummary: true,
+  },
+  {
+    id: "data-error-reports",
+    label: "Atlas data-error reports",
+    audiences: ["voluntary-submitter", "owner-admin"],
+    trigger:
+      "A person submits the Atlas data-error form after accepting its versioned notice.",
+    data:
+      "Exact entity, field, affected release, displayed source and URL, published value, optional proposed value/evidence, explanation, privacy choice, optional name/email/affiliation, acknowledgement receipt, triage, disposition, and linked correction-history identifiers.",
+    purpose:
+      "Acknowledge, investigate, triage, and preserve an accountable path from a precise report to any versioned correction or no-change/rejection disposition.",
+    destinations:
+      "Civica's Neon database, authenticated owner-admin corrections queue, and the public corrections log only when the reporter does not request privacy. Contact details are never public.",
+    retention:
+      "The evidence report, receipt, disposition, and linked release history are retained as correction evidence. Optional contact fields are redacted on a valid privacy request or when no longer needed for follow-up.",
+    access:
+      "Fernando Balino through the authenticated owner-admin surface; public report content only when the submitter leaves the privacy option off.",
+    deletion:
+      "A reporter may request contact-field redaction. The evidence record is retained so released changes and public dispositions are not silently detached from their source report.",
+    safeguards:
+      "Versioned contextual notice, bounded strict input, hidden bot trap, shared HMAC rate limit, no new raw-IP retention, immediate opaque receipt, authenticated and audited triage, private no-store responses, and a required change-history link before corrected resolution.",
+    providers: ["Vercel", "Neon"],
+    sourcePaths: [
+      "src/app/(reader)/report-data-issue/ReportDataIssueForm.tsx",
+      "src/app/api/civica-index/corrections/route.ts",
+      "src/app/api/admin/corrections/[id]/route.ts",
       "src/lib/db/schema.ts",
     ],
     publicSummary: true,

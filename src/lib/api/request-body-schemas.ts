@@ -22,6 +22,7 @@ export const REQUEST_BODY_LIMITS = Object.freeze({
   adminPulseReview: 32_768,
   adminPulseReviewException: 16_384,
   adminLogin: 8_192,
+  adminCorrectionMutation: 24_576,
   advisoryApplication: ADVISORY_APPLICATION_LIMITS.requestBody,
   chat: 16_384,
   contact: 8_192,
@@ -297,6 +298,7 @@ export const chatBodySchema = z
 export type ChatBody = z.infer<typeof chatBodySchema>;
 
 export const CORRECTION_CATEGORIES = [
+  "atlas_data_error",
   "ci_data_error",
   "ci_methodology",
   "pulse_misclassification",
@@ -330,9 +332,73 @@ export const correctionBodySchema = z
     submitterAffiliation: nullableText(300),
     description: text(10_000, 10),
     requestPrivacy: z.boolean().optional().default(false),
+    entityType: z
+      .enum([
+        "fact",
+        "institution",
+        "office",
+        "person",
+        "election",
+        "constitution-passage",
+        "organization",
+        "indicator",
+      ])
+      .nullable()
+      .optional(),
+    entityId: nullableText(200),
+    fieldPath: nullableText(200),
+    releaseId: nullableText(200),
+    sourceId: nullableText(200),
+    sourceUrl: z.string().url().max(2_048).nullable().optional(),
+    publishedValue: nullableText(2_000),
+    proposedValue: nullableText(2_000),
+    evidenceUrl: z.string().url().max(2_048).nullable().optional(),
+    noticeVersion: nullableText(120),
+    noticeAccepted: z.boolean().optional().default(false),
+    _trap: text(256).optional(),
   })
   .strict();
 export type CorrectionBody = z.infer<typeof correctionBodySchema>;
+
+export const adminCorrectionMutationBodySchema = z
+  .object({
+    status: z.enum([
+      "open",
+      "in_review",
+      "resolved_corrected",
+      "resolved_no_change",
+      "rejected",
+    ]),
+    disposition: nullableText(10_000),
+    internalNotes: nullableText(10_000),
+    redirect: redirect,
+    redactSubmitter: z.boolean().optional().default(false),
+  })
+  .strict();
+export const adminCorrectionMutationFormSchema =
+  adminCorrectionMutationBodySchema.extend({
+    status: optionalFormValue(
+      z.enum([
+        "open",
+        "in_review",
+        "resolved_corrected",
+        "resolved_no_change",
+        "rejected",
+      ]),
+    ).transform((value) => value ?? "in_review"),
+    disposition: optionalFormValue(text(10_000))
+      .nullable()
+      .transform((value) => value ?? null),
+    internalNotes: optionalFormValue(text(10_000))
+      .nullable()
+      .transform((value) => value ?? null),
+    redirect: formRedirect,
+    redactSubmitter: optionalFormValue(z.literal("1"))
+      .transform((value) => value === "1"),
+  });
+export type AdminCorrectionMutationBody = z.infer<
+  typeof adminCorrectionMutationBodySchema
+>;
 
 export const CONTACT_BODY_LIMITS = Object.freeze({
   name: 100,

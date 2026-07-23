@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "8605dc1ebca0d5810a7f4090e959d70c7e7e49982a993040423623ff92955a63",
+  "semanticHash": "c58ec87328f8c09e7cd4519652ffbb38bc31d208038f50e492ba643d2c67c59e",
   "summary": {
-    "route": 178,
+    "route": 184,
     "pipeline": 50,
     "calculation": 8,
     "data_domain": 14,
@@ -4151,6 +4151,100 @@
       }
     },
     {
+      "id": "route:src/app/(admin)/admin/corrections/[id]/page.tsx",
+      "kind": "route",
+      "title": "/admin/corrections/[id] reader page",
+      "source": "src/app/(admin)/admin/corrections/[id]/page.tsx",
+      "critical": true,
+      "owner": "Admin and reviewer operations",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "covered",
+          "evidence": [
+            "npm run test:qa-011"
+          ],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/(admin)/admin/corrections/page.tsx",
+      "kind": "route",
+      "title": "/admin/corrections reader page",
+      "source": "src/app/(admin)/admin/corrections/page.tsx",
+      "critical": true,
+      "owner": "Admin and reviewer operations",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "covered",
+          "evidence": [
+            "npm run test:qa-011"
+          ],
+          "gapTask": null
+        }
+      }
+    },
+    {
       "id": "route:src/app/(admin)/admin/data-disputes/[id]/page.tsx",
       "kind": "route",
       "title": "/admin/data-disputes/[id] reader page",
@@ -5667,6 +5761,96 @@
       }
     },
     {
+      "id": "route:src/app/(reader)/governance-change/page.tsx",
+      "kind": "route",
+      "title": "/governance-change reader page",
+      "source": "src/app/(reader)/governance-change/page.tsx",
+      "critical": true,
+      "owner": "Reader experience and Atlas product",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/(reader)/leaders/page.tsx",
+      "kind": "route",
+      "title": "/leaders reader page",
+      "source": "src/app/(reader)/leaders/page.tsx",
+      "critical": true,
+      "owner": "Reader experience and Atlas product",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
       "id": "route:src/app/(reader)/methodology/approach/page.tsx",
       "kind": "route",
       "title": "/methodology/approach reader page",
@@ -5986,6 +6170,51 @@
       "kind": "route",
       "title": "/policies reader page",
       "source": "src/app/(reader)/policies/page.tsx",
+      "critical": true,
+      "owner": "Reader experience and Atlas product",
+      "fixture": "Route-specific browser fixture required",
+      "command": "npm run test:e2e",
+      "coverage": {
+        "unit": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "integration": {
+          "status": "partial",
+          "evidence": [
+            "Route/module registry"
+          ],
+          "gapTask": "QA-013"
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "partial",
+          "evidence": [
+            "Canonical browser harness"
+          ],
+          "gapTask": "QA-013"
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/(reader)/report-data-issue/page.tsx",
+      "kind": "route",
+      "title": "/report-data-issue reader page",
+      "source": "src/app/(reader)/report-data-issue/page.tsx",
       "critical": true,
       "owner": "Reader experience and Atlas product",
       "fixture": "Route-specific browser fixture required",
@@ -6396,6 +6625,51 @@
       "critical": true,
       "owner": "Admin and reviewer operations",
       "fixture": "admin route-inventory declaration for GET",
+      "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
+      "coverage": {
+        "unit": {
+          "status": "covered",
+          "evidence": [
+            "src/lib/api/route-inventory/__tests__/route-inventory.test.ts"
+          ],
+          "gapTask": null
+        },
+        "integration": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:route-io-policy"
+          ],
+          "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        },
+        "manual": {
+          "status": "covered",
+          "evidence": [
+            "npm run test:qa-011"
+          ],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/api/admin/corrections/[id]/route.ts",
+      "kind": "route",
+      "title": "/api/admin/corrections/[id] API handler",
+      "source": "src/app/api/admin/corrections/[id]/route.ts",
+      "critical": true,
+      "owner": "Admin and reviewer operations",
+      "fixture": "admin route-inventory declaration for POST",
       "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
       "coverage": {
         "unit": {

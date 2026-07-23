@@ -3,7 +3,7 @@
 **Status:** implemented coverage registry
 **Machine-readable artifact:** `data/verification-matrix.v1.json`
 **Schema:** `civica-verification-matrix/v1`
-**Semantic hash:** `8605dc1ebca0d5810a7f4090e959d70c7e7e49982a993040423623ff92955a63`
+**Semantic hash:** `c58ec87328f8c09e7cd4519652ffbb38bc31d208038f50e492ba643d2c67c59e`
 
 ## Purpose
 
@@ -14,9 +14,9 @@ fixture, command, and current status for unit, integration, database, browser,
 and manual verification. It is a coverage map, not a claim that every planned
 test already exists.
 
-The checked artifact currently registers 266 critical surfaces:
+The checked artifact currently registers 272 critical surfaces:
 
-- 178 Git-tracked Next.js page, route-handler, and error-boundary sources discovered under `src/app`.
+- 184 Git-tracked Next.js page, route-handler, and error-boundary sources discovered under `src/app`.
 - 50 scheduled or manual production adapters from `production-adapter-registry`.
 - 8 published calculation families from the QA-007 golden-test registry.
 - 14 Atlas source-coverage domains.

@@ -288,6 +288,17 @@ snapshots. Apply it only after the recorded migration plan; recovery is an
 isolated pre-change backup or reviewed forward compensation, never an invented
 historical release mapping.
 
+`0047_atlas_data_error_reports` extends the retained correction log with
+ATL-024's exact Atlas entity, field, affected release, displayed source,
+published/proposed value, evidence, versioned notice, acknowledgement,
+and authenticated triage coordinates. It adds only nullable columns,
+constraints, and indexes; legacy Index/Pulse reports remain valid. New Atlas
+reports require a complete coordinate set and opaque receipt. A report may be
+marked corrected only through application triage after an ATL-020 history
+event links back to it. Apply only after the read-only legacy-row preflight;
+recovery is an isolated pre-change backup or reviewed forward compensation,
+never deletion or rewriting of a submitted correction report.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 307
-- **Completed:** 244
-- **Remaining:** 63
-- **Progress:** 79.5%
+- **Completed:** 245
+- **Remaining:** 62
+- **Progress:** 79.8%
 - **Priority mix:** P0 190 · P1 112 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -182,7 +182,14 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-007** (P0) Audit and qualify the expanded elections corpus before calling it global. _Done when: all 915 baseline rows are checked for event type, date semantics, status, jurisdiction identity, source, license, duplication, historical/upcoming distinction, and freshness; coverage report and UI claims reflect the verified result._
 - [x] **ATL-008** (P1) Complete election research utilities around verified data. _Done when: calendar/timeline/filter/export views use only qualified rows, time zones and tentative dates are explicit, electoral-system context is source-linked, and sparse/uncertain jurisdictions render an honest state._
 - [x] **ATL-009** (P1) Add cross-corpus constitutional full-text search as a research feature. _Done when: query, language/translation context, jurisdiction/topic filters, highlighted passages, stable citations/anchors, source/license attribution, pagination, performance limits, and no-result/error states pass automated and browser tests._
-- [ ] **ATL-010** (P2) Build a world leaders directory only from verified office/person/tenure data. _Done when: search/filter/sort and profile links expose source/vintage and ambiguity, acting/interim/co-leadership states are correct, missing portraits do not imply missing data, and directory counts match a release query._ **Agent preparation complete 2026-07-23:** the UI, release/query contract, ranked-source resolver, fail-closed ambiguity handling, co-leadership-safe reconciliation, validators, and browser evidence are complete. A zero-write live audit found 89 retained-versus-ranked-source roster discrepancies plus one ambiguous role, so publication is safely blocked and unlinked pending an owner-authorized production Wikidata refresh and post-run verification; see `plan/evidence/ATL-010/`.
+- [ ] **ATL-010** (P2) Build a world leaders directory only from verified office/person/tenure data. _Done when: search/filter/sort and profile links expose source/vintage and ambiguity, acting/interim/co-leadership states are correct, missing portraits do not imply missing data, and directory counts match a release query._
+  **Agent preparation complete 2026-07-23:** the UI, release/query contract,
+  ranked-source resolver, fail-closed ambiguity handling, co-leadership-safe
+  reconciliation, validators, and browser evidence are complete. A zero-write
+  live audit found 89 retained-versus-ranked-source roster discrepancies plus
+  one ambiguous role, so publication is safely blocked and unlinked pending an
+  owner-authorized production Wikidata refresh and post-run verification; see
+  `plan/evidence/ATL-010/`.
 - [x] **ATL-011** (P1) Audit political-party identity, seats, coalition, and ideology coverage before expanding the party browser. _Done when: every displayed attribute has source/vintage/license, party identity changes/splits are versioned, unknown ideology is not inferred, and any ideology visualization uses an adopted external methodology or remains absent._
 - [x] **ATL-012** (P1) Audit organizations and memberships as dated relationships rather than timeless facts. _Done when: membership type, start/end/status, disputed/observer cases, source/vintage, and organization identity are represented; UI/API/export fixtures cover current and historical memberships._
 - [x] **ATL-013** (P1) Audit bills/legislative activity coverage and narrow claims to supported jurisdictions. _Done when: source, chamber, status taxonomy, date semantics, pagination, freshness, and jurisdiction coverage are published; unsupported countries render a coverage explanation rather than a misleading empty legislature._
@@ -197,6 +204,14 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-022** (P2) Create a source-native governance-change explorer only after ATL-003. _Done when: “movers/backsliding” views use declared external series and time windows, show uncertainty/revisions and sensitivity to start/end dates, avoid Civica letter grades, and allow no-ranking when comparability is insufficient._
 - [x] **ATL-023** (P1) Publish at least three reproducible reconciliation or institutional-data case studies. _Done when: each case has a research question, frozen input rows, decision trail, code/notebook, output, source rights, limitations, stable citation, and a test that regenerates its tables/figures._
 - [ ] **ATL-024** (P1) Add an evidence-backed data-error/report-correction flow. _Done when: a reader can report a precise entity/field/release/source issue; submissions are authenticated against abuse, acknowledged, triaged, linked to corrections, and covered by privacy/retention policy and delivery tests._
+  **Agent preparation complete 2026-07-23:** the exact Atlas intake, abuse
+  controls, opaque receipt, authenticated/audited triage, privacy/redaction
+  registry, and required ATL-020 correction-history linkage are implemented
+  and locally validated. The page and API fail closed with no form/write while
+  the additive schema is absent. Completion requires owner-authorized
+  production migrations 0046/0047 plus stored-schema browser, durable receipt,
+  triage, linkage, and delivery verification. Evidence:
+  `plan/evidence/ATL-024/`.
 - [x] **ATL-025** (P1) Reconcile every older roadmap/mockup promise with the atlas-first release. _Done when: each existing dated plan/mockup is tagged imported/completed/superseded/deferred/post-release with evidence and any still-valid open work has a task ID in this master plan; no active pointer targets a noncanonical plan._
 - [ ] **ATL-026** (P0) Persist every Civica Conditions component value, reference year, source, missingness, and inclusion decision. _Done when: economic/HDI/security rows can be decomposed into exact components and years, mixed-year inputs follow an adopted alignment rule or are refused/flagged, and no composite is labelled solely with the newest component year._
 - [ ] **ATL-027** (P0) Freeze Conditions reference distributions and transformations by release. _Done when: reference population/period, means/SDs or other normalization parameters, direction, included components, and missingness are stored/queryable; rerunning a release is deterministic and cannot shift prior values silently._

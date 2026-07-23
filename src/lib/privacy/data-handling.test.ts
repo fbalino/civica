@@ -17,6 +17,7 @@ test("every required BRD-012 domain has a distinct flow", () => {
   const ids = new Set<string>(PRIVACY_DATA_FLOWS.map((flow) => flow.id));
   for (const id of [
     "contact-messages",
+    "data-error-reports",
     "advisory-applications",
     "route-performance",
     "owner-admin",
@@ -35,8 +36,12 @@ test("public summaries name every reader-visible external service boundary", () 
   }
 });
 
-test("contact and application flows prohibit new raw-IP retention", () => {
-  for (const id of ["contact-messages", "advisory-applications"]) {
+test("public submission flows prohibit new raw-IP retention", () => {
+  for (const id of [
+    "contact-messages",
+    "data-error-reports",
+    "advisory-applications",
+  ]) {
     const flow = PRIVACY_DATA_FLOWS.find((candidate) => candidate.id === id);
     assert.ok(flow);
     assert.match(flow.safeguards, /no new raw-IP retention/i);

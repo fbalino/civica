@@ -2464,35 +2464,85 @@ export const civicaConditionsComponents = pgTable(
  * Pulse misclassification reports. Backs the /civica-index/corrections page.
  * Rows where is_public=false are hidden from the public log (PII redaction).
  */
-export const correctionLog = pgTable("correction_log", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
-  /** FK to jurisdictions.id — nullable for methodology-wide disputes */
-  countryId: uuid("country_id").references(() => jurisdictions.id),
-  /**
-   * ci_data_error | ci_methodology | pulse_misclassification |
-   * pulse_severity | pulse_false_positive | pulse_missing_event |
-   * pulse_duplicate | other
-   */
-  category: text("category").notNull(),
-  /** Optional CI dimension the dispute pertains to */
-  dimension: text("dimension"),
-  submitterName: text("submitter_name"),
-  submitterEmail: text("submitter_email"),
-  submitterAffiliation: text("submitter_affiliation"),
-  description: text("description").notNull(),
-  /**
-   * open | in_review | resolved_corrected | resolved_no_change | rejected
-   */
-  status: text("status").notNull().default("open"),
-  /** Public-facing response from Civica, set when resolved */
-  disposition: text("disposition"),
-  resolvedAt: timestamp("resolved_at"),
-  /** false = row is hidden from the public log (PII redaction toggle) */
-  isPublic: boolean("is_public").notNull().default(true),
-  /** Internal team notes — never shown publicly */
-  internalNotes: text("internal_notes"),
-});
+export const correctionLog = pgTable(
+  "correction_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+    /** FK to jurisdictions.id — nullable for methodology-wide disputes */
+    countryId: uuid("country_id").references(() => jurisdictions.id),
+    /**
+     * atlas_data_error | ci_data_error | ci_methodology |
+     * pulse_misclassification | pulse_severity | pulse_false_positive |
+     * pulse_missing_event | pulse_duplicate | other
+     */
+    category: text("category").notNull(),
+    /** Optional CI dimension the dispute pertains to */
+    dimension: text("dimension"),
+    submitterName: text("submitter_name"),
+    submitterEmail: text("submitter_email"),
+    submitterAffiliation: text("submitter_affiliation"),
+    description: text("description").notNull(),
+    /**
+     * open | in_review | resolved_corrected | resolved_no_change | rejected
+     */
+    status: text("status").notNull().default("open"),
+    /** Public-facing response from Civica, set when resolved */
+    disposition: text("disposition"),
+    resolvedAt: timestamp("resolved_at"),
+    /** false = row is hidden from the public log (PII redaction toggle) */
+    isPublic: boolean("is_public").notNull().default(true),
+    /** Internal team notes — never shown publicly */
+    internalNotes: text("internal_notes"),
+    /** ATL-024 exact Atlas entity/field/release/source report coordinates. */
+    entityType: text("entity_type"),
+    entityId: text("entity_id"),
+    fieldPath: text("field_path"),
+    affectedReleaseId: text("affected_release_id"),
+    reportedSourceId: text("reported_source_id"),
+    reportedSourceUrl: text("reported_source_url"),
+    publishedValue: text("published_value"),
+    proposedValue: text("proposed_value"),
+    evidenceUrl: text("evidence_url"),
+    /** Versioned contextual notice accepted by the voluntary submitter. */
+    noticeVersion: text("notice_version"),
+    noticeAcceptedAt: timestamp("notice_accepted_at"),
+    /** Durable on-screen acknowledgement; never a promise of email delivery. */
+    acknowledgmentCode: text("acknowledgment_code"),
+    acknowledgedAt: timestamp("acknowledged_at"),
+    triagedAt: timestamp("triaged_at"),
+    reviewerId: text("reviewer_id"),
+  },
+  (table) => [
+    uniqueIndex("idx_correction_log_acknowledgment_code")
+      .on(table.acknowledgmentCode)
+      .where(dsql`${table.acknowledgmentCode} IS NOT NULL`),
+    index("idx_correction_log_status_submitted").on(
+      table.status,
+      table.submittedAt,
+    ),
+    index("idx_correction_log_entity").on(
+      table.entityType,
+      table.entityId,
+    ),
+    check(
+      "correction_log_status_closed",
+      dsql`${table.status} IN ('open','in_review','resolved_corrected','resolved_no_change','rejected')`,
+    ),
+    check(
+      "correction_log_resolution_shape",
+      dsql`((${table.status} IN ('open','in_review')) AND ${table.resolvedAt} IS NULL) OR ((${table.status} IN ('resolved_corrected','resolved_no_change','rejected')) AND ${table.resolvedAt} IS NOT NULL AND length(trim(${table.disposition})) >= 10)`,
+    ),
+    check(
+      "correction_log_atlas_report_shape",
+      dsql`${table.category} <> 'atlas_data_error' OR (${table.entityType} IN ('fact','institution','office','person','election','constitution-passage','organization','indicator') AND length(trim(${table.entityId})) > 0 AND length(trim(${table.fieldPath})) > 0 AND length(trim(${table.affectedReleaseId})) > 0 AND length(trim(${table.reportedSourceId})) > 0 AND ${table.reportedSourceUrl} LIKE 'https://%' AND length(trim(${table.publishedValue})) > 0 AND ${table.noticeVersion} = 'civica-data-error-report-notice/2026-07-23' AND ${table.noticeAcceptedAt} IS NOT NULL AND ${table.acknowledgmentCode} ~ '^CA-[A-F0-9]{12}$' AND ${table.acknowledgedAt} IS NOT NULL)`,
+    ),
+    check(
+      "correction_log_url_shape",
+      dsql`(${table.reportedSourceUrl} IS NULL OR ${table.reportedSourceUrl} LIKE 'https://%') AND (${table.evidenceUrl} IS NULL OR ${table.evidenceUrl} LIKE 'https://%')`,
+    ),
+  ],
+);
 
 /**
  * Consented public profiles for appointed advisory-board members. The table

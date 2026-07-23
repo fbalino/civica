@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
+  atlas_data_error: "Atlas data error",
   ci_data_error: "CI data error",
   ci_methodology: "CI methodology",
   pulse_misclassification: "Pulse misclassification",
@@ -154,6 +155,12 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         <p style={{ marginTop: "var(--space-3)", marginBottom: 0 }}>
           Governments, researchers, NGOs, journalists, and any affected party may submit.
           You do not need to provide your name or email.
+        </p>
+        <p>
+          For an Atlas fact or entity, use the{" "}
+          <Link href="/report-data-issue">precise data-report form</Link> so
+          the entity, field, release, source, and published value are retained
+          separately.
         </p>
       </Banner>
 

@@ -61,10 +61,10 @@ async function findRepositoryRouteFilesOnDisk(): Promise<string[]> {
 // Positive: the real registry is internally consistent and complete
 // ─────────────────────────────────────────────────────────────────────
 
-test("the real registry has exactly 108 entries, one per real route.ts file", async () => {
+test("the real registry has exactly 109 entries, one per real route.ts file", async () => {
   const diskFiles = await findRepositoryRouteFilesOnDisk();
-  assert.equal(diskFiles.length, 108, "expected exactly 108 route.ts files under src/app");
-  assert.equal(ROUTE_INVENTORY.length, 108);
+  assert.equal(diskFiles.length, 109, "expected exactly 109 route.ts files under src/app");
+  assert.equal(ROUTE_INVENTORY.length, 109);
 });
 
 test("no duplicate filePath entries in the registry", () => {

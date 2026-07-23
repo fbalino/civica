@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
+import ts from "typescript";
 import {
   APPEND_ONLY_EVIDENCE_RELATIONS,
   DESTRUCTIVE_WRITE_PATHS,
@@ -99,6 +100,39 @@ function sourceFiles(directory: string): string[] {
   );
 }
 
+function containsDestructiveDatabaseWrite(path: string): boolean {
+  const sourceText = readFileSync(resolve(root, path), "utf8");
+  const source = ts.createSourceFile(
+    path,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  let found = false;
+  const visit = (node: ts.Node) => {
+    if (found) return;
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.name.text === "delete"
+    ) {
+      found = true;
+      return;
+    }
+    if (
+      ts.isTaggedTemplateExpression(node) &&
+      /DELETE\s+FROM/i.test(node.template.getText(source))
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return found;
+}
+
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
   if (
     !migration.includes(`'${relation}'`) &&
@@ -162,8 +196,7 @@ for (const required of [
 }
 
 for (const path of DESTRUCTIVE_WRITE_PATHS) {
-  const source = readFileSync(resolve(root, path.path), "utf8");
-  if (!/\.delete\s*\(|DELETE\s+FROM/i.test(source)) {
+  if (!containsDestructiveDatabaseWrite(path.path)) {
     fail(
       `registered destructive path no longer contains a database deletion: ${path.path}`,
     );
@@ -183,11 +216,7 @@ const registeredPaths = new Set<string>(
   DESTRUCTIVE_WRITE_PATHS.map((row) => row.path),
 );
 const discoveredPaths = [...sourceFiles("scripts"), ...sourceFiles("src/lib")]
-  .filter((path) =>
-    /\.delete\s*\(|DELETE\s+FROM/i.test(
-      readFileSync(resolve(root, path), "utf8"),
-    ),
-  )
+  .filter(containsDestructiveDatabaseWrite)
   .sort();
 for (const path of discoveredPaths) {
   if (!registeredPaths.has(path))

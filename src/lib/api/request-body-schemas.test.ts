@@ -5,6 +5,8 @@ import type { z } from "zod";
 import {
   adminAdvisoryMutationBodySchema,
   adminAdvisoryMutationFormSchema,
+  adminCorrectionMutationBodySchema,
+  adminCorrectionMutationFormSchema,
   adminDataDisputeBodySchema,
   adminDataDisputeFormSchema,
   adminLoginBodySchema,
@@ -51,6 +53,16 @@ const fixtures: Array<{
     name: "admin advisory mutation",
     schema: adminAdvisoryMutationBodySchema,
     body: { status: "reviewed", redirect: "/admin/advisory-applications" },
+  },
+  {
+    name: "admin Atlas correction",
+    schema: adminCorrectionMutationBodySchema,
+    body: {
+      status: "in_review",
+      disposition: null,
+      internalNotes: "Checking the retained release row.",
+      redactSubmitter: false,
+    },
   },
   {
     name: "admin data dispute",
@@ -123,6 +135,32 @@ const fixtures: Array<{
       dimension: "rule_of_law",
       description: "This observation cites the wrong vintage.",
       requestPrivacy: false,
+    },
+  },
+  {
+    name: "Atlas data-error report",
+    schema: correctionBodySchema,
+    body: {
+      category: "atlas_data_error",
+      countrySlug: "uruguay",
+      dimension: null,
+      entityType: "fact",
+      entityId: UUID,
+      fieldPath: "population.value",
+      releaseId: "atlas-2026-07-11",
+      sourceId: "worldbank",
+      sourceUrl: "https://example.org/source",
+      publishedValue: "3,499,451",
+      proposedValue: null,
+      evidenceUrl: null,
+      description: "The retained publisher row appears to carry another value.",
+      submitterName: null,
+      submitterEmail: null,
+      submitterAffiliation: null,
+      requestPrivacy: true,
+      noticeVersion: "civica-data-error-report-notice/2026-07-23",
+      noticeAccepted: true,
+      _trap: "",
     },
   },
   {
@@ -242,6 +280,22 @@ test("form schemas preserve empty optional-field semantics", () => {
       redirect: "",
     }),
     { status: "reviewed", redirect: undefined },
+  );
+  assert.deepEqual(
+    adminCorrectionMutationFormSchema.parse({
+      status: "in_review",
+      disposition: "",
+      internalNotes: "",
+      redirect: "",
+      redactSubmitter: "",
+    }),
+    {
+      status: "in_review",
+      disposition: null,
+      internalNotes: null,
+      redirect: undefined,
+      redactSubmitter: false,
+    },
   );
   assert.deepEqual(
     adminDataDisputeFormSchema.parse({

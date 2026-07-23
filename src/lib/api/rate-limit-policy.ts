@@ -499,6 +499,15 @@ export const RATE_LIMIT_ROUTE_POLICIES: readonly RateLimitRoutePolicyMapping[] =
         "The common admin mutation boundary supplies session, exact-origin, and audit controls.",
       ),
     ),
+    route(
+      "api/admin/corrections/[id]/route.ts",
+      ["POST"],
+      authenticated(
+        "admin",
+        "declared-admin-audit",
+        "The common admin mutation boundary supplies session, exact-origin, input, and audit controls.",
+      ),
+    ),
     route("api/admin/google/callback/route.ts", ["GET"], CONFIRMED_OAUTH),
     route("api/admin/google/start/route.ts", ["GET"], CONFIRMED_OAUTH),
     route(

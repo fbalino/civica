@@ -43,6 +43,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/civica-index/methodology/pulse/backtest", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/pulse-changelog", changeFrequency: "monthly", priority: 0.7 },
   { path: "/civica-index/corrections", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/report-data-issue", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/replication", changeFrequency: "monthly", priority: 0.5 },
   { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/policies", changeFrequency: "monthly", priority: 0.5 },

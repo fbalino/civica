@@ -76,6 +76,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Pulse Changelog", href: "/civica-index/pulse-changelog" },
       { label: "Replication", href: "/civica-index/replication" },
       { label: "Corrections", href: "/civica-index/corrections" },
+      { label: "Report a Data Issue", href: "/report-data-issue" },
     ],
   },
   {

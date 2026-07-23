@@ -492,6 +492,15 @@ export const REQUEST_CONTRACT_MAPPINGS: readonly RequestContractMapping[] = [
       "after-auth-before-work",
     ],
     [
+      "admin/atlas-correction-v1",
+      "api/admin/corrections/[id]/route.ts",
+      "json-or-form",
+      24_576,
+      "admin-atlas-correction-body/v1",
+      "admin-resource-uuid-params/v1",
+      "after-auth-before-work",
+    ],
+    [
       "admin/message-status-v1",
       "api/admin/messages/[id]/route.ts",
       "json-or-form",

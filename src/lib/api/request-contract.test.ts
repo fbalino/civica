@@ -375,6 +375,19 @@ const BODY_SCHEMA_EXPECTATIONS: Readonly<
     ],
     limit: "adminMessageStatus",
   },
+  "admin-atlas-correction-body/v1": {
+    media: [
+      {
+        mediaType: "JSON_MEDIA_TYPE",
+        schema: "adminCorrectionMutationBodySchema",
+      },
+      {
+        mediaType: "FORM_MEDIA_TYPE",
+        schema: "adminCorrectionMutationFormSchema",
+      },
+    ],
+    limit: "adminCorrectionMutation",
+  },
   "admin-pulse-review-body/v1": {
     media: [
       {

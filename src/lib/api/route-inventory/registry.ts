@@ -89,6 +89,20 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "Updates or deletes an advisory application through the shared active-session, exact-origin, and common audit boundary.",
   },
   {
+    filePath: "api/admin/corrections/[id]/route.ts",
+    exposure: "admin",
+    methods: ["POST"],
+    mutation: true,
+    sensitive: true,
+    controls: [
+      "admin-session",
+      "same-origin-mutation",
+      "admin-audit",
+      "input-validation",
+    ],
+    note: "Triages precise Atlas data reports through the shared active-session, exact-origin, input, and common audit boundaries; corrected resolution additionally requires linked ATL-020 history.",
+  },
+  {
     filePath: "api/admin/advisory-applications/route.ts",
     exposure: "admin",
     methods: ["GET"],

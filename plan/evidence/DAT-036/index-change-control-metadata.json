@@ -1,0 +1,29 @@
+{
+  "id": "atlas-publisher-date-contract-2026-07-23",
+  "toVersion": "civica-index-atlas-publisher-date-contract-v50",
+  "categories": [
+    "presentation"
+  ],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/DAT-036/README.md"
+    ],
+    "registry": [
+      "src/lib/api/contract/schemas.ts",
+      "src/lib/api/contract/examples.ts"
+    ],
+    "release_note": [
+      "plan/evidence/DAT-036/release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/DAT-036/repair-runbook.md",
+      "plan/evidence/DAT-036/live-repair-plan.json"
+    ],
+    "golden_test": [
+      "src/lib/data/value-state.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-wikidata-date-precision.ts"
+    ]
+  }
+}

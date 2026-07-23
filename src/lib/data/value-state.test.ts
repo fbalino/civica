@@ -193,6 +193,7 @@ test("export rows preserve all states instead of collapsing absent values to zer
       },
       freshness: {
         asOf: "2025-01-01",
+        publisherDate: null,
         observationYear: 2025,
         dataVintageYear: 2025,
         retrievedAt: "2026-01-01T00:00:00.000Z",
