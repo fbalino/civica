@@ -58,16 +58,21 @@ import {
   type StructuredArticle,
   type ParsedSection,
 } from "../src/lib/constitute/sync-constitutions";
+import { routineConstitutionPassageHistory } from "../src/lib/constitute/constitution-passage-history-writer";
 
 interface CliArgs {
   dryRun: boolean;
   slugs: string[] | null;
+  releaseId: string | null;
 }
 
 function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { dryRun: false, slugs: null };
+  const args: CliArgs = { dryRun: false, slugs: null, releaseId: null };
   for (const a of argv) {
     if (a === "--dry-run") args.dryRun = true;
+    else if (a.startsWith("--release-id=")) {
+      args.releaseId = a.slice("--release-id=".length).trim() || null;
+    }
     else if (a.startsWith("--slugs=")) {
       const list = a
         .slice("--slugs=".length)
@@ -112,6 +117,9 @@ function fmtDelta(n: number): string {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
+  const passageHistory = args.dryRun
+    ? null
+    : routineConstitutionPassageHistory(args.releaseId);
 
   console.log("=== Constitution re-parse (local, no source fetch) ===");
   if (args.dryRun) console.log("MODE: dry run (no writes)");
@@ -249,6 +257,7 @@ async function main(): Promise<void> {
       sourceDocumentId: t.sourceDocumentId,
       retrievedAt: t.lastFetched,
       articles: storedArticles,
+      history: passageHistory!,
     });
     excerptsTotal += excerptRows;
     updated++;

@@ -24,29 +24,22 @@
  * The World's Constitutions to Read, Search, and Compare."
  */
 import { parse, type HTMLElement, type Node } from "node-html-parser";
-import type { BatchItem } from "drizzle-orm/batch";
 
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
   constitutions,
-  constitutionPassages,
   constitutionTopicExcerpts,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
-import { and, eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { getTopicLabel } from "./topics";
 import {
-  CONSTITUTION_PASSAGE_LANGUAGE,
-  CONSTITUTION_PASSAGE_LANGUAGE_BASIS,
-  CONSTITUTION_PASSAGE_SCHEMA_VERSION,
-  CONSTITUTION_PASSAGE_TRANSLATION_STATUS,
-  CONSTITUTION_SEARCH_INDEX_VERSION,
-  constituteDocumentUrl,
-  constituteRetrievalUrl,
-  prepareConstitutionPassages,
-} from "@/lib/constitution/passage-index";
+  replaceConstitutionPassageProjectionWithHistory,
+  routineConstitutionPassageHistory,
+  type ConstitutionPassageHistoryContext,
+} from "./constitution-passage-history-writer";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -510,6 +503,8 @@ export interface SyncConstitutionsOptions {
   db?: ConstituteSyncDb;
   /** Parse + resolve everything but write NOTHING (and never stamp freshness). */
   dryRun?: boolean;
+  /** Named Atlas release. Apply runs also accept CIVICA_ATLAS_RELEASE_ID. */
+  atlasReleaseId?: string;
   /** Cap the number of constitutions processed (after slug filtering). */
   limit?: number;
   /** Restrict to these Civica jurisdiction slugs. */
@@ -682,95 +677,18 @@ export async function replaceCurrentConstitutionPassages(
     sourceDocumentId: string;
     retrievedAt: Date;
     articles: StructuredArticle[];
+    history?: ConstitutionPassageHistoryContext;
   },
 ): Promise<ReplaceConstitutionPassagesResult> {
-  const prepared = prepareConstitutionPassages(
-    input.sourceDocumentId,
-    input.articles,
-  );
-  const current = await db
-    .select({ passageId: constitutionPassages.passageId })
-    .from(constitutionPassages)
-    .where(
-      and(
-        eq(constitutionPassages.constitutionId, input.constitutionId),
-        eq(constitutionPassages.isCurrent, true),
-      ),
-    );
-  const currentIds = current.map((row) => row.passageId).sort();
-  const nextIds = prepared.map((row) => row.passageId).sort();
-  if (
-    currentIds.length === nextIds.length &&
-    currentIds.every((id, index) => id === nextIds[index])
-  ) {
-    return { current: prepared.length, written: 0, superseded: 0 };
-  }
-
-  const sourceUrl = constituteDocumentUrl(input.sourceDocumentId);
-  const retrievalUrl = constituteRetrievalUrl(input.sourceDocumentId);
-  const now = input.retrievedAt;
-
-  const rows = prepared.map((passage) => ({
-    ...passage,
-    schemaVersion: CONSTITUTION_PASSAGE_SCHEMA_VERSION,
-    searchIndexVersion: CONSTITUTION_SEARCH_INDEX_VERSION,
-    constitutionId: input.constitutionId,
-    jurisdictionId: input.jurisdictionId,
-    sourceDocumentId: input.sourceDocumentId,
-    languageCode: CONSTITUTION_PASSAGE_LANGUAGE,
-    languageBasis: CONSTITUTION_PASSAGE_LANGUAGE_BASIS,
-    translationStatus: CONSTITUTION_PASSAGE_TRANSLATION_STATUS,
-    originalLanguageCode: null,
-    translator: null,
-    sourceId: CONSTITUTE_SOURCE_ID,
-    sourceUrl,
-    retrievalUrl,
-    retrievedAt: now,
-    isCurrent: true,
-    supersededAt: null,
-  }));
-
-  const operations: BatchItem<"pg">[] = [
-    db
-      .update(constitutionPassages)
-      .set({ isCurrent: false, supersededAt: now })
-      .where(
-        and(
-          eq(constitutionPassages.constitutionId, input.constitutionId),
-          eq(constitutionPassages.isCurrent, true),
-        ),
-      ),
-  ];
-  for (let offset = 0; offset < rows.length; offset += 100) {
-    const batch = rows.slice(offset, offset + 100);
-    operations.push(
-      db.insert(constitutionPassages).values(batch).onConflictDoNothing(),
+  if (!input.history) {
+    throw new Error(
+      "Constitution passage writes require a named Atlas release history context",
     );
   }
-  for (let offset = 0; offset < nextIds.length; offset += 500) {
-    const batch = nextIds.slice(offset, offset + 500);
-    operations.push(
-      db
-        .update(constitutionPassages)
-        .set({ isCurrent: true, supersededAt: null })
-        .where(
-          and(
-            inArray(constitutionPassages.passageId, batch),
-            eq(constitutionPassages.isCurrent, false),
-          ),
-        ),
-    );
-  }
-  const [first, ...rest] = operations;
-  if (first) {
-    await db.batch([first, ...rest] as [BatchItem<"pg">, ...BatchItem<"pg">[]]);
-  }
-
-  return {
-    current: prepared.length,
-    written: prepared.length,
-    superseded: currentIds.filter((id) => !nextIds.includes(id)).length,
-  };
+  return replaceConstitutionPassageProjectionWithHistory(db, {
+    ...input,
+    history: input.history,
+  });
 }
 
 /**
@@ -853,6 +771,9 @@ export async function syncConstitutions(
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
   const dryRun = options.dryRun ?? false;
+  const passageHistory = dryRun
+    ? null
+    : routineConstitutionPassageHistory(options.atlasReleaseId);
   const politenessDelay = options.politenessDelayMs ?? POLITENESS_DELAY_MS;
 
   const summary: SyncConstitutionsSummary = {
@@ -1033,6 +954,7 @@ export async function syncConstitutions(
               sourceDocumentId: row.id,
               retrievedAt,
               articles: storedArticles,
+              history: passageHistory!,
             }),
           {
             label: `passages ${row.id}`,
