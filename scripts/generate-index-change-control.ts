@@ -7,6 +7,7 @@ import {
   indexEvidence,
   indexSnapshotSha256,
   requiredIndexValidations,
+  stagedIndexSnapshot,
   type IndexChangeCategory,
   type IndexChangeRegistry,
   type IndexChangeEvidenceRole,
@@ -15,6 +16,7 @@ import {
 const outputDir = "data/releases/index-change-control-v1";
 const outputPath = `${outputDir}/registry.v1.json`;
 const initialize = process.argv.includes("--initialize");
+const staged = process.argv.includes("--staged");
 const metadataArg = process.argv.find((arg) => arg.startsWith("--metadata="));
 
 type Metadata = {
@@ -31,7 +33,7 @@ function changedPaths(before: IndexChangeRegistry["entries"][number]["protectedF
   return after.filter((row) => prior.get(row.path) !== row.sha256);
 }
 
-const snapshot = currentIndexSnapshot();
+const snapshot = staged ? stagedIndexSnapshot() : currentIndexSnapshot();
 if (initialize) {
   if (existsSync(outputPath) && !process.argv.includes("--force-initialize")) {
     throw new Error("The change-control registry already exists. Append with --metadata; do not reset its history.");

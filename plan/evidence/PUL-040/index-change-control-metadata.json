@@ -1,0 +1,43 @@
+{
+  "id": "post-v48-atlas-pulse-contract-rollup-2026-07-23",
+  "toVersion": "civica-index-atlas-pulse-contract-v49",
+  "categories": ["input", "presentation"],
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-040/protected-contract-rollup.md"
+    ],
+    "registry": [
+      "src/lib/data/production-adapter-registry.ts",
+      "src/lib/api/contract/registry.ts",
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "plan/evidence/PUL-040/start-readiness.json"
+    ],
+    "release_note": [
+      "plan/evidence/PUL-040/runtime-evidence-cut-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-040/runtime-evidence-cut-migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-runtime-method.ts",
+      "scripts/audit-pulse-prospective-start.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:pulse-runtime",
+    "validate:pulse-prospective-start"
+  ]
+}

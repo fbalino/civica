@@ -280,6 +280,8 @@
     "audit:pulse-source-independence:live": "tsx scripts/audit-pulse-source-independence.ts",
     "validate:pulse-runtime": "tsx scripts/validate-pulse-runtime-method.ts",
     "validate:pulse-runtime:live": "tsx scripts/validate-pulse-runtime-method.ts --live",
+    "audit:pulse-prospective-start": "tsx scripts/audit-pulse-prospective-start.ts --write",
+    "validate:pulse-prospective-start": "tsx scripts/audit-pulse-prospective-start.ts",
     "validate:pulse-incidents": "tsx scripts/validate-pulse-incidents.ts",
     "validate:pulse-incidents:live": "tsx scripts/validate-pulse-incidents.ts --live",
     "validate:pulse-classification-state": "node --import tsx --test src/lib/pulse/v2/classification-state.test.ts src/lib/pulse/v2/classify-fixture.test.ts src/lib/pulse/v2/classification-publication.test.ts src/lib/pulse/v2/classify-cron-retry.test.ts && tsx scripts/validate-pulse-classification-state.ts",

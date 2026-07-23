@@ -525,6 +525,19 @@ export function currentIndexSnapshot(): IndexSnapshotFile[] {
   }));
 }
 
+export function stagedIndexSnapshot(): IndexSnapshotFile[] {
+  return INDEX_PROTECTED_FILES.map((row) => ({
+    ...row,
+    sha256: indexProtectedFileHash(
+      row.path,
+      execFileSync("git", ["show", `:${row.path}`], {
+        cwd: process.cwd(),
+        maxBuffer: 20 * 1024 * 1024,
+      }),
+    ),
+  }));
+}
+
 export function indexSnapshotSha256(
   files: readonly IndexSnapshotFile[],
 ): string {
