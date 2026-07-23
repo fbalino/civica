@@ -58,6 +58,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/elections/systems", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-conditions", changeFrequency: "weekly", priority: 0.7 },
   { path: "/governance-evidence", changeFrequency: "weekly", priority: 0.95 },
+  { path: "/governance-change", changeFrequency: "weekly", priority: 0.7 },
   { path: "/rankings", changeFrequency: "weekly", priority: 0.7 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.4 },

@@ -1097,4 +1097,18 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       "{Math.min(...years)} – {Math.max(...years)} · {years.length} observations {runtime}",
       "getIndicatorHistoryForCountry observed-value years for each selected country and source series",
     ),
+    runtimeClaim(
+      "leaders.live-directory-counts",
+      "src/app/(reader)/leaders/page.tsx",
+      "/leaders",
+      '${counts.people.toLocaleString("en")} people · ${counts.jurisdictions.toLocaleString("en")} countries and areas · live verified records',
+      "release-bound verified leader-directory people and jurisdiction counts; page remains publication-blocked while its checked release is blocked",
+    ),
+    runtimeClaim(
+      "governance-change.exact-window-coverage",
+      "src/app/(reader)/governance-change/page.tsx",
+      "/governance-change",
+      "{result.comparableJurisdictions} of {result.eligibleJurisdictions} sovereign-state records",
+      "live source-native indicator-history query with exact selected endpoints and explicit source-unavailable state",
+    ),
   ];
