@@ -1,0 +1,68 @@
+Civica Atlas — Rights and Attribution Notice
+Effective: 2026-07-23
+
+1. Scope of the root code terms
+
+The root LICENSE documents a non-open, all-rights-reserved posture for
+copyrightable original source code and documentation to the extent rights
+exist. It is not an OSI-approved open-source license and does not grant a
+general right to copy, modify, redistribute, sublicense, sell, or create
+derivative works.
+
+The notice does not override rights held by another contributor, a third-party
+package author, an upstream data publisher, a font or image rights holder, or a
+trademark owner.
+
+2. Authorship and tool assistance
+
+Fernando Balino is the responsible human author and publisher identified in
+the project's authorship record. Other human contributors retain rights in
+their respective contributions unless those rights were separately assigned.
+The project records material AI and software-agent assistance in
+data/research/ai-use-disclosure-v1.json. AI-assisted or generated output is
+covered by the root terms only to the extent enforceable rights exist.
+
+No contributor agreement or blanket copyright assignment is implied by this
+notice. Contributor ownership, assignment, and the treatment of generated
+material remain queued for professional review before broad launch.
+
+3. Third-party software and generated artifacts
+
+Dependencies remain governed by the licenses and notices supplied by their
+authors. The dependency inventory and lockfile are maintained in package.json,
+package-lock.json, and plan/evidence/PLT-005/dependency-policy.md. The current
+direct dependency set uses permissive or standard terms, including MIT, BSD,
+ISC, Apache-2.0, and MPL-2.0; file-level or package-level notices continue to
+apply.
+
+Generated source, database migrations, schemas, reports, and build artifacts
+do not erase upstream notices or create rights in third-party inputs. Where a
+generated file includes a separate notice, source header, or upstream license,
+that specific notice controls its covered material.
+
+4. Data, research inputs, and release artifacts
+
+The root LICENSE applies to source code, not to every dataset, observation,
+publisher file, release artifact, or research input in the repository. Those
+materials follow the source-, field-, product-, and release-specific rights
+registry at https://civicaatlas.org/licensing#reuse and in
+src/lib/rights/manifest.ts. Restricted and non-commercial inputs are not
+relicensed by Civica.
+
+5. Fonts, images, and marks
+
+Bundled or fetched fonts retain their upstream licenses. Inter and Source
+Serif 4 are distributed under the SIL Open Font License 1.1 where their font
+files are supplied by the project or its build dependencies.
+
+Editorial illustrations, portraits, flags, logos, maps, and other visual
+assets follow their asset-specific records and the public imagery policy.
+No trademark license is granted for "Civica", "Civica Atlas", associated
+marks, or third-party marks.
+
+6. Review status
+
+This notice records the project's current operational posture and is not legal
+advice. Professional review remains required for contributor ownership,
+generated-code treatment, trademark/name risk, and any future public reuse
+license.

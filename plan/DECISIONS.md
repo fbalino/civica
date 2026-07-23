@@ -1184,3 +1184,27 @@ future table columns, stored HTML, provider redirects, or exception text at
 runtime. Closed boundaries make those trust transitions reviewable and turn a
 new route, field, parser bypass, HTML sink, or response spread into a failing
 build instead of a silent expansion of the public contract.
+
+### APR-D169 — Public source visibility grants no general code-reuse permission
+
+**Decision:** Adopt a root `LICENSE` and `NOTICE` that record Civica's current
+source-code posture as non-open and all rights reserved. Fernando Balino is
+identified for his original contributions; other contributors retain rights in
+their respective work unless separately assigned. Public repository access
+does not grant permission to copy, modify, redistribute, sublicense, sell, or
+build derivative services beyond hosting-platform terms or applicable law.
+Third-party packages, data, fonts, assets, trademarks, file-level notices, and
+generated material remain separately governed. `CITATION.cff` deliberately
+omits an SPDX `license` field because one identifier would misstate the mixed
+scope. No claim is made that every AI-assisted or generated output is
+independently copyrightable.
+
+**Why:** The previous absence of a root file accurately denied an open-source
+grant but forced readers to infer the operational posture. An explicit
+non-open notice makes permissions and exclusions legible without inventing
+ownership over other contributors or upstream materials. It is compatible with
+the current direct dependency inventory because Civica does not relicense
+packages and preserves their package/file terms, including Mapbox product terms
+and MPL file-level obligations. Professional review remains queued for
+contributor ownership, generated-material treatment, and any future reuse
+license; this decision is an accurate interim posture, not legal clearance.

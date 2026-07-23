@@ -1,9 +1,9 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "bd6283385b2845d3eb8b343669a6404abc75f4cd4f0c81d7c857f1d0560b0f3d",
-    "plan/PROGRESS.md": "9e1fc27250d4f043dc0b617958124b3001e97abca85f4a139c0f7821d7a573e2",
-    "plan/MANUAL-CHECKS.md": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
+    "plan/MASTER-CHECKLIST.md": "430283fc171ba4bfa7314602e52208d1db6f4d4b3b856e913ce4d9183108a49b",
+    "plan/PROGRESS.md": "4b8f3e5ca662807777c529d4196e26d4615216c8945da5739a663592edaf4802",
+    "plan/MANUAL-CHECKS.md": "9cee3e34a8b9ae7c9030fe478ed96cfdc5025f51aa20727454d0933e851e7a9b",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "3fb5da3362a6361a477f89fd46993a12587ffebc086c3beccdb773ff770e7558",
@@ -14,7 +14,7 @@
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
     "plan/09-testing-qa-and-release.md": "cc6ef6a056bcb0bd279fa4dcffba3d9939a9267b5a7538ab1b5f44f555be69e6",
     "plan/10-academic-governance-review-and-outreach.md": "3737814fb2cd220a1600dd12d54474b2eabefcbeb325e0a3723cd224f8228e8e",
-    "plan/11-brand-legal-and-licensing.md": "e62fdc5b7b3d89c16d40a1be79813a7f117e98822013e8b9ffb2cb877caf4b84"
+    "plan/11-brand-legal-and-licensing.md": "7c3989aa13da0480d17780fef6701811dd717f37dd5f216dca45f8f5a286d52b"
   },
   "reports": [
     {
@@ -23,12 +23,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 243,
-        "remaining": 63,
+        "completed": 244,
+        "remaining": 62,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 162
+            "completed": 163
           },
           "P1": {
             "total": 111,
@@ -46,7 +46,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 10
+            "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -88,7 +88,6 @@
         "ATL-028",
         "ATL-029",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -122,7 +121,6 @@
         "ATL-029",
         "ATL-030",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -176,11 +174,12 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
+        "sha256": "9cee3e34a8b9ae7c9030fe478ed96cfdc5025f51aa20727454d0933e851e7a9b",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
           "BRD-004",
+          "BRD-007",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -247,7 +246,7 @@
         }
       ],
       "blockers": [
-        "28 unchecked P0 tasks prevent a green report"
+        "27 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -256,12 +255,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 243,
-        "remaining": 63,
+        "completed": 244,
+        "remaining": 62,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 162
+            "completed": 163
           },
           "P1": {
             "total": 111,
@@ -279,7 +278,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 10
+            "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -321,7 +320,6 @@
         "ATL-028",
         "ATL-029",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -355,7 +353,6 @@
         "ATL-029",
         "ATL-030",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -409,11 +406,12 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
+        "sha256": "9cee3e34a8b9ae7c9030fe478ed96cfdc5025f51aa20727454d0933e851e7a9b",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
           "BRD-004",
+          "BRD-007",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -487,8 +485,8 @@
         }
       ],
       "blockers": [
-        "28 unchecked P0 tasks prevent a green report",
-        "58 unchecked P0/P1 tasks prevent G4"
+        "27 unchecked P0 tasks prevent a green report",
+        "57 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -497,12 +495,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 243,
-        "remaining": 63,
+        "completed": 244,
+        "remaining": 62,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 162
+            "completed": 163
           },
           "P1": {
             "total": 111,
@@ -520,7 +518,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 10
+            "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -562,7 +560,6 @@
         "ATL-028",
         "ATL-029",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -596,7 +593,6 @@
         "ATL-029",
         "ATL-030",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -650,11 +646,12 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
+        "sha256": "9cee3e34a8b9ae7c9030fe478ed96cfdc5025f51aa20727454d0933e851e7a9b",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
           "BRD-004",
+          "BRD-007",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -714,7 +711,7 @@
         }
       ],
       "blockers": [
-        "28 unchecked P0 tasks prevent a green report",
+        "27 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -724,12 +721,12 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 306,
-        "completed": 243,
-        "remaining": 63,
+        "completed": 244,
+        "remaining": 62,
         "byPriority": {
           "P0": {
             "total": 190,
-            "completed": 162
+            "completed": 163
           },
           "P1": {
             "total": 111,
@@ -747,7 +744,7 @@
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
-            "completed": 10
+            "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
             "total": 19,
@@ -789,7 +786,6 @@
         "ATL-028",
         "ATL-029",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -823,7 +819,6 @@
         "ATL-029",
         "ATL-030",
         "BRD-003",
-        "BRD-007",
         "BRD-010",
         "BRD-012",
         "BRD-016",
@@ -877,11 +872,12 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "b1700d2c6cc411a8462a1c2789d6932c3e86dabac23da47633b49adda33abe2e",
+        "sha256": "9cee3e34a8b9ae7c9030fe478ed96cfdc5025f51aa20727454d0933e851e7a9b",
         "linkedTaskIds": [
           "BRD-002",
           "BRD-003",
           "BRD-004",
+          "BRD-007",
           "BRD-014",
           "DAT-021",
           "EXP-006",
@@ -941,7 +937,7 @@
         }
       ],
       "blockers": [
-        "28 unchecked P0 tasks prevent a green report",
+        "27 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }

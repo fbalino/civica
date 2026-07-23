@@ -3,7 +3,8 @@
  *
  * This module is the single typed source for Civica's reuse-rights posture:
  * one canonical rights page, the access-vs-reuse boundary statement, code
- * rights (no root LICENSE file exists), the DAT-003 machine-readable rights
+ * rights (the root LICENSE records a non-open posture), the DAT-003
+ * machine-readable rights
  * registry, an artifact-class summary, and the set of public surfaces
  * that must carry a rights pointer. `/licensing` renders from this registry;
  * `scripts/validate-rights-claims.ts` scans the required surfaces against it.
@@ -47,11 +48,11 @@ export interface CodeRights {
 }
 
 export const CODE_RIGHTS: CodeRights = {
-  hasLicenseFile: false,
+  hasLicenseFile: true,
   repositoryUrl: "https://github.com/fbalino/civica",
   // PUBLIC_CLAIM: licensing.code-status
   posture:
-    "The Civica source code is publicly viewable in the repository above. No root LICENSE file is published, so no open-source reuse license (MIT or otherwise) is currently granted for the code. A future code-license decision (BRD-007/BRD-008) will replace this posture when made.",
+    "The Civica source code is publicly viewable in the repository above. Its root LICENSE records a non-open, all-rights-reserved posture: no open-source reuse license (MIT or otherwise) and no general permission to copy, modify, redistribute, or build derivative services is granted.",
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -152,9 +153,9 @@ export const RIGHTS_ARTIFACT_CLASSES: readonly RightsArtifactClassRow[] = [
     scope: "The Civica Atlas codebase in the public GitHub repository.",
     currentPermissionPosture: CODE_RIGHTS.posture,
     governingBasis:
-      "No root LICENSE file; Civica has not published a general code-reuse grant.",
+      "The root LICENSE and NOTICE record the non-open code posture, authorship scope, and third-party boundaries. Package, contributor, generated-material, data, font, asset, and trademark rights remain separately governed.",
     readerAction:
-      "Do not treat the public repository as open-source or MIT-licensed; contact the project before redistributing or building a derivative service from the code.",
+      "Read the root LICENSE and NOTICE. Do not treat the public repository as open-source or MIT-licensed; contact the project to request written permission before reuse.",
   },
   {
     id: "editorial-imagery",
@@ -402,8 +403,8 @@ const CODE_OPEN_SOURCE_CLAIM_PATTERNS: readonly RegExp[] = [
   /\bMIT license\b/i,
 ];
 
-/** Code-reuse claims (open-source / MIT) that assert a license grant that
- *  does not exist while `CODE_RIGHTS.hasLicenseFile` is false. */
+/** Code-reuse claims (open-source / MIT) that assert a grant excluded by the
+ *  current non-open `CODE_RIGHTS` posture. */
 export function findCodeOpenSourceClaims(text: string): RightsScanFinding[] {
   return scan(text, "code-open-source-claim", CODE_OPEN_SOURCE_CLAIM_PATTERNS);
 }

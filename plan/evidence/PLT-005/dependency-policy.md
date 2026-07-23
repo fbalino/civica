@@ -1,36 +1,38 @@
 # Dependency, vulnerability, and lockfile policy (PLT-005)
 
-Adopted 2026-07-12. Canonical policy for how Civica manages its npm
-dependencies.
+Adopted 2026-07-12; inventory refreshed 2026-07-23. Canonical policy for how
+Civica manages its npm dependencies.
 
 ## Inventory
-- **23 production** dependencies, **16 dev** dependencies (`package.json`).
-- Full resolved tree: `package-lock.json` v3, 771 packages.
+- **25 production** dependencies, **19 dev** dependencies (`package.json`).
+- Full resolved tree: `package-lock.json` v3, 791 packages.
 - Runtime baseline (from PLT-004): Next 16.2, React 19.2, Drizzle 0.45,
   `@neondatabase/serverless` 1.0, Tailwind v4. Node pinned via
   `engines.node: ">=22"` (matches CI).
 
 ## Licenses
-Every direct dependency resolves to a permissive/standard license — no
-copyleft (GPL/AGPL/LGPL) obligations enter the tree:
-MIT (20), BSD-3-Clause (3), ISC (3), BSD-2-Clause (1), Apache-2.0 (1),
-MPL-2.0 (1, file-level copyleft only, compatible), and one "SEE LICENSE IN
-LICENSE.txt" (reviewed permissive). Nine type-only/scoped packages do not
-publish a resolvable `license` field and inherit their monorepo's permissive
-terms. This is distinct from the *data/source* rights governed by
+Every installed direct dependency publishes a resolvable package-level license:
+MIT (30), Apache-2.0 (5), BSD-3-Clause (3), ISC (3), BSD-2-Clause (1),
+MPL-2.0 (1, file-level copyleft), and one `SEE LICENSE IN LICENSE.txt`.
+That last package is `mapbox-gl`, whose supplied file contains Mapbox product
+terms rather than a permissive license. Civica loads it only for the
+token-gated Mapbox 3D view, so use and distribution remain subject to the
+Mapbox account/product terms and its bundled notices. The root Civica LICENSE
+does not relicense any dependency. No GPL, AGPL, or LGPL package appears in the
+direct inventory. This is distinct from the *data/source* rights governed by
 `src/lib/rights/manifest.ts`.
 
 ## Vulnerability scanning
 - **Gate:** `npm run validate:deps` = `npm audit --audit-level=critical
   --omit=dev`, wired into CI (`.github/workflows/claims-docs.yml`). **Critical
   production findings block CI.**
-- **Current state (2026-07-12):** 11 advisories total (1 high, 9 moderate,
-  1 low); 5 touch the production tree. **Zero critical**, so the gate passes.
-- **Known high — tracked, not blocking:** `protobufjs` (transitive) — DoS via
-  recursive JSON descriptor expansion, `fixAvailable: true`. Practical risk is
-  low: Civica never parses untrusted protobuf descriptors. It will be resolved
-  by the next Dependabot bump (or `npm audit fix`); it does not warrant an
-  emergency force-fix.
+- **Current state (2026-07-23):** nine production-tree advisories (seven high,
+  two moderate), with **zero critical**, so the declared critical-only gate
+  passes. The live audit identifies direct or transitive findings involving
+  Next.js, Anthropic SDK, Transformers/ONNX/adm-zip, js-yaml, PostCSS,
+  protobufjs, and sharp. This refreshed record does not reclassify those
+  findings as acceptable release risk; ordinary dependency remediation remains
+  required through reviewed upgrade tasks and the full CI/build gates.
 
 ## Lockfile integrity
 - `package-lock.json` is committed and authoritative. CI and clean installs

@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: f34fc3efbe0f53c621fc35a33589d8af4c36c47010d6cf94c747b3d8b83f7bbf
-  Generated body SHA-256: 2c8819353653ba80cfee18158823e4d4de7221da3199aa914e727a6f8cb78d01
+  Template SHA-256: 8755d8ca5838153390e649dd9a5335b5583b53151b66fe7a1c93cd7ee484b483
+  Generated body SHA-256: c20ba7c1b4d38948fbf512c2ca9e410b44b7d8981cf1f05cf3de595f268a9d44
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -231,7 +231,7 @@ Full script reference: see [AGENTS.md](./AGENTS.md).
 
 ## Contributing
 
-Civica welcomes contributions. The repository is publicly viewable on GitHub, but no root LICENSE file is published, so no open-source or MIT reuse license currently applies to the code. Public-facing data mixes public-domain, CC0, and publisher-restricted sources (preserved per-row where disclosed) — see [Licensing](https://civicaatlas.org/licensing#reuse) for the current, source-by-source posture.
+Civica welcomes proposed contributions. The repository is publicly viewable on GitHub, but its root [LICENSE](LICENSE) records a non-open, all-rights-reserved code posture and grants no general right to copy, modify, redistribute, or build derivative services. [NOTICE](NOTICE) describes contributor, dependency, generated-material, data, font, asset, and trademark boundaries. Public-facing data mixes public-domain, CC0, and publisher-restricted sources (preserved per-row where disclosed) — see [Licensing](https://civicaatlas.org/licensing#reuse) for the current, source-by-source posture.
 
 If you're an academic interested in reviewing the methodology, please get in touch — external review is an explicit goal of the project, not a hypothetical.
 

@@ -125,9 +125,10 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   `/licensing#rights-manifest` is the reader view. Pending source terms never
   permit public bulk export.
 - `src/lib/claims/reuse-rights.ts` remains the public policy/summary registry.
-- The repository has no root `LICENSE` file. Do not call the code open-source,
-  MIT-licensed, or reusable under a repository license until BRD-007/008 makes
-  and implements that decision.
+- The root `LICENSE` documents a non-open, all-rights-reserved code posture;
+  `NOTICE` records its scope and third-party boundaries. Do not call the code
+  open-source, MIT-licensed, or generally reusable. Dependency, data, font,
+  asset, contributor, and generated-material rights remain separate.
 - Run both `npm run validate:rights-manifest` and
   `npm run validate:rights-claims` after changing public rights, licensing,
   downloads, citation, embeds, code-license, or release-manifest language.

@@ -233,7 +233,7 @@ Full script reference: see [AGENTS.md](./AGENTS.md).
 
 ## Contributing
 
-Civica welcomes contributions. The repository is publicly viewable on GitHub, but no root LICENSE file is published, so no open-source or MIT reuse license currently applies to the code. Public-facing data mixes public-domain, CC0, and publisher-restricted sources (preserved per-row where disclosed) — see [Licensing](https://civicaatlas.org/licensing#reuse) for the current, source-by-source posture.
+Civica welcomes proposed contributions. The repository is publicly viewable on GitHub, but its root [LICENSE](LICENSE) records a non-open, all-rights-reserved code posture and grants no general right to copy, modify, redistribute, or build derivative services. [NOTICE](NOTICE) describes contributor, dependency, generated-material, data, font, asset, and trademark boundaries. Public-facing data mixes public-domain, CC0, and publisher-restricted sources (preserved per-row where disclosed) — see [Licensing](https://civicaatlas.org/licensing#reuse) for the current, source-by-source posture.
 
 If you're an academic interested in reviewing the methodology, please get in touch — external review is an explicit goal of the project, not a hypothetical.
 

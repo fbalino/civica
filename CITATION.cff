@@ -6,11 +6,11 @@
 # reference work with no single license. Public-domain and CC0 sources have
 # their own broad reuse posture; publisher-restricted datasets (IPU Parline,
 # Constitute Project, index feeds) remain governed by their upstream terms.
-# The code is publicly viewable, but no root LICENSE file currently grants an
-# open-source reuse license. See https://civicaatlas.org/licensing#reuse for
-# the current rights registry. Declaring one
-# SPDX license here would misrepresent that posture, so we omit it rather than
-# fabricate one.
+# The root LICENSE records non-open, all-rights-reserved source-code terms; it
+# is not an SPDX open-source grant. See NOTICE and
+# https://civicaatlas.org/licensing#reuse for the current scope and third-party
+# boundaries. Declaring one SPDX license here would misrepresent the mixed
+# code/data/asset posture, so the `license` key remains omitted.
 cff-version: 1.2.0
 message: "If you use Civica Atlas data or code, please cite it using the metadata below."
 title: "Civica Atlas"

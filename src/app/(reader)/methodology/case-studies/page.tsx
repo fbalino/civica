@@ -127,7 +127,7 @@ export default function AtlasCaseStudiesPage() {
               <p>
                 <strong>{recipe.label}.</strong>{" "}
                 {recipe.inputRowCount.toLocaleString()} input rows frozen in
-                release {artifact.release.id} across{" "}
+                release {report.release.id} across{" "}
                 {recipe.pagesRead.toLocaleString()} page
                 {recipe.pagesRead === 1 ? "" : "s"}.
               </p>

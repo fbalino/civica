@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 306
-- **Completed:** 243
-- **Remaining:** 63
-- **Progress:** 79.4%
+- **Completed:** 244
+- **Remaining:** 62
+- **Progress:** 79.7%
 - **Priority mix:** P0 190 · P1 111 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -355,7 +355,7 @@ Source: `plan/11-brand-legal-and-licensing.md`
 - [x] **BRD-004** (P1) Adopt objective keep/rename decision criteria. _Done when: criteria cover legal/confusion risk, distinctiveness, mission fit, pronunciation/searchability, domains/handles, international meaning, transition cost, and owner preference; the decision cannot be based solely on personal dislike of another project._
 - [ ] **BRD-005** (P2) Generate and test replacement names only if BRD-003/004 warrant it. _Done when: at least three strategic naming territories and screened candidates are evaluated against the criteria, obvious registry/domain conflicts are removed, audience comprehension is tested, and no candidate is adopted before professional clearance._
 - [x] **BRD-006** (P1) Prepare a reversible brand/domain migration plan if renaming remains possible. _Done when: inventory covers code, DB, emails, domains, redirects, canonicals, DOI/citations, package/repo, social, assets, legal pages, search, status page, API/embed compatibility, deprecation window, and rollback; zero-change path is equally documented._
-- [ ] **BRD-007** (P0) Add an explicit source-code license or documented non-open posture consistent with repository/public claims. _Done when: root license and notices identify copyright holder/year/permissions, dependency and generated-code obligations are compatible, README/CFF/licensing page agree, and counsel/manual review is queued where needed._
+- [x] **BRD-007** (P0) Add an explicit source-code license or documented non-open posture consistent with repository/public claims. _Done when: root license and notices identify copyright holder/year/permissions, dependency and generated-code obligations are compatible, README/CFF/licensing page agree, and counsel/manual review is queued where needed._
 - [x] **BRD-008** (P0) Publish release-specific data rights and attribution rather than one blanket dataset license. _Done when: DAT-003 manifest is reader-accessible, each bulk table/field/source has reuse terms and required attribution, excluded/restricted inputs are named, machine-readable metadata agrees, and download acceptance does not misstate rights._
 - [x] **BRD-009** (P0) Enforce a non-commercial-source monetization gate. _Done when: CI/build/release inventory identifies IPU, Constitute, IDEA, and any other restricted sources/products; a documented test blocks paid subscription/API/embed/commercial release paths until relicensing/removal and owner/legal approval._
 - [ ] **BRD-010** (P0) Establish editorial-illustration copyright, source/reference, AI-tool, and reuse policy. _Done when: ownership/terms for generated/edited assets, trademark/landmark/personality issues where relevant, reference-image provenance, disclosures, takedown/correction, manifest retention, and allowed reuse are documented and professionally reviewed as required._

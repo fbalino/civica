@@ -17,7 +17,22 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   analysis; and give a written recommendation or privileged decision summary.
   The owner then records keep/constraint/rename disposition. No namesake
   contact, filing, domain purchase, or rename is authorized by this queue item.
-- Professional review of code licensing, database rights, source-specific redistribution terms, AI-assisted illustration disclosure, privacy, and terms before the DOI release.
+- **BRD-007 · Owner/counsel:** review the root `LICENSE`, `NOTICE`, APR-D169,
+  `data/research/authorship-and-contributions-v1.json`,
+  `data/research/ai-use-disclosure-v1.json`, Git contributor history, the
+  current direct-dependency license inventory, and any generated/file-level
+  notices before broad launch. Confirm the legal copyright holder and year
+  wording, whether the single differently named Git contributor created
+  protectable work or assigned it, whether a contributor agreement is needed,
+  how AI-assisted/generated code should be treated in the launch
+  jurisdictions, and whether Mapbox/MPL/other package obligations are
+  satisfied in deployed and distributed forms. Record written advice or a
+  privileged decision summary and any required corrections. Until then the
+  repository remains non-open; this queue item does not authorize an
+  open-source grant or third-party reuse.
+- Professional review of database rights, source-specific redistribution
+  terms, AI-assisted illustration disclosure, privacy, and terms before the
+  DOI release.
 
 ## Academic review
 
