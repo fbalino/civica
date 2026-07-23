@@ -160,6 +160,15 @@ export type GovernmentClassificationShape = z.infer<
   typeof zGovernmentClassification
 >;
 
+export const zPublisherDate = z
+  .object({
+    precision: z.enum(["year", "month", "day", "unknown"]),
+    year: z.number().int().nullable(),
+    month: z.number().int().min(1).max(12).nullable(),
+    day: z.number().int().min(1).max(31).nullable(),
+  })
+  .strict();
+
 /** Mirrors `ApiAlternate` (src/lib/factbook/reconcile/api.ts). */
 export const zApiAlternate = z
   .object({
@@ -167,6 +176,7 @@ export const zApiAlternate = z
     sourceName: z.string(),
     value: z.union([z.number(), z.string(), z.null()]),
     asOf: z.string().nullable(),
+    publisherDate: zPublisherDate.nullable(),
     vintageLabel: z.string().nullable(),
     url: z.string().nullable(),
     rejected: z.literal(true).optional(),
@@ -184,6 +194,7 @@ export const zApiProvenanceEntry = z
     source: z.string(),
     sourceName: z.string(),
     asOf: z.string().nullable(),
+    publisherDate: zPublisherDate.nullable(),
     vintageLabel: z.string().nullable(),
     decisionReason: z.enum([
       "single_source",
@@ -2419,6 +2430,7 @@ const zCountryExportObservation = z
     freshness: z
       .object({
         asOf: z.string().nullable(),
+        publisherDate: zPublisherDate.nullable(),
         observationYear: z.number().int().nullable(),
         dataVintageYear: z.number().int().nullable(),
         retrievedAt: z.string().datetime(),

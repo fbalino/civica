@@ -41,6 +41,10 @@ import {
   publicDataValueStatus,
   type DataValueStatus,
 } from "@/lib/data/value-state";
+import {
+  storedPublisherDate,
+  type PublisherDate,
+} from "./publisher-date";
 
 /**
  * Phase F.4 / R.22 — public-API metadata block.
@@ -189,6 +193,9 @@ export interface ApiAlternate {
    *  display string. */
   value: number | string | null;
   asOf: string | null;
+  /** Honest upstream date granularity when the publisher supplied
+   *  year- or month-level Wikibase time precision. */
+  publisherDate: PublisherDate | null;
   vintageLabel: string | null;
   url: string | null;
   rejected?: true;
@@ -220,6 +227,9 @@ export interface ApiProvenanceEntry {
   source: string;
   sourceName: string;
   asOf: string | null;
+  /** Honest upstream date granularity when `asOf` cannot represent
+   *  a non-day-precision publisher date without inventing a day. */
+  publisherDate: PublisherDate | null;
   vintageLabel: string | null;
   decisionReason: DecisionReason;
   decisionTrace: DecisionTraceStep[];
@@ -312,6 +322,7 @@ export function buildApiProvenanceEntry(
         sourceName: sourceName(row.sourceId),
         value: alternateValue(row),
         asOf: row.asOf,
+        publisherDate: storedPublisherDate(row.valueJson),
         vintageLabel: row.upstreamVintageLabel,
         url: buildAlternateUrl(row),
         // Bug 1 — surface the per-row valueType so consumers can
@@ -332,6 +343,7 @@ export function buildApiProvenanceEntry(
     source: canonical.sourceId,
     sourceName: sourceName(canonical.sourceId),
     asOf: canonical.asOf,
+    publisherDate: storedPublisherDate(canonical.valueJson),
     vintageLabel: canonical.upstreamVintageLabel,
     decisionReason: output.decisionReason,
     decisionTrace: output.decisionTrace,

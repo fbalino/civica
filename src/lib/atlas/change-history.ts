@@ -65,6 +65,7 @@ export const PUBLIC_HISTORY_FIELDS: Record<
     "fact_value_numeric",
     "fact_unit",
     "fact_year",
+    "value_json",
     "value_status",
     "value_status_reason",
     "as_of",

@@ -183,6 +183,7 @@ const exampleProvenanceEntry = {
   source: "un_data",
   sourceName: "UN Statistics Division",
   asOf: "2024",
+  publisherDate: null,
   vintageLabel: "UN World Population Prospects 2024 revision",
   decisionReason: "fresher_winner" as const,
   decisionTrace: [
@@ -206,6 +207,7 @@ const exampleProvenanceEntry = {
       sourceName: "CIA World Factbook",
       value: 68170228,
       asOf: "2024-07",
+      publisherDate: null,
       vintageLabel: "CIA World Factbook, archived January 2026",
       url: null,
       valueType: "measured" as const,
@@ -1729,6 +1731,7 @@ const countryExportJsonExample = zCountryExportJson.parse({
         },
         freshness: {
           asOf: "2024-01-01",
+          publisherDate: null,
           observationYear: 2024,
           dataVintageYear: 2024,
           retrievedAt: "2026-04-01T00:00:00.000Z",

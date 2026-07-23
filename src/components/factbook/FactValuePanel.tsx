@@ -21,6 +21,10 @@ import {
   lineageForFactRow,
 } from "@/lib/factbook/reconcile/fact-evidence-summary";
 import { AtlasChangeHistoryDisclosure } from "@/components/atlas/AtlasChangeHistoryDisclosure";
+import {
+  formatPublisherDate,
+  storedPublisherDate,
+} from "@/lib/factbook/reconcile/publisher-date";
 
 const SOURCE_LABELS: Record<string, string> = {
   cia_factbook: "CIA World Factbook",
@@ -123,6 +127,10 @@ function formatValue(row: FactRow, factKey: string): string {
 }
 
 function formatAsOf(row: FactRow): string {
+  const publisherDate = storedPublisherDate(row.valueJson);
+  if (publisherDate) {
+    return `${formatPublisherDate(publisherDate)} (${publisherDate.precision} precision)`;
+  }
   if (row.asOf) {
     return new Date(row.asOf).toLocaleDateString("en-US", {
       year: "numeric",

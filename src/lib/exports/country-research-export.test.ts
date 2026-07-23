@@ -69,7 +69,17 @@ const blockedRights = (sourceId: string): SourceRightsRecord => ({
 
 function fixture() {
   const canonical = row("fr-wb", "world_bank", 68_170_000);
-  const alternate = row("fr-wd", "wikidata", 68_100_000);
+  const alternate = row("fr-wd", "wikidata", 68_100_000, {
+    asOf: null,
+    valueJson: {
+      publisherDate: {
+        precision: "month",
+        year: 2025,
+        month: 4,
+        day: null,
+      },
+    },
+  });
   const projection = row("fr-cia-proj", "cia_factbook", 68_521_974, {
     valueType: "projected",
     factYear: 2025,
@@ -229,6 +239,23 @@ test("France population JSON and CSV preserve the same observation semantics", (
   assert.deepEqual(csvRows, jsonRows);
 });
 
+test("country JSON and CSV expose publisher date precision without a fake day", () => {
+  const document = fixture();
+  const alternate = document.facts[0].alternates[0];
+  const records = parseCsv(countryResearchExportCsv(document));
+  const header = records[0];
+  const alternateRecord = records.find(
+    (record) => record[header.indexOf("row_id")] === alternate.rowId,
+  );
+  assert.ok(alternateRecord);
+  assert.equal(alternate.freshness.asOf, null);
+  assert.deepEqual(
+    JSON.parse(alternateRecord[header.indexOf("publisher_date_json")]),
+    alternate.freshness.publisherDate,
+  );
+  assert.equal(alternateRecord[header.indexOf("as_of")], "");
+});
+
 test("country CSV preserves a genuine negative numeric value as numeric", () => {
   const document = fixture();
   document.facts[0].canonical.value.numeric = -12.5;
@@ -242,7 +269,6 @@ test("country CSV preserves a genuine negative numeric value as numeric", () => 
 
 test("a restricted canonical withholds the fact instead of relabeling an alternate", () => {
   const document = fixture();
-  const population = document.facts[0];
   const restrictedCanonical: ResolverOutput = {
     ...({} as ResolverOutput),
     jurisdictionId: "france-id",

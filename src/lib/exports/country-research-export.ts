@@ -8,6 +8,10 @@ import { SOURCE_PRECEDENCE_VERSION } from "@/lib/factbook/reconcile/resolver";
 import type { AtlasSelectionMetadata } from "@/lib/factbook/read-selection";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import { spreadsheetSafeCsvCell } from "@/lib/exports/csv";
+import {
+  storedPublisherDate,
+  type PublisherDate,
+} from "@/lib/factbook/reconcile/publisher-date";
 
 export const COUNTRY_RESEARCH_EXPORT_VERSION =
   "country-research-export/v1" as const;
@@ -57,6 +61,7 @@ export interface CountryExportObservation {
   };
   freshness: {
     asOf: string | null;
+    publisherDate: PublisherDate | null;
     observationYear: number | null;
     dataVintageYear: number | null;
     retrievedAt: string;
@@ -137,6 +142,7 @@ function observation(
     },
     freshness: {
       asOf: row.asOf,
+      publisherDate: storedPublisherDate(row.valueJson),
       observationYear: row.factYear,
       dataVintageYear: row.dataVintageYear,
       retrievedAt: row.retrievedAt,
@@ -294,6 +300,7 @@ export const COUNTRY_RESEARCH_EXPORT_CSV_COLUMNS = [
   "source_terms_url",
   "source_last_synced_at",
   "as_of",
+  "publisher_date_json",
   "observation_year",
   "data_vintage_year",
   "retrieved_at",
@@ -370,6 +377,9 @@ export function countryResearchExportCsv(
         row.source.termsUrl,
         row.source.lastSyncedAt ?? "",
         row.freshness.asOf ?? "",
+        row.freshness.publisherDate == null
+          ? ""
+          : JSON.stringify(row.freshness.publisherDate),
         row.freshness.observationYear == null
           ? ""
           : String(row.freshness.observationYear),

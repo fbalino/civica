@@ -36,6 +36,7 @@ import {
   type WikidataFactConfig,
 } from "./wikidata-fact-mapping";
 import { getFactKey } from "./fact-keys";
+import { parseWikidataPublisherDate } from "./publisher-date";
 import {
   isAllowedReference,
   findAllowlistEntry,
@@ -291,25 +292,6 @@ function pickAdmissibleClaim(
   return newest;
 }
 
-function isoYearFromPit(pit: string | undefined): {
-  asOf: string | null;
-  factYear: number | null;
-} {
-  if (!pit) return { asOf: null, factYear: null };
-  const cleaned = pit.startsWith("+") ? pit.slice(1) : pit;
-  const yearMatch = cleaned.match(/^(\d{4})/);
-  const yearNum = yearMatch ? parseInt(yearMatch[1], 10) : null;
-  let asOf: string | null = null;
-  if (yearMatch) {
-    asOf = `${yearMatch[1]}-01-01`;
-    const fullMatch = cleaned.match(/^(\d{4}-\d{2}-\d{2})/);
-    if (fullMatch && !cleaned.startsWith(`${yearMatch[1]}-00-00`)) {
-      asOf = fullMatch[1];
-    }
-  }
-  return { asOf, factYear: yearNum };
-}
-
 function payloadHash(payload: object): string {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
@@ -402,7 +384,10 @@ export async function syncFactbookWikidata(
       if (!chosen) continue;
 
       const numericValue = applyUnitConversion(config, chosen.valueRaw)!;
-      const { asOf, factYear } = isoYearFromPit(chosen.pointInTime);
+      const { asOf, factYear, valueJson } = parseWikidataPublisherDate(
+        chosen.pointInTime,
+        chosen.pointInTimePrecision,
+      );
 
       const allowedRefsPayload = chosen.references
         .filter((ref) =>
@@ -430,6 +415,7 @@ export async function syncFactbookWikidata(
         valueRaw: chosen.valueRaw,
         valueUnitQid: chosen.valueUnitQid,
         pointInTime: chosen.pointInTime,
+        pointInTimePrecision: chosen.pointInTimePrecision,
         references: chosen.references,
       };
       const hash = payloadHash(upstreamPayload);
@@ -499,7 +485,7 @@ export async function syncFactbookWikidata(
         factValueNumeric: numericValue,
         factUnit: factKeyDef.unit ?? null,
         factYear,
-        valueJson: null,
+        valueJson,
         asOf,
         retrievedAt: new Date(),
         upstreamVintageLabel: null,

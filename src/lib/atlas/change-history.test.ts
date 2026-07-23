@@ -24,6 +24,41 @@ test("history projection reports only allowlisted fact fields", () => {
   );
 });
 
+test("history projection retains structured publisher-date corrections", () => {
+  assert.deepEqual(
+    projectPublicHistoryDiff(
+      "fact",
+      { value_json: null, as_of: "2025-01-01" },
+      {
+        value_json: {
+          publisherDate: {
+            precision: "year",
+            year: 2025,
+            month: null,
+            day: null,
+          },
+        },
+        as_of: null,
+      },
+    ),
+    [
+      {
+        field: "value_json",
+        before: null,
+        after: {
+          publisherDate: {
+            precision: "year",
+            year: 2025,
+            month: null,
+            day: null,
+          },
+        },
+      },
+      { field: "as_of", before: "2025-01-01", after: null },
+    ],
+  );
+});
+
 test("history projection keeps an explicit null for a removed public value", () => {
   assert.deepEqual(
     projectPublicHistoryDiff("indicator", { value: 4.2 }, {}),

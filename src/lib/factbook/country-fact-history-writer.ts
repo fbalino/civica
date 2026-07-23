@@ -224,6 +224,10 @@ export function buildCountryFactHistoryStatement(
             THEN jsonb_build_array(jsonb_build_object('field', 'fact_year', 'before', b.fact_year, 'after', u.fact_year))
             ELSE '[]'::jsonb END
           ||
+          CASE WHEN b.value_json IS DISTINCT FROM u.value_json
+            THEN jsonb_build_array(jsonb_build_object('field', 'value_json', 'before', b.value_json, 'after', u.value_json))
+            ELSE '[]'::jsonb END
+          ||
           CASE WHEN b.value_status IS DISTINCT FROM u.value_status
             THEN jsonb_build_array(jsonb_build_object('field', 'value_status', 'before', b.value_status, 'after', u.value_status))
             ELSE '[]'::jsonb END
