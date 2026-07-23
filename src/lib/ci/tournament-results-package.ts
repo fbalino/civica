@@ -75,7 +75,17 @@ export function buildArtifactInventoryCsv(rows: readonly { id: string; path: str
   return `${[header, ...rows.map((row) => [row.id, row.role, row.analysisClass, String(row.bytes), row.sha256, row.path])].map((row) => row.map((cell) => `"${cell.replaceAll('"', '""')}"`).join(",")).join("\n")}\n`;
 }
 
-export function tournamentResultsPackageErrors(manifest: any): string[] {
+type TournamentResultsPackageManifest = {
+  schemaVersion?: unknown;
+  releaseId?: unknown;
+  artifacts?: { length?: unknown };
+  reproduction?: { commands?: { length?: unknown } };
+  analysisSeparation?: { exploratoryArtifacts?: { length?: unknown }; policy?: unknown };
+  errorLedger?: { entries?: unknown };
+  winnerSelected?: unknown;
+};
+
+export function tournamentResultsPackageErrors(manifest: TournamentResultsPackageManifest): string[] {
   const errors: string[] = [];
   if (manifest.schemaVersion !== "civica-index-tournament-results-package/v1") errors.push("schema version drifted");
   if (manifest.releaseId !== TOURNAMENT_RESULTS_PACKAGE_ID) errors.push("release id drifted");

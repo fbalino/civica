@@ -57,7 +57,8 @@ export function MobileNav({
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    setOpen(false);
+    const frame = requestAnimationFrame(() => setOpen(false));
+    return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
   useEffect(() => {

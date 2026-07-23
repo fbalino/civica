@@ -19,10 +19,11 @@ if (!verifyOnly) {
     try {
       const stdout = execFileSync("npm", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 20 * 1024 * 1024 });
       writeFileSync(`${logDir}/${command.id}.log`, `${JSON.stringify({ command: `npm ${args.join(" ")}`, exitCode: 0 })}\n${sanitize(stdout)}\n`);
-    } catch (error: any) {
-      const stdout = sanitize(String(error.stdout ?? ""));
-      const stderr = sanitize(String(error.stderr ?? ""));
-      writeFileSync(`${logDir}/${command.id}.log`, `${JSON.stringify({ command: `npm ${args.join(" ")}`, exitCode: error.status ?? 1 })}\n${stdout}\n${stderr}\n`);
+    } catch (error: unknown) {
+      const commandError = error as { stdout?: unknown; stderr?: unknown; status?: number };
+      const stdout = sanitize(String(commandError.stdout ?? ""));
+      const stderr = sanitize(String(commandError.stderr ?? ""));
+      writeFileSync(`${logDir}/${command.id}.log`, `${JSON.stringify({ command: `npm ${args.join(" ")}`, exitCode: commandError.status ?? 1 })}\n${stdout}\n${stderr}\n`);
       throw error;
     }
   }

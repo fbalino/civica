@@ -5,7 +5,6 @@ import {
 } from "../src/lib/ci/research-panel";
 import {
   runK1TournamentCandidate,
-  type K1PanelInput,
 } from "../src/lib/ci/tournament-candidate-k1";
 import {
   K2_RATERS,
@@ -67,7 +66,9 @@ export async function buildIndexValidityAnalysis() {
   const k1 = runK1TournamentCandidate(normalized);
   const k2 = runK2Concordance(
     normalized.filter((r) =>
-      K2_RATERS.includes(`${r.sourceId}:${r.indicatorId}` as any),
+      K2_RATERS.includes(
+        `${r.sourceId}:${r.indicatorId}` as (typeof K2_RATERS)[number],
+      ),
     ),
   );
   const hdi = byKey(

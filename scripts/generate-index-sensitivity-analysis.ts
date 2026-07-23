@@ -379,7 +379,10 @@ export async function buildIndexSensitivityAnalysis() {
         kind === "alternating"
           ? "counter-direction dependence stress"
           : "perfect same-direction bound stress",
-      ...compareSensitivity(exactBase, scenario(kind as any)),
+      ...compareSensitivity(
+        exactBase,
+        scenario(kind as "lower" | "upper" | "alternating"),
+      ),
     }));
   const longitudinal = JSON.parse(
     readFileSync(

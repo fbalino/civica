@@ -185,7 +185,7 @@ export function PartyExplorer({
     null | "region" | "country" | "coalition"
   >(null);
   // Table pagination — keeps the initial DOM small (default page below).
-  const [showAll, setShowAll] = useState<boolean>(false);
+  const [showAllFilterKey, setShowAllFilterKey] = useState<string | null>(null);
 
   const menusRef = useRef<HTMLDivElement>(null);
 
@@ -245,11 +245,10 @@ export function PartyExplorer({
     });
   }, [parties, region, countrySlug, coalition, onlyWithIdeology]);
 
-  // Reset to the first page whenever the filter set changes, so a narrowed view
-  // never opens already-expanded to thousands of rows.
-  useEffect(() => {
-    setShowAll(false);
-  }, [region, countrySlug, coalition, onlyWithIdeology]);
+  // An expanded table applies only to the exact filter set that requested it,
+  // so narrowing results never opens already-expanded to thousands of rows.
+  const filterKey = `${region}|${countrySlug}|${coalition}|${onlyWithIdeology}`;
+  const showAll = showAllFilterKey === filterKey;
 
   // Rows fed to the table. The compass always uses the FULL `filtered` set; the
   // table body is capped to PAGE_SIZE (seat-ranked, matching the default sort)
@@ -500,7 +499,7 @@ export function PartyExplorer({
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setShowAll(true)}
+                onClick={() => setShowAllFilterKey(filterKey)}
               >
                 Show all {filtered.length.toLocaleString()} parties
               </Button>

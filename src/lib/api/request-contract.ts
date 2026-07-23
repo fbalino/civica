@@ -7,7 +7,7 @@ import { DATA_VALUE_STATUSES } from "@/lib/data/value-state";
 import {
   ATLAS_QUERY_COLUMNS,
   ATLAS_QUERY_TABLES,
-} from "@/lib/exports/atlas-query";
+} from "@/lib/exports/atlas-query-contract";
 
 const MAX_RAW_QUERY_BYTES = 16_384;
 const MAX_QUERY_PAIRS = 64;

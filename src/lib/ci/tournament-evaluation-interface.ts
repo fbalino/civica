@@ -13,15 +13,39 @@ export type TournamentEvaluationArtifact = {
   validationState: "implemented" | "development_gate_failed" | "external_gates_pending";
 };
 
-type Json = Record<string, any>;
+type BaselinesInput = {
+  methodVersion: string; panelReleaseId: string; valuesLocation: string; inputCells: number; observedInputRows: number;
+  baselines: { B0: { rows: number; coverage: Record<string, number>; outputSha256: string } };
+};
+type K1Input = {
+  methodVersion: string; panelReleaseId: string; valuesLocation: string; protocolVersion: string;
+  observedInputs: number;
+  outputs: { scored: number; full: number; partial: number; outputSha256: string; bySplit: Record<string, number> };
+  uncertainty: { status: string };
+};
+type K2Input = {
+  methodVersion: string; panelReleaseId: string; valuesLocation: string; inputCells: number; withinSourceUncertainty: string;
+  outputs: { total: number; development: number; validation: number; finalHoldout: number; outputSha256: string };
+};
+type K3Input = {
+  methodVersion: string; asOf: string; valuesLocation: string; prototypeRows: number; sovereignJurisdictionsWithoutPrototypeRow: number;
+  observedExecutiveIdentity: number; contestedExecutiveIdentity: number; transferStatesComputed: number; termLimitStatesComputed: number; outputSha256: string; bySplit: Record<string, number>;
+};
+type K4Input = {
+  methodVersion: string; inputReleaseId: string; valuesLocation: string; outputRows: number; candidateTaggedRows: number; noTaggedExcerptRows: number; observedPracticeRows: number; outputSha256: string; bySplit: Record<string, number>;
+};
+type K5Input = {
+  methodVersion: string; releaseId: string; candidateRows: number; jurisdictions: number; graphEdgesPublished: number; validationStatus: string; outputSha256: string;
+  bySplit: { split: string; candidates: number }[];
+};
 const split = (value: Record<string, number>, finalKey = "final_holdout"): TournamentSplitCoverage => ({ development: Number(value.development), validation: Number(value.validation), finalHoldout: Number(value[finalKey]) });
 
-export function buildTournamentEvaluationSuite(input: { baselines: Json; k1: Json; k2: Json; k3: Json; k4: Json; k5: Json }) {
+export function buildTournamentEvaluationSuite(input: { baselines: BaselinesInput; k1: K1Input; k2: K2Input; k3: K3Input; k4: K4Input; k5: K5Input }) {
   const b0 = input.baselines.baselines.B0;
   const artifacts: TournamentEvaluationArtifact[] = [
     { artifactId: "K0", methodVersion: input.baselines.methodVersion, outputKind: "native_dashboard", unit: "jurisdiction-year native-source dashboard row", inputReleaseIds: [input.baselines.panelReleaseId], possibleUnits: b0.rows, emittedUnits: b0.rows, withheldOrMissingUnits: 0, splitCoverage: split(b0.coverage), evidenceCoverage: { panelInputCells: input.baselines.inputCells, observedInputCells: input.baselines.observedInputRows }, uncertainty: { mode: "not_retained", boundedUnits: 0, note: "Native observations remain separate; upstream uncertainty is not standardized in baseline v3." }, outputSha256: b0.outputSha256, valuesLocation: input.baselines.valuesLocation, publicValuesIncluded: false, heldoutLabelAccess: "not_applicable_no_labels_used", validationState: "implemented" },
     { artifactId: "K1", methodVersion: input.k1.methodVersion, outputKind: "score_estimate", unit: "jurisdiction-year composite estimate", inputReleaseIds: [input.k1.panelReleaseId], possibleUnits: 4850, emittedUnits: input.k1.outputs.scored, withheldOrMissingUnits: 4850 - input.k1.outputs.scored, splitCoverage: split(input.k1.outputs.bySplit), evidenceCoverage: { full: input.k1.outputs.full, partial: input.k1.outputs.partial, observedInputCells: input.k1.observedInputs }, uncertainty: { mode: "not_estimable", boundedUnits: 0, note: input.k1.uncertainty.status }, outputSha256: input.k1.outputs.outputSha256, valuesLocation: input.k1.valuesLocation, publicValuesIncluded: false, heldoutLabelAccess: "not_applicable_no_labels_used", validationState: "implemented" },
-    { artifactId: "K2", methodVersion: input.k2.methodVersion, outputKind: "concordance_profile", unit: "jurisdiction-year three-rater profile", inputReleaseIds: [input.k2.panelReleaseId], possibleUnits: 4850, emittedUnits: input.k2.outputs.total, withheldOrMissingUnits: 4850 - input.k2.outputs.total, splitCoverage: split(input.k2.outputs, "finalHoldout"), evidenceCoverage: { commonCoverageProfiles: input.k2.outputs.total, inputCells: input.k2.inputCells }, uncertainty: { mode: "not_retained", boundedUnits: 0, note: input.k2.withinSourceUncertainty }, outputSha256: input.k2.outputs.outputSha256, valuesLocation: input.k2.valuesLocation, publicValuesIncluded: false, heldoutLabelAccess: "sealed_not_inspected", validationState: "development_gate_failed" },
+    { artifactId: "K2", methodVersion: input.k2.methodVersion, outputKind: "concordance_profile", unit: "jurisdiction-year three-rater profile", inputReleaseIds: [input.k2.panelReleaseId], possibleUnits: 4850, emittedUnits: input.k2.outputs.total, withheldOrMissingUnits: 4850 - input.k2.outputs.total, splitCoverage: split({ development: input.k2.outputs.development, validation: input.k2.outputs.validation, finalHoldout: input.k2.outputs.finalHoldout }, "finalHoldout"), evidenceCoverage: { commonCoverageProfiles: input.k2.outputs.total, inputCells: input.k2.inputCells }, uncertainty: { mode: "not_retained", boundedUnits: 0, note: input.k2.withinSourceUncertainty }, outputSha256: input.k2.outputs.outputSha256, valuesLocation: input.k2.valuesLocation, publicValuesIncluded: false, heldoutLabelAccess: "sealed_not_inspected", validationState: "development_gate_failed" },
     { artifactId: "K3", methodVersion: input.k3.methodVersion, outputKind: "ledger_state", unit: "sovereign jurisdiction current-executive state", inputReleaseIds: [input.k3.asOf], possibleUnits: 194, emittedUnits: input.k3.prototypeRows, withheldOrMissingUnits: input.k3.sovereignJurisdictionsWithoutPrototypeRow, splitCoverage: split(input.k3.bySplit), evidenceCoverage: { observedIdentity: input.k3.observedExecutiveIdentity, contestedIdentity: input.k3.contestedExecutiveIdentity, transferStates: input.k3.transferStatesComputed, termLimitStates: input.k3.termLimitStatesComputed }, uncertainty: { mode: "categorical_state", boundedUnits: 0, note: "Observed, contested, and unknown states are separate; no probability is asserted." }, outputSha256: input.k3.outputSha256, valuesLocation: input.k3.valuesLocation, publicValuesIncluded: false, heldoutLabelAccess: "not_applicable_no_labels_used", validationState: "external_gates_pending" },
     { artifactId: "K4", methodVersion: input.k4.methodVersion, outputKind: "evidence_pair", unit: "jurisdiction-construct pairing candidate", inputReleaseIds: [input.k4.inputReleaseId], possibleUnits: 582, emittedUnits: input.k4.outputRows, withheldOrMissingUnits: 0, splitCoverage: split(input.k4.bySplit), evidenceCoverage: { candidateTaggedExcerpt: input.k4.candidateTaggedRows, noTaggedExcerpt: input.k4.noTaggedExcerptRows, observedPractice: input.k4.observedPracticeRows }, uncertainty: { mode: "publisher_bounds", boundedUnits: input.k4.observedPracticeRows, note: "Every observed V-Dem practice value retains its published lower and upper credible bounds." }, outputSha256: input.k4.outputSha256, valuesLocation: input.k4.valuesLocation, publicValuesIncluded: false, heldoutLabelAccess: "sealed_not_inspected", validationState: "external_gates_pending" },
     { artifactId: "K5", methodVersion: input.k5.methodVersion, outputKind: "relation_candidate", unit: "candidate constitutional passage for a formal relation", inputReleaseIds: [input.k5.releaseId], possibleUnits: null, emittedUnits: input.k5.candidateRows, withheldOrMissingUnits: null, splitCoverage: split(Object.fromEntries(input.k5.bySplit.map((row: { split: string; candidates: number }) => [row.split === "final_holdout" ? "final_holdout" : row.split, row.candidates]))), evidenceCoverage: { candidatePassages: input.k5.candidateRows, representedJurisdictions: input.k5.jurisdictions, assertedGraphEdges: input.k5.graphEdgesPublished }, uncertainty: { mode: "pending_coder_reliability", boundedUnits: 0, note: input.k5.validationStatus }, outputSha256: input.k5.outputSha256, valuesLocation: "private_reproducible_from_constitution_topic_excerpts", publicValuesIncluded: false, heldoutLabelAccess: "sealed_not_inspected", validationState: "external_gates_pending" },

@@ -178,6 +178,36 @@ test("other shared-query edits remain protected Index drift", () => {
   );
 });
 
+test("exact QA-021 type/lint repairs are nonsemantic but further edits remain protected", () => {
+  const repairs = [
+    {
+      path: "src/lib/ci/tournament-evaluation-interface.ts",
+      prior:
+        "6460ac00b54ef65003e9d168c0a8b994225afc92eb4eee028e094f7fcdc1dcba",
+    },
+    {
+      path: "src/lib/ci/tournament-results-package.ts",
+      prior:
+        "9eb8107cc2a086ec63cbce9398ca7540a14c4ef2a9a1430cae2ce22e4e534389",
+    },
+    {
+      path: "src/lib/pulse/v2/decouple.ts",
+      prior:
+        "8ba490e2060a309ad0711b6862252211b70fada971a752c824433ed24886cc0f",
+    },
+  ] as const;
+
+  for (const repair of repairs) {
+    const current = readFileSync(repair.path, "utf8");
+    assert.notEqual(sha256(current), repair.prior);
+    assert.equal(indexProtectedFileHash(repair.path, current), repair.prior);
+    assert.notEqual(
+      indexProtectedFileHash(repair.path, `${current}\n// semantic drift\n`),
+      repair.prior,
+    );
+  }
+});
+
 test("the Atlas-only organization source specification is excluded from Index semantic drift", () => {
   const manifestPath = "src/lib/data/source-input-manifest.ts";
   const currentManifest = readFileSync(manifestPath, "utf8");

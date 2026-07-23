@@ -4,7 +4,7 @@
   "releaseId": "atlas-2026-07-11",
   "protocol": {
     "path": "plan/research/dat-034-value-fidelity-protocol-v1.md",
-    "sha256": "e47331492adb3d30bcdf78165b9de29ed2fff630e140a1c0983a13e931d35427",
+    "sha256": "5142611d05f193a001cc5503707940df44a92c2e3de40f0d9ae8fd2ee84c42ee",
     "seed": "dat-034|atlas-2026-07-11|publisher-fidelity-v1",
     "preregisteredBeforePublisherRetrieval": true
   },
@@ -11181,5 +11181,5 @@
       }
     }
   ],
-  "semanticSha256": "c63b81252d634ea48915f44c543e5692ddc297fc5c217d4282012643de779656"
+  "semanticSha256": "2f97ad41be20c8d3f5002d4869fb79ae86cfda297ce5b51c74b950401e876971"
 }

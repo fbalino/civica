@@ -7,6 +7,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
@@ -16,9 +17,11 @@ import { createPortal } from "react-dom";
 // server's `false`, then enables the portal after hydration; a client-only
 // snapshot during hydration would change the trigger tree and cause a mismatch.
 function useMounted(): boolean {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  return mounted;
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 }
 
 /*

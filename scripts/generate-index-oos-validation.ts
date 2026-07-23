@@ -104,7 +104,7 @@ export async function buildIndexOosValidation() {
         splitCounts: k1.outputs.bySplit,
         finalCommonSample: incremental.samples.finalHoldout,
         publicInputReproductionR2: incremental.originality.publicInputModelR2,
-        interval: incremental.models.find((m: any) => m.id === "P1").intervals
+        interval: incremental.models.find((m: { id: string; intervals: { r2: unknown } }) => m.id === "P1").intervals
           .r2,
         status: "fails_original_information",
       },
@@ -127,7 +127,7 @@ export async function buildIndexOosValidation() {
       K4: { splitCounts: k4.bySplit, status: "insufficient_blinded_labels" },
       K5: {
         splitCounts: Object.fromEntries(
-          k5.bySplit.map((r: any) => [r.split, r.candidates]),
+          k5.bySplit.map((r: { split: string; candidates: unknown }) => [r.split, r.candidates]),
         ),
         status: "insufficient_adjudicated_labels",
       },

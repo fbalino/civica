@@ -50,8 +50,7 @@ export async function buildIncrementalInformationAnalysis() {
       id,
       new Map(out.map((r) => [r.unitId, r])),
     ]),
-  ) as Record<string, Map<string, any>>;
-  const k1map = new Map(k1.map((r) => [r.unitId, r]));
+  ) as Record<string, Map<string, (typeof baseline.outputs)[keyof typeof baseline.outputs][number]>>;
   const groups = new Map<string, Panel[]>();
   for (const r of normalized)
     groups.set(key(r), [...(groups.get(key(r)) ?? []), r]);
@@ -98,7 +97,7 @@ export async function buildIncrementalInformationAnalysis() {
       fitScalar(
         development.map((r) => ({
           target: r.scoreInteger,
-          value: maps[id].get(r.unitId).value,
+          value: maps[id]!.get(r.unitId)!.value!,
         })),
       ),
     ]),
@@ -118,7 +117,7 @@ export async function buildIncrementalInformationAnalysis() {
         id === "P1"
           ? predictOls(ols, features.get(r.unitId)!)
           : scalar[id].intercept +
-            scalar[id].slope * maps[id].get(r.unitId).value,
+            scalar[id].slope * maps[id]!.get(r.unitId)!.value!,
     }));
   const models = ["B1", "B2", "B3", "P1"].map((id) => {
     const p = predictions(id);

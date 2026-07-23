@@ -6,7 +6,9 @@ const path = "data/releases/index-tournament-results-package-v1/manifest.v1.json
 const manifest = JSON.parse(readFileSync(path, "utf8"));
 assert.deepEqual(tournamentResultsPackageErrors(manifest), []);
 for (const artifact of TOURNAMENT_PACKAGE_ARTIFACTS) {
-  const checked = manifest.artifacts.find((row: any) => row.id === artifact.id);
+  const checked = manifest.artifacts.find(
+    (row: { id: string }) => row.id === artifact.id,
+  );
   assert.ok(checked, `missing ${artifact.id}`);
   const bytes = readFileSync(artifact.path);
   assert.equal(checked.sha256, packageSha256(bytes), `${artifact.id} hash drift`);

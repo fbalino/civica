@@ -50,6 +50,31 @@ function href(status: Status | undefined, page: number): string {
   return query ? `?${query}` : "/admin/corrections";
 }
 
+function CorrectionsHeader({
+  schemaReady,
+  total,
+}: {
+  schemaReady: boolean;
+  total?: number;
+}) {
+  return (
+    <header className="admin-page-head">
+      <h1 className="admin-title">Atlas corrections</h1>
+      <p className="admin-subtitle">
+        {schemaReady
+          ? "Precise public reports with immutable intake coordinates and authenticated triage. A corrected resolution requires a linked release-history event."
+          : "The append-only ATL-024 schema has not been activated in this environment. The public form is also safely unavailable."}
+      </p>
+      {schemaReady ? (
+        <p className="admin-meta">
+          <span className="admin-meta-num">{total ?? 0}</span>
+          <span>matching reports</span>
+        </p>
+      ) : null}
+    </header>
+  );
+}
+
 export default async function AtlasCorrectionsQueue({
   searchParams,
 }: {
@@ -59,13 +84,7 @@ export default async function AtlasCorrectionsQueue({
   if (!schemaReady) {
     return (
       <>
-        <header className="admin-page-head">
-          <h1 className="admin-title">Atlas corrections</h1>
-          <p className="admin-subtitle">
-            The append-only ATL-024 schema has not been activated in this
-            environment. The public form is also safely unavailable.
-          </p>
-        </header>
+        <CorrectionsHeader schemaReady={false} />
         <div className="admin-empty">
           <strong>Migration pending</strong>
           Apply the authoritative migration through the release protocol before
@@ -111,18 +130,7 @@ export default async function AtlasCorrectionsQueue({
 
   return (
     <>
-      <header className="admin-page-head">
-        <h1 className="admin-title">Atlas corrections</h1>
-        <p className="admin-subtitle">
-          Precise public reports with immutable intake coordinates and
-          authenticated triage. A corrected resolution requires a linked
-          release-history event.
-        </p>
-        <p className="admin-meta">
-          <span className="admin-meta-num">{total}</span>
-          <span>matching reports</span>
-        </p>
-      </header>
+      <CorrectionsHeader schemaReady total={total} />
 
       <div className="admin-filters">
         <div className="admin-filter-row">

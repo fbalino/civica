@@ -16,14 +16,20 @@ async function main() {
   assert.equal(m.scope.expected, 970);
   assert.equal(m.scope.expected, m.scope.observed + m.scope.missing);
   assert.equal(
-    m.coverage.find((r: any) => r.identity === "freedom_house:pr_cl_total")
+    m.coverage.find(
+      (r: { identity: string; bounded: number }) =>
+        r.identity === "freedom_house:pr_cl_total",
+    )
       .bounded,
     0,
   );
   assert.ok(
     m.coverage
-      .filter((r: any) => r.identity !== "freedom_house:pr_cl_total")
-      .every((r: any) => r.bounded > 0),
+      .filter(
+        (r: { identity: string; bounded: number }) =>
+          r.identity !== "freedom_house:pr_cl_total",
+      )
+      .every((r: { bounded: number }) => r.bounded > 0),
   );
   const [r] =
     await sql`SELECT status,row_sha256 AS hash,expected_rows AS expected FROM ci_research_panel_releases WHERE id=${K1_UNCERTAINTY_INPUT_RELEASE_ID}`;

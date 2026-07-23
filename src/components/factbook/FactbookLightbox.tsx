@@ -32,6 +32,25 @@ export function FactbookLightbox({
   initialIndex = 0,
   onClose,
 }: FactbookLightboxProps) {
+  if (!open) return null;
+
+  return (
+    <FactbookLightboxDialog
+      key={initialIndex}
+      mode={mode}
+      images={images}
+      initialIndex={initialIndex}
+      onClose={onClose}
+    />
+  );
+}
+
+function FactbookLightboxDialog({
+  mode,
+  images,
+  initialIndex = 0,
+  onClose,
+}: Omit<FactbookLightboxProps, "open">) {
   const [idx, setIdx] = useState(initialIndex);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -45,14 +64,8 @@ export function FactbookLightbox({
     [images.length]
   );
 
-  useEffect(() => {
-    if (open) setIdx(initialIndex);
-  }, [open, initialIndex]);
-
   // Keyboard nav + focus management.
   useEffect(() => {
-    if (!open) return;
-
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
@@ -82,14 +95,12 @@ export function FactbookLightbox({
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [open, images.length, next, onClose]);
+  }, [images.length, next, onClose]);
 
   // Preserve the control that launched the dialog. A lightbox is shared by
   // both map and photo tiles, so restore here rather than depending on every
   // caller to remember the accessibility contract.
   useEffect(() => {
-    if (!open) return;
-
     const activeElement = document.activeElement;
     returnFocusRef.current =
       activeElement instanceof HTMLElement ? activeElement : null;
@@ -101,19 +112,17 @@ export function FactbookLightbox({
         if (returnFocus?.isConnected) returnFocus.focus();
       });
     };
-  }, [open]);
+  }, []);
 
   // Lock body scroll while open.
   useEffect(() => {
-    if (!open) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [open]);
+  }, []);
 
-  if (!open) return null;
   const current = images[idx];
   if (!current) return null;
   const hasMultipleImages = images.length > 1;

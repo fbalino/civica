@@ -89,7 +89,11 @@ export function SingleSelectMenu({
     wasOpenRef.current = true;
     const index = openFocusIndexRef.current ?? selectedIndex;
     openFocusIndexRef.current = null;
-    focusOption(index);
+    const frame = requestAnimationFrame(() => {
+      setFocusedIndex(index);
+      optionRefs.current[index]?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [open, selectedIndex]);
 
   const selectItem = (item: SingleSelectItem) => {

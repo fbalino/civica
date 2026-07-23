@@ -11,6 +11,7 @@ import {
 } from "react";
 import { RotateCcw } from "lucide-react";
 import { useReducedMotion } from "motion/react";
+import Link from "next/link";
 import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
@@ -647,7 +648,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             </p>
             <p className="atlas-indicator-scope">
               Map scope: map-eligible sovereign-state entries under
-              jurisdiction-status/v1. <a href="/country">Browse the full reference catalog</a>.
+              jurisdiction-status/v1. <Link href="/country">Browse the full reference catalog</Link>.
             </p>
           </div>
         </div>

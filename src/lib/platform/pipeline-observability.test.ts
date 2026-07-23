@@ -35,7 +35,8 @@ test("registered pipelines derive bounded declared source versions", async () =>
     memoryStore,
   );
   assert.equal(handle.pipelineId, "factbook.wdi");
-  assert.equal(starts.at(-1)?.sourceVersions[0]?.upstreamVersion.length! > 0, true);
+  const sourceVersion = starts.at(-1)?.sourceVersions[0];
+  assert.equal(sourceVersion !== undefined && sourceVersion.upstreamVersion.length > 0, true);
 });
 
 test("a retry retains the store-owned logical run identity", async () => {

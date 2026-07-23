@@ -178,7 +178,7 @@ export async function decoupleAbsorbedEvents(
   const now = opts.now ?? new Date();
   const byDimension: Record<string, number> = {};
   const planned: AbsorptionAssessment[] = [];
-  let hasComparable = ABSORBABLE_DIMENSIONS.some((dimension) =>
+  const hasComparable = ABSORBABLE_DIMENSIONS.some((dimension) =>
     priorComparableRelease(currentRelease, dimension),
   );
 

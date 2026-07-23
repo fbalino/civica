@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- this standalone CommonJS evidence utility is invoked directly by Node.
 const sharp = require('/Users/fernandobalino/Projects/civica/node_modules/sharp');
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- this standalone CommonJS evidence utility is invoked directly by Node.
 const path = require('path');
 
 // Deterministic de-orange grading recipes for dark engravings (EXP-006 pilot).
