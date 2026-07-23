@@ -339,6 +339,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0046_little_mulholland_black",
+    "drizzle/authoritative/0046_little_mulholland_black.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

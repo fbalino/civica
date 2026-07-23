@@ -1224,6 +1224,53 @@ export const researchEvidenceHistory = pgTable(
   ],
 );
 
+/**
+ * ATL-020 public, field-safe projection of an Atlas entity revision. This is
+ * deliberately separate from `research_evidence_history`: that trigger ledger
+ * retains complete snapshots for audit and must never become a public API.
+ */
+export const atlasEntityChangeHistory = pgTable(
+  "atlas_entity_change_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    entityTable: text("entity_table").notNull(),
+    operation: text("operation").notNull(),
+    changeKind: text("change_kind").notNull(),
+    changes: jsonb("changes").notNull(),
+    reason: text("reason").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    /** Release identity is mandatory for every new public event. */
+    releaseId: text("release_id").notNull(),
+    correctionLogId: uuid("correction_log_id").references(() => correctionLog.id, {
+      onDelete: "restrict",
+    }),
+    correctionStatus: text("correction_status"),
+    recordedAt: timestamp("recorded_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_atlas_entity_change_history_entity").on(
+      table.entityType,
+      table.entityId,
+      table.recordedAt,
+    ),
+    index("idx_atlas_entity_change_history_release").on(table.releaseId),
+    check(
+      "atlas_entity_change_history_identity_check",
+      dsql`${table.entityType} IN ('fact','institution','office','person','election','constitution-passage','organization','indicator') AND btrim(${table.entityId}) <> '' AND ${table.entityTable} IN ('country_facts','government_bodies','offices','persons','elections','constitution_passages','organizations','country_metrics')`,
+    ),
+    check(
+      "atlas_entity_change_history_event_check",
+      dsql`${table.operation} IN ('insert','update','delete') AND ${table.changeKind} IN ('routine_refresh','substantive_revision','correction','retraction','methodology_change') AND jsonb_typeof(${table.changes}) = 'array' AND btrim(${table.reason}) <> '' AND btrim(${table.methodologyVersion}) <> '' AND ${table.releaseId} ~ '^[A-Za-z0-9._-]{1,96}$'`,
+    ),
+    check(
+      "atlas_entity_change_history_correction_check",
+      dsql`(${table.correctionLogId} IS NULL AND ${table.correctionStatus} IS NULL) OR (${table.correctionLogId} IS NOT NULL AND ${table.correctionStatus} IN ('open','in_review','resolved_corrected','resolved_no_change','rejected'))`,
+    ),
+  ],
+);
+
 export const statements = pgTable(
   "statements",
   {
