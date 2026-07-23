@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "civica-release-candidate-staging-smoke/v1",
+  "taskId": "QA-018",
+  "status": "pending_external_authority",
+  "blocker": "owner_platform_staging_authority",
+  "candidate": {
+    "commit": null,
+    "dataReleaseIds": [],
+    "methodVersions": [],
+    "migrationIds": [
+      "0033_flat_hardball",
+      "0034_superb_the_fallen",
+      "0035_equal_marvex",
+      "0036_moaning_toad_men",
+      "0037_minor_sharon_carter",
+      "0038_heavy_slyde",
+      "0039_living_clea",
+      "0040_closed_young_avengers",
+      "0042_grey_sally_floyd"
+    ],
+    "assetManifestSha256": null
+  },
+  "isolation": {
+    "neonBranchId": null,
+    "vercelDeploymentId": null,
+    "productionDatabaseExcluded": null,
+    "jobsQuiesced": null
+  },
+  "checks": [
+    { "id": "zero-write-migration-plan", "status": "not_run", "evidence": null },
+    { "id": "authoritative-migrations", "status": "not_run", "evidence": null },
+    { "id": "schema-fingerprint", "status": "not_run", "evidence": null },
+    { "id": "release-data", "status": "not_run", "evidence": null },
+    { "id": "deployment-identity", "status": "not_run", "evidence": null },
+    { "id": "cache-headers", "status": "not_run", "evidence": null },
+    { "id": "atlas-browser", "status": "not_run", "evidence": null },
+    { "id": "index-api", "status": "not_run", "evidence": null },
+    { "id": "pulse-api", "status": "not_run", "evidence": null },
+    { "id": "protected-error", "status": "not_run", "evidence": null },
+    { "id": "cron-dry-run", "status": "not_run", "evidence": null },
+    { "id": "source-freshness-unchanged", "status": "not_run", "evidence": null }
+  ],
+  "signoff": {
+    "owner": null,
+    "checkedAt": null,
+    "remainingManualChecks": [
+      "Create and authorize the isolated Neon/Vercel staging environment.",
+      "Run the exact candidate through the migration, release, deploy, browser, API, cache, and dry-run sequence.",
+      "Record bounded evidence and owner sign-off without credentials or production data."
+    ]
+  }
+}

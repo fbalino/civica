@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "civica-rollback-forward-fix-rehearsal/v1",
+  "taskId": "QA-019",
+  "status": "pending_external_authority",
+  "blocker": "owner_platform_staging_authority",
+  "deliberatelyBadRelease": false,
+  "candidateCommit": null,
+  "stagingDeploymentId": null,
+  "defectFixture": null,
+  "recoveryMode": null,
+  "recoveredCommit": null,
+  "checks": [
+    { "id": "detect-seeded-defect", "status": "not_run", "evidence": null },
+    { "id": "quiesce-jobs", "status": "not_run", "evidence": null },
+    { "id": "contain-traffic", "status": "not_run", "evidence": null },
+    { "id": "select-compatible-recovery", "status": "not_run", "evidence": null },
+    { "id": "restore-or-forward-fix-app", "status": "not_run", "evidence": null },
+    { "id": "verify-data-state", "status": "not_run", "evidence": null },
+    { "id": "verify-cache-state", "status": "not_run", "evidence": null },
+    { "id": "verify-artifact-state", "status": "not_run", "evidence": null },
+    { "id": "verify-version-metadata", "status": "not_run", "evidence": null },
+    { "id": "publish-correction-record", "status": "not_run", "evidence": null },
+    { "id": "publish-status-and-changelog", "status": "not_run", "evidence": null },
+    { "id": "resume-after-verification", "status": "not_run", "evidence": null }
+  ],
+  "correction": {
+    "incidentId": null,
+    "statusRecordId": null,
+    "changelogPath": null,
+    "correctionRecordId": null
+  },
+  "signoff": {
+    "owner": null,
+    "checkedAt": null,
+    "remainingManualChecks": [
+      "Authorize a deliberately defective release only in the isolated staging environment.",
+      "Choose a harmless deterministic defect fixture that cannot touch production or retained research evidence.",
+      "Exercise detection, containment, compatible rollback or forward fix, cache/artifact/version verification, and correction publication.",
+      "Record bounded evidence and owner sign-off."
+    ]
+  }
+}

@@ -413,6 +413,7 @@
     "validate:rendered-module-ledger": "tsx scripts/validate-rendered-module-ledger.ts",
     "validate:operations-readiness": "tsx scripts/validate-operations-readiness.ts",
     "validate:program-cost-effort": "tsx scripts/validate-program-cost-effort.ts",
+    "validate:external-release-rehearsal": "node --import tsx --test src/lib/qa/external-release-rehearsal.test.ts && tsx scripts/validate-external-release-rehearsal.ts",
     "test:e2e:embed": "playwright test e2e/exp-030-retired-embed.spec.ts",
     "test:qa-011": "tsx scripts/run-qa-011.ts",
     "test:e2e:report": "playwright show-report output/playwright/report",
