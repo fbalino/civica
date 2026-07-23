@@ -401,6 +401,8 @@
     "update:e2e:visual": "tsx scripts/capture-visual-baseline-candidate.ts",
     "approve:e2e:visual": "tsx scripts/approve-visual-baselines.ts",
     "validate:visual-baselines": "tsx scripts/validate-visual-baselines.ts",
+    "generate:rendered-module-ledger": "tsx scripts/generate-rendered-module-ledger.ts",
+    "validate:rendered-module-ledger": "tsx scripts/validate-rendered-module-ledger.ts",
     "test:e2e:embed": "playwright test e2e/exp-030-retired-embed.spec.ts",
     "test:qa-011": "tsx scripts/run-qa-011.ts",
     "test:e2e:report": "playwright show-report output/playwright/report",
