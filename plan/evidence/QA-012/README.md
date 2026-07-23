@@ -1,6 +1,6 @@
 # QA-012 — accessibility automation and keyboard journeys
 
-Automated evidence updated 2026-07-18. QA-012 remains open only for a
+Automated evidence updated 2026-07-23. QA-012 remains open only for a
 documented human-assisted screen-reader review; its canonical control/state
 matrix is covered by the command below, including public admin error states
 and the isolated form journeys owned by EXP-034/QA-011.
@@ -61,6 +61,19 @@ The skipped checks are the eight country/Atlas theme audits, nine data-backed
 keyboard journeys, and four Atlas pointer/keyboard matrix cases. They run in
 full only when `E2E_PERFORMANCE_FIXTURE_DB=1` declares the controlled read-only
 fixture; CI does not receive database credentials.
+
+The credential-free matrix was rerun from the current working tree on
+2026-07-23:
+
+```sh
+E2E_BASE_URL=http://localhost:3102 npm run test:e2e:a11y
+# 30 passed, 21 fixture-dependent checks skipped, exit 0 (27.4s)
+```
+
+The first sandboxed attempt could not launch Chromium because macOS denied the
+browser process rendezvous. The identical non-mutating command passed when
+Chromium was granted its required local process permission; this was an
+execution-environment restriction, not a product failure.
 
 ## Findings repaired before the passing run
 
