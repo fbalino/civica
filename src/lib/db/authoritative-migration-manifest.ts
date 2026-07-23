@@ -271,4 +271,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "78deee17328f6931c5cc0aaf1cb7885b85047eeefc1e8968efb33f4013ed1caf",
     baseline: false,
   },
+  {
+    id: "0046_little_mulholland_black",
+    path: "drizzle/authoritative/0046_little_mulholland_black.sql",
+    sha256: "78c86331e815fbd799fdcfc51e6d2f569bf66f06ac97c771edde226365eb75cb",
+    baseline: false,
+  },
 ] as const;

@@ -611,7 +611,7 @@
       "checkConstraints": {
         "atlas_entity_change_history_identity_check": {
           "name": "atlas_entity_change_history_identity_check",
-          "value": "\"atlas_entity_change_history\".\"entity_type\" IN ('fact','institution','office','person','election','constitution-passage','organization','indicator') AND btrim(\"atlas_entity_change_history\".\"entity_id\") <> '' AND \"atlas_entity_change_history\".\"entity_table\" IN ('country_facts','government_bodies','offices','persons','elections','constitution_passages','organizations','country_metrics')"
+          "value": "btrim(\"atlas_entity_change_history\".\"entity_id\") <> '' AND (\"atlas_entity_change_history\".\"entity_type\", \"atlas_entity_change_history\".\"entity_table\") IN (('fact','country_facts'),('institution','government_bodies'),('office','offices'),('person','persons'),('election','elections'),('constitution-passage','constitution_passages'),('organization','organizations'),('indicator','country_metrics'))"
         },
         "atlas_entity_change_history_event_check": {
           "name": "atlas_entity_change_history_event_check",

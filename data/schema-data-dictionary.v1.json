@@ -2,13 +2,13 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "0e4a0dfcf79fd657c4443fb81a9a1c6f1766ed82c868707afd7e64cf0962624b",
+  "schemaFingerprint": "9ef40261670dc877ec34d35f18c591ab4f998ec5246adf90831d55cae871b53a",
   "summary": {
-    "tables": 101,
-    "columns": 1383,
+    "tables": 102,
+    "columns": 1396,
     "publicAtlasTables": 22,
     "researchBetaTables": 32,
-    "supportTables": 11,
+    "supportTables": 12,
     "internalTables": 34,
     "privateTables": 2,
     "legacyTables": 1
@@ -1120,6 +1120,355 @@
           "cadence": "Manual approval and profile update.",
           "vintageSemantics": "created/updated timestamps describe profile administration, not scholarly review dates.",
           "rights": "Published with member permission; private contact details must not be stored here.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "atlas_entity_change_history",
+      "exportName": "atlasEntityChangeHistory",
+      "definition": "Public, field-allowlisted release history for stable Atlas citation entities.",
+      "rowGrain": "One release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+      "releaseScope": "public_support",
+      "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+      "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+      "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+      "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "change_kind",
+          "propertyName": "changeKind",
+          "definition": "Change kind recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "changes",
+          "propertyName": "changes",
+          "definition": "Changes recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "correction_log_id",
+          "propertyName": "correctionLogId",
+          "definition": "Correction log id; relational link to correction_log.id.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": "correction_log.id",
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing correction_log.id; substantive provenance follows this table's source contract.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "correction_status",
+          "propertyName": "correctionStatus",
+          "definition": "Correction status recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_id",
+          "propertyName": "entityId",
+          "definition": "Entity id recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_atlas_entity_change_history_entity"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_table",
+          "propertyName": "entityTable",
+          "definition": "Entity table recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "entity_type",
+          "propertyName": "entityType",
+          "definition": "Entity type recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_atlas_entity_change_history_entity"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "methodology_version",
+          "propertyName": "methodologyVersion",
+          "definition": "Version of the Civica method that produced or interprets this row.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "operation",
+          "propertyName": "operation",
+          "definition": "Operation recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "reason",
+          "propertyName": "reason",
+          "definition": "Recorded reason for the associated action or decision.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "recorded_at",
+          "propertyName": "recordedAt",
+          "definition": "Recorded at recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_atlas_entity_change_history_entity"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "Recorded at follows this table contract. release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "release_id",
+          "propertyName": "releaseId",
+          "definition": "Release id recorded for the release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_atlas_entity_change_history_release"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+          "cadence": "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+          "vintageSemantics": "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+          "rights": "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
           "deprecation": {
             "status": "active"
           }

@@ -277,6 +277,17 @@ disabled successor study with the checked frozen packet set and an explicit
 is a reviewed forward successor or isolated pre-change backup; never reseed or
 rewrite the original workspace to make its historical hash appear correct.
 
+`0046_little_mulholland_black` adds ATL-020's public, field-safe Atlas entity
+change-history projection. Every event binds one stable citation entity to an
+allowlisted old/new field diff, explicit routine/substantive/correction kind,
+methodology version, and Civica release identifier. Public correction
+references remain optional and foreign-keyed; application reads expose them
+only when the linked correction row is public. This additive migration creates
+an empty history table and never republishes the complete DAT-016 audit
+snapshots. Apply it only after the recorded migration plan; recovery is an
+isolated pre-change backup or reviewed forward compensation, never an invented
+historical release mapping.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

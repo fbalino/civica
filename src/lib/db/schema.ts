@@ -1258,7 +1258,7 @@ export const atlasEntityChangeHistory = pgTable(
     index("idx_atlas_entity_change_history_release").on(table.releaseId),
     check(
       "atlas_entity_change_history_identity_check",
-      dsql`${table.entityType} IN ('fact','institution','office','person','election','constitution-passage','organization','indicator') AND btrim(${table.entityId}) <> '' AND ${table.entityTable} IN ('country_facts','government_bodies','offices','persons','elections','constitution_passages','organizations','country_metrics')`,
+      dsql`btrim(${table.entityId}) <> '' AND (${table.entityType}, ${table.entityTable}) IN (('fact','country_facts'),('institution','government_bodies'),('office','offices'),('person','persons'),('election','elections'),('constitution-passage','constitution_passages'),('organization','organizations'),('indicator','country_metrics'))`,
     ),
     check(
       "atlas_entity_change_history_event_check",

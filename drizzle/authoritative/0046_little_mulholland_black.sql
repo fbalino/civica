@@ -13,9 +13,17 @@ CREATE TABLE "atlas_entity_change_history" (
   "correction_status" text,
   "recorded_at" timestamp DEFAULT now() NOT NULL,
   CONSTRAINT "atlas_entity_change_history_identity_check" CHECK (
-    "atlas_entity_change_history"."entity_type" IN ('fact','institution','office','person','election','constitution-passage','organization','indicator')
-    AND btrim("atlas_entity_change_history"."entity_id") <> ''
-    AND "atlas_entity_change_history"."entity_table" IN ('country_facts','government_bodies','offices','persons','elections','constitution_passages','organizations','country_metrics')
+    btrim("atlas_entity_change_history"."entity_id") <> ''
+    AND ("atlas_entity_change_history"."entity_type", "atlas_entity_change_history"."entity_table") IN (
+      ('fact','country_facts'),
+      ('institution','government_bodies'),
+      ('office','offices'),
+      ('person','persons'),
+      ('election','elections'),
+      ('constitution-passage','constitution_passages'),
+      ('organization','organizations'),
+      ('indicator','country_metrics')
+    )
   ),
   CONSTRAINT "atlas_entity_change_history_event_check" CHECK (
     "atlas_entity_change_history"."operation" IN ('insert','update','delete')

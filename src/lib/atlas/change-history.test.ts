@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isAtlasChangeKind, projectPublicHistoryDiff } from "./change-history";
+import {
+  ATLAS_CHANGE_HISTORY_COVERAGE_NOTE,
+  buildAtlasEntityChangeHistoryDocument,
+  isAtlasChangeKind,
+  projectPublicHistoryDiff,
+  zAtlasEntityChangeHistoryDocument,
+} from "./change-history";
 
 test("history projection reports only allowlisted fact fields", () => {
   assert.deepEqual(
@@ -23,4 +29,198 @@ test("history projection keeps an explicit null for a removed public value", () 
   );
   assert.equal(isAtlasChangeKind("correction"), true);
   assert.equal(isAtlasChangeKind("guess"), false);
+});
+
+const citation = {
+  entityType: "fact" as const,
+  id: "123e4567-e89b-42d3-a456-426614174000",
+  label: "Uruguay — Population",
+  citationUrl:
+    "https://civicaatlas.org/api/citations/fact/123e4567-e89b-42d3-a456-426614174000",
+  readerUrl: "https://civicaatlas.org/country/uruguay",
+};
+
+test("history document binds every event to the stable citation identity", () => {
+  const document = buildAtlasEntityChangeHistoryDocument({
+    citation,
+    rows: [
+      {
+        id: "223e4567-e89b-42d3-a456-426614174000",
+        operation: "update",
+        changeKind: "routine_refresh",
+        changes: [
+          {
+            field: "upstream_vintage_label",
+            before: "2024",
+            after: "2025",
+          },
+        ],
+        reason: "Publisher annual refresh",
+        methodologyVersion: "fact-reconciliation-v1",
+        releaseId: "atlas-2026-07",
+        publicCorrectionId: null,
+        publicCorrectionStatus: null,
+        recordedAt: new Date("2026-07-23T10:00:00.000Z"),
+      },
+    ],
+    limit: 50,
+    offset: 0,
+  });
+
+  assert.equal(document.entity.entityId, citation.id);
+  assert.equal(document.events[0]?.entityId, citation.id);
+  assert.equal(document.events[0]?.entityType, "fact");
+  assert.equal(document.coverage.state, "recorded_history");
+  assert.equal(document.coverage.note, ATLAS_CHANGE_HISTORY_COVERAGE_NOTE);
+  assert.deepEqual(zAtlasEntityChangeHistoryDocument.parse(document), document);
+});
+
+test("history document distinguishes no recorded history from a missing entity", () => {
+  const document = buildAtlasEntityChangeHistoryDocument({
+    citation,
+    rows: [],
+    limit: 25,
+    offset: 0,
+  });
+
+  assert.equal(document.entity.entityId, citation.id);
+  assert.equal(document.coverage.state, "no_recorded_history");
+  assert.deepEqual(document.events, []);
+});
+
+test("history document hides a correction reference unless the joined row is public", () => {
+  const baseRow = {
+    id: "323e4567-e89b-42d3-a456-426614174000",
+    operation: "update",
+    changeKind: "correction",
+    changes: [{ field: "fact_value", before: "1", after: "2" }],
+    reason: "Corrected transcription",
+    methodologyVersion: "fact-reconciliation-v1",
+    releaseId: "atlas-2026-07-correction-1",
+    recordedAt: new Date("2026-07-23T11:00:00.000Z"),
+  };
+  const privateDocument = buildAtlasEntityChangeHistoryDocument({
+    citation,
+    rows: [
+      {
+        ...baseRow,
+        publicCorrectionId: null,
+        publicCorrectionStatus: null,
+      },
+    ],
+    limit: 50,
+    offset: 0,
+  });
+  const publicDocument = buildAtlasEntityChangeHistoryDocument({
+    citation,
+    rows: [
+      {
+        ...baseRow,
+        publicCorrectionId: "423e4567-e89b-42d3-a456-426614174000",
+        publicCorrectionStatus: "resolved_corrected",
+      },
+    ],
+    limit: 50,
+    offset: 0,
+  });
+
+  assert.equal(privateDocument.events[0]?.correction, null);
+  assert.deepEqual(publicDocument.events[0]?.correction, {
+    id: "423e4567-e89b-42d3-a456-426614174000",
+    status: "resolved_corrected",
+  });
+});
+
+test("history document rejects unregistered fields and unsupported event states", () => {
+  assert.throws(() =>
+    zAtlasEntityChangeHistoryDocument.parse({
+      schemaVersion: "civica-atlas-change-history/v1",
+      entity: citation,
+      coverage: {
+        state: "recorded_history",
+        note: ATLAS_CHANGE_HISTORY_COVERAGE_NOTE,
+      },
+      events: [
+        {
+          id: "523e4567-e89b-42d3-a456-426614174000",
+          entityType: "fact",
+          entityId: citation.id,
+          operation: "update",
+          changeKind: "guessed_correction",
+          changes: [{ field: "fact_value", before: "1", after: "2" }],
+          reason: "Unsupported classification",
+          methodologyVersion: "v1",
+          releaseId: "r1",
+          correction: null,
+          recordedAt: "2026-07-23T12:00:00.000Z",
+          internalNotes: "must never escape",
+        },
+      ],
+      pagination: { limit: 50, offset: 0, hasMore: false },
+    }),
+  );
+});
+
+test("history document rejects a valid-looking field from the wrong entity registry", () => {
+  assert.throws(() =>
+    zAtlasEntityChangeHistoryDocument.parse({
+      schemaVersion: "civica-atlas-change-history/v1",
+      entity: {
+        ...citation,
+        entityId: citation.id,
+      },
+      coverage: {
+        state: "recorded_history",
+        note: ATLAS_CHANGE_HISTORY_COVERAGE_NOTE,
+      },
+      events: [
+        {
+          id: "623e4567-e89b-42d3-a456-426614174000",
+          entityType: "fact",
+          entityId: citation.id,
+          operation: "update",
+          changeKind: "routine_refresh",
+          changes: [{ field: "full_name", before: "A", after: "B" }],
+          reason: "Wrong registry",
+          methodologyVersion: "v1",
+          releaseId: "r1",
+          correction: null,
+          recordedAt: "2026-07-23T12:00:00.000Z",
+        },
+      ],
+      pagination: { limit: 50, offset: 0, hasMore: false },
+    }),
+  );
+});
+
+test("history document rejects event identity drift", () => {
+  assert.throws(() =>
+    zAtlasEntityChangeHistoryDocument.parse({
+      schemaVersion: "civica-atlas-change-history/v1",
+      entity: {
+        ...citation,
+        entityId: citation.id,
+      },
+      coverage: {
+        state: "recorded_history",
+        note: ATLAS_CHANGE_HISTORY_COVERAGE_NOTE,
+      },
+      events: [
+        {
+          id: "723e4567-e89b-42d3-a456-426614174000",
+          entityType: "fact",
+          entityId: "823e4567-e89b-42d3-a456-426614174000",
+          operation: "update",
+          changeKind: "routine_refresh",
+          changes: [{ field: "fact_value", before: "1", after: "2" }],
+          reason: "Mismatched identity",
+          methodologyVersion: "v1",
+          releaseId: "r1",
+          correction: null,
+          recordedAt: "2026-07-23T12:00:00.000Z",
+        },
+      ],
+      pagination: { limit: 50, offset: 0, hasMore: false },
+    }),
+  );
 });

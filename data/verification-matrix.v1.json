@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "905824f69cd4b81cbfc7be20ef40fd8a86ea3755d3ad431916d4ff90c1a2c680",
+  "semanticHash": "0e0c3c8f5aedcc8ff88ce263cb38777848474901763e9540c0c3cad53e57e6ac",
   "summary": {
-    "route": 175,
+    "route": 176,
     "pipeline": 50,
     "calculation": 8,
     "data_domain": 14,
@@ -6799,6 +6799,49 @@
       "critical": true,
       "owner": "Public API and platform",
       "fixture": "chat route-inventory declaration for POST",
+      "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
+      "coverage": {
+        "unit": {
+          "status": "covered",
+          "evidence": [
+            "src/lib/api/route-inventory/__tests__/route-inventory.test.ts"
+          ],
+          "gapTask": null
+        },
+        "integration": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:route-io-policy"
+          ],
+          "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/api/citations/[entityType]/[id]/history/route.ts",
+      "kind": "route",
+      "title": "/api/citations/[entityType]/[id]/history API handler",
+      "source": "src/app/api/citations/[entityType]/[id]/history/route.ts",
+      "critical": true,
+      "owner": "Public API and platform",
+      "fixture": "public-read route-inventory declaration for GET",
       "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
       "coverage": {
         "unit": {

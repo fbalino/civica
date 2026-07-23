@@ -1,25 +1,63 @@
+import "server-only";
+
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { atlasEntityChangeHistory } from "@/lib/db/schema";
-import { ATLAS_CHANGE_HISTORY_SCHEMA_VERSION, type AtlasHistoryEntityType } from "./change-history";
+import {
+  atlasEntityChangeHistory,
+  correctionLog,
+} from "@/lib/db/schema";
+import type { EntityCitation } from "@/lib/citations/stable-identity";
+import {
+  buildAtlasEntityChangeHistoryDocument,
+  type AtlasHistoryEntityType,
+} from "./change-history";
 
 export async function getAtlasEntityChangeHistory(input: {
-  entityType: AtlasHistoryEntityType;
-  entityId: string;
+  citation: Pick<
+    EntityCitation,
+    "entityType" | "id" | "label" | "citationUrl" | "readerUrl"
+  >;
   limit: number;
   offset: number;
 }) {
   const rows = await db
-    .select({ id: atlasEntityChangeHistory.id, operation: atlasEntityChangeHistory.operation, changeKind: atlasEntityChangeHistory.changeKind, changes: atlasEntityChangeHistory.changes, reason: atlasEntityChangeHistory.reason, methodologyVersion: atlasEntityChangeHistory.methodologyVersion, releaseId: atlasEntityChangeHistory.releaseId, correctionLogId: atlasEntityChangeHistory.correctionLogId, correctionStatus: atlasEntityChangeHistory.correctionStatus, recordedAt: atlasEntityChangeHistory.recordedAt })
+    .select({
+      id: atlasEntityChangeHistory.id,
+      operation: atlasEntityChangeHistory.operation,
+      changeKind: atlasEntityChangeHistory.changeKind,
+      changes: atlasEntityChangeHistory.changes,
+      reason: atlasEntityChangeHistory.reason,
+      methodologyVersion: atlasEntityChangeHistory.methodologyVersion,
+      releaseId: atlasEntityChangeHistory.releaseId,
+      publicCorrectionId: correctionLog.id,
+      publicCorrectionStatus: correctionLog.status,
+      recordedAt: atlasEntityChangeHistory.recordedAt,
+    })
     .from(atlasEntityChangeHistory)
-    .where(and(eq(atlasEntityChangeHistory.entityType, input.entityType), eq(atlasEntityChangeHistory.entityId, input.entityId)))
+    .leftJoin(
+      correctionLog,
+      and(
+        eq(atlasEntityChangeHistory.correctionLogId, correctionLog.id),
+        eq(correctionLog.isPublic, true),
+      ),
+    )
+    .where(
+      and(
+        eq(
+          atlasEntityChangeHistory.entityType,
+          input.citation.entityType as AtlasHistoryEntityType,
+        ),
+        eq(atlasEntityChangeHistory.entityId, input.citation.id),
+      ),
+    )
     .orderBy(desc(atlasEntityChangeHistory.recordedAt))
     .limit(input.limit + 1)
     .offset(input.offset);
-  const hasMore = rows.length > input.limit;
-  return {
-    schemaVersion: ATLAS_CHANGE_HISTORY_SCHEMA_VERSION,
-    events: rows.slice(0, input.limit).map((row) => ({ ...row, recordedAt: row.recordedAt.toISOString() })),
-    pagination: { limit: input.limit, offset: input.offset, hasMore },
-  };
+
+  return buildAtlasEntityChangeHistoryDocument({
+    citation: input.citation,
+    rows,
+    limit: input.limit,
+    offset: input.offset,
+  });
 }

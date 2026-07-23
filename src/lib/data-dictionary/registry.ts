@@ -749,6 +749,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Resolved per source_id; derived display positions inherit input restrictions.",
     deprecation: active,
   },
+  atlas_entity_change_history: {
+    definition:
+      "Public, field-allowlisted release history for stable Atlas citation entities.",
+    rowGrain:
+      "One release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+    releaseScope: "public_support",
+    sourceOrDerivation:
+      "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+    cadence:
+      "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+    vintageSemantics:
+      "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+    rights:
+      "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
+    deprecation: active,
+  },
   correction_log: {
     definition:
       "Public correction, clarification, retraction, and supersession records.",

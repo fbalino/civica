@@ -556,6 +556,11 @@ export const RATE_LIMIT_ROUTE_POLICIES: readonly RateLimitRoutePolicyMapping[] =
       CONFIRMED_PUBLIC_READ,
     ),
     route(
+      "api/citations/[entityType]/[id]/history/route.ts",
+      ["GET"],
+      CONFIRMED_PUBLIC_READ,
+    ),
+    route(
       "api/civica-index/corrections/route.ts",
       ["POST"],
       durableDb(
