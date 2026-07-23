@@ -40,6 +40,56 @@ Each public event must contain only:
 No actor identifier, internal note, submitter contact detail, raw publisher
 payload, or unrestricted JSON snapshot may enter the public API or reader UI.
 
+## Classification policy
+
+The writer, not the diff projector, supplies `change_kind`. The projector must
+never infer editorial intent from a changed value.
+
+| Kind | Required evidence |
+|---|---|
+| `routine_refresh` | A new upstream publication, retrieval, source, or vintage processed under the same public method. Values may change because the publisher refreshed them. |
+| `substantive_revision` | An intentional Atlas content or canonical-selection revision that is not merely a new publisher vintage. The reason must name the revision basis. |
+| `correction` | A retained `correction_log` row plus its current status. The event fixes an error in a prior Civica release. |
+| `retraction` | A retained `correction_log` row plus its current status. The event withdraws a previously published value or record. |
+| `methodology_change` | A named method/version change that alters how the public record is derived or selected. |
+
+`correction` and `retraction` fail closed without a correction-log reference.
+All other kinds reject a correction-log reference. Every writer must supply a
+non-empty reason, a method/version, and a named Atlas release ID matching
+`[A-Za-z0-9._-]{1,96}`. A deployment ID or synthesized timestamp is not a data
+release.
+
+## Writer adoption ledger
+
+The public relation and helper are not sufficient by themselves. ATL-020 stays
+open until each primary entity writer appends through an atomic data-and-history
+path.
+
+| Entity | Canonical writer status |
+|---|---|
+| fact | Pending adoption across reconciliation/Factbook writers |
+| institution | Pending adoption |
+| office | Pending adoption |
+| person | Pending adoption |
+| election | Pending adoption |
+| constitution-passage | Pending adoption |
+| organization | Pending adoption |
+| indicator | Implemented for `writeCountryMetrics`: one PostgreSQL CTE upserts the observation and appends the bounded event atomically; apply runs fail closed without `CIVICA_ATLAS_RELEASE_ID` or `--release-id` |
+
+## Reader design register
+
+- **Layout row:** existing multi-pane country reference surface; the history
+  disclosure lives inside the existing source-evidence panel.
+- **Hero treatment:** none. History is supporting provenance, not a competing
+  page-level destination.
+- **Component register:** existing `FactValuePanel`, canonical `Chip`,
+  `DataTable`, and `Button`, plus the shared
+  `AtlasChangeHistoryDisclosure`. Styling lives in `editorial.css` and uses
+  design-system tokens.
+- **States:** loading, recorded history, no recorded public history, pagination,
+  public correction status, and temporarily unavailable. The unavailable state
+  preserves the current value/source rather than implying no history.
+
 ## Delivery sequence
 
 1. Add an additive public-history relation plus forward migration. Writers
@@ -61,6 +111,21 @@ payload, or unrestricted JSON snapshot may enter the public API or reader UI.
    correction linked to a public correction log, a withheld/non-public detail,
    pagination, no history, and data-unavailable states. Record the migration
    plan and browser evidence under `plan/evidence/ATL-020/`.
+
+## Current implementation checkpoint — 2026-07-23
+
+- Strict public DTO, stable citation binding, explicit coverage state,
+  public-only correction join, pagination, rate limiting, and forward migration
+  are implemented.
+- Writer classification validation and the first atomic production writer
+  adoption (`indicator`) are implemented.
+- The reusable reader module is mounted on canonical Factbook observations.
+  A local browser journey verified the temporarily-unavailable state without
+  applying migration `0046` to the connected database. This is implementation
+  evidence only, not the final ATL-020 browser gate.
+- Remaining implementation work is the other seven writer families plus
+  fixture-backed recorded/no-history/correction/private/pagination journeys and
+  the authorized live migration plan/apply/verification sequence.
 
 ## Non-goals and constraints
 

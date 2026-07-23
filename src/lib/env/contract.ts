@@ -128,6 +128,15 @@ export const ENV_CONTRACT: EnvVarSpec[] = [
         : "must be exactly true or false when set",
   },
   {
+    name: "CIVICA_ATLAS_RELEASE_ID",
+    requiredIn: [],
+    note: "Explicit opt-in naming the Atlas data release for writers that append public release-to-release history.",
+    validate: (value) =>
+      /^[A-Za-z0-9._-]{1,96}$/.test(value.trim())
+        ? null
+        : "must be a 1-96 character release identifier",
+  },
+  {
     name: "ANTHROPIC_API_KEY_CHAT",
     requiredIn: ["chat"],
     secret: true,

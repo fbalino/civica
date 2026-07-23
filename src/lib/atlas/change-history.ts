@@ -50,6 +50,9 @@ export const ATLAS_CORRECTION_STATUSES = [
   "rejected",
 ] as const;
 
+export type AtlasCorrectionStatus =
+  (typeof ATLAS_CORRECTION_STATUSES)[number];
+
 export const ATLAS_CHANGE_HISTORY_COVERAGE_NOTE =
   "Public release-mapped history begins with the ATL-020 contract. Earlier retained audit evidence is not shown unless it can be mapped to a documented release without inference.";
 
@@ -86,6 +89,12 @@ const zPublicHistoryFieldChange = z
       context.addIssue({
         code: "custom",
         message: "History changes require explicit before and after values",
+      });
+    }
+    if (JSON.stringify(change.before) === JSON.stringify(change.after)) {
+      context.addIssue({
+        code: "custom",
+        message: "History changes require distinct before and after values",
       });
     }
   });

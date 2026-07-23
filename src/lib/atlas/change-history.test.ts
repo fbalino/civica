@@ -224,3 +224,40 @@ test("history document rejects event identity drift", () => {
     }),
   );
 });
+
+test("history document rejects no-op field changes", () => {
+  assert.throws(
+    () =>
+      zAtlasEntityChangeHistoryDocument.parse({
+        schemaVersion: "civica-atlas-change-history/v1",
+        entity: citation,
+        coverage: {
+          state: "recorded_history",
+          note: ATLAS_CHANGE_HISTORY_COVERAGE_NOTE,
+        },
+        events: [
+          {
+            id: "923e4567-e89b-42d3-a456-426614174000",
+            entityType: "fact",
+            entityId: citation.id,
+            operation: "update",
+            changeKind: "routine_refresh",
+            changes: [
+              {
+                field: "source_id",
+                before: "cia_factbook",
+                after: "cia_factbook",
+              },
+            ],
+            reason: "No public change",
+            methodologyVersion: "v1",
+            releaseId: "r1",
+            correction: null,
+            recordedAt: "2026-07-23T12:00:00.000Z",
+          },
+        ],
+        pagination: { limit: 50, offset: 0, hasMore: false },
+      }),
+    /distinct before and after values/,
+  );
+});

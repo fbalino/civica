@@ -20,6 +20,7 @@ import {
   buildFactEvidenceSummary,
   lineageForFactRow,
 } from "@/lib/factbook/reconcile/fact-evidence-summary";
+import { AtlasChangeHistoryDisclosure } from "@/components/atlas/AtlasChangeHistoryDisclosure";
 
 const SOURCE_LABELS: Record<string, string> = {
   cia_factbook: "CIA World Factbook",
@@ -301,6 +302,13 @@ export function FactValuePanel({
           );
         })}
       </ul>
+
+      {canonicalId ? (
+        <AtlasChangeHistoryDisclosure
+          entityType="fact"
+          entityId={canonicalId}
+        />
+      ) : null}
 
       <footer className="fact-value-panel-foot">
         <span className="fact-value-panel-foot-cite">
