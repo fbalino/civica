@@ -77,7 +77,10 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
       route: "/api/cron/factbook/sync-wikidata",
       inputKind: "external",
       sources: ["wikidata"],
-      implementationPaths: ["src/lib/factbook/reconcile/wikidata-client.ts"],
+      implementationPaths: [
+        "src/lib/factbook/reconcile/wikidata-client.ts",
+        "src/lib/factbook/reconcile/wikidata-sync.ts",
+      ],
     },
     {
       id: "factbook.officeholders",

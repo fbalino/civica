@@ -14,7 +14,7 @@ export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
 /** SHA-256 of the complete credential-free production build command. */
 export const BUILD_CORE_SHA256 =
-  "749f2eee1ee3a31fe86d59726a59141841dc850a6d1bea6db3b5efc3031ceba2";
+  "b13c0fc67333a3da2782fd18ceb6dff315119a2f66524d978527a1e737e7d860";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
@@ -269,6 +269,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "npm run validate:query-budgets",
     "npm run validate:route-performance-telemetry",
     "npm run validate:verification-matrix",
+    "npm run validate:atlas-change-history-writers",
     "npm run validate:claims-docs",
     "next build",
   ]) {

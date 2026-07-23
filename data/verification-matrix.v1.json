@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "0e0c3c8f5aedcc8ff88ce263cb38777848474901763e9540c0c3cad53e57e6ac",
+  "semanticHash": "49e1ba36a8970766846d79a79f598773c9dbc201a02bb2ae74b106da4dbaef99",
   "summary": {
     "route": 176,
     "pipeline": 50,
@@ -3550,7 +3550,7 @@
       "id": "pipeline:factbook.wikidata",
       "kind": "pipeline",
       "title": "factbook.wikidata scheduled production pipeline",
-      "source": "src/lib/factbook/reconcile/wikidata-client.ts",
+      "source": "src/lib/factbook/reconcile/wikidata-client.ts, src/lib/factbook/reconcile/wikidata-sync.ts",
       "critical": true,
       "owner": "Scheduled data operations",
       "fixture": "Registered factbook.wikidata cron adapter and source-input specification",

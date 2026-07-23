@@ -1,6 +1,6 @@
 # ATL-020 — Atlas entity change and correction history plan
 
-**Status:** implementation plan  
+**Status:** implementation complete; authorized live migration gate pending
 **Task:** release-to-release change and correction histories for primary Atlas
 entities.
 
@@ -67,13 +67,13 @@ path.
 
 | Entity | Canonical writer status |
 |---|---|
-| fact | In progress: the shared serialized one-statement fact upsert/history primitive and frozen CIA seed adoption are implemented; reconciliation, classification, editorial-dispute, and legacy-in-sync mutation paths remain |
-| institution | Pending adoption |
-| office | Pending adoption |
-| person | Pending adoption |
-| election | Pending adoption |
-| constitution-passage | Pending adoption |
-| organization | Pending adoption |
+| fact | Implemented: frozen CIA seed, all recurring reconciliation/classification syncs, and editorial dispute demotion use serialized atomic history writes; the recurring WTO legacy mutation was retired |
+| institution | Implemented: officeholder, CIA cabinet, IPU Parline, and Wikidata legislature writers preserve the selected UUID and append bounded history atomically |
+| office | Implemented: officeholder and CIA cabinet writers use the stable-ID-aware atomic office boundary; ambiguous CIA title renames fail closed |
+| person | Implemented: officeholder, CIA cabinet, portrait/birthdate, and QID-backfill mutations use the atomic person boundary; QID-less mutation requires an explicit stable UUID |
+| election | Implemented: confirmed IPU/Wikidata contests, IDEA turnout, and estimated insert/update/delete paths append history atomically; non-QID contests bind to the publisher contest URL |
+| constitution-passage | Implemented: one serialized statement supersedes old digest IDs, inserts/reactivates current IDs, and appends linked bounded events |
+| organization | Implemented in the existing release transaction |
 | indicator | Implemented for `writeCountryMetrics`: one PostgreSQL CTE upserts the observation and appends the bounded event atomically; apply runs fail closed without `CIVICA_ATLAS_RELEASE_ID` or `--release-id` |
 
 ## Reader design register
@@ -133,9 +133,19 @@ path.
   A local browser journey verified the temporarily-unavailable state without
   applying migration `0046` to the connected database. This is implementation
   evidence only, not the final ATL-020 browser gate.
-- Remaining implementation work is the other seven writer families plus
-  fixture-backed recorded/no-history/correction/private/pagination journeys and
-  the authorized live migration plan/apply/verification sequence.
+- Every recurring primary-entity mutation now routes through one of six
+  registered atomic history boundaries. `npm run
+  validate:atlas-change-history-writers` scans the repository and fails on a
+  new direct write outside those boundaries; eleven named historical
+  repair/seed tools remain explicit non-recurring exceptions.
+- Fixture-backed Chromium journeys cover routine refresh, public and withheld
+  correction detail, pagination, no recorded history, and unavailable history
+  while preserving the current observation. Evidence is recorded under
+  `plan/evidence/ATL-020/`.
+- The zero-write live migration plan passed with four additive statements and
+  no destructive statements. Remaining work is the authorized apply/live
+  verification sequence. Migration `0046` has not been applied by this
+  implementation pass.
 
 ## Non-goals and constraints
 

@@ -67,6 +67,10 @@ test("Neon HTTP paths use one atomic request and the legacy API cannot leak full
     "src/lib/constitute/sync-constitutions.ts",
     "utf8",
   );
+  const historyWriter = readFileSync(
+    "src/lib/constitute/constitution-passage-history-writer.ts",
+    "utf8",
+  );
   const query = readFileSync(
     "src/lib/db/queries-constitution-search.ts",
     "utf8",
@@ -84,13 +88,25 @@ test("Neon HTTP paths use one atomic request and the legacy API cannot leak full
     "utf8",
   );
   assert.doesNotMatch(writer, /\.transaction\s*\(/);
-  assert.match(writer, /db\.batch\(/);
+  assert.match(writer, /replaceConstitutionPassageProjectionWithHistory\(db,/);
+  assert.match(
+    historyWriter,
+    /database\.execute\(\s*buildConstitutionPassageHistoryStatement\(input\)/,
+  );
+  assert.match(historyWriter, /WITH lock_row AS MATERIALIZED/);
+  assert.match(historyWriter, /INSERT INTO atlas_entity_change_history/);
   assert.match(query, /query\.transaction\(\(txn\) =>/);
   assert.doesNotMatch(query, /from "\.\/index"/);
-  const deactivate = writer.indexOf(".set({ isCurrent: false");
-  const insert = writer.indexOf(".insert(constitutionPassages)");
-  const activate = writer.indexOf(".set({ isCurrent: true");
-  assert.ok(deactivate >= 0 && deactivate < insert && insert < activate);
+  const deactivate = historyWriter.indexOf(
+    "UPDATE constitution_passages cp",
+  );
+  const insert = historyWriter.indexOf(
+    "INSERT INTO constitution_passages",
+  );
+  const history = historyWriter.indexOf(
+    "INSERT INTO atlas_entity_change_history",
+  );
+  assert.ok(deactivate >= 0 && deactivate < insert && insert < history);
   assert.ok(
     query.indexOf("SET LOCAL statement_timeout") < query.indexOf("WITH q AS"),
   );

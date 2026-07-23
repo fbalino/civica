@@ -44,8 +44,8 @@ test("direct-write manual scripts retain retry-safe identity guards", () => {
       /DRY_RUN/,
     ],
     "scripts/sync-wikidata-parties.ts": [
-      /if \(!DRY_RUN\)/,
       /writeLegislatureComposition/,
+      /dryRun: DRY_RUN/,
       /DRY_RUN/,
     ],
     "scripts/ingest-vparty-positions.ts": [/writePartyPositions/, /DRY_RUN/],
