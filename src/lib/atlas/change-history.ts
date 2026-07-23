@@ -56,15 +56,105 @@ export type AtlasCorrectionStatus =
 export const ATLAS_CHANGE_HISTORY_COVERAGE_NOTE =
   "Public release-mapped history begins with the ATL-020 contract. Earlier retained audit evidence is not shown unless it can be mapped to a documented release without inference.";
 
-export const PUBLIC_HISTORY_FIELDS: Record<AtlasHistoryEntityType, readonly string[]> = {
-  fact: ["fact_value", "fact_value_numeric", "fact_unit", "fact_year", "value_status", "value_status_reason", "source_id", "source_url", "upstream_vintage_label", "methodology_version", "status", "status_reason"],
-  institution: ["name", "body_type", "status", "wikidata_qid", "ipu_parline_id"],
-  office: ["name", "office_type", "status", "wikidata_qid", "ipu_parline_id"],
-  person: ["full_name", "role", "status", "wikidata_qid"],
-  election: ["election_name", "election_date", "status", "election_type", "source_id", "source_url"],
-  "constitution-passage": ["heading_label", "plain_text", "source_id", "source_url", "language_code", "translation_status", "is_current"],
-  organization: ["name", "organization_type", "status", "source_id", "source_url", "upstream_vintage"],
-  indicator: ["value", "value_status", "value_status_reason", "rank", "total_ranked", "source_id", "source_url", "year"],
+export const PUBLIC_HISTORY_FIELDS: Record<
+  AtlasHistoryEntityType,
+  readonly string[]
+> = {
+  fact: [
+    "fact_value",
+    "fact_value_numeric",
+    "fact_unit",
+    "fact_year",
+    "value_status",
+    "value_status_reason",
+    "as_of",
+    "source_id",
+    "source_url",
+    "upstream_vintage_label",
+    "methodology_version",
+    "status",
+    "status_reason",
+  ],
+  institution: [
+    "name",
+    "body_type",
+    "chamber_type",
+    "total_seats",
+    "branch",
+    "wikidata_qid",
+    "ipu_parline_id",
+    "electoral_system_family",
+    "electoral_subsystem",
+    "source_id",
+    "source_url",
+  ],
+  office: [
+    "name",
+    "office_type",
+    "is_elected",
+    "wikidata_qid",
+    "reports_to_office_id",
+    "display_order",
+    "source_id",
+    "source_url",
+  ],
+  person: [
+    "name",
+    "date_of_birth",
+    "wikidata_qid",
+    "photo_url",
+    "photo_license",
+    "photo_credit",
+    "parline_person_code",
+    "source_id",
+    "source_url",
+  ],
+  election: [
+    "election_name",
+    "election_date",
+    "election_type",
+    "electoral_system",
+    "body_id",
+    "turnout_percent",
+    "registered_voters",
+    "total_valid_votes",
+    "wikidata_qid",
+    "date_confidence",
+    "source_id",
+    "source_url",
+  ],
+  "constitution-passage": [
+    "heading_label",
+    "plain_text",
+    "source_id",
+    "source_url",
+    "language_code",
+    "translation_status",
+    "is_current",
+  ],
+  organization: [
+    "name",
+    "full_name",
+    "type",
+    "founded_year",
+    "hq_country",
+    "member_count",
+    "wikidata_qid",
+    "source_id",
+    "source_url",
+    "source_license",
+    "upstream_vintage",
+  ],
+  indicator: [
+    "value",
+    "value_status",
+    "value_status_reason",
+    "rank",
+    "total_ranked",
+    "source_id",
+    "source_url",
+    "year",
+  ],
 };
 
 export const ATLAS_HISTORY_ENTITY_TABLES: Record<AtlasHistoryEntityType, string> = {
@@ -258,8 +348,8 @@ export function projectPublicHistoryDiff(
   before: Record<string, unknown> | null,
   after: Record<string, unknown> | null,
 ): PublicHistoryFieldChange[] {
-  const oldRow = before ?? {};
-  const newRow = after ?? {};
+  const oldRow = toAtlasPublicHistorySnapshot(entityType, before) ?? {};
+  const newRow = toAtlasPublicHistorySnapshot(entityType, after) ?? {};
   return PUBLIC_HISTORY_FIELDS[entityType]
     .filter((field) => hasOwn(oldRow, field) || hasOwn(newRow, field))
     .map((field) => ({
@@ -268,6 +358,40 @@ export function projectPublicHistoryDiff(
       after: hasOwn(newRow, field) ? newRow[field] ?? null : null,
     }))
     .filter((change) => JSON.stringify(change.before) !== JSON.stringify(change.after));
+}
+
+/**
+ * Projects either a database-shaped snake_case row or a Drizzle camelCase row
+ * into the one closed public snapshot contract. Unknown/internal keys are
+ * discarded before diffing, and dates are serialized deterministically.
+ */
+export function toAtlasPublicHistorySnapshot(
+  entityType: AtlasHistoryEntityType,
+  snapshot: Record<string, unknown> | null,
+): Record<string, unknown> | null {
+  if (!snapshot) return null;
+  const projected: Record<string, unknown> = {};
+  for (const field of PUBLIC_HISTORY_FIELDS[entityType]) {
+    const camelField = snakeToCamel(field);
+    if (hasOwn(snapshot, field)) {
+      projected[field] = normalizePublicHistoryValue(snapshot[field]);
+    } else if (hasOwn(snapshot, camelField)) {
+      projected[field] = normalizePublicHistoryValue(snapshot[camelField]);
+    }
+  }
+  return projected;
+}
+
+function normalizePublicHistoryValue(value: unknown): unknown {
+  if (value === undefined) return null;
+  if (value instanceof Date) return value.toISOString();
+  return value;
+}
+
+function snakeToCamel(value: string): string {
+  return value.replace(/_([a-z])/g, (_, character: string) =>
+    character.toUpperCase(),
+  );
 }
 
 /** A writer must classify every event. The projection deliberately refuses to

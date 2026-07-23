@@ -5,6 +5,8 @@ import {
   buildAtlasEntityChangeHistoryDocument,
   isAtlasChangeKind,
   projectPublicHistoryDiff,
+  PUBLIC_HISTORY_FIELDS,
+  toAtlasPublicHistorySnapshot,
   zAtlasEntityChangeHistoryDocument,
 } from "./change-history";
 
@@ -29,6 +31,49 @@ test("history projection keeps an explicit null for a removed public value", () 
   );
   assert.equal(isAtlasChangeKind("correction"), true);
   assert.equal(isAtlasChangeKind("guess"), false);
+});
+
+test("history projection normalizes Drizzle camelCase rows before diffing", () => {
+  assert.deepEqual(
+    projectPublicHistoryDiff(
+      "person",
+      {
+        name: "María Example",
+        dateOfBirth: "1970-01-01",
+        wikidataQid: "Q1",
+        internalReviewerNote: "private",
+      },
+      {
+        name: "Maria Example",
+        dateOfBirth: "1970-01-01",
+        wikidataQid: "Q1",
+        internalReviewerNote: "still private",
+      },
+    ),
+    [{ field: "name", before: "María Example", after: "Maria Example" }],
+  );
+});
+
+test("public snapshot registries match real entity fields and discard phantom aliases", () => {
+  assert.ok(PUBLIC_HISTORY_FIELDS.institution.includes("total_seats"));
+  assert.ok(PUBLIC_HISTORY_FIELDS.election.includes("turnout_percent"));
+  assert.ok(PUBLIC_HISTORY_FIELDS.organization.includes("type"));
+  assert.equal(PUBLIC_HISTORY_FIELDS.person.includes("full_name"), false);
+  assert.equal(PUBLIC_HISTORY_FIELDS.office.includes("status"), false);
+  assert.deepEqual(
+    toAtlasPublicHistorySnapshot("organization", {
+      name: "United Nations",
+      fullName: "United Nations",
+      type: "intergovernmental",
+      organizationType: "must not leak",
+      sourceRetrievedAt: new Date("2026-07-23T00:00:00.000Z"),
+    }),
+    {
+      name: "United Nations",
+      full_name: "United Nations",
+      type: "intergovernmental",
+    },
+  );
 });
 
 const citation = {

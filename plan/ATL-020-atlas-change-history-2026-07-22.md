@@ -67,7 +67,7 @@ path.
 
 | Entity | Canonical writer status |
 |---|---|
-| fact | Pending adoption across reconciliation/Factbook writers |
+| fact | In progress: the shared serialized one-statement fact upsert/history primitive and frozen CIA seed adoption are implemented; reconciliation, classification, editorial-dispute, and legacy-in-sync mutation paths remain |
 | institution | Pending adoption |
 | office | Pending adoption |
 | person | Pending adoption |
@@ -119,6 +119,16 @@ path.
   are implemented.
 - Writer classification validation and the first atomic production writer
   adoption (`indicator`) are implemented.
+- The public field registry now matches the real backing schemas and accepts
+  either database snake_case rows or Drizzle camelCase rows through one bounded
+  snapshot projector. Retrieval timestamps are intentionally excluded from
+  release diffs so an otherwise identical retry does not manufacture a public
+  change event.
+- The shared country-fact CTE serializes the natural key, captures the prior
+  stable UUID, preserves reviewer-demoted status by default, upserts the source
+  row, and appends the bounded event in one PostgreSQL statement. The frozen
+  CIA seed is the first fact writer routed through it and fails closed without
+  a named Atlas release.
 - The reusable reader module is mounted on canonical Factbook observations.
   A local browser journey verified the temporarily-unavailable state without
   applying migration `0046` to the connected database. This is implementation
