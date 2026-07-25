@@ -92,30 +92,38 @@ export function CountryDirectory({
           {entries.length} {entries.length === 1 ? "entry" : "entries"}
         </span>
       </div>
-      {entries.map((country) => (
-        <Link
-          key={country.id ?? country.slug}
-          href={destination(hrefPrefix, queryParam, country.slug)}
-          className="country-directory__item"
-        >
-          <span className="country-directory__flag" aria-hidden="true">
-            <CountryFlag iso2={country.iso2} size={21} decorative />
-          </span>
-          <span className="country-directory__name">
-            {country.name}
-            {country.status ? (
-              <span className="country-directory__status">
-                {country.status.label}
-              </span>
-            ) : null}
-          </span>
-          <span
-            className="country-directory__dot"
-            style={{ background: regionDot(country.continent) }}
-            aria-hidden="true"
-          />
-        </Link>
-      ))}
+      <div className="country-directory__entries">
+        {entries.map((country) => (
+          <Link
+            key={country.id ?? country.slug}
+            href={destination(hrefPrefix, queryParam, country.slug)}
+            className="country-directory__item"
+          >
+            <span className="country-directory__flag" aria-hidden="true">
+              <CountryFlag iso2={country.iso2} size={21} decorative />
+            </span>
+            <span className="country-directory__name">
+              <span className="country-directory__label">{country.name}</span>
+              {country.status ? (
+                <span className="country-directory__status">
+                  <span
+                    className="country-directory__status-separator"
+                    aria-hidden="true"
+                  >
+                    ·
+                  </span>
+                  {country.status.label}
+                </span>
+              ) : null}
+            </span>
+            <span
+              className="country-directory__dot"
+              style={{ background: regionDot(country.continent) }}
+              aria-hidden="true"
+            />
+          </Link>
+        ))}
+      </div>
     </section>
   ));
 

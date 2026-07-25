@@ -62,6 +62,12 @@ export interface PageHeroProps {
    */
   chips?: ReactNode;
   /**
+   * Accessible name for an interactive chip collection. When provided, the
+   * canonical chip wrapper becomes the semantic group so slot consumers do
+   * not need a nested layout wrapper that can break gap and wrapping.
+   */
+  chipsAriaLabel?: string;
+  /**
    * Optional trailing slot for any extra hero content (a stat strip, an
    * advanced-filter bar, CTAs). Rendered last, inside the same stagger, so it
    * inherits the on-mount reveal. Prefer the dedicated `search` / `chips` slots
@@ -94,6 +100,7 @@ export function PageHero({
   engraving,
   search,
   chips,
+  chipsAriaLabel,
   children,
   titleId = "page-hero-title",
   titleAs = "h1",
@@ -142,7 +149,11 @@ export function PageHero({
         ) : null}
 
         {chips != null ? (
-          <HeroRevealItem className="factbook-hero-chips">
+          <HeroRevealItem
+            className="factbook-hero-chips"
+            role={chipsAriaLabel ? "group" : undefined}
+            aria-label={chipsAriaLabel}
+          >
             {chips}
           </HeroRevealItem>
         ) : null}

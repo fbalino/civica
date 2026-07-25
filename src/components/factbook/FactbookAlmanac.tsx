@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
-import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { CountryDirectory } from "@/components/country/CountryDirectory";
+import { PageHero } from "@/components/PageHero";
 import {
   AlmanacFilters,
   EMPTY_FILTER_STATE,
@@ -267,38 +266,33 @@ export function FactbookAlmanac({
 
   return (
     <div className="factbook-landing">
-      {/* ── Full-bleed engraving hero with centered typeahead ── */}
-      <section className="factbook-landing-hero" aria-labelledby="factbook-hero-title">
-        <ParallaxImage
-          className="factbook-hero-art"
-          src="/engravings/pages/countries.webp"
-          darkSrc="/engravings/pages/countries-dark.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="factbook-hero-scrim" aria-hidden="true" />
-        <HeroReveal className="factbook-hero-inner">
-          <HeroRevealItem className="factbook-hero-eyebrow">
-            Countries &amp; areas
-          </HeroRevealItem>
-          <HeroRevealItem as="h1" id="factbook-hero-title" className="factbook-hero-title">
-            Every country and area, in full.
-          </HeroRevealItem>
-          <HeroRevealItem as="p" className="factbook-hero-dek">
-            Start typing &mdash; or browse the complete index below. Every entry is
-            sourced, structured, and ready to cite.
-          </HeroRevealItem>
-
-          <HeroRevealItem className="factbook-hero-search">
-            <CountrySearchCombobox
-              countries={searchOptions}
-              countryPathPrefix="/country"
-              placeholder="Search any country or area&hellip;"
-              ariaLabel="Search countries and areas"
-            />
-          </HeroRevealItem>
-
-          <HeroRevealItem className="factbook-hero-chips" role="group" aria-label="Filter by region">
+      {/* ── Canonical full-bleed PageHero with centered browse composition ── */}
+      <PageHero
+        className="factbook-landing-hero--centered"
+        eyebrow="Countries & areas"
+        title="Every country and area, in full."
+        titleId="factbook-hero-title"
+        description={
+          <>
+            Start typing &mdash; or browse the complete index below. Every entry
+            is sourced, structured, and ready to cite.
+          </>
+        }
+        engraving={{
+          src: "/engravings/pages/countries.webp",
+          darkSrc: "/engravings/pages/countries-dark.webp",
+        }}
+        search={
+          <CountrySearchCombobox
+            countries={searchOptions}
+            countryPathPrefix="/country"
+            placeholder="Search any country or area&hellip;"
+            ariaLabel="Search countries and areas"
+          />
+        }
+        chipsAriaLabel="Filter by region"
+        chips={
+          <>
             {REGIONS.map((r) => {
               const active =
                 r.key === "all" ? regions.size === 0 : regions.has(r.key);
@@ -335,20 +329,18 @@ export function FactbookAlmanac({
                 </button>
               );
             })}
-          </HeroRevealItem>
-
-          {/* Advanced filters live WITH the region chips (owner direction):
-              dropdown pills right under the hero chips, selections as
-              removable pills. The almanac sub-line is the live match count. */}
-          <HeroRevealItem>
-            <AlmanacFilters
-              filters={filters}
-              onToggle={toggleFilter}
-              onClear={clearFilters}
-            />
-          </HeroRevealItem>
-        </HeroReveal>
-      </section>
+          </>
+        }
+      >
+        {/* Advanced filters live WITH the region chips (owner direction):
+            dropdown pills right under the hero chips, selections as
+            removable pills. The almanac sub-line is the live match count. */}
+        <AlmanacFilters
+          filters={filters}
+          onToggle={toggleFilter}
+          onClear={clearFilters}
+        />
+      </PageHero>
 
       {/* ── Almanac index ── */}
       <div className="factbook-almanac">

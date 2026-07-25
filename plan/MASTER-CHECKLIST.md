@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 308
-- **Completed:** 246
+- **Total tasks:** 310
+- **Completed:** 248
 - **Remaining:** 62
-- **Progress:** 79.9%
-- **Priority mix:** P0 191 · P1 112 · P2 5
+- **Progress:** 80%
+- **Priority mix:** P0 192 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -268,6 +268,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-041** (P0) Give `/governance-evidence` a design-system landing and flagship register. _Done when: visiting without a country shows a landing with hero treatment, explainer, and full country selection instead of a hardcoded default country; `?country=` deep links still resolve; the country view keeps its provenance and rights links; and light/dark plus desktop/mobile browser checks pass with no hardcoded values._
 - [x] **EXP-042** (P1) Name the backing source visibly on every rankings column. _Done when: each metric column header shows its source name beside the provenance dot, a short note explains the one-source-per-column rule and points to country-page reconciliation, a column whose cells mix sources surfaces a visible flag, and browser checks pass in both themes._
 - [x] **EXP-043** (P0) Restore the country-engraving disclosure after the reference-header redesign. _Done when: every country hero with art visibly carries the exact `Editorial engraving` label and linked `AI-assisted illustration` disclosure, and `npm run validate:editorial-illustrations` passes._
+- [x] **EXP-044** (P0) Repair the confirmed country-directory and Governance Change composition drift and codify the page-width system. _Done when: `/country` uses the canonical centered `PageHero`; its A–Z directory reads sequentially with responsive per-letter grids and separated status labels; Governance Change row headers share left alignment and hover treatment with the row; exactly four outer width roles plus named internal tracks cover Methodology, country, Constitution, and Record layouts; CI enforces token, pattern, and composition contracts; and desktop/mobile real-route checks pass._
 
 ## Area 08 — Platform, Security, Performance, and Operations
 
@@ -328,6 +329,7 @@ Source: `plan/09-testing-qa-and-release.md`
 - [ ] **QA-019** (P1) Rehearse rollback/forward-fix and correction publication. _Done when: a deliberately bad staged app/data/method release is detected, contained, rolled back or forward-fixed, caches/artifacts/version metadata are consistent, and correction/status/changelog flows match policy._
 - [x] **QA-020** (P0) Generate machine-readable G2/G4/G5/G6 readiness reports from evidence. _Done when: reports calculate checked/total tasks by area/priority, execute required gates, link artifacts/manual checks/waivers, reject missing evidence or master/area mismatch, and cannot report green with an open P0 or failed command._
 - [x] **QA-021** (P0) Repair the local G4 verification matrix after discovered drift. _Done when: every authoritative migration has a current zero-write preflight, ESLint has zero errors, deterministic review/protocol artifacts match tracked inputs, the production build and fixed G4 command matrix pass, and non-semantic Index lint changes cannot bypass future methodology drift detection._
+- [x] **QA-022** (P1) Publish an actionable owner handoff for every remaining checklist task. _Done when: each open task is classified exactly once; owner, professional, platform, evidence, and Codex-resumption responsibilities are explicit; dependency and no-contact gates are preserved; no person, approval, authority, deployment, or elapsed period is invented; and the machine-readable remaining-work validator passes._
 
 ## Area 10 — Academic Governance, Human Review, and Outreach
 

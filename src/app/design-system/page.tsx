@@ -141,10 +141,37 @@ const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
   tokenGroup(
     "layout",
     "Layout widths",
-    ["--width-reference-content", "--width-reference-shell"],
+    [
+      "--width-page-reading",
+      "--width-page-wide",
+      "--width-page-standard",
+      "--width-reference-content",
+      "--width-reference-shell",
+      "--width-document-rail",
+      "--width-document-body",
+      "--width-rail-compact",
+      "--width-country-rail",
+      "--width-country-context",
+      "--width-constitution-outline",
+      "--width-constitution-context",
+      "--width-record-rail",
+      "--width-record-body",
+    ],
     {
+      "--width-page-reading": "760px short-form reading",
+      "--width-page-wide": "960px lists and changelogs",
+      "--width-page-standard": "1200px standard page",
       "--width-reference-content": "1280px content",
       "--width-reference-shell": "1280px + two --space-6 gutters",
+      "--width-document-rail": "220px section navigation",
+      "--width-document-body": "800px methodology body",
+      "--width-rail-compact": "200px compact rail",
+      "--width-country-rail": "240px country navigation",
+      "--width-country-context": "280px country context rail",
+      "--width-constitution-outline": "180px document outline",
+      "--width-constitution-context": "360px comparison context",
+      "--width-record-rail": "200px Record metadata rail",
+      "--width-record-body": "680px Record reading measure",
     },
   ),
   tokenGroup("radii", "Radii", [
@@ -1143,9 +1170,10 @@ export default function DesignSystemPage() {
             Import from <code>@/components/PageHero</code>. Props:{" "}
             <code>eyebrow</code>, <code>title</code>, <code>description</code>,{" "}
             <code>engraving</code> (light/dark asset), <code>search</code>,{" "}
-            <code>chips</code>, and a trailing <code>children</code> slot for a
-            stat strip or CTA. Given the same content it renders identical to
-            the home, <code>/country</code>, and <code>/about</code> heroes.
+            <code>chips</code>, <code>chipsAriaLabel</code> for an interactive
+            chip group, and a trailing <code>children</code> slot for a stat
+            strip or CTA. Given the same content it renders identical to the
+            home, <code>/country</code>, and <code>/about</code> heroes.
           </p>
         </section>
 

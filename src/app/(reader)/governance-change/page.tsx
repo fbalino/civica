@@ -288,53 +288,49 @@ export default async function GovernanceChangePage({
               </Banner>
             ) : null}
 
-            <div className="editorial-table-scroll">
-              <DataTable aria-label={`${selected.label} source-native changes`}>
-                <thead>
-                  <tr>
-                    <th scope="col">
-                      {result.status === "ranked" ? "Position" : "Order"}
+            <DataTable aria-label={`${selected.label} source-native changes`}>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    {result.status === "ranked" ? "Position" : "Order"}
+                  </th>
+                  <th scope="col">Country</th>
+                  <th scope="col">{result.startYear}</th>
+                  <th scope="col">{result.endYear}</th>
+                  <th scope="col">Native change</th>
+                  <th scope="col">Adjacent-endpoint range</th>
+                  <th scope="col">Direction sensitivity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.map((row, index) => (
+                  <tr key={row.jurisdictionId}>
+                    <td>{result.status === "ranked" ? index + 1 : "—"}</td>
+                    <th scope="row">
+                      <Link href={`/country/${row.jurisdictionSlug}/civica-data#ci-long-run`}>
+                        {row.jurisdictionName}
+                      </Link>
                     </th>
-                    <th scope="col">Country</th>
-                    <th scope="col">{result.startYear}</th>
-                    <th scope="col">{result.endYear}</th>
-                    <th scope="col">Native change</th>
-                    <th scope="col">Adjacent-endpoint range</th>
-                    <th scope="col">Direction sensitivity</th>
+                    <td>{formatValue(row.startValue)}</td>
+                    <td>{formatValue(row.endValue)}</td>
+                    <td>{formatDelta(row.rawDelta)}</td>
+                    <td>
+                      {formatDelta(row.sensitivityMin)} to{" "}
+                      {formatDelta(row.sensitivityMax)}
+                      <small>
+                        {row.sensitivityWindowCount} observed endpoint
+                        combinations
+                      </small>
+                    </td>
+                    <td>
+                      {row.directionStable
+                        ? "Same direction"
+                        : "Direction changes"}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {visibleRows.map((row, index) => (
-                    <tr key={row.jurisdictionId}>
-                      <td>
-                        {result.status === "ranked" ? index + 1 : "—"}
-                      </td>
-                      <th scope="row">
-                        <Link href={`/country/${row.jurisdictionSlug}/civica-data#ci-long-run`}>
-                          {row.jurisdictionName}
-                        </Link>
-                      </th>
-                      <td>{formatValue(row.startValue)}</td>
-                      <td>{formatValue(row.endValue)}</td>
-                      <td>{formatDelta(row.rawDelta)}</td>
-                      <td>
-                        {formatDelta(row.sensitivityMin)} to{" "}
-                        {formatDelta(row.sensitivityMax)}
-                        <small>
-                          {row.sensitivityWindowCount} observed endpoint
-                          combinations
-                        </small>
-                      </td>
-                      <td>
-                        {row.directionStable
-                          ? "Same direction"
-                          : "Direction changes"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </DataTable>
-            </div>
+                ))}
+              </tbody>
+            </DataTable>
 
             <Banner variant="info">
               Missing endpoint years exclude a country from this window; they

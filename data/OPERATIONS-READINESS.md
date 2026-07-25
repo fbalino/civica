@@ -1,7 +1,7 @@
 # Civica G4 operations-readiness report
 
 **Contract:** `civica-g4-operations-readiness/v1`  
-**Reviewed:** 2026-07-23  
+**Reviewed:** 2026-07-25
 **Status:** blocked  
 **Waivers:** none
 
@@ -45,9 +45,12 @@ and P1 operational finding below is closed.
   accessibility, performance, secret, lint, type, and module gates.
 - Clean-checkout evidence installed the lockfile-pinned dependencies, completed
   the production build, and passed the fixture-only test suite.
+- The fixed local G4 matrix was rerun on 2026-07-25: master-plan integrity,
+  verification-matrix validation, the unit suite, typecheck, lint, and the
+  production build all passed.
 - Hosted pull-request/main runs and branch-protection enforcement have not been
   observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 246 of 308 tasks complete, 27 open P0 tasks,
+- The current G4 readiness record reports 248 of 310 tasks complete, 27 open P0 tasks,
   58 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 

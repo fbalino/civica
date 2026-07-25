@@ -441,6 +441,7 @@
     "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "validate:design-tokens": "tsx scripts/validate-design-tokens.ts",
+    "validate:design-composition": "node --import tsx --test src/lib/qa/design-composition-contract.test.ts",
     "validate:ui-pattern-map": "tsx scripts/validate-ui-pattern-map.ts",
     "measure:gdelt-noise": "tsx scripts/measure-gdelt-noise.ts",
     "admin:set-password": "tsx scripts/hash-admin-password.ts",

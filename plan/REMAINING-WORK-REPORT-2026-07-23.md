@@ -1,8 +1,8 @@
 # Civica master checklist — remaining-work report
 
-**Reviewed:** 2026-07-23
+**Reviewed:** 2026-07-25
 
-**Checklist state:** 246 of 308 complete; 62 remain; 79.9%.
+**Checklist state:** 248 of 310 complete; 62 remain; 80%.
 
 ## Bottom line
 
@@ -25,6 +25,12 @@ The machine-readable source is
 `data/readiness/remaining-work.v1.json`. Its validator compares the five
 categories with every unchecked master-checklist ID and fails on an omission,
 duplicate, stale count, or newly agent-executable task.
+
+The step-by-step owner handoff is
+`plan/OWNER-ACTION-RUNBOOK-2026-07-25.md`. It names what Fernando can decide
+directly, which professional or platform role is needed for every other
+action, what evidence to request, when Codex can resume, and which contacts
+must wait for G4 or G5.
 
 ## What needs action now
 
@@ -101,9 +107,10 @@ The principal chains are:
 1. EXP-015 owner selection → EXP-016 implementation → EXP-028 blind audit.
 2. Conditions staging/release → ATL-028 frozen longitudinal construct study.
 3. Pulse migrations + v2.15 deployment/cycle → PUL-040 start → PUL-026
-   90-day window → PUL-018–023 evaluation → PUL-028/029 disposition →
-   PUL-030 product release.
-4. Green G4/PLT-025 + completed Pulse packet → GOV-015/016 →
+   90-day window → PUL-018–023 evaluation. Those results unlock the GOV-015
+   Pulse review packet; the separate PUL-028/029 disposition → PUL-030 product
+   release chain follows its own declared order.
+4. Green G4/QA-020 + completed GOV-015 Pulse packet → GOV-016 →
    GOV-017–020 external review and G5.
 5. G5 → GOV-021 DOI → GOV-022–028 notes, adoption assets, outreach,
    discoverability, staged launch, and use measurement.

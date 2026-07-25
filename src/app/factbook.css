@@ -383,7 +383,10 @@
 /* === Body grid ============================================================ */
 .factbook-body {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 280px;
+  grid-template-columns:
+    var(--width-country-rail)
+    minmax(0, 1fr)
+    var(--width-country-context);
   gap: var(--space-7);
   max-width: var(--width-reference-shell);
   margin: 0 auto;
@@ -427,7 +430,10 @@
 }
 .factbook-sticky-country-search__inner {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 280px;
+  grid-template-columns:
+    var(--width-country-rail)
+    minmax(0, 1fr)
+    var(--width-country-context);
   gap: var(--space-7);
   align-items: center;
   max-width: var(--width-reference-shell);
@@ -563,7 +569,7 @@
 /* === Tablet (<= 1100px): drop right rail ================================== */
 @media (max-width: 1100px) {
   .factbook-body {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns: var(--width-rail-compact) minmax(0, 1fr);
     gap: var(--space-6);
   }
   .factbook-rail {
@@ -1192,7 +1198,7 @@
   z-index: 2;
   /* Left-aligned content (homepage idiom) aligned to the index container below;
      the engraving's landmark falls on the right, so left content balances it. */
-  max-width: 1200px;
+  max-width: var(--width-page-standard);
   margin: 0 auto;
   padding: var(--space-9) var(--space-6) var(--space-8);
   text-align: left;
@@ -1271,6 +1277,30 @@
   gap: var(--space-2);
   margin-top: var(--space-6);
 }
+
+/* The /country landing keeps its original centered browse composition while
+   other PageHero consumers retain the canonical left-aligned engraving layout. */
+.factbook-landing-hero--centered .factbook-hero-scrim {
+  background: radial-gradient(
+    120% 90% at 50% 30%,
+    color-mix(in oklab, var(--color-bg) 28%, transparent) 0%,
+    color-mix(in oklab, var(--color-bg) 70%, transparent) 60%,
+    color-mix(in oklab, var(--color-bg) 96%, transparent) 100%
+  );
+}
+.factbook-landing-hero--centered .factbook-hero-inner {
+  text-align: center;
+}
+.factbook-landing-hero--centered .factbook-hero-dek {
+  margin-inline: auto;
+}
+.factbook-landing-hero--centered .factbook-hero-search {
+  margin-inline: auto;
+}
+.factbook-landing-hero--centered .factbook-hero-chips {
+  justify-content: center;
+}
+
 .factbook-region-chip {
   display: inline-flex;
   align-items: center;
@@ -1294,7 +1324,7 @@
 
 /* ── Almanac index ── */
 .factbook-almanac {
-  max-width: 1200px;
+  max-width: var(--width-page-standard);
   margin: 0 auto;
   padding: var(--space-8) var(--space-6) var(--space-9);
 }
