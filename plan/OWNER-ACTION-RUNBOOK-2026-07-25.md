@@ -3,6 +3,61 @@
 **Reviewed:** 2026-07-25
 **Scope:** the 62 unchecked tasks in `plan/MASTER-CHECKLIST.md`
 
+## Open the review material
+
+Every task below links to the prepared document, evidence folder, image, or
+operator protocol that should be opened first. **No packet yet** means the task
+is downstream and should not be started; it does not mean Fernando should
+search the repository for an undocumented input.
+
+Repository links open the source material directly in Codex or GitHub. Browser
+paths show the current implementation, not an approval record. In the current
+desktop session, Civica is running at `http://localhost:3002`; port 3000 is a
+different project. If Civica restarts on another port, keep the path after the
+port.
+
+### EXP-015 — compare the three Explore concepts
+
+Open the [comparison brief](EXP-014-explore-navigation-concepts-2026-07-18.md)
+first. Then inspect the three live, non-production concepts at
+[the local design-system comparison](http://localhost:3002/design-system#explore-concepts).
+The durable route is `/design-system#explore-concepts`.
+
+If the local server is unavailable, use the committed captures:
+
+| Concept | Desktop | Small mobile |
+| --- | --- | --- |
+| **The scholarly index** | [Light](evidence/EXP-014/mockups/2026-07-18-typography-first-scholarly-index-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-typography-first-scholarly-index-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-typography-first-scholarly-index-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-typography-first-scholarly-index-small-mobile-dark.png) |
+| **The civic cabinet** | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-dark.png) |
+| **The reading room** | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-dark.png) |
+
+Compare hierarchy, scanning speed, mobile behavior, keyboard/focus model, and
+the asset/performance cost described in the brief. Return one concept name—or
+reject all three—with a dated reason. This selects a direction; it does not
+change production navigation by itself.
+
+### EXP-038 — review the prepared English copy
+
+Open the [itemized copy approval deck](EXP-038-english-copy-review-2026-07-23.md#proposed-edits).
+It contains the current wording, proposed wording, and reason for each item,
+from H1 through V2. Record `approve`, `revise`, or `reject` for each item in the
+[approval record](EXP-038-english-copy-review-2026-07-23.md#approval-record).
+
+The website routes named in the deck show the **current** copy; they do not show
+an unpublished alternate version. Do not approve H5 until GOV-003 is answered,
+T3 unless a monitored response target is real, or T4 until ATL-024 is active.
+For context, browse the current [home](http://localhost:3002/),
+[About](http://localhost:3002/about),
+[Methodology](http://localhost:3002/methodology),
+[Andorra Factbook](http://localhost:3002/country/andorra),
+[Andorra data](http://localhost:3002/country/andorra/civica-data),
+[Andorra Constitution](http://localhost:3002/country/andorra/constitution),
+[Governance Evidence](http://localhost:3002/governance-evidence),
+[Licensing](http://localhost:3002/licensing),
+[Contact](http://localhost:3002/contact), and
+[Advisory Board](http://localhost:3002/about/advisory-board) pages while
+reading the corresponding item in the deck.
+
 ## How to use this runbook
 
 Work the five phases below in order. Fernando supplies decisions and
@@ -20,16 +75,19 @@ estimated.
 
 These require no external contact before a decision is recorded.
 
-| Task | Fernando decides or supplies | What to return to Codex |
-| --- | --- | --- |
-| EXP-015 | Select one of the three prepared Explore navigation concepts, or reject all three with a reason. | Selected concept and a short dated rationale. Codex can then canonize and implement EXP-016. |
-| EXP-038 | Approve, revise, or reject each prepared English copy item. Confirm factual predicates such as the independence label, correction call to action, and any monitored response target. | Item-by-item disposition plus corrected facts. Codex can apply only approved wording. |
-| GOV-003 | Supply the seven prepared funding, conflict, sponsorship, political-independence, source-provider, tool-support, and editorial-control facts. | Completed fact sheet and permission to publish or a list of facts to withhold. Codex can make public and reviewer disclosures match. |
-| PLT-029 | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |
+| Task | Open first | Fernando decides or supplies | What to return to Codex |
+| --- | --- | --- | --- |
+| EXP-015 | [Concept brief](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-decision-for-exp-015), [live local comparison](http://localhost:3002/design-system#explore-concepts), or the captures above | Select one Explore navigation concept, or reject all three with a reason. | Selected concept and a short dated rationale. Codex can then canonize and implement EXP-016. |
+| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#proposed-edits) | Approve, revise, or reject each English copy item. Confirm factual predicates such as the independence label, correction call to action, and any monitored response target. | Item-by-item disposition plus corrected facts. Codex can apply only approved wording. |
+| GOV-003 | [Owner confirmation fields](research/project-disclosure-owner-confirmation-v1.md#confirmation-fields) | Supply the seven funding, conflict, sponsorship, political-independence, source-provider, tool-support, and editorial-control facts. | Completed fact sheet and permission to publish or a list of facts to withhold. Codex can make public and reviewer disclosures match. |
+| PLT-029 | [Telemetry procedure](PLT-029-program-cost-effort-telemetry-2026-07-23.md) and [current ledger](../data/program-cost-effort-ledger.v1.json) | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |
 
-GOV-012 also needs Fernando to choose a no-honorarium or compensation posture,
-ceiling, payer/entity, currency, and jurisdiction, but it is not complete until
-the accounting/tax role in Phase 2 confirms the handling.
+[GOV-012](research/reviewer-honorarium-decision-brief-v1.md#decision-requested)
+also needs Fernando to choose a no-honorarium or compensation posture, ceiling,
+payer/entity, currency, and jurisdiction and complete its
+[approval record](research/reviewer-honorarium-decision-brief-v1.md#approval-record).
+It is not complete until the accounting/tax role in Phase 2 confirms the
+handling.
 
 ## Phase 2 — professional and qualified-human work
 
@@ -38,21 +96,22 @@ have contacted anyone.
 
 | Task | Role to contact | Send | Ask for and retain | Codex resumes with |
 | --- | --- | --- | --- | --- |
-| BRD-003 | Trademark/IP counsel | Launch geography, entity, services, intended posture, marks, domains, and estimated migration cost. | Written advice or a privileged decision summary covering registry, common-law, and confusion risk; owner disposition to keep, constrain, or rename. | Conditional BRD-005 naming work, then BRD-016 input. No namesake contact or filing is authorized here. |
-| BRD-010 | IP/media counsel | Image-provider terms, current illustration policy, manifests, disclosures, retention, and complaint process. | Written disposition on provider terms, copyrightability, references, landmarks, trademarks, likenesses, retention, and complaint handling. | Bounded policy or asset corrections. Candidate images are not cleared merely by this review. |
-| BRD-012 | Privacy professional | Data-flow inventory, providers/subprocessors, retention rules, rights handling, operator and intended jurisdictions. | Written decision on lawful basis, transfers, retention, subprocessors, user rights, and the proposed legacy-ID purge. | Policy/implementation reconciliation and, only if separately authorized, a zero-write-reviewed purge with aggregate before/after counts. |
-| GOV-012 | Accounting/tax adviser | Fernando's proposed compensation posture, ceiling, payer/entity, currency, and jurisdictions. | Confirmation of payment, withholding, fees, currency, and institutional-payment handling. | Update of the reviewer packet and ledger only; reviewer outreach still waits for GOV-016. |
-| EXP-001 | Qualified visual reviewer | Rendered-module ledger and safe review fixtures. | A dated disposition for every required desktop/mobile × light/dark module cell, with screenshots and findings. | Repair of recorded findings and refreshed evidence. |
-| EXP-009 | Qualified visual reviewer | The four hash-pinned France/UK illustration candidates and reference contract. | Approve, reject, or revise each pair with hash, date, and reason. | A separate bounded replacement task if approved; approval alone does not publish an image. |
-| EXP-025 and QA-013 | Qualified visual-baseline reviewer | The 68-image candidate manifest and visual-regression instructions. | Explicit baseline promotion with reviewer, date, reason, and approved hashes. | Activation of enforceable visual diffs. Candidate baselines are not approvals. |
-| QA-012 | Qualified screen-reader accessibility reviewer | Country route, contact validation, and both sign-in error journeys. | Assistive technology/browser versions, keystrokes, spoken labels and announcements, findings, and dated disposition. | Accessibility fixes and bounded verification evidence. |
-| IDX-034 | Blinded coders and a constitutional scholar | The frozen mapping codebook, small justified pairing set, source text, practice indicators, uncertainty rules, and no-gap/no-rank constraint. | Blinded coding outputs and a documented fairness review against the preregistered thresholds. | Analysis of the coded results and a bounded nonaggregated disposition. |
+| BRD-003 | Trademark/IP counsel | [Brand landscape](research/brand-confusion-landscape-2026-07-23.md), [official registry records](evidence/BRD-002/official-registry-records-2026-07-23.md), [keep/rename rubric](research/brand-keep-rename-decision-criteria-v1.md), [migration consequences](BRD-006-reversible-brand-domain-migration-plan-2026-07-23.md), plus launch geography, entity, services, posture, marks, domains, and estimated migration cost. | Written advice or a privileged decision summary covering registry, common-law, and confusion risk; owner disposition to keep, constrain, or rename. | Conditional BRD-005 naming work, then BRD-016 input. No namesake contact or filing is authorized here. |
+| BRD-010 | IP/media counsel | [Counsel packet](evidence/BRD-010/README.md), [illustration rights policy](../data/EDITORIAL-ILLUSTRATION-RIGHTS.md), [policy audit](evidence/BRD-010/rights-policy-audit.v1.json), [illustration manifest](../src/lib/illustrations/illustration-manifest.generated.json), and [AI-use disclosure](../data/research/ai-use-disclosure-v1.json). | Written disposition on provider terms, copyrightability, references, landmarks, trademarks, likenesses, retention, and complaint handling. | Bounded policy or asset corrections. Candidate images are not cleared merely by this review. |
+| BRD-012 | Privacy professional | [Review packet](evidence/BRD-012/README.md), [data-handling policy](../data/PRIVACY-DATA-HANDLING.md), [typed flow inventory](../src/lib/privacy/data-handling.ts), and the [aggregate live](evidence/BRD-012/privacy-live-audit.v1.json) and [browser](evidence/BRD-012/privacy-browser-check.v1.json) audits. Browse `/privacy` and the collection/error routes named in the packet for context. | Written decision on lawful basis, transfers, retention, subprocessors, user rights, and the proposed legacy-ID purge. | Policy/implementation reconciliation and, only if separately authorized, a zero-write-reviewed purge with aggregate before/after counts. |
+| GOV-012 | Accounting/tax adviser | Fernando's completed [honorarium decision brief](research/reviewer-honorarium-decision-brief-v1.md), including posture, ceiling, payer/entity, currency, and jurisdictions. | Confirmation of payment, withholding, fees, currency, and institutional-payment handling. | Update of the reviewer packet and ledger only; reviewer outreach still waits for GOV-016. |
+| EXP-001 | Qualified visual reviewer | [Review instructions](evidence/EXP-001/README.md), [rendered-module ledger](../data/rendered-module-ledger.v1.json), [evidence overlay](../data/rendered-module-evidence.v1.json), and the safe private fixtures named there. | A dated disposition for every required desktop/mobile × light/dark module cell, with screenshots and findings. | Repair of recorded findings and refreshed evidence. |
+| EXP-009 | Qualified visual reviewer | [Candidate packet](evidence/EXP-009/README.md), [hash manifest](evidence/EXP-009/candidate-manifest.json), [prompts](evidence/EXP-009/PROMPTS.md), France [light](evidence/EXP-009/candidates/fra-candidate-light.webp)/[dark](evidence/EXP-009/candidates/fra-candidate-dark.webp), and United Kingdom [light](evidence/EXP-009/candidates/gbr-candidate-light.webp)/[dark](evidence/EXP-009/candidates/gbr-candidate-dark.webp). | Approve, reject, or revise each pair with hash, date, and reason. | A separate bounded replacement task if approved; approval alone does not publish an image. |
+| EXP-025 and QA-013 | Qualified visual-baseline reviewer | [Promotion instructions](evidence/QA-013-EXP-025/README.md), [68-image candidate manifest](../e2e/visual-baselines/candidate-manifest.json), [coverage contract](../src/lib/qa/visual-regression-contract.ts), and the [candidate snapshot folder](../e2e/qa-013-visual-regression.spec.ts-snapshots/). | Explicit baseline promotion with reviewer, date, reason, and approved hashes. | Activation of enforceable visual diffs. Candidate baselines are not approvals. |
+| QA-012 | Qualified screen-reader accessibility reviewer | [Manual review instructions](evidence/QA-012/README.md), [automated accessibility matrix](../e2e/qa-012-accessibility.spec.ts), and [keyboard journeys](../e2e/qa-012-keyboard.spec.ts). Review `/country/switzerland`, `/contact` validation, `/admin/sign-in?error=1`, and `/admin/pulse-coding/sign-in?error=1`. | Assistive technology/browser versions, keystrokes, spoken labels and announcements, findings, and dated disposition. | Accessibility fixes and bounded verification evidence. |
+| IDX-034 | Blinded coders and a constitutional scholar | [Prepared evidence](evidence/IDX-034/README.md), [frozen coding codebook](research/k4-mapping-and-blind-coding-codebook-v1.md), [pairing release manifest](../data/releases/k4-constitution-practice-pairings-2024-v1/manifest.v1.json), and [practice-input manifest](../data/releases/ci-k4-practice-panel-2000-2024-v1/manifest.v1.json). | Blinded coding outputs and a documented fairness review against the preregistered thresholds. | Analysis of the coded results and a bounded nonaggregated disposition. |
 
-IDX-022 needs at least 30 qualified research participants and explicitly waits
-for qualified human testing at G5. Do not recruit those participants yet. Its
-prepared protocol must stay frozen before recruitment. IDX-034 has no G5
-dependency and may proceed now with the qualified roles and frozen constraints
-listed above.
+[IDX-022 preparation](evidence/IDX-022/PREPARATION.md) and its
+[reader-task preregistration](research/index-reader-task-preregistration-v1.md)
+need at least 30 qualified research participants and explicitly wait for
+qualified human testing at G5. Do not recruit those participants yet. The
+protocol must stay frozen before recruitment. IDX-034 has no G5 dependency and
+may proceed now with the qualified roles and frozen constraints listed above.
 
 ## Phase 3 — one isolated staging and external-authority wave
 
@@ -60,34 +119,64 @@ The platform operator may be Fernando if he controls the relevant accounts.
 Otherwise use the person responsible for the Civica Vercel and Neon projects.
 Production promotion remains a separate decision.
 
-1. **QA-018 first — create the release-candidate staging environment.** Use an
-   isolated Neon branch and Vercel staging project, disable staging cron,
-   deploy the exact candidate commit, apply only the approved migrations and
-   inputs, and retain the twelve named smoke-check results.
+1. **[QA-018 first — create the release-candidate staging environment](evidence/QA-018/README.md).**
+   Follow the [release-candidate staging protocol](../data/RELEASE-CANDIDATE-STAGING-SMOKE.md)
+   and [deployment rehearsal](../data/DEPLOYMENT-REHEARSAL.md). Use an isolated
+   Neon branch and Vercel staging project, disable staging cron, deploy the
+   exact candidate commit, apply only the approved migrations and inputs, and
+   retain the twelve named smoke-check results.
 2. **Conditions batch — ATL-016, ATL-026, ATL-027, ATL-029, ATL-030.** Apply
    migrations 0040 and 0042 in isolated staging, ingest a real immutable
    Conditions release, and retain aligned, mixed-year-refused, and missing-row
    evidence. Codex can then reconcile browser, API, export, and replication
-   outputs. This does not authorize production.
+   outputs. This does not authorize production. Open the prepared records for
+   [ATL-016](ATL-016-conditions-comparison-2026-07-18.md),
+   [ATL-026](ATL-026-conditions-components-2026-07-18.md),
+   [ATL-027](ATL-027-conditions-release-freezing-2026-07-18.md),
+   [ATL-029](ATL-029-versioned-conditions-public-read-2026-07-18.md), and
+   [ATL-030](ATL-030-conditions-codebook-replication-2026-07-18.md). The
+   corresponding evidence folders contain the migration and release notes.
+   Review staging output on `/civica-conditions`,
+   `/civica-conditions/methodology`, and `/api/v1/conditions`.
 3. **Atlas history and corrections — ATL-020 and ATL-024.** Apply additive
    migrations 0046 and 0047 through the approved flow, then retain the stored
    history journey, opaque correction receipt, authenticated triage,
-   correction linkage, and delivery evidence.
+   correction linkage, and delivery evidence. Start with the
+   [ATL-020 plan](ATL-020-atlas-change-history-2026-07-22.md),
+   [ATL-020 evidence](evidence/ATL-020/README.md), and
+   [ATL-024 staging packet](evidence/ATL-024/README.md). The relevant routes
+   are `/api/citations/[entityType]/[id]/history`, `/report-data-issue`,
+   `/admin/corrections`, and `/admin/corrections/[id]`; several intentionally
+   fail closed until the staging schema exists.
 4. **Source refreshes — ATL-010, DAT-036, EXP-029.** Authorize named-release
    Wikidata refreshes and migration 0048 where required. Retain input release,
    adapter/version, row counts, discrepancy report, representative stored
-   forms, and browser review. Never rewrite the immutable G2 release.
+   forms, and browser review. Never rewrite the immutable G2 release. Use the
+   [ATL-010 refresh plan](ATL-010-world-leaders-directory-readiness-2026-07-18.md)
+   and [browser checklist](evidence/ATL-010/browser-verification.md), the
+   [DAT-036 repair runbook](evidence/DAT-036/repair-runbook.md), and the
+   [EXP-029 internationalization plan](EXP-029-internationalization-readiness-2026-07-18.md).
+   `/leaders` remains publication-paused until the refresh; `/about#language`
+   is the EXP-029 reader surface.
 5. **Pulse setup — PUL-043, PUL-024, PUL-027, then PUL-040.** Apply and
    reconcile the prepared additive migrations, deploy the exact locked
    `pulse-v2.15-beta` method, and permit one complete scheduled
    ingest → cluster → classify → corroborate/score cycle. Only then may Codex
    calculate and record the first compliant, non-backdated PUL-040 start.
    Any paid manual classifier run needs separate written provider/model,
-   maximum-volume, and hard-USD-cap authority.
-6. **QA-019 last — rehearse recovery.** In staging only, release the prepared
-   deliberately bad candidate, demonstrate detection and containment, then
-   rollback or forward-fix it. Retain cache, artifact, version, status, and
-   correction evidence plus the dated sign-off.
+   maximum-volume, and hard-USD-cap authority. Open the
+   [PUL-043 migration packet](evidence/PUL-043/README.md),
+   [PUL-024 drift plan](PUL-024-drift-monitoring-2026-07-18.md),
+   [PUL-027 lifecycle plan](PUL-027-decay-window-lifecycle-2026-07-18.md), and
+   [PUL-040 start-readiness packet](evidence/PUL-040/README.md). Operating
+   evidence appears at `/api/v1/pulse/source-coverage` and
+   `/api/v1/pulse/cluster-coverage`; neither route proves the 90-day clock has
+   started.
+6. **[QA-019 last — rehearse recovery](evidence/QA-019/README.md).** In staging
+   only, follow the [rollback/forward-fix rehearsal](../data/ROLLBACK-FORWARD-FIX-REHEARSAL.md),
+   release the prepared deliberately bad candidate, demonstrate detection and
+   containment, then rollback or forward-fix it. Retain cache, artifact,
+   version, status, and correction evidence plus the dated sign-off.
 
 The authority-gated task set is ATL-010, ATL-016, ATL-020, ATL-024, ATL-026,
 ATL-027, ATL-029, ATL-030, DAT-036, EXP-029, PUL-024, PUL-027, PUL-040,
@@ -95,36 +184,67 @@ PUL-043, QA-018, and QA-019.
 
 ## Phase 4 — blockers that cannot be simulated
 
-- **DAT-034:** obtain the exact retained CIA publisher bytes, or equivalent
-  official evidence, for the 171 frozen-sample rows. Do not substitute easier
-  rows or publish a full-sample error estimate from the available subset.
-- **PUL-026:** after PUL-040 records the valid start, preserve locked outputs
-  for 90 consecutive UTC days before labels are opened or evaluation begins.
-  The period cannot be backdated.
+- **[DAT-034](evidence/DAT-034/README.md):** follow the
+  [value-fidelity protocol](research/dat-034-value-fidelity-protocol-v1.md) and
+  obtain the exact retained CIA publisher bytes, or equivalent official
+  evidence, for the 171 frozen-sample rows. Do not substitute easier rows or
+  publish a full-sample error estimate from the available subset.
+- **PUL-026:** read the
+  [prospective validation protocol](research/pulse-validation-protocol-v1.md)
+  and [start boundary](evidence/PUL-025/start-boundary.md). After PUL-040
+  records the valid start, preserve locked outputs for 90 consecutive UTC days
+  before labels are opened or evaluation begins. The period cannot be
+  backdated. **No PUL-026 result packet exists yet because the observation has
+  not started.**
 
 ## Phase 5 — work that starts only after its gate
 
-1. EXP-015 unlocks EXP-016; completed fixes, promoted baselines, and the
-   module review then unlock EXP-028.
-2. A real frozen Conditions staging/release unlocks ATL-028.
+1. [EXP-015](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-decision-for-exp-015)
+   unlocks EXP-016;
+   completed fixes, promoted baselines, and the module review then unlock
+   EXP-028. **No standalone EXP-016 or EXP-028 packet exists yet; Codex creates
+   those bounded work records only after the decisions above.**
+2. A real frozen Conditions staging/release unlocks
+   [ATL-028](ATL-028-economic-stability-construct-2026-07-18.md); its current
+   [evidence note](evidence/ATL-028/README.md) prohibits publishing an economic
+   composite before that gate.
 3. Pulse setup and PUL-040 unlock PUL-026; after the full 90 days, Codex can
-   execute PUL-018 through PUL-023. Those prospective results unlock GOV-015,
-   the Pulse review packet. The separate PUL-028, PUL-029, and PUL-030
-   evaluation, disposition, and release chain still follows its own declared
-   order.
-4. PLT-025 can close only after the unwaived P0/P1 operational blockers close.
-   GOV-016 requires both a green G4/QA-020 report and the completed GOV-015
-   Pulse packet.
+   execute PUL-018 through PUL-023 under the
+   [sampling preregistration](research/pulse-evaluation-sampling-preregistration-v1.md),
+   [independent-coding codebook](research/pulse-independent-coding-codebook-v1.md),
+   and [validation protocol](research/pulse-validation-protocol-v1.md). Those
+   prospective results create GOV-015, the Pulse review packet. **PUL-018–023
+   and GOV-015 have protocols but no result packet yet.** The separate
+   PUL-028, PUL-029, and PUL-030 evaluation, disposition, and release chain is
+   controlled by the [Pulse checklist](05-pulse-event-ledger-and-validation.md)
+   and likewise has no standalone result packet yet.
+4. [PLT-025](PLT-025-g4-operations-readiness-2026-07-23.md) can close only
+   after the unwaived P0/P1 operational blockers close; the current
+   [operations report](../data/OPERATIONS-READINESS.md) remains blocked.
+   GOV-016 requires both a green G4/[QA-020 report](evidence/QA-020/README.md)
+   and the completed GOV-015 Pulse packet.
 5. Only after GOV-016 may Fernando approve reviewer identities, conflicts,
-   compensation, and outreach order. The roles are an independent governance
-   measurement reviewer, a political event-data reviewer, a research-data
-   librarian or curator, and an accessibility reviewer. GOV-017 through
-   GOV-020 capture reports, author responses, revisions, and the G5 decision.
+   compensation, and outreach order. The prepared inputs are the
+   [selection criteria](research/reviewer-selection-criteria-v1.md),
+   [longlist](research/reviewer-longlist-v1.md),
+   [ranking](research/reviewer-ranking-v1.md), and
+   [honorarium brief](research/reviewer-honorarium-decision-brief-v1.md). The
+   roles are an independent governance-measurement reviewer, a political
+   event-data reviewer, a research-data librarian or curator, and an
+   accessibility reviewer. GOV-017 through GOV-020 capture reports, author
+   responses, revisions, and the G5 decision; they deliberately have no
+   standalone packet before outreach is authorized.
 6. Only after G5 may GOV-021 deposit the DOI. GOV-022 through GOV-028 then
    cover reproducible notes, teaching assets, approved outreach,
-   discoverability, staged launch, and use measurement.
-7. BRD-003 determines whether BRD-005 is needed. BRD-016 remains the final G6
-   legal/privacy/rights memo.
+   discoverability, staged launch, and use measurement. Their controlling
+   definitions are in the
+   [governance/outreach checklist](10-academic-governance-review-and-outreach.md);
+   no post-G5 packets exist yet.
+7. The BRD-003 counsel decision above determines whether BRD-005 is needed.
+   Use the [keep/rename rubric](research/brand-keep-rename-decision-criteria-v1.md)
+   and [reversible migration plan](BRD-006-reversible-brand-domain-migration-plan-2026-07-23.md)
+   if it is. BRD-016 is the final G6 legal/privacy/rights memo and has no packet
+   until the underlying reviews are complete.
 
 No external-review solicitation, DOI claim, outreach, deployment, paid
 activity, approval, or elapsed observation is recorded by this runbook.
