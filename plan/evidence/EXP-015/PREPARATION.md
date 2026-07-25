@@ -2,7 +2,8 @@
 
 Date: 2026-07-25
 
-Status: owner rejection recorded; replacement art and browser concept pending
+Status: light masters generated and screened; owner review, dark variants, and
+browser concept pending
 
 ## Owner decision
 
@@ -32,35 +33,41 @@ with a place” and “Research tools.” Mobile will retain the same order, lab
 descriptions, and art in a single scrollable menu. Images are decorative; the
 destination name remains the accessible identity.
 
-The planned batch is eight 1024×1024 light masters followed by eight matched
-dark-theme variants. Release candidates will be 384×384 WebP derivatives,
-displayed at 96–120 CSS pixels. The closed menu must request no Explore art;
-opening it may load only the active theme, capped at 96 KB across eight files.
-No separate decorative hero image is planned because it would compete with the
-destinations.
+The native generator returned eight 1254×1254 light masters. The checked review
+derivatives are 384×384 WebP files, displayed at 96 pixels during the first
+menu-scale screen. Together they weigh 79,622 bytes, below the provisional
+96 KB active-theme budget. The closed menu must request no Explore art; opening
+it may load only the active theme. No separate decorative hero image is planned
+because it would compete with the destinations.
 
-Exact prompt specifications are in `PROMPTS.md`. No image has been generated,
-selected, screened, published, or represented as approved.
+Exact prompt specifications are in `PROMPTS.md`. The generated files, hashes,
+screening record, and remaining limitations are in
+`GENERATED-LIGHT-MASTERS.md`. None is owner-approved, published, or represented
+as production art.
 
-## Current execution boundary
+## Generation correction
 
-The explicitly requested image-generation workflow requires the OpenAI Image
-API. In this checkout:
+The initial preparation record incorrectly treated the installed workflow as
+requiring a project API key and separate paid-API authority. Fernando corrected
+that assumption on 2026-07-25. Codex then used the native image-generation tool;
+no project `OPENAI_API_KEY`, provider/model approval, or direct API-spend
+authority was required.
 
-- `OPENAI_API_KEY` is not configured; and
-- `.orchestrator/state.json` records subscription-only mode, no approved API
-  provider or model, and a hard API cap of US$0.
+The returned native tool record did not expose a model version, seed, or exact
+provider/account terms. Those fields remain unavailable rather than being
+inferred, and the rights contract therefore blocks production release of these
+files. The full-resolution masters remain in ignored local output; small review
+derivatives are committed under this evidence directory.
 
-Generating the batch therefore requires a separate owner authorization naming
-the provider/model and a hard USD cap, followed by secure key setup. Until that
-authority exists, only preparation is complete. The production menu, design
-contract, illustration manifest, and checked asset inventory remain unchanged.
+The production menu, design contract, illustration manifest, and checked public
+asset inventory remain unchanged.
 
-## Acceptance sequence after authorization
+## Remaining acceptance sequence
 
-1. Generate the eight light masters as one batch and retain the call metadata.
-2. Screen composition and meaning before generating matched dark variants.
-3. Record model/tool/version/account terms, prompts, parameters, human
+1. Fernando reviews the eight light masters and approves, revises, or rejects
+   each image or the batch.
+2. Generate matched dark variants only from accepted light masters.
+3. Record all exposed tool/version/account terms, prompts, parameters, human
    direction, exact hashes/dimensions, and all five rights-screening
    dispositions required by `data/EDITORIAL-ILLUSTRATION-RIGHTS.md`.
 4. Create the non-production replacement on

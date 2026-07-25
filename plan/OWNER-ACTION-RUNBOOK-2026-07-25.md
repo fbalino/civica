@@ -16,7 +16,7 @@ desktop session, Civica is running at `http://localhost:3002`; port 3000 is a
 different project. If Civica restarts on another port, keep the path after the
 port.
 
-### EXP-015 — replacement Explore concept in preparation
+### EXP-015 — review the generated Explore light masters
 
 Fernando rejected all three original concepts on 2026-07-25 because the menu
 was too small and the directions did not provide the custom image-led
@@ -24,6 +24,11 @@ experience requested. That decision and the replacement brief are recorded in
 the [concept study](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-decision-for-exp-015),
 the [replacement preparation record](evidence/EXP-015/PREPARATION.md), and the
 [eight-image prompt specification](evidence/EXP-015/PROMPTS.md).
+
+The eight native light masters are now generated. Review every image through
+the linked table in the
+[light-master generation record](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md).
+They are also displayed in the Codex task where Fernando requested generation.
 
 The old comparison remains available as historical evidence at
 [the local design-system comparison](http://localhost:3002/design-system#explore-concepts)
@@ -35,12 +40,12 @@ and in these committed captures:
 | **The civic cabinet** | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-dark.png) |
 | **The reading room** | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-dark.png) |
 
-No further selection among those three is required. Before the new visual batch
-can run, Fernando must separately authorize the OpenAI Image API provider/model
-and a hard USD cap; the project currently permits subscription-only work with a
-US$0 API cap and has no configured API key. After the new non-production
-concept is rendered, this runbook will link its browser view and acceptance
-captures for a fresh approve/revise/reject decision.
+No further selection among the old three is required. The earlier claim that
+the new image batch needed an API key and direct paid-API authority was
+incorrect; Fernando corrected it, and Codex used native image generation. The
+next decision is to approve, revise, or reject the generated light images.
+Accepted images then receive matched dark variants before the large
+non-production mega-menu concept is built.
 
 ### EXP-038 — review the prepared English copy
 
@@ -85,7 +90,7 @@ These require no external contact before a decision is recorded.
 
 | Task | Open first | Fernando decides or supplies | What to return to Codex |
 | --- | --- | --- | --- |
-| EXP-015 | [Replacement preparation](evidence/EXP-015/PREPARATION.md) and [image prompts](evidence/EXP-015/PROMPTS.md) | If the requested custom generation should proceed, authorize the OpenAI Image API provider/model and a hard USD cap. Later, approve, revise, or reject the rendered replacement concept. | API authority/cap first; a visual decision only after the replacement exists. Production navigation remains unchanged until then. |
+| EXP-015 | [Generated light masters](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md), [replacement preparation](evidence/EXP-015/PREPARATION.md), and [image prompts](evidence/EXP-015/PROMPTS.md) | Approve, revise, or reject each light image or the batch. Later, review the rendered large mega-menu concept. | Light-image dispositions first. Codex then generates matched dark variants and builds the non-production concept. Production navigation remains unchanged until that later approval. |
 | EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Later: choose A4 naming, H5 after GOV-003, T3 only if a real response posture exists, and T4 when the interim or live correction route is selected. | The four remaining dispositions. The approved subset is already applied; no translation or deployment is implied. |
 | GOV-003 | [Owner confirmation fields](research/project-disclosure-owner-confirmation-v1.md#confirmation-fields) | Fields 1–4 are confirmed. Later: state ordinary paid/formal vendor relationships, confirm whether any third party has exceptional control rights, and authorize publication plus the review cadence. | Fields 5–7. Codex will then generate one disclosure for `/about` and the reviewer packets. |
 | PLT-029 | [Telemetry procedure](PLT-029-program-cost-effort-telemetry-2026-07-23.md) and [current ledger](../data/program-cost-effort-ledger.v1.json) | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |

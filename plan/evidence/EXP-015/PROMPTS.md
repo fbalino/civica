@@ -2,14 +2,21 @@
 
 Date: 2026-07-25
 
-Status: prepared; not executed
+Status: light-master prompts executed; dark-variant prompts not executed
 
-Tool required by the owner: Civica's installed `imagegen` workflow using the
-OpenAI Image API
+Tool used: Codex native image generation through Civica's installed `imagegen`
+workflow. No project API key or direct paid-API call was used.
 
-Planned use case: `stylized-concept`
+Use case: `stylized-concept`
 
-Planned master size: 1024×1024
+Returned master size: 1254×1254
+
+The first pass generated all eight subjects. A 96-pixel screen found three
+specific constraint misses. Countries was edited to remove map silhouettes;
+Compare was edited to replace literal buildings, people, and a tiny flag with
+abstract diagrams; Elections was edited to remove a seal-like medallion. The
+other five first-pass compositions were retained. Exact output hashes and
+review links are in `GENERATED-LIGHT-MASTERS.md`.
 
 ## Shared light-master direction
 
@@ -85,7 +92,7 @@ organization logo, emblem, building, or flag arrangement.
 
 ## Matched dark variants
 
-Generate each dark variant only from its accepted light master:
+Generate each dark variant only from an owner-accepted light master:
 
 > Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve
 > the object, composition, crop, proportions, negative space, and every
@@ -96,7 +103,7 @@ Generate each dark variant only from its accepted light master:
 
 ## Planned names
 
-Light masters and dark variants will use the stable slugs `countries`,
+Light masters use, and dark variants will use, the stable slugs `countries`,
 `world-atlas`, `compare`, `constitutions`, `parties`, `elections`, `rankings`,
-and `organizations`. Final public filenames, manifest rows, and hashes will be
-created only after generation, screening, and selection.
+and `organizations`. Final public filenames and manifest rows will be created
+only after owner selection, dark-pair generation, and rights screening.
