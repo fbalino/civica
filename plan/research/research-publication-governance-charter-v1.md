@@ -8,7 +8,7 @@ Status: operative internal charter; public disclosure work follows in GOV-002–
 
 ## Accountable human
 
-**Fernando Balino**, founder and publisher, is currently the named human responsible for Civica Atlas's research and publication decisions.
+**Fernando Baliño**, founder and publisher, is currently the named human responsible for Civica Atlas's research and publication decisions.
 
 Civica currently has one accountable human. That concentration is a limitation. Automated gates, immutable records, and independent external criticism provide checks, but they do not create an internal separation of duties or turn a one-person project into an editorial board.
 

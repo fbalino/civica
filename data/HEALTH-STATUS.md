@@ -36,7 +36,7 @@ and every value from the environment.
 
 ## Incident threshold and ownership
 
-Fernando Balino is the accountable owner. The `operations.health-alerts` Cron
+Fernando Baliño is the accountable owner. The `operations.health-alerts` Cron
 writes one safe `[health-alert]` JSON line to Vercel Runtime Logs whenever a
 component is not operational. It intentionally succeeds after reporting an
 open condition, so the monitor does not create a second failed-pipeline alert.

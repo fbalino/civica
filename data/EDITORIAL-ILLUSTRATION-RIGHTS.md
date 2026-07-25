@@ -13,7 +13,7 @@ property Civica owns.
 
 ## Ownership and provider terms
 
-Fernando Balino records and controls Civica's human-authored selection,
+Fernando Baliño records and controls Civica's human-authored selection,
 arrangement, captions, edits, and release decisions to the extent those
 elements are protectable. Civica does not claim ownership of upstream
 references, landmarks, logos, likenesses, provider technology, or

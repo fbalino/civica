@@ -29,7 +29,7 @@ const expectations: Expectation[] = [
       "Supported observations retain source and retrieval metadata; statement-level coverage remains incomplete.",
       "We are not these institutions.",
     ],
-    absent: ["Civica is a small project led by Fernando Balino."],
+    absent: ["Civica is a small project led by Fernando Baliño."],
   },
   {
     path: "src/app/(reader)/methodology/page.tsx",
@@ -77,7 +77,7 @@ const expectations: Expectation[] = [
     path: "src/app/contact/ContactClient.tsx",
     present: [
       'title="Contact the editors"',
-      "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Balino reviews submissions manually.",
+      "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Baliño reviews submissions manually.",
       "The editors usually reply within <strong>3 business days</strong>.",
       "urgent data corrections, open an issue on GitHub.",
       "We usually reply within <strong>3 business days</strong>.",

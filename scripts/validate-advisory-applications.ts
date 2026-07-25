@@ -28,7 +28,8 @@ const adminApi = readFileSync(
 
 for (const phrase of [
   "board charter",
-  "charter areas",
+  "five areas",
+  "named by the charter",
   "privacyNoticeVersion",
   "consent",
   "no confirmation email",

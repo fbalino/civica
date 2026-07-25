@@ -180,7 +180,7 @@ Current:
 
 Proposed:
 
-> Civica is a small project led by Fernando Balino. It does not have the formal
+> Civica is a small project led by Fernando Baliño. It does not have the formal
 > review structures of the institutions it cites. Versioned methods, visible
 > beta labels, source records, and correction history make the project’s own
 > work inspectable while external review remains pending.
@@ -199,7 +199,7 @@ institution-like wording from obscuring who makes final decisions. The word
 “led,” however, is imprecise and can sound organizational or self-promotional.
 Two safer alternatives for a later owner decision are:
 
-> Civica is independently maintained by Fernando Balino, who has final
+> Civica is independently maintained by Fernando Baliño, who has final
 > editorial responsibility.
 
 or, if the name should live only in the formal disclosure:
@@ -404,7 +404,7 @@ Current:
 Proposed:
 
 > Send a data correction, research question, press inquiry, or collaboration
-> proposal. Fernando Balino reviews submissions manually.
+> proposal. Fernando Baliño reviews submissions manually.
 
 Reason: matches the named human accountability record and uses categories that
 fit a comparative reference project.
@@ -460,14 +460,14 @@ Current:
 
 > Civica Atlas accepts private expressions of interest across the five charter
 > areas: governance measurement, political event data, research-data curation,
-> data-heavy accessibility, and source rights. Fernando Balino reads each
+> data-heavy accessibility, and source rights. Fernando Baliño reads each
 > application. Applying is not an appointment, a review, or an endorsement.
 
 Proposed:
 
 > Civica Atlas accepts private expressions of interest in the five areas named
 > by the charter: governance measurement, political event data, research-data
-> curation, data-heavy accessibility, and source rights. Fernando Balino reads
+> curation, data-heavy accessibility, and source rights. Fernando Baliño reads
 > each application. Submission does not confer membership, a review role, or
 > endorsement.
 
@@ -476,7 +476,7 @@ formal and consistent with the success receipt.
 
 ## Approval record
 
-Owner: Fernando Balino
+Owner: Fernando Baliño
 
 Decision: English copy approved as a bundle on 2026-07-25, except for the
 explicit holds below.

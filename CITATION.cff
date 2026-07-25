@@ -22,7 +22,7 @@ abstract: "A provenance-first comparative reference to how every country is gove
 type: dataset
 authors:
   - given-names: "Fernando"
-    family-names: "Balino"
+    family-names: "Baliño"
     affiliation: "Independent project; no institutional affiliation claimed"
     website: "https://civicaatlas.org/contact"
 publisher: "Civica Atlas"

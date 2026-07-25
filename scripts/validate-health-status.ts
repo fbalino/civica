@@ -94,7 +94,7 @@ if (errors.length === 0) {
     "https://statuspage.incident.io/civica-atlas",
     "two consecutive 15-minute",
     "/api/health",
-    "Fernando Balino",
+    "Fernando Baliño",
     "Incident.io",
   ]) {
     if (!docs.includes(token)) errors.push(`health runbook omits ${token}`);

@@ -5,7 +5,7 @@ Status: partially confirmed, not complete; publication remains blocked
 Date: 2026-07-11
 
 The repository proves named ownership and publication control through
-GOV-001/GOV-002. On 2026-07-25 Fernando Balino confirmed that Civica is
+GOV-001/GOV-002. On 2026-07-25 Fernando Baliño confirmed that Civica is
 personally funded, has received no grants or other outside funding, has
 received no donated or discounted support, and has no outside affiliations.
 Those four facts are now recorded in

@@ -7,7 +7,7 @@ browser concept pending
 
 ## Owner decision
 
-Fernando Balino rejected all three EXP-014 directions. The required replacement
+Fernando Baliño rejected all three EXP-014 directions. The required replacement
 is a substantially larger, more beautiful Explore mega menu with custom images
 created specifically for the menu.
 

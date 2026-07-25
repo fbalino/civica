@@ -106,8 +106,8 @@
       "id": "correction_policy",
       "path": "content/policies.md",
       "role": "Correction, retraction, supersession, and preservation policy",
-      "bytes": 16123,
-      "sha256": "7191dd4e4f074715d1205db334b40859f7bb1c3417b20be41612ef2dcbb7cb12"
+      "bytes": 16124,
+      "sha256": "11c28a97cc291e3b7609a6639853f31f71fb71bc798e339b384da4de8c4da821"
     }
   ],
   "questions": [
@@ -122,5 +122,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "f5f97d8404cf8f91921bed91aeda8391ac9c4ca2b197fda5235401e9819adcc2"
+  "semanticSha256": "5a09283d9fbd16abf8517fd5959d77c2c86d74da79175d3d04d25e9faafa4cbb"
 }

@@ -1,0 +1,129 @@
+{
+  "contract": "civica-editorial-illustration-forward-records/v1",
+  "updatedOn": "2026-07-25",
+  "records": [
+    {
+      "id": "home-governance-evidence-2026-07-25-v1",
+      "assetKey": "home-governance-evidence",
+      "route": "/",
+      "subject": "Five separate archival source folios with research instruments, used as a non-documentary Governance Evidence motif.",
+      "caption": "Archival source folios and research instruments used as a Governance Evidence editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/home-governance-evidence.webp",
+          "sha256": "19200e2d3fdd7bffb2bf15aab963ac35606b7cf1e43c9e82a5c2a62384160448",
+          "width": 1250,
+          "height": 750,
+          "format": "webp",
+          "sourceOutputSha256": "d4c66d998c6c9c13da11192ed12d455c7e00fa76eb55c5d9cf32c164ef176c7b"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/home-governance-evidence-dark.webp",
+          "sha256": "8108d107bb99118b2ba6983701a505475db8667e354f635465172000145109b3",
+          "width": 1250,
+          "height": 750,
+          "format": "webp",
+          "sourceOutputSha256": "8d295e5a8688e0df654846b4eb65664c62a8831234e9e7951129a221787deccb"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-runtime",
+        "version": "not-exposed-by-runtime",
+        "modelDisclosure": "The native runtime did not expose an exact image model or version, so none is inferred.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no API key or paid API call was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through the native tool in the authenticated ChatGPT/Codex consumer session.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "3:2 landscape",
+          "returnedWidth": 1536,
+          "returnedHeight": 1024,
+          "quality": "not-exposed-by-runtime",
+          "styleControl": "prompt-only"
+        }
+      },
+      "prompts": {
+        "light": "Use case: stylized-concept\nAsset type: production Civica Atlas homepage feature artwork for the Governance Evidence card, exact 3:2 horizontal landscape\nPrimary request: Create a beautiful, bespoke editorial engraving that communicates comparing several independent governance sources without combining them into one score.\nScene/backdrop: an elegant archival research table seen at a shallow three-quarter angle, with five distinct unlabelled source folios arranged separately beside a brass measuring compass, a restrained balance scale, and a partially unrolled world map; the instruments should feel scholarly and civic, not financial or judicial.\nSubject: source-native evidence, careful comparison, provenance, and multiple independent observations.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper, fine coherent cross-hatching, confident linework, restrained texture, subtle vignette at the outer edges, consistent with a scholarly reference atlas.\nComposition/framing: exact 3:2 landscape; fill the entire frame with a wide connected composition designed for a rounded rectangular web card; strong visual interest across left, center, and right; main objects large enough to read at about 380 by 220 CSS pixels; safe central crop; no tiny isolated square object and no large empty margins.\nLighting/mood: clear soft daylight, calm, meticulous, trustworthy.\nColor palette: near-monochrome graphite, muted warm parchment, restrained terracotta and deep navy accents, low saturation.\nConstraints: no text, letters, numbers, charts, rankings, grades, country flags, government seals, logos, watermarks, identifiable people, identifiable modern buildings, sacred imagery, documentary event depiction, fantasy structures, decorative border, or dominant orange wash. This is AI-assisted non-documentary editorial art, not source evidence.\nAvoid: generic lone globe, cute icon treatment, clip art, photorealism, 3D render, glossy UI illustration, centered square composition, excessive empty paper.",
+        "dark": "Use case: lighting-weather\nAsset type: production Civica Atlas dark-theme homepage Governance Evidence card artwork paired with the supplied light engraving\nPrimary request: Re-render this exact archival research-table scene as a restrained night engraving for a dark interface.\nComposition/framing: preserve the exact 3:2 landscape crop, every folio, map, balance scale, compass, telescope, table edge, and their precise positions and proportions.\nLighting/mood: calm low-key night, scholarly and meticulous, with enough tonal separation to recognize all instruments and separate folios at about 380 by 220 CSS pixels.\nColor palette: near-black graphite and deep navy ground with muted warm sepia, restrained terracotta, and soft gold linework; warm accents only, no dominant orange wash and no blue neon cast.\nConstraints: change lighting, paper/ink polarity, and palette only. Do not add, remove, move, duplicate, relabel, or reinterpret any object or depicted scene. No text, letters, numbers, charts, rankings, grades, country flags, seals, logos, watermarks, identifiable people, modern buildings, decorative border, or glossy effects. Keep it an AI-assisted non-documentary copperplate editorial engraving.",
+        "negativePrompt": "No text, numbers, rankings, grades, flags, seals, logos, watermarks, identifiable people, identifiable modern buildings, sacred imagery, documentary event depiction, fantasy structures, decorative border, generic lone globe, clip art, photorealism, glossy 3D rendering, centered square composition, or excessive empty margins."
+      },
+      "references": [],
+      "referenceDisclosure": "No image, photograph, artist, building, trademark, insignia, person, or other external visual reference was supplied to the generator.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "Replace the small square globe on homepage point 03, Governance Evidence, with a better custom image made for the exact box.",
+        "specificOutputApproval": null,
+        "specificOutputApprovalDisclosure": "The owner authorized generation and implementation but did not separately approve this exact generated pair before integration."
+      },
+      "selection": {
+        "selectedBy": "Codex implementation agent",
+        "selectedOn": "2026-07-25",
+        "basis": "The wide research-table composition communicates separate source evidence and survives the measured 5:3 card interior without the prior isolated-square treatment.",
+        "rejectedAlternatives": []
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "tool": "ImageMagick 7.1.2-18",
+          "operation": "Center-crop the returned 1536x1024 PNG to the 5:3 card geometry, resize to 1250x750, strip metadata, and encode WebP at quality 84.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic crop/resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No external visual reference was supplied; the scene uses generic folios and research instruments."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "No identifiable modern architecture, public art, or interior is depicted."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "No logo, flag, official emblem, seal, or trade dress is depicted."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The folio scenes are generic and unlabeled; the image is rendered as decorative, non-source editorial art beside copy that names the real source-native evidence product."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt compliance, exact-box composition, light/dark legibility, technical file integrity, and the five required pre-release screening domains.",
+        "independentProfessionalReview": false
+      },
+      "release": {
+        "releaseIdentity": "homepage-governance-evidence-2026-07-25-v1",
+        "status": "selected-for-implementation-under-owner-request",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "correctionHistory": []
+    }
+  ]
+}

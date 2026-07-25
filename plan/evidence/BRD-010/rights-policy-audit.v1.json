@@ -1,10 +1,11 @@
 {
   "contract": "civica-editorial-illustration-rights-audit/v1",
-  "checkedOn": "2026-07-23",
+  "checkedOn": "2026-07-25",
   "policyVersion": "civica-editorial-illustration-rights/v1",
   "manifestVersion": "civica-editorial-illustration-manifest/v1",
-  "manifestAssetCount": 550,
+  "manifestAssetCount": 552,
   "irrecoverableGenerationSessions": 548,
+  "completeForwardGenerationRecords": 2,
   "historicalPartialCompositionSessions": 2,
   "assetsWithIncompleteOriginRecords": 550,
   "missingPairs": 0,

@@ -16,6 +16,8 @@ The country caption is structural rather than copied into hundreds of caption st
 - `src/lib/illustrations/editorial-illustration-disclosure.ts` — pure policy/surface checks
 - `scripts/validate-editorial-illustration-disclosure.ts` — DB-free, fail-closed build guard
 - `src/lib/illustrations/__tests__/editorial-illustration-disclosure.test.ts` — adversarial fixtures
+- `data/illustration-generation-records.v1.json` — complete forward record for post-policy image generation
+- `home-governance-evidence-2026-07-25/` — first production-bound forward-record asset pair and four-mode browser proof
 
 ## What the guard proves
 

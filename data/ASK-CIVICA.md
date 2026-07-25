@@ -1,7 +1,7 @@
 # Ask Civica evidence, privacy, and failure contract
 
 **Contract:** `ask-civica-contract/v1`
-**Owner:** Fernando Balino
+**Owner:** Fernando Baliño
 **Public disclosure:** `/privacy#ask-civica`
 **Updated:** 2026-07-16
 

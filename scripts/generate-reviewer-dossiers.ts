@@ -1,14 +1,19 @@
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { buildReviewerDossiers, reviewerDossierErrors, reviewerDossierHash } from "../src/lib/research/reviewer-dossiers";
+import {
+  REVIEWER_DOSSIER_V1_SIGNATORY,
+  buildReviewerDossiers,
+  reviewerDossierErrors,
+  reviewerDossierHash,
+} from "../src/lib/research/reviewer-dossiers";
 
 const OUTPUT = resolve("data/research/reviewer-dossiers-v1.json");
 const DIR = resolve("plan/research/reviewer-dossiers-v1");
 const WRITE = process.argv.includes("--write");
 
 export function buildReviewerDossierArtifact() {
-  const body = buildReviewerDossiers();
+  const body = buildReviewerDossiers(REVIEWER_DOSSIER_V1_SIGNATORY);
   return { ...body, semanticSha256: reviewerDossierHash(body) };
 }
 

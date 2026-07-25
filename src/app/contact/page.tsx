@@ -8,12 +8,12 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Contact the editors",
   description:
-    "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Balino reviews submissions manually.",
+    "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Baliño reviews submissions manually.",
   alternates: { canonical: "https://civicaatlas.org/contact" },
   openGraph: withOg({
     title: "Contact the editors · Civica Atlas",
     description:
-      "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Balino reviews submissions manually.",
+      "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Baliño reviews submissions manually.",
     url: "https://civicaatlas.org/contact",
   }),
 };

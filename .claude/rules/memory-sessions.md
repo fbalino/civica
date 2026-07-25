@@ -719,13 +719,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 
 ## 2026-07-11 — GOV-001 publication governance completed
 
-- Adopted a ten-domain charter naming Fernando Balino as the current accountable human and disclosing the project's single-owner governance concentration.
+- Adopted a ten-domain charter naming Fernando Baliño as the current accountable human and disclosing the project's single-owner governance concentration.
 - Agents, models, and anonymous groups have no decision authority; independent reviewers retain their conclusions and original reports.
 - Each domain has required evidence and a blocking condition. GOV-002 is next for accountable authorship and contributor identity.
 
 ## 2026-07-11 — GOV-002 accountable authorship completed
 
-- Canonical and frozen-release citations now name Fernando Balino personally and retain Civica Atlas as publisher.
+- Canonical and frozen-release citations now name Fernando Baliño personally and retain Civica Atlas as publisher.
 - The project claims no institutional affiliation and records no ORCID because none was supplied or reliably found.
 - Nine contribution roles and three history periods are machine-readable; 15 generic blog bylines now name the accountable author. GOV-003 is next.
 

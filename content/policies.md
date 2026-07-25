@@ -105,7 +105,7 @@ policy mechanically true before a frozen release is published.
 
 ## Authority and emergency action {#authority}
 
-This section follows `civica-release-correction-authority/v1`. Fernando Balino is the approver for data and methodology releases, corrections, retractions, supersessions, emergency suppression, and restoration. A release still has to pass its applicable evidence and review gates; approval cannot turn a failed gate into a passing one. Fernando cannot rewrite an independent report or decide an appeal where he has an unmanageable conflict. That decision stays blocked until a qualified independent decision-maker is appointed and named.
+This section follows `civica-release-correction-authority/v1`. Fernando Baliño is the approver for data and methodology releases, corrections, retractions, supersessions, emergency suppression, and restoration. A release still has to pass its applicable evidence and review gates; approval cannot turn a failed gate into a passing one. Fernando cannot rewrite an independent report or decide an appeal where he has an unmanageable conflict. That decision stays blocked until a qualified independent decision-maker is appointed and named.
 
 ### Emergency action
 

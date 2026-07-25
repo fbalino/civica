@@ -1,7 +1,7 @@
 # Deployment and rollback rehearsal
 
 **Contract:** `civica-deployment-rehearsal/v1`
-**Owner:** Fernando Balino
+**Owner:** Fernando Baliño
 **Last reviewed:** 2026-07-18
 
 This is the mandatory order for schema, data release, application deployment,

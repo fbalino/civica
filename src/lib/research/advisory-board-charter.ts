@@ -20,7 +20,7 @@ export const ADVISORY_BOARD_CHARTER = Object.freeze({
     publicationVeto: false,
     endorsementImplied: false,
     claimValidationImplied: false,
-    finalDecisionMaker: "Fernando Balino",
+    finalDecisionMaker: "Fernando Baliño",
     dissentRule: "Material board disagreement and the author's response remain in the review record when publication consent permits.",
   }),
   appointment: Object.freeze({
@@ -52,7 +52,7 @@ export const ADVISORY_BOARD_CHARTER = Object.freeze({
   resignationAndRemoval: Object.freeze({
     resignation: "A member may resign at any time without giving a reason. Completed agreed work is handled under its payment terms.",
     removalGrounds: ["unmanaged conflict", "confidentiality or research-integrity breach", "misrepresentation of board authority", "harassment or unsafe conduct", "sustained non-participation after a private check-in"],
-    process: "Fernando Balino gives written notice and a chance to respond unless immediate access removal is needed for safety or confidentiality. The roster records the end date; private personal details are not published.",
+    process: "Fernando Baliño gives written notice and a chance to respond unless immediate access removal is needed for safety or confidentiality. The roster records the end date; private personal details are not published.",
   }),
   publication: Object.freeze({
     names: "Publish a member's name, affiliation, bio, photograph, and term only with item-specific consent.",

@@ -3,7 +3,7 @@
   "contract": "civica-health-status/v1",
   "drill": "status-page-publication-decision",
   "recordedAt": "2026-07-16",
-  "owner": "Fernando Balino",
+  "owner": "Fernando Baliño",
   "publicStatusPage": "https://statuspage.incident.io/civica-atlas",
   "scenarios": [
     {

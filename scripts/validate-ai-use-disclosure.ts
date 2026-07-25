@@ -12,7 +12,7 @@ for (const phrase of [
   "Production research systems",
   "Prose and illustrations",
   "not independent peer review",
-  "Fernando Balino remains responsible",
+  "Fernando Baliño remains responsible",
 ]) assert.ok(about.includes(phrase), `About disclosure missing: ${phrase}`);
 for (const model of ["DeepSeek V4 Flash", "GLM 4.7", "Claude Haiku 4.5", "Claude Sonnet 4.6", "GPT-5.3 Codex Spark"])
   assert.ok(about.includes(model), `About disclosure missing material model: ${model}`);

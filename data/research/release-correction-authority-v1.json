@@ -2,7 +2,7 @@
   "schemaVersion": "civica-release-correction-authority/v1",
   "effectiveOn": "2026-07-11",
   "approver": {
-    "name": "Fernando Balino",
+    "name": "Fernando Baliño",
     "role": "Founder, publisher, and responsible human decision-maker",
     "releaseAuthority": "Approve preview, frozen, DOI, superseding, retracted, rolled-back, and retired release states after applicable gates pass.",
     "methodologyAuthority": "Approve methodology versions and claim standing after applicable validation and independent-review gates pass.",
@@ -32,7 +32,7 @@
       "set restoration criteria"
     ],
     "reviewDeadlineHours": 72,
-    "restorationRule": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+    "restorationRule": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Baliño's restoration decision."
   },
   "historicalPreservation": {
     "correction": "Publish the corrected value or statement prospectively and retain the prior value/version as superseded in history.",
@@ -73,14 +73,14 @@
         "fromDoi": "10.0000/civica.v1",
         "summary": "A country identity was assigned to the wrong jurisdiction.",
         "changedFrozenBytes": true,
-        "actor": "Fernando Balino",
+        "actor": "Fernando Baliño",
         "status": "contained_pending_disposition"
       },
       "emergencyAction": {
         "action": "suppress_affected_claim_and_promotion",
         "takenAt": "2026-07-11T12:00:00.000Z",
         "reviewDueAt": "2026-07-14T12:00:00.000Z",
-        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Baliño's restoration decision."
       },
       "changelog": {
         "incidentId": "tabletop-material-error",
@@ -127,14 +127,14 @@
         "fromDoi": null,
         "summary": "The construct cannot support the published interpretation.",
         "changedFrozenBytes": true,
-        "actor": "Fernando Balino",
+        "actor": "Fernando Baliño",
         "status": "contained_pending_disposition"
       },
       "emergencyAction": {
         "action": "suppress_affected_claim_and_promotion",
         "takenAt": "2026-07-11T12:00:00.000Z",
         "reviewDueAt": "2026-07-14T12:00:00.000Z",
-        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Baliño's restoration decision."
       },
       "changelog": {
         "incidentId": "tabletop-method",
@@ -178,14 +178,14 @@
         "fromDoi": null,
         "summary": "A restricted publisher payload entered a public export.",
         "changedFrozenBytes": true,
-        "actor": "Fernando Balino",
+        "actor": "Fernando Baliño",
         "status": "contained_pending_disposition"
       },
       "emergencyAction": {
         "action": "restrict_affected_payload_and_export",
         "takenAt": "2026-07-11T12:00:00.000Z",
         "reviewDueAt": "2026-07-14T12:00:00.000Z",
-        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision."
+        "restorationCriteria": "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Baliño's restoration decision."
       },
       "changelog": {
         "incidentId": "tabletop-rights",
@@ -220,5 +220,5 @@
       }
     }
   ],
-  "semanticSha256": "24137dc19405220a9d1b741f0a9ed7692b034516aee7179336ab98658167c5b0"
+  "semanticSha256": "951a8c5730bd3da72ebd00fb52d57b4d6c58aeee2015dd0afa101418a0bae10b"
 }

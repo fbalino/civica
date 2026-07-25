@@ -8,7 +8,7 @@ Task: GOV-003
 
 ## Why confirmation is required
 
-The repository establishes that Fernando Balino controls publication. On
+The repository establishes that Fernando Baliño controls publication. On
 2026-07-25 Fernando also confirmed the funding, support, and outside-affiliation
 facts recorded below. Ordinary source/vendor relationships, any exceptions to
 the documented control boundary, and permission to publish still require
@@ -19,7 +19,7 @@ separate confirmation.
 Approve, correct, or replace every bracketed field:
 
 > **Funding and sponsorship.** Civica Atlas is personally funded by Fernando
-> Balino. As of 2026-07-25, it has received no grants, sponsorships, donations,
+> Baliño. As of 2026-07-25, it has received no grants, sponsorships, donations,
 > employer support, or outcome-contingent funding. No outside funder or sponsor
 > exists.
 >
@@ -38,7 +38,7 @@ Approve, correct, or replace every bracketed field:
 > outside affiliations or interests. The project takes no institutional
 > position on parties, governments, or regime outcomes.
 >
-> **Editorial control.** Fernando Balino has final authority over data inclusion, methodology, copy, corrections, releases, security, source rights, reviewer process, conflicts, and emergency action under `civica-research-publication-governance/v1`. Contractors, agents, model providers, source publishers, prospective reviewers, and advisory-board applicants have no publication veto or automatic approval role. Any future delegation, funder condition, or sponsor right will be named and dated.
+> **Editorial control.** Fernando Baliño has final authority over data inclusion, methodology, copy, corrections, releases, security, source rights, reviewer process, conflicts, and emergency action under `civica-research-publication-governance/v1`. Contractors, agents, model providers, source publishers, prospective reviewers, and advisory-board applicants have no publication veto or automatic approval role. Any future delegation, funder condition, or sponsor right will be named and dated.
 >
 > **Source and vendor relationships.** Civica obtains data under the source-by-source access and rights conditions in its manifests. Formal partnerships, memberships, paid licenses, data-sharing agreements, API credits, consulting relationships, or privileged access with source publishers or model/tool vendors are [none beyond ordinary customer/public-access relationships / ___]. Citation, payment, public access, or technical integration does not imply endorsement by either party.
 >
@@ -47,7 +47,7 @@ Approve, correct, or replace every bracketed field:
 ## Confirmation fields
 
 1. Legal/personal payer(s) and funding sources: **confirmed 2026-07-25 —
-   Fernando Balino personally funds Civica Atlas; no other funding source was
+   Fernando Baliño personally funds Civica Atlas; no other funding source was
    reported**
 2. Grants, sponsors, donations, crowdfunding, or employer/institutional
    support: **confirmed 2026-07-25 — none**

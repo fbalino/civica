@@ -95,7 +95,7 @@ export default async function AdvisoryBoardPage() {
         <section className="editorial-section" id="authority">
           <h2>Advisory, not an endorsement</h2>
           <p>
-            The board gives advice and may recommend correction, redesign, suspension, or retirement. It has no publication veto and does not replace Fernando Balino as the accountable decision-maker. Material disagreement and Civica&apos;s response remain in the review record when publication consent permits.
+            The board gives advice and may recommend correction, redesign, suspension, or retirement. It has no publication veto and does not replace Fernando Baliño as the accountable decision-maker. Material disagreement and Civica&apos;s response remain in the review record when publication consent permits.
           </p>
           <p><strong>{charter.publication.nonEndorsement}</strong></p>
         </section>

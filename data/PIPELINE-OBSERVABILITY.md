@@ -20,7 +20,7 @@ The daily `operations.pipeline-alerts` Vercel Cron evaluates the most recent
 expected UTC slot after a two-hour grace period for a missed run, plus the most
 recent failed, empty, or rejection-rate-anomalous runs. Open alerts produce a content-free
 structured Vercel Cron log and a non-success job response. The accountable
-owner is Fernando Balino. Within one business day, follow the **Upstream
+owner is Fernando Baliño. Within one business day, follow the **Upstream
 data-source breakage** runbook in `data/OPERATIONAL-RUNBOOKS.md`: contain the
 affected source, preserve the safe run record and unchanged freshness state,
 repair or retry idempotently, then verify plausible counts and

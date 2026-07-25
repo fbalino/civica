@@ -46,20 +46,53 @@ const manifest = JSON.parse(read(manifestPath)) as {
   summary?: {
     assetCount?: number;
     irrecoverableGenerationSessions?: number;
+    completeForwardGenerationRecords?: number;
   };
   assets?: Array<{
     id?: string;
     origin?: {
+      provider?: string | null;
       model?: string;
+      version?: string | null;
       tool?: string;
       prompt?: string;
-      sourceReferences?: string;
+      negativePrompt?: string | null;
+      sourceReferences?: unknown;
+      parameters?: Record<string, unknown> | null;
+      accountContext?: string | null;
+      accountTerms?: {
+        name?: string;
+        url?: string;
+        effectiveOn?: string;
+        checkedOn?: string;
+        applicabilityBasis?: string;
+        outputRightsSummary?: string;
+        nonUniquenessSummary?: string;
+      } | null;
+      humanDirection?: Record<string, unknown> | null;
+      selection?: Record<string, unknown> | null;
       provenanceStatus?: string;
       firstTrackedAt?: string | null;
     };
     rights?: {
       policy?: string;
       sourceEvidence?: boolean;
+      forwardRecord?: string | null;
+      screenings?: Array<{
+        id?: string;
+        disposition?: string;
+        reason?: string;
+      }> | null;
+      review?: {
+        reviewer?: string;
+        reviewedOn?: string;
+        outcome?: string;
+      } | null;
+      release?: {
+        releaseIdentity?: string;
+        status?: string;
+      } | null;
+      correctionHistory?: Array<Record<string, unknown>> | null;
     };
   }>;
 };
@@ -94,6 +127,7 @@ const assets = manifest.assets ?? [];
 if (manifest.summary?.assetCount !== assets.length)
   errors.push("manifest asset summary does not match rows");
 let irrecoverable = 0;
+let completeForward = 0;
 for (const asset of assets) {
   if (asset.rights?.policy !== "/licensing#imagery")
     errors.push(`${asset.id}: public policy pointer drifted`);
@@ -111,6 +145,83 @@ for (const asset of assets) {
     "partial-irrecoverable-generation-session"
   )
     irrecoverable += 1;
+  if (origin?.provenanceStatus === "complete-forward-generation-record") {
+    completeForward += 1;
+    for (const [field, value] of Object.entries({
+      provider: origin.provider,
+      model: origin.model,
+      version: origin.version,
+      tool: origin.tool,
+      prompt: origin.prompt,
+      negativePrompt: origin.negativePrompt,
+      accountContext: origin.accountContext,
+    })) {
+      if (typeof value !== "string" || !value.trim()) {
+        errors.push(`${asset.id}: forward generation record missing ${field}`);
+      }
+    }
+    if (!origin.parameters || !Object.keys(origin.parameters).length)
+      errors.push(`${asset.id}: forward generation parameters missing`);
+    const terms = origin.accountTerms;
+    for (const [field, value] of Object.entries({
+      name: terms?.name,
+      url: terms?.url,
+      effectiveOn: terms?.effectiveOn,
+      checkedOn: terms?.checkedOn,
+      applicabilityBasis: terms?.applicabilityBasis,
+      outputRightsSummary: terms?.outputRightsSummary,
+      nonUniquenessSummary: terms?.nonUniquenessSummary,
+    })) {
+      if (typeof value !== "string" || !value.trim()) {
+        errors.push(`${asset.id}: account terms missing ${field}`);
+      }
+    }
+    if (!origin.humanDirection || !Object.keys(origin.humanDirection).length)
+      errors.push(`${asset.id}: human direction record missing`);
+    if (!origin.selection || !Object.keys(origin.selection).length)
+      errors.push(`${asset.id}: selection record missing`);
+    if (asset.rights?.forwardRecord !== "data/illustration-generation-records.v1.json")
+      errors.push(`${asset.id}: forward record pointer missing`);
+    const screenings = asset.rights?.screenings ?? [];
+    const screeningIds = new Set(screenings.map((screening) => screening.id));
+    for (const id of [
+      "reference-copyright",
+      "architecture-panorama",
+      "trademark-insignia",
+      "personality-likeness",
+      "cultural-documentary-risk",
+    ]) {
+      if (!screeningIds.has(id))
+        errors.push(`${asset.id}: screening missing ${id}`);
+    }
+    for (const screening of screenings) {
+      if (
+        !["cleared", "replaced", "withheld", "professional-review-required"].includes(
+          screening.disposition ?? "",
+        ) ||
+        !screening.reason?.trim()
+      ) {
+        errors.push(`${asset.id}: invalid screening ${screening.id ?? "unknown"}`);
+      }
+      if (screening.disposition === "professional-review-required")
+        errors.push(`${asset.id}: professional review blocks release`);
+    }
+    if (
+      !asset.rights?.review?.reviewer?.trim() ||
+      !asset.rights.review.reviewedOn?.trim() ||
+      asset.rights.review.outcome !== "cleared"
+    ) {
+      errors.push(`${asset.id}: cleared release review missing`);
+    }
+    if (
+      !asset.rights?.release?.releaseIdentity?.trim() ||
+      !asset.rights.release.status?.trim()
+    ) {
+      errors.push(`${asset.id}: release identity missing`);
+    }
+    if (!Array.isArray(asset.rights?.correctionHistory))
+      errors.push(`${asset.id}: correction history missing`);
+  }
   if (
     origin?.firstTrackedAt &&
     origin.firstTrackedAt.slice(0, 10) >=
@@ -124,6 +235,8 @@ for (const asset of assets) {
 }
 if (manifest.summary?.irrecoverableGenerationSessions !== irrecoverable)
   errors.push("irrecoverable generation-session count drifted");
+if (manifest.summary?.completeForwardGenerationRecords !== completeForward)
+  errors.push("complete forward-generation count drifted");
 
 const manual = read("plan/MANUAL-CHECKS.md");
 if (!manual.includes("BRD-010"))
@@ -135,11 +248,20 @@ else {
   const evidence = JSON.parse(read(evidencePath)) as {
     manifestAssetCount?: number;
     irrecoverableGenerationSessions?: number;
+    completeForwardGenerationRecords?: number;
+    assetsWithIncompleteOriginRecords?: number;
   };
   if (evidence.manifestAssetCount !== assets.length)
     errors.push("BRD-010 evidence asset count drifted");
   if (evidence.irrecoverableGenerationSessions !== irrecoverable)
     errors.push("BRD-010 evidence provenance count drifted");
+  if (evidence.completeForwardGenerationRecords !== completeForward)
+    errors.push("BRD-010 forward-record count drifted");
+  if (
+    evidence.assetsWithIncompleteOriginRecords !==
+    assets.length - completeForward
+  )
+    errors.push("BRD-010 incomplete-origin count drifted");
 }
 
 const packageJson = JSON.parse(read("package.json")) as {

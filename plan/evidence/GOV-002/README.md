@@ -4,7 +4,7 @@ Completed 2026-07-11.
 
 ## Outcome
 
-`civica-authorship-contributions/v1` identifies Fernando Balino as the responsible human author and Civica Atlas as the organizational publisher. The record includes:
+`civica-authorship-contributions/v1` identifies Fernando Baliño as the responsible human author and Civica Atlas as the organizational publisher. The record includes:
 
 - independent status with no institutional affiliation claimed;
 - the public Civica Atlas contact route;
@@ -40,3 +40,11 @@ Local browser QA on `/blog/anatomy-of-a-modern-coup` confirmed the byline in the
 - Local browser: `/blog/anatomy-of-a-modern-coup`, named byline present, zero console warnings/errors
 
 The byline establishes human accountability. GOV-004 separately owns the detailed disclosure of agent, model, and tool assistance.
+
+## Clerical correction
+
+On 2026-07-25 the owner confirmed that his name is spelled **Fernando Baliño**.
+Mutable canonical records and public surfaces now use that spelling. Frozen
+release packets and their checksums were not rewritten; the correction record
+under `plan/evidence/GOV-002/author-name-correction-2026-07-25/` explains how
+their unaccented historical metadata relates to the same person.

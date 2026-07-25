@@ -1,6 +1,6 @@
 # Civica Atlas — copyright / trademark / data-rights complaint handling (BRD-015)
 
-Accountable owner: **Fernando Balino**. This is the internal process for a
+Accountable owner: **Fernando Baliño**. This is the internal process for a
 rights complaint (copyright, trademark, database/data rights, or a personality/
 likeness objection) and how it connects to correction publication. It composes
 existing mechanisms rather than inventing a parallel system; personal data in a

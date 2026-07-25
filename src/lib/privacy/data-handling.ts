@@ -84,7 +84,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
       "Civica's Neon database and the authenticated owner-admin message queue.",
     retention:
       "No automatic maximum is currently implemented. Messages remain until the owner deletes them after the request or a related complaint/security need is resolved.",
-    access: "Fernando Balino through the authenticated owner-admin surface.",
+    access: "Fernando Baliño through the authenticated owner-admin surface.",
     deletion:
       "A sender may request deletion through the contact route; the owner-admin message detail supports permanent deletion.",
     safeguards:
@@ -113,7 +113,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     retention:
       "The evidence report, receipt, disposition, and linked release history are retained as correction evidence. Optional contact fields are redacted on a valid privacy request or when no longer needed for follow-up.",
     access:
-      "Fernando Balino through the authenticated owner-admin surface; public report content only when the submitter leaves the privacy option off.",
+      "Fernando Baliño through the authenticated owner-admin surface; public report content only when the submitter leaves the privacy option off.",
     deletion:
       "A reporter may request contact-field redaction. The evidence record is retained so released changes and public dispositions are not silently detached from their source report.",
     safeguards:
@@ -141,7 +141,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
       "Civica's Neon database and the authenticated owner-admin application queue.",
     retention:
       "Delete within 18 months of submission, including when a later appointment or review relationship receives its own record.",
-    access: "Fernando Balino through the authenticated owner-admin surface.",
+    access: "Fernando Baliño through the authenticated owner-admin surface.",
     deletion:
       "Applicants may request access, correction, or earlier deletion; the owner-admin application detail supports permanent deletion.",
     safeguards:
@@ -217,7 +217,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     destinations: "Vercel's hosting and Runtime Logs systems.",
     retention:
       "Controlled by the configured Vercel plan/account and provider policy; Civica's repository does not enforce or claim an exact provider-log period.",
-    access: "Fernando Balino and authorized Vercel service personnel under provider controls.",
+    access: "Fernando Baliño and authorized Vercel service personnel under provider controls.",
     deletion:
       "Provider-managed; privacy requests can be routed through Civica for account-specific follow-up.",
     safeguards:
@@ -240,7 +240,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     purpose: "Measure reliability and performance by route class and release.",
     destinations: "Civica's Neon database.",
     retention: "30 days, with best-effort scheduled pruning.",
-    access: "Fernando Balino through internal operational reporting.",
+    access: "Fernando Baliño through internal operational reporting.",
     deletion: "Rows older than the retention boundary are pruned.",
     safeguards:
       "No raw path parameter, query string, cookie, IP address, user agent, request body, account identifier, or exception text.",
@@ -263,7 +263,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     destinations: "Civica's Neon database.",
     retention:
       "Only through the active fixed window; expired rows are deleted by subsequent counter operations.",
-    access: "Application enforcement code and Fernando Balino for bounded operations.",
+    access: "Application enforcement code and Fernando Baliño for bounded operations.",
     deletion: "Automatic expiry cleanup in the atomic counter statement.",
     safeguards:
       "Raw IP addresses never cross the durable-store boundary; an independent secret domain-separates the digest.",
@@ -287,7 +287,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
       "Browser cookie, Civica's Neon database, Vercel, and Google only for optional owner OAuth.",
     retention:
       "The browser session expires after seven days. Revocation and append-only audit rows currently have no automatic deletion because they preserve security/accountability evidence.",
-    access: "Fernando Balino through authenticated admin/operational tooling.",
+    access: "Fernando Baliño through authenticated admin/operational tooling.",
     deletion:
       "Logout clears the browser cookie and stores a non-reversible revocation digest. Audit evidence is not user-editable.",
     safeguards:
@@ -338,7 +338,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     purpose: "Detect, group, remediate, and resolve released-surface failures.",
     destinations: "Civica's Neon database and bounded Vercel alert logs.",
     retention: "90 days, with best-effort pruning.",
-    access: "Fernando Balino through internal operational reporting.",
+    access: "Fernando Baliño through internal operational reporting.",
     deletion: "Rows older than the retention boundary are pruned.",
     safeguards:
       "No exception text, stack, digest, raw path, parameter, query, header, cookie, IP, user agent, request body, account identifier, source-map content, or reporter prose.",

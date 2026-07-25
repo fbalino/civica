@@ -19,8 +19,8 @@ export const AUTHORSHIP_RECORD = Object.freeze({
   effectiveOn: "2026-07-11",
   responsibleAuthor: Object.freeze({
     givenNames: "Fernando",
-    familyNames: "Balino",
-    displayName: "Fernando Balino",
+    familyNames: "Baliño",
+    displayName: "Fernando Baliño",
     affiliation: "Independent project; no institutional affiliation claimed",
     independentStatus: true,
     orcid: null,
@@ -47,7 +47,7 @@ export const AUTHORSHIP_RECORD = Object.freeze({
     {
       period: "2026-04-13",
       contribution: "Initiated the repository and directed the first Atlas, source-pipeline, country-page, navigation, and reconciliation foundation.",
-      evidence: "Git history beginning at commit 0359b07; named commits by Fernando Balino.",
+      evidence: "Git history beginning at commit 0359b07; named commits by Fernando Baliño.",
     },
     {
       period: "2026-04-14/2026-06-30",

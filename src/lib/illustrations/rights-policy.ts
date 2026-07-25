@@ -77,7 +77,7 @@ export const EDITORIAL_ILLUSTRATION_RIGHTS_POLICY = Object.freeze({
   scope:
     "Every AI-assisted, generated, edited, or photographic-treatment editorial image released by Civica, including country, territory, page, blog, navigation, and shared imagery.",
   ownership:
-    "Fernando Balino records and controls Civica's human-authored selection, arrangement, captions, edits, and release decisions to the extent protectable. Civica does not claim ownership of upstream references, landmarks, marks, likenesses, provider technology, or machine-generated elements that applicable law does not protect.",
+    "Fernando Baliño records and controls Civica's human-authored selection, arrangement, captions, edits, and release decisions to the extent protectable. Civica does not claim ownership of upstream references, landmarks, marks, likenesses, provider technology, or machine-generated elements that applicable law does not protect.",
   historicalPosture:
     "Historical assets with missing model, prompt, seed, tool-terms, or reference-image records remain explicitly partial. Missing facts are never reconstructed from filenames, Git time, captions, or visual similarity.",
   futureReleaseRule:

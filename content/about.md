@@ -66,7 +66,7 @@ Country and territory hero images are AI-assisted editorial illustrations, not p
 
 ## Use of models and agents {#ai-use}
 
-This disclosure follows `civica-ai-use-disclosure/v1`. Models and agents assist with several parts of Civica; Fernando Balino remains responsible for what the project publishes.
+This disclosure follows `civica-ai-use-disclosure/v1`. Models and agents assist with several parts of Civica; Fernando Baliño remains responsible for what the project publishes.
 
 **Code, planning, and internal audits.** OpenAI Codex and Anthropic Claude/Claude Code have drafted code and documentation, inspected the repository, run tests, researched candidates, and criticized methods. Fable 5 is used for consequential design choices. These systems can find defects and propose changes. Their work stays subject to version control, tests, data and claims checks, and human acceptance. Agent agreement is not independent peer review or academic validation. Historical sessions do not all have complete model/version transcripts, and missing session metadata is left unknown.
 

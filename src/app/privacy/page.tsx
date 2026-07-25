@@ -137,7 +137,7 @@ export default function PrivacyPage() {
               <strong>Contact form.</strong> If you use the{" "}
               <Link href="/contact">contact form</Link>, the details you type
               there (name, email, subject, and message) are stored in the
-              Civica project database so Fernando Balino can read and respond.
+              Civica project database so Fernando Baliño can read and respond.
               New messages do not retain your raw IP address. They are not used
               for advertising or sold.
             </li>

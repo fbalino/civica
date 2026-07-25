@@ -8,7 +8,7 @@ assert.deepEqual(JSON.parse(readFileSync("data/research/release-correction-autho
 const policy = readFileSync("content/policies.md", "utf8");
 for (const phrase of [
   RELEASE_AUTHORITY.schemaVersion,
-  "Fernando Balino is the approver",
+  "Fernando Baliño is the approver",
   "Emergency action",
   "IsNewVersionOf",
   "IsPreviousVersionOf",

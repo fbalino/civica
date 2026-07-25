@@ -3,8 +3,8 @@
   "effectiveOn": "2026-07-11",
   "responsibleAuthor": {
     "givenNames": "Fernando",
-    "familyNames": "Balino",
-    "displayName": "Fernando Balino",
+    "familyNames": "Baliño",
+    "displayName": "Fernando Baliño",
     "affiliation": "Independent project; no institutional affiliation claimed",
     "independentStatus": true,
     "orcid": null,
@@ -39,7 +39,7 @@
     {
       "period": "2026-04-13",
       "contribution": "Initiated the repository and directed the first Atlas, source-pipeline, country-page, navigation, and reconciliation foundation.",
-      "evidence": "Git history beginning at commit 0359b07; named commits by Fernando Balino."
+      "evidence": "Git history beginning at commit 0359b07; named commits by Fernando Baliño."
     },
     {
       "period": "2026-04-14/2026-06-30",
@@ -53,5 +53,5 @@
     }
   ],
   "contributorHistoryRule": "Add a named contributor only with consent, exact role ids, contribution period, artifact evidence, affiliation/independent status, contact route, and ORCID when the person supplies one. Preserve prior records when roles change.",
-  "semanticSha256": "9983945550d0186e39ab921b91b038e0c8511f4adde08e62a1d66bd7b1719f05"
+  "semanticSha256": "f0202c56a6a3471b4deb8455f477e99626ac01188cfbad8270829561fbbdf456"
 }

@@ -4,7 +4,7 @@
 
 **Reviewed:** 2026-07-14
 
-**Owner:** Fernando Balino
+**Owner:** Fernando Baliño
 
 This document explains the production request-protection architecture and the
 operator response when one of its layers is unavailable. The machine-readable

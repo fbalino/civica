@@ -1,0 +1,27 @@
+{
+  "id": "gov-002-author-name-diacritic-correction-2026-07-25",
+  "toVersion": "civica-index-governance-evidence-copy-v52-author-name-evidence",
+  "recordKind": "evidence",
+  "categories": [],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/GOV-002/author-name-correction-2026-07-25/README.md",
+      "plan/EXP-038-english-copy-review-2026-07-23.md"
+    ],
+    "registry": [
+      "data/research/authorship-and-contributions-v1.json"
+    ],
+    "release_note": [
+      "plan/evidence/GOV-002/author-name-correction-2026-07-25/release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/GOV-002/author-name-correction-2026-07-25/migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/research/authorship.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-exp-038-copy.ts"
+    ]
+  }
+}

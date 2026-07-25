@@ -18,8 +18,9 @@ shell-evaluate report data or store command output.
 
 ## Current truthful state
 
-The checked report records 306 tasks: 215 complete, 91 remaining, 38 open P0,
-and 86 open P0/P1 tasks. All gates are `blocked`. Its completion-log parser
+The freshly regenerated report records 310 tasks: 248 complete, 62 remaining,
+27 open P0, and 58 open P0/P1 tasks. All gates are `blocked`. It reports zero
+evidence gaps, master/mirror errors, or waivers. Its completion-log parser
 recognizes the project's established `TASK-ID completed…` grammar (including
 qualified completions such as “completed through” and “completed and
 corrected”), while still rejecting a checked task with no completion record or

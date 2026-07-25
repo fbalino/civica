@@ -203,7 +203,7 @@ export default function ContactClient() {
       <section className="editorial-section">
         <p className="editorial-page-subtitle">
           Send a data correction, research question, press inquiry, or
-          collaboration proposal. Fernando Balino reviews submissions manually.
+          collaboration proposal. Fernando Baliño reviews submissions manually.
         </p>
       </section>
 

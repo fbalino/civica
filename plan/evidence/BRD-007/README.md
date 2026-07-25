@@ -8,7 +8,7 @@ Civica now has an explicit root [`LICENSE`](../../../LICENSE) and
 [`NOTICE`](../../../NOTICE). The posture is source-visible but non-open and
 all rights reserved: repository availability does not grant a general right to
 copy, modify, redistribute, sublicense, sell, or build derivative services.
-The notice names Fernando Balino for his original contributions without
+The notice names Fernando Baliño for his original contributions without
 claiming ownership of another contributor's work, and it limits generated or
 AI-assisted material to rights that actually exist.
 
@@ -41,7 +41,7 @@ controls its covered material.
 
 ## Authorship and limits
 
-The repository authorship record names Fernando Balino as responsible human
+The repository authorship record names Fernando Baliño as responsible human
 author/publisher. The current Git history contains 974 commits under Fernando's
 identity and one under `Frontend Engineer <frontend@paperclip.local>`. No
 contributor agreement or assignment record was found. The root terms therefore
