@@ -455,7 +455,7 @@ export interface ReplicationPackageState {
  *  QA-020 (machine-readable readiness reports) per
  *  `plan/MASTER-CHECKLIST.md`. */
 const GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL =
-  "https://github.com/fbalino/civica/tree/main/data/releases/governance-evidence-review-packet-2026-07-v2";
+  "https://github.com/fbalino/civica/tree/main/data/releases/governance-evidence-review-packet-2026-07-v3";
 
 export const replicationPackage: ReplicationPackageState = {
   pageStatus: "review-packet-available",

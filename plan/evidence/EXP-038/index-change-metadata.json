@@ -1,0 +1,28 @@
+{
+  "id": "exp-038-governance-evidence-copy-2026-07-25",
+  "toVersion": "civica-index-governance-evidence-copy-v51",
+  "categories": [
+    "presentation"
+  ],
+  "evidence": {
+    "documentation": [
+      "plan/EXP-038-english-copy-review-2026-07-23.md",
+      "plan/evidence/EXP-038/README.md"
+    ],
+    "registry": [
+      "src/lib/claims/public-claims.ts"
+    ],
+    "release_note": [
+      "plan/evidence/EXP-038/governance-evidence-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/EXP-038/governance-evidence-migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/ci/governance-evidence-copy.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-exp-038-copy.ts"
+    ]
+  }
+}

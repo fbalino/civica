@@ -274,6 +274,7 @@
     "migrate:rate-limits": "tsx scripts/create-rate-limits-table.ts",
     "regenerate:readme": "tsx scripts/regenerate-readme.ts",
     "validate:content-templates": "tsx scripts/validate-content-templates.ts",
+    "validate:exp-038-copy": "tsx scripts/validate-exp-038-copy.ts",
     "validate:numeric-claims": "tsx scripts/validate-public-numeric-claims.ts",
     "snapshot:pulse-runtime": "tsx scripts/generate-pulse-runtime-method.ts",
     "generate:pulse-cluster-coverage": "tsx scripts/generate-pulse-cluster-coverage.ts",

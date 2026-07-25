@@ -198,12 +198,12 @@ export default function ContactClient() {
           Contact
         </>
       }
-      title="Dispatch desk"
+      title="Contact the editors"
     >
       <section className="editorial-section">
         <p className="editorial-page-subtitle">
-          Story tips, data corrections, partnerships, press. Pick a category and
-          send a note &mdash; a human on the editorial team will read it.
+          Send a data correction, research question, press inquiry, or
+          collaboration proposal. Fernando Balino reviews submissions manually.
         </p>
       </section>
 

@@ -425,7 +425,7 @@ export const PUBLIC_CLAIMS = [
     surface: "about",
     routeOrArtifact: "/about",
     exactClaim:
-      "Civica publishes methods and aims to expose source disagreement without claiming that every value is already reconciled or independently reviewed.",
+      "The project publishes its methods and records source disagreement where the data supports it. Some values remain unreconciled, and the project has not completed independent review.",
     tier: "reconciled-fact",
     evidenceSources: [
       "content/about.md",
@@ -439,7 +439,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "content/about.md",
       fragment:
-        "without claiming that every value is already reconciled or independently reviewed.",
+        "records source disagreement where the data supports it. Some values remain unreconciled, and the project has not completed independent review.",
     },
   },
   {

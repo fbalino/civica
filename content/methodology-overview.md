@@ -37,7 +37,7 @@ Two kinds of pages on the site carry a BETA marker.
 
 ## What's not yet published {#not-yet-published}
 
-Internal methodology resolution documents cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, monarchy-status coding rules, and source-allowlist policy. These form the audit trail behind specific methodology calls and are currently held as working documents. Public publication of a curated subset is a v1.x deliverable — the goal is for any external reviewer to be able to read both *what* Civica decided and *how*.
+Internal methodology resolution documents cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, monarchy-status coding rules, and source-allowlist policy. These form the audit trail behind specific methodology calls and are currently held as working documents. A later release may publish a reviewed subset. Until then, the public methodology pages identify the decisions they can support and leave the remaining working records unpublished.
 
 ## Get in touch {#get-in-touch}
 

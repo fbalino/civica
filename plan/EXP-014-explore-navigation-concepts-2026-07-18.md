@@ -1,6 +1,6 @@
 # EXP-014 — Explore navigation concept study
 
-**Status:** complete; awaiting the owner selection required by EXP-015.
+**Status:** complete; all three directions rejected by the owner on 2026-07-25.
 
 ## Shared brief
 
@@ -121,7 +121,22 @@ The 2026-07-18 capture set is under `plan/evidence/EXP-014/mockups/`:
 
 ## Owner decision for EXP-015
 
-Fernando should select one of the three directions using the mockups and this
-brief. EXP-015—not this concept study—will then canonize the selected component,
-tokens/assets, `DESIGN.md`, acceptance screenshots, and the production
-navigation contract.
+Fernando rejected all three directions on 2026-07-25. The concepts were too
+small and did not deliver the beautiful, image-led mega menu he intended.
+
+The replacement brief is:
+
+- a substantially larger desktop panel with a clear “start with a place” and
+  “research tools” hierarchy;
+- eight custom Explore images made specifically for the eight destinations,
+  rather than reused spot art or generic icons;
+- a shared desktop/mobile identity model with destination names remaining the
+  accessible identity;
+- a light/dark, lazy-loaded image budget that preserves the zero-request closed
+  menu; and
+- a new non-production browser concept for owner review before `DESIGN.md` or
+  the production navigation changes.
+
+Preparation and the image-generation boundary are recorded under
+`plan/evidence/EXP-015/`. EXP-015 remains open until the replacement is
+generated, reviewed, and canonized.

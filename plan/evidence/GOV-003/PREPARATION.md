@@ -1,9 +1,22 @@
 # GOV-003 preparation evidence
 
-Status: prepared, not complete; owner factual confirmation required
+Status: partially confirmed, not complete; publication remains blocked
 
 Date: 2026-07-11
 
-The repository proves named ownership and publication control through GOV-001/GOV-002. It does not prove funding provenance, material in-kind support, outside affiliations, or private vendor/source relationships. `plan/research/project-disclosure-owner-confirmation-v1.md` therefore records seven exact confirmation fields and proposed language without filling unknowns by inference.
+The repository proves named ownership and publication control through
+GOV-001/GOV-002. On 2026-07-25 Fernando Balino confirmed that Civica is
+personally funded, has received no grants or other outside funding, has
+received no donated or discounted support, and has no outside affiliations.
+Those four facts are now recorded in
+`plan/research/project-disclosure-owner-confirmation-v1.md`.
 
-After confirmation, one machine-readable disclosure must generate the public `/about` disclosure and the identical reviewer-packet disclosure, with a six-month and material-change review cadence. No public claim or reviewer-packet regeneration occurred during preparation.
+Personal voting history and unrelated personal political-donation history were
+deliberately excluded because they are not evidence of Civica funding,
+affiliation, or editorial control.
+
+Formal or paid source/vendor relationships, any exceptions to the documented
+third-party control boundary, and explicit permission to publish and adopt the
+six-month/material-change review cadence remain pending. Until those fields are
+confirmed, no machine-readable public disclosure, `/about` claim, or
+reviewer-packet regeneration may occur.

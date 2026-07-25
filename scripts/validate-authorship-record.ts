@@ -14,7 +14,7 @@ assert.deepEqual(
 const citationFiles = [
   "CITATION.cff",
   "data/releases/atlas-2026-07-11/g2-rc1/CITATION.cff",
-  "data/releases/governance-evidence-review-packet-2026-07-v2/CITATION.cff",
+  "data/releases/governance-evidence-review-packet-2026-07-v3/CITATION.cff",
 ];
 for (const path of citationFiles) {
   const citation = YAML.parse(readFileSync(path, "utf8"));

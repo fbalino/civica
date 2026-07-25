@@ -1,6 +1,6 @@
 # EXP-038 — English-first editorial copy review
 
-**Status:** agent review and draft package complete; owner approval pending.
+**Status:** approved edits applied on 2026-07-25; four gated decisions remain.
 
 ## Editorial standard
 
@@ -17,11 +17,11 @@ The review also removed or flagged common machine-writing patterns: ornamental
 antithesis, stacked lists, rhetorical scaffolding, vague superlatives, and
 headings that sound like campaign copy rather than a reference work.
 
-No public copy was changed. The proposed text below is an approval deck.
-Fernando may approve items individually or as a bundle. After approval, the
-accepted edits must be applied to the named source files, then pass
-`validate:claims-docs`, `validate:content-templates`,
-`validate:design-tokens`, TypeScript, and rendered browser checks.
+No public copy was changed during the review itself. Fernando approved the
+English copy bundle on 2026-07-25 except for A4, which remains held while he
+considers whether and how his name should appear. H5, T3, and T4 retain their
+separate factual or operational gates. The unambiguous approved edits were then
+applied to the named source files.
 
 ## Source snapshot
 
@@ -188,6 +188,26 @@ Proposed:
 Reason: removes repetitive contrast and states the accountability and review
 boundary directly. Final adoption should use the owner-confirmed GOV-003
 disclosure if it changes this description.
+
+Owner follow-up on 2026-07-25: the sentence remains unchanged while Fernando
+considers whether the About narrative should name him this prominently.
+
+The rationale for naming him was accountability, not promotion. The checked
+authorship and governance records name Fernando as the responsible publisher
+with final editorial authority; naming the person prevents “we” or
+institution-like wording from obscuring who makes final decisions. The word
+“led,” however, is imprecise and can sound organizational or self-promotional.
+Two safer alternatives for a later owner decision are:
+
+> Civica is independently maintained by Fernando Balino, who has final
+> editorial responsibility.
+
+or, if the name should live only in the formal disclosure:
+
+> Civica is an independently maintained project without a formal external
+> review structure.
+
+Neither alternative is approved or applied yet.
 
 ### Methodology landing
 
@@ -458,16 +478,26 @@ formal and consistent with the success receipt.
 
 Owner: Fernando Balino
 
-Decision: pending
+Decision: English copy approved as a bundle on 2026-07-25, except for the
+explicit holds below.
 
-Items approved: pending
+Items approved and applied: H1–H4, A1–A3, M1–M4, C1, C3, G3, L2, T1–T2,
+and V2.
 
-Items revised/rejected: pending
+Items approved as retained without source changes: C2, G1–G2, L1, and V1.
 
-Decision date: pending
+Items held: A4 pending the naming decision; H5 pending the completed GOV-003
+disclosure; T3 pending a choice between the no-guarantee text and a genuinely
+monitored target; T4 pending an explicit choice of the interim instruction or
+ATL-024 production activation.
 
-Approved source commit: pending
+Decision date: 2026-07-25
 
-EXP-038 remains open until this record is completed, approved text is applied,
-the relevant source hashes are refreshed, claims/docs gates pass, and rendered
-desktop/mobile checks confirm the final copy.
+Approved source baseline: `cd9ed1e64d499100fb5951fd18091a49584710d5`.
+The L2 sentence was separately re-read against the working tree because the
+Licensing page also contained unrelated owner changes; the approved edit
+changed only that sentence.
+
+EXP-038 remains open because A4, H5, T3, and T4 are not approved for
+application. Completion also requires refreshed source hashes, passing
+claims/docs gates, and rendered desktop/mobile checks of every applied surface.

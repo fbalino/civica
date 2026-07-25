@@ -55,10 +55,10 @@ export default function LicensingPage() {
         </p>
 
         <Banner variant="info">
-          This page is a practical reuse guide, not legal advice. For exact
-          reuse obligations, follow the upstream publisher license shown with
-          the specific data point where available, or check its named source
-          in the registry below when point-of-use coverage is absent.
+          This page is a practical reuse guide, not legal advice. Check the
+          publisher terms attached to the value. If no terms appear there, find
+          the source in the registry below. A citation or public page does not
+          by itself grant reuse permission.
         </Banner>
 
         <Banner variant="info">

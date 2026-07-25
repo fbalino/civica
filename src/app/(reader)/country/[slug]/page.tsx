@@ -197,9 +197,8 @@ export default async function CountryFactbookTab({
         <div className="factbook-main">
         {sectionsResult.status === "unavailable" ? (
           <Banner variant="warn">
-            Factbook sections are temporarily unavailable. Civica is keeping
-            this tab visible rather than presenting an outage as though
-            {jurisdiction.name} has no reference information.
+            Factbook sections are temporarily unavailable. This is a loading
+            error, not a zero-data state for {jurisdiction.name}.
           </Banner>
         ) : (
           visibleSections.map((section) => {

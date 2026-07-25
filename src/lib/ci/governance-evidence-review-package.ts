@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { GOVERNANCE_EVIDENCE_REVIEW_PACKET } from "./governance-evidence-review-packet";
 
 export const GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR =
-  "data/releases/governance-evidence-review-packet-2026-07-v2";
+  "data/releases/governance-evidence-review-packet-2026-07-v3";
 
 type InventoryRole =
   | "packet-document"
@@ -74,7 +74,7 @@ function canonicalize(value: unknown): unknown {
 
 export function renderReviewPacketReadme(): string {
   const packet = GOVERNANCE_EVIDENCE_REVIEW_PACKET;
-  return `# Governance Evidence external-review packet v2
+  return `# Governance Evidence external-review packet v3
 
 This is the versioned replication and review bundle for Civica's selected source-native public comparison product. It also carries the complete Index tournament inventory, decision, failures, misuse audit, and adopted disposition so a reviewer can assess the choice in context.
 

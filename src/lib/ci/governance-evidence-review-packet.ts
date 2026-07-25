@@ -3,7 +3,7 @@ import { INDEX_DISPOSITION } from "./index-disposition";
 
 export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
   schemaVersion: "governance-evidence-review-packet/v1",
-  releaseId: "governance-evidence-review-packet-2026-07-v2",
+  releaseId: "governance-evidence-review-packet-2026-07-v3",
   status: "ready_for_external_review_not_endorsed",
   selectedProduct: INDEX_DISPOSITION.selectedDisposition,
   productRoute: INDEX_DISPOSITION.publicProduct.route,
@@ -94,7 +94,7 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
   ],
   citation: {
     title: "Civica Atlas Governance Evidence Dashboard external-review packet",
-    version: "governance-evidence-review-packet-2026-07-v2",
+    version: "governance-evidence-review-packet-2026-07-v3",
     url: "https://civicaatlas.org/governance-evidence",
     accessVsReuse: "Citation does not grant permission to redistribute upstream data.",
   },

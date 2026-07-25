@@ -16,14 +16,18 @@ desktop session, Civica is running at `http://localhost:3002`; port 3000 is a
 different project. If Civica restarts on another port, keep the path after the
 port.
 
-### EXP-015 — compare the three Explore concepts
+### EXP-015 — replacement Explore concept in preparation
 
-Open the [comparison brief](EXP-014-explore-navigation-concepts-2026-07-18.md)
-first. Then inspect the three live, non-production concepts at
-[the local design-system comparison](http://localhost:3002/design-system#explore-concepts).
-The durable route is `/design-system#explore-concepts`.
+Fernando rejected all three original concepts on 2026-07-25 because the menu
+was too small and the directions did not provide the custom image-led
+experience requested. That decision and the replacement brief are recorded in
+the [concept study](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-decision-for-exp-015),
+the [replacement preparation record](evidence/EXP-015/PREPARATION.md), and the
+[eight-image prompt specification](evidence/EXP-015/PROMPTS.md).
 
-If the local server is unavailable, use the committed captures:
+The old comparison remains available as historical evidence at
+[the local design-system comparison](http://localhost:3002/design-system#explore-concepts)
+and in these committed captures:
 
 | Concept | Desktop | Small mobile |
 | --- | --- | --- |
@@ -31,17 +35,21 @@ If the local server is unavailable, use the committed captures:
 | **The civic cabinet** | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-dark.png) |
 | **The reading room** | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-dark.png) |
 
-Compare hierarchy, scanning speed, mobile behavior, keyboard/focus model, and
-the asset/performance cost described in the brief. Return one concept name—or
-reject all three—with a dated reason. This selects a direction; it does not
-change production navigation by itself.
+No further selection among those three is required. Before the new visual batch
+can run, Fernando must separately authorize the OpenAI Image API provider/model
+and a hard USD cap; the project currently permits subscription-only work with a
+US$0 API cap and has no configured API key. After the new non-production
+concept is rendered, this runbook will link its browser view and acceptance
+captures for a fresh approve/revise/reject decision.
 
 ### EXP-038 — review the prepared English copy
 
 Open the [itemized copy approval deck](EXP-038-english-copy-review-2026-07-23.md#proposed-edits).
-It contains the current wording, proposed wording, and reason for each item,
-from H1 through V2. Record `approve`, `revise`, or `reject` for each item in the
-[approval record](EXP-038-english-copy-review-2026-07-23.md#approval-record).
+It contains the current wording, proposed wording, reason, and
+[2026-07-25 approval record](EXP-038-english-copy-review-2026-07-23.md#approval-record).
+The unambiguous approved edits have been applied. A4 remains held while Fernando
+decides whether and how the About narrative should name him; H5, T3, and T4
+retain their separate factual or operating gates.
 
 The website routes named in the deck show the **current** copy; they do not show
 an unpublished alternate version. Do not approve H5 until GOV-003 is answered,
@@ -77,9 +85,9 @@ These require no external contact before a decision is recorded.
 
 | Task | Open first | Fernando decides or supplies | What to return to Codex |
 | --- | --- | --- | --- |
-| EXP-015 | [Concept brief](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-decision-for-exp-015), [live local comparison](http://localhost:3002/design-system#explore-concepts), or the captures above | Select one Explore navigation concept, or reject all three with a reason. | Selected concept and a short dated rationale. Codex can then canonize and implement EXP-016. |
-| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#proposed-edits) | Approve, revise, or reject each English copy item. Confirm factual predicates such as the independence label, correction call to action, and any monitored response target. | Item-by-item disposition plus corrected facts. Codex can apply only approved wording. |
-| GOV-003 | [Owner confirmation fields](research/project-disclosure-owner-confirmation-v1.md#confirmation-fields) | Supply the seven funding, conflict, sponsorship, political-independence, source-provider, tool-support, and editorial-control facts. | Completed fact sheet and permission to publish or a list of facts to withhold. Codex can make public and reviewer disclosures match. |
+| EXP-015 | [Replacement preparation](evidence/EXP-015/PREPARATION.md) and [image prompts](evidence/EXP-015/PROMPTS.md) | If the requested custom generation should proceed, authorize the OpenAI Image API provider/model and a hard USD cap. Later, approve, revise, or reject the rendered replacement concept. | API authority/cap first; a visual decision only after the replacement exists. Production navigation remains unchanged until then. |
+| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Later: choose A4 naming, H5 after GOV-003, T3 only if a real response posture exists, and T4 when the interim or live correction route is selected. | The four remaining dispositions. The approved subset is already applied; no translation or deployment is implied. |
+| GOV-003 | [Owner confirmation fields](research/project-disclosure-owner-confirmation-v1.md#confirmation-fields) | Fields 1–4 are confirmed. Later: state ordinary paid/formal vendor relationships, confirm whether any third party has exceptional control rights, and authorize publication plus the review cadence. | Fields 5–7. Codex will then generate one disclosure for `/about` and the reviewer packets. |
 | PLT-029 | [Telemetry procedure](PLT-029-program-cost-effort-telemetry-2026-07-23.md) and [current ledger](../data/program-cost-effort-ledger.v1.json) | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |
 
 [GOV-012](research/reviewer-honorarium-decision-brief-v1.md#decision-requested)
@@ -199,8 +207,8 @@ PUL-043, QA-018, and QA-019.
 
 ## Phase 5 — work that starts only after its gate
 
-1. [EXP-015](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-decision-for-exp-015)
-   unlocks EXP-016;
+1. The [EXP-015 replacement](evidence/EXP-015/PREPARATION.md) must be
+   generated, rendered, and owner-approved before it unlocks EXP-016;
    completed fixes, promoted baselines, and the module review then unlock
    EXP-028. **No standalone EXP-016 or EXP-028 packet exists yet; Codex creates
    those bounded work records only after the decisions above.**
