@@ -2,7 +2,7 @@
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
     "plan/MASTER-CHECKLIST.md": "8f6ef1cc5987a97bbdf243a6f5f836b360872c0bdad68207029a2f4293dd501f",
-    "plan/PROGRESS.md": "43379e49fc4847020c21e1d183d83a179a4e6f9a3347c92ca2bfe925e937a8d4",
+    "plan/PROGRESS.md": "a9237c3b064a617314b81773816386ec02a6171b1a471b100d66445012f4f387",
     "plan/MANUAL-CHECKS.md": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",

@@ -68,16 +68,14 @@
     {
       "id": "calendar-bound-observation",
       "label": "Calendar-bound observation",
-      "count": 1,
-      "taskIds": [
-        "PUL-026"
-      ],
-      "nextStep": "After PUL-040 starts a compliant, non-backdated window, retain the locked pipeline outputs for 90 consecutive UTC days before opening labels or evaluating results."
+      "count": 0,
+      "taskIds": [],
+      "nextStep": "No compliant observation is currently running. PUL-026 remains downstream of the authority-gated PUL-040 start and must never be backdated."
     },
     {
       "id": "dependency-blocked-downstream",
       "label": "Downstream work blocked by an earlier gate",
-      "count": 29,
+      "count": 30,
       "taskIds": [
         "ATL-028",
         "BRD-005",
@@ -105,6 +103,7 @@
         "PUL-021",
         "PUL-022",
         "PUL-023",
+        "PUL-026",
         "PUL-028",
         "PUL-029",
         "PUL-030"

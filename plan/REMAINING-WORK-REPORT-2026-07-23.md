@@ -10,9 +10,10 @@ No: the remaining work is not only human review.
 
 Fifteen tasks are direct owner, qualified-human, counsel/privacy, or research
 participant work. Sixteen require production, staging, provider, migration, or
-source-refresh authority. One is blocked by unavailable publisher evidence.
-One is a 90-day calendar-bound observation. The other 29 are downstream tasks
-that cannot honestly start until an earlier gate produces real evidence.
+source-refresh authority. One requires unavailable publisher evidence and
+external archive/source cooperation. No compliant calendar-bound observation
+is currently running. The other 30 are downstream tasks that cannot honestly
+start until an earlier gate produces real evidence.
 
 All currently safe, dependency-valid agent preparation is complete. There is
 no checklist item that an agent can finish now without one of those new inputs
@@ -95,22 +96,23 @@ which the exact earlier publisher evidence is unavailable. Replacing those
 rows or silently checking only the easier subset would invalidate the
 preregistration.
 
-### 4. Calendar-bound observation — 1
+### 4. Calendar-bound observation — 0
 
-ID: PUL-026.
+IDs: none.
 
-The prospective Pulse shadow period must run for 90 consecutive UTC days after
-PUL-040 records a compliant start. The clock has not started. It cannot be
-backdated to a code freeze, a partial run, or the current date.
+No prospective Pulse shadow period is currently running. PUL-026 remains
+downstream of PUL-040, which first requires authority-gated deployment and one
+compliant scheduled cycle. Its eventual 90-day clock cannot be backdated to a
+code freeze, a partial run, or the current date.
 
 ## What must wait
 
-### 5. Downstream work blocked by an earlier gate — 29
+### 5. Downstream work blocked by an earlier gate — 30
 
 IDs: ATL-028, BRD-005, BRD-016, EXP-016, EXP-028, GOV-015, GOV-016,
 GOV-017, GOV-018, GOV-019, GOV-020, GOV-021, GOV-022, GOV-023, GOV-024,
 GOV-025, GOV-026, GOV-027, GOV-028, PLT-025, PUL-018, PUL-019, PUL-020,
-PUL-021, PUL-022, PUL-023, PUL-028, PUL-029, PUL-030.
+PUL-021, PUL-022, PUL-023, PUL-026, PUL-028, PUL-029, PUL-030.
 
 The principal chains are:
 
