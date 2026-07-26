@@ -298,4 +298,11 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
       "364cb122250cc55921dee2050cc33030b9536b8c1f2605891779084e6d8a9b3b",
     baseline: false,
   },
+  {
+    id: "0050_index_release_header_contract",
+    path: "drizzle/authoritative/0050_index_release_header_contract.sql",
+    sha256:
+      "b8eba1a6a10a7b5e74d7ad34244290ea52d26ca36ab775a0dbb13fa051ee7b75",
+    baseline: false,
+  },
 ] as const;

@@ -23,7 +23,8 @@
       "0046_little_mulholland_black",
       "0047_atlas_data_error_reports",
       "0048_entity_name_forms",
-      "0049_curvy_shen"
+      "0049_curvy_shen",
+      "0050_index_release_header_contract"
     ],
     "migrationOwners": {
       "0033_flat_hardball": "PLT-009",
@@ -41,7 +42,8 @@
       "0046_little_mulholland_black": "ATL-020",
       "0047_atlas_data_error_reports": "ATL-024",
       "0048_entity_name_forms": "EXP-029",
-      "0049_curvy_shen": "ATL-027"
+      "0049_curvy_shen": "ATL-027",
+      "0050_index_release_header_contract": "PLT-014"
     },
     "assetManifestSha256": null
   },

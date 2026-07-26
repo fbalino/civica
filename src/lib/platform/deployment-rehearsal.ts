@@ -26,6 +26,7 @@ export const STAGED_MIGRATION_IDS = [
   "0047_atlas_data_error_reports",
   "0048_entity_name_forms",
   "0049_curvy_shen",
+  "0050_index_release_header_contract",
 ] as const;
 
 export type DeploymentScope = "staging" | "production" | "recovery";

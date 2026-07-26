@@ -57,6 +57,7 @@ test("migration compatibility allows old readers but rejects destructive DDL/dat
     "0047_atlas_data_error_reports": "ALTER TABLE correction_log ADD COLUMN entity_type text;",
     "0048_entity_name_forms": "CREATE TABLE entity_name_forms (id text);",
     "0049_curvy_shen": "ALTER TABLE civica_conditions_scores ALTER COLUMN normalized_score SET DATA TYPE double precision;",
+    "0050_index_release_header_contract": "UPDATE ci_index_releases SET input_manifest_sha256 = 'checked';",
   };
   assert.deepEqual(stagedMigrationCompatibilityErrors(source), []);
   assert.ok(stagedMigrationCompatibilityErrors({ ...source, "0038_heavy_slyde": "DROP TABLE production_pipeline_runs;" }).some((error) => /drops a table/.test(error)));

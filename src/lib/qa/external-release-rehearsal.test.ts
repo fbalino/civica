@@ -110,7 +110,7 @@ test("staging binds every post-0032 authoritative migration to its owning task",
     !stagingRecord.candidate.migrationIds.some((id) => id.startsWith("0041_")),
   );
   assert.deepEqual(
-    stagingRecord.candidate.migrationIds.slice(-7),
+    stagingRecord.candidate.migrationIds.slice(-8),
     [
       "0043_pulse_decay_lifecycle",
       "0044_pulse_drift_monitoring",
@@ -119,6 +119,7 @@ test("staging binds every post-0032 authoritative migration to its owning task",
       "0047_atlas_data_error_reports",
       "0048_entity_name_forms",
       "0049_curvy_shen",
+      "0050_index_release_header_contract",
     ],
   );
 });
@@ -126,7 +127,7 @@ test("staging binds every post-0032 authoritative migration to its owning task",
 test("staging rejects an omitted migration or misstated owning task", () => {
   const omitted = clone(stagingRecord) as StagingSmokeRecord;
   omitted.candidate.migrationIds = omitted.candidate.migrationIds.filter(
-    (id) => id !== "0049_curvy_shen",
+    (id) => id !== "0050_index_release_header_contract",
   );
   assert.match(
     stagingSmokeErrors(omitted).join("\n"),
@@ -134,7 +135,8 @@ test("staging rejects an omitted migration or misstated owning task", () => {
   );
 
   const misowned = clone(stagingRecord) as StagingSmokeRecord;
-  misowned.candidate.migrationOwners["0049_curvy_shen"] = "QA-018";
+  misowned.candidate.migrationOwners["0050_index_release_header_contract"] =
+    "QA-018";
   assert.match(
     stagingSmokeErrors(misowned).join("\n"),
     /migration owners must exactly match/,

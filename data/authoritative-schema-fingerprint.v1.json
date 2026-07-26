@@ -1,12 +1,12 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-26T18:18:49.735Z",
+  "generatedAt": "2026-07-26T19:11:34.993Z",
   "authoritativeManifest": {
     "head": {
-      "id": "0049_curvy_shen",
-      "sha256": "364cb122250cc55921dee2050cc33030b9536b8c1f2605891779084e6d8a9b3b"
+      "id": "0050_index_release_header_contract",
+      "sha256": "b8eba1a6a10a7b5e74d7ad34244290ea52d26ca36ab775a0dbb13fa051ee7b75"
     },
-    "sha256": "f7dcb675554aecaa88d17eb19e649bc8eb9549a100131c3b7f7b579c63c85942"
+    "sha256": "ad7102f01f40b69c7f6a31d7055c4e3d2a338f21f0cc34207f5afefb909af3d9"
   },
   "sha256": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b",
   "schema": {

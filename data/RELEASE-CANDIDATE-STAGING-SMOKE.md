@@ -33,7 +33,7 @@ The deployment is accepted only after `vercel env pull --id <deployment-id>`
 proves its exact runtime target is project `ancient-art-58836757`, branch
 `br-bitter-fire-amcx8asi`, endpoint `ep-sparkling-pine-amdbr4ke`, a host
 different from production, and authoritative head
-`0049_curvy_shen`. Abort on any mismatch. Do not persistently edit the
+`0050_index_release_header_contract`. Abort on any mismatch. Do not persistently edit the
 Vercel project environment, invoke a browser-opening SSO command, promote the
 Preview, or open a Neon dashboard.
 
@@ -87,6 +87,7 @@ migration associated with the task currently being reviewed.
 | `0047_atlas_data_error_reports` | ATL-024 |
 | `0048_entity_name_forms` | EXP-029 |
 | `0049_curvy_shen` | ATL-027 |
+| `0050_index_release_header_contract` | PLT-014 |
 
 There is no authoritative `0041` migration. The machine validator compares
 this closed sequence with the authoritative manifest tail, so a newly added,

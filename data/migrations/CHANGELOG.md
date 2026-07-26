@@ -318,6 +318,17 @@ single-precision values are widened as stored; the migration does not invent
 digits already lost before this contract, and any corrected release must be
 regenerated and published under a new immutable release identity.
 
+`0050_index_release_header_contract` repairs the three exact still-staging
+Index release headers seeded by `0036_moaning_toad_men`. It replaces the
+pre-DAT-035 source-input-manifest byte hash with the reconciled checked hash and
+sorts the unchanged five dimension rules into the canonical stored-header
+order. The migration locks the release registry, requires either all three
+untouched staging headers or an empty clean database, refuses a public pointer
+or any published/partially changed header, and changes no score, method,
+release status, publication time, or pointer. Recovery is an isolated
+pre-change backup or a reviewed forward compensation; never rewrite a
+published release identity.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

@@ -363,6 +363,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0050_index_release_header_contract",
+    "drizzle/authoritative/0050_index_release_header_contract.sql",
+    "data",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

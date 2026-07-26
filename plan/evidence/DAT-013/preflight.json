@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T18:33:39.124Z",
+  "generatedAt": "2026-07-26T19:17:27.027Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -1362,6 +1362,27 @@
         "civica_conditions_components": "missing",
         "civica_conditions_normalization_parameters": "missing",
         "civica_conditions_scores": 331
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0050_index_release_header_contract",
+      "artifact": "drizzle/authoritative/0050_index_release_header_contract.sql",
+      "kind": "data",
+      "historyStatus": "journaled",
+      "sha256": "b8eba1a6a10a7b5e74d7ad34244290ea52d26ca36ab775a0dbb13fa051ee7b75",
+      "affectedRelations": [
+        "ci_index_release_pointers",
+        "ci_index_releases"
+      ],
+      "statementCount": 32,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0050_index_release_header_contract-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0050_index_release_header_contract --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_index_release_pointers": "missing",
+        "ci_index_releases": "missing"
       },
       "writesPerformed": 0
     },

@@ -9,6 +9,8 @@ import {
   splitPostgresStatements,
   validateAuthoritativeSchemaFingerprintArtifact,
 } from "./authoritative-migrations";
+import { ciStagedReleaseHeader } from "../ci/release-publication";
+import { resolveCiRelease } from "../ci/release-selection";
 
 test("statement splitter preserves semicolons inside PostgreSQL function bodies", () => {
   const sql = "CREATE FUNCTION f() RETURNS void LANGUAGE plpgsql AS $$ BEGIN PERFORM 1; END; $$; CREATE TABLE x(id int);";
@@ -74,6 +76,33 @@ test("0036 limits its frozen-vintage bypass to the release-id backfill", () => {
     statements.filter((statement) => /DISABLE TRIGGER/.test(statement)).length,
     1,
   );
+});
+
+test("0050 repairs only the three exact unpublished Index headers", () => {
+  const source = readFileSync(
+    "drizzle/authoritative/0050_index_release_header_contract.sql",
+    "utf8",
+  );
+  const currentHeader = ciStagedReleaseHeader(
+    resolveCiRelease("ci-beta-r5-2024-Q4"),
+  );
+
+  assert.match(source, /LOCK TABLE ci_index_releases IN ACCESS EXCLUSIVE MODE/);
+  assert.match(source, /status = 'staging'/);
+  assert.match(source, /published_at IS NULL/);
+  assert.match(source, /Index header repair refuses a release selected by the public pointer/);
+  assert.match(
+    source,
+    /dc74a651c96ec770cd8128cb22c61d663f0b8192f9441ce55ff44f24966602cc/,
+  );
+  assert.ok(source.includes(currentHeader.inputManifestSha256));
+  assert.match(source, /DISABLE TRIGGER plt_014_guard_ci_release_header/);
+  assert.match(source, /ENABLE TRIGGER plt_014_guard_ci_release_header/);
+  assert.match(source, /rule\.value->>'dimension'/);
+  assert.match(source, /repaired_count NOT IN \(0, 3\)/);
+  assert.doesNotMatch(source, /\bDELETE\s+FROM\b/i);
+  assert.doesNotMatch(source, /\bSET\s+status\b/i);
+  assert.doesNotMatch(source, /\bSET\s+published_at\b/i);
 });
 
 test("ordered migration plan applies every later migration exactly once", () => {
