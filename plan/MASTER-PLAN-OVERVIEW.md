@@ -98,7 +98,7 @@ Humans are reserved for work that is genuinely human:
 No decision is needed to begin the plan. Later gates will bring back only these material choices:
 
 - approve the engraving-grade pilot;
-- choose one of three Explore navigation concepts;
+- approve, revise, or reject the large rendered Explore candidate;
 - approve a shortlist/contact terms for independent reviewers;
 - decide a keep/rename outcome after evidence and professional advice;
 - approve the final disposition of Index/Pulse candidates after the declared tests and external review.

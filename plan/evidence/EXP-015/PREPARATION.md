@@ -2,8 +2,8 @@
 
 Date: 2026-07-25
 
-Status: light masters generated and screened; owner review, dark variants, and
-browser concept pending
+Status: light masters owner-approved; matched dark variants generated and
+screened; rendered-candidate owner review pending
 
 ## Owner decision
 
@@ -11,8 +11,11 @@ Fernando Baliño rejected all three EXP-014 directions. The required replacement
 is a substantially larger, more beautiful Explore mega menu with custom images
 created specifically for the menu.
 
-This is a direction decision, not approval of a replacement and not authority
-to change production navigation.
+On 2026-07-25 Fernando approved all eight corrected generated light masters as
+the EXP-015 batch and asked Codex to build the large Explore mega menu. That
+approval authorizes the local rendered candidate and matched dark generation.
+It is not approval of the as-yet-unseen rendered result and is not deployment
+authority.
 
 ## Prepared replacement
 
@@ -42,8 +45,9 @@ because it would compete with the destinations.
 
 Exact prompt specifications are in `PROMPTS.md`. The generated files, hashes,
 screening record, and remaining limitations are in
-`GENERATED-LIGHT-MASTERS.md`. None is owner-approved, published, or represented
-as production art.
+`GENERATED-LIGHT-MASTERS.md` and `GENERATED-DARK-MASTERS.md`. The optimized
+theme pairs are wired into a local rendered candidate, but neither that
+composition nor a production release has received owner approval.
 
 ## Generation correction
 
@@ -53,27 +57,17 @@ that assumption on 2026-07-25. Codex then used the native image-generation tool;
 no project `OPENAI_API_KEY`, provider/model approval, or direct API-spend
 authority was required.
 
-The returned native tool record did not expose a model version, seed, or exact
-provider/account terms. Those fields remain unavailable rather than being
-inferred, and the rights contract therefore blocks production release of these
-files. The full-resolution masters remain in ignored local output; small review
-derivatives are committed under this evidence directory.
-
-The production menu, design contract, illustration manifest, and checked public
-asset inventory remain unchanged.
+The masters' embedded C2PA metadata identifies software agent `gpt-image`
+version `2.0`, claim generator `OpenAI Media Service API`, and
+trained-algorithmic-media origin. This corrects the initial note that no version
+was exposed; it does not establish the exact marketed model release. The seed
+and iterative correction wording remain unavailable rather than inferred.
+Full-resolution masters remain in ignored local output; optimized candidates
+and review derivatives carry checked hashes.
 
 ## Remaining acceptance sequence
 
-1. Fernando reviews the eight light masters and approves, revises, or rejects
-   each image or the batch.
-2. Generate matched dark variants only from accepted light masters.
-3. Record all exposed tool/version/account terms, prompts, parameters, human
-   direction, exact hashes/dimensions, and all five rights-screening
-   dispositions required by `data/EDITORIAL-ILLUSTRATION-RIGHTS.md`.
-4. Create the non-production replacement on
-   `/design-system#explore-concepts`.
-5. Verify keyboard/focus, mobile behavior, theme pairs, overflow, console
-   health, and the asset budget in a real browser.
-6. Ask Fernando to approve, revise, or reject the rendered replacement.
-7. Only after approval, canonize the component/tokens/assets and let EXP-016
-   change production navigation.
+1. Ask Fernando to approve, revise, or reject the exact rendered candidate,
+   using `RENDERED-CANDIDATE.md` and the local browser.
+2. Only after that approval, close EXP-015 and EXP-016, commit the canonical
+   implementation, and treat deployment as a separate authority boundary.

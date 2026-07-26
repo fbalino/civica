@@ -137,7 +137,8 @@ The replacement brief is:
 - a new non-production browser concept for owner review before `DESIGN.md` or
   the production navigation changes.
 
-Preparation, the generated light masters, and their first-pass screen are
-recorded under `plan/evidence/EXP-015/`. EXP-015 remains open until the light
-images are owner-approved, matched dark variants and the replacement menu are
-generated, and the final component is reviewed and canonized.
+Preparation and exact asset records are under `plan/evidence/EXP-015/`.
+Fernando approved the corrected light-master batch on 2026-07-25; matched dark
+variants and the replacement candidate now exist. EXP-015 remains open until
+Fernando reviews the exact desktop/mobile and light/dark rendering and the
+result is truthfully canonized.

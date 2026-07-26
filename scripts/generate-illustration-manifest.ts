@@ -46,6 +46,38 @@ const SHARED_SUBJECTS: Record<string, { subject: string; routes: string[] }> = {
     subject: "Archival source folios and research instruments used as a Governance Evidence editorial motif",
     routes: ["/"],
   },
+  "explore-countries": {
+    subject: "Open civic atlas index, compass divider, and laurel editorial motif",
+    routes: ["/country", "explore-navigation"],
+  },
+  "explore-world-atlas": {
+    subject: "Terrestrial globe and meridian-stand editorial motif",
+    routes: ["/atlas", "explore-navigation"],
+  },
+  "explore-compare": {
+    subject: "Paired institutional specimen cards and surveyor's divider editorial motif",
+    routes: ["/compare", "explore-navigation"],
+  },
+  "explore-constitutions": {
+    subject: "Bound civic charter, classical column, and unmarked seal editorial motif",
+    routes: ["/constitution", "explore-navigation"],
+  },
+  "explore-parties": {
+    subject: "Semicircular assembly and neutral coalition-table editorial motif",
+    routes: ["/parties", "explore-navigation"],
+  },
+  "explore-elections": {
+    subject: "Civic ballot box, unmarked ballot, and abstract tally-sheet editorial motif",
+    routes: ["/elections", "explore-navigation"],
+  },
+  "explore-rankings": {
+    subject: "Surveyor's balance and neutral ordered-marker editorial motif",
+    routes: ["/rankings", "explore-navigation"],
+  },
+  "explore-organizations": {
+    subject: "Interlocking geographic rings and neutral globe-grid editorial motif",
+    routes: ["/organizations", "explore-navigation"],
+  },
   "spot-laurel": { subject: "Laurel editorial motif", routes: ["explore-navigation"] },
   "spot-mountains": { subject: "Mountain landscape editorial motif", routes: ["explore-navigation"] },
   "spot-ship": { subject: "Historical ship editorial motif", routes: ["explore-navigation"] },

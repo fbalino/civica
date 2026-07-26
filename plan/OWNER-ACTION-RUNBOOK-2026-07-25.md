@@ -16,7 +16,7 @@ desktop session, Civica is running at `http://localhost:3002`; port 3000 is a
 different project. If Civica restarts on another port, keep the path after the
 port.
 
-### EXP-015 — review the generated Explore light masters
+### EXP-015 — review the rendered large Explore candidate
 
 Fernando rejected all three original concepts on 2026-07-25 because the menu
 was too small and the directions did not provide the custom image-led
@@ -25,14 +25,23 @@ the [concept study](EXP-014-explore-navigation-concepts-2026-07-18.md#owner-deci
 the [replacement preparation record](evidence/EXP-015/PREPARATION.md), and the
 [eight-image prompt specification](evidence/EXP-015/PROMPTS.md).
 
-The eight native light masters are now generated. Review every image through
-the linked table in the
-[light-master generation record](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md).
-They are also displayed in the Codex task where Fernando requested generation.
+Fernando approved the complete corrected light-master batch on 2026-07-25.
+Codex generated matching dark masters and built the near-page-width candidate.
+The exact source hashes and limitations are in the
+[light-master record](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md) and
+[dark-master record](evidence/EXP-015/GENERATED-DARK-MASTERS.md). The four
+dated captures and verification boundary are in the
+[rendered-candidate record](evidence/EXP-015/RENDERED-CANDIDATE.md).
 
-The old comparison remains available as historical evidence at
-[the local design-system comparison](http://localhost:3002/design-system#explore-concepts)
-and in these committed captures:
+To review the actual candidate, open the [local home page](http://localhost:3002/)
+and activate `Explore` in the desktop header. Switch light/dark mode in the
+header. For the mobile treatment, narrow the browser and open the hamburger
+menu; the same eight destination identities appear in one reading order. The
+always-open canonical component is also shown on the
+[local design-system page](http://localhost:3002/design-system#explore-concepts).
+
+The rejected alternatives remain only as historical evidence in these
+committed captures:
 
 | Concept | Desktop | Small mobile |
 | --- | --- | --- |
@@ -40,12 +49,10 @@ and in these committed captures:
 | **The civic cabinet** | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-emblem-led-compact-menu-small-mobile-dark.png) |
 | **The reading room** | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-desktop-dark.png) | [Light](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-light.png) · [Dark](evidence/EXP-014/mockups/2026-07-18-editorial-mega-menu-small-mobile-dark.png) |
 
-No further selection among the old three is required. The earlier claim that
-the new image batch needed an API key and direct paid-API authority was
-incorrect; Fernando corrected it, and Codex used native image generation. The
-next decision is to approve, revise, or reject the generated light images.
-Accepted images then receive matched dark variants before the large
-non-production mega-menu concept is built.
+No further selection among the old three or the approved light masters is
+required. The current decision is to approve, revise, or reject the exact
+rendered candidate after reviewing desktop/mobile and light/dark states.
+Approval closes the visual gate but does not authorize deployment.
 
 ### EXP-038 — review the prepared English copy
 
@@ -90,7 +97,7 @@ These require no external contact before a decision is recorded.
 
 | Task | Open first | Fernando decides or supplies | What to return to Codex |
 | --- | --- | --- | --- |
-| EXP-015 | [Generated light masters](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md), [replacement preparation](evidence/EXP-015/PREPARATION.md), and [image prompts](evidence/EXP-015/PROMPTS.md) | Approve, revise, or reject each light image or the batch. Later, review the rendered large mega-menu concept. | Light-image dispositions first. Codex then generates matched dark variants and builds the non-production concept. Production navigation remains unchanged until that later approval. |
+| EXP-015 | [Local rendered candidate](http://localhost:3002/), [design-system rendering](http://localhost:3002/design-system#explore-concepts), [dated captures and verification](evidence/EXP-015/RENDERED-CANDIDATE.md), [approved light masters](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md), [dark masters](evidence/EXP-015/GENERATED-DARK-MASTERS.md), and [replacement preparation](evidence/EXP-015/PREPARATION.md) | Approve, revise, or reject the exact desktop/mobile and light/dark rendered result. | One rendered-candidate disposition and any specific revisions. Approval is not deployment authority. |
 | EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Later: choose A4 naming, H5 after GOV-003, T3 only if a real response posture exists, and T4 when the interim or live correction route is selected. | The four remaining dispositions. The approved subset is already applied; no translation or deployment is implied. |
 | GOV-003 | [Owner confirmation fields](research/project-disclosure-owner-confirmation-v1.md#confirmation-fields) | Fields 1–4 are confirmed. Later: state ordinary paid/formal vendor relationships, confirm whether any third party has exceptional control rights, and authorize publication plus the review cadence. | Fields 5–7. Codex will then generate one disclosure for `/about` and the reviewer packets. |
 | PLT-029 | [Telemetry procedure](PLT-029-program-cost-effort-telemetry-2026-07-23.md) and [current ledger](../data/program-cost-effort-ledger.v1.json) | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |

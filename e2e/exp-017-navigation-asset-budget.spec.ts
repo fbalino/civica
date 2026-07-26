@@ -4,13 +4,13 @@ import type { Response } from "@playwright/test";
 import { EXPLORE_NAV_GROUPS } from "../src/components/exploreNavItems";
 import { expect, test } from "./harness/fixtures";
 
-const NAVIGATION_ART_PREFIX = "/engravings/navigation/spot-";
-const MAX_OPEN_MENU_ART_BYTES = 20_000;
+const NAVIGATION_ART_PREFIX = "/engravings/navigation/explore-";
+const MAX_OPEN_MENU_ART_BYTES = 96_000;
 
 const NAVIGATION_ART_NAMES = Array.from(
   new Set(
     EXPLORE_NAV_GROUPS.flatMap((group) =>
-      group.items.map((item) => item.engraving),
+      group.items.map((item) => item.art),
     ),
   ),
 ).sort();
@@ -28,8 +28,8 @@ function navigationArtPaths(responses: readonly Response[]): string[] {
 
 function expectedNavigationArtPaths(theme: "light" | "dark"): string[] {
   return NAVIGATION_ART_NAMES.map(
-    (engraving) =>
-      `${NAVIGATION_ART_PREFIX}${engraving}${theme === "dark" ? "-dark" : ""}.webp`,
+    (art) =>
+      `${NAVIGATION_ART_PREFIX}${art}${theme === "dark" ? "-dark" : ""}.webp`,
   );
 }
 
@@ -40,7 +40,7 @@ async function openExploreMenu(page: import("@playwright/test").Page) {
 }
 
 test.describe("EXP-017 — navigation and hero asset budget", () => {
-  test("closed desktop Explore menu defers its art, then loads only compact light assets", async ({
+  test("closed desktop Explore menu defers its art, then loads only the light destination batch", async ({
     page,
   }) => {
     const responses: Response[] = [];
@@ -107,7 +107,7 @@ test.describe("EXP-017 — navigation and hero asset budget", () => {
     expect(heroPaths).not.toContain("/engravings/hero.webp");
   });
 
-  test("closed mobile menu defers its compact navigation art", async ({ page }) => {
+  test("closed mobile menu defers its destination artwork", async ({ page }) => {
     const responses: Response[] = [];
     page.on("response", (response) => responses.push(response));
 

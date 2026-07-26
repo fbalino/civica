@@ -14,7 +14,6 @@ import { SegmentedControlDemo } from "./SegmentedControlDemo";
 import { IndicatorTrendChartDemo } from "./IndicatorTrendChartDemo";
 import { IdeologyCompassDemo } from "./IdeologyCompassDemo";
 import { ExploreMenuDemo } from "./ExploreMenuDemo";
-import { ExploreConceptDemos } from "./ExploreConceptDemos";
 import { CountryDirectory } from "@/components/country/CountryDirectory";
 import { MobileNav } from "@/components/MobileNav";
 import { SearchField } from "@/components/editorial/SearchField";
@@ -985,30 +984,13 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp ds-comp--wide">
-              <h4 id="explore-concepts">Explore navigation concept study</h4>
+              <h4 id="explore-concepts">Explore megamenu</h4>
               <p className="ds-component-note">
-                Three non-production directions for the owner decision. Each
-                uses the shared eight-destination identity and renders as real
-                keyboard-focusable links.
-              </p>
-              <ExploreConceptDemos />
-            </div>
-
-            <div className="ds-comp ds-comp--wide">
-              <h4>Explore megamenu (real .explore-menu)</h4>
-              <p
-                style={{
-                  margin: "0 0 var(--space-4)",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-13)",
-                  color: "var(--color-text-muted)",
-                  maxWidth: "48ch",
-                }}
-              >
-                The header&rsquo;s &ldquo;Explore&rdquo; panel, shown open.
-                Ivory paper, a terracotta hairline top rule, and destination
-                rows that pair a spot engraving with a serif name and a one-line
-                description. Rows warm on hover and keyboard focus.
+                The current near-page-width EXP-015 candidate: two explicit
+                registers and eight destination-specific editorial
+                illustrations. The artwork is decorative; each serif
+                destination name and description carries the accessible
+                identity.
               </p>
               <ExploreMenuDemo />
             </div>

@@ -13,9 +13,10 @@ open for professional review and owner disposition.
 - Bound `civica-editorial-illustration-manifest/v1` to the operator policy,
   public disclosure, conservative reuse posture, Git/frozen-release retention,
   and superseding-record/tombstone rule.
-- Kept the historical limitation explicit: 548 of 550 current manifest assets
-  have irrecoverable original generation-session fields; nothing was inferred
-  or backfilled.
+- Kept the historical limitation explicit: 550 of 568 current manifest assets
+  have incomplete origin records (548 irrecoverable generation sessions and
+  two historical partial-composition sessions); 18 assets have complete
+  forward records. Nothing was inferred or backfilled.
 - Linked accuracy/rights complaints and urgent containment to the BRD-015
   evidence-preserving complaint workflow.
 - Added a build gate that rejects policy, manifest, count, future-record,

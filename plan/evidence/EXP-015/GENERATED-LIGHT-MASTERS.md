@@ -2,17 +2,18 @@
 
 Date: 2026-07-25
 
-Status: generated and first-pass screened; not owner-approved and not production
+Status: generated, screened, and owner-approved as a batch; rendered result and
+production release not approved
 
 ## Generation record
 
 Codex ran the eight prepared prompts through the native image-generation tool.
 No project API key or direct paid-API call was used. The tool returned
-1254×1254 PNG masters. Its returned record did not expose a model version,
-seed, or the exact provider/account terms applicable to the generation, so
-none is inferred here. Under `data/EDITORIAL-ILLUSTRATION-RIGHTS.md`, that
-missing release metadata blocks these files from production even if their
-visual direction is approved.
+1254×1254 PNG masters. Embedded C2PA metadata identifies software agent
+`gpt-image` version `2.0`, claim generator `OpenAI Media Service API`, and
+trained-algorithmic-media origin. It does not identify the exact marketed model
+release; the seed and iterative correction wording remain unexposed and are not
+inferred.
 
 Full-resolution masters are retained locally under the ignored directory
 `output/imagegen/exp015-light/`. The committed files below are 384×384 WebP
@@ -40,14 +41,19 @@ All eight images remained distinguishable in the 4×2 contact sheet at a
 - Elections no longer contains a seal-like medallion.
 
 The corrected batch contains no intended text, labels, scores, logos, flags,
-party marks, or identifiable people. This is an internal visual screen, not an
-owner approval, independent art review, rights clearance, or browser acceptance
-of the future menu.
+party marks, or identifiable people. This was an internal visual screen, not an
+independent art review, rights clearance, or browser acceptance of the future
+menu.
+
+## Owner decision
+
+On 2026-07-25 Fernando approved the complete corrected eight-image batch as the
+EXP-015 generated light masters. The approval is bound to the exact PNG and
+review WebP hashes above. It does not approve later dark outputs, the rendered
+menu composition, deployment, or any changed file.
 
 ## Still required
 
-- owner approve/revise/reject decision for each light master or the batch;
-- matched dark variants generated only from accepted light masters;
-- complete forward rights/provenance dispositions;
-- the non-production large mega-menu implementation and real-browser review;
-- design-system canonization and production authority.
+- final owner approval, revision, or rejection of the exact rendered candidate;
+- checklist closure and commit only after that decision;
+- separate deployment authority.

@@ -2,7 +2,7 @@
 
 Date: 2026-07-25
 
-Status: light-master prompts executed; dark-variant prompts not executed
+Status: light-master and matched-dark prompts executed
 
 Tool used: Codex native image generation through Civica's installed `imagegen`
 workflow. No project API key or direct paid-API call was used.
@@ -92,7 +92,9 @@ organization logo, emblem, building, or flag arrangement.
 
 ## Matched dark variants
 
-Generate each dark variant only from an owner-accepted light master:
+After Fernando approved the corrected eight-master light batch on 2026-07-25,
+Codex used each accepted master as the sole visual input and applied this
+matched-dark instruction:
 
 > Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve
 > the object, composition, crop, proportions, negative space, and every
@@ -103,7 +105,7 @@ Generate each dark variant only from an owner-accepted light master:
 
 ## Planned names
 
-Light masters use, and dark variants will use, the stable slugs `countries`,
-`world-atlas`, `compare`, `constitutions`, `parties`, `elections`, `rankings`,
-and `organizations`. Final public filenames and manifest rows will be created
-only after owner selection, dark-pair generation, and rights screening.
+Light and dark masters use the stable slugs `countries`, `world-atlas`,
+`compare`, `constitutions`, `parties`, `elections`, `rankings`, and
+`organizations`. Optimized candidate filenames use the
+`public/engravings/navigation/explore-{slug}{-dark}.webp` contract.

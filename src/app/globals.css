@@ -1096,154 +1096,292 @@ a {
 }
 
 /* ============================================================
-   Explore megamenu — "The Reading Room"
-   A wide two-column browse panel dropped from the "Explore" nav
-   trigger. Extends the .nav-dropdown-menu interaction model
-   (CSS :hover / :focus-within) with an ivory paper surface, a
-   hairline top rule carrying a terracotta hint, a soft
-   navy-tinted shadow, and destination rows pairing a spot
-   engraving with a serif name + Inter description. Token-only.
+   Explore megamenu — EXP-015 image-led atlas candidate
+   Near-page-width disclosure with two explicit 2 × 2 registers.
+   Every destination carries its own editorial motif;
+   text remains the accessible identity. Token-only.
    ============================================================ */
 
+/* Let the large panel resolve against the sticky header instead of the
+   narrow trigger box while it remains a descendant for hover/focus. */
+.nav-dropdown--explore {
+  position: static;
+}
+
 .explore-menu {
-  /* Two generous columns. On a base .nav-dropdown-menu the panel is
-     centred under the trigger via translateX(-50%); clamp keeps it
-     inside the viewport on narrow laptops. */
-  grid-template-columns: repeat(2, minmax(15rem, 1fr));
-  gap: var(--space-6);
-  width: min(40rem, calc(100vw - var(--space-7)));
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  width: min(
+    var(--width-page-standard),
+    calc(100vw - var(--space-7) - var(--space-7))
+  );
+  max-height: calc(100svh - var(--header-height) - var(--space-5));
   padding: var(--space-6);
-  border-radius: var(--radius-lg);
+  overflow-y: auto;
+  border-top: calc(var(--border-hairline) + var(--border-hairline)) solid
+    var(--color-accent);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-hard-lg);
-  /* Hairline top rule with a terracotta hint — the fine-press signal. */
-  border-top: 2px solid var(--color-accent);
 }
 
-.explore-col {
+.explore-menu__header {
   display: grid;
-  gap: var(--space-1);
-  align-content: start;
+  grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+  gap: var(--space-7);
+  align-items: end;
+  padding-bottom: var(--space-5);
+  border-bottom: var(--border-hairline) solid var(--color-border-default);
 }
 
-.explore-col-label {
-  margin: 0 0 var(--space-2) var(--space-3);
+.explore-menu__eyebrow,
+.explore-register__label {
   font-family: var(--font-body);
   font-size: var(--text-12);
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-snug);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  color: var(--color-text-40);
+}
+
+.explore-menu__eyebrow {
+  margin: 0 0 var(--space-3);
+  color: var(--color-accent);
+}
+
+.explore-menu__header h2 {
+  max-width: 18ch;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-32);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.explore-menu__dek {
+  max-width: 44ch;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.explore-menu__registers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.explore-register {
+  min-width: 0;
+}
+
+.explore-register__label {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.explore-register__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
 }
 
 .explore-item {
+  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  transition:
-    background var(--motion-fast) var(--motion-ease-out),
-    border-color var(--motion-fast) var(--motion-ease-out);
-}
-
-.explore-item__engraving {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  flex: 0 0 auto;
-  border-radius: var(--radius-md);
-  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
-  border: 1px solid var(--color-card-border);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
   overflow: hidden;
+  border: var(--border-hairline) solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  box-shadow: var(--shadow-hard-sm);
+  transition:
+    background var(--motion-base) var(--motion-ease-out),
+    border-color var(--motion-base) var(--motion-ease-out),
+    box-shadow var(--motion-base) var(--motion-ease-out),
+    transform var(--motion-base) var(--motion-ease-out);
 }
 
-.explore-item__engraving :is(img, .civica-themed-image) {
+.explore-item::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--border-hairline);
+  background: var(--color-accent);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--motion-slow) var(--motion-ease-out);
+}
+
+.explore-item__art {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: var(--border-hairline) solid var(--color-card-border);
+  background: color-mix(
+    in oklab,
+    var(--color-accent) 4%,
+    var(--color-surface-secondary)
+  );
+}
+
+.explore-item__art-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform var(--motion-base) var(--motion-ease-out);
+  background-size: contain;
+  transform: scale(0.94);
+  transition: transform var(--motion-slow) var(--motion-ease-out);
 }
 
 .explore-item__body {
   display: grid;
-  gap: 1px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-4);
+}
+
+.explore-item__copy {
+  display: grid;
+  gap: var(--space-1);
   min-width: 0;
 }
 
 .explore-item__name {
   font-family: var(--font-heading);
-  font-size: var(--text-16);
-  font-weight: 500;
-  line-height: 1.25;
+  font-size: var(--text-20);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
   letter-spacing: var(--tracking-snug);
   color: var(--color-text-primary);
 }
 
 .explore-item__desc {
   font-family: var(--font-body);
-  font-size: var(--text-13);
-  line-height: 1.35;
-  color: var(--color-text-40);
+  font-size: var(--text-12);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
 }
 
-/* Restrained hover: the row warms and its accent hairline appears; the
-   engraving nudges up a hair. Focus mirrors hover for keyboard readers. */
+.explore-item__arrow {
+  width: var(--space-5);
+  height: var(--space-5);
+  color: var(--color-text-muted);
+  stroke-width: 1.5;
+  transition:
+    color var(--motion-base) var(--motion-ease-out),
+    transform var(--motion-base) var(--motion-ease-out);
+}
+
 .explore-item:hover,
-.explore-item:focus-visible {
-  background: color-mix(in oklab, var(--color-accent) 6%, var(--color-card-bg));
-  border-color: color-mix(
-    in oklab,
-    var(--color-accent) 28%,
-    var(--color-card-border)
-  );
-  outline: none;
-}
-
-.explore-item:hover .explore-item__engraving :is(img, .civica-themed-image),
-.explore-item:focus-visible .explore-item__engraving :is(img, .civica-themed-image) {
-  transform: translateY(-2px) scale(1.03);
-}
-
+.explore-item:focus-visible,
 .explore-item--active {
   border-color: color-mix(
     in oklab,
-    var(--color-accent) 28%,
+    var(--color-accent) 40%,
     var(--color-card-border)
   );
+  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
+  box-shadow: var(--shadow-hard-md);
+  transform: translateY(calc(var(--space-1) * -1));
+  outline: none;
 }
 
+.explore-item:hover::after,
+.explore-item:focus-visible::after,
+.explore-item--active::after {
+  transform: scaleX(1);
+}
+
+.explore-item:hover .explore-item__art-image,
+.explore-item:focus-visible .explore-item__art-image,
+.explore-item--active .explore-item__art-image {
+  transform: scale(1);
+}
+
+.explore-item:hover .explore-item__arrow,
+.explore-item:focus-visible .explore-item__arrow,
+.explore-item--active .explore-item__arrow,
 .explore-item--active .explore-item__name {
   color: var(--color-accent);
 }
 
+.explore-item:hover .explore-item__arrow,
+.explore-item:focus-visible .explore-item__arrow {
+  transform: translate(var(--space-1), calc(var(--space-1) * -1));
+}
+
+@media (max-width: 960px) {
+  .explore-menu {
+    width: calc(100vw - var(--space-5) - var(--space-5));
+    padding: var(--space-5);
+  }
+
+  .explore-menu__header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .explore-menu__header h2 {
+    max-width: none;
+    font-size: var(--text-28);
+  }
+
+  .explore-menu__registers {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .explore-item {
+    grid-template-columns: calc(var(--space-9) + var(--space-8)) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .explore-item__art {
+    aspect-ratio: 1;
+    border-right: var(--border-hairline) solid var(--color-card-border);
+    border-bottom: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .explore-item__engraving :is(img, .civica-themed-image) {
+  .explore-item,
+  .explore-item::after,
+  .explore-item__art-image,
+  .explore-item__arrow {
     transition: none;
   }
-  .explore-item:hover .explore-item__engraving :is(img, .civica-themed-image),
-  .explore-item:focus-visible .explore-item__engraving :is(img, .civica-themed-image) {
+
+  .explore-item:hover,
+  .explore-item:focus-visible,
+  .explore-item--active,
+  .explore-item:hover .explore-item__art-image,
+  .explore-item:focus-visible .explore-item__art-image,
+  .explore-item--active .explore-item__art-image,
+  .explore-item:hover .explore-item__arrow,
+  .explore-item:focus-visible .explore-item__arrow {
     transform: none;
   }
 }
 
-/* Below the wide breakpoint the megamenu could clip; the mobile nav
-   (hamburger) owns browse there, and the desktop nav row is hidden by
-   the `hidden md:flex` wrapper anyway. No extra handling needed. */
-
-/* Static, always-open rendering for the /design-system showcase — unpins the
-   panel from the absolute dropdown slot and forces it visible. */
+/* Static, always-open rendering for the /design-system showcase. */
 .explore-menu--static {
   position: static;
-  transform: none;
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  overflow: visible;
   opacity: 1;
   pointer-events: auto;
-  max-width: 100%;
+  transform: none;
 }
 
 /* ============================================================
@@ -4195,7 +4333,9 @@ a {
 }
 .mobile-menu__explore-link {
   display: grid;
-  grid-template-columns: var(--space-9) minmax(0, 1fr) auto;
+  grid-template-columns:
+    calc(var(--space-9) + var(--space-5))
+    minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-4);
   min-height: var(--space-9);
@@ -4218,19 +4358,26 @@ a {
 }
 .mobile-menu__spot {
   position: relative;
-  width: var(--space-9);
-  height: var(--space-9);
+  width: calc(var(--space-9) + var(--space-5));
+  height: calc(var(--space-9) + var(--space-5));
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border: var(--border-hairline) solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(
+    in oklab,
+    var(--color-accent) 4%,
+    var(--color-surface-secondary)
+  );
 }
 .mobile-menu__spot :is(img, .civica-themed-image) {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-size: contain;
+  transform: scale(0.94);
   transition: transform var(--motion-slow) var(--motion-ease-out);
 }
 .mobile-menu__explore-link:hover .mobile-menu__spot :is(img, .civica-themed-image) {
-  transform: scale(1.06) translateX(var(--space-1));
+  transform: scale(1);
 }
 .mobile-menu__explore-copy {
   min-width: 0;
@@ -4462,11 +4609,9 @@ a {
     grid-template-columns: 1fr;
   }
   .mobile-menu__explore-link {
-    grid-template-columns: var(--space-8) minmax(0, 1fr) auto;
-  }
-  .mobile-menu__spot {
-    width: var(--space-8);
-    height: var(--space-8);
+    grid-template-columns:
+      calc(var(--space-9) + var(--space-5))
+      minmax(0, 1fr) auto;
   }
 }
 @media (prefers-reduced-motion: reduce) {

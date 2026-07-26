@@ -7,8 +7,8 @@ import { usePathname } from "next/navigation";
 import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
 import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 import { EXPLORE_NAV_GROUPS } from "@/components/exploreNavItems";
+import { ExploreMenuPanel } from "@/components/ExploreMenuPanel";
 import { EDITORIAL_NAV_ITEMS } from "@/components/editorialNavItems";
-import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import {
   isExploreGroupActive,
   isGovernanceEvidenceGroupActive,
@@ -20,27 +20,6 @@ import {
 const EXPLORE_HREFS = EXPLORE_NAV_GROUPS.flatMap((g) =>
   g.items.map((i) => i.href),
 );
-
-/** Menu art is mounted only after the disclosure opens, then resolves exactly
- * one active-theme asset instead of transferring a hidden counterpart. */
-function ExploreEngraving({
-  engraving,
-  shouldLoad,
-}: {
-  engraving: string;
-  shouldLoad: boolean;
-}) {
-  return (
-    <span className="explore-item__engraving" aria-hidden="true">
-      {shouldLoad ? (
-        <ThemedDecorativeImage
-          src={`/engravings/navigation/spot-${engraving}.webp`}
-          darkSrc={`/engravings/navigation/spot-${engraving}-dark.webp`}
-        />
-      ) : null}
-    </span>
-  );
-}
 
 export function NavLinks() {
   const pathname = usePathname();
@@ -67,9 +46,11 @@ export function NavLinks() {
   // gives hover-intent so a diagonal mouse path to the panel doesn't flicker.
   const [exploreOpen, setExploreOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressFocusOpen = useRef(false);
 
   const openExplore = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
+    suppressFocusOpen.current = false;
     setExploreOpen(true);
   };
   const closeExploreSoon = () => {
@@ -88,18 +69,27 @@ export function NavLinks() {
   return (
     <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
       <div
-        className="nav-dropdown"
+        className="nav-dropdown nav-dropdown--explore"
         onMouseEnter={openExplore}
-        onFocus={openExplore}
+        onFocus={(event) => {
+          if (suppressFocusOpen.current) {
+            suppressFocusOpen.current = false;
+            return;
+          }
+          if (event.currentTarget.contains(event.target)) openExplore();
+        }}
         onMouseLeave={closeExploreSoon}
         onBlur={(e) => {
           // Close only when focus leaves the whole dropdown (trigger + panel).
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+            suppressFocusOpen.current = false;
             setExploreOpen(false);
           }
         }}
         onKeyDown={(e) => {
           if (e.key === "Escape" && exploreOpen) {
+            e.preventDefault();
+            suppressFocusOpen.current = true;
             setExploreOpen(false);
             (e.currentTarget.querySelector(
               ".nav-dropdown-trigger",
@@ -112,8 +102,8 @@ export function NavLinks() {
           className={`tab-nav nav-dropdown-trigger ${
             exploreActive ? "tab-nav--active" : ""
           }`}
-          aria-haspopup="true"
           aria-expanded={exploreOpen}
+          aria-controls="explore-navigation-panel"
           onClick={openExplore}
         >
           Explore
@@ -128,38 +118,20 @@ export function NavLinks() {
             arrow-key/typeahead traversal we don't implement). Tab moves
             through the links, matching the Index / Methodology dropdowns
             below, which also carry no ARIA menu roles. */}
-        <div
-          className={`nav-dropdown-menu explore-menu ${
-            exploreOpen ? "explore-menu--open" : ""
-          }`}
-          aria-label="Explore Civica Atlas"
-        >
-          {EXPLORE_NAV_GROUPS.map((group) => (
-            <div className="explore-col" key={group.label}>
-              <p className="explore-col-label">{group.label}</p>
-              {group.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`explore-item ${
-                    isActiveHref(item.href) ? "explore-item--active" : ""
-                  }`}
-                >
-                  <ExploreEngraving
-                    engraving={item.engraving}
-                    shouldLoad={exploreOpen}
-                  />
-                  <span className="explore-item__body">
-                    <span className="explore-item__name">{item.label}</span>
-                    <span className="explore-item__desc">
-                      {item.description}
-                    </span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          ))}
-        </div>
+        {exploreOpen ? (
+          <div
+            id="explore-navigation-panel"
+            className="nav-dropdown-menu explore-menu explore-menu--open"
+            aria-label="Explore Civica Atlas"
+          >
+            <ExploreMenuPanel
+              shouldLoadArt
+              groups={EXPLORE_NAV_GROUPS}
+              isActiveHref={isActiveHref}
+              onNavigate={() => setExploreOpen(false)}
+            />
+          </div>
+        ) : null}
       </div>
 
       <div className="nav-dropdown">

@@ -85,7 +85,11 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   pair with reviewer, date, exact hashes, and reason. Approval authorizes only
   a later checked asset replacement; it is not itself a production change or
   a source-evidence claim.
-- Select one of three design-system-compliant Explore navigation concepts before new artwork or final implementation; review `plan/EXP-014-explore-navigation-concepts-2026-07-18.md` and its dated browser mockups first.
+- **EXP-015 · Owner:** review the exact large Explore candidate on the local
+  home header and `/design-system#explore-concepts` in desktop/mobile and
+  light/dark states. The corrected light-master batch is already approved;
+  record approve/revise/reject for the rendered result. Approval is not
+  deployment authority.
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.

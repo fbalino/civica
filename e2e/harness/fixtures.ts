@@ -115,14 +115,17 @@ export async function waitForReactHydration(locator: Locator) {
     .toBe(true);
 }
 
-/** Emulate the given theme. The app reads `prefers-color-scheme` and a
- *  `data-theme` attribute on <html>; set both so the theme is stable
- *  regardless of which the surface consults. */
+/** Emulate and persist the given theme through the same contract as the real
+ * toggle. ThemeProvider reads localStorage and may otherwise overwrite a
+ * test-only `data-theme` stamp after hydration. */
 export async function setTheme(page: Page, theme: Theme): Promise<void> {
   await page.emulateMedia({ colorScheme: theme });
   await page.evaluate((t) => {
+    window.localStorage.setItem("theme", t);
     document.documentElement.dataset.theme = t;
+    window.dispatchEvent(new Event("civica-theme-change"));
   }, theme);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 }
 
 /** Measure horizontal overflow of the root scroller at the current

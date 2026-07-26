@@ -4,11 +4,12 @@
  * (countries/places + politics/data) under one trigger, replacing the old
  * flat Countries / Parties / Atlas / Compare / Constitutions nav links.
  *
- * Shared by the desktop megamenu (`NavLinks`) and the mobile accordion
- * (`MobileNav`) so the two never drift. Each entry pairs with a spot
- * engraving (`public/engravings/navigation/spot-*.webp` + `-dark` variant)
- * chosen to evoke the destination. They are compact 96px derived assets;
- * the shared themed renderer transfers only the active variant.
+ * Shared by the desktop megamenu (`NavLinks`) and the full-screen mobile
+ * menu (`MobileNav`) so the two never drift. Each entry pairs with its own
+ * destination-specific Explore illustration
+ * (`public/engravings/navigation/explore-*.webp` + `-dark` variant). The
+ * shared themed renderer mounts them only while navigation is open and
+ * transfers only the active theme.
  *
  * Every href resolves to a real route under `src/app` (verified against the
  * routing tree). Keep this list in sync with those routes.
@@ -17,8 +18,16 @@ export type ExploreNavItem = {
   href: string;
   label: string;
   description: string;
-  /** Compact navigation-engraving basename: spot-{engraving}{-dark}.webp */
-  engraving: "laurel" | "globe" | "compass" | "column" | "ship" | "mountains";
+  /** Destination-specific basename: explore-{art}{-dark}.webp */
+  art:
+    | "countries"
+    | "world-atlas"
+    | "compare"
+    | "constitutions"
+    | "parties"
+    | "elections"
+    | "rankings"
+    | "organizations";
 };
 
 export type ExploreNavGroup = {
@@ -28,60 +37,60 @@ export type ExploreNavGroup = {
 
 export const EXPLORE_NAV_GROUPS: ExploreNavGroup[] = [
   {
-    label: "Countries & Places",
+    label: "Start with a place",
     items: [
       {
         href: "/country",
         label: "Countries",
         description: "Every country, profiled in full",
-        engraving: "laurel",
+        art: "countries",
       },
       {
         href: "/atlas",
         label: "World Atlas",
         description: "Explore governments on the map",
-        engraving: "globe",
+        art: "world-atlas",
       },
       {
         href: "/compare",
         label: "Compare",
         description: "Two countries, side by side",
-        engraving: "compass",
+        art: "compare",
       },
       {
         href: "/constitution",
         label: "Constitutions",
         description: "Read and compare founding texts",
-        engraving: "column",
+        art: "constitutions",
       },
     ],
   },
   {
-    label: "Politics & Data",
+    label: "Research tools",
     items: [
       {
         href: "/parties",
         label: "Parties",
         description: "Ideology, seats and coalitions",
-        engraving: "ship",
+        art: "parties",
       },
       {
         href: "/elections",
         label: "Elections",
         description: "Audited records, projections and gaps",
-        engraving: "compass",
+        art: "elections",
       },
       {
         href: "/rankings",
         label: "Rankings",
         description: "Every country, ordered by measure",
-        engraving: "mountains",
+        art: "rankings",
       },
       {
         href: "/organizations",
         label: "Organizations",
         description: "Blocs, unions and memberships",
-        engraving: "globe",
+        art: "organizations",
       },
     ],
   },
