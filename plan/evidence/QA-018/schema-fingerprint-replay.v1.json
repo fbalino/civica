@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "civica-qa018-schema-fingerprint-replay/v1",
+  "taskId": "QA-018",
+  "recordedAt": "2026-07-26T15:24:21Z",
+  "repositoryHeadAtDiscovery": "6ff269549df61186967a0b240eff1448964bd10e",
+  "isolation": {
+    "neonProjectId": "ancient-art-58836757",
+    "branchId": "br-bitter-fire-amcx8asi",
+    "branchName": "qa-018-6ff26954-20260726",
+    "parentBranchId": "br-dawn-frog-amrf0h6a",
+    "parentTimestamp": "2026-07-26T14:59:39Z",
+    "endpointId": "ep-sparkling-pine-amdbr4ke",
+    "expiresAt": "2026-07-27T14:59:31Z",
+    "protected": false,
+    "productionBranchExcluded": true,
+    "pooledHostnameSha256": "a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761",
+    "unpooledHostnameSha256": "8fbcb2627e8587e925f648862d419eb8ceeb8c3d463790cf6179260accb4662e",
+    "activeLeaseCountBeforeMigration": 0,
+    "jobsAttachedToBranch": false
+  },
+  "productionShapedUpgrade": {
+    "startingMigrationHead": "0032_sparkling_genesis",
+    "startingLedgerCount": 33,
+    "startingPublicTableCount": 80,
+    "plannedMigrationIds": [
+      "0033_flat_hardball",
+      "0034_superb_the_fallen",
+      "0035_equal_marvex",
+      "0036_moaning_toad_men",
+      "0037_minor_sharon_carter",
+      "0038_heavy_slyde",
+      "0039_living_clea",
+      "0040_closed_young_avengers",
+      "0042_grey_sally_floyd",
+      "0043_pulse_decay_lifecycle",
+      "0044_pulse_drift_monitoring",
+      "0045_pulse_evaluation_workspace_reconciliation",
+      "0046_little_mulholland_black",
+      "0047_atlas_data_error_reports",
+      "0048_entity_name_forms"
+    ],
+    "zeroWritePlanArtifact": "plan/evidence/QA-018/migration-plan.json",
+    "planEntries": 66,
+    "planWritesPerformed": 0,
+    "appliedMigrationCount": 15,
+    "finalLedgerCount": 48,
+    "baselineMode": "adopted",
+    "finalPublicTableCount": 103,
+    "finalFingerprintSha256": "e7ccdd8c30a57fcf3377844aa3fca98a3c4ef8bd0ba2be30c196e8fc54b3bec8",
+    "idempotentRerunPendingCount": 0,
+    "idempotentRerunPassed": true,
+    "liveValidatorPassed": true
+  },
+  "freshFullHistoryReplay": {
+    "databaseName": "qa018_fresh_replay_20260726",
+    "postgresVersion": "17.10 (2947584)",
+    "startingPublicTableCount": 0,
+    "appliedMigrationCount": 48,
+    "finalMigrationHead": "0048_entity_name_forms",
+    "finalLedgerCount": 48,
+    "baselineMode": "executed",
+    "finalPublicTableCount": 103,
+    "finalFingerprintSha256": "e7ccdd8c30a57fcf3377844aa3fca98a3c4ef8bd0ba2be30c196e8fc54b3bec8",
+    "liveValidatorPassed": true
+  },
+  "catalogDiff": {
+    "priorFingerprintSha256": "6c724c61b9292ea5b4a8ebc2d982c708d89035b71c0f510ef521b193411bb00a",
+    "correctedFingerprintSha256": "e7ccdd8c30a57fcf3377844aa3fca98a3c4ef8bd0ba2be30c196e8fc54b3bec8",
+    "addedRelations": [
+      "atlas_entity_change_history",
+      "entity_name_forms"
+    ],
+    "addedColumns": 45,
+    "addedConstraints": 20,
+    "addedIndexes": 9,
+    "addedTriggers": 1,
+    "removedCatalogObjects": 0,
+    "changedConstraints": [
+      "civica_conditions_normalization_parameters.conditions_normalization_parameter_shape_check"
+    ],
+    "conditionsDirectionNotRankedPresent": true,
+    "unexpectedChanges": 0
+  },
+  "preventionGuard": {
+    "artifactVersion": "authoritative-schema-fingerprint/v1",
+    "manifestHead": "0048_entity_name_forms",
+    "manifestHeadSha256": "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0",
+    "manifestSha256": "f52b6d0b70e28a178140b9f2c971ae32de7c6c3c85a73381aae0e463653dfbc2",
+    "focusedTestsPassed": 8,
+    "staticValidatorPassed": true
+  },
+  "outcome": {
+    "status": "pass",
+    "productionWritesPerformed": 0,
+    "productionDeploymentPerformed": false,
+    "qa018Complete": false,
+    "remaining": [
+      "Run every migration-owner live validator.",
+      "Build and deploy the exact committed candidate with the disposable branch bound only to that Preview.",
+      "Complete the remaining QA-018 release, cache, browser, API, protected-error, cron-dry-run, and source-freshness checks.",
+      "Obtain Fernando Baliño's dated owner sign-off after the technical run."
+    ]
+  }
+}

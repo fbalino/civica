@@ -50,6 +50,12 @@ test("migration compatibility allows old readers but rejects destructive DDL/dat
     "0039_living_clea": "CREATE TABLE events (id text);",
     "0040_closed_young_avengers": "CREATE TABLE conditions_components (id text); ALTER TABLE conditions_scores ADD COLUMN calculation_key text;",
     "0042_grey_sally_floyd": "CREATE TABLE conditions_releases (id text); ALTER TABLE conditions_scores ADD COLUMN release_id text;",
+    "0043_pulse_decay_lifecycle": "CREATE TABLE pulse_decay_recomputations (id text);",
+    "0044_pulse_drift_monitoring": "CREATE TABLE pulse_drift_runs (id text);",
+    "0045_pulse_evaluation_workspace_reconciliation": "CREATE TABLE pulse_evaluation_workspace_reconciliations (id text);",
+    "0046_little_mulholland_black": "CREATE TABLE atlas_entity_change_history (id text);",
+    "0047_atlas_data_error_reports": "ALTER TABLE correction_log ADD COLUMN entity_type text;",
+    "0048_entity_name_forms": "CREATE TABLE entity_name_forms (id text);",
   };
   assert.deepEqual(stagedMigrationCompatibilityErrors(source), []);
   assert.ok(stagedMigrationCompatibilityErrors({ ...source, "0038_heavy_slyde": "DROP TABLE production_pipeline_runs;" }).some((error) => /drops a table/.test(error)));

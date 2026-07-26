@@ -1,7 +1,14 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-18T14:01:03.325Z",
-  "sha256": "6c724c61b9292ea5b4a8ebc2d982c708d89035b71c0f510ef521b193411bb00a",
+  "generatedAt": "2026-07-26T15:18:40.090Z",
+  "authoritativeManifest": {
+    "head": {
+      "id": "0048_entity_name_forms",
+      "sha256": "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0"
+    },
+    "sha256": "f52b6d0b70e28a178140b9f2c971ae32de7c6c3c85a73381aae0e463653dfbc2"
+  },
+  "sha256": "e7ccdd8c30a57fcf3377844aa3fca98a3c4ef8bd0ba2be30c196e8fc54b3bec8",
   "schema": {
     "columns": [
       {
@@ -372,6 +379,123 @@
         "default": "true",
         "nullable": "NO",
         "position": 9
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "atlas_entity_change_history",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "entity_type",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "entity_id",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "entity_table",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "operation",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "change_kind",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "jsonb",
+        "name": "changes",
+        "type": "jsonb",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "reason",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "methodology_version",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "release_id",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "uuid",
+        "name": "correction_log_id",
+        "type": "uuid",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "correction_status",
+        "type": "text",
+        "table": "atlas_entity_change_history",
+        "default": null,
+        "nullable": "YES",
+        "position": 12
+      },
+      {
+        "udt": "timestamp",
+        "name": "recorded_at",
+        "type": "timestamp without time zone",
+        "table": "atlas_entity_change_history",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 13
       },
       {
         "udt": "text",
@@ -3461,6 +3585,141 @@
         "position": 14
       },
       {
+        "udt": "text",
+        "name": "entity_type",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "entity_id",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "field_path",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "affected_release_id",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "reported_source_id",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "reported_source_url",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "published_value",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 21
+      },
+      {
+        "udt": "text",
+        "name": "proposed_value",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 22
+      },
+      {
+        "udt": "text",
+        "name": "evidence_url",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 23
+      },
+      {
+        "udt": "text",
+        "name": "notice_version",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 24
+      },
+      {
+        "udt": "timestamp",
+        "name": "notice_accepted_at",
+        "type": "timestamp without time zone",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 25
+      },
+      {
+        "udt": "text",
+        "name": "acknowledgment_code",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 26
+      },
+      {
+        "udt": "timestamp",
+        "name": "acknowledged_at",
+        "type": "timestamp without time zone",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 27
+      },
+      {
+        "udt": "timestamp",
+        "name": "triaged_at",
+        "type": "timestamp without time zone",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 28
+      },
+      {
+        "udt": "text",
+        "name": "reviewer_id",
+        "type": "text",
+        "table": "correction_log",
+        "default": null,
+        "nullable": "YES",
+        "position": 29
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -5232,6 +5491,159 @@
         "default": null,
         "nullable": "YES",
         "position": 13
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "entity_name_forms",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "contract_version",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "entity_type",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "uuid",
+        "name": "entity_id",
+        "type": "uuid",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "value",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "language_tag",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "text",
+        "name": "script_code",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "YES",
+        "position": 7
+      },
+      {
+        "udt": "text",
+        "name": "name_role",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "source_id",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
+        "udt": "text",
+        "name": "source_url",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 10
+      },
+      {
+        "udt": "timestamp",
+        "name": "retrieved_at",
+        "type": "timestamp without time zone",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "upstream_vintage",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "translation_status",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "transliteration_status",
+        "type": "text",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "bool",
+        "name": "is_current",
+        "type": "boolean",
+        "table": "entity_name_forms",
+        "default": "true",
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "timestamp",
+        "name": "superseded_at",
+        "type": "timestamp without time zone",
+        "table": "entity_name_forms",
+        "default": null,
+        "nullable": "YES",
+        "position": 16
+      },
+      {
+        "udt": "timestamp",
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "table": "entity_name_forms",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 17
       },
       {
         "udt": "uuid",
@@ -12733,6 +13145,21 @@
         "definition": "CREATE UNIQUE INDEX advisory_board_members_pkey ON public.advisory_board_members USING btree (id)"
       },
       {
+        "name": "atlas_entity_change_history_pkey",
+        "table": "atlas_entity_change_history",
+        "definition": "CREATE UNIQUE INDEX atlas_entity_change_history_pkey ON public.atlas_entity_change_history USING btree (id)"
+      },
+      {
+        "name": "idx_atlas_entity_change_history_entity",
+        "table": "atlas_entity_change_history",
+        "definition": "CREATE INDEX idx_atlas_entity_change_history_entity ON public.atlas_entity_change_history USING btree (entity_type, entity_id, recorded_at)"
+      },
+      {
+        "name": "idx_atlas_entity_change_history_release",
+        "table": "atlas_entity_change_history",
+        "definition": "CREATE INDEX idx_atlas_entity_change_history_release ON public.atlas_entity_change_history USING btree (release_id)"
+      },
+      {
         "name": "backtest_cases_pkey",
         "table": "backtest_cases",
         "definition": "CREATE UNIQUE INDEX backtest_cases_pkey ON public.backtest_cases USING btree (id)"
@@ -13043,6 +13470,21 @@
         "definition": "CREATE UNIQUE INDEX correction_log_pkey ON public.correction_log USING btree (id)"
       },
       {
+        "name": "idx_correction_log_acknowledgment_code",
+        "table": "correction_log",
+        "definition": "CREATE UNIQUE INDEX idx_correction_log_acknowledgment_code ON public.correction_log USING btree (acknowledgment_code) WHERE (acknowledgment_code IS NOT NULL)"
+      },
+      {
+        "name": "idx_correction_log_entity",
+        "table": "correction_log",
+        "definition": "CREATE INDEX idx_correction_log_entity ON public.correction_log USING btree (entity_type, entity_id)"
+      },
+      {
+        "name": "idx_correction_log_status_submitted",
+        "table": "correction_log",
+        "definition": "CREATE INDEX idx_correction_log_status_submitted ON public.correction_log USING btree (status, submitted_at)"
+      },
+      {
         "name": "country_fact_vintage_candidates_pkey",
         "table": "country_fact_vintage_candidates",
         "definition": "CREATE UNIQUE INDEX country_fact_vintage_candidates_pkey ON public.country_fact_vintage_candidates USING btree (id)"
@@ -13291,6 +13733,21 @@
         "name": "elections_pkey",
         "table": "elections",
         "definition": "CREATE UNIQUE INDEX elections_pkey ON public.elections USING btree (id)"
+      },
+      {
+        "name": "entity_name_forms_current_identity_idx",
+        "table": "entity_name_forms",
+        "definition": "CREATE UNIQUE INDEX entity_name_forms_current_identity_idx ON public.entity_name_forms USING btree (entity_type, entity_id, name_role, language_tag, source_id) WHERE (is_current = true)"
+      },
+      {
+        "name": "entity_name_forms_entity_idx",
+        "table": "entity_name_forms",
+        "definition": "CREATE INDEX entity_name_forms_entity_idx ON public.entity_name_forms USING btree (entity_type, entity_id, is_current)"
+      },
+      {
+        "name": "entity_name_forms_pkey",
+        "table": "entity_name_forms",
+        "definition": "CREATE UNIQUE INDEX entity_name_forms_pkey ON public.entity_name_forms USING btree (id)"
       },
       {
         "name": "error_monitoring_events_pkey",
@@ -15142,6 +15599,11 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON elections FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "entity_name_forms_research_evidence_history",
+        "table": "entity_name_forms",
+        "definition": "CREATE TRIGGER entity_name_forms_research_evidence_history BEFORE DELETE OR UPDATE ON entity_name_forms FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "government_bodies",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON government_bodies FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -15485,6 +15947,11 @@
       },
       {
         "kind": "r",
+        "name": "atlas_entity_change_history",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "backtest_cases",
         "definition": null
       },
@@ -15671,6 +16138,11 @@
       {
         "kind": "r",
         "name": "elections",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "entity_name_forms",
         "definition": null
       },
       {
@@ -16067,6 +16539,36 @@
         "name": "advisory_board_members_pkey",
         "type": "p",
         "table": "advisory_board_members",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "atlas_entity_change_history_correction_check",
+        "type": "c",
+        "table": "atlas_entity_change_history",
+        "definition": "CHECK (correction_log_id IS NULL AND correction_status IS NULL OR correction_log_id IS NOT NULL AND (correction_status = ANY (ARRAY['open'::text, 'in_review'::text, 'resolved_corrected'::text, 'resolved_no_change'::text, 'rejected'::text])))"
+      },
+      {
+        "name": "atlas_entity_change_history_correction_log_id_correction_log_id",
+        "type": "f",
+        "table": "atlas_entity_change_history",
+        "definition": "FOREIGN KEY (correction_log_id) REFERENCES correction_log(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "atlas_entity_change_history_event_check",
+        "type": "c",
+        "table": "atlas_entity_change_history",
+        "definition": "CHECK ((operation = ANY (ARRAY['insert'::text, 'update'::text, 'delete'::text])) AND (change_kind = ANY (ARRAY['routine_refresh'::text, 'substantive_revision'::text, 'correction'::text, 'retraction'::text, 'methodology_change'::text])) AND jsonb_typeof(changes) = 'array'::text AND btrim(reason) <> ''::text AND btrim(methodology_version) <> ''::text AND release_id ~ '^[A-Za-z0-9._-]{1,96}$'::text)"
+      },
+      {
+        "name": "atlas_entity_change_history_identity_check",
+        "type": "c",
+        "table": "atlas_entity_change_history",
+        "definition": "CHECK (btrim(entity_id) <> ''::text AND (entity_type = 'fact'::text AND entity_table = 'country_facts'::text OR entity_type = 'institution'::text AND entity_table = 'government_bodies'::text OR entity_type = 'office'::text AND entity_table = 'offices'::text OR entity_type = 'person'::text AND entity_table = 'persons'::text OR entity_type = 'election'::text AND entity_table = 'elections'::text OR entity_type = 'constitution-passage'::text AND entity_table = 'constitution_passages'::text OR entity_type = 'organization'::text AND entity_table = 'organizations'::text OR entity_type = 'indicator'::text AND entity_table = 'country_metrics'::text))"
+      },
+      {
+        "name": "atlas_entity_change_history_pkey",
+        "type": "p",
+        "table": "atlas_entity_change_history",
         "definition": "PRIMARY KEY (id)"
       },
       {
@@ -16487,7 +16989,7 @@
         "name": "conditions_normalization_parameter_shape_check",
         "type": "c",
         "table": "civica_conditions_normalization_parameters",
-        "definition": "CHECK ((direction = ANY (ARRAY['higher_is_better'::text, 'lower_is_better'::text])) AND btrim(transformation_id) <> ''::text AND (standard_deviation IS NULL OR standard_deviation > 0::double precision) AND (lower_bound IS NULL AND upper_bound IS NULL OR lower_bound < upper_bound))"
+        "definition": "CHECK ((direction = ANY (ARRAY['higher_is_better'::text, 'lower_is_better'::text, 'not_ranked'::text])) AND btrim(transformation_id) <> ''::text AND (standard_deviation IS NULL OR standard_deviation > 0::double precision) AND (lower_bound IS NULL AND upper_bound IS NULL OR lower_bound < upper_bound))"
       },
       {
         "name": "conditions_normalization_reference_set_fk",
@@ -16628,6 +17130,12 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "correction_log_atlas_report_shape",
+        "type": "c",
+        "table": "correction_log",
+        "definition": "CHECK (category <> 'atlas_data_error'::text OR (entity_type = ANY (ARRAY['fact'::text, 'institution'::text, 'office'::text, 'person'::text, 'election'::text, 'constitution-passage'::text, 'organization'::text, 'indicator'::text])) AND length(TRIM(BOTH FROM entity_id)) > 0 AND length(TRIM(BOTH FROM field_path)) > 0 AND length(TRIM(BOTH FROM affected_release_id)) > 0 AND length(TRIM(BOTH FROM reported_source_id)) > 0 AND reported_source_url ~~ 'https://%'::text AND length(TRIM(BOTH FROM published_value)) > 0 AND notice_version = 'civica-data-error-report-notice/2026-07-23'::text AND notice_accepted_at IS NOT NULL AND acknowledgment_code ~ '^CA-[A-F0-9]{12}$'::text AND acknowledged_at IS NOT NULL)"
+      },
+      {
         "name": "correction_log_country_id_jurisdictions_id_fk",
         "type": "f",
         "table": "correction_log",
@@ -16638,6 +17146,24 @@
         "type": "p",
         "table": "correction_log",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "correction_log_resolution_shape",
+        "type": "c",
+        "table": "correction_log",
+        "definition": "CHECK ((status = ANY (ARRAY['open'::text, 'in_review'::text])) AND resolved_at IS NULL OR (status = ANY (ARRAY['resolved_corrected'::text, 'resolved_no_change'::text, 'rejected'::text])) AND resolved_at IS NOT NULL AND length(TRIM(BOTH FROM disposition)) >= 10)"
+      },
+      {
+        "name": "correction_log_status_closed",
+        "type": "c",
+        "table": "correction_log",
+        "definition": "CHECK (status = ANY (ARRAY['open'::text, 'in_review'::text, 'resolved_corrected'::text, 'resolved_no_change'::text, 'rejected'::text]))"
+      },
+      {
+        "name": "correction_log_url_shape",
+        "type": "c",
+        "table": "correction_log",
+        "definition": "CHECK ((reported_source_url IS NULL OR reported_source_url ~~ 'https://%'::text) AND (evidence_url IS NULL OR evidence_url ~~ 'https://%'::text))"
       },
       {
         "name": "country_fact_vintage_candidates_jurisdiction_id_jurisdictions_i",
@@ -16968,6 +17494,72 @@
         "type": "p",
         "table": "elections",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "entity_name_forms_contract_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (contract_version = 'civica-entity-name-form/v1'::text)"
+      },
+      {
+        "name": "entity_name_forms_entity_type_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (entity_type = ANY (ARRAY['jurisdiction'::text, 'person'::text, 'office'::text, 'political_party'::text]))"
+      },
+      {
+        "name": "entity_name_forms_https_source_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (source_url ~ '^https://'::text)"
+      },
+      {
+        "name": "entity_name_forms_language_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (language_tag ~ '^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$'::text)"
+      },
+      {
+        "name": "entity_name_forms_lifecycle_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (is_current = true AND superseded_at IS NULL OR is_current = false AND superseded_at IS NOT NULL)"
+      },
+      {
+        "name": "entity_name_forms_pkey",
+        "type": "p",
+        "table": "entity_name_forms",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "entity_name_forms_role_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (name_role = ANY (ARRAY['english_display'::text, 'source'::text, 'native'::text, 'official'::text, 'transliterated'::text]))"
+      },
+      {
+        "name": "entity_name_forms_script_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (script_code IS NULL OR script_code ~ '^[A-Z][a-z]{3}$'::text)"
+      },
+      {
+        "name": "entity_name_forms_source_id_sources_id_fk",
+        "type": "f",
+        "table": "entity_name_forms",
+        "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "entity_name_forms_translation_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (translation_status = ANY (ARRAY['not_translated'::text, 'publisher_supplied_translation'::text, 'civica_translation'::text, 'unknown'::text]))"
+      },
+      {
+        "name": "entity_name_forms_transliteration_check",
+        "type": "c",
+        "table": "entity_name_forms",
+        "definition": "CHECK (transliteration_status = ANY (ARRAY['not_transliterated'::text, 'publisher_supplied_transliteration'::text, 'civica_transliteration'::text, 'unknown'::text]))"
       },
       {
         "name": "error_monitoring_context_check",

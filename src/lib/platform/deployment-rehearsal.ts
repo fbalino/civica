@@ -19,6 +19,12 @@ export const STAGED_MIGRATION_IDS = [
   "0039_living_clea",
   "0040_closed_young_avengers",
   "0042_grey_sally_floyd",
+  "0043_pulse_decay_lifecycle",
+  "0044_pulse_drift_monitoring",
+  "0045_pulse_evaluation_workspace_reconciliation",
+  "0046_little_mulholland_black",
+  "0047_atlas_data_error_reports",
+  "0048_entity_name_forms",
 ] as const;
 
 export type DeploymentScope = "staging" | "production" | "recovery";

@@ -38,5 +38,12 @@ build.
 5. Run fresh-database and production-shaped upgrade tests, then
    `npm run validate:authoritative-migrations:live`.
 
+The fingerprint artifact records the authoritative manifest head and a stable
+content hash of the complete ordered manifest. Static validation deliberately
+rejects legacy artifacts, a stale manifest binding, an altered serialized
+schema, or an unexpected artifact version. After any manifest change,
+`npm run validate:authoritative-migrations` must fail until the fingerprint is
+regenerated from the reviewed database.
+
 Never edit an applied migration, replay the historical archive, or use
 `drizzle-kit push` against production.

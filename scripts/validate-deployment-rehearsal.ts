@@ -6,6 +6,7 @@ import {
   deploymentRehearsalErrors,
   stagedMigrationCompatibilityErrors,
 } from "../src/lib/platform/deployment-rehearsal";
+import { AUTHORITATIVE_MIGRATIONS } from "../src/lib/db/authoritative-migration-manifest";
 
 const read = (path: string) => readFileSync(path, "utf8");
 const errors = [
@@ -19,6 +20,21 @@ const errors = [
     ) as Record<(typeof STAGED_MIGRATION_IDS)[number], string>,
   ),
 ];
+const productionHeadIndex = AUTHORITATIVE_MIGRATIONS.findIndex(
+  ({ id }) => id === "0032_sparkling_genesis",
+);
+const authoritativeTail = AUTHORITATIVE_MIGRATIONS
+  .slice(productionHeadIndex + 1)
+  .map(({ id }) => id);
+if (productionHeadIndex < 0) {
+  errors.push("configured production migration head is absent from the authoritative manifest");
+} else if (
+  JSON.stringify(STAGED_MIGRATION_IDS) !== JSON.stringify(authoritativeTail)
+) {
+  errors.push(
+    `staged migration scope differs from authoritative tail: ${authoritativeTail.join(", ")}`,
+  );
+}
 
 const packageJson = JSON.parse(read("package.json")) as { scripts: Record<string, string | undefined> };
 if (packageJson.scripts["validate:deployment-rehearsal"] !== "node --import tsx --test src/lib/platform/deployment-rehearsal.test.ts && tsx scripts/validate-deployment-rehearsal.ts") {

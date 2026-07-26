@@ -2,11 +2,27 @@ import { readFileSync, readdirSync } from "node:fs";
 import { config } from "dotenv";
 import { neon } from "@neondatabase/serverless";
 import { AUTHORITATIVE_MIGRATIONS } from "../src/lib/db/authoritative-migration-manifest";
-import { PUBLIC_SCHEMA_FINGERPRINT_SQL, publicSchemaFingerprint, splitPostgresStatements, validateAuthoritativeManifest } from "../src/lib/db/authoritative-migrations";
+import {
+  type AuthoritativeSchemaFingerprintArtifact,
+  PUBLIC_SCHEMA_FINGERPRINT_SQL,
+  publicSchemaFingerprint,
+  splitPostgresStatements,
+  validateAuthoritativeManifest,
+  validateAuthoritativeSchemaFingerprintArtifact,
+} from "../src/lib/db/authoritative-migrations";
 
 config({ path: ".env.local" });
 async function main() {
 const errors = validateAuthoritativeManifest(AUTHORITATIVE_MIGRATIONS);
+const fingerprintArtifact = JSON.parse(
+  readFileSync("data/authoritative-schema-fingerprint.v1.json", "utf8"),
+) as AuthoritativeSchemaFingerprintArtifact;
+errors.push(
+  ...validateAuthoritativeSchemaFingerprintArtifact(
+    fingerprintArtifact,
+    AUTHORITATIVE_MIGRATIONS,
+  ),
+);
 const baseline = AUTHORITATIVE_MIGRATIONS[0];
 const sqlFiles = readdirSync("drizzle/authoritative").filter((name) => name.endsWith(".sql")).sort();
 const journal = JSON.parse(readFileSync("drizzle/authoritative/meta/_journal.json", "utf8")) as { entries: Array<{ tag: string }> };
@@ -33,8 +49,7 @@ if (process.argv.includes("--live")) {
     if (JSON.stringify(applied.map((row) => ({ id: row.id, sha256: row.sha256 }))) !== JSON.stringify(AUTHORITATIVE_MIGRATIONS.map(({ id, sha256 }) => ({ id, sha256 })))) errors.push("live authoritative ledger differs from ordered manifest");
     const rows = await sql.query(PUBLIC_SCHEMA_FINGERPRINT_SQL, []) as unknown as Array<{ schema: unknown }>;
     const actual = publicSchemaFingerprint(rows[0]?.schema);
-    const expected = JSON.parse(readFileSync("data/authoritative-schema-fingerprint.v1.json", "utf8")) as { sha256: string };
-    if (actual !== expected.sha256) errors.push(`live schema fingerprint ${actual} differs from ${expected.sha256}`);
+    if (actual !== fingerprintArtifact.sha256) errors.push(`live schema fingerprint ${actual} differs from ${fingerprintArtifact.sha256}`);
     console.log(`Live ledger: ${applied.length}/${AUTHORITATIVE_MIGRATIONS.length}; baseline mode: ${applied[0]?.mode}; fingerprint: ${actual}`);
   }
 }

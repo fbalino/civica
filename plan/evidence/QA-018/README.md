@@ -1,7 +1,7 @@
 # QA-018 — Release-candidate staging and smoke evidence
 
-Status: agent-executable protocol and evidence contract complete; actual
-staging run pending owner/platform authority.
+Status: authorized disposable-branch migration run in progress; Vercel Preview
+deployment, remaining smoke checks, and owner sign-off are still pending.
 
 `data/RELEASE-CANDIDATE-STAGING-SMOKE.md` defines the exact isolated run and
 `data/release-candidate-staging-smoke.v1.json` is its fail-closed record. Twelve
@@ -17,9 +17,11 @@ internationalization migrations or attribute their live evidence to QA-018.
 The validator also compares this plan to the checked authoritative manifest
 tail and fails if either drifts.
 
-The record is `pending_external_authority`; all run outcomes and provider IDs
-are empty. No Neon branch, Vercel deployment, migration, release publication,
-cron invocation, production access, or owner sign-off is claimed.
+The canonical smoke record remains `pending_external_authority` until an exact
+committed candidate is bound and the remaining checks run. Attempt 04 now
+retains the authorized Neon branch and migration/fingerprint results; it does
+not claim a Vercel deployment, release publication, cron invocation,
+production change, or owner sign-off.
 
 ## Recorded staging attempts
 
@@ -42,6 +44,14 @@ cron invocation, production access, or owner sign-off is claimed.
   [`vercel-cli-isolation-probe.v1.json`](vercel-cli-isolation-probe.v1.json).
   Vercel-managed automated Preview branching must be enabled on the existing
   project/resource connection before another run.
+- [`attempt-04-schema-fingerprint-2026-07-26.md`](attempt-04-schema-fingerprint-2026-07-26.md)
+  records the authorized CLI-created disposable branch, the exact `0032` →
+  `0048` apply, the stale checked-fingerprint defect it exposed, the bounded
+  catalog correction, and matching production-shaped and fresh PostgreSQL 17
+  replays. Its machine record is
+  [`schema-fingerprint-replay.v1.json`](schema-fingerprint-replay.v1.json).
+  Production remained untouched and the remaining Vercel/release/browser/API
+  smoke checks are not yet claimed.
 
 When the authorized run occurs, Vercel tooling may handle bounded deployment
 actions and identity capture, while the operator separately proves the Neon

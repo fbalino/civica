@@ -2,7 +2,11 @@ import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { config } from "dotenv";
 import { neon } from "@neondatabase/serverless";
-import { PUBLIC_SCHEMA_FINGERPRINT_SQL, publicSchemaFingerprint } from "../src/lib/db/authoritative-migrations";
+import { AUTHORITATIVE_MIGRATIONS } from "../src/lib/db/authoritative-migration-manifest";
+import {
+  buildAuthoritativeSchemaFingerprintArtifact,
+  PUBLIC_SCHEMA_FINGERPRINT_SQL,
+} from "../src/lib/db/authoritative-migrations";
 
 config({ path: ".env.local" });
 async function main() {
@@ -17,7 +21,10 @@ if (postgresUrlArg) {
   const rows = await sql.query(PUBLIC_SCHEMA_FINGERPRINT_SQL, []);
   schema = (rows as unknown as Array<{ schema: unknown }>)[0]?.schema;
 }
-const payload = { schemaVersion: "authoritative-schema-fingerprint/v1", generatedAt: new Date().toISOString(), sha256: publicSchemaFingerprint(schema), schema };
+const payload = buildAuthoritativeSchemaFingerprintArtifact(
+  schema,
+  AUTHORITATIVE_MIGRATIONS,
+);
 writeFileSync("data/authoritative-schema-fingerprint.v1.json", `${JSON.stringify(payload, null, 2)}\n`);
 console.log(`Wrote schema fingerprint ${payload.sha256}`);
 }
