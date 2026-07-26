@@ -44,6 +44,31 @@ test("statement splitter keeps the 0036 release-registration comment with its IN
   assert.equal(statements.some((statement) => /^publication remains\b/.test(statement)), false);
 });
 
+test("0036 limits its frozen-vintage bypass to the release-id backfill", () => {
+  const source = readFileSync("drizzle/authoritative/0036_moaning_toad_men.sql", "utf8");
+  const statements = splitPostgresStatements(source);
+  const disableIndex = statements.findIndex((statement) =>
+    /ALTER TABLE ci_composite_scores DISABLE TRIGGER dat_023_immutable_vintage/.test(statement),
+  );
+  const backfillIndex = statements.findIndex((statement) =>
+    /UPDATE ci_composite_scores score\s+SET release_id=release\.id/.test(statement),
+  );
+  const enableIndex = statements.findIndex((statement) =>
+    /ALTER TABLE ci_composite_scores ENABLE TRIGGER dat_023_immutable_vintage/.test(statement),
+  );
+
+  assert.ok(disableIndex >= 0);
+  assert.equal(backfillIndex, disableIndex + 1);
+  assert.equal(enableIndex, backfillIndex + 1);
+  assert.match(statements[backfillIndex], /WHERE score\.release_id IS NULL/);
+  assert.match(statements[backfillIndex], /score\.vintage_label=release\.vintage_label/);
+  assert.doesNotMatch(statements[backfillIndex], /\bSET\s+(?!release_id=)/);
+  assert.equal(
+    statements.filter((statement) => /DISABLE TRIGGER/.test(statement)).length,
+    1,
+  );
+});
+
 test("ordered migration plan applies every later migration exactly once", () => {
   const all = [
     { id: "0000_base", path: "a", sha256: "x", baseline: true },

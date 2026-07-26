@@ -1069,7 +1069,7 @@
       "artifact": "drizzle/authoritative/0036_moaning_toad_men.sql",
       "kind": "mixed",
       "historyStatus": "journaled",
-      "sha256": "0da3dc84b726f52cdd2c0c61f5d734a69fa7c2c37133f9a9b5add695737ddc23",
+      "sha256": "8706eedb27c8d074b934e3941d394ba0bb01cc3d1db3ea40e062f86c8363b20a",
       "affectedRelations": [
         "ci_composite_scores",
         "ci_dimension_scores",
@@ -1083,7 +1083,7 @@
         "pulse_pipeline_runs",
         "pulse_score_publication_pointers"
       ],
-      "statementCount": 216,
+      "statementCount": 218,
       "destructiveStatementCount": 2,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0036_moaning_toad_men-compensation; never reverse production DDL/data implicitly.",
       "invariantPlan": "npm run db:plan -- --id=0036_moaning_toad_men --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",

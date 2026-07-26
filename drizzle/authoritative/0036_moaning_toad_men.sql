@@ -104,6 +104,14 @@ WHERE score.release_id IS NULL
   AND score.methodology_version=release.methodology_version
   AND score.quarter=release.quarter;
 --> statement-breakpoint
+
+-- The pre-0036 frozen-vintage trigger rejects every UPDATE, including this
+-- one-time release-registry linkage. Disable only that trigger while changing
+-- only release_id. ALTER TABLE holds an ACCESS EXCLUSIVE lock until this
+-- migration transaction commits, so no concurrent write can enter the gap;
+-- an error rolls the disable and the backfill back together.
+ALTER TABLE ci_composite_scores DISABLE TRIGGER dat_023_immutable_vintage;
+--> statement-breakpoint
 UPDATE ci_composite_scores score
 SET release_id=release.id
 FROM ci_index_releases release
@@ -111,6 +119,8 @@ WHERE score.release_id IS NULL
   AND score.methodology_version=release.methodology_version
   AND score.quarter=release.quarter
   AND score.vintage_label=release.vintage_label;
+--> statement-breakpoint
+ALTER TABLE ci_composite_scores ENABLE TRIGGER dat_023_immutable_vintage;
 --> statement-breakpoint
 
 -- These helpers reproduce the exact JavaScript recipes used by

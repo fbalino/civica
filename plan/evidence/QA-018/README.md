@@ -27,6 +27,11 @@ cron invocation, production access, or owner sign-off is claimed.
   disposable-branch run. It stopped at migration `0036` after exposing a SQL
   statement-splitting defect, preserved the transactional rollback, deleted
   the partial branch, and made no production or deployment change.
+- [`attempt-02-2026-07-25.md`](attempt-02-2026-07-25.md) records the second
+  disposable-branch run. It stopped at the same migration after exposing a
+  frozen-vintage/backfill guard collision, preserved the transactional
+  rollback, invalidated and deleted the child-only credential, and left
+  production untouched.
 
 When the authorized run occurs, Vercel tooling may handle bounded deployment
 actions and identity capture, while the operator separately creates and proves
