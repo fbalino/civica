@@ -3,7 +3,7 @@
 Completed 2026-07-25.
 
 The canonical owner runbook is
-`plan/OWNER-ACTION-RUNBOOK-2026-07-25.md`. It translates all 62 unchecked tasks
+`plan/OWNER-ACTION-RUNBOOK-2026-07-25.md`. It translates all 61 unchecked tasks
 into direct owner decisions, professional or qualified-human reviews,
 staging/external-authority work, non-substitutable blockers, and downstream
 dependency chains.

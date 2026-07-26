@@ -1,7 +1,7 @@
 # Civica G4 operations-readiness report
 
 **Contract:** `civica-g4-operations-readiness/v1`  
-**Reviewed:** 2026-07-25
+**Reviewed:** 2026-07-26
 **Status:** blocked  
 **Waivers:** none
 
@@ -27,7 +27,7 @@ and P1 operational finding below is closed.
 ## Security and access controls
 
 - The current tracked tree passes `npm run validate:secrets` with zero
-  findings across 3,826 files.
+  findings across 3,931 files.
 - The history scanner distinguishes 28 exact non-secret historical fixture
   hashes from the one real historical Neon connection-string exposure. The
   latter remains recoverable from Git history and must be rotated by the owner;
@@ -45,13 +45,16 @@ and P1 operational finding below is closed.
   accessibility, performance, secret, lint, type, and module gates.
 - Clean-checkout evidence installed the lockfile-pinned dependencies, completed
   the production build, and passed the fixture-only test suite.
-- The fixed local G4 matrix was rerun on 2026-07-25: master-plan integrity,
-  verification-matrix validation, the unit suite, typecheck, lint, and the
-  production build all passed.
+- The fixed local G4 matrix was rerun on 2026-07-26 from a clean source
+  checkout at `2eddeb5d`: master-plan integrity, verification-matrix
+  validation, the unit suite, typecheck, lint, and the canonical
+  credential-free production build all passed. The checkout had no
+  `.env.local` or database variable; exact command durations and the reused
+  dependency-tree limitation are retained under `plan/evidence/QA-021/`.
 - Hosted pull-request/main runs and branch-protection enforcement have not been
   observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 248 of 310 tasks complete, 27 open P0 tasks,
-  58 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
+- The current G4 readiness record reports 249 of 310 tasks complete, 27 open P0 tasks,
+  57 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 
 ## Jobs, freshness, and error monitoring
@@ -85,9 +88,14 @@ and P1 operational finding below is closed.
   compatibility, abort, validation-only deployment, cache/release boundary,
   and forward-only recovery fixtures.
 - No disposable Neon/Vercel staging rehearsal has run for the current
-  migration set. QA-018 therefore has no exact deployed commit/data/method
-  smoke evidence, and QA-019 has no deliberately bad staged release rollback
-  or forward-fix evidence.
+  migration set. The 2026-07-26 Vercel CLI isolation probe found that Preview
+  resolves to the production Neon branch and aborted before any migration,
+  Conditions release, deployment, or database write. QA-018 therefore has no
+  exact deployed commit/data/method smoke evidence, and QA-019 has no
+  deliberately bad staged release rollback or forward-fix evidence. The
+  remaining Preview connection settings require Vercel project authority;
+  after they are confirmed, Codex resumes through Vercel CLI only. A Neon
+  Console or browser sign-in is not an accepted operator path.
 - Conditions migrations/releases, Pulse workspace reconciliation, observability
   migrations, and other production promotions remain authority-gated. This
   report does not authorize them.
@@ -112,9 +120,10 @@ and P1 operational finding below is closed.
    not.
 2. **Hosted CI — owner/platform:** observe passing pull-request and `main`
    workflows and require the canonical `verify` job through branch protection.
-3. **Staging and release smoke — owner/platform:** complete PLT-019 and QA-018
-   on a disposable Neon branch and isolated Vercel environment, with jobs
-   quiesced and exact release identities retained.
+3. **Staging and release smoke — owner/platform:** enable the two prepared
+   Preview connection settings in Vercel, then complete PLT-019 and QA-018
+   through Vercel CLI on a disposable Neon branch and isolated Vercel
+   environment, with jobs quiesced and exact release identities retained.
 4. **Rollback/correction rehearsal — owner/platform:** complete QA-019 with a
    deliberately bad staged release and verify cache, artifact, status, and
    changelog consistency.

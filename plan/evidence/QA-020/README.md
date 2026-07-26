@@ -18,13 +18,20 @@ shell-evaluate report data or store command output.
 
 ## Current truthful state
 
-The freshly regenerated report records 310 tasks: 248 complete, 62 remaining,
-27 open P0, and 58 open P0/P1 tasks. All gates are `blocked`. It reports zero
+The freshly regenerated report records 310 tasks: 249 complete, 61 remaining,
+27 open P0, and 57 open P0/P1 tasks. All gates are `blocked`. It reports zero
 evidence gaps, master/mirror errors, or waivers. Its completion-log parser
 recognizes the project's established `TASK-ID completed…` grammar (including
 qualified completions such as “completed through” and “completed and
 corrected”), while still rejecting a checked task with no completion record or
 evidence directory.
+
+The G4 runner was rerun on 2026-07-26 from a clean source checkout at
+`2eddeb5d`. All six fixed commands passed. The command matrix now uses the
+canonical `npm run build:ci` path, so the current proof needs no database
+variable, `.env.local`, Neon access, or provider credential. Its overall
+status remains `blocked` because the open P0/P1 tasks are real gates, not
+command failures.
 
 The live G2 runner was executed on 2026-07-18. Its five fixed commands passed:
 master-plan integrity, G2 Atlas validation, offline Atlas reproduction,
@@ -37,6 +44,7 @@ status remained `blocked` because readiness requires no open P0 work.
 npm run generate:readiness-reports
 npm run validate:readiness-reports
 npm run run:readiness-reports -- --gate=G2 --execute
+npm run run:readiness-reports -- --gate=G4
 npm run typecheck
 node plan/tools/validate-master-plan.mjs
 git diff --check
@@ -44,4 +52,5 @@ git diff --check
 
 The focused contract test proves that an unchecked P0 cannot become green even
 with passing commands, missing evidence/progress is visible, and a failed
-allowlisted command fails the report.
+allowlisted command fails the report. It also locks G4 to the canonical
+credential-free production build and rejects `:live` commands in that matrix.

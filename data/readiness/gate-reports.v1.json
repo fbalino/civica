@@ -1,9 +1,9 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "8f6ef1cc5987a97bbdf243a6f5f836b360872c0bdad68207029a2f4293dd501f",
-    "plan/PROGRESS.md": "a9237c3b064a617314b81773816386ec02a6171b1a471b100d66445012f4f387",
-    "plan/MANUAL-CHECKS.md": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
+    "plan/MASTER-CHECKLIST.md": "932b0534d65ea2f7405cbf98a20dee6115702f822a09ebb49ab368280878c427",
+    "plan/PROGRESS.md": "32c4017547821de7ea30ef016b5e45dc5e970cc34ab143d87c28f9a89fb3ab05",
+    "plan/MANUAL-CHECKS.md": "91c82be8d9db82158b9ec85db31ed20a28ee41475a21636a71d62fa1bea8cd6c",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "d8e19b6dadb22036d58240748581a45711840bfdb48fc9fd3bc29df1cb10d293",
@@ -13,7 +13,7 @@
     "plan/07-design-system-assets-and-reader-experience.md": "1c35dba50ace06d4de0fc57968ca6a0486f2abe3bdfe2f6f44cdaf423ee7aa93",
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
     "plan/09-testing-qa-and-release.md": "cca051890a0c5c06b444e2474dc0c3824025a5c213c67fbfda16f83491cfd69d",
-    "plan/10-academic-governance-review-and-outreach.md": "3737814fb2cd220a1600dd12d54474b2eabefcbeb325e0a3723cd224f8228e8e",
+    "plan/10-academic-governance-review-and-outreach.md": "d92e4b4bc3392dccd81ad135c257304ed60edaece5d2cd7f28a6123a5e02baa6",
     "plan/11-brand-legal-and-licensing.md": "7c3989aa13da0480d17780fef6701811dd717f37dd5f216dca45f8f5a286d52b"
   },
   "reports": [
@@ -23,8 +23,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 248,
-        "remaining": 62,
+        "completed": 249,
+        "remaining": 61,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -32,7 +32,7 @@
           },
           "P1": {
             "total": 113,
-            "completed": 82
+            "completed": 83
           },
           "P2": {
             "total": 5,
@@ -62,7 +62,7 @@
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
-            "completed": 12
+            "completed": 13
           },
           "04-civica-index-research-program.md": {
             "total": 41,
@@ -133,7 +133,6 @@
         "EXP-028",
         "EXP-029",
         "EXP-038",
-        "GOV-003",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -175,7 +174,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
+        "sha256": "91c82be8d9db82158b9ec85db31ed20a28ee41475a21636a71d62fa1bea8cd6c",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -265,8 +264,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 248,
-        "remaining": 62,
+        "completed": 249,
+        "remaining": 61,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -274,7 +273,7 @@
           },
           "P1": {
             "total": 113,
-            "completed": 82
+            "completed": 83
           },
           "P2": {
             "total": 5,
@@ -304,7 +303,7 @@
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
-            "completed": 12
+            "completed": 13
           },
           "04-civica-index-research-program.md": {
             "total": 41,
@@ -375,7 +374,6 @@
         "EXP-028",
         "EXP-029",
         "EXP-038",
-        "GOV-003",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -417,7 +415,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
+        "sha256": "91c82be8d9db82158b9ec85db31ed20a28ee41475a21636a71d62fa1bea8cd6c",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -498,7 +496,7 @@
         },
         {
           "id": "production-build",
-          "command": "npm run build",
+          "command": "npm run build:ci",
           "status": "not_run",
           "exitCode": null,
           "durationMs": null
@@ -506,7 +504,7 @@
       ],
       "blockers": [
         "27 unchecked P0 tasks prevent a green report",
-        "58 unchecked P0/P1 tasks prevent G4"
+        "57 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -515,8 +513,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 248,
-        "remaining": 62,
+        "completed": 249,
+        "remaining": 61,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -524,7 +522,7 @@
           },
           "P1": {
             "total": 113,
-            "completed": 82
+            "completed": 83
           },
           "P2": {
             "total": 5,
@@ -554,7 +552,7 @@
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
-            "completed": 12
+            "completed": 13
           },
           "04-civica-index-research-program.md": {
             "total": 41,
@@ -625,7 +623,6 @@
         "EXP-028",
         "EXP-029",
         "EXP-038",
-        "GOV-003",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -667,7 +664,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
+        "sha256": "91c82be8d9db82158b9ec85db31ed20a28ee41475a21636a71d62fa1bea8cd6c",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -751,8 +748,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 248,
-        "remaining": 62,
+        "completed": 249,
+        "remaining": 61,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -760,7 +757,7 @@
           },
           "P1": {
             "total": 113,
-            "completed": 82
+            "completed": 83
           },
           "P2": {
             "total": 5,
@@ -790,7 +787,7 @@
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
-            "completed": 12
+            "completed": 13
           },
           "04-civica-index-research-program.md": {
             "total": 41,
@@ -861,7 +858,6 @@
         "EXP-028",
         "EXP-029",
         "EXP-038",
-        "GOV-003",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -903,7 +899,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
+        "sha256": "91c82be8d9db82158b9ec85db31ed20a28ee41475a21636a71d62fa1bea8cd6c",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
