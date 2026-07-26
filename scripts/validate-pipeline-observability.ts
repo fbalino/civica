@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 
 import {
+  CONDITIONS_PRODUCTION_COMMAND,
   MANUAL_PRODUCTION_ADAPTERS,
   SCHEDULED_PRODUCTION_ADAPTERS,
 } from "../src/lib/data/production-adapter-registry";
@@ -34,6 +35,14 @@ for (const pipeline of MANUAL_PRODUCTION_ADAPTERS) {
   }
   if (!command.includes(pipeline.entrypoint)) {
     errors.push(`${pipeline.id}: canonical script does not invoke ${pipeline.entrypoint}`);
+  }
+  if (
+    pipeline.id === "conditions.current-beta" &&
+    command !== CONDITIONS_PRODUCTION_COMMAND
+  ) {
+    errors.push(
+      `${pipeline.id}: canonical command drifted from the unified Conditions orchestrator`,
+    );
   }
 }
 

@@ -22,6 +22,9 @@ export interface ScheduledProductionAdapter {
   implementationPaths: readonly string[];
 }
 
+export const CONDITIONS_PRODUCTION_COMMAND =
+  "npm run run:production-pipeline -- --pipeline=conditions.current-beta -- tsx scripts/ingest-conditions-all.ts" as const;
+
 /**
  * Source ownership for every deployed cron route. `vercel.json` remains the
  * schedule authority; this registry adds the source/input meaning that a URL
@@ -457,11 +460,11 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       product: "conditions",
       sources: ["undp_hdi", "global_peace_index", "worldbank_economic"],
       canonicalNpmScript: "ingest:conditions:all",
-      entrypoint: "scripts/ingest-conditions-hdi.ts",
+      entrypoint: "scripts/ingest-conditions-all.ts",
       implementationPaths: [
-        "scripts/ingest-conditions-hdi.ts",
-        "scripts/ingest-conditions-gpi.ts",
-        "scripts/ingest-conditions-economic.ts",
+        "scripts/ingest-conditions-all.ts",
+        "src/lib/conditions/production-workflow.ts",
+        "src/lib/conditions/ingest.ts",
       ],
     },
   ] as const;
