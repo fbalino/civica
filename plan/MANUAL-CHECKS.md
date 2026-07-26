@@ -93,17 +93,25 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
-- **GOV-003 · Owner:** complete the seven factual fields in `plan/research/project-disclosure-owner-confirmation-v1.md`: funding/payer, grants or sponsorship, material in-kind support, relevant affiliations/interests, vendor/source relationships, third-party control rights, and approval to publish/update the resulting disclosure. The repo cannot prove a no-funding or no-conflict state from silence.
+- **GOV-003 · Owner:** fields 1–4 in
+  `plan/research/project-disclosure-owner-confirmation-v1.md` are confirmed:
+  Fernando personally funds Civica; there are no grants or other outside
+  funding, no donated or discounted support, and no outside affiliations.
+  Complete only fields 5–7: state whether formal/paid source or vendor
+  relationships extend beyond ordinary customer/public-access terms; name any
+  third party with exceptional control rights or confirm none; and authorize
+  publication plus the six-month/material-change review cadence. Personal
+  voting and unrelated political-donation history are intentionally excluded.
 - **GOV-012 · Owner:** choose and sign the compensation posture in `plan/research/reviewer-honorarium-decision-brief-v1.md`. The recommendation is fixed honoraria of $1,000 for each 8–12-hour Atlas/Index review and $1,500 for each 12–16-hour Pulse review, with a $12,075 first-wave ceiling for nine primaries including a 15% logistics reserve. Also identify the paying person/entity and jurisdiction so accounting can confirm forms, withholding, currency, fees, and institutional-payment handling. This approval does not authorize contact; GOV-016 and G4 still apply, and Pulse also waits for GOV-015.
-- **EXP-038 · Owner:** review
-  `plan/EXP-038-english-copy-review-2026-07-23.md` and approve, revise, or
-  reject each proposed English copy item. Confirm whether the home independence
-  label is supported by the completed GOV-003 facts, whether contact carries a
-  monitored three-business-day response target, and whether ATL-024 is active
-  before selecting its dedicated correction CTA. Record the approved item IDs,
-  decision date, and source commit. Approval authorizes only the listed English
-  copy edits; it does not authorize translation, a production deployment, a
-  legal claim, or an external message.
+- **EXP-038 · Owner:** the approved subset in
+  `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. Record
+  only the four remaining dispositions: retain or replace A4 after deciding
+  how prominently to name Fernando; approve H5 only after GOV-003 closes;
+  choose the no-guarantee T3 response copy or adopt a genuinely monitored
+  response target; and choose the interim T4 correction instruction or wait
+  for ATL-024 activation. These decisions authorize only the named English
+  copy; they do not authorize translation, deployment, a legal conclusion, or
+  an external message.
 - Approve the final public disposition of each experimental measurement after its resolution and external review are complete.
 - **EXP-030 / EXP-031 · Owner decision — embed disposition (found 2026-07-12):** the Civica Index score embed (`/embed/[slug]`) is retired (HTTP 410 stub) under the atlas-first decision, so there are no live size presets to repair, and the old preset builder (`src/components/widget/WidgetBuilder.tsx` + `WidgetCopyButton.tsx`) is **orphaned dead code — mounted in no route** and still points its generated iframes at the 410 endpoint. Hardening the retired stub's HTML (add `<h1>`, `robots noindex`) is blocked because the route is an Index-change-control **protected presentation file**, so any edit requires the full methodology-change ceremony (version advance + all six evidence roles) — disproportionate for a cosmetic fix to a retired page. Decide the structural path: (a) formally **de-protect** the retired embed route from `INDEX_PROTECTED_FILES` via a proper change-control record, then harden its document, or (b) fold EXP-030 into **EXP-031** (source-native embed redesign), which will rebuild or remove the route and the orphaned builder through the same ceremony. Until then EXP-030 stays open.
 - **PUL-039 · Owner:** approve the independent-coder recruitment plan — candidate pool, compensation posture and budget ceiling, blinding/independence terms, and start timing — before any candidate is contacted. Allow six to eight weeks after contact authorization to recruit, screen, contract, train, and qualify the panel. PUL-041's packet prerequisite is complete; external contact remains blocked until G4 and this approval.

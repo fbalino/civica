@@ -10,7 +10,8 @@ decision pending
 Fernando approved the exact corrected eight-image light-master batch and asked
 Codex to build a much larger, image-led Explore mega menu. That approval does
 not pre-approve this rendered composition, its matched dark outputs, a
-checklist completion, a commit, or deployment.
+checklist completion, canonization, or deployment. Commit `4b7385fd` records
+the candidate and its review evidence only.
 
 ## Candidate
 
@@ -70,6 +71,13 @@ checked manifest hashes. Their release state remains
 `candidate-pending-owner-render-approval`, and production authorization remains
 false.
 
+After candidate commit `4b7385fd`, the canonical illustration manifest was
+regenerated once so all 16 assets now bind their first-tracked provenance to
+that commit instead of retaining the pre-commit null. The full editorial
+illustration chain passes for 568 assets. The fixed local G4 runner then passed
+master-plan integrity, the verification matrix, the unit suite, TypeScript,
+lint, and the production build; G4 remains correctly blocked by its open tasks.
+
 An in-app browser review confirmed the real header disclosure, all eight
 accessible link names, dark-theme asset resolution, mobile dialog structure,
 and Escape unmount/focus restoration against `localhost:3002`.
@@ -84,5 +92,5 @@ captures, then record one of:
 - reject it.
 
 No deployment is authorized by that visual decision. EXP-015 and EXP-016 remain
-open until the decision is recorded and the final checked evidence/commit is
-reconciled.
+open until the decision is recorded and the accepted or revised canonical
+pattern is reconciled in a separate closure commit.

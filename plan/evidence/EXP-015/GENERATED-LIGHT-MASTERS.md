@@ -55,5 +55,5 @@ menu composition, deployment, or any changed file.
 ## Still required
 
 - final owner approval, revision, or rejection of the exact rendered candidate;
-- checklist closure and commit only after that decision;
+- checklist closure and a separate canonization commit only after that decision;
 - separate deployment authority.

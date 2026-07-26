@@ -41,10 +41,12 @@ EXP-038, GOV-003, GOV-012, IDX-022, IDX-034, PLT-029, QA-012, QA-013.
 
 The prepared decisions and reviews are:
 
-- owner facts for funding/conflicts/editorial control and actual
-  subscription/spend;
-- owner selection of the Explore direction, English copy, and reviewer
-  compensation posture;
+- three residual GOV-003 confirmations for ordinary/formal source or vendor
+  relationships, exceptional third-party control rights, and publication
+  authorization/review cadence, plus actual subscription/spend;
+- owner approval, revision, or rejection of the exact rendered Explore
+  candidate, the four remaining English-copy dispositions (A4, H5, T3, and
+  T4), and reviewer compensation posture;
 - qualified review of the rendered-module ledger, illustration candidates,
   visual baselines, screen-reader journeys, Index reader tasks, and
   constitution-to-practice coding;
@@ -54,6 +56,14 @@ The prepared decisions and reviews are:
 These are not interchangeable approvals. For example, approving EXP-009
 candidates does not authorize replacing the production images, and approving
 EXP-038 drafts does not authorize deployment or a new legal claim.
+
+The generated Explore light-master batch is approved and its rendered
+implementation candidate is committed for review, but the exact desktop/mobile
+light/dark result remains undecided. The immediately applicable EXP-038 subset
+is implemented; A4, H5, T3, and T4 remain held. GOV-003 fields 1–4 are
+confirmed, but the disclosure remains unpublished until fields 5–7 are
+answered. None of those partial decisions supplies the remaining owner
+disposition or authorizes deployment.
 
 ### 2. Production, staging, or external-system authority — 16
 
@@ -104,7 +114,9 @@ PUL-021, PUL-022, PUL-023, PUL-028, PUL-029, PUL-030.
 
 The principal chains are:
 
-1. EXP-015 owner selection → EXP-016 implementation → EXP-028 blind audit.
+1. EXP-015 rendered-result decision and canonization → EXP-016 reconciliation
+   and closure → EXP-028 blind audit. The implementation candidate exists, but
+   cannot bypass the owner decision.
 2. Conditions staging/release → ATL-028 frozen longitudinal construct study.
 3. Pulse migrations + v2.15 deployment/cycle → PUL-040 start → PUL-026
    90-day window → PUL-018–023 evaluation. Those results unlock the GOV-015
@@ -123,8 +135,9 @@ release, or imply approvals that do not exist.
 
 ## Recommended order
 
-1. Resolve the owner-review bundle: GOV-003, GOV-012, EXP-015, EXP-009,
-   EXP-038, EXP-025/QA-013, and PLT-029 facts.
+1. Resolve the owner-review bundle: GOV-003 fields 5–7, GOV-012, the exact
+   EXP-015 rendered result, EXP-009, EXP-038 A4/H5/T3/T4, EXP-025/QA-013, and
+   PLT-029 facts.
 2. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
 3. Authorize one isolated staging wave covering QA-018 and the prepared Atlas,

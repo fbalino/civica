@@ -31,3 +31,8 @@ The contact response-time text still requires a real operating choice, and
 the correction instruction remains held until Fernando selects the interim
 wording or ATL-024 is production-active. L2 remains subject to any later
 BRD-010/012 counsel correction.
+
+Final post-application source hashes and rendered route evidence are
+intentionally deferred until A4, H5, T3, and T4 are resolved. The current
+browser evidence covers only the implemented approved subset and will be
+refreshed after those owner dispositions.

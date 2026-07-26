@@ -69,5 +69,7 @@ and review derivatives carry checked hashes.
 
 1. Ask Fernando to approve, revise, or reject the exact rendered candidate,
    using `RENDERED-CANDIDATE.md` and the local browser.
-2. Only after that approval, close EXP-015 and EXP-016, commit the canonical
-   implementation, and treat deployment as a separate authority boundary.
+2. Only after that approval, close EXP-015 and EXP-016, record the accepted or
+   revised canonical pattern in a separate closure commit, and treat deployment
+   as a separate authority boundary. Candidate commit `4b7385fd` is review
+   evidence and does not satisfy this step.

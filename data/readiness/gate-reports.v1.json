@@ -2,8 +2,8 @@
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
     "plan/MASTER-CHECKLIST.md": "8f6ef1cc5987a97bbdf243a6f5f836b360872c0bdad68207029a2f4293dd501f",
-    "plan/PROGRESS.md": "d614089f43493d6ab818e9f27894481417b20c18a56ab93c6c44312a0e92b850",
-    "plan/MANUAL-CHECKS.md": "41e25d14c7c28017d15a6f734b84dfcff9b44867d95af286e5197a1dc9c3cabc",
+    "plan/PROGRESS.md": "43379e49fc4847020c21e1d183d83a179a4e6f9a3347c92ca2bfe925e937a8d4",
+    "plan/MANUAL-CHECKS.md": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "d8e19b6dadb22036d58240748581a45711840bfdb48fc9fd3bc29df1cb10d293",
@@ -175,7 +175,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "41e25d14c7c28017d15a6f734b84dfcff9b44867d95af286e5197a1dc9c3cabc",
+        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -192,7 +192,7 @@
           "EXP-001",
           "EXP-006",
           "EXP-009",
-          "EXP-014",
+          "EXP-015",
           "EXP-030",
           "EXP-031",
           "EXP-038",
@@ -417,7 +417,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "41e25d14c7c28017d15a6f734b84dfcff9b44867d95af286e5197a1dc9c3cabc",
+        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -434,7 +434,7 @@
           "EXP-001",
           "EXP-006",
           "EXP-009",
-          "EXP-014",
+          "EXP-015",
           "EXP-030",
           "EXP-031",
           "EXP-038",
@@ -667,7 +667,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "41e25d14c7c28017d15a6f734b84dfcff9b44867d95af286e5197a1dc9c3cabc",
+        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -684,7 +684,7 @@
           "EXP-001",
           "EXP-006",
           "EXP-009",
-          "EXP-014",
+          "EXP-015",
           "EXP-030",
           "EXP-031",
           "EXP-038",
@@ -903,7 +903,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "41e25d14c7c28017d15a6f734b84dfcff9b44867d95af286e5197a1dc9c3cabc",
+        "sha256": "759f44a388fe3446f4c1c296b21abd71ec8caa8389f4916a2e1aa57094f6a448",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -920,7 +920,7 @@
           "EXP-001",
           "EXP-006",
           "EXP-009",
-          "EXP-014",
+          "EXP-015",
           "EXP-030",
           "EXP-031",
           "EXP-038",
