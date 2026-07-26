@@ -14,13 +14,15 @@ export function fileSha256(path: string): string {
   return createHash("sha256").update(readFileSync(resolve(path))).digest("hex");
 }
 
-/** PostgreSQL-aware enough for checked migrations: respects strings and dollar-quoted function bodies. */
+/** PostgreSQL-aware enough for checked migrations: respects comments, strings, and dollar-quoted function bodies. */
 export function splitPostgresStatements(source: string): string[] {
   const statements: string[] = [];
   let start = 0;
   let single = false;
   let double = false;
   let dollar: string | null = null;
+  let lineComment = false;
+  let blockCommentDepth = 0;
   for (let i = 0; i < source.length; i++) {
     if (dollar) {
       if (source.startsWith(dollar, i)) { i += dollar.length - 1; dollar = null; }
@@ -37,8 +39,19 @@ export function splitPostgresStatements(source: string): string[] {
       else if (ch === '"') double = false;
       continue;
     }
+    if (lineComment) {
+      if (ch === "\n" || ch === "\r") lineComment = false;
+      continue;
+    }
+    if (blockCommentDepth > 0) {
+      if (ch === "/" && source[i + 1] === "*") { blockCommentDepth++; i++; }
+      else if (ch === "*" && source[i + 1] === "/") { blockCommentDepth--; i++; }
+      continue;
+    }
     if (ch === "'") { single = true; continue; }
     if (ch === '"') { double = true; continue; }
+    if (ch === "-" && source[i + 1] === "-") { lineComment = true; i++; continue; }
+    if (ch === "/" && source[i + 1] === "*") { blockCommentDepth = 1; i++; continue; }
     if (ch === "$" && (source.slice(i).match(/^\$[A-Za-z0-9_]*\$/)?.[0])) {
       dollar = source.slice(i).match(/^\$[A-Za-z0-9_]*\$/)![0];
       i += dollar.length - 1;

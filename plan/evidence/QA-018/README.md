@@ -21,6 +21,13 @@ The record is `pending_external_authority`; all run outcomes and provider IDs
 are empty. No Neon branch, Vercel deployment, migration, release publication,
 cron invocation, production access, or owner sign-off is claimed.
 
+## Recorded staging attempts
+
+- [`attempt-01-2026-07-25.md`](attempt-01-2026-07-25.md) records the first
+  disposable-branch run. It stopped at migration `0036` after exposing a SQL
+  statement-splitting defect, preserved the transactional rollback, deleted
+  the partial branch, and made no production or deployment change.
+
 When the authorized run occurs, Vercel tooling may handle bounded deployment
 actions and identity capture, while the operator separately creates and proves
 the Neon branch, executes the single ordered database plan/apply, and retains
