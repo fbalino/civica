@@ -1,0 +1,779 @@
+import { createHash } from "node:crypto";
+import { readFile, writeFile } from "node:fs/promises";
+
+import { and, eq, isNotNull } from "drizzle-orm";
+
+import type { CivicaDb } from "@/lib/db";
+import { ciDimensionScores, jurisdictions } from "@/lib/db/schema";
+import { stableStringify } from "@/lib/data/frozen-vintage";
+import { buildIndicatorLineage } from "@/lib/indicators/lineage";
+import {
+  CONDITIONS_ALIGNMENT_POLICY,
+  CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  conditionCalculationKey,
+  type ConditionScoreInput,
+} from "./contract";
+import {
+  buildEconomicConditionsCalculations,
+  buildEconomicReferenceSets,
+  type EconomicComponentObservation,
+  type EconomicLineages,
+  type EconomicObservation,
+} from "./economic";
+import { writeConditionsRelease } from "./ingest";
+import {
+  buildFixedBoundReferenceSets,
+  type ConditionsReferenceSet,
+  type ConditionsReleaseInput,
+} from "./release";
+
+const HDI_SOURCE_ID = "undp_hdi";
+const HDI_SOURCE_DIMENSION = "human_development";
+const HDI_SOURCE_METHODOLOGY_VERSION = "v1.0";
+const GPI_SOURCE_ID = "global_peace_index";
+const GPI_SOURCE_DIMENSION = "stability_security";
+const GPI_SOURCE_METHODOLOGY_VERSION = "v1.0";
+
+const WORLD_BANK_SOURCE_ID = "worldbank_economic";
+const WORLD_BANK_BASE_URL = "https://api.worldbank.org/v2";
+export const WORLD_BANK_ECONOMIC_DATE_RANGE = "2020:2024";
+const WORLD_BANK_PER_PAGE = 10;
+const WORLD_BANK_CAPTURE_CONCURRENCY = 8;
+export const WORLD_BANK_ECONOMIC_INDICATORS = {
+  inflation: "FP.CPI.TOTL.ZG",
+  unemployment: "SL.UEM.TOTL.ZS",
+  gdpGrowth: "NY.GDP.MKTP.KD.ZG",
+} as const;
+export const WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION =
+  "conditions-world-bank-economic-capture/v1" as const;
+
+type ConditionsDb = CivicaDb;
+type CiDimensionScore = typeof ciDimensionScores.$inferSelect;
+
+export interface PreparedConditionsDimension {
+  rows: ConditionScoreInput[];
+  referenceSets: ConditionsReferenceSet[];
+}
+
+export interface WorldBankEconomicCaptureResponse {
+  jurisdictionId: string;
+  iso2: string;
+  indicatorId: string;
+  requestUrl: string;
+  retrievedAt: string;
+  responseBodySha256: string;
+  responseBody: string;
+}
+
+export interface WorldBankEconomicCapture {
+  schemaVersion: typeof WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION;
+  baseUrl: typeof WORLD_BANK_BASE_URL;
+  dateRange: typeof WORLD_BANK_ECONOMIC_DATE_RANGE;
+  perPage: typeof WORLD_BANK_PER_PAGE;
+  responses: WorldBankEconomicCaptureResponse[];
+  captureSha256: string;
+}
+
+interface CaptureCore {
+  schemaVersion: typeof WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION;
+  baseUrl: typeof WORLD_BANK_BASE_URL;
+  dateRange: typeof WORLD_BANK_ECONOMIC_DATE_RANGE;
+  perPage: typeof WORLD_BANK_PER_PAGE;
+  responses: WorldBankEconomicCaptureResponse[];
+}
+
+export interface ConditionsWorkflowDependencies {
+  prepareHdi: (
+    db: ConditionsDb,
+    releaseId: string,
+  ) => Promise<PreparedConditionsDimension>;
+  prepareGpi: (
+    db: ConditionsDb,
+    releaseId: string,
+  ) => Promise<PreparedConditionsDimension>;
+  prepareEconomic: (
+    db: ConditionsDb,
+    releaseId: string,
+    options: EconomicInputOptions,
+  ) => Promise<PreparedConditionsDimension>;
+  writeRelease: typeof writeConditionsRelease;
+}
+
+export interface EconomicInputOptions {
+  inputFile?: string;
+  captureOutput?: string;
+  fetchImpl?: typeof fetch;
+  now?: () => Date;
+}
+
+export interface RunConditionsWorkflowOptions extends EconomicInputOptions {
+  releaseId: string;
+  dryRun?: boolean;
+  dependencies?: Partial<ConditionsWorkflowDependencies>;
+}
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function compareText(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function referenceYear(quarter: string): number | null {
+  const match = /^(\d{4})-Q[1-4]$/.exec(quarter);
+  return match ? Number(match[1]) : null;
+}
+
+function hdiRow(row: CiDimensionScore, releaseId: string): ConditionScoreInput {
+  const year = referenceYear(row.quarter);
+  const observed = row.rawValue !== null && year !== null;
+  const reason = row.rawValue === null
+    ? "The copied HDI source row has no native raw value"
+    : "The copied HDI source row has an invalid reference quarter";
+  const component = {
+    componentId: "hdi" as const,
+    nativeValue: observed ? row.rawValue : null,
+    nativeUnit: "index_0_1",
+    referenceYear: observed ? year : null,
+    valueStatus: observed ? ("observed" as const) : ("missing" as const),
+    valueStatusReason: observed ? null : reason,
+    inclusionDecision: observed ? ("included" as const) : ("excluded_missing" as const),
+    sourceId: HDI_SOURCE_ID,
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-hdi-component/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  const base = {
+    releaseId,
+    jurisdictionId: row.jurisdictionId,
+    dimension: "human_development" as const,
+    quarter: observed ? row.quarter : null,
+    normalizedScore: observed
+      ? Math.min(100, Math.max(0, row.rawValue! * 100))
+      : null,
+    rawValue: observed ? row.rawValue : null,
+    sourceId: HDI_SOURCE_ID,
+    datasetYear: observed ? year : null,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceYear: observed ? year : null,
+    alignmentPolicy: CONDITIONS_ALIGNMENT_POLICY,
+    alignmentStatus: observed ? ("aligned" as const) : ("missing_component" as const),
+    components: [component],
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-hdi-fixed-bound/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  return { ...base, calculationKey: conditionCalculationKey(base) };
+}
+
+function normalizeGpi(raw: number): number {
+  return Math.min(100, Math.max(0, ((5 - raw) / 4) * 100));
+}
+
+function gpiRow(row: CiDimensionScore, releaseId: string): ConditionScoreInput {
+  const year = referenceYear(row.quarter);
+  const observed = row.rawValue !== null && year !== null;
+  const reason = row.rawValue === null
+    ? "The copied GPI source row has no native raw value"
+    : "The copied GPI source row has an invalid reference quarter";
+  const component = {
+    componentId: "global_peace_index" as const,
+    nativeValue: observed ? row.rawValue : null,
+    nativeUnit: "index_1_5_inverted",
+    referenceYear: observed ? year : null,
+    valueStatus: observed ? ("observed" as const) : ("missing" as const),
+    valueStatusReason: observed ? null : reason,
+    inclusionDecision: observed ? ("included" as const) : ("excluded_missing" as const),
+    sourceId: GPI_SOURCE_ID,
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-gpi-component/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  const base = {
+    releaseId,
+    jurisdictionId: row.jurisdictionId,
+    dimension: "peace_security" as const,
+    quarter: observed ? row.quarter : null,
+    normalizedScore: observed ? normalizeGpi(row.rawValue!) : null,
+    rawValue: observed ? row.rawValue : null,
+    sourceId: GPI_SOURCE_ID,
+    datasetYear: observed ? year : null,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceYear: observed ? year : null,
+    alignmentPolicy: CONDITIONS_ALIGNMENT_POLICY,
+    alignmentStatus: observed ? ("aligned" as const) : ("missing_component" as const),
+    components: [component],
+    indicatorId: row.indicatorId,
+    upstreamRelease: row.upstreamRelease,
+    artifactHash: row.artifactHash,
+    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+    temporalCoverage: row.temporalCoverage,
+    licenseUrl: row.licenseUrl,
+    transformationId: "conditions-gpi-fixed-bound/v2",
+    substitutionReason: row.substitutionReason,
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  return { ...base, calculationKey: conditionCalculationKey(base) };
+}
+
+export async function prepareHdiConditions(
+  db: ConditionsDb,
+  releaseId: string,
+): Promise<PreparedConditionsDimension> {
+  const sourceRows = await db
+    .select()
+    .from(ciDimensionScores)
+    .where(
+      and(
+        eq(ciDimensionScores.dimension, HDI_SOURCE_DIMENSION),
+        eq(ciDimensionScores.sourceId, HDI_SOURCE_ID),
+        eq(ciDimensionScores.methodologyVersion, HDI_SOURCE_METHODOLOGY_VERSION),
+      ),
+    );
+  if (!sourceRows.length) {
+    throw new Error("No HDI rows found in ci_dimension_scores. Run ingest:ci first.");
+  }
+  const rows = sourceRows.map((row) => hdiRow(row, releaseId));
+  return {
+    rows,
+    referenceSets: buildFixedBoundReferenceSets({
+      calculations: rows,
+      componentId: "hdi",
+      direction: "higher_is_better",
+      transformationId: "conditions-hdi-fixed-bound/v2",
+      lowerBound: 0,
+      upperBound: 1,
+    }),
+  };
+}
+
+export async function prepareGpiConditions(
+  db: ConditionsDb,
+  releaseId: string,
+): Promise<PreparedConditionsDimension> {
+  const sourceRows = await db
+    .select()
+    .from(ciDimensionScores)
+    .where(
+      and(
+        eq(ciDimensionScores.dimension, GPI_SOURCE_DIMENSION),
+        eq(ciDimensionScores.sourceId, GPI_SOURCE_ID),
+        eq(ciDimensionScores.methodologyVersion, GPI_SOURCE_METHODOLOGY_VERSION),
+      ),
+    );
+  if (!sourceRows.length) {
+    throw new Error("No GPI rows found in ci_dimension_scores. Run ingest:ci first.");
+  }
+  const rows = sourceRows.map((row) => gpiRow(row, releaseId));
+  return {
+    rows,
+    referenceSets: buildFixedBoundReferenceSets({
+      calculations: rows,
+      componentId: "global_peace_index",
+      direction: "lower_is_better",
+      transformationId: "conditions-gpi-fixed-bound/v2",
+      lowerBound: 1,
+      upperBound: 5,
+    }),
+  };
+}
+
+function worldBankRequestUrl(iso2: string, indicatorId: string): string {
+  return `${WORLD_BANK_BASE_URL}/country/${iso2}/indicator/${indicatorId}?format=json&date=${WORLD_BANK_ECONOMIC_DATE_RANGE}&per_page=${WORLD_BANK_PER_PAGE}`;
+}
+
+function orderedCaptureResponses(
+  responses: readonly WorldBankEconomicCaptureResponse[],
+): WorldBankEconomicCaptureResponse[] {
+  return [...responses].sort((left, right) =>
+    compareText(
+      `${left.jurisdictionId}:${left.indicatorId}`,
+      `${right.jurisdictionId}:${right.indicatorId}`,
+    ));
+}
+
+function captureCore(
+  responses: readonly WorldBankEconomicCaptureResponse[],
+): CaptureCore {
+  return {
+    schemaVersion: WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION,
+    baseUrl: WORLD_BANK_BASE_URL,
+    dateRange: WORLD_BANK_ECONOMIC_DATE_RANGE,
+    perPage: WORLD_BANK_PER_PAGE,
+    responses: orderedCaptureResponses(responses),
+  };
+}
+
+export function buildWorldBankEconomicCapture(
+  responses: readonly WorldBankEconomicCaptureResponse[],
+): WorldBankEconomicCapture {
+  const core = captureCore(responses);
+  return {
+    ...core,
+    captureSha256: sha256(stableStringify(core)),
+  };
+}
+
+export function validateWorldBankEconomicCapture(
+  capture: WorldBankEconomicCapture,
+  expectedJurisdictions?: readonly { id: string; iso2: string }[],
+): string[] {
+  const errors: string[] = [];
+  if (capture.schemaVersion !== WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION) {
+    errors.push("capture schema version is invalid");
+  }
+  if (
+    capture.baseUrl !== WORLD_BANK_BASE_URL ||
+    capture.dateRange !== WORLD_BANK_ECONOMIC_DATE_RANGE ||
+    capture.perPage !== WORLD_BANK_PER_PAGE
+  ) {
+    errors.push("capture request contract is invalid");
+  }
+  const expectedCaptureSha256 = sha256(
+    stableStringify(captureCore(capture.responses)),
+  );
+  if (capture.captureSha256 !== expectedCaptureSha256) {
+    errors.push("captureSha256 does not match the capture payload");
+  }
+  const keys = new Set<string>();
+  for (const response of capture.responses) {
+    const key = `${response.jurisdictionId}:${response.indicatorId}`;
+    if (keys.has(key)) errors.push(`duplicate response ${key}`);
+    keys.add(key);
+    if (!/^[A-Z]{2}$/.test(response.iso2)) {
+      errors.push(`${key} has an invalid ISO2 code`);
+    }
+    if (
+      !Object.values(WORLD_BANK_ECONOMIC_INDICATORS).includes(
+        response.indicatorId as never,
+      )
+    ) {
+      errors.push(`${key} has an undeclared indicator`);
+    }
+    if (response.requestUrl !== worldBankRequestUrl(response.iso2, response.indicatorId)) {
+      errors.push(`${key} has an unexpected request URL`);
+    }
+    if (!Number.isFinite(Date.parse(response.retrievedAt))) {
+      errors.push(`${key} has an invalid retrieval timestamp`);
+    }
+    if (sha256(response.responseBody) !== response.responseBodySha256) {
+      errors.push(`${key} response body hash does not match`);
+    }
+  }
+  if (expectedJurisdictions) {
+    const expectedKeys = new Set(
+      expectedJurisdictions.flatMap(({ id }) =>
+        Object.values(WORLD_BANK_ECONOMIC_INDICATORS).map(
+          (indicatorId) => `${id}:${indicatorId}`,
+        )),
+    );
+    if (keys.size !== expectedKeys.size) {
+      errors.push(
+        `capture response count ${keys.size} does not match expected ${expectedKeys.size}`,
+      );
+    }
+    for (const key of expectedKeys) {
+      if (!keys.has(key)) errors.push(`capture is missing response ${key}`);
+    }
+    const expectedIso2 = new Map(
+      expectedJurisdictions.map(({ id, iso2 }) => [id, iso2.toUpperCase()]),
+    );
+    for (const response of capture.responses) {
+      if (expectedIso2.get(response.jurisdictionId) !== response.iso2) {
+        errors.push(
+          `${response.jurisdictionId}:${response.indicatorId} does not match the expected ISO2 code`,
+        );
+      }
+    }
+  }
+  return errors;
+}
+
+function parseWorldBankObservation(
+  response: WorldBankEconomicCaptureResponse,
+): EconomicComponentObservation {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(response.responseBody);
+  } catch {
+    throw new Error(
+      `World Bank returned invalid JSON for ${response.iso2}/${response.indicatorId}`,
+    );
+  }
+  if (
+    !Array.isArray(payload) ||
+    payload.length < 2 ||
+    !Array.isArray(payload[1])
+  ) {
+    throw new Error(
+      `World Bank returned an invalid indicator payload for ${response.iso2}/${response.indicatorId}`,
+    );
+  }
+  const points = (payload[1] as Array<{ date?: unknown; value?: unknown }>)
+    .filter(
+      (point): point is { date: string; value: number } =>
+        typeof point?.date === "string" &&
+        typeof point?.value === "number" &&
+        Number.isFinite(point.value),
+    )
+    .map((point) => ({
+      year: Number.parseInt(point.date, 10),
+      value: point.value,
+    }))
+    .filter((point) => Number.isInteger(point.year))
+    .sort((left, right) => right.year - left.year);
+  const latest = points[0];
+  if (!latest) {
+    return {
+      value: null,
+      referenceYear: null,
+      valueStatus: "not_observed",
+      valueStatusReason:
+        "World Bank returned no non-null observation in the requested period",
+    };
+  }
+  return {
+    value: latest.value,
+    referenceYear: latest.year,
+    valueStatus: "observed",
+    valueStatusReason: null,
+  };
+}
+
+export async function captureWorldBankEconomicInputs(input: {
+  jurisdictions: readonly { id: string; iso2: string }[];
+  fetchImpl?: typeof fetch;
+  now?: () => Date;
+}): Promise<WorldBankEconomicCapture> {
+  if (!input.jurisdictions.length) {
+    throw new Error("World Bank economic capture has no jurisdictions");
+  }
+  const fetchImpl = input.fetchImpl ?? fetch;
+  const now = input.now ?? (() => new Date());
+  const jobs = input.jurisdictions.flatMap((jurisdiction) => {
+    const iso2 = jurisdiction.iso2.toUpperCase();
+    return Object.values(WORLD_BANK_ECONOMIC_INDICATORS).map((indicatorId) => ({
+      jurisdictionId: jurisdiction.id,
+      iso2,
+      indicatorId,
+    }));
+  });
+  const responses = new Array<WorldBankEconomicCaptureResponse>(jobs.length);
+  let nextJobIndex = 0;
+  async function worker(): Promise<void> {
+    while (nextJobIndex < jobs.length) {
+      const jobIndex = nextJobIndex;
+      nextJobIndex += 1;
+      const { jurisdictionId, iso2, indicatorId } = jobs[jobIndex];
+      const requestUrl = worldBankRequestUrl(iso2, indicatorId);
+      let response: Response;
+      try {
+        response = await fetchImpl(requestUrl);
+      } catch (error) {
+        throw new Error(
+          `World Bank transport failed for ${iso2}/${indicatorId}`,
+          { cause: error },
+        );
+      }
+      if (!response.ok) {
+        throw new Error(
+          `World Bank request returned HTTP ${response.status} for ${iso2}/${indicatorId}`,
+        );
+      }
+      const responseBody = await response.text();
+      const capturedResponse = {
+        jurisdictionId,
+        iso2,
+        indicatorId,
+        requestUrl,
+        retrievedAt: now().toISOString(),
+        responseBodySha256: sha256(responseBody),
+        responseBody,
+      };
+      // Parse now so malformed 2xx responses fail before a capture can publish.
+      parseWorldBankObservation(capturedResponse);
+      responses[jobIndex] = capturedResponse;
+    }
+  }
+  await Promise.all(
+    Array.from(
+      { length: Math.min(WORLD_BANK_CAPTURE_CONCURRENCY, jobs.length) },
+      () => worker(),
+    ),
+  );
+  const capture = buildWorldBankEconomicCapture(responses);
+  const errors = validateWorldBankEconomicCapture(capture, input.jurisdictions);
+  if (errors.length) {
+    throw new Error(`Invalid World Bank economic capture: ${errors.join(", ")}`);
+  }
+  return capture;
+}
+
+export async function readWorldBankEconomicCapture(
+  path: string,
+): Promise<WorldBankEconomicCapture> {
+  const capture = JSON.parse(
+    await readFile(path, "utf8"),
+  ) as WorldBankEconomicCapture;
+  const errors = validateWorldBankEconomicCapture(capture);
+  if (errors.length) {
+    throw new Error(`Invalid World Bank economic capture: ${errors.join(", ")}`);
+  }
+  return capture;
+}
+
+export async function writeWorldBankEconomicCapture(
+  path: string,
+  capture: WorldBankEconomicCapture,
+): Promise<void> {
+  const errors = validateWorldBankEconomicCapture(capture);
+  if (errors.length) {
+    throw new Error(`Invalid World Bank economic capture: ${errors.join(", ")}`);
+  }
+  // Refuse overwrite: a capture is an immutable input, not a mutable cache.
+  await writeFile(path, `${JSON.stringify(capture, null, 2)}\n`, {
+    encoding: "utf8",
+    flag: "wx",
+  });
+}
+
+export function worldBankEconomicObservationsFromCapture(
+  capture: WorldBankEconomicCapture,
+  expectedJurisdictions: readonly { id: string; iso2: string }[],
+): EconomicObservation[] {
+  const errors = validateWorldBankEconomicCapture(
+    capture,
+    expectedJurisdictions,
+  );
+  if (errors.length) {
+    throw new Error(`Invalid World Bank economic capture: ${errors.join(", ")}`);
+  }
+  const byKey = new Map(
+    capture.responses.map((response) => [
+      `${response.jurisdictionId}:${response.indicatorId}`,
+      response,
+    ]),
+  );
+  const observations = expectedJurisdictions.map(({ id }) => ({
+    jurisdictionId: id,
+    inflation: parseWorldBankObservation(
+      byKey.get(`${id}:${WORLD_BANK_ECONOMIC_INDICATORS.inflation}`)!,
+    ),
+    unemployment: parseWorldBankObservation(
+      byKey.get(`${id}:${WORLD_BANK_ECONOMIC_INDICATORS.unemployment}`)!,
+    ),
+    gdpGrowth: parseWorldBankObservation(
+      byKey.get(`${id}:${WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth}`)!,
+    ),
+  }));
+  for (const [component, indicatorId] of Object.entries(
+    WORLD_BANK_ECONOMIC_INDICATORS,
+  )) {
+    const observed = capture.responses
+      .filter((response) => response.indicatorId === indicatorId)
+      .map(parseWorldBankObservation)
+      .filter((observation) => observation.valueStatus === "observed").length;
+    if (observed === 0) {
+      throw new Error(
+        `World Bank coverage failed closed: ${component} has zero observed jurisdictions`,
+      );
+    }
+  }
+  return observations;
+}
+
+function aggregateResponseBodyHash(
+  responses: readonly WorldBankEconomicCaptureResponse[],
+): string {
+  return sha256(
+    stableStringify(
+      responses
+        .map(({ jurisdictionId, indicatorId, responseBodySha256 }) => ({
+          jurisdictionId,
+          indicatorId,
+          responseBodySha256,
+        }))
+        .sort((left, right) =>
+          compareText(
+            `${left.jurisdictionId}:${left.indicatorId}`,
+            `${right.jurisdictionId}:${right.indicatorId}`,
+          )),
+    ),
+  );
+}
+
+function economicLineages(
+  observations: readonly EconomicObservation[],
+  capture: WorldBankEconomicCapture,
+): EconomicLineages {
+  const common = {
+    sourceId: WORLD_BANK_SOURCE_ID,
+    dimension: "economic_stability",
+    upstreamRelease:
+      `World Bank API indicators ${WORLD_BANK_ECONOMIC_DATE_RANGE}; capture ${capture.captureSha256}`,
+    temporalCoverage: WORLD_BANK_ECONOMIC_DATE_RANGE.replace(":", "/"),
+    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+  };
+  const responsesFor = (indicatorId: string) =>
+    capture.responses.filter((response) => response.indicatorId === indicatorId);
+  return {
+    score: buildIndicatorLineage({
+      ...common,
+      transformationId: "conditions-economic-source-native/v1",
+      rows: observations,
+      publisherArtifactHash: aggregateResponseBodyHash(capture.responses),
+    }),
+    components: {
+      inflation: buildIndicatorLineage({
+        ...common,
+        indicatorId: WORLD_BANK_ECONOMIC_INDICATORS.inflation,
+        transformationId: "conditions-economic-component/v1",
+        rows: observations.map(({ jurisdictionId, inflation }) => ({
+          jurisdictionId,
+          ...inflation,
+        })),
+        publisherArtifactHash: aggregateResponseBodyHash(
+          responsesFor(WORLD_BANK_ECONOMIC_INDICATORS.inflation),
+        ),
+      }),
+      unemployment: buildIndicatorLineage({
+        ...common,
+        indicatorId: WORLD_BANK_ECONOMIC_INDICATORS.unemployment,
+        transformationId: "conditions-economic-component/v1",
+        rows: observations.map(({ jurisdictionId, unemployment }) => ({
+          jurisdictionId,
+          ...unemployment,
+        })),
+        publisherArtifactHash: aggregateResponseBodyHash(
+          responsesFor(WORLD_BANK_ECONOMIC_INDICATORS.unemployment),
+        ),
+      }),
+      gdp_growth: buildIndicatorLineage({
+        ...common,
+        indicatorId: WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth,
+        transformationId: "conditions-economic-component/v1",
+        rows: observations.map(({ jurisdictionId, gdpGrowth }) => ({
+          jurisdictionId,
+          ...gdpGrowth,
+        })),
+        publisherArtifactHash: aggregateResponseBodyHash(
+          responsesFor(WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth),
+        ),
+      }),
+    },
+  };
+}
+
+export async function prepareEconomicConditions(
+  db: ConditionsDb,
+  releaseId: string,
+  options: EconomicInputOptions,
+): Promise<PreparedConditionsDimension> {
+  if (Boolean(options.inputFile) === Boolean(options.captureOutput)) {
+    throw new Error(
+      "Pass exactly one of --economic-input=<capture.json> or --economic-capture-output=<capture.json>",
+    );
+  }
+  const jurisdictionRows = await db
+    .select({ id: jurisdictions.id, iso2: jurisdictions.iso2 })
+    .from(jurisdictions)
+    .where(isNotNull(jurisdictions.iso2));
+  const expectedJurisdictions = jurisdictionRows
+    .filter(
+      (row): row is { id: string; iso2: string } =>
+        typeof row.iso2 === "string" && /^[A-Za-z]{2}$/.test(row.iso2),
+    )
+    .map((row) => ({ id: row.id, iso2: row.iso2.toUpperCase() }));
+  if (!expectedJurisdictions.length) {
+    throw new Error("No jurisdictions with ISO2 codes are available");
+  }
+  const capture = options.inputFile
+    ? await readWorldBankEconomicCapture(options.inputFile)
+    : await captureWorldBankEconomicInputs({
+        jurisdictions: expectedJurisdictions,
+        fetchImpl: options.fetchImpl,
+        now: options.now,
+      });
+  if (options.captureOutput) {
+    await writeWorldBankEconomicCapture(options.captureOutput, capture);
+  }
+  const observations = worldBankEconomicObservationsFromCapture(
+    capture,
+    expectedJurisdictions,
+  );
+  const rows = buildEconomicConditionsCalculations({
+    observations,
+    releaseId,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    lineages: economicLineages(observations, capture),
+  });
+  const referenceSets = buildEconomicReferenceSets(observations);
+  if (!referenceSets.length) {
+    throw new Error(
+      "World Bank coverage failed closed: no jurisdiction has all economic components aligned to one reference year",
+    );
+  }
+  return {
+    rows,
+    referenceSets,
+  };
+}
+
+export async function runCombinedConditionsIngestion(
+  db: ConditionsDb,
+  options: RunConditionsWorkflowOptions,
+) {
+  if (!/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/.test(options.releaseId)) {
+    throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
+  }
+  const dependencies: ConditionsWorkflowDependencies = {
+    prepareHdi: prepareHdiConditions,
+    prepareGpi: prepareGpiConditions,
+    prepareEconomic: prepareEconomicConditions,
+    writeRelease: writeConditionsRelease,
+    ...options.dependencies,
+  };
+  const [hdi, gpi, economic] = await Promise.all([
+    dependencies.prepareHdi(db, options.releaseId),
+    dependencies.prepareGpi(db, options.releaseId),
+    dependencies.prepareEconomic(db, options.releaseId, {
+      inputFile: options.inputFile,
+      captureOutput: options.captureOutput,
+      fetchImpl: options.fetchImpl,
+      now: options.now,
+    }),
+  ]);
+  const release: ConditionsReleaseInput = {
+    releaseId: options.releaseId,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceSets: [
+      ...hdi.referenceSets,
+      ...gpi.referenceSets,
+      ...economic.referenceSets,
+    ],
+  };
+  const rows = [...hdi.rows, ...gpi.rows, ...economic.rows];
+  const summary = await dependencies.writeRelease(db, release, rows, {
+    dryRun: options.dryRun,
+  });
+  return { release, rows, summary };
+}

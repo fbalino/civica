@@ -21,6 +21,9 @@ const compareConditions = read("src/components/compare/CompareConditions.tsx");
 const economicScript = read("scripts/ingest-conditions-economic.ts");
 const hdiScript = read("scripts/ingest-conditions-hdi.ts");
 const gpiScript = read("scripts/ingest-conditions-gpi.ts");
+const allScript = read("scripts/ingest-conditions-all.ts");
+const productionWorkflow = read("src/lib/conditions/production-workflow.ts");
+const packageJson = read("package.json");
 
 for (const token of [
   "CURRENT_CONDITIONS_METHODOLOGY_VERSION",
@@ -41,6 +44,12 @@ for (const token of [
 ]) {
   if (!schema.includes(token)) errors.push(`release schema omits ${token}`);
   if (!releaseMigration.includes(token)) errors.push(`release migration omits ${token}`);
+}
+if (
+  !schema.includes("'higher_is_better','lower_is_better','not_ranked'") ||
+  !releaseMigration.includes("'higher_is_better','lower_is_better','not_ranked'")
+) {
+  errors.push("Conditions normalization storage rejects the source-native not_ranked direction");
 }
 for (const token of [
   "conditionsReleaseManifestSha256",
@@ -83,7 +92,7 @@ if (!economic.includes("mixed_year_refused") || !economic.includes("missing_comp
 if (/available\.length\s*<\s*2/.test(economicScript) || /Math\.max\(\s*\.\.\.\(available/.test(economicScript)) {
   errors.push("economic ingestion retains the legacy partial/newest-year shortcut");
 }
-for (const script of [hdiScript, gpiScript]) {
+for (const script of [hdiScript + productionWorkflow, gpiScript + productionWorkflow]) {
   if (!script.includes("CURRENT_CONDITIONS_METHODOLOGY_VERSION")) {
     errors.push("single-component Conditions writer uses an unversioned legacy method");
   }
@@ -92,6 +101,55 @@ for (const script of [hdiScript, gpiScript]) {
   }
   if (!script.includes("SOURCE_METHODOLOGY_VERSION")) {
     errors.push("single-component Conditions writer does not pin its source methodology");
+  }
+}
+for (const [name, script] of [
+  ["HDI", hdiScript],
+  ["GPI", gpiScript],
+  ["economic", economicScript],
+] as const) {
+  if (
+    !script.includes("Single-dimension Conditions writes are disabled") ||
+    !script.includes("if (!DRY_RUN)")
+  ) {
+    errors.push(`${name} entrypoint can create a partial canonical release`);
+  }
+  if (script.includes("override: true")) {
+    errors.push(`${name} entrypoint can override an explicit staging environment`);
+  }
+}
+if (allScript.includes("override: true")) {
+  errors.push("combined Conditions entrypoint can override an explicit staging environment");
+}
+for (const token of [
+  "runCombinedConditionsIngestion",
+  "prepareHdiConditions",
+  "prepareGpiConditions",
+  "prepareEconomicConditions",
+]) {
+  if (!allScript.includes(token) && !productionWorkflow.includes(token)) {
+    errors.push(`combined Conditions workflow omits ${token}`);
+  }
+}
+if (
+  !packageJson.includes(
+    '"ingest:conditions:all": "npm run run:production-pipeline -- --pipeline=conditions.current-beta -- tsx scripts/ingest-conditions-all.ts"',
+  ) ||
+  packageJson.includes(
+    "tsx scripts/ingest-conditions-hdi.ts && tsx scripts/ingest-conditions-gpi.ts",
+  )
+) {
+  errors.push("ingest:conditions:all does not preserve one release manifest and exact CLI arguments");
+}
+for (const token of [
+  "World Bank transport failed",
+  "World Bank request returned HTTP",
+  "World Bank coverage failed closed",
+  "captureSha256 does not match",
+  'flag: "wx"',
+]) {
+  if (!productionWorkflow.includes(token)) {
+    errors.push(`World Bank Conditions capture contract omits ${token}`);
   }
 }
 for (const token of [

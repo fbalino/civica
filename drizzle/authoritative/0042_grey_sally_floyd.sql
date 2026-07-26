@@ -10,7 +10,7 @@ CREATE TABLE "civica_conditions_normalization_parameters" (
 	"lower_bound" real,
 	"upper_bound" real,
 	CONSTRAINT "civica_conditions_normalization_parameters_pk" PRIMARY KEY("release_id","dimension","reference_period","component_id"),
-	CONSTRAINT "conditions_normalization_parameter_shape_check" CHECK ("civica_conditions_normalization_parameters"."direction" IN ('higher_is_better','lower_is_better') AND btrim("civica_conditions_normalization_parameters"."transformation_id") <> '' AND ("civica_conditions_normalization_parameters"."standard_deviation" IS NULL OR "civica_conditions_normalization_parameters"."standard_deviation" > 0) AND (("civica_conditions_normalization_parameters"."lower_bound" IS NULL AND "civica_conditions_normalization_parameters"."upper_bound" IS NULL) OR ("civica_conditions_normalization_parameters"."lower_bound" < "civica_conditions_normalization_parameters"."upper_bound")))
+	CONSTRAINT "conditions_normalization_parameter_shape_check" CHECK ("civica_conditions_normalization_parameters"."direction" IN ('higher_is_better','lower_is_better','not_ranked') AND btrim("civica_conditions_normalization_parameters"."transformation_id") <> '' AND ("civica_conditions_normalization_parameters"."standard_deviation" IS NULL OR "civica_conditions_normalization_parameters"."standard_deviation" > 0) AND (("civica_conditions_normalization_parameters"."lower_bound" IS NULL AND "civica_conditions_normalization_parameters"."upper_bound" IS NULL) OR ("civica_conditions_normalization_parameters"."lower_bound" < "civica_conditions_normalization_parameters"."upper_bound")))
 );
 --> statement-breakpoint
 CREATE TABLE "civica_conditions_reference_sets" (

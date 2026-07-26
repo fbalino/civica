@@ -1,127 +1,40 @@
 /** Civica Conditions — Peace & Security component ledger. */
 
 import { config } from "dotenv";
-config({ path: ".env.local", override: true });
-
-import { and, eq } from "drizzle-orm";
+config({ path: ".env.local" });
 
 import { db } from "../src/lib/db";
-import { ciDimensionScores } from "../src/lib/db/schema";
-import {
-  CONDITIONS_ALIGNMENT_POLICY,
-  CURRENT_CONDITIONS_METHODOLOGY_VERSION,
-  conditionCalculationKey,
-  type ConditionScoreInput,
-} from "../src/lib/conditions/contract";
+import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "../src/lib/conditions/contract";
 import { writeConditionsRelease } from "../src/lib/conditions/ingest";
-import { buildFixedBoundReferenceSets } from "../src/lib/conditions/release";
+import { prepareGpiConditions } from "../src/lib/conditions/production-workflow";
 
-const SOURCE_ID = "global_peace_index";
-const CI_DIMENSION = "stability_security";
-const SOURCE_METHODOLOGY_VERSION = "v1.0";
-const CONDITIONS_DIMENSION = "peace_security" as const;
 const DRY_RUN = process.argv.includes("--dry-run");
 const RELEASE_ID = process.argv.find((arg) => arg.startsWith("--release-id="))?.slice(
   "--release-id=".length,
 );
-
-function referenceYear(quarter: string): number | null {
-  const match = /^(\d{4})-Q[1-4]$/.exec(quarter);
-  return match ? Number(match[1]) : null;
-}
-
-function normalizeGpi(raw: number): number {
-  return Math.min(100, Math.max(0, ((5 - raw) / 4) * 100));
-}
-
-function conditionRow(
-  row: typeof ciDimensionScores.$inferSelect,
-): ConditionScoreInput {
-  const year = referenceYear(row.quarter);
-  const observed = row.rawValue !== null && year !== null;
-  const reason = row.rawValue === null
-    ? "The copied GPI source row has no native raw value"
-    : "The copied GPI source row has an invalid reference quarter";
-  const component = {
-    componentId: "global_peace_index" as const,
-    nativeValue: observed ? row.rawValue : null,
-    nativeUnit: "index_1_5_inverted",
-    referenceYear: observed ? year : null,
-    valueStatus: observed ? ("observed" as const) : ("missing" as const),
-    valueStatusReason: observed ? null : reason,
-    inclusionDecision: observed ? ("included" as const) : ("excluded_missing" as const),
-    sourceId: SOURCE_ID,
-    indicatorId: row.indicatorId,
-    upstreamRelease: row.upstreamRelease,
-    artifactHash: row.artifactHash,
-    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
-    temporalCoverage: row.temporalCoverage,
-    licenseUrl: row.licenseUrl,
-    transformationId: "conditions-gpi-component/v2",
-    substitutionReason: row.substitutionReason,
-    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
-  };
-  const base = {
-    releaseId: RELEASE_ID!,
-    jurisdictionId: row.jurisdictionId,
-    dimension: CONDITIONS_DIMENSION,
-    quarter: observed ? row.quarter : null,
-    normalizedScore: observed ? normalizeGpi(row.rawValue!) : null,
-    rawValue: observed ? row.rawValue : null,
-    sourceId: SOURCE_ID,
-    datasetYear: observed ? year : null,
-    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
-    referenceYear: observed ? year : null,
-    alignmentPolicy: CONDITIONS_ALIGNMENT_POLICY,
-    alignmentStatus: observed ? ("aligned" as const) : ("missing_component" as const),
-    components: [component],
-    indicatorId: row.indicatorId,
-    upstreamRelease: row.upstreamRelease,
-    artifactHash: row.artifactHash,
-    artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
-    temporalCoverage: row.temporalCoverage,
-    licenseUrl: row.licenseUrl,
-    transformationId: "conditions-gpi-fixed-bound/v2",
-    substitutionReason: row.substitutionReason,
-    methodVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
-  };
-  return { ...base, calculationKey: conditionCalculationKey(base) };
-}
 
 async function main() {
   console.log("=== Civica Conditions — Peace & Security component ledger ===\n");
   if (!RELEASE_ID) {
     throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
   }
-  const sourceRows = await db
-    .select()
-    .from(ciDimensionScores)
-    .where(
-      and(
-        eq(ciDimensionScores.dimension, CI_DIMENSION),
-        eq(ciDimensionScores.sourceId, SOURCE_ID),
-        eq(ciDimensionScores.methodologyVersion, SOURCE_METHODOLOGY_VERSION),
-      ),
+  if (!DRY_RUN) {
+    throw new Error(
+      "Single-dimension Conditions writes are disabled; use ingest:conditions:all for one canonical release",
     );
-  if (!sourceRows.length) {
-    throw new Error("No GPI rows found in ci_dimension_scores. Run ingest:ci first.");
   }
-
-  const rows = sourceRows.map(conditionRow);
+  const prepared = await prepareGpiConditions(db, RELEASE_ID);
   const summary = await writeConditionsRelease(db, {
     releaseId: RELEASE_ID,
     methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
-    referenceSets: buildFixedBoundReferenceSets({
-      calculations: rows,
-      componentId: "global_peace_index",
-      direction: "lower_is_better",
-      transformationId: "conditions-gpi-fixed-bound/v2",
-      lowerBound: 1,
-      upperBound: 5,
-    }),
-  }, rows, { dryRun: DRY_RUN });
-  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? rows.length : summary.componentsWritten} component rows.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`);
+    referenceSets: prepared.referenceSets,
+  }, prepared.rows, { dryRun: DRY_RUN });
+  console.log(
+    `${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? prepared.rows.length : summary.componentsWritten} component rows.`,
+  );
+  console.log(
+    `Dimension: peace_security | Source: global_peace_index | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`,
+  );
 }
 
 main().catch((error) => {

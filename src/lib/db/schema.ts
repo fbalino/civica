@@ -2376,7 +2376,7 @@ export const civicaConditionsNormalizationParameters = pgTable(
     }).onDelete("restrict"),
     check(
       "conditions_normalization_parameter_shape_check",
-      dsql`${table.direction} IN ('higher_is_better','lower_is_better') AND btrim(${table.transformationId}) <> '' AND (${table.standardDeviation} IS NULL OR ${table.standardDeviation} > 0) AND ((${table.lowerBound} IS NULL AND ${table.upperBound} IS NULL) OR (${table.lowerBound} < ${table.upperBound}))`,
+      dsql`${table.direction} IN ('higher_is_better','lower_is_better','not_ranked') AND btrim(${table.transformationId}) <> '' AND (${table.standardDeviation} IS NULL OR ${table.standardDeviation} > 0) AND ((${table.lowerBound} IS NULL AND ${table.upperBound} IS NULL) OR (${table.lowerBound} < ${table.upperBound}))`,
     ),
   ],
 );
