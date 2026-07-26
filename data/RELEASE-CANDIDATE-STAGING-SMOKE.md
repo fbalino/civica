@@ -20,6 +20,27 @@ passing staging run.
 3. Disable staging jobs and prove no active lease remains. Do not use a
    deployment as a job-stop mechanism.
 
+The checked static-asset manifest means the complete Vercel Build Output API
+`static` tree, not the editorial illustration manifest or Next.js route-chunk
+manifest. Build once, generate and verify the deterministic inventory, then
+deploy that same output without rebuilding:
+
+```sh
+vercel build --target=preview --yes
+node --import tsx scripts/staging-static-assets.ts \
+  --root=.vercel/output/static \
+  --out=plan/evidence/QA-018/staging-static-assets.v1.json
+node --import tsx scripts/staging-static-assets.ts \
+  --root=.vercel/output/static \
+  --verify=plan/evidence/QA-018/staging-static-assets.v1.json
+vercel deploy --prebuilt --target=preview --yes
+```
+
+The generator records every regular file's relative path, byte count, and
+SHA-256 in deterministic order and refuses an empty tree, a symbolic link, a
+changed file, or an unlisted extra file. Record the printed manifest SHA-256 in
+the run record.
+
 ## Closed migration scope
 
 The prepared staging migration plan requires the future isolated branch to
