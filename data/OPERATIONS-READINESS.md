@@ -27,7 +27,7 @@ and P1 operational finding below is closed.
 ## Security and access controls
 
 - The current tracked tree passes `npm run validate:secrets` with zero
-  findings across 3,931 files.
+  findings across 3,969 files.
 - The history scanner distinguishes 28 exact non-secret historical fixture
   hashes from the one real historical Neon connection-string exposure. The
   latter remains recoverable from Git history and must be rotated by the owner;
@@ -46,15 +46,15 @@ and P1 operational finding below is closed.
 - Clean-checkout evidence installed the lockfile-pinned dependencies, completed
   the production build, and passed the fixture-only test suite.
 - The fixed local G4 matrix was rerun on 2026-07-26 from a clean source
-  checkout at `2eddeb5d`: master-plan integrity, verification-matrix
+  checkout at `b327cfff`: master-plan integrity, verification-matrix
   validation, the unit suite, typecheck, lint, and the canonical
   credential-free production build all passed. The checkout had no
-  `.env.local` or database variable; exact command durations and the reused
+  `.env.local` or database variable; exact command durations and the local
   dependency-tree limitation are retained under `plan/evidence/QA-021/`.
 - Hosted pull-request/main runs and branch-protection enforcement have not been
   observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 249 of 310 tasks complete, 27 open P0 tasks,
-  57 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
+- The current G4 readiness record reports 252 of 310 tasks complete, 26 open P0 tasks,
+  54 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 
 ## Jobs, freshness, and error monitoring
@@ -87,15 +87,17 @@ and P1 operational finding below is closed.
 - `civica-deployment-rehearsal/v1` passes its local nine-migration staged-order,
   compatibility, abort, validation-only deployment, cache/release boundary,
   and forward-only recovery fixtures.
-- No disposable Neon/Vercel staging rehearsal has run for the current
-  migration set. The 2026-07-26 Vercel CLI isolation probe found that Preview
-  resolves to the production Neon branch and aborted before any migration,
-  Conditions release, deployment, or database write. QA-018 therefore has no
-  exact deployed commit/data/method smoke evidence, and QA-019 has no
-  deliberately bad staged release rollback or forward-fix evidence. The
-  remaining Preview connection settings require Vercel project authority;
-  after they are confirmed, Codex resumes through Vercel CLI only. A Neon
-  Console or browser sign-in is not an accepted operator path.
+- The 2026-07-26 isolated rehearsal migrated a disposable Neon child through
+  authoritative head `0050`, published the bound Conditions release there,
+  deployed exact candidate `fb7376f3` to Vercel Preview, and passed the
+  release-pointer, cache, protected-route, idempotent non-model dry-run,
+  unchanged-freshness, API, and responsive-browser checks. Exact Preview
+  runtime identity excluded the production branch and host; production was
+  untouched. QA-018 remains unchecked only until Fernando records a dated
+  approval or rejection of that retained run.
+- QA-019 still has no deliberately bad isolated release rollback or
+  forward-fix evidence. A Neon Console or browser sign-in is not an accepted
+  operator path for the remaining CLI-run work.
 - Conditions migrations/releases, Pulse workspace reconciliation, observability
   migrations, and other production promotions remain authority-gated. This
   report does not authorize them.
@@ -120,10 +122,11 @@ and P1 operational finding below is closed.
    not.
 2. **Hosted CI — owner/platform:** observe passing pull-request and `main`
    workflows and require the canonical `verify` job through branch protection.
-3. **Staging and release smoke — owner/platform:** enable the two prepared
-   Preview connection settings in Vercel, then complete PLT-019 and QA-018
-   through Vercel CLI on a disposable Neon branch and isolated Vercel
-   environment, with jobs quiesced and exact release identities retained.
+3. **Isolated release disposition and production authority — owner/platform:**
+   review the retained QA-018 run and record a dated approval or rejection.
+   Separately authorize or reject the prepared ATL-026/ATL-027 production
+   Conditions migration and release batch; the isolated rehearsal does not
+   grant production authority.
 4. **Rollback/correction rehearsal — owner/platform:** complete QA-019 with a
    deliberately bad staged release and verify cache, artifact, status, and
    changelog consistency.

@@ -3,29 +3,30 @@
 ## Current result — 2026-07-26
 
 The fixed G4 command matrix passes all six local commands at source commit
-`2eddeb5d`. Its overall status remains correctly `blocked`: 249/310 tasks are
-complete, 61 remain, and 27 P0 plus 57 P0/P1 tasks still require human
+`b327cfff`. Its overall status remains correctly `blocked`: 252/310 tasks are
+complete, 58 remain, and 26 P0 plus 54 P0/P1 tasks still require human
 decisions, external review, production or staging authority, unavailable
 publisher evidence, elapsed observation time, or completion of those
 dependencies. It reports zero evidence gaps, zero master-mirror errors, and
 zero waivers.
 
-The run used a fresh clean source clone with no `.env.local` and no database
-variable. It reused the repository's existing dependency tree rather than
-performing a network install; QA-017 remains the clean-install proof. The G4
-production command is now the canonical credential-free `npm run build:ci`,
-so no Neon, Vercel, provider credential, migration, deployment, production
-mutation, paid model call, external review, or elapsed observation was used or
-claimed.
+The run used a clean detached source checkout with no `.env.local` and no
+database variable. It used a local hard-linked copy of the repository's
+existing dependency tree rather than a network install; QA-017 remains the
+clean-install proof. The dependency tree was placed inside the checkout so
+Turbopack did not rely on an out-of-root symlink. The G4 production command is
+the canonical credential-free `npm run build:ci`, so no Neon, Vercel, provider
+credential, migration, deployment, production mutation, paid model call,
+external review, or elapsed observation was used or claimed.
 
 | Command | Result | Duration |
 | --- | --- | ---: |
-| `node plan/tools/validate-master-plan.mjs` | passed | 30 ms |
-| `npm run validate:verification-matrix` | passed | 2,639 ms |
-| `npm test` | passed | 27,695 ms |
-| `npm run typecheck` | passed | 15,028 ms |
-| `npm run lint` | passed | 23,223 ms |
-| `npm run build:ci` | passed | 148,441 ms |
+| `node plan/tools/validate-master-plan.mjs` | passed | 36 ms |
+| `npm run validate:verification-matrix` | passed | 3,112 ms |
+| `npm test` | passed | 36,809 ms |
+| `npm run typecheck` | passed | 22,538 ms |
+| `npm run lint` | passed | 26,053 ms |
+| `npm run build:ci` | passed | 192,895 ms |
 
 ## Additional repairs found by the fresh run
 

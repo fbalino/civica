@@ -7,25 +7,28 @@ The canonical report is `data/OPERATIONS-READINESS.md`.
 
 ## Current refresh — 2026-07-26
 
-A clean source checkout at `2eddeb5d` reran the fixed G4 matrix. All six
+A clean detached source checkout at `b327cfff` reran the fixed G4 matrix. All six
 commands passed: master-plan integrity, verification-matrix validation, the
 unit suite, typecheck, lint, and `npm run build:ci`. The build path was
 credential-free; the checkout had no `.env.local` or database variable. The
-source checkout reused the repository's already-installed dependency tree
-rather than performing a new network install, so QA-017 remains the separate
-clean-install proof.
+source checkout used a local hard-linked copy of the repository's
+already-installed dependency tree rather than performing a new network
+install, so QA-017 remains the separate clean-install proof.
 
-The current tracked-tree secret scan reports zero findings across 3,931 files.
-The generated readiness state is correctly blocked at 249/310 tasks, with 61
-remaining, 27 open P0, 57 open P0/P1, zero evidence gaps, zero master-mirror
+The current tracked-tree secret scan reports zero findings across 3,969 files.
+The generated readiness state is correctly blocked at 252/310 tasks, with 58
+remaining, 26 open P0, 54 open P0/P1, zero evidence gaps, zero master-mirror
 errors, and zero waivers.
 
-The 2026-07-26 QA-018 Vercel CLI isolation probe found that Preview resolves
-to the production Neon branch and stopped before any write or migration.
-Staging remains external-authority work: enable the prepared Vercel Preview
-connection settings, then resume through Vercel CLI only. No Neon Console
-sign-in, migration, deployment, production mutation, provider-setting change,
-paid model call, status notification, or waiver is claimed here.
+The 2026-07-26 QA-018 technical run completed against a disposable Neon child
+and exact Vercel Preview candidate, with production explicitly excluded and
+untouched. The retained migration, release, cache, protected-route,
+idempotent dry-run, freshness, API, and responsive-browser checks passed.
+QA-018 remains unchecked only for Fernando's dated approval or rejection.
+ATL-026/ATL-027 production migration and release work still require separate
+production authority. No Neon Console sign-in, production mutation, paid model
+call, status notification, external review, elapsed observation, or waiver is
+claimed here.
 
 ## Initial preparation — 2026-07-23
 
