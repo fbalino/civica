@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "c58ec87328f8c09e7cd4519652ffbb38bc31d208038f50e492ba643d2c67c59e",
+  "semanticHash": "58ee73db8fb83d94cfc8ca7459c4a5abbc04e9660b7b12ebc2408b1768d84296",
   "summary": {
     "route": 184,
     "pipeline": 50,
@@ -2426,7 +2426,7 @@
       "id": "pipeline:conditions.current-beta",
       "kind": "pipeline",
       "title": "conditions.current-beta manual production pipeline",
-      "source": "scripts/ingest-conditions-hdi.ts, scripts/ingest-conditions-gpi.ts, scripts/ingest-conditions-economic.ts",
+      "source": "scripts/ingest-conditions-all.ts, src/lib/conditions/production-workflow.ts, src/lib/conditions/ingest.ts",
       "critical": true,
       "owner": "Data ingestion and release operations",
       "fixture": "Registered conditions.current-beta manual adapter and canonical command",
