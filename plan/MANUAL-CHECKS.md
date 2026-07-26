@@ -93,15 +93,6 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
-- **GOV-003 · Owner:** fields 1–4 in
-  `plan/research/project-disclosure-owner-confirmation-v1.md` are confirmed:
-  Fernando personally funds Civica; there are no grants or other outside
-  funding, no donated or discounted support, and no outside affiliations.
-  Complete only fields 5–7: state whether formal/paid source or vendor
-  relationships extend beyond ordinary customer/public-access terms; name any
-  third party with exceptional control rights or confirm none; and authorize
-  publication plus the six-month/material-change review cadence. Personal
-  voting and unrelated political-donation history are intentionally excluded.
 - **GOV-012 · Owner:** choose and sign the compensation posture in `plan/research/reviewer-honorarium-decision-brief-v1.md`. The recommendation is fixed honoraria of $1,000 for each 8–12-hour Atlas/Index review and $1,500 for each 12–16-hour Pulse review, with a $12,075 first-wave ceiling for nine primaries including a 15% logistics reserve. Also identify the paying person/entity and jurisdiction so accounting can confirm forms, withholding, currency, fees, and institutional-payment handling. This approval does not authorize contact; GOV-016 and G4 still apply, and Pulse also waits for GOV-015.
 - **EXP-038 · Owner:** the approved subset in
   `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. Record

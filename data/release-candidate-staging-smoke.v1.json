@@ -16,8 +16,31 @@
       "0038_heavy_slyde",
       "0039_living_clea",
       "0040_closed_young_avengers",
-      "0042_grey_sally_floyd"
+      "0042_grey_sally_floyd",
+      "0043_pulse_decay_lifecycle",
+      "0044_pulse_drift_monitoring",
+      "0045_pulse_evaluation_workspace_reconciliation",
+      "0046_little_mulholland_black",
+      "0047_atlas_data_error_reports",
+      "0048_entity_name_forms"
     ],
+    "migrationOwners": {
+      "0033_flat_hardball": "PLT-009",
+      "0034_superb_the_fallen": "PLT-010",
+      "0035_equal_marvex": "PLT-010",
+      "0036_moaning_toad_men": "PLT-014",
+      "0037_minor_sharon_carter": "PLT-016",
+      "0038_heavy_slyde": "PLT-017",
+      "0039_living_clea": "PLT-018",
+      "0040_closed_young_avengers": "ATL-026",
+      "0042_grey_sally_floyd": "ATL-027",
+      "0043_pulse_decay_lifecycle": "PUL-027",
+      "0044_pulse_drift_monitoring": "PUL-024",
+      "0045_pulse_evaluation_workspace_reconciliation": "PUL-043",
+      "0046_little_mulholland_black": "ATL-020",
+      "0047_atlas_data_error_reports": "ATL-024",
+      "0048_entity_name_forms": "EXP-029"
+    },
     "assetManifestSha256": null
   },
   "isolation": {

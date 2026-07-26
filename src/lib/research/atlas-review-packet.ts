@@ -16,6 +16,7 @@ export const ATLAS_REVIEW_ARTIFACTS = Object.freeze([
   { id: "limitations", path: "data/releases/atlas-2026-07-11/g2-rc1/KNOWN-LIMITATIONS.md", role: "Known limitations" },
   { id: "citation", path: "data/releases/atlas-2026-07-11/g2-rc1/CITATION.cff", role: "Citation metadata" },
   { id: "correction_policy", path: "content/policies.md", role: "Correction, retraction, supersession, and preservation policy" },
+  { id: "project_disclosure", path: "data/research/project-disclosure-v1.json", role: "Funding, conflicts, independence, source relationships, and editorial control" },
 ]);
 
 export const ATLAS_REVIEW_QUESTIONS = Object.freeze([
@@ -34,7 +35,7 @@ export const ATLAS_REVIEW_QUESTIONS = Object.freeze([
 export function atlasReviewPacketErrors(): string[] {
   const errors: string[] = [];
   const ids = new Set(ATLAS_REVIEW_ARTIFACTS.map(({ id }) => id));
-  for (const required of ["frozen_release", "codebook", "data_dictionary", "rights_manifest", "source_input_manifest", "checksums", "clean_room", "coverage", "quality", "correction_policy"])
+  for (const required of ["frozen_release", "codebook", "data_dictionary", "rights_manifest", "source_input_manifest", "checksums", "clean_room", "coverage", "quality", "correction_policy", "project_disclosure"])
     if (!ids.has(required)) errors.push(`missing ${required}`);
   if (ids.size !== ATLAS_REVIEW_ARTIFACTS.length) errors.push("duplicate artifact id");
   if (ATLAS_REVIEW_QUESTIONS.length < 10) errors.push("review questionnaire is too broad or incomplete");

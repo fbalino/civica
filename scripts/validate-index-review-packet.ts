@@ -22,6 +22,6 @@ for (const path of [packet.sensitivity.relatedCompositeAnalysis, packet.subgroup
   assert.ok(existsSync(path), `${path} is missing`);
 
 const inventory = readFileSync("data/releases/governance-evidence-review-packet-2026-07-v3/artifact-inventory.v1.csv", "utf8").trim().split("\n");
-assert.equal(inventory.length - 1, 49);
+assert.equal(inventory.length - 1, 50);
 
 console.log("PASS — the current Index review packet closes preregistration, candidates/baselines, frozen panel, code/environment, analyses, sensitivity/uncertainty/subgroups, thresholds, failures, disposition, misuse, and 11 bounded questions.");

@@ -425,6 +425,13 @@
       "path": "data/releases/k5-institutional-relation-candidates-v1/manifest.v1.json"
     },
     {
+      "artifactId": "project-disclosure",
+      "role": "governance",
+      "bytes": 4549,
+      "sha256": "408f653b60310c7ee4b05ff14c471313da4fe2d5c6f78068cf9ed99f48f40640",
+      "path": "data/research/project-disclosure-v1.json"
+    },
+    {
       "artifactId": "package-lock",
       "role": "environment",
       "bytes": 416947,
@@ -476,8 +483,8 @@
     {
       "artifactId": "review-packet-validator",
       "role": "selected-product-code",
-      "bytes": 2723,
-      "sha256": "b5421a7945b01efb0ca3e64c68b1b940257f479793410a0304dc9403a7408982",
+      "bytes": 2739,
+      "sha256": "2a1712b13b0fc3e2846549c8c5c5ec7efbf7d968e9c58eec21ebef920a2c1f53",
       "path": "scripts/validate-governance-evidence-review-packet.ts"
     },
     {
@@ -504,8 +511,8 @@
     {
       "artifactId": "review-packet-builder",
       "role": "selected-product-code",
-      "bytes": 10693,
-      "sha256": "a7f91af75337d44da30b5d1b12a5c180403b51db582b96671ad5190b64148a7e",
+      "bytes": 10820,
+      "sha256": "ef9d8e11e9ba3276d77f0bb0cf26f4b8d251e5cdb4d524902bf576fa40509e64",
       "path": "src/lib/ci/governance-evidence-review-package.ts"
     },
     {
@@ -544,5 +551,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "295d74da62a849de523746649793dc6021ca293b1cac6b12192804e3eddeeb1b"
+  "bundleSemanticSha256": "d871b7e9f3fe9365945937e3e7b0230522406777dcbc538d6784a3e482e9650d"
 }

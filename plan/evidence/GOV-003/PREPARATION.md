@@ -1,6 +1,6 @@
 # GOV-003 preparation evidence
 
-Status: partially confirmed, not complete; publication remains blocked
+Status: superseded by completed owner confirmation and implementation
 
 Date: 2026-07-11
 
@@ -15,8 +15,9 @@ Personal voting history and unrelated personal political-donation history were
 deliberately excluded because they are not evidence of Civica funding,
 affiliation, or editorial control.
 
-Formal or paid source/vendor relationships, any exceptions to the documented
-third-party control boundary, and explicit permission to publish and adopt the
-six-month/material-change review cadence remain pending. Until those fields are
-confirmed, no machine-readable public disclosure, `/about` claim, or
-reviewer-packet regeneration may occur.
+Fernando subsequently confirmed that there are no formal or privileged source
+or vendor relationships beyond ordinary paid-customer or public-access terms;
+no third party has exceptional control rights; and the disclosure is authorized
+for `/about`, unchanged Atlas/Index/Pulse reviewer-packet reuse, and review every
+six months and after any material change. Completion evidence is recorded in
+`plan/evidence/GOV-003/README.md`.

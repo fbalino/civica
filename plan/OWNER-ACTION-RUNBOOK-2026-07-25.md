@@ -64,8 +64,9 @@ decides whether and how the About narrative should name him; H5, T3, and T4
 retain their separate factual or operating gates.
 
 The website routes named in the deck show the **current** copy; they do not show
-an unpublished alternate version. Do not approve H5 until GOV-003 is answered,
-T3 unless a monitored response target is real, or T4 until ATL-024 is active.
+an unpublished alternate version. GOV-003 is now answered and published, so
+H5 can be decided. Do not approve T3 unless a monitored response target is real,
+or T4 until ATL-024 is active.
 For context, browse the current [home](http://localhost:3002/),
 [About](http://localhost:3002/about),
 [Methodology](http://localhost:3002/methodology),
@@ -98,8 +99,7 @@ These require no external contact before a decision is recorded.
 | Task | Open first | Fernando decides or supplies | What to return to Codex |
 | --- | --- | --- | --- |
 | EXP-015 | [Local rendered candidate](http://localhost:3002/), [design-system rendering](http://localhost:3002/design-system#explore-concepts), [dated captures and verification](evidence/EXP-015/RENDERED-CANDIDATE.md), [approved light masters](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md), [dark masters](evidence/EXP-015/GENERATED-DARK-MASTERS.md), and [replacement preparation](evidence/EXP-015/PREPARATION.md) | Approve, revise, or reject the exact desktop/mobile and light/dark rendered result. | One rendered-candidate disposition and any specific revisions. Approval is not deployment authority. |
-| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Later: choose A4 naming, H5 after GOV-003, T3 only if a real response posture exists, and T4 when the interim or live correction route is selected. | The four remaining dispositions. The approved subset is already applied; no translation or deployment is implied. |
-| GOV-003 | [Owner confirmation fields](research/project-disclosure-owner-confirmation-v1.md#confirmation-fields) | Fields 1–4 are confirmed. Later: state ordinary paid/formal vendor relationships, confirm whether any third party has exceptional control rights, and authorize publication plus the review cadence. | Fields 5–7. Codex will then generate one disclosure for `/about` and the reviewer packets. |
+| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Choose A4 naming and H5 now that GOV-003 is complete; choose T3 only if a real response posture exists, and T4 when the interim or live correction route is selected. | The four remaining dispositions. The approved subset is already applied; no translation or deployment is implied. |
 | PLT-029 | [Telemetry procedure](PLT-029-program-cost-effort-telemetry-2026-07-23.md) and [current ledger](../data/program-cost-effort-ledger.v1.json) | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |
 
 [GOV-012](research/reviewer-honorarium-decision-brief-v1.md#decision-requested)

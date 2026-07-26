@@ -28,6 +28,10 @@ const errors: string[] = [];
 
 const allRows = [...master.matchAll(/^- \[(x| )\] \*\*([A-Z]+-\d+)\*\* \((P[0-2])\)/gm)];
 const openIds = allRows.filter((match) => match[1] === " ").map((match) => match[2]).sort();
+const openP0 = allRows.filter((match) => match[1] === " " && match[3] === "P0").length;
+const openP0P1 = allRows.filter(
+  (match) => match[1] === " " && (match[3] === "P0" || match[3] === "P1"),
+).length;
 const completed = allRows.length - openIds.length;
 const progress = Number(((completed / allRows.length) * 100).toFixed(1));
 
@@ -75,7 +79,7 @@ for (const text of [
   `${completed} of ${allRows.length} complete`,
   `${openIds.length} remain`,
   "There is no checklist item that an agent can finish now",
-  "G4 remains blocked with 27 unchecked P0 tasks and 58 unchecked P0/P1 tasks.",
+  `G4 remains blocked with ${openP0} unchecked P0 tasks and ${openP0P1} unchecked P0/P1 tasks.`,
 ]) {
   if (!normalizedReport.includes(text)) errors.push(`report omits current conclusion: ${text}`);
 }

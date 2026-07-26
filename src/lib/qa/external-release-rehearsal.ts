@@ -3,6 +3,37 @@ export const STAGING_SMOKE_SCHEMA_VERSION =
 export const RECOVERY_REHEARSAL_SCHEMA_VERSION =
   "civica-rollback-forward-fix-rehearsal/v1" as const;
 
+/**
+ * QA-018 starts from the configured database ledger recorded at 0032. Because
+ * db:migrate applies the authoritative ledger in order, the staging rehearsal
+ * must include every later migration currently checked into the repository.
+ *
+ * The owning task is part of the protocol rather than an inferred annotation:
+ * it identifies which task-specific live validation must be retained after the
+ * shared migration pass.
+ */
+export const QA_018_DATABASE_HEAD = "0032_sparkling_genesis" as const;
+export const QA_018_REQUIRED_MIGRATIONS = [
+  { id: "0033_flat_hardball", ownerTaskId: "PLT-009" },
+  { id: "0034_superb_the_fallen", ownerTaskId: "PLT-010" },
+  { id: "0035_equal_marvex", ownerTaskId: "PLT-010" },
+  { id: "0036_moaning_toad_men", ownerTaskId: "PLT-014" },
+  { id: "0037_minor_sharon_carter", ownerTaskId: "PLT-016" },
+  { id: "0038_heavy_slyde", ownerTaskId: "PLT-017" },
+  { id: "0039_living_clea", ownerTaskId: "PLT-018" },
+  { id: "0040_closed_young_avengers", ownerTaskId: "ATL-026" },
+  { id: "0042_grey_sally_floyd", ownerTaskId: "ATL-027" },
+  { id: "0043_pulse_decay_lifecycle", ownerTaskId: "PUL-027" },
+  { id: "0044_pulse_drift_monitoring", ownerTaskId: "PUL-024" },
+  {
+    id: "0045_pulse_evaluation_workspace_reconciliation",
+    ownerTaskId: "PUL-043",
+  },
+  { id: "0046_little_mulholland_black", ownerTaskId: "ATL-020" },
+  { id: "0047_atlas_data_error_reports", ownerTaskId: "ATL-024" },
+  { id: "0048_entity_name_forms", ownerTaskId: "EXP-029" },
+] as const;
+
 export const STAGING_CHECK_IDS = [
   "zero-write-migration-plan",
   "authoritative-migrations",
@@ -52,6 +83,7 @@ export interface StagingSmokeRecord {
     dataReleaseIds: string[];
     methodVersions: string[];
     migrationIds: string[];
+    migrationOwners: Record<string, string>;
     assetManifestSha256: string | null;
   };
   isolation: {
@@ -128,12 +160,41 @@ const isCommit = (value: string | null) => /^[a-f0-9]{40}$/.test(value ?? "");
 const isTimestamp = (value: string | null) =>
   value !== null && Number.isFinite(Date.parse(value));
 
-export function stagingSmokeErrors(record: StagingSmokeRecord) {
-  const errors = checkSetErrors(
-    record.checks,
-    STAGING_CHECK_IDS,
-    record.status,
+function stagingMigrationPlanErrors(record: StagingSmokeRecord) {
+  const errors: string[] = [];
+  const expectedIds = QA_018_REQUIRED_MIGRATIONS.map(({ id }) => id);
+  if (
+    JSON.stringify(record.candidate.migrationIds) !==
+    JSON.stringify(expectedIds)
+  ) {
+    errors.push(
+      `candidate migrations must exactly follow the authoritative ledger after ${QA_018_DATABASE_HEAD}`,
+    );
+  }
+
+  const expectedOwners = Object.fromEntries(
+    QA_018_REQUIRED_MIGRATIONS.map(({ id, ownerTaskId }) => [id, ownerTaskId]),
   );
+  const actualOwners = record.candidate.migrationOwners ?? {};
+  const actualOwnerIds = Object.keys(actualOwners);
+  if (
+    JSON.stringify(actualOwnerIds) !== JSON.stringify(expectedIds) ||
+    QA_018_REQUIRED_MIGRATIONS.some(
+      ({ id, ownerTaskId }) => actualOwners[id] !== ownerTaskId,
+    )
+  ) {
+    errors.push(
+      `candidate migration owners must exactly match ${JSON.stringify(expectedOwners)}`,
+    );
+  }
+  return errors;
+}
+
+export function stagingSmokeErrors(record: StagingSmokeRecord) {
+  const errors = [
+    ...checkSetErrors(record.checks, STAGING_CHECK_IDS, record.status),
+    ...stagingMigrationPlanErrors(record),
+  ];
   if (record.schemaVersion !== STAGING_SMOKE_SCHEMA_VERSION) {
     errors.push(`unexpected staging schema ${record.schemaVersion}`);
   }

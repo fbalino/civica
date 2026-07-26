@@ -108,6 +108,13 @@
       "role": "Correction, retraction, supersession, and preservation policy",
       "bytes": 16124,
       "sha256": "11c28a97cc291e3b7609a6639853f31f71fb71bc798e339b384da4de8c4da821"
+    },
+    {
+      "id": "project_disclosure",
+      "path": "data/research/project-disclosure-v1.json",
+      "role": "Funding, conflicts, independence, source relationships, and editorial control",
+      "bytes": 4549,
+      "sha256": "408f653b60310c7ee4b05ff14c471313da4fe2d5c6f78068cf9ed99f48f40640"
     }
   ],
   "questions": [
@@ -122,5 +129,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "5a09283d9fbd16abf8517fd5959d77c2c86d74da79175d3d04d25e9faafa4cbb"
+  "semanticSha256": "2cff819c37f15fcd1471555eb3c41873e1d427d55e4bb0749e453937fc569765"
 }

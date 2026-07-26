@@ -3,16 +3,16 @@
   "reviewedAt": "2026-07-25",
   "checklist": {
     "total": 310,
-    "completed": 248,
-    "remaining": 62,
-    "progressPercent": 80
+    "completed": 249,
+    "remaining": 61,
+    "progressPercent": 80.3
   },
   "agentExecutableNow": [],
   "categories": [
     {
       "id": "direct-human-owner-professional",
       "label": "Direct human, owner, or professional review",
-      "count": 15,
+      "count": 14,
       "taskIds": [
         "BRD-003",
         "BRD-010",
@@ -22,7 +22,6 @@
         "EXP-015",
         "EXP-025",
         "EXP-038",
-        "GOV-003",
         "GOV-012",
         "IDX-022",
         "IDX-034",
@@ -30,7 +29,7 @@
         "QA-012",
         "QA-013"
       ],
-      "nextStep": "Obtain the exact rendered Explore disposition; GOV-003 fields 5–7; the four residual EXP-038 dispositions; owner spend and honorarium facts; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
+      "nextStep": "Obtain the exact rendered Explore disposition; the four residual EXP-038 dispositions; owner spend and honorarium facts; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
     },
     {
       "id": "production-staging-external-authority",

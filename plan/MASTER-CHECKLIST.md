@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 310
-- **Completed:** 248
-- **Remaining:** 62
-- **Progress:** 80%
+- **Completed:** 249
+- **Remaining:** 61
+- **Progress:** 80.3%
 - **Priority mix:** P0 192 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -337,7 +337,7 @@ Source: `plan/10-academic-governance-review-and-outreach.md`
 
 - [x] **GOV-001** (P0) Adopt a research/publication governance charter. _Done when: the charter names decision rights for data, methodology, editorial copy, corrections, releases, security, source rights, reviewer independence, conflicts, and emergency action; no responsibility is assigned to an anonymous “Civica Team.”_
 - [x] **GOV-002** (P0) Establish accountable human authorship and contributor identity. _Done when: release and citation metadata name responsible author(s), affiliations/independent status, ORCID where available, roles via a declared taxonomy, contact channel, and contribution history; organization-only authorship is justified rather than used to hide accountability._
-- [ ] **GOV-003** (P1) Publish funding, conflicts, sponsorship, political-independence, and editorial-control disclosures. _Done when: disclosures cover funding sources, in-kind/model/tool support, relevant affiliations, source-provider relationships, no-funding state where applicable, update cadence, and conflict handling; reviewer packets use the same disclosure._
+- [x] **GOV-003** (P1) Publish funding, conflicts, sponsorship, political-independence, and editorial-control disclosures. _Done when: disclosures cover funding sources, in-kind/model/tool support, relevant affiliations, source-provider relationships, no-funding state where applicable, update cadence, and conflict handling; reviewer packets use the same disclosure._
 - [x] **GOV-004** (P1) Publish a detailed AI/model-use disclosure for research and editorial production. _Done when: it distinguishes code assistance, audits, classification, annotation proposals, illustration, prose, and final human responsibility; lists versioned systems where material; explains validation and limitations; no model is presented as a peer reviewer._
 - [x] **GOV-005** (P0) Define release, methodology-version, correction, retraction, and supersession authority. _Done when: policies name approvers, semantic version triggers, emergency correction process, historical preservation, DOI/version relationships, notice locations, and appeal/report channels; a tabletop scenario produces the expected artifacts._
 - [x] **GOV-006** (P0) Redefine the advisory board's remit and independence. _Done when: a public charter states purpose, expertise sought, advisory/nonendorsement status, term, workload, confidentiality/publicity, conflicts, compensation posture, removal/resignation, publication of names/reviews, and that board service does not automatically validate every Civica claim._
