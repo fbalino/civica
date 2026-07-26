@@ -140,7 +140,7 @@
 .factbook-hero-name {
   font-family: var(--font-heading);
   font-size: var(--text-44);
-  font-weight: 400;
+  font-weight: var(--font-weight-light);
   margin: 0;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tighter);
@@ -1211,7 +1211,7 @@
   font-size: clamp(var(--text-36), 6vw, var(--text-56));
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-light);
   color: var(--color-text-primary);
   margin: 0 0 var(--space-4);
 }
@@ -1275,7 +1275,7 @@
 .factbook-almanac-title {
   font-family: var(--font-heading);
   font-size: var(--text-28);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-tight);
   color: var(--color-text-primary);
   margin: 0;

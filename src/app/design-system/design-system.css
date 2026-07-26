@@ -77,7 +77,7 @@
 }
 .ds-section-head h2 {
   font-family: var(--font-heading);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   font-size: var(--text-36);
   letter-spacing: var(--tracking-tight);
   margin: 0;

@@ -132,14 +132,87 @@ const COLOR_GROUP_IDS = [
 ] as const;
 
 const TYPE_SCALE = [
-  { lab: "Display / H1", text: "Every government.", family: "var(--font-heading)", size: "var(--text-56)", weight: 600, lh: 1.05, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 56/64" },
-  { lab: "H2", text: "How every country is governed.", family: "var(--font-heading)", size: "var(--text-40)", weight: 600, lh: 1.1, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 40/48" },
-  { lab: "H3", text: "Parliament, live.", family: "var(--font-heading)", size: "var(--text-28)", weight: 600, lh: 1.2, tr: "var(--tracking-snug)", spec: "Source Serif 4 · 600 · 28/36" },
-  { lab: "Lead / dek", text: "A semi-presidential republic in Western Europe.", family: "var(--font-heading)", size: "var(--text-22)", weight: 400, lh: 1.36, tr: "0", spec: "Source Serif 4 · 400 · 22/30" },
-  { lab: "Body", text: "Hover any seat to meet the member. Compare two countries side by side.", family: "var(--font-body)", size: "var(--text-16)", weight: 400, lh: 1.625, tr: "0", spec: "Inter · 400 · 16/26" },
-  { lab: "Caption", text: "577 seats · elected by a two-round system", family: "var(--font-body)", size: "var(--text-13)", weight: 400, lh: 1.5, tr: "0", spec: "Inter · 400 · 13" },
-  { lab: "Label / eyebrow", text: "WELCOME · ATLAS", family: "var(--font-body)", size: "var(--text-12)", weight: 600, lh: 1.45, tr: "var(--tracking-caps)", spec: "Inter · 600 · 11 · +0.8% · caps", caps: true },
-  { lab: "Code", text: "var(--color-accent) · GET /api/v1/index", family: "var(--font-code)", size: "var(--text-12)", weight: 500, lh: 1.4, tr: "0", spec: "ui-monospace · 12 · code only" },
+  {
+    lab: "Display / H1",
+    text: "Every government.",
+    family: "var(--font-heading)",
+    size: "var(--text-56)",
+    weight: "var(--font-weight-light)",
+    lh: "var(--leading-tight)",
+    tr: "var(--tracking-tight)",
+    spec: "Newsreader · Light · 56 token · 120% calibrated",
+  },
+  {
+    lab: "H2",
+    text: "How every country is governed.",
+    family: "var(--font-heading)",
+    size: "var(--text-40)",
+    weight: "var(--font-weight-regular)",
+    lh: "var(--leading-snug)",
+    tr: "var(--tracking-tight)",
+    spec: "Newsreader · Regular · 40 token · 120% calibrated",
+  },
+  {
+    lab: "H3",
+    text: "Parliament, live.",
+    family: "var(--font-heading)",
+    size: "var(--text-28)",
+    weight: "var(--font-weight-regular)",
+    lh: "var(--leading-none)",
+    tr: "var(--tracking-snug)",
+    spec: "Newsreader · Regular · 28 token · 120% calibrated",
+  },
+  {
+    lab: "Lead / dek",
+    text: "A semi-presidential republic in Western Europe.",
+    family: "var(--font-heading)",
+    size: "var(--text-22)",
+    weight: "var(--font-weight-regular)",
+    lh: "var(--leading-snug)",
+    tr: "var(--tracking-normal)",
+    spec: "Newsreader · Regular · 22 token · 120% calibrated",
+  },
+  {
+    lab: "Body",
+    text: "Hover any seat to meet the member. Compare two countries side by side.",
+    family: "var(--font-body)",
+    size: "var(--text-16)",
+    weight: "var(--font-weight-regular)",
+    lh: "var(--leading-normal)",
+    tr: "var(--tracking-normal)",
+    spec: "Archivo · Regular · 16 token · 106% calibrated",
+  },
+  {
+    lab: "Caption",
+    text: "577 seats · elected by a two-round system",
+    family: "var(--font-body)",
+    size: "var(--text-13)",
+    weight: "var(--font-weight-regular)",
+    lh: "var(--leading-normal)",
+    tr: "var(--tracking-normal)",
+    spec: "Archivo · Regular · 13 token · 106% calibrated",
+  },
+  {
+    lab: "Label / eyebrow",
+    text: "WELCOME · ATLAS",
+    family: "var(--font-body)",
+    size: "var(--text-12)",
+    weight: "var(--font-weight-semibold)",
+    lh: "var(--leading-snug)",
+    tr: "var(--tracking-caps)",
+    spec: "Archivo · Semibold · 12 token · caps",
+    caps: true,
+  },
+  {
+    lab: "Code",
+    text: "var(--color-accent) · GET /api/v1/index",
+    family: "var(--font-code)",
+    size: "var(--text-12)",
+    weight: "var(--font-weight-medium)",
+    lh: "var(--leading-snug)",
+    tr: "var(--tracking-normal)",
+    spec: "ui-monospace · 12 · code only",
+  },
 ];
 
 const SAMPLE_CHAMBER = {
@@ -257,8 +330,11 @@ export default function DesignSystemPage() {
         <section className="ds-section">
           <div className="ds-section-head">
             <span className="num">02 · Typography</span>
-            <h2>Source Serif 4, Inter, mono.</h2>
-            <span className="dek">A high-contrast serif for voice, a precise sans for data, mono for labels and codes.</span>
+            <h2>Newsreader, Archivo, mono.</h2>
+            <span className="dek">
+              An editorial serif for voice, a sturdy sans for data, and mono
+              only for literal code.
+            </span>
           </div>
           {TYPE_SCALE.map((t) => (
             <div key={t.lab} className="ds-type-row">

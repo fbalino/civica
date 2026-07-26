@@ -97,7 +97,7 @@
 .editorial-page h1 {
   font-family: var(--font-heading);
   font-size: var(--text-56);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-tighter);
   line-height: 1.02;
   margin: 0 0 var(--space-4);
@@ -111,7 +111,7 @@
 .editorial-page-subtitle {
   font-family: var(--font-heading);
   font-size: var(--text-20);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: -0.01em; /* -0.01em — no exact token; between --tracking-snug(-0.02) and --tracking-normal(0) */
   color: var(--color-text-60);
   margin: 0 0 28px; /* 28px — no exact token */
@@ -2420,7 +2420,7 @@ legend.editorial-filter-label {
 .constitution-section h3,
 .constitution-section h4 {
   font-family: var(--font-heading);
-  font-weight: 500;
+  font-weight: var(--font-weight-regular);
   line-height: var(--leading-snug);
   color: var(--color-text-primary);
   margin: var(--space-5) 0 var(--space-3);

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Source_Serif_4, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo, CivicaLogoSprite } from "@/components/CivicaLogo";
@@ -18,21 +17,6 @@ import "./civica-index.css";
 import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
-
-const sourceSerif = Source_Serif_4({
-  variable: "--font-source-serif",
-  subsets: ["latin"],
-  display: "swap",
-  weight: "variable",
-  style: ["normal", "italic"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600"],
-});
 
 // Canonical host. The apex `civicaatlas.org` is the production domain and is
 // what every other surface already declares — sitemap.ts, robots.ts,
@@ -95,7 +79,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sourceSerif.variable} ${inter.variable}`}
       // The root scroller uses NO CSS smooth scrolling (globals.css sets
       // `scroll-behavior: auto`) so the router's scroll-to-top on navigation
       // is always instant and can never be canceled mid-animation by the new
@@ -105,6 +88,22 @@ export default function RootLayout({
       // navigation (observed on both mobile and desktop).
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="preload"
+          href="/fonts/newsreader/newsreader-normal-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/archivo/archivo-normal-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         {/* The Civica mark geometry, emitted once per document as a hidden
             <symbol>. Every <CivicaLogo> below is a lightweight <use> reference,
