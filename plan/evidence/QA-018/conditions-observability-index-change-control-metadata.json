@@ -1,0 +1,35 @@
+{
+  "id": "qa-018-conditions-observability-nonmethod-2026-07-26",
+  "toVersion": "civica-index-conditions-observability-record-v53",
+  "categories": [
+    "input"
+  ],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/QA-018/conditions-observability-index-change-control.md"
+    ],
+    "registry": [
+      "src/lib/data/production-adapter-registry.ts"
+    ],
+    "release_note": [
+      "plan/evidence/QA-018/conditions-observability-index-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/QA-018/conditions-observability-index-migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/data/__tests__/manual-adapter-repeatability-contract.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pipeline-observability.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition"
+  ]
+}
