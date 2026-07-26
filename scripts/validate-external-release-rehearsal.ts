@@ -60,5 +60,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `PASS — QA-018 ${staging.status}; QA-019 ${recovery.status}. Protocols are fail-closed and no external run is claimed.`,
+  `PASS — QA-018 ${staging.status}; QA-019 ${recovery.status}. Protocols are fail-closed; recorded evidence never implies owner sign-off.`,
 );

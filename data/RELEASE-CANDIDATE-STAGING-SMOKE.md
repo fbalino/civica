@@ -83,6 +83,12 @@ with bounded evidence:
 11. one idempotent non-model cron dry run; and
 12. proof that the dry run did not advance source freshness.
 
+After all twelve technical checks pass, the record first becomes
+`run_complete_pending_owner_signoff`. That state requires the exact candidate
+and provider identities plus bounded evidence for every check, but it keeps the
+owner and sign-off date empty and names Fernando's remaining review. Only his
+later dated decision can move the record to `complete`.
+
 Record IDs, hashes, timestamps, result counts, and pass/fail outcomes only. Do
 not retain credentials, database URLs, production rows, cookies, prompts,
 provider error bodies, or private review data.

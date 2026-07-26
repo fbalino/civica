@@ -14,6 +14,29 @@ import {
 
 const clone = <T>(value: T): T => structuredClone(value);
 
+function technicallyCompleteStagingRecord(): StagingSmokeRecord {
+  const candidate = clone(stagingRecord) as StagingSmokeRecord;
+  candidate.status = "run_complete_pending_owner_signoff";
+  candidate.blocker = "owner_post_run_signoff";
+  candidate.candidate.commit = "a".repeat(40);
+  candidate.candidate.dataReleaseIds = ["atlas-test-release"];
+  candidate.candidate.methodVersions = ["test-method"];
+  candidate.candidate.assetManifestSha256 = "b".repeat(64);
+  candidate.isolation.neonBranchId = "br-test";
+  candidate.isolation.vercelDeploymentId = "dpl-test";
+  candidate.isolation.productionDatabaseExcluded = true;
+  candidate.isolation.jobsQuiesced = true;
+  candidate.checks = candidate.checks.map((check) => ({
+    ...check,
+    status: "pass",
+    evidence: `bounded evidence for ${check.id}`,
+  }));
+  candidate.signoff.remainingManualChecks = [
+    "Fernando reviews the retained staging evidence and records approval or rejection.",
+  ];
+  return candidate;
+}
+
 test("pending external release records are complete protocols without fabricated outcomes", () => {
   assert.deepEqual(
     stagingSmokeErrors(stagingRecord as StagingSmokeRecord),
@@ -30,6 +53,30 @@ test("staging cannot complete without every evidenced check and exact identities
   candidate.status = "complete";
   candidate.blocker = null;
   assert.ok(stagingSmokeErrors(candidate).length > 0);
+});
+
+test("staging can retain a complete technical run without fabricating owner sign-off", () => {
+  assert.deepEqual(
+    stagingSmokeErrors(technicallyCompleteStagingRecord()),
+    [],
+  );
+});
+
+test("technically complete staging requires a real owner-review blocker and no sign-off", () => {
+  const signed = technicallyCompleteStagingRecord();
+  signed.signoff.owner = "Fernando Baliño";
+  signed.signoff.checkedAt = "2026-07-25T23:59:00-03:00";
+  assert.match(
+    stagingSmokeErrors(signed).join("\n"),
+    /must not fabricate owner sign-off/,
+  );
+
+  const noReview = technicallyCompleteStagingRecord();
+  noReview.signoff.remainingManualChecks = [];
+  assert.match(
+    stagingSmokeErrors(noReview).join("\n"),
+    /must identify the remaining owner review/,
+  );
 });
 
 test("staging binds every post-0032 authoritative migration to its owning task", () => {

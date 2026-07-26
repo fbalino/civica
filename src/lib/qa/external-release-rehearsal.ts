@@ -65,7 +65,11 @@ export const RECOVERY_CHECK_IDS = [
 ] as const;
 
 type CheckStatus = "not_run" | "pass" | "fail";
-type RunStatus = "pending_external_authority" | "complete";
+type StagingRunStatus =
+  | "pending_external_authority"
+  | "run_complete_pending_owner_signoff"
+  | "complete";
+type RecoveryRunStatus = "pending_external_authority" | "complete";
 
 interface CheckRecord {
   id: string;
@@ -76,7 +80,7 @@ interface CheckRecord {
 export interface StagingSmokeRecord {
   schemaVersion: typeof STAGING_SMOKE_SCHEMA_VERSION;
   taskId: "QA-018";
-  status: RunStatus;
+  status: StagingRunStatus;
   blocker: string | null;
   candidate: {
     commit: string | null;
@@ -103,7 +107,7 @@ export interface StagingSmokeRecord {
 export interface RecoveryRehearsalRecord {
   schemaVersion: typeof RECOVERY_REHEARSAL_SCHEMA_VERSION;
   taskId: "QA-019";
-  status: RunStatus;
+  status: RecoveryRunStatus;
   blocker: string | null;
   deliberatelyBadRelease: boolean;
   candidateCommit: string | null;
@@ -128,7 +132,7 @@ export interface RecoveryRehearsalRecord {
 function checkSetErrors(
   records: CheckRecord[],
   requiredIds: readonly string[],
-  status: RunStatus,
+  runCompleted: boolean,
 ) {
   const errors: string[] = [];
   const ids = records.map((record) => record.id);
@@ -139,7 +143,7 @@ function checkSetErrors(
   for (const id of ids) {
     if (!requiredIds.includes(id)) errors.push(`unknown check ${id}`);
   }
-  if (status === "pending_external_authority") {
+  if (!runCompleted) {
     for (const check of records) {
       if (check.status !== "not_run" || check.evidence !== null) {
         errors.push(`${check.id} fabricates evidence before the external run`);
@@ -192,7 +196,11 @@ function stagingMigrationPlanErrors(record: StagingSmokeRecord) {
 
 export function stagingSmokeErrors(record: StagingSmokeRecord) {
   const errors = [
-    ...checkSetErrors(record.checks, STAGING_CHECK_IDS, record.status),
+    ...checkSetErrors(
+      record.checks,
+      STAGING_CHECK_IDS,
+      record.status !== "pending_external_authority",
+    ),
     ...stagingMigrationPlanErrors(record),
   ];
   if (record.schemaVersion !== STAGING_SMOKE_SCHEMA_VERSION) {
@@ -218,7 +226,6 @@ export function stagingSmokeErrors(record: StagingSmokeRecord) {
       errors.push("pending staging record must not contain invented run evidence");
     }
   } else {
-    if (record.blocker !== null) errors.push("complete staging record retains blocker");
     if (!isCommit(record.candidate.commit)) errors.push("candidate commit is invalid");
     if (!isSha256(record.candidate.assetManifestSha256)) {
       errors.push("asset manifest SHA-256 is invalid");
@@ -238,8 +245,35 @@ export function stagingSmokeErrors(record: StagingSmokeRecord) {
     ) {
       errors.push("complete staging record lacks isolation and quiescence proof");
     }
-    if (!record.signoff.owner || !isTimestamp(record.signoff.checkedAt)) {
-      errors.push("complete staging record lacks dated owner sign-off");
+    if (record.status === "run_complete_pending_owner_signoff") {
+      if (record.blocker !== "owner_post_run_signoff") {
+        errors.push(
+          "technically complete staging record must name the owner sign-off blocker",
+        );
+      }
+      if (
+        record.signoff.owner !== null ||
+        record.signoff.checkedAt !== null
+      ) {
+        errors.push(
+          "technically complete staging record must not fabricate owner sign-off",
+        );
+      }
+      if (
+        record.signoff.remainingManualChecks.length === 0 ||
+        record.signoff.remainingManualChecks.some((item) => !item.trim())
+      ) {
+        errors.push(
+          "technically complete staging record must identify the remaining owner review",
+        );
+      }
+    } else {
+      if (record.blocker !== null) {
+        errors.push("complete staging record retains blocker");
+      }
+      if (!record.signoff.owner || !isTimestamp(record.signoff.checkedAt)) {
+        errors.push("complete staging record lacks dated owner sign-off");
+      }
     }
   }
   return errors;
@@ -249,7 +283,7 @@ export function recoveryRehearsalErrors(record: RecoveryRehearsalRecord) {
   const errors = checkSetErrors(
     record.checks,
     RECOVERY_CHECK_IDS,
-    record.status,
+    record.status !== "pending_external_authority",
   );
   if (record.schemaVersion !== RECOVERY_REHEARSAL_SCHEMA_VERSION) {
     errors.push(`unexpected recovery schema ${record.schemaVersion}`);
