@@ -337,6 +337,13 @@
       "when": 1784798458954,
       "tag": "0048_entity_name_forms",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1785089298490,
+      "tag": "0049_curvy_shen",
+      "breakpoints": true
     }
   ]
 }

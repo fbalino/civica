@@ -32,6 +32,7 @@ export const QA_018_REQUIRED_MIGRATIONS = [
   { id: "0046_little_mulholland_black", ownerTaskId: "ATL-020" },
   { id: "0047_atlas_data_error_reports", ownerTaskId: "ATL-024" },
   { id: "0048_entity_name_forms", ownerTaskId: "EXP-029" },
+  { id: "0049_curvy_shen", ownerTaskId: "ATL-027" },
 ] as const;
 
 export const QA_018_DATABASE_TARGET_SCRIPT_PATHS = [

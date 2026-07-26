@@ -32,6 +32,7 @@ import {
   date,
   timestamp,
   real,
+  doublePrecision,
   boolean,
   jsonb,
   unique,
@@ -2350,10 +2351,10 @@ export const civicaConditionsNormalizationParameters = pgTable(
     componentId: text("component_id").notNull(),
     direction: text("direction").notNull(),
     transformationId: text("transformation_id").notNull(),
-    mean: real("mean"),
-    standardDeviation: real("standard_deviation"),
-    lowerBound: real("lower_bound"),
-    upperBound: real("upper_bound"),
+    mean: doublePrecision("mean"),
+    standardDeviation: doublePrecision("standard_deviation"),
+    lowerBound: doublePrecision("lower_bound"),
+    upperBound: doublePrecision("upper_bound"),
   },
   (table) => [
     primaryKey({
@@ -2435,9 +2436,9 @@ export const civicaConditionsScores = pgTable(
     /** Quarter string matching ci_dimension_scores.quarter, e.g. "2026-Q3" */
     quarter: text("quarter").notNull(),
     /** Normalized 0–100 score (higher = better) */
-    normalizedScore: real("normalized_score").notNull(),
+    normalizedScore: doublePrecision("normalized_score").notNull(),
     /** Original native-scale value, kept for transparency */
-    rawValue: real("raw_value"),
+    rawValue: doublePrecision("raw_value"),
     sourceId: text("source_id")
       .references(() => sources.id)
       .notNull(),
@@ -2498,7 +2499,7 @@ export const civicaConditionsComponents = pgTable(
       .references(() => civicaConditionsCalculations.calculationKey)
       .notNull(),
     componentId: text("component_id").notNull(),
-    nativeValue: real("native_value"),
+    nativeValue: doublePrecision("native_value"),
     nativeUnit: text("native_unit").notNull(),
     referenceYear: integer("reference_year"),
     valueStatus: text("value_status").notNull(),

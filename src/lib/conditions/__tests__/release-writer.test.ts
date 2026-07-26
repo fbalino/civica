@@ -87,7 +87,11 @@ async function createDatabase() {
     CREATE UNIQUE INDEX idx_conditions_unique ON civica_conditions_scores (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id);
     CREATE FUNCTION civica_capture_research_evidence_history() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END; $$;
   `);
-  for (const path of ["0040_closed_young_avengers.sql", "0042_grey_sally_floyd.sql"]) {
+  for (const path of [
+    "0040_closed_young_avengers.sql",
+    "0042_grey_sally_floyd.sql",
+    "0049_curvy_shen.sql",
+  ]) {
     await database.exec(readFileSync(`drizzle/authoritative/${path}`, "utf8").replaceAll("--> statement-breakpoint", ""));
   }
   return database;
@@ -364,6 +368,21 @@ test("Neon Conditions plan gates the complete release and DB-clock freshness in 
   assert.ok(publishSql.includes("stamped_sources AS"));
   assert.ok(publishSql.includes("inserted_release.created_at"));
   assert.ok(publishSql.includes("cardinality_guard"));
+  for (const field of [
+    "mean",
+    '"standardDeviation"',
+    '"lowerBound"',
+    '"upperBound"',
+    '"nativeValue"',
+    '"normalizedScore"',
+    '"rawValue"',
+  ]) {
+    assert.match(
+      publishSql,
+      new RegExp(`${field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} double precision`),
+      `atomic JSON ingress does not preserve double precision for ${field}`,
+    );
+  }
   assert.ok(
     transaction.queries[1].sql.includes("civica_conditions_releases"),
   );
@@ -394,6 +413,192 @@ test("Neon Conditions plan gates the complete release and DB-clock freshness in 
   );
   assert.deepEqual(harness.committed(), afterFirst);
   assert.equal(harness.transactions.length, 3);
+});
+
+test("atomic Conditions publish preserves economic decimals whose identity float32 would change", async () => {
+  const database = await createDatabase();
+  try {
+    const releaseId = "conditions-economic-precision-v1";
+    const exactInflation = 0.12345678901234566;
+    const exactUnemployment = 7.987654321098765;
+    const exactGrowth = -1.2345678901234567;
+    const observations = [{
+      jurisdictionId: "11111111-1111-4111-8111-111111111111",
+      inflation: {
+        value: exactInflation,
+        referenceYear: 2024,
+        valueStatus: "observed" as const,
+        valueStatusReason: null,
+      },
+      unemployment: {
+        value: exactUnemployment,
+        referenceYear: 2024,
+        valueStatus: "observed" as const,
+        valueStatusReason: null,
+      },
+      gdpGrowth: {
+        value: exactGrowth,
+        referenceYear: 2024,
+        valueStatus: "observed" as const,
+        valueStatusReason: null,
+      },
+    }];
+    const calculations = buildEconomicConditionsCalculations({
+      observations,
+      releaseId,
+      methodologyVersion: "conditions-components/v1",
+      lineages: economicLineages(),
+    });
+    const float32Inflation = Math.fround(exactInflation);
+    assert.notEqual(
+      float32Inflation,
+      exactInflation,
+      "fixture must detect float32 precision loss",
+    );
+    const float32Calculations = buildEconomicConditionsCalculations({
+      observations: [{
+        ...observations[0],
+        inflation: {
+          ...observations[0].inflation,
+          value: float32Inflation,
+        },
+      }],
+      releaseId,
+      methodologyVersion: "conditions-components/v1",
+      lineages: economicLineages(),
+    });
+    assert.notEqual(
+      float32Calculations[0].calculationKey,
+      calculations[0].calculationKey,
+      "float32 coercion must change the content-addressed calculation identity",
+    );
+
+    const release = {
+      releaseId,
+      methodologyVersion: "conditions-components/v1",
+      referenceSets: buildEconomicReferenceSets(observations),
+    };
+    const first = await writeConditionsRelease(
+      {} as never,
+      release,
+      calculations,
+      { neonSql: pgliteAtomicNeonSql(database) },
+    );
+    assert.deepEqual(first, {
+      proposed: 1,
+      written: 0,
+      calculationsWritten: 1,
+      componentsWritten: 3,
+    });
+
+    const precisionColumns = (
+      await database.query<{ tableName: string; columnName: string; dataType: string }>(`
+        SELECT
+          table_name AS "tableName",
+          column_name AS "columnName",
+          data_type AS "dataType"
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND (
+            (table_name = 'civica_conditions_normalization_parameters'
+              AND column_name IN ('mean', 'standard_deviation', 'lower_bound', 'upper_bound'))
+            OR (table_name = 'civica_conditions_scores'
+              AND column_name IN ('normalized_score', 'raw_value'))
+            OR (table_name = 'civica_conditions_components'
+              AND column_name = 'native_value')
+          )
+        ORDER BY table_name, ordinal_position
+      `)
+    ).rows;
+    assert.equal(precisionColumns.length, 7);
+    assert.ok(
+      precisionColumns.every((column) => column.dataType === "double precision"),
+      JSON.stringify(precisionColumns),
+    );
+
+    const storedComponents = (
+      await database.query<{ componentId: string; nativeValue: number }>(`
+        SELECT
+          component_id AS "componentId",
+          native_value AS "nativeValue"
+        FROM civica_conditions_components
+        WHERE calculation_key = '${calculations[0].calculationKey}'
+        ORDER BY component_id
+      `)
+    ).rows;
+    assert.deepEqual(storedComponents, [
+      { componentId: "gdp_growth", nativeValue: exactGrowth },
+      { componentId: "inflation", nativeValue: exactInflation },
+      { componentId: "unemployment", nativeValue: exactUnemployment },
+    ]);
+    const storedCalculation = (
+      await database.query<{
+        calculationKey: string;
+        releaseId: string;
+        jurisdictionId: string;
+        dimension: ConditionScoreInput["dimension"];
+        methodologyVersion: string;
+        alignmentStatus: ConditionScoreInput["alignmentStatus"];
+        referenceYear: number | null;
+      }>(`
+        SELECT
+          calculation_key AS "calculationKey",
+          release_id AS "releaseId",
+          jurisdiction_id::text AS "jurisdictionId",
+          dimension,
+          methodology_version AS "methodologyVersion",
+          alignment_status AS "alignmentStatus",
+          reference_year AS "referenceYear"
+        FROM civica_conditions_calculations
+        WHERE calculation_key = '${calculations[0].calculationKey}'
+      `)
+    ).rows[0];
+    assert.ok(storedCalculation);
+    const storedNativeValues = new Map(
+      storedComponents.map((component) => [
+        component.componentId,
+        component.nativeValue,
+      ]),
+    );
+    assert.equal(
+      conditionCalculationKey({
+        ...storedCalculation,
+        components: calculations[0].components.map((component) => ({
+          ...component,
+          nativeValue: storedNativeValues.get(component.componentId) ?? null,
+        })),
+      }),
+      storedCalculation.calculationKey,
+      "calculation identity must replay from stored double-precision values",
+    );
+
+    assert.deepEqual(
+      await writeConditionsRelease({} as never, release, calculations, {
+        neonSql: pgliteAtomicNeonSql(database),
+      }),
+      {
+        proposed: 1,
+        written: 0,
+        calculationsWritten: 0,
+        componentsWritten: 0,
+      },
+    );
+    assert.deepEqual(
+      (
+        await database.query<{ componentId: string; nativeValue: number }>(`
+          SELECT
+            component_id AS "componentId",
+            native_value AS "nativeValue"
+          FROM civica_conditions_components
+          WHERE calculation_key = '${calculations[0].calculationKey}'
+          ORDER BY component_id
+        `)
+      ).rows,
+      storedComponents,
+    );
+  } finally {
+    await database.close();
+  }
 });
 
 test("Neon Conditions transaction rolls back the header and freshness when a descendant insert fails", async () => {

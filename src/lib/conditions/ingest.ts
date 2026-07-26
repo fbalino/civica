@@ -133,10 +133,10 @@ parameter_input AS (
     "componentId" text,
     direction text,
     "transformationId" text,
-    mean real,
-    "standardDeviation" real,
-    "lowerBound" real,
-    "upperBound" real
+    mean double precision,
+    "standardDeviation" double precision,
+    "lowerBound" double precision,
+    "upperBound" double precision
   )
 ),
 inserted_parameters AS (
@@ -212,7 +212,7 @@ component_input AS (
   FROM jsonb_to_recordset(($4::jsonb)->'components') AS input(
     "calculationKey" text,
     "componentId" text,
-    "nativeValue" real,
+    "nativeValue" double precision,
     "nativeUnit" text,
     "referenceYear" integer,
     "valueStatus" text,
@@ -281,8 +281,8 @@ score_input AS (
     "jurisdictionId" uuid,
     dimension text,
     quarter text,
-    "normalizedScore" real,
-    "rawValue" real,
+    "normalizedScore" double precision,
+    "rawValue" double precision,
     "sourceId" text,
     "indicatorId" text,
     "upstreamRelease" text,

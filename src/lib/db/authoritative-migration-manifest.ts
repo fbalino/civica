@@ -291,4 +291,11 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
       "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0",
     baseline: false,
   },
+  {
+    id: "0049_curvy_shen",
+    path: "drizzle/authoritative/0049_curvy_shen.sql",
+    sha256:
+      "364cb122250cc55921dee2050cc33030b9536b8c1f2605891779084e6d8a9b3b",
+    baseline: false,
+  },
 ] as const;

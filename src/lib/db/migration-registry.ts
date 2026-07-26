@@ -357,6 +357,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0049_curvy_shen",
+    "drizzle/authoritative/0049_curvy_shen.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-cia-vintage",
     "backfill-election-results",

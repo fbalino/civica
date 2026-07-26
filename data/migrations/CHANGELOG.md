@@ -309,6 +309,15 @@ by the research-evidence history trigger. Production population requires an
 authorized source refresh and preserves existing English display names until
 reviewed source-form rows are available.
 
+`0049_curvy_shen` widens every precision-bearing Civica Conditions column from
+single-precision `real` to double precision: normalization means, standard
+deviations and bounds; score and raw values; and native component values. This
+keeps publisher decimals aligned with the content-addressed calculation
+identity through atomic JSON ingestion and deterministic replay. Existing
+single-precision values are widened as stored; the migration does not invent
+digits already lost before this contract, and any corrected release must be
+regenerated and published under a new immutable release identity.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

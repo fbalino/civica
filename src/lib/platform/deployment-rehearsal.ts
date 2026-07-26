@@ -25,6 +25,7 @@ export const STAGED_MIGRATION_IDS = [
   "0046_little_mulholland_black",
   "0047_atlas_data_error_reports",
   "0048_entity_name_forms",
+  "0049_curvy_shen",
 ] as const;
 
 export type DeploymentScope = "staging" | "production" | "recovery";

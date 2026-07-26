@@ -22,7 +22,8 @@
       "0045_pulse_evaluation_workspace_reconciliation",
       "0046_little_mulholland_black",
       "0047_atlas_data_error_reports",
-      "0048_entity_name_forms"
+      "0048_entity_name_forms",
+      "0049_curvy_shen"
     ],
     "migrationOwners": {
       "0033_flat_hardball": "PLT-009",
@@ -39,7 +40,8 @@
       "0045_pulse_evaluation_workspace_reconciliation": "PUL-043",
       "0046_little_mulholland_black": "ATL-020",
       "0047_atlas_data_error_reports": "ATL-024",
-      "0048_entity_name_forms": "EXP-029"
+      "0048_entity_name_forms": "EXP-029",
+      "0049_curvy_shen": "ATL-027"
     },
     "assetManifestSha256": null
   },

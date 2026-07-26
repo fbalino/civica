@@ -1,14 +1,14 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-26T15:18:40.090Z",
+  "generatedAt": "2026-07-26T18:18:49.735Z",
   "authoritativeManifest": {
     "head": {
-      "id": "0048_entity_name_forms",
-      "sha256": "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0"
+      "id": "0049_curvy_shen",
+      "sha256": "364cb122250cc55921dee2050cc33030b9536b8c1f2605891779084e6d8a9b3b"
     },
-    "sha256": "f52b6d0b70e28a178140b9f2c971ae32de7c6c3c85a73381aae0e463653dfbc2"
+    "sha256": "f7dcb675554aecaa88d17eb19e649bc8eb9549a100131c3b7f7b579c63c85942"
   },
-  "sha256": "e7ccdd8c30a57fcf3377844aa3fca98a3c4ef8bd0ba2be30c196e8fc54b3bec8",
+  "sha256": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b",
   "schema": {
     "columns": [
       {
@@ -2442,9 +2442,9 @@
         "position": 3
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "native_value",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_components",
         "default": null,
         "nullable": "YES",
@@ -2649,36 +2649,36 @@
         "position": 6
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "mean",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_normalization_parameters",
         "default": null,
         "nullable": "YES",
         "position": 7
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "standard_deviation",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_normalization_parameters",
         "default": null,
         "nullable": "YES",
         "position": 8
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "lower_bound",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_normalization_parameters",
         "default": null,
         "nullable": "YES",
         "position": 9
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "upper_bound",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_normalization_parameters",
         "default": null,
         "nullable": "YES",
@@ -2856,18 +2856,18 @@
         "position": 4
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "normalized_score",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_scores",
         "default": null,
         "nullable": "NO",
         "position": 5
       },
       {
-        "udt": "float4",
+        "udt": "float8",
         "name": "raw_value",
-        "type": "real",
+        "type": "double precision",
         "table": "civica_conditions_scores",
         "default": null,
         "nullable": "YES",
