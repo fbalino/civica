@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "civica-atl-029-release-reconciliation/v1",
+  "taskId": "ATL-029",
+  "status": "pass",
+  "candidateCommit": "fb7376f3ee7990c89b9da57716b3e563924af028",
+  "deploymentId": "dpl_DuymaVKNXCiyc34cC7q9SuRW6pMw",
+  "isolationEvidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json",
+  "release": {
+    "releaseId": "conditions-qa018-20260726-v2",
+    "methodologyVersion": "conditions-components/v1",
+    "manifestSha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b"
+  },
+  "storedRelease": {
+    "scope": "all retained jurisdiction rows",
+    "counts": {
+      "calculations": 340,
+      "components": 818,
+      "scores": 101,
+      "referenceSets": 3,
+      "normalizationParameters": 5,
+      "sources": 3
+    },
+    "dimensions": [
+      {
+        "dimension": "human_development",
+        "calculations": 51,
+        "aligned": 51,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 51,
+        "scores": 51
+      },
+      {
+        "dimension": "peace_security",
+        "calculations": 50,
+        "aligned": 50,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 50,
+        "scores": 50
+      },
+      {
+        "dimension": "economic_stability",
+        "calculations": 239,
+        "aligned": 162,
+        "mixedYearRefused": 6,
+        "missingComponent": 71,
+        "components": 717,
+        "scores": 0
+      }
+    ]
+  },
+  "publicApi": {
+    "contract": "civica-conditions-public-release/v1",
+    "status": 200,
+    "bodySha256": "72ed6f73a9cfd2711535234af2c566f5f8e7590740e51354aae4fef17e45c31d",
+    "scope": "jurisdictions classified as sovereign_state",
+    "counts": {
+      "calculations": 295,
+      "components": 683,
+      "scores": 101
+    },
+    "coverage": [
+      {
+        "dimension": "human_development",
+        "calculations": 51,
+        "aligned": 51,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 51,
+        "observedComponents": 51,
+        "unavailableComponents": 0,
+        "scores": 51
+      },
+      {
+        "dimension": "peace_security",
+        "calculations": 50,
+        "aligned": 50,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 50,
+        "observedComponents": 50,
+        "unavailableComponents": 0,
+        "scores": 50
+      },
+      {
+        "dimension": "economic_stability",
+        "calculations": 194,
+        "aligned": 160,
+        "mixedYearRefused": 5,
+        "missingComponent": 29,
+        "components": 582,
+        "observedComponents": 541,
+        "unavailableComponents": 41,
+        "scores": 0
+      }
+    ],
+    "scopeReconciliation": {
+      "excludedNonSovereignCalculations": 45,
+      "excludedNonSovereignComponents": 135,
+      "queryContract": "calculation and component rows require jurisdictions.type = sovereign_state"
+    },
+    "alignmentStates": [
+      "aligned",
+      "missing_component",
+      "mixed_year_refused"
+    ],
+    "aggregateOrRankPublished": false,
+    "examples": {
+      "aligned": {
+        "countrySlug": "afghanistan",
+        "referenceYear": 2024,
+        "componentYears": [
+          2024,
+          2024,
+          2024
+        ],
+        "normalizedScore": null
+      },
+      "missingComponent": {
+        "countrySlug": "andorra",
+        "referenceYear": null,
+        "componentYears": [
+          2024,
+          null,
+          null
+        ],
+        "normalizedScore": null
+      },
+      "mixedYearRefused": {
+        "countrySlug": "bosnia-and-herzegovina",
+        "referenceYear": null,
+        "componentYears": [
+          2024,
+          2023,
+          2024
+        ],
+        "normalizedScore": null
+      }
+    }
+  },
+  "readerSurfaces": {
+    "browserEvidence": "plan/evidence/ATL-016/browser-evidence.v1.json",
+    "browserCheckedAt": "2026-07-26T19:56:33.535Z",
+    "surfaces": [
+      "civica-conditions-explorer",
+      "country-civica-data-panel",
+      "three-country-comparison"
+    ],
+    "viewports": [
+      "desktop",
+      "390px-mobile"
+    ],
+    "releaseIdentityVisible": true,
+    "sourceUnitYearMissingnessVisible": true,
+    "allThreeAlignmentStatesVisible": true,
+    "horizontalOverflow": false,
+    "consoleErrors": 0
+  },
+  "outcome": {
+    "storedRowsMatchLiveValidator": true,
+    "publicCountsAreRowDerived": true,
+    "publicRowsMatchSovereignFilter": true,
+    "apiAndReaderSurfacesMatchSelectedRelease": true,
+    "universalCountryCountClaimPublished": false,
+    "economicCompositeOrRankPublished": false
+  }
+}

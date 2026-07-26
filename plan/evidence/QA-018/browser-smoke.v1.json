@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "civica-browser-smoke/v1",
+  "deploymentId": "dpl_DuymaVKNXCiyc34cC7q9SuRW6pMw",
+  "deploymentUrl": "https://civica-ad577jclc-fbalinos-projects.vercel.app",
+  "checks": [
+    {
+      "id": "country-andorra-desktop",
+      "status": "pass",
+      "metrics": {
+        "countryNav": [
+          "Factbook",
+          "Civica Data",
+          "Constitution"
+        ],
+        "h1": "Andorra",
+        "horizontalOverflow": false,
+        "scrollWidth": 1429,
+        "sourceDots": 0,
+        "title": "Andorra — Government & Political System · Civica Atlas",
+        "viewportWidth": 1429
+      },
+      "screenshot": "plan/evidence/QA-018/browser-country-andorra-desktop.png"
+    },
+    {
+      "id": "conditions-explorer-desktop",
+      "status": "pass",
+      "metrics": {
+        "h1": "Civica Conditions",
+        "horizontalOverflow": false,
+        "noEconomicCompositeDisclosure": true,
+        "noRankingDisclosure": true,
+        "releaseVisible": true,
+        "rows": [
+          {
+            "country": "Afghanistan",
+            "text": "Afghanistan · AFG\tEconomic stability\nAligned inputs\tNo composite published\n2024\tComponent ledger only\t\nGDP growth\n1.87 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\n-6.6 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\n13.69 percent_labor_force · 2024\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+            "top": 1048
+          },
+          {
+            "country": "Bosnia and Herzegovina",
+            "text": "Bosnia and Herzegovina · BIH\tEconomic stability\nMixed years refused\tNo composite published\tComponent ledger only\t\nGDP growth\n3.23 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\n6.11 percent_annual_change · 2023\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\n10.69 percent_labor_force · 2024\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+            "top": 8927
+          },
+          {
+            "country": "Andorra",
+            "text": "Andorra · AND\tEconomic stability\nComponent unavailable\tNo composite published\tComponent ledger only\t\nGDP growth\n3.85 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\nNot observed\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\nNot observed\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+            "top": 2068
+          }
+        ],
+        "scrollWidth": 1429,
+        "tableRows": 298,
+        "title": "Civica Conditions — Material Conditions by Country · Civica Atlas",
+        "viewportWidth": 1429
+      },
+      "screenshot": "plan/evidence/ATL-016/conditions-explorer-desktop.png"
+    },
+    {
+      "id": "conditions-explorer-three-states-desktop",
+      "status": "pass",
+      "metrics": {
+        "aligned": {
+          "bottom": 488,
+          "text": "Afghanistan · AFG\tEconomic stability\nAligned inputs\tNo composite published\n2024\tComponent ledger only\t\nGDP growth\n1.87 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\n-6.6 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\n13.69 percent_labor_force · 2024\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+          "top": 148
+        },
+        "missing": {
+          "bottom": 471,
+          "text": "Andorra · AND\tEconomic stability\nComponent unavailable\tNo composite published\tComponent ledger only\t\nGDP growth\n3.85 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\nNot observed\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\nNot observed\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+          "top": 118
+        },
+        "mixed": {
+          "bottom": 517,
+          "text": "Bosnia and Herzegovina · BIH\tEconomic stability\nMixed years refused\tNo composite published\tComponent ledger only\t\nGDP growth\n3.23 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\n6.11 percent_annual_change · 2023\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\n10.69 percent_labor_force · 2024\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+          "top": 177
+        }
+      },
+      "screenshots": [
+        "plan/evidence/ATL-016/conditions-aligned-afghanistan-desktop.png",
+        "plan/evidence/ATL-016/conditions-missing-andorra-desktop.png",
+        "plan/evidence/ATL-016/conditions-mixed-bosnia-desktop.png"
+      ]
+    },
+    {
+      "id": "country-andorra-conditions-desktop",
+      "status": "pass",
+      "metrics": {
+        "bottom": 1022,
+        "text": "04 · CIVICA CONDITIONS\n\nCivica Conditions\n\nCIVICA CONDITIONS\n\nSeparate source-native material indicators. They are not combined with governance or each other.\n\nExplore release\nEconomic stability\nComponent unavailable\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.85 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\nNot observed\n· World Bank — Economic Stability Indicators\nUnemployment\nNot observed\n· World Bank — Economic Stability Indicators",
+        "top": 293
+      },
+      "screenshot": "plan/evidence/ATL-016/country-andorra-conditions-desktop.png"
+    },
+    {
+      "id": "country-afghanistan-conditions-desktop",
+      "status": "pass",
+      "metrics": {
+        "bottom": 1003,
+        "text": "04 · CIVICA CONDITIONS\n\nCivica Conditions\n\nCIVICA CONDITIONS\n\nSeparate source-native material indicators. They are not combined with governance or each other.\n\nExplore release\nEconomic stability\nAligned inputs\n\nNo composite published\n\nReference year 2024\n\nGDP growth\n1.87 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\n-6.6 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nUnemployment\n13.69 percent_labor_force\n· 2024 · World Bank — Economic Stability Indicators",
+        "top": 276
+      },
+      "screenshot": "plan/evidence/ATL-016/country-afghanistan-conditions-desktop.png"
+    },
+    {
+      "id": "country-bosnia-conditions-desktop",
+      "status": "pass",
+      "metrics": {
+        "bottom": 1036,
+        "text": "04 · CIVICA CONDITIONS\n\nCivica Conditions\n\nCIVICA CONDITIONS\n\nSeparate source-native material indicators. They are not combined with governance or each other.\n\nExplore release\nEconomic stability\nMixed years refused\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.23 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\n6.11 percent_annual_change\n· 2023 · World Bank — Economic Stability Indicators\nUnemployment\n10.69 percent_labor_force\n· 2024 · World Bank — Economic Stability Indicators",
+        "top": 276
+      },
+      "screenshot": "plan/evidence/ATL-016/country-bosnia-conditions-desktop.png"
+    },
+    {
+      "id": "conditions-compare-three-countries-desktop",
+      "status": "pass",
+      "metrics": {
+        "bottom": 1100,
+        "horizontalOverflow": false,
+        "text": "IV · CONDITIONS\nMaterial indicators, without a hidden composite.\nValues below are source-native components from one Conditions release. Reference years can differ across countries or conditions; Civica does not normalize, rank, or combine them here.\n\nRelease conditions-qa018-20260726-v2 · conditions-components/v1 · inspect the full release or read the codebook.\n\nAfghanistan\nEconomic stability\nAligned inputs\n\nNo composite published\n\nReference year 2024\n\nGDP growth\n1.87 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\n-6.6 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nUnemployment\n13.69 percent_labor_force\n· 2024 · World Bank — Economic Stability Indicators\nBosnia and Herzegovina\nEconomic stability\nMixed years refused\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.23 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\n6.11 percent_annual_change\n· 2023 · World Bank — Economic Stability Indicators\nUnemployment\n10.69 percent_labor_force\n· 2024 · World Bank — Economic Stability Indicators\nAndorra\nEconomic stability\nComponent unavailable\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.85 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\nNot observed\n· World Bank — Economic Stability Indicators\nUnemployment\nNot observed\n· World Bank — Economic Stability Indicators",
+        "top": 310
+      },
+      "screenshot": "plan/evidence/ATL-016/conditions-compare-three-countries-desktop.png"
+    },
+    {
+      "id": "conditions-compare-three-countries-mobile",
+      "status": "pass",
+      "metrics": {
+        "bottom": 2332,
+        "horizontalOverflow": false,
+        "scrollWidth": 379,
+        "text": "IV · CONDITIONS\nMaterial indicators, without a hidden composite.\nValues below are source-native components from one Conditions release. Reference years can differ across countries or conditions; Civica does not normalize, rank, or combine them here.\n\nRelease conditions-qa018-20260726-v2 · conditions-components/v1 · inspect the full release or read the codebook.\n\nAfghanistan\nEconomic stability\nAligned inputs\n\nNo composite published\n\nReference year 2024\n\nGDP growth\n1.87 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\n-6.6 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nUnemployment\n13.69 percent_labor_force\n· 2024 · World Bank — Economic Stability Indicators\nBosnia and Herzegovina\nEconomic stability\nMixed years refused\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.23 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\n6.11 percent_annual_change\n· 2023 · World Bank — Economic Stability Indicators\nUnemployment\n10.69 percent_labor_force\n· 2024 · World Bank — Economic Stability Indicators\nAndorra\nEconomic stability\nComponent unavailable\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.85 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\nNot observed\n· World Bank — Economic Stability Indicators\nUnemployment\nNot observed\n· World Bank — Economic Stability Indicators",
+        "title": "Afghanistan vs. Bosnia and Herzegovina vs. Andorra — Compare Countries · Civica Atlas",
+        "top": 128,
+        "viewportWidth": 379
+      },
+      "screenshots": [
+        "plan/evidence/ATL-016/conditions-compare-mobile-aligned.png",
+        "plan/evidence/ATL-016/conditions-compare-mobile-mixed.png",
+        "plan/evidence/ATL-016/conditions-compare-mobile-missing.png"
+      ]
+    },
+    {
+      "id": "conditions-explorer-mobile",
+      "status": "pass",
+      "metrics": {
+        "aligned": "Afghanistan · AFG\tEconomic stability\nAligned inputs\tNo composite published\n2024\tComponent ledger only\t\nGDP growth\n1.87 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\n-6.6 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\n13.69 percent_labor_force · 2024\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+        "h1": "Civica Conditions",
+        "horizontalOverflow": false,
+        "missing": "Andorra · AND\tEconomic stability\nComponent unavailable\tNo composite published\tComponent ledger only\t\nGDP growth\n3.85 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\nNot observed\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\nNot observed\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+        "mixed": "Bosnia and Herzegovina · BIH\tEconomic stability\nMixed years refused\tNo composite published\tComponent ledger only\t\nGDP growth\n3.23 percent_annual_change · 2024\nWorld Bank — Economic Stability Indicators · NY.GDP.MKTP.KD.ZG\nInflation\n6.11 percent_annual_change · 2023\nWorld Bank — Economic Stability Indicators · FP.CPI.TOTL.ZG\nUnemployment\n10.69 percent_labor_force · 2024\nWorld Bank — Economic Stability Indicators · SL.UEM.TOTL.ZS",
+        "scrollWidth": 379,
+        "tableRows": 298,
+        "title": "Civica Conditions — Material Conditions by Country · Civica Atlas",
+        "viewportWidth": 379
+      },
+      "screenshot": "plan/evidence/ATL-016/conditions-explorer-mobile.png"
+    },
+    {
+      "id": "country-andorra-conditions-mobile",
+      "status": "pass",
+      "metrics": {
+        "bottom": 793,
+        "horizontalOverflow": false,
+        "scrollWidth": 379,
+        "text": "04 · CIVICA CONDITIONS\n\nCivica Conditions\n\nCIVICA CONDITIONS\n\nSeparate source-native material indicators. They are not combined with governance or each other.\n\nExplore release\nEconomic stability\nComponent unavailable\n\nNo composite published\n\nNo common reference year\n\nGDP growth\n3.85 percent_annual_change\n· 2024 · World Bank — Economic Stability Indicators\nInflation\nNot observed\n· World Bank — Economic Stability Indicators\nUnemployment\nNot observed\n· World Bank — Economic Stability Indicators",
+        "top": 72,
+        "viewportWidth": 379
+      },
+      "screenshot": "plan/evidence/ATL-016/country-andorra-conditions-mobile.png"
+    }
+  ],
+  "consoleErrors": [],
+  "checkedAt": "2026-07-26T19:56:33.535Z",
+  "status": "pass"
+}

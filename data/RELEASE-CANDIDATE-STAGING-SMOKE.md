@@ -2,7 +2,7 @@
 
 **Contract:** `civica-release-candidate-staging-smoke/v1`  
 **Task:** QA-018  
-**Current status:** pending external authority
+**Current status:** technical run complete; owner sign-off pending
 
 This protocol specializes `data/DEPLOYMENT-REHEARSAL.md` into the evidence
 required to close QA-018. The canonical run record is
@@ -29,13 +29,24 @@ CLI dotenv loader does not replace an existing process value, and the QA-018
 static target-inventory check rejects database scripts that use
 `override: true`.
 
-The deployment is accepted only after `vercel env pull --id <deployment-id>`
-proves its exact runtime target is project `ancient-art-58836757`, branch
+The preferred runtime proof is `vercel env pull --id <deployment-id>`, followed
+by the exact target guard. Vercel currently permits that pull only while a
+deployment is `INITIALIZING`; a prebuilt deployment can pass through that state
+before the CLI can inspect it. The only accepted fallback is an exact Preview
+runtime attestation that retains sanitized `BUILDING` and `READY` rejections
+against the expected `INITIALIZING` state and binds the same deployment ID,
+Preview URL, candidate commit, child project/branch/endpoint/hostname hash,
+forbidden production branch/hostname hash, authoritative head, and a child-only
+Conditions release ID/method/manifest observed through that deployed host.
+
+Both modes must prove project `ancient-art-58836757`, branch
 `br-bitter-fire-amcx8asi`, endpoint `ep-sparkling-pine-amdbr4ke`, a host
 different from production, and authoritative head
-`0050_index_release_header_contract`. Abort on any mismatch. Do not persistently edit the
-Vercel project environment, invoke a browser-opening SSO command, promote the
-Preview, or open a Neon dashboard.
+`0050_index_release_header_contract`. A generic screenshot, inherited Preview
+environment, project-level configuration, or unbound database query is not a
+runtime attestation. Abort on any mismatch. Do not persistently edit the Vercel
+project environment, invoke a browser-opening SSO command, promote the Preview,
+or open a Neon dashboard.
 
 The checked static-asset manifest means the complete Vercel Build Output API
 `static` tree, not the editorial illustration manifest or Next.js route-chunk
@@ -135,6 +146,16 @@ later dated decision can move the record to `complete`.
 Record IDs, hashes, timestamps, result counts, and pass/fail outcomes only. Do
 not retain credentials, database URLs, production rows, cookies, prompts,
 provider error bodies, or private review data.
+
+The retained 2026-07-26 run uses the exact-Preview fallback because the
+deployment-scoped environment pull was rejected at both `BUILDING` and `READY`.
+`plan/evidence/QA-018/run-06-preview-smoke.v1.json` binds deployment
+`dpl_DuymaVKNXCiyc34cC7q9SuRW6pMw` and commit
+`fb7376f3ee7990c89b9da57716b3e563924af028` to the isolated child, migration
+head `0050_index_release_header_contract`, the three current research-product
+pointers, cache/error/dry-run checks, and unchanged source freshness. The
+record is intentionally not `complete` until Fernando reviews that evidence
+and records a dated decision.
 
 Vercel tooling may create or inspect the isolated deployment and capture its
 bounded project/deployment identifiers. It does not apply database migrations,

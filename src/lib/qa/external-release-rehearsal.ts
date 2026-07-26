@@ -115,6 +115,9 @@ type StagingRunStatus =
   | "run_complete_pending_owner_signoff"
   | "complete";
 type RecoveryRunStatus = "pending_external_authority" | "complete";
+type StagingRuntimeProofMode =
+  | "deployment_env_pull"
+  | "exact_preview_runtime";
 
 interface CheckRecord {
   id: string;
@@ -140,6 +143,28 @@ export interface StagingSmokeRecord {
     vercelDeploymentId: string | null;
     productionDatabaseExcluded: boolean | null;
     jobsQuiesced: boolean | null;
+    runtimeAttestation: {
+      proofMode: StagingRuntimeProofMode | null;
+      deploymentUrl: string | null;
+      target: "preview" | null;
+      candidateCommit: string | null;
+      neonProjectId: string | null;
+      neonBranchId: string | null;
+      neonEndpointId: string | null;
+      databaseHostnameSha256: string | null;
+      forbiddenProductionBranchId: string | null;
+      forbiddenProductionHostnameSha256: string | null;
+      migrationHead: string | null;
+      conditionsReleaseId: string | null;
+      conditionsMethodologyVersion: string | null;
+      conditionsManifestSha256: string | null;
+      evidencePath: string | null;
+      envPullUnavailable: {
+        expectedState: "INITIALIZING";
+        rejectedStates: Array<"BUILDING" | "READY">;
+        errorCode: "deployment_state_window_unavailable";
+      } | null;
+    };
   };
   checks: CheckRecord[];
   signoff: {
@@ -208,6 +233,144 @@ const isSha256 = (value: string | null) => /^[a-f0-9]{64}$/.test(value ?? "");
 const isCommit = (value: string | null) => /^[a-f0-9]{40}$/.test(value ?? "");
 const isTimestamp = (value: string | null) =>
   value !== null && Number.isFinite(Date.parse(value));
+const isVercelDeploymentId = (value: string | null) =>
+  /^dpl_[A-Za-z0-9]+$/.test(value ?? "");
+const isNeonBranchId = (value: string | null) =>
+  /^br-[a-z0-9-]+$/.test(value ?? "");
+const isNeonEndpointId = (value: string | null) =>
+  /^ep-[a-z0-9-]+$/.test(value ?? "");
+
+function isVercelPreviewUrl(value: string | null): boolean {
+  if (!value) return false;
+  try {
+    const parsed = new URL(value);
+    return (
+      parsed.protocol === "https:" &&
+      parsed.pathname === "/" &&
+      parsed.search === "" &&
+      parsed.hash === "" &&
+      parsed.hostname.endsWith(".vercel.app")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function runtimeAttestationErrors(
+  record: StagingSmokeRecord,
+  runCompleted: boolean,
+): string[] {
+  const errors: string[] = [];
+  const attestation = record.isolation.runtimeAttestation;
+  if (!attestation) {
+    return ["staging runtime attestation is absent"];
+  }
+
+  if (!runCompleted) {
+    const hasEvidence =
+      Object.entries(attestation).some(
+        ([key, value]) => key !== "envPullUnavailable" && value !== null,
+      ) || attestation.envPullUnavailable !== null;
+    if (hasEvidence) {
+      errors.push(
+        "pending staging record must not contain invented runtime attestation",
+      );
+    }
+    return errors;
+  }
+
+  if (
+    !["deployment_env_pull", "exact_preview_runtime"].includes(
+      attestation.proofMode ?? "",
+    )
+  ) {
+    errors.push("staging runtime proof mode is invalid");
+  }
+  if (
+    !isVercelDeploymentId(record.isolation.vercelDeploymentId) ||
+    !isVercelPreviewUrl(attestation.deploymentUrl) ||
+    attestation.target !== "preview"
+  ) {
+    errors.push("staging runtime attestation is not bound to a Preview deployment");
+  }
+  if (
+    !isCommit(attestation.candidateCommit) ||
+    attestation.candidateCommit !== record.candidate.commit
+  ) {
+    errors.push("staging runtime attestation candidate commit does not match");
+  }
+  if (
+    !attestation.neonProjectId?.trim() ||
+    !isNeonBranchId(attestation.neonBranchId) ||
+    attestation.neonBranchId !== record.isolation.neonBranchId ||
+    !isNeonEndpointId(attestation.neonEndpointId)
+  ) {
+    errors.push("staging runtime attestation child database identity is invalid");
+  }
+  if (
+    !isSha256(attestation.databaseHostnameSha256) ||
+    !isNeonBranchId(attestation.forbiddenProductionBranchId) ||
+    !isSha256(attestation.forbiddenProductionHostnameSha256) ||
+    attestation.neonBranchId === attestation.forbiddenProductionBranchId ||
+    attestation.databaseHostnameSha256 ===
+      attestation.forbiddenProductionHostnameSha256 ||
+    record.isolation.productionDatabaseExcluded !== true
+  ) {
+    errors.push(
+      "staging runtime attestation does not fail closed against production",
+    );
+  }
+  if (
+    attestation.migrationHead !==
+    QA_018_REQUIRED_MIGRATIONS.at(-1)?.id
+  ) {
+    errors.push("staging runtime attestation migration head is invalid");
+  }
+  if (
+    !attestation.conditionsReleaseId?.trim() ||
+    !record.candidate.dataReleaseIds.includes(
+      attestation.conditionsReleaseId,
+    ) ||
+    !attestation.conditionsMethodologyVersion?.trim() ||
+    !record.candidate.methodVersions.includes(
+      attestation.conditionsMethodologyVersion,
+    ) ||
+    !isSha256(attestation.conditionsManifestSha256)
+  ) {
+    errors.push("staging runtime attestation Conditions pointer is invalid");
+  }
+  if (
+    !attestation.evidencePath ||
+    !/^plan\/evidence\/QA-018\/[A-Za-z0-9._/-]+\.json$/.test(
+      attestation.evidencePath,
+    ) ||
+    attestation.evidencePath.includes("..")
+  ) {
+    errors.push("staging runtime attestation evidence path is invalid");
+  }
+
+  if (attestation.proofMode === "deployment_env_pull") {
+    if (attestation.envPullUnavailable !== null) {
+      errors.push(
+        "deployment environment-pull proof cannot claim the state window was unavailable",
+      );
+    }
+  } else if (attestation.proofMode === "exact_preview_runtime") {
+    const fallback = attestation.envPullUnavailable;
+    const rejectedStates = [...(fallback?.rejectedStates ?? [])].sort();
+    if (
+      fallback?.expectedState !== "INITIALIZING" ||
+      fallback.errorCode !== "deployment_state_window_unavailable" ||
+      JSON.stringify(rejectedStates) !== JSON.stringify(["BUILDING", "READY"])
+    ) {
+      errors.push(
+        "exact Preview runtime proof lacks the bounded Vercel state-window failure",
+      );
+    }
+  }
+
+  return errors;
+}
 
 function stagingMigrationPlanErrors(record: StagingSmokeRecord) {
   const errors: string[] = [];
@@ -247,6 +410,10 @@ export function stagingSmokeErrors(record: StagingSmokeRecord) {
       record.status !== "pending_external_authority",
     ),
     ...stagingMigrationPlanErrors(record),
+    ...runtimeAttestationErrors(
+      record,
+      record.status !== "pending_external_authority",
+    ),
   ];
   if (record.schemaVersion !== STAGING_SMOKE_SCHEMA_VERSION) {
     errors.push(`unexpected staging schema ${record.schemaVersion}`);
@@ -284,7 +451,7 @@ export function stagingSmokeErrors(record: StagingSmokeRecord) {
     }
     if (
       !record.isolation.neonBranchId ||
-      !record.isolation.vercelDeploymentId ||
+      !isVercelDeploymentId(record.isolation.vercelDeploymentId) ||
       record.isolation.productionDatabaseExcluded !== true ||
       record.isolation.jobsQuiesced !== true
     ) {

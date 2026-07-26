@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress. The public codebook is available at
+Complete. The public codebook is available at
 `/civica-conditions/methodology`, and the Conditions explorer links to it.
 It documents the release-specific ledger, source-native economic inputs, the
 no-imputation and same-reference-year policies, missingness, nonclaims, and
@@ -17,14 +17,18 @@ the fixture commands that exercise the implementation contract.
 - The public Conditions API and explorer only expose one immutable selected
   release; they never synthesize a current cross-release result.
 
-## Remaining evidence before completion
+## Completion evidence
 
-1. Apply the Conditions migrations in an isolated staging environment and
-   publish a captured release manifest plus its source-input hashes.
-2. Reproduce that specific release from its retained inputs and independently
-   inspect the generated component, coverage, and public-read output.
-3. Record the stage URL, release identifier, manifest hash, and validation
-   artifacts under `plan/evidence/ATL-030/`; then update the master checklist.
+The isolated QA-018 run published `conditions-qa018-20260726-v2`, retained its
+capture/file/expectations/manifest hashes, replayed all 340 calculation keys,
+and independently reconciled 818 components and 101 scores. An identical-input
+rerun inserted zero scores and components; a deliberately altered input failed
+closed and left the release and source freshness unchanged.
 
-The current configured database does not yet contain the Conditions release
-tables, so this task cannot claim a published-release reproduction yet.
+- `plan/evidence/ATL-030/release-reproduction.v1.json`
+- `plan/evidence/ATL-029/release-reconciliation.v1.json`
+- `plan/evidence/QA-018/run-06-preview-smoke.v1.json`
+
+The raw World Bank response capture is not committed; the checked packet
+retains only hashes, counts, and bounded outcomes. This completes the
+release-specific staging criteria without claiming production publication.

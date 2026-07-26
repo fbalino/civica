@@ -1,12 +1,22 @@
 {
   "schemaVersion": "civica-release-candidate-staging-smoke/v1",
   "taskId": "QA-018",
-  "status": "pending_external_authority",
-  "blocker": "owner_platform_staging_authority",
+  "status": "run_complete_pending_owner_signoff",
+  "blocker": "owner_post_run_signoff",
   "candidate": {
-    "commit": null,
-    "dataReleaseIds": [],
-    "methodVersions": [],
+    "commit": "fb7376f3ee7990c89b9da57716b3e563924af028",
+    "dataReleaseIds": [
+      "atlas-2026-07-11",
+      "ci-beta-r5-2024-Q4",
+      "conditions-qa018-20260726-v2",
+      "c96d8e5d-beb6-48e9-927d-edef7ecde6d1"
+    ],
+    "methodVersions": [
+      "civica-atlas-export/v3",
+      "beta-r5",
+      "conditions-components/v1",
+      "pulse-v2.15-beta"
+    ],
     "migrationIds": [
       "0033_flat_hardball",
       "0034_superb_the_fallen",
@@ -45,36 +55,106 @@
       "0049_curvy_shen": "ATL-027",
       "0050_index_release_header_contract": "PLT-014"
     },
-    "assetManifestSha256": null
+    "assetManifestSha256": "92260d47f5554356d4b37bd5854d1850cf92f7b3db31a58d26c6b7147678cd6d"
   },
   "isolation": {
-    "neonBranchId": null,
-    "vercelDeploymentId": null,
-    "productionDatabaseExcluded": null,
-    "jobsQuiesced": null
+    "neonBranchId": "br-bitter-fire-amcx8asi",
+    "vercelDeploymentId": "dpl_DuymaVKNXCiyc34cC7q9SuRW6pMw",
+    "productionDatabaseExcluded": true,
+    "jobsQuiesced": true,
+    "runtimeAttestation": {
+      "proofMode": "exact_preview_runtime",
+      "deploymentUrl": "https://civica-ad577jclc-fbalinos-projects.vercel.app",
+      "target": "preview",
+      "candidateCommit": "fb7376f3ee7990c89b9da57716b3e563924af028",
+      "neonProjectId": "ancient-art-58836757",
+      "neonBranchId": "br-bitter-fire-amcx8asi",
+      "neonEndpointId": "ep-sparkling-pine-amdbr4ke",
+      "databaseHostnameSha256": "a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761",
+      "forbiddenProductionBranchId": "br-dawn-frog-amrf0h6a",
+      "forbiddenProductionHostnameSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
+      "migrationHead": "0050_index_release_header_contract",
+      "conditionsReleaseId": "conditions-qa018-20260726-v2",
+      "conditionsMethodologyVersion": "conditions-components/v1",
+      "conditionsManifestSha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b",
+      "evidencePath": "plan/evidence/QA-018/run-06-preview-smoke.v1.json",
+      "envPullUnavailable": {
+        "expectedState": "INITIALIZING",
+        "rejectedStates": [
+          "READY",
+          "BUILDING"
+        ],
+        "errorCode": "deployment_state_window_unavailable"
+      }
+    }
   },
   "checks": [
-    { "id": "zero-write-migration-plan", "status": "not_run", "evidence": null },
-    { "id": "authoritative-migrations", "status": "not_run", "evidence": null },
-    { "id": "schema-fingerprint", "status": "not_run", "evidence": null },
-    { "id": "release-data", "status": "not_run", "evidence": null },
-    { "id": "deployment-identity", "status": "not_run", "evidence": null },
-    { "id": "cache-headers", "status": "not_run", "evidence": null },
-    { "id": "atlas-browser", "status": "not_run", "evidence": null },
-    { "id": "index-api", "status": "not_run", "evidence": null },
-    { "id": "pulse-api", "status": "not_run", "evidence": null },
-    { "id": "protected-error", "status": "not_run", "evidence": null },
-    { "id": "cron-dry-run", "status": "not_run", "evidence": null },
-    { "id": "source-freshness-unchanged", "status": "not_run", "evidence": null }
+    {
+      "id": "zero-write-migration-plan",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/migration-plan.json"
+    },
+    {
+      "id": "authoritative-migrations",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "schema-fingerprint",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "release-data",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json; plan/evidence/ATL-030/release-reproduction.v1.json; data/releases/atlas-2026-07-11/g2-rc1/"
+    },
+    {
+      "id": "deployment-identity",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "cache-headers",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "atlas-browser",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/browser-smoke.v1.json"
+    },
+    {
+      "id": "index-api",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "pulse-api",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "protected-error",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "cron-dry-run",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    },
+    {
+      "id": "source-freshness-unchanged",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json"
+    }
   ],
   "signoff": {
     "owner": null,
     "checkedAt": null,
     "remainingManualChecks": [
-      "Enable Required Preview branching and Resource must be active before deployment on the Civica connection to neon-claret-bucket.",
-      "Rerun the read-only target probe and require a child branch distinct from br-dawn-frog-amrf0h6a before any migration.",
-      "Run the exact candidate through the migration, release, deploy, browser, API, cache, and dry-run sequence.",
-      "Record bounded evidence and owner sign-off without credentials or production data."
+      "Fernando reviews the retained isolated-Preview evidence and records a dated approval or rejection; this technical run does not authorize production promotion."
     ]
   }
 }

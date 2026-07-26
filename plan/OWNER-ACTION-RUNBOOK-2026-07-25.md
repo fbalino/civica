@@ -139,37 +139,27 @@ The platform operator may be Fernando if he controls the relevant accounts.
 Otherwise use the person responsible for the Civica Vercel and Neon projects.
 Production promotion remains a separate decision.
 
-1. **[QA-018 first — create the release-candidate staging environment](evidence/QA-018/README.md).**
-   Follow the [release-candidate staging protocol](../data/RELEASE-CANDIDATE-STAGING-SMOKE.md)
-   and [deployment rehearsal](../data/DEPLOYMENT-REHEARSAL.md). Use an isolated
-   Neon branch and Vercel staging project, disable staging cron, deploy the
-   exact candidate commit, apply only the approved migrations and inputs, and
-   retain the twelve named smoke-check results. The
-   [2026-07-26 CLI isolation probe](evidence/QA-018/attempt-03-vercel-cli-isolation-2026-07-26.md)
-   proved that the current Preview connection resolves to production and
-   aborted with zero writes. Before Codex resumes, open Vercel
-   **Storage → neon-claret-bucket → Projects → civica → Advanced Options →
-   Deployments Configuration**, enable **Required → Preview** and
-   **Resource must be active before deployment**, then save. Return only
-   confirmation that both settings are active; never paste a database URL or
-   password. This is a Vercel project setting; no Neon sign-in is required.
-   Vercel CLI 53.2.0 cannot change these two connection fields, so Codex will
-   not open either provider dashboard and will resume through Vercel CLI only
-   after your confirmation. This affects future Preview deployments and is not
-   production promotion.
-2. **Conditions batch — ATL-016, ATL-026, ATL-027, ATL-029, ATL-030.** Apply
-   migrations 0040 and 0042 in isolated staging, ingest a real immutable
-   Conditions release, and retain aligned, mixed-year-refused, and missing-row
-   evidence. Codex can then reconcile browser, API, export, and replication
-   outputs. This does not authorize production. Open the prepared records for
-   [ATL-016](ATL-016-conditions-comparison-2026-07-18.md),
+1. **[QA-018 first — review the completed isolated run](evidence/QA-018/README.md).**
+   The exact candidate has now passed the isolated Neon/Vercel Preview
+   migration, release, API, cache, protected-route, idempotent-dry-run, and
+   responsive-browser checks. Open the
+   [attempt-06 narrative](evidence/QA-018/attempt-06-isolated-preview-smoke-2026-07-26.md)
+   and its [bounded machine record](evidence/QA-018/run-06-preview-smoke.v1.json).
+   Confirm or reject the run and record the date. No provider setting, database
+   URL, password, production promotion, or Neon sign-in is needed for this
+   review. QA-018 remains unchecked only because Codex cannot invent your
+   sign-off.
+2. **Conditions production batch — ATL-026 and ATL-027.** The isolated run
+   completed the staging-verifiable ATL-016, ATL-029, and ATL-030 criteria.
+   Production still needs explicit authority to apply the additive Conditions
+   migrations and publish a named immutable release. Open the completed
+   staging records for [ATL-016](ATL-016-conditions-comparison-2026-07-18.md),
    [ATL-026](ATL-026-conditions-components-2026-07-18.md),
    [ATL-027](ATL-027-conditions-release-freezing-2026-07-18.md),
    [ATL-029](ATL-029-versioned-conditions-public-read-2026-07-18.md), and
-   [ATL-030](ATL-030-conditions-codebook-replication-2026-07-18.md). The
-   corresponding evidence folders contain the migration and release notes.
-   Review staging output on `/civica-conditions`,
-   `/civica-conditions/methodology`, and `/api/v1/conditions`.
+   [ATL-030](ATL-030-conditions-codebook-replication-2026-07-18.md). If you
+   authorize production, state that explicitly; the staging run itself does
+   not grant that authority.
 3. **Atlas history and corrections — ATL-020 and ATL-024.** Apply additive
    migrations 0046 and 0047 through the approved flow, then retain the stored
    history journey, opaque correction receipt, authenticated triage,
@@ -210,9 +200,9 @@ Production promotion remains a separate decision.
    containment, then rollback or forward-fix it. Retain cache, artifact,
    version, status, and correction evidence plus the dated sign-off.
 
-The authority-gated task set is ATL-010, ATL-016, ATL-020, ATL-024, ATL-026,
-ATL-027, ATL-029, ATL-030, DAT-036, EXP-029, PUL-024, PUL-027, PUL-040,
-PUL-043, QA-018, and QA-019.
+The remaining authority/sign-off task set is ATL-010, ATL-020, ATL-024,
+ATL-026, ATL-027, DAT-036, EXP-029, PUL-024, PUL-027, PUL-040, PUL-043,
+QA-018, and QA-019.
 
 ## Phase 4 — blockers that cannot be simulated
 

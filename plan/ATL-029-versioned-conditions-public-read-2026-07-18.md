@@ -2,23 +2,19 @@
 
 ## Status
 
-In progress. The public `/civica-conditions` explorer and every country
+Complete. The public `/civica-conditions` explorer and every country
 `/civica-data` tab now read the same selected Conditions release model, rather
 than the generic `metric_definitions` / `country_metrics` path. They disclose
 component-level provenance, years, missingness, alignment, and coverage
 derived only from that release's calculation rows. A missing release is a
 visible availability state, not a silently omitted surface.
 
-The configured database was checked read-only on 2026-07-18 and does not yet
-contain `civica_conditions_releases`; the authored migrations must be applied
-to the isolated staging database before a real release/page/API verification.
-The existing local Next development process was also observed stuck in a
-Turbopack rebuild on 2026-07-18, so the browser screenshot for the new honest
-unavailable state remains pending a responsive local or staging server.
-
-Static verification on 2026-07-18 passed `npm run typecheck`,
-`npm run validate:design-tokens`, `npm run validate:conditions-components`,
-and `npm run validate:claims-docs`.
+The isolated QA-018 database now contains the exact selected release, and its
+stored rows, sovereign-state public API projection, explorer, country panel,
+and comparison surface have been reconciled. Static verification remains
+covered by `npm run typecheck`, `npm run validate:design-tokens`,
+`npm run validate:conditions-components`, and
+`npm run validate:claims-docs`.
 
 ## Adopted public-read contract
 
@@ -45,14 +41,16 @@ until ATL-028's frozen longitudinal study supplies a valid resolution.
 3. **Complete:** replace the generic-metric Conditions explorer read path and
    the country panel read path with this one selected release, including
    source/year/missingness disclosure.
-4. **In progress:** `/api/v1/conditions` now selects one stored release with
+4. **Complete:** `/api/v1/conditions` selects one stored release with
    the same public model as the explorer and country panel. Its closed query
    contract, response schema, registry, rate-limit/inventory policies, API
    documentation, illustrative fixture, and negative schema fixtures are
    checked by `npm run validate:api-docs` and
-   `npm run validate:route-io-policy`. Browser fixtures against deterministic
-   Conditions data remain pending a responsive server and an approved staging
-   release.
-5. After an isolated staging release is approved, verify page/API values
-   against the stored release and preserve the evidence before marking ATL-029
-   complete.
+   `npm run validate:route-io-policy`.
+5. **Complete:** `plan/evidence/ATL-029/release-reconciliation.v1.json`
+   reconciles the stored all-jurisdiction release to the public
+   `sovereign_state` projection and all three reader surfaces. Browser evidence
+   is retained under `plan/evidence/ATL-016/`.
+
+Production migration/publication remains separately authority-gated under
+ATL-026 and ATL-027.

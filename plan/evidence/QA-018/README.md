@@ -1,7 +1,7 @@
 # QA-018 — Release-candidate staging and smoke evidence
 
-Status: authorized disposable-branch migration run in progress; Vercel Preview
-deployment, remaining smoke checks, and owner sign-off are still pending.
+Status: isolated technical run complete; Fernando's post-run review and dated
+sign-off remain pending.
 
 `data/RELEASE-CANDIDATE-STAGING-SMOKE.md` defines the exact isolated run and
 `data/release-candidate-staging-smoke.v1.json` is its fail-closed record. Twelve
@@ -9,24 +9,20 @@ checks bind the candidate commit, data/method/migration/asset identities,
 isolation, job quiescence, schema/release/deployment/cache state, browser/API
 smoke, protected error handling, idempotent dry run, and unchanged freshness.
 
-The prepared migration plan is now bound to the complete authoritative ledger
-after the configured `0032_sparkling_genesis` head: `0033`–`0040`, `0042`–`0049`
-in exact order, with no `0041`. Each migration is machine-mapped to its actual
-owning task so the shared staging apply cannot omit the later Pulse, Atlas, or
-internationalization migrations or attribute their live evidence to QA-018.
-The validator also compares this plan to the checked authoritative manifest
-tail and fails if either drifts.
+The migration plan is bound to the complete authoritative ledger after the
+configured `0032_sparkling_genesis` head: `0033`–`0040`, `0042`–`0050` in exact
+order, with no `0041`. The disposable child now proves head
+`0050_index_release_header_contract`, 50 matching ledger entries, and the
+checked public-schema fingerprint. Each migration remains machine-mapped to
+its actual owning task; one shared schema pass is not substituted for each
+task's product validation.
 
-The current disposable branch remains truthfully recorded at `0048`; migration
-`0049_curvy_shen` is now part of the required plan but is not claimed as
-applied until the next bounded staging record proves it.
-
-The canonical smoke record remains `pending_external_authority` until an exact
-committed candidate is bound and the remaining checks run. Attempts 04 and 05
-now retain the authorized Neon branch, migration/fingerprint results, target
-isolation correction, and Pulse staging rehearsal; neither claims a Vercel
-deployment, production release, production cron invocation, production
-database change, or owner sign-off.
+The canonical smoke record is now
+`run_complete_pending_owner_signoff`. The exact candidate, disposable child,
+prebuilt Preview, release/method pointers, static manifest, twelve checks,
+responsive browser evidence, and unchanged freshness are retained without
+credentials. No production release, production cron invocation, production
+database change, promotion, or owner sign-off is claimed.
 
 ## Recorded staging attempts
 
@@ -62,6 +58,13 @@ database change, or owner sign-off.
   the corrected model-free Pulse successor run, and the production-only
   read-only PUL-040 refresh. The bounded Pulse record is
   [`../PUL-027/qa-018-staging-rehearsal-2026-07-26.json`](../PUL-027/qa-018-staging-rehearsal-2026-07-26.json).
+- [`attempt-06-isolated-preview-smoke-2026-07-26.md`](attempt-06-isolated-preview-smoke-2026-07-26.md)
+  records the exact prebuilt Preview, runtime target attestation, API/cache/
+  protected-route/idempotent-dry-run checks, responsive browser run, and the
+  owner-signoff boundary. Its bounded records are
+  [`run-06-preview-smoke.v1.json`](run-06-preview-smoke.v1.json),
+  [`browser-smoke.v1.json`](browser-smoke.v1.json), and
+  [`staging-static-assets.v1.json`](staging-static-assets.v1.json).
 
 The existing automatic Preview integration still resolves the production
 branch by default, so it is not accepted as isolation evidence. The remaining
@@ -71,9 +74,9 @@ prebuilt output with a deployment-scoped `DATABASE_URL` override. This changes
 neither the project's persistent Preview environment nor the production
 deployment. Codex will not open an integration or Neon dashboard.
 
-After Vercel creates the deployment, pull its exact runtime environment into a
-temporary `0600` file with `vercel env pull --id <deployment-id>`, then run the
-guard before accepting any smoke result:
+The preferred post-deployment proof pulls the exact runtime environment into a
+temporary `0600` file with `vercel env pull --id <deployment-id>`, then runs
+the guard before accepting any smoke result:
 
 ```sh
 node --env-file=<temporary-preview-env> --import tsx \
@@ -83,12 +86,16 @@ node --env-file=<temporary-preview-env> --import tsx \
   --expected-hostname-sha256=a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761 \
   --forbidden-branch=br-dawn-frog-amrf0h6a \
   --forbidden-hostname-sha256=c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b \
-  --required-migration-head=0048_entity_name_forms
+  --required-migration-head=0050_index_release_header_contract
 ```
 
-The temporary environment and deployment-scoped secret are never printed or
-checked in and are deleted after bounded evidence is retained. A rejected
-result prints only a sanitized fail-closed message.
+When Vercel has already left `INITIALIZING`, the checked protocol permits only
+the exact-Preview runtime attestation described in
+`data/RELEASE-CANDIDATE-STAGING-SMOKE.md`. Attempt 06 retained the sanitized
+`BUILDING` and `READY` rejections, then matched the deployment-scoped child
+input guard to a child-only Conditions release and head/pointer evidence
+observed from the exact Preview host. The temporary environment, automation
+token, and deployment-scoped secret were never printed or checked in.
 
 Verification:
 

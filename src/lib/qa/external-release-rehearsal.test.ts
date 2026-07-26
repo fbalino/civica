@@ -17,6 +17,46 @@ import {
 
 const clone = <T>(value: T): T => structuredClone(value);
 
+function pendingStagingRecord(): StagingSmokeRecord {
+  const candidate = clone(stagingRecord) as StagingSmokeRecord;
+  candidate.status = "pending_external_authority";
+  candidate.blocker = "owner_platform_staging_authority";
+  candidate.candidate.commit = null;
+  candidate.candidate.dataReleaseIds = [];
+  candidate.candidate.methodVersions = [];
+  candidate.candidate.assetManifestSha256 = null;
+  candidate.isolation.neonBranchId = null;
+  candidate.isolation.vercelDeploymentId = null;
+  candidate.isolation.productionDatabaseExcluded = null;
+  candidate.isolation.jobsQuiesced = null;
+  candidate.isolation.runtimeAttestation = {
+    proofMode: null,
+    deploymentUrl: null,
+    target: null,
+    candidateCommit: null,
+    neonProjectId: null,
+    neonBranchId: null,
+    neonEndpointId: null,
+    databaseHostnameSha256: null,
+    forbiddenProductionBranchId: null,
+    forbiddenProductionHostnameSha256: null,
+    migrationHead: null,
+    conditionsReleaseId: null,
+    conditionsMethodologyVersion: null,
+    conditionsManifestSha256: null,
+    evidencePath: null,
+    envPullUnavailable: null,
+  };
+  candidate.checks = candidate.checks.map((check) => ({
+    ...check,
+    status: "not_run",
+    evidence: null,
+  }));
+  candidate.signoff.owner = null;
+  candidate.signoff.checkedAt = null;
+  return candidate;
+}
+
 function technicallyCompleteStagingRecord(): StagingSmokeRecord {
   const candidate = clone(stagingRecord) as StagingSmokeRecord;
   candidate.status = "run_complete_pending_owner_signoff";
@@ -26,9 +66,31 @@ function technicallyCompleteStagingRecord(): StagingSmokeRecord {
   candidate.candidate.methodVersions = ["test-method"];
   candidate.candidate.assetManifestSha256 = "b".repeat(64);
   candidate.isolation.neonBranchId = "br-test";
-  candidate.isolation.vercelDeploymentId = "dpl-test";
+  candidate.isolation.vercelDeploymentId = "dpl_Test123";
   candidate.isolation.productionDatabaseExcluded = true;
   candidate.isolation.jobsQuiesced = true;
+  candidate.isolation.runtimeAttestation = {
+    proofMode: "exact_preview_runtime",
+    deploymentUrl: "https://civica-test.vercel.app",
+    target: "preview",
+    candidateCommit: "a".repeat(40),
+    neonProjectId: "project-test",
+    neonBranchId: "br-test",
+    neonEndpointId: "ep-test",
+    databaseHostnameSha256: "c".repeat(64),
+    forbiddenProductionBranchId: "br-production",
+    forbiddenProductionHostnameSha256: "d".repeat(64),
+    migrationHead: "0050_index_release_header_contract",
+    conditionsReleaseId: "atlas-test-release",
+    conditionsMethodologyVersion: "test-method",
+    conditionsManifestSha256: "e".repeat(64),
+    evidencePath: "plan/evidence/QA-018/test-runtime.json",
+    envPullUnavailable: {
+      expectedState: "INITIALIZING",
+      rejectedStates: ["READY", "BUILDING"],
+      errorCode: "deployment_state_window_unavailable",
+    },
+  };
   candidate.checks = candidate.checks.map((check) => ({
     ...check,
     status: "pass",
@@ -40,7 +102,7 @@ function technicallyCompleteStagingRecord(): StagingSmokeRecord {
   return candidate;
 }
 
-test("pending external release records are complete protocols without fabricated outcomes", () => {
+test("checked external release records satisfy their fail-closed contracts", () => {
   assert.deepEqual(
     stagingSmokeErrors(stagingRecord as StagingSmokeRecord),
     [],
@@ -100,6 +162,69 @@ test("technically complete staging requires a real owner-review blocker and no s
   );
 });
 
+test("exact Preview runtime proof fails closed on production and state-window drift", () => {
+  const productionTarget = technicallyCompleteStagingRecord();
+  productionTarget.isolation.runtimeAttestation.target =
+    "production" as "preview";
+  assert.match(
+    stagingSmokeErrors(productionTarget).join("\n"),
+    /not bound to a Preview deployment/,
+  );
+
+  const forbiddenBranch = technicallyCompleteStagingRecord();
+  forbiddenBranch.isolation.runtimeAttestation.neonBranchId =
+    forbiddenBranch.isolation.runtimeAttestation.forbiddenProductionBranchId;
+  assert.match(
+    stagingSmokeErrors(forbiddenBranch).join("\n"),
+    /fail closed against production/,
+  );
+
+  const forbiddenHost = technicallyCompleteStagingRecord();
+  forbiddenHost.isolation.runtimeAttestation.databaseHostnameSha256 =
+    forbiddenHost.isolation.runtimeAttestation
+      .forbiddenProductionHostnameSha256;
+  assert.match(
+    stagingSmokeErrors(forbiddenHost).join("\n"),
+    /fail closed against production/,
+  );
+
+  const wrongHead = technicallyCompleteStagingRecord();
+  wrongHead.isolation.runtimeAttestation.migrationHead =
+    "0049_curvy_shen";
+  assert.match(
+    stagingSmokeErrors(wrongHead).join("\n"),
+    /migration head is invalid/,
+  );
+
+  const wrongRelease = technicallyCompleteStagingRecord();
+  wrongRelease.isolation.runtimeAttestation.conditionsReleaseId =
+    "conditions-unbound-v1";
+  assert.match(
+    stagingSmokeErrors(wrongRelease).join("\n"),
+    /Conditions pointer is invalid/,
+  );
+
+  const missingStateWindow = technicallyCompleteStagingRecord();
+  missingStateWindow.isolation.runtimeAttestation.envPullUnavailable = null;
+  assert.match(
+    stagingSmokeErrors(missingStateWindow).join("\n"),
+    /state-window failure/,
+  );
+});
+
+test("deployment environment-pull proof cannot also claim fallback", () => {
+  const candidate = technicallyCompleteStagingRecord();
+  candidate.isolation.runtimeAttestation.proofMode =
+    "deployment_env_pull";
+  assert.match(
+    stagingSmokeErrors(candidate).join("\n"),
+    /cannot claim the state window was unavailable/,
+  );
+
+  candidate.isolation.runtimeAttestation.envPullUnavailable = null;
+  assert.deepEqual(stagingSmokeErrors(candidate), []);
+});
+
 test("staging binds every post-0032 authoritative migration to its owning task", () => {
   assert.equal(QA_018_DATABASE_HEAD, "0032_sparkling_genesis");
   assert.deepEqual(
@@ -151,9 +276,17 @@ test("recovery cannot complete without a bad release and correction publication"
 });
 
 test("pending records reject fabricated provider evidence", () => {
-  const staging = clone(stagingRecord) as StagingSmokeRecord;
+  const staging = pendingStagingRecord();
   staging.isolation.vercelDeploymentId = "invented";
   assert.match(stagingSmokeErrors(staging).join("\n"), /invented run evidence/);
+
+  const runtime = pendingStagingRecord();
+  runtime.isolation.runtimeAttestation.proofMode =
+    "exact_preview_runtime";
+  assert.match(
+    stagingSmokeErrors(runtime).join("\n"),
+    /invented runtime attestation/,
+  );
 
   const recovery = clone(recoveryRecord) as RecoveryRehearsalRecord;
   recovery.deliberatelyBadRelease = true;

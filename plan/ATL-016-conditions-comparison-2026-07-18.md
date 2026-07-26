@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress. `/compare` now includes a Conditions section that reads the same
+Complete. `/compare` includes a Conditions section that reads the same
 single immutable release as the Conditions explorer and country page. It
 reuses the country-panel presentation, so every comparison retains the native
 component, unit, source name, reference year, and value/missingness state.
@@ -19,12 +19,17 @@ component, unit, source name, reference year, and value/missingness state.
 - `npm run validate:conditions-components` now checks that the explorer,
   country panel, and comparison surface retain this contract.
 
-## Remaining evidence before completion
+## Completion evidence
 
-1. Apply the Conditions release migration to isolated staging and publish a
-   captured immutable release.
-2. Exercise the compare route with two and three countries from that release
-   in the browser, including aligned, mixed-year-refused, and missing-component
-   rows, at desktop and mobile widths.
-3. Store the release ID, manifest hash, screenshots, and validation output in
-   `plan/evidence/ATL-016/`, then update the master checklist.
+The isolated QA-018 Preview published
+`conditions-qa018-20260726-v2` and exercised a three-country comparison plus
+the explorer and country panel at desktop and 390px mobile widths. The retained
+packet covers aligned, mixed-year-refused, and missing-component rows with no
+horizontal overflow or console errors:
+
+- `plan/evidence/ATL-016/release-browser-reconciliation.v1.json`
+- `plan/evidence/ATL-016/browser-evidence.v1.json`
+- `plan/evidence/ATL-029/release-reconciliation.v1.json`
+
+This completes the task's staging-verifiable acceptance criteria. Production
+migration/publication remains separately owned by ATL-026 and ATL-027.

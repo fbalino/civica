@@ -3,16 +3,16 @@
   "reviewedAt": "2026-07-26",
   "checklist": {
     "total": 310,
-    "completed": 249,
-    "remaining": 61,
-    "progressPercent": 80.3
+    "completed": 252,
+    "remaining": 58,
+    "progressPercent": 81.3
   },
   "agentExecutableNow": [],
   "categories": [
     {
       "id": "direct-human-owner-professional",
       "label": "Direct human, owner, or professional review",
-      "count": 14,
+      "count": 15,
       "taskIds": [
         "BRD-003",
         "BRD-010",
@@ -27,33 +27,30 @@
         "IDX-034",
         "PLT-029",
         "QA-012",
-        "QA-013"
+        "QA-013",
+        "QA-018"
       ],
-      "nextStep": "Obtain the exact rendered Explore disposition; the four residual EXP-038 dispositions; owner spend and honorarium facts; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
+      "nextStep": "Obtain the exact rendered Explore disposition; the four residual EXP-038 dispositions; owner spend and honorarium facts; Fernando's dated QA-018 isolated-run disposition; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
     },
     {
       "id": "production-staging-external-authority",
       "label": "Production, staging, or external-system authority",
-      "count": 16,
+      "count": 12,
       "taskIds": [
         "ATL-010",
-        "ATL-016",
         "ATL-020",
         "ATL-024",
         "ATL-026",
         "ATL-027",
-        "ATL-029",
-        "ATL-030",
         "DAT-036",
         "EXP-029",
         "PUL-024",
         "PUL-027",
         "PUL-040",
         "PUL-043",
-        "QA-018",
         "QA-019"
       ],
-      "nextStep": "First enable Required Preview branching and Resource must be active before deployment on the Civica-to-Neon Vercel connection; rerun the read-only isolation probe; then authorize and run the checked migration, source refresh, isolated staging deployment, scheduled pipeline, or recovery drill and retain bounded live evidence."
+      "nextStep": "Authorize the remaining production migrations and source refreshes separately from the completed isolated run; then run the checked Atlas, Conditions, internationalization, Pulse, or recovery action and retain bounded live evidence."
     },
     {
       "id": "external-evidence-unavailable",
