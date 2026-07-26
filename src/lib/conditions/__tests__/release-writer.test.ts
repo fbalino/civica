@@ -16,7 +16,10 @@ import {
   type EconomicLineages,
 } from "../economic";
 import { writeConditionsRelease } from "../ingest";
-import { buildFixedBoundReferenceSets } from "../release";
+import {
+  buildFixedBoundReferenceSets,
+  conditionsReleaseManifestSha256,
+} from "../release";
 
 function row(
   rawValue = 0.9,
@@ -90,6 +93,34 @@ async function createDatabase() {
   return database;
 }
 
+function pgliteAtomicNeonSql(database: PGlite) {
+  return {
+    async transaction(
+      build: (transaction: {
+        query: (
+          sql: string,
+          params?: unknown[],
+        ) => { sql: string; params: unknown[] };
+      }) => Array<{ sql: string; params: unknown[] }>,
+    ) {
+      const queries = build({
+        query(sql, params = []) {
+          return { sql, params };
+        },
+      });
+      return database.transaction(async (transaction) => {
+        const results = [];
+        for (const query of queries) {
+          results.push(
+            (await transaction.query(query.sql, query.params)).rows,
+          );
+        }
+        return results;
+      });
+    },
+  } as never;
+}
+
 function gpiRow(releaseId: string): ConditionScoreInput {
   const base = {
     ...row(0.9, releaseId),
@@ -158,7 +189,14 @@ test("Conditions release writer commits one immutable release and rejects a chan
       methodologyVersion: first.methodologyVersion,
       referenceSets: buildFixedBoundReferenceSets({ calculations: [first], componentId: "hdi", direction: "higher_is_better", transformationId: first.transformationId, lowerBound: 0, upperBound: 1 }),
     };
-    assert.equal((await writeConditionsRelease(db as never, release, [first])).written, 1);
+    assert.equal(
+      (
+        await writeConditionsRelease(db as never, release, [first], {
+          neonSql: pgliteAtomicNeonSql(database),
+        })
+      ).written,
+      1,
+    );
     const timestampOrder = (
       await database.query<{ ordered: boolean; sameClock: boolean }>(`
         SELECT
@@ -171,10 +209,257 @@ test("Conditions release writer commits one immutable release and rejects a chan
       `)
     ).rows[0];
     assert.deepEqual(timestampOrder, { ordered: true, sameClock: true });
-    assert.equal((await writeConditionsRelease(db as never, release, [first])).written, 0);
-    await assert.rejects(writeConditionsRelease(db as never, release, [row(0.8)]), /different manifest/);
+    assert.equal(
+      (
+        await writeConditionsRelease(db as never, release, [first], {
+          neonSql: pgliteAtomicNeonSql(database),
+        })
+      ).written,
+      0,
+    );
+    await assert.rejects(
+      writeConditionsRelease(db as never, release, [row(0.8)], {
+        neonSql: pgliteAtomicNeonSql(database),
+      }),
+      /different manifest/,
+    );
     assert.equal((await database.query<{ count: number }>("SELECT count(*)::int AS count FROM civica_conditions_scores")).rows[0].count, 1);
   } finally { await database.close(); }
+});
+
+type CapturedAtomicQuery = {
+  sql: string;
+  params: unknown[];
+};
+
+type CapturedAtomicTransaction = {
+  queries: CapturedAtomicQuery[];
+  options: { isolationLevel?: string };
+};
+
+function createAtomicNeonHarness() {
+  let storedManifest: string | null = null;
+  let committed = {
+    releases: 0,
+    referenceSets: 0,
+    parameters: 0,
+    calculations: 0,
+    components: 0,
+    scores: 0,
+    sources: 0,
+  };
+  const transactions: CapturedAtomicTransaction[] = [];
+  const neonSql = {
+    async transaction(
+      build: (transaction: {
+        query: (sql: string, params?: unknown[]) => CapturedAtomicQuery;
+      }) => CapturedAtomicQuery[],
+      options: { isolationLevel?: string } = {},
+    ) {
+      const queries: CapturedAtomicQuery[] = [];
+      const planned = build({
+        query(sql, params = []) {
+          const query = { sql, params };
+          queries.push(query);
+          return query;
+        },
+      });
+      assert.equal(planned.length, 2);
+      transactions.push({ queries, options });
+
+      const publish = queries[0];
+      assert.ok(publish);
+      const requestedManifest = String(publish.params[2]);
+      const payload = JSON.parse(String(publish.params[3])) as {
+        referenceSets: unknown[];
+        parameters: unknown[];
+        calculations: unknown[];
+        components: unknown[];
+        scores: unknown[];
+        sourceIds: unknown[];
+      };
+      const isNew = storedManifest === null;
+      if (isNew) {
+        storedManifest = requestedManifest;
+        committed = {
+          releases: 1,
+          referenceSets: payload.referenceSets.length,
+          parameters: payload.parameters.length,
+          calculations: payload.calculations.length,
+          components: payload.components.length,
+          scores: payload.scores.length,
+          sources: payload.sourceIds.length,
+        };
+      }
+      return [
+        [{
+          releases_written: isNew ? 1 : 0,
+          reference_sets_written: isNew ? payload.referenceSets.length : 0,
+          parameters_written: isNew ? payload.parameters.length : 0,
+          calculations_written: isNew ? payload.calculations.length : 0,
+          components_written: isNew ? payload.components.length : 0,
+          scores_written: isNew ? payload.scores.length : 0,
+          sources_stamped: isNew ? payload.sourceIds.length : 0,
+        }],
+        [{ manifest_sha256: storedManifest }],
+      ];
+    },
+  } as never;
+  return {
+    neonSql,
+    transactions,
+    committed: () => ({ ...committed }),
+  };
+}
+
+test("Neon Conditions plan gates the complete release and DB-clock freshness in one transaction batch", async () => {
+  const first = row();
+  const release = {
+    releaseId: first.releaseId,
+    methodologyVersion: first.methodologyVersion,
+    referenceSets: buildFixedBoundReferenceSets({
+      calculations: [first],
+      componentId: "hdi",
+      direction: "higher_is_better",
+      transformationId: first.transformationId,
+      lowerBound: 0,
+      upperBound: 1,
+    }),
+  };
+  const harness = createAtomicNeonHarness();
+  assert.deepEqual(
+    await writeConditionsRelease({} as never, release, [first], {
+      neonSql: harness.neonSql,
+    }),
+    {
+      proposed: 1,
+      written: 1,
+      calculationsWritten: 1,
+      componentsWritten: 1,
+    },
+  );
+
+  const transaction = harness.transactions[0];
+  assert.equal(transaction.options.isolationLevel, "ReadCommitted");
+  assert.equal(transaction.queries.length, 2);
+  const publishSql = transaction.queries[0].sql;
+  for (const table of [
+    "civica_conditions_releases",
+    "civica_conditions_reference_sets",
+    "civica_conditions_normalization_parameters",
+    "civica_conditions_calculations",
+    "civica_conditions_components",
+    "civica_conditions_scores",
+  ]) {
+    assert.ok(
+      publishSql.includes(`INSERT INTO ${table}`),
+      `atomic plan omits ${table}`,
+    );
+  }
+  assert.equal(publishSql.match(/\bON CONFLICT\b/g)?.length, 1);
+  assert.ok(publishSql.includes("ON CONFLICT (id) DO NOTHING"));
+  assert.ok(publishSql.includes("inserted_release AS"));
+  assert.ok(publishSql.includes("JOIN inserted_calculations"));
+  assert.ok(publishSql.includes("inserted_source_rows AS"));
+  assert.ok(publishSql.includes("stamped_sources AS"));
+  assert.ok(publishSql.includes("inserted_release.created_at"));
+  assert.ok(publishSql.includes("cardinality_guard"));
+  assert.ok(
+    transaction.queries[1].sql.includes("civica_conditions_releases"),
+  );
+  assert.equal(
+    transaction.queries[0].params[2],
+    conditionsReleaseManifestSha256(release, [first]),
+  );
+
+  const afterFirst = harness.committed();
+  assert.deepEqual(
+    await writeConditionsRelease({} as never, release, [first], {
+      neonSql: harness.neonSql,
+    }),
+    {
+      proposed: 1,
+      written: 0,
+      calculationsWritten: 0,
+      componentsWritten: 0,
+    },
+  );
+  assert.deepEqual(harness.committed(), afterFirst);
+
+  await assert.rejects(
+    writeConditionsRelease({} as never, release, [row(0.8)], {
+      neonSql: harness.neonSql,
+    }),
+    /already exists with a different manifest/,
+  );
+  assert.deepEqual(harness.committed(), afterFirst);
+  assert.equal(harness.transactions.length, 3);
+});
+
+test("Neon Conditions transaction rolls back the header and freshness when a descendant insert fails", async () => {
+  const database = await createDatabase();
+  try {
+    const first = row();
+    const invalidBase = {
+      ...first,
+      components: [{
+        ...first.components[0],
+        sourceId: "missing_conditions_source",
+      }],
+    };
+    const invalid = {
+      ...invalidBase,
+      calculationKey: conditionCalculationKey(invalidBase),
+    };
+    const release = {
+      releaseId: invalid.releaseId,
+      methodologyVersion: invalid.methodologyVersion,
+      referenceSets: buildFixedBoundReferenceSets({
+        calculations: [invalid],
+        componentId: "hdi",
+        direction: "higher_is_better",
+        transformationId: invalid.transformationId,
+        lowerBound: 0,
+        upperBound: 1,
+      }),
+    };
+    await assert.rejects(
+      writeConditionsRelease({} as never, release, [invalid], {
+        neonSql: pgliteAtomicNeonSql(database),
+      }),
+    );
+    const state = (
+      await database.query<{
+        releases: number;
+        referenceSets: number;
+        parameters: number;
+        calculations: number;
+        components: number;
+        scores: number;
+        freshness: Date | null;
+      }>(`
+        SELECT
+          (SELECT count(*)::int FROM civica_conditions_releases) AS releases,
+          (SELECT count(*)::int FROM civica_conditions_reference_sets) AS "referenceSets",
+          (SELECT count(*)::int FROM civica_conditions_normalization_parameters) AS parameters,
+          (SELECT count(*)::int FROM civica_conditions_calculations) AS calculations,
+          (SELECT count(*)::int FROM civica_conditions_components) AS components,
+          (SELECT count(*)::int FROM civica_conditions_scores) AS scores,
+          (SELECT last_sync_at FROM sources WHERE id = 'undp_hdi') AS freshness
+      `)
+    ).rows[0];
+    assert.deepEqual(state, {
+      releases: 0,
+      referenceSets: 0,
+      parameters: 0,
+      calculations: 0,
+      components: 0,
+      scores: 0,
+      freshness: null,
+    });
+  } finally {
+    await database.close();
+  }
 });
 
 test("Conditions release writer applies all three dimensions under one release, including not_ranked parameters", async () => {
@@ -240,6 +525,7 @@ test("Conditions release writer applies all three dimensions under one release, 
       db as never,
       release,
       calculations,
+      { transactionMode: "drizzle-fixture" },
     );
     assert.deepEqual(first, {
       proposed: 3,
@@ -248,7 +534,11 @@ test("Conditions release writer applies all three dimensions under one release, 
       componentsWritten: 5,
     });
     assert.equal(
-      (await writeConditionsRelease(db as never, release, calculations)).written,
+      (
+        await writeConditionsRelease(db as never, release, calculations, {
+          transactionMode: "drizzle-fixture",
+        })
+      ).written,
       0,
     );
     const changedEconomic = buildEconomicConditionsCalculations({
@@ -265,6 +555,7 @@ test("Conditions release writer applies all three dimensions under one release, 
         db as never,
         release,
         [hdi, gpi, changedEconomic],
+        { transactionMode: "drizzle-fixture" },
       ),
       /already exists with a different manifest/,
     );

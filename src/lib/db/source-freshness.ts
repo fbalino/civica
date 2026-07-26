@@ -298,3 +298,29 @@ export function markSourcesSyncedFromInsertedRowsCte(at: Date): SQL {
     RETURNING s.id
   )`;
 }
+
+/**
+ * Build the sanctioned freshness CTE for an immutable release publisher.
+ *
+ * The enclosing statement must expose:
+ * - `inserted_release(created_at)`, containing a row only when this execution
+ *   created the immutable release header; and
+ * - `inserted_source_rows(source_id)`, containing only source ids reached by
+ *   rows inserted for that new release.
+ *
+ * Existing-release reruns therefore stamp nothing, while a new release uses
+ * the exact PostgreSQL timestamp stored on its header.
+ */
+export function markSourcesSyncedFromInsertedReleaseCte(): string {
+  return `stamped_sources AS (
+    UPDATE sources AS source
+    SET last_sync_at = inserted_release.created_at
+    FROM inserted_release
+    WHERE EXISTS (
+      SELECT 1
+      FROM inserted_source_rows AS inserted
+      WHERE inserted.source_id = source.id
+    )
+    RETURNING source.id
+  )`;
+}
