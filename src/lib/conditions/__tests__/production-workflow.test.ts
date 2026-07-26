@@ -16,6 +16,7 @@ import {
   readWorldBankEconomicCapture,
   runCombinedConditionsIngestion,
   validateWorldBankEconomicCapture,
+  worldBankRequestCountryCode,
   worldBankEconomicObservationsFromCapture,
   writeWorldBankEconomicCapture,
   type PreparedConditionsDimension,
@@ -27,7 +28,23 @@ import { CONDITIONS_MISSINGNESS_POLICY } from "../release";
 const jurisdiction = {
   id: "11111111-1111-4111-8111-111111111111",
   iso2: "UY",
+  requestCountryCode: "URY",
 };
+
+test("World Bank request codes use the publisher-specific Kosovo identity", () => {
+  assert.equal(
+    worldBankRequestCountryCode({ iso2: "XK", iso3: "XKS" }),
+    "XKX",
+  );
+  assert.equal(
+    worldBankRequestCountryCode({ iso2: "UY", iso3: "URY" }),
+    "URY",
+  );
+  assert.equal(
+    worldBankRequestCountryCode({ iso2: "JE", iso3: null }),
+    "JE",
+  );
+});
 
 function preparedConditionsDimension(
   dimension: ConditionsDimension,
@@ -107,16 +124,23 @@ function sourceScoreRow(input: {
 }
 
 function capturedResponse(
-  targetJurisdiction: { id: string; iso2: string },
+  targetJurisdiction: {
+    id: string;
+    iso2: string;
+    requestCountryCode: string;
+  },
   indicatorId: string,
   responseBody: string,
+  httpStatus = 200,
 ): WorldBankEconomicCaptureResponse {
   return {
     jurisdictionId: targetJurisdiction.id,
     iso2: targetJurisdiction.iso2,
+    requestCountryCode: targetJurisdiction.requestCountryCode,
     indicatorId,
     requestUrl:
-      `https://api.worldbank.org/v2/country/${targetJurisdiction.iso2}/indicator/${indicatorId}?format=json&date=${WORLD_BANK_ECONOMIC_DATE_RANGE}&per_page=10`,
+      `https://api.worldbank.org/v2/country/${targetJurisdiction.requestCountryCode}/indicator/${indicatorId}?format=json&date=${WORLD_BANK_ECONOMIC_DATE_RANGE}&per_page=10`,
+    httpStatus,
     retrievedAt: "2026-07-25T12:00:00.000Z",
     responseBodySha256: createHash("sha256").update(responseBody).digest("hex"),
     responseBody,
@@ -371,18 +395,139 @@ test("World Bank transport, HTTP, and malformed payload failures fail closed", a
   );
 });
 
-test("World Bank unsupported-country envelopes are retained as not observed", () => {
+test("World Bank capture retains only the exact unsupported-country HTTP 200/400 envelope", async () => {
+  const unavailableBody = JSON.stringify([
+    {
+      message: [
+        {
+          id: "120",
+          key: "Invalid value",
+          value: "The provided parameter value is not valid",
+        },
+      ],
+    },
+  ]);
+  const capture = await captureWorldBankEconomicInputs({
+    jurisdictions: [jurisdiction],
+    fetchImpl: async () =>
+      new Response(unavailableBody, { status: 400 }),
+  });
+  assert.equal(capture.responses.length, 3);
+  assert.ok(
+    capture.responses.every(
+      (response) =>
+        response.requestCountryCode === jurisdiction.requestCountryCode,
+    ),
+  );
+  const http200Capture = await captureWorldBankEconomicInputs({
+    jurisdictions: [jurisdiction],
+    fetchImpl: async () =>
+      new Response(unavailableBody, { status: 200 }),
+  });
+  assert.ok(
+    http200Capture.responses.every(
+      (response) => response.httpStatus === 200,
+    ),
+  );
+
+  await assert.rejects(
+    captureWorldBankEconomicInputs({
+      jurisdictions: [jurisdiction],
+      fetchImpl: async () =>
+        new Response(
+          JSON.stringify([
+            {
+              message: [
+                {
+                  id: "999",
+                  key: "Invalid value",
+                  value: "The provided parameter value is not valid",
+                },
+              ],
+            },
+          ]),
+          { status: 400 },
+        ),
+    }),
+    /invalid HTTP status\/body pairing/,
+  );
+});
+
+test("World Bank capture retains only the exact empty-observation HTTP 200 envelope", async () => {
+  const emptyObservationBody = JSON.stringify([
+    {
+      page: 0,
+      pages: 0,
+      per_page: 0,
+      total: 0,
+      sourceid: null,
+      lastupdated: null,
+    },
+    null,
+  ]);
+  const capture = await captureWorldBankEconomicInputs({
+    jurisdictions: [jurisdiction],
+    fetchImpl: async () =>
+      new Response(emptyObservationBody, { status: 200 }),
+  });
+  assert.equal(capture.responses.length, 3);
+
+  await assert.rejects(
+    captureWorldBankEconomicInputs({
+      jurisdictions: [jurisdiction],
+      fetchImpl: async () =>
+        new Response(
+          JSON.stringify([
+            {
+              page: 1,
+              pages: 0,
+              per_page: 0,
+              total: 0,
+              sourceid: null,
+              lastupdated: null,
+            },
+            null,
+          ]),
+          { status: 200 },
+        ),
+    }),
+    /invalid indicator payload/,
+  );
+  await assert.rejects(
+    captureWorldBankEconomicInputs({
+      jurisdictions: [jurisdiction],
+      fetchImpl: async () =>
+        new Response(emptyObservationBody, { status: 400 }),
+    }),
+    /invalid HTTP status\/body pairing/,
+  );
+});
+
+test("World Bank publisher absence envelopes are retained as not observed", () => {
   const unsupportedJurisdiction = {
     id: "22222222-2222-4222-8222-222222222222",
     iso2: "AQ",
+    requestCountryCode: "ATA",
   };
   const observedJurisdiction = {
     id: "33333333-3333-4333-8333-333333333333",
     iso2: "FR",
+    requestCountryCode: "FRA",
   };
   const observedBody = JSON.stringify([
     { page: 1 },
     [{ date: "2024", value: 1 }],
+  ]);
+  const emptyObservationBody = JSON.stringify([
+    {
+      page: 0,
+      pages: 0,
+      per_page: 0,
+      total: 0,
+      sourceid: null,
+      lastupdated: null,
+    },
+    null,
   ]);
   const responses = [
     ...Object.values(WORLD_BANK_ECONOMIC_INDICATORS).map((indicatorId) =>
@@ -403,23 +548,14 @@ test("World Bank unsupported-country envelopes are retained as not observed", ()
             ],
           },
         ]),
+        400,
       ),
     ),
     ...Object.values(WORLD_BANK_ECONOMIC_INDICATORS).map((indicatorId) =>
       capturedResponse(
         unsupportedJurisdiction,
         indicatorId,
-        JSON.stringify([
-          {
-            message: [
-              {
-                id: " 120 ",
-                key: " Invalid value ",
-                value: " The provided parameter value is not valid. ",
-              },
-            ],
-          },
-        ]),
+        emptyObservationBody,
       ),
     ),
   ];
@@ -625,7 +761,7 @@ test("World Bank capture uses bounded concurrent requests", async () => {
   });
   assert.equal(capture.responses.length, 3);
   assert.ok(maxActive > 1);
-  assert.ok(maxActive <= 8);
+  assert.ok(maxActive <= 2);
 });
 
 test("World Bank capture refuses zero indicator coverage", () => {
@@ -668,4 +804,45 @@ test("World Bank capture replay is hash-verified, immutable, and payload-sensiti
     response(WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth, 2),
   ]);
   assert.notEqual(changed.captureSha256, capture.captureSha256);
+
+  const statusMutated = {
+    ...capture,
+    responses: capture.responses.map((captured, index) =>
+      index === 0 ? { ...captured, httpStatus: 400 } : captured,
+    ),
+  };
+  assert.ok(
+    validateWorldBankEconomicCapture(statusMutated, [jurisdiction]).some(
+      (error) => error.includes("captureSha256"),
+    ),
+  );
+
+  const unsupportedBody = JSON.stringify([
+    {
+      message: [
+        {
+          id: "120",
+          key: "Invalid value",
+          value: "The provided parameter value is not valid",
+        },
+      ],
+    },
+  ]);
+  const invalidStatusPairing = buildWorldBankEconomicCapture([
+    capturedResponse(
+      jurisdiction,
+      WORLD_BANK_ECONOMIC_INDICATORS.inflation,
+      unsupportedBody,
+      201,
+    ),
+    response(WORLD_BANK_ECONOMIC_INDICATORS.unemployment, 8),
+    response(WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth, 2),
+  ]);
+  assert.throws(
+    () =>
+      worldBankEconomicObservationsFromCapture(invalidStatusPairing, [
+        jurisdiction,
+      ]),
+    /invalid response status\/body contract/,
+  );
 });

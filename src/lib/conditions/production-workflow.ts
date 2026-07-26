@@ -42,14 +42,22 @@ const WORLD_BANK_SOURCE_ID = "worldbank_economic";
 const WORLD_BANK_BASE_URL = "https://api.worldbank.org/v2";
 export const WORLD_BANK_ECONOMIC_DATE_RANGE = "2020:2024";
 const WORLD_BANK_PER_PAGE = 10;
-const WORLD_BANK_CAPTURE_CONCURRENCY = 8;
+// Verified against the World Bank API on 2026-07-26: XKS returns the
+// unsupported-country envelope while the publisher's XKX code resolves Kosovo.
+const WORLD_BANK_COUNTRY_CODE_OVERRIDES: Readonly<Record<string, string>> = {
+  XKS: "XKX",
+};
+// The World Bank endpoint begins returning malformed transient responses under
+// higher fan-out. Keep capture deliberately gentle and fail closed on any
+// response that still violates the contract.
+const WORLD_BANK_CAPTURE_CONCURRENCY = 2;
 export const WORLD_BANK_ECONOMIC_INDICATORS = {
   inflation: "FP.CPI.TOTL.ZG",
   unemployment: "SL.UEM.TOTL.ZS",
   gdpGrowth: "NY.GDP.MKTP.KD.ZG",
 } as const;
 export const WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION =
-  "conditions-world-bank-economic-capture/v1" as const;
+  "conditions-world-bank-economic-capture/v2" as const;
 
 type ConditionsDb = CivicaDb;
 type CiDimensionScore = typeof ciDimensionScores.$inferSelect;
@@ -67,8 +75,10 @@ export type ConditionsExpectedCalculationCounts = Readonly<
 export interface WorldBankEconomicCaptureResponse {
   jurisdictionId: string;
   iso2: string;
+  requestCountryCode: string;
   indicatorId: string;
   requestUrl: string;
+  httpStatus: number;
   retrievedAt: string;
   responseBodySha256: string;
   responseBody: string;
@@ -411,8 +421,26 @@ export async function prepareGpiConditions(
   };
 }
 
-function worldBankRequestUrl(iso2: string, indicatorId: string): string {
-  return `${WORLD_BANK_BASE_URL}/country/${iso2}/indicator/${indicatorId}?format=json&date=${WORLD_BANK_ECONOMIC_DATE_RANGE}&per_page=${WORLD_BANK_PER_PAGE}`;
+function worldBankRequestUrl(
+  requestCountryCode: string,
+  indicatorId: string,
+): string {
+  return `${WORLD_BANK_BASE_URL}/country/${requestCountryCode}/indicator/${indicatorId}?format=json&date=${WORLD_BANK_ECONOMIC_DATE_RANGE}&per_page=${WORLD_BANK_PER_PAGE}`;
+}
+
+export function worldBankRequestCountryCode(input: {
+  iso2: string;
+  iso3: string | null;
+}): string {
+  const iso3 =
+    typeof input.iso3 === "string" && /^[A-Za-z]{3}$/.test(input.iso3)
+      ? input.iso3.toUpperCase()
+      : null;
+  return (
+    (iso3 ? WORLD_BANK_COUNTRY_CODE_OVERRIDES[iso3] : undefined) ??
+    iso3 ??
+    input.iso2.toUpperCase()
+  );
 }
 
 function orderedCaptureResponses(
@@ -449,7 +477,11 @@ export function buildWorldBankEconomicCapture(
 
 export function validateWorldBankEconomicCapture(
   capture: WorldBankEconomicCapture,
-  expectedJurisdictions?: readonly { id: string; iso2: string }[],
+  expectedJurisdictions?: readonly {
+    id: string;
+    iso2: string;
+    requestCountryCode: string;
+  }[],
 ): string[] {
   const errors: string[] = [];
   if (capture.schemaVersion !== WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION) {
@@ -476,6 +508,9 @@ export function validateWorldBankEconomicCapture(
     if (!/^[A-Z]{2}$/.test(response.iso2)) {
       errors.push(`${key} has an invalid ISO2 code`);
     }
+    if (!/^[A-Z]{2,3}$/.test(response.requestCountryCode)) {
+      errors.push(`${key} has an invalid World Bank request country code`);
+    }
     if (
       !Object.values(WORLD_BANK_ECONOMIC_INDICATORS).includes(
         response.indicatorId as never,
@@ -483,14 +518,25 @@ export function validateWorldBankEconomicCapture(
     ) {
       errors.push(`${key} has an undeclared indicator`);
     }
-    if (response.requestUrl !== worldBankRequestUrl(response.iso2, response.indicatorId)) {
+    if (
+      response.requestUrl !==
+      worldBankRequestUrl(response.requestCountryCode, response.indicatorId)
+    ) {
       errors.push(`${key} has an unexpected request URL`);
+    }
+    if (!Number.isInteger(response.httpStatus)) {
+      errors.push(`${key} has an invalid HTTP status`);
     }
     if (!Number.isFinite(Date.parse(response.retrievedAt))) {
       errors.push(`${key} has an invalid retrieval timestamp`);
     }
     if (sha256(response.responseBody) !== response.responseBodySha256) {
       errors.push(`${key} response body hash does not match`);
+    }
+    try {
+      parseWorldBankObservation(response);
+    } catch {
+      errors.push(`${key} has an invalid response status/body contract`);
     }
   }
   if (expectedJurisdictions) {
@@ -511,10 +557,24 @@ export function validateWorldBankEconomicCapture(
     const expectedIso2 = new Map(
       expectedJurisdictions.map(({ id, iso2 }) => [id, iso2.toUpperCase()]),
     );
+    const expectedRequestCountryCode = new Map(
+      expectedJurisdictions.map(({ id, requestCountryCode }) => [
+        id,
+        requestCountryCode.toUpperCase(),
+      ]),
+    );
     for (const response of capture.responses) {
       if (expectedIso2.get(response.jurisdictionId) !== response.iso2) {
         errors.push(
           `${response.jurisdictionId}:${response.indicatorId} does not match the expected ISO2 code`,
+        );
+      }
+      if (
+        expectedRequestCountryCode.get(response.jurisdictionId) !==
+        response.requestCountryCode
+      ) {
+        errors.push(
+          `${response.jurisdictionId}:${response.indicatorId} does not match the expected World Bank request country code`,
         );
       }
     }
@@ -533,14 +593,40 @@ function parseWorldBankObservation(
       `World Bank returned invalid JSON for ${response.iso2}/${response.indicatorId}`,
     );
   }
-  const unavailableReason = recognizedWorldBankCountryUnavailableReason(payload);
-  if (unavailableReason) {
+  const countryUnavailableReason =
+    recognizedWorldBankCountryUnavailableReason(payload);
+  if (countryUnavailableReason) {
+    if (response.httpStatus !== 200 && response.httpStatus !== 400) {
+      throw new Error(
+        `World Bank returned an invalid HTTP status/body pairing for ${response.iso2}/${response.indicatorId}`,
+      );
+    }
     return {
       value: null,
       referenceYear: null,
       valueStatus: "not_observed",
-      valueStatusReason: unavailableReason,
+      valueStatusReason: countryUnavailableReason,
     };
+  }
+  const emptyObservationReason =
+    recognizedWorldBankEmptyObservationReason(payload);
+  if (emptyObservationReason) {
+    if (response.httpStatus !== 200) {
+      throw new Error(
+        `World Bank returned an invalid HTTP status/body pairing for ${response.iso2}/${response.indicatorId}`,
+      );
+    }
+    return {
+      value: null,
+      referenceYear: null,
+      valueStatus: "not_observed",
+      valueStatusReason: emptyObservationReason,
+    };
+  }
+  if (response.httpStatus !== 200) {
+    throw new Error(
+      `World Bank returned an invalid HTTP status/body pairing for ${response.iso2}/${response.indicatorId}`,
+    );
   }
   if (
     !Array.isArray(payload) ||
@@ -586,6 +672,41 @@ function normalizeWorldBankMessage(value: string): string {
   return value.trim().replace(/[.!]+$/, "");
 }
 
+function recognizedWorldBankEmptyObservationReason(
+  payload: unknown,
+): string | null {
+  if (
+    !Array.isArray(payload) ||
+    payload.length !== 2 ||
+    payload[1] !== null ||
+    typeof payload[0] !== "object" ||
+    payload[0] === null
+  ) {
+    return null;
+  }
+  const metadata = payload[0] as Record<string, unknown>;
+  const expectedKeys = [
+    "lastupdated",
+    "page",
+    "pages",
+    "per_page",
+    "sourceid",
+    "total",
+  ];
+  if (
+    Object.keys(metadata).sort().join(",") !== expectedKeys.join(",") ||
+    metadata.page !== 0 ||
+    metadata.pages !== 0 ||
+    metadata.per_page !== 0 ||
+    metadata.total !== 0 ||
+    metadata.sourceid !== null ||
+    metadata.lastupdated !== null
+  ) {
+    return null;
+  }
+  return "World Bank returned no rows for this jurisdiction and indicator in the requested period";
+}
+
 function recognizedWorldBankCountryUnavailableReason(
   payload: unknown,
 ): string | null {
@@ -629,7 +750,11 @@ function recognizedWorldBankCountryUnavailableReason(
 }
 
 export async function captureWorldBankEconomicInputs(input: {
-  jurisdictions: readonly { id: string; iso2: string }[];
+  jurisdictions: readonly {
+    id: string;
+    iso2: string;
+    requestCountryCode: string;
+  }[];
   fetchImpl?: typeof fetch;
   now?: () => Date;
 }): Promise<WorldBankEconomicCapture> {
@@ -640,9 +765,11 @@ export async function captureWorldBankEconomicInputs(input: {
   const now = input.now ?? (() => new Date());
   const jobs = input.jurisdictions.flatMap((jurisdiction) => {
     const iso2 = jurisdiction.iso2.toUpperCase();
+    const requestCountryCode = jurisdiction.requestCountryCode.toUpperCase();
     return Object.values(WORLD_BANK_ECONOMIC_INDICATORS).map((indicatorId) => ({
       jurisdictionId: jurisdiction.id,
       iso2,
+      requestCountryCode,
       indicatorId,
     }));
   });
@@ -652,33 +779,40 @@ export async function captureWorldBankEconomicInputs(input: {
     while (nextJobIndex < jobs.length) {
       const jobIndex = nextJobIndex;
       nextJobIndex += 1;
-      const { jurisdictionId, iso2, indicatorId } = jobs[jobIndex];
-      const requestUrl = worldBankRequestUrl(iso2, indicatorId);
+      const {
+        jurisdictionId,
+        iso2,
+        requestCountryCode,
+        indicatorId,
+      } = jobs[jobIndex];
+      const requestUrl = worldBankRequestUrl(requestCountryCode, indicatorId);
       let response: Response;
       try {
         response = await fetchImpl(requestUrl);
       } catch (error) {
         throw new Error(
-          `World Bank transport failed for ${iso2}/${indicatorId}`,
+          `World Bank transport failed for ${requestCountryCode}/${indicatorId}`,
           { cause: error },
         );
       }
-      if (!response.ok) {
+      if (response.status !== 200 && response.status !== 400) {
         throw new Error(
-          `World Bank request returned HTTP ${response.status} for ${iso2}/${indicatorId}`,
+          `World Bank request returned HTTP ${response.status} for ${requestCountryCode}/${indicatorId}`,
         );
       }
       const responseBody = await response.text();
       const capturedResponse = {
         jurisdictionId,
         iso2,
+        requestCountryCode,
         indicatorId,
         requestUrl,
+        httpStatus: response.status,
         retrievedAt: now().toISOString(),
         responseBodySha256: sha256(responseBody),
         responseBody,
       };
-      // Parse now so malformed 2xx responses fail before a capture can publish.
+      // Parse now so malformed responses fail before a capture can publish.
       parseWorldBankObservation(capturedResponse);
       responses[jobIndex] = capturedResponse;
     }
@@ -727,7 +861,11 @@ export async function writeWorldBankEconomicCapture(
 
 export function worldBankEconomicObservationsFromCapture(
   capture: WorldBankEconomicCapture,
-  expectedJurisdictions: readonly { id: string; iso2: string }[],
+  expectedJurisdictions: readonly {
+    id: string;
+    iso2: string;
+    requestCountryCode: string;
+  }[],
 ): EconomicObservation[] {
   const errors = validateWorldBankEconomicCapture(
     capture,
@@ -863,15 +1001,23 @@ export async function prepareEconomicConditions(
     );
   }
   const jurisdictionRows = await db
-    .select({ id: jurisdictions.id, iso2: jurisdictions.iso2 })
+    .select({
+      id: jurisdictions.id,
+      iso2: jurisdictions.iso2,
+      iso3: jurisdictions.iso3,
+    })
     .from(jurisdictions)
     .where(isNotNull(jurisdictions.iso2));
   const expectedJurisdictions = jurisdictionRows
     .filter(
-      (row): row is { id: string; iso2: string } =>
+      (row): row is { id: string; iso2: string; iso3: string | null } =>
         typeof row.iso2 === "string" && /^[A-Za-z]{2}$/.test(row.iso2),
     )
-    .map((row) => ({ id: row.id, iso2: row.iso2.toUpperCase() }));
+    .map((row) => ({
+      id: row.id,
+      iso2: row.iso2.toUpperCase(),
+      requestCountryCode: worldBankRequestCountryCode(row),
+    }));
   if (!expectedJurisdictions.length) {
     throw new Error("No jurisdictions with ISO2 codes are available");
   }
