@@ -16,6 +16,7 @@
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:baseline:generate": "tsx scripts/generate-authoritative-baseline.ts && tsx scripts/generate-authoritative-schema-fingerprint.ts",
     "db:plan": "tsx scripts/plan-migration.ts",
+    "inspect:neon-target": "tsx scripts/inspect-neon-target.ts",
     "db:push": "tsx scripts/refuse-production-db-push.ts",
     "db:push:local": "tsx scripts/db-push-local.ts",
     "db:studio": "drizzle-kit studio",

@@ -20,6 +20,21 @@ passing staging run.
 3. Disable staging jobs and prove no active lease remains. Do not use a
    deployment as a job-stop mechanism.
 
+The 2026-07-26 Vercel CLI isolation probe found that the current Preview
+connection resolves to the production Neon branch. Before another run, the
+owner/platform operator must enable **Required → Preview** and **Resource must
+be active before deployment** in the `civica` connection to
+`neon-claret-bucket`. The first action after that change is the same read-only
+target probe. Abort unless it returns project `ancient-art-58836757`, a branch
+different from `br-dawn-frog-amrf0h6a`, a distinct endpoint/host, and
+authoritative head `0032_sparkling_genesis`.
+
+Vercel CLI 53.2.0 can list and inspect the attached resource but cannot update
+these connection-level deployment fields. The owner configuration change is
+made in Vercel, not Neon. Codex must not open an integration or Neon dashboard;
+all subsequent target inspection, migration, and validation remains
+Vercel-CLI-only.
+
 The checked static-asset manifest means the complete Vercel Build Output API
 `static` tree, not the editorial illustration manifest or Next.js route-chunk
 manifest. Build once, generate and verify the deterministic inventory, then

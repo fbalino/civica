@@ -1,6 +1,6 @@
 {
   "schemaVersion": "civica-remaining-work/v1",
-  "reviewedAt": "2026-07-25",
+  "reviewedAt": "2026-07-26",
   "checklist": {
     "total": 310,
     "completed": 249,
@@ -53,7 +53,7 @@
         "QA-018",
         "QA-019"
       ],
-      "nextStep": "Authorize and run the checked migration, source refresh, isolated staging deployment, provider configuration, scheduled pipeline, or recovery drill; then capture the required bounded live evidence."
+      "nextStep": "First enable Required Preview branching and Resource must be active before deployment on the Civica-to-Neon Vercel connection; rerun the read-only isolation probe; then authorize and run the checked migration, source refresh, isolated staging deployment, scheduled pipeline, or recovery drill and retain bounded live evidence."
     },
     {
       "id": "external-evidence-unavailable",

@@ -1,7 +1,7 @@
 # Civica remaining-work owner action runbook
 
-**Reviewed:** 2026-07-25
-**Scope:** the 62 unchecked tasks in `plan/MASTER-CHECKLIST.md`
+**Reviewed:** 2026-07-26
+**Scope:** the 61 unchecked tasks in `plan/MASTER-CHECKLIST.md`
 
 ## Open the review material
 
@@ -144,7 +144,19 @@ Production promotion remains a separate decision.
    and [deployment rehearsal](../data/DEPLOYMENT-REHEARSAL.md). Use an isolated
    Neon branch and Vercel staging project, disable staging cron, deploy the
    exact candidate commit, apply only the approved migrations and inputs, and
-   retain the twelve named smoke-check results.
+   retain the twelve named smoke-check results. The
+   [2026-07-26 CLI isolation probe](evidence/QA-018/attempt-03-vercel-cli-isolation-2026-07-26.md)
+   proved that the current Preview connection resolves to production and
+   aborted with zero writes. Before Codex resumes, open Vercel
+   **Storage → neon-claret-bucket → Projects → civica → Advanced Options →
+   Deployments Configuration**, enable **Required → Preview** and
+   **Resource must be active before deployment**, then save. Return only
+   confirmation that both settings are active; never paste a database URL or
+   password. This is a Vercel project setting; no Neon sign-in is required.
+   Vercel CLI 53.2.0 cannot change these two connection fields, so Codex will
+   not open either provider dashboard and will resume through Vercel CLI only
+   after your confirmation. This affects future Preview deployments and is not
+   production promotion.
 2. **Conditions batch — ATL-016, ATL-026, ATL-027, ATL-029, ATL-030.** Apply
    migrations 0040 and 0042 in isolated staging, ingest a real immutable
    Conditions release, and retain aligned, mixed-year-refused, and missing-row

@@ -1,6 +1,6 @@
 # Civica master checklist — remaining-work report
 
-**Reviewed:** 2026-07-25
+**Reviewed:** 2026-07-26
 
 **Checklist state:** 249 of 310 complete; 61 remain; 80.3%.
 
@@ -71,6 +71,8 @@ QA-019.
 
 This batch includes:
 
+- enabling automated Neon Preview branching on the existing Vercel resource
+  connection, then rerunning the fail-closed QA-018 isolation probe;
 - isolated Conditions staging and release capture;
 - Atlas entity-history and data-error migrations;
 - a hardened Wikidata leaders refresh and a date-precision repair refresh;
@@ -80,8 +82,10 @@ This batch includes:
 - exact-commit release-candidate staging and the subsequent rollback or
   forward-fix rehearsal.
 
-The checked plans are zero-write or pending-authority records. None should be
-marked complete from local fixtures alone.
+The checked plans are zero-write or pending-authority records. The 2026-07-26
+Vercel CLI probe proved that Preview currently resolves to the production Neon
+branch and therefore aborted before migration. None should be marked complete
+from local fixtures alone.
 
 ### 3. Required external evidence unavailable — 1
 
@@ -138,9 +142,11 @@ release, or imply approvals that do not exist.
    EXP-009, EXP-038 A4/H5/T3/T4, EXP-025/QA-013, and PLT-029 facts.
 2. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
-3. Authorize one isolated staging wave covering QA-018 and the prepared Atlas,
-   Conditions, internationalization, and Pulse migrations; keep production
-   promotion separate.
+3. Enable Required Preview branching and Resource must be active before
+   deployment for the Civica-to-Neon Vercel connection, then authorize one
+   isolated staging wave covering QA-018 and the prepared Atlas, Conditions,
+   internationalization, and Pulse migrations; keep production promotion
+   separate.
 4. Run the authorized Wikidata refreshes, deployed delivery checks, and
    QA-019 recovery rehearsal.
 5. Deploy the locked Pulse method, complete one full scheduled cycle, record

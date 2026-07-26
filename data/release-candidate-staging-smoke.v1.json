@@ -67,7 +67,8 @@
     "owner": null,
     "checkedAt": null,
     "remainingManualChecks": [
-      "Create and authorize the isolated Neon/Vercel staging environment.",
+      "Enable Required Preview branching and Resource must be active before deployment on the Civica connection to neon-claret-bucket.",
+      "Rerun the read-only target probe and require a child branch distinct from br-dawn-frog-amrf0h6a before any migration.",
       "Run the exact candidate through the migration, release, deploy, browser, API, cache, and dry-run sequence.",
       "Record bounded evidence and owner sign-off without credentials or production data."
     ]

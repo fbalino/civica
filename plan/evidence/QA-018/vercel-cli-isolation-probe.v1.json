@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "civica-qa018-vercel-cli-isolation-probe/v1",
+  "recordedAt": "2026-07-26T03:31:39Z",
+  "candidateCommit": "8cf26c9746c079634488df53afc23d4adf6a1407",
+  "vercel": {
+    "cliVersion": "53.2.0",
+    "projectId": "prj_R9vTWWG1suzmXS0uh1MOcFm1rqLW",
+    "resourceId": "store_zrI9HcM7Xkz18TRS",
+    "resourceName": "neon-claret-bucket",
+    "manualDeploymentProvisioningAvailable": false,
+    "integrationUpdateSupportsDeploymentConfiguration": false,
+    "automaticPreviewBranchingObserved": false,
+    "deployments": [
+      {
+        "id": "dpl_FFeMTv4ZysKqzPW4pryiW6HpuJLv",
+        "status": "error",
+        "purpose": "initial_source_upload"
+      },
+      {
+        "id": "dpl_FaQ3EJkFWx4AKATQdBQRDfwSbQaT",
+        "status": "canceled",
+        "purpose": "deployment_environment_capture_attempt"
+      },
+      {
+        "id": "dpl_4WEvwGTPe6e8hrGF95ErrW7jkuAF",
+        "status": "canceled",
+        "purpose": "atomic_deployment_environment_capture_attempt"
+      },
+      {
+        "id": "dpl_92Htc1WCoid5TnVJAQaANTsfDVEJ",
+        "status": "canceled",
+        "purpose": "direct_deployment_environment_capture_attempt"
+      },
+      {
+        "id": "dpl_25dzXrLkp8VHjnHyYtqLip9yGNrG",
+        "status": "error",
+        "purpose": "read_only_database_isolation_probe"
+      }
+    ]
+  },
+  "accessBoundary": {
+    "acceptedEvidenceSource": "vercel_cli_only",
+    "neonBrowserSignInAttempted": true,
+    "neonBrowserAccessObtained": false,
+    "browserEvidenceUsed": false,
+    "futureRequiredPath": "vercel_cli_only"
+  },
+  "configuredDatabase": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-dawn-frog-amrf0h6a",
+    "endpointId": "ep-bitter-night-amod9dl6",
+    "hostSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
+    "migrationHeadBefore": "0032_sparkling_genesis",
+    "migrationHeadAfter": "0032_sparkling_genesis"
+  },
+  "probe": {
+    "deploymentId": "dpl_25dzXrLkp8VHjnHyYtqLip9yGNrG",
+    "target": "preview",
+    "result": "blocked",
+    "reason": "preview_resolved_to_forbidden_production_branch",
+    "databaseQueriesWereReadOnly": true,
+    "databaseWritesPerformed": 0,
+    "migrationsApplied": [],
+    "conditionsRuns": 0
+  },
+  "blocker": {
+    "id": "vercel_neon_preview_branching_disabled",
+    "authorityRequired": true,
+    "requiredAction": "Enable Required Preview deployment configuration and Resource must be active before deployment on the Civica connection to neon-claret-bucket, or provide a separately authorized disposable Neon branch through another credentialed CLI path.",
+    "productionPromotionAuthorized": false
+  }
+}
