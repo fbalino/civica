@@ -56,6 +56,23 @@ test("G4 cannot report pass with an open P0 task even when every command passes"
   }
 });
 
+test("G4 uses the canonical credential-free production build", () => {
+  assert.deepEqual(
+    GATE_COMMANDS.G4.find((command) => command.id === "production-build"),
+    {
+      id: "production-build",
+      program: "npm",
+      args: ["run", "build:ci"],
+    },
+  );
+  assert.equal(
+    GATE_COMMANDS.G4.some((command) =>
+      command.args.some((argument) => argument.includes(":live")),
+    ),
+    false,
+  );
+});
+
 test("missing evidence or progress is a visible blocking gap", () => {
   const root = fixture({ completed: true, evidence: false, progress: false });
   try {

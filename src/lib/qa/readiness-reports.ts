@@ -104,7 +104,11 @@ export const GATE_COMMANDS: Record<ReadinessGate, readonly GateCommand[]> = {
     { id: "unit-suite", program: "npm", args: ["test"] },
     { id: "typecheck", program: "npm", args: ["run", "typecheck"] },
     { id: "lint", program: "npm", args: ["run", "lint"] },
-    { id: "production-build", program: "npm", args: ["run", "build"] },
+    {
+      id: "production-build",
+      program: "npm",
+      args: ["run", "build:ci"],
+    },
   ],
   G5: [
     { id: "master-plan", program: "node", args: ["plan/tools/validate-master-plan.mjs"] },
