@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "pulse-delta-lifecycle-staging-rehearsal/v1",
+  "taskId": "PUL-027",
+  "stagingTaskId": "QA-018",
+  "checkedAt": "2026-07-26T15:54:47.000Z",
+  "target": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-bitter-fire-amcx8asi",
+    "branchName": "qa-018-6ff26954-20260726",
+    "endpointId": "ep-sparkling-pine-amdbr4ke",
+    "hostnameSha256": "a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761",
+    "migrationHead": "0048_entity_name_forms",
+    "productionTarget": false
+  },
+  "corroboration": {
+    "runId": "478abc07-020a-456c-9bc0-efde52b25911",
+    "startedAt": "2026-07-26T15:54:43.592285Z",
+    "completedAt": "2026-07-26T15:54:44.124561Z",
+    "completionOrdered": true,
+    "examined": 380,
+    "updated": 380,
+    "contributingReports": 528,
+    "independentEvidenceGroups": 436
+  },
+  "score": {
+    "runId": "c96d8e5d-beb6-48e9-927d-edef7ecde6d1",
+    "versionKey": "pulse-stage/sha256:0b30649c29f7ab871a17d86061f153b0e305957e6b00b24dd8839609e41e1ef2",
+    "startedAt": "2026-07-26T15:54:45.957776Z",
+    "completedAt": "2026-07-26T15:54:46.909279Z",
+    "completionOrdered": true,
+    "scoreAsOf": "2026-07-26",
+    "eventsConsidered": 13,
+    "countriesScored": 65,
+    "dimensionRowsWritten": 325,
+    "significantDeltas": 3,
+    "absorbedEventsExcluded": 0
+  },
+  "publication": {
+    "product": "pulse_dimensions",
+    "selectedRunId": "c96d8e5d-beb6-48e9-927d-edef7ecde6d1",
+    "publishedAt": "2026-07-26T15:54:46.909279Z",
+    "publicationMatchesCompletion": true
+  },
+  "lifecycle": {
+    "currentRows": 325,
+    "jurisdictions": 65,
+    "nonzeroRows": 13,
+    "immutableHistoryRows": 2600,
+    "historyRuns": 8,
+    "wrongAlgorithmRows": 0,
+    "validatorStatus": "pass"
+  },
+  "sourceFreshness": {
+    "rows": 57,
+    "sha256": "f694602caaae6496a5231b88379dd8132db0f51946f501fa6322f017d5e12859",
+    "changedByRehearsal": false
+  },
+  "diagnosticHistory": {
+    "unorderedScoreRunsRetained": 2,
+    "unorderedCorroborationRunsRetained": 2,
+    "terminalRowsRewrittenOrDeleted": 0,
+    "selectedByPublicationPointer": false
+  },
+  "execution": {
+    "modelCalls": 0,
+    "paidCalls": 0,
+    "productionWrites": 0,
+    "productionDeployments": 0
+  },
+  "status": "staging_pass_production_pending"
+}

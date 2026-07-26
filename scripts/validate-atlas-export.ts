@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import { ATLAS_EXPORT_RELEASE_ID, ATLAS_EXPORT_SCHEMA_VERSION, ATLAS_EXPORT_VINTAGE_LABEL, atlasExportSha256, buildAtlasExport, buildAtlasReleaseBom, loadAtlasExportInput, serializeAtlasExport } from "../src/lib/exports/atlas-release";
 import { evaluatePublicExport } from "../src/lib/rights/manifest";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 type Release = ReturnType<typeof buildAtlasExport>;
 const manifest = JSON.parse(readFileSync(`data/releases/${ATLAS_EXPORT_RELEASE_ID}/manifest.v1.json`, "utf8"));

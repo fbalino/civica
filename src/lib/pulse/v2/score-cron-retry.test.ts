@@ -180,9 +180,11 @@ test("corroboration publish rolls back, retries one stable run, and then becomes
         status: string;
         decisions: number;
         corroboration_run_id: string;
+        completion_ordered: boolean;
       }>(`
         SELECT
           r.status,
+          r.completed_at >= r.started_at AS completion_ordered,
           (SELECT count(*)::integer FROM pulse_event_decisions) AS decisions,
           e.corroboration_run_id::text
         FROM pulse_pipeline_runs r
@@ -194,6 +196,7 @@ test("corroboration publish rolls back, retries one stable run, and then becomes
       status: "completed",
       decisions: 1,
       corroboration_run_id: runId,
+      completion_ordered: true,
     });
 
     const duplicate = await corroborateEvents(db, changedInputRetry);
@@ -373,13 +376,19 @@ test("score publish rolls back, retries one stable run, and never duplicates his
           history_rows: number;
           projection_rows: number;
           published_run_id: string;
+          completion_ordered: boolean;
+          publication_matches_completion: boolean;
         }>(`
           SELECT
             status,
+            completed_at >= started_at AS completion_ordered,
             (SELECT count(*)::integer FROM pulse_dimensional_delta_history) AS history_rows,
             (SELECT count(*)::integer FROM pulse_dimensional_deltas) AS projection_rows,
             (SELECT computation_run_id::text FROM pulse_score_publication_pointers
-              WHERE product = 'pulse_dimensions') AS published_run_id
+              WHERE product = 'pulse_dimensions') AS published_run_id,
+            (SELECT published_at = pulse_pipeline_runs.completed_at
+              FROM pulse_score_publication_pointers
+              WHERE product = 'pulse_dimensions') AS publication_matches_completion
           FROM pulse_pipeline_runs
           WHERE id = $1
         `, [runId])
@@ -389,6 +398,8 @@ test("score publish rolls back, retries one stable run, and never duplicates his
         history_rows: 5,
         projection_rows: 5,
         published_run_id: runId,
+        completion_ordered: true,
+        publication_matches_completion: true,
       },
     );
   } finally {

@@ -90,7 +90,10 @@ export async function writeConditionsRelease(
       ...options,
       markSynced: deferredFreshness.capture,
     });
-    await deferredFreshness.flush({ executor: tx });
+    await deferredFreshness.flush({
+      executor: tx,
+      timestampSource: "database",
+    });
     return summary;
   });
 }

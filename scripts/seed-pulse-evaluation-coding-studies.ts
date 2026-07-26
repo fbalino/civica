@@ -27,7 +27,7 @@ import {
   type PulseCodingStudyContract,
 } from "../src/lib/pulse/v2/coding-workspace";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 const APPLY = process.argv.includes("--apply");
 const MANIFEST_PATH = "data/research/pulse-evaluation-packet-manifest-v1.json";

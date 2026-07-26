@@ -8,6 +8,7 @@ import {
   inspectNeonTarget,
   neonHostnameSha256,
   neonTargetErrors,
+  neonTargetExpectationsFromArguments,
   readNeonTarget,
   validateNeonTarget,
   type NeonTargetExpectations,
@@ -16,9 +17,11 @@ import {
 } from "./neon-target";
 
 const databaseUrl =
-  "postgresql://qa_user:super-secret@ep-qa.example.neon.tech/civica?sslmode=require&channel_binding=require";
+  "postgresql://ep-qa.example.neon.tech/civica?sslmode=require&channel_binding=require";
 const expectations: NeonTargetExpectations = {
   expectedProjectId: "project-qa",
+  expectedBranchId: "branch-qa",
+  expectedHostnameSha256: neonHostnameSha256("ep-qa.example.neon.tech"),
   forbiddenBranchId: "branch-production",
   forbiddenHostnameSha256: neonHostnameSha256(
     "ep-production.example.neon.tech",
@@ -55,8 +58,6 @@ test("validated Neon target report contains only bounded non-credential fields",
   assert.equal(report.writesPerformed, 0);
   const serialized = JSON.stringify(report);
   for (const secret of [
-    "qa_user",
-    "super-secret",
     "civica",
     "sslmode",
     "channel_binding",
@@ -85,6 +86,8 @@ test("pure target validation fails closed on every production identity guard", (
   });
   const cases: Array<[Partial<NeonTargetReport>, Partial<NeonTargetExpectations>, RegExp]> = [
     [{ projectId: "other-project" }, {}, /expected project/],
+    [{ branchId: "branch-other" }, {}, /expected branch/],
+    [{ hostnameSha256: neonHostnameSha256("ep-other.example.neon.tech") }, {}, /expected hostname/],
     [{ branchId: "branch-production" }, {}, /forbidden branch/],
     [
       { hostnameSha256: expectations.forbiddenHostnameSha256 },
@@ -94,6 +97,8 @@ test("pure target validation fails closed on every production identity guard", (
     [{ migrationHead: "0047_atlas_data_error_reports" }, {}, /ledger head/],
     [{ migrationHead: null, ledgerPresent: false }, {}, /ledger is absent/],
     [{ endpointId: "" }, {}, /endpoint identity is absent/],
+    [{}, { expectedHostnameSha256: "invalid" }, /expected hostname hash/],
+    [{}, { expectedBranchId: "branch-production" }, /must differ/],
     [{}, { forbiddenHostnameSha256: "invalid" }, /must be SHA-256/],
   ];
   for (const [reportPatch, expectationPatch, error] of cases) {
@@ -105,6 +110,27 @@ test("pure target validation fails closed on every production identity guard", (
       error,
     );
   }
+});
+
+test("target expectations require exact staging and forbidden production identities", () => {
+  assert.deepEqual(
+    neonTargetExpectationsFromArguments([
+      "--expected-project=project-qa",
+      "--expected-branch=branch-qa",
+      `--expected-hostname-sha256=${expectations.expectedHostnameSha256}`,
+      "--forbidden-branch=branch-production",
+      `--forbidden-hostname-sha256=${expectations.forbiddenHostnameSha256}`,
+      "--required-migration-head=0048_entity_name_forms",
+    ]),
+    expectations,
+  );
+  assert.throws(
+    () =>
+      neonTargetExpectationsFromArguments([
+        "--expected-project=project-qa",
+      ]),
+    /--expected-branch=/,
+  );
 });
 
 test("read-only reader executes only identity and ledger-head queries", async () => {
@@ -187,14 +213,14 @@ test("integrated inspector validates before returning and sanitizes query failur
       databaseUrl,
       sql: {
         async query() {
-          throw new Error(`connection failed for ${databaseUrl}`);
+          throw new Error("connection failed with opaque credential material");
         },
       },
       expectations,
     }),
     (error: Error) => {
       assert.equal(error.message, "Unable to read Neon target identity");
-      assert.ok(!error.message.includes("super-secret"));
+      assert.ok(!error.message.includes("opaque credential material"));
       return true;
     },
   );

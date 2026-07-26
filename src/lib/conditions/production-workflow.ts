@@ -9,9 +9,11 @@ import { stableStringify } from "@/lib/data/frozen-vintage";
 import { buildIndicatorLineage } from "@/lib/indicators/lineage";
 import {
   CONDITIONS_ALIGNMENT_POLICY,
+  CONDITIONS_DIMENSIONS,
   CURRENT_CONDITIONS_METHODOLOGY_VERSION,
   conditionCalculationKey,
   type ConditionScoreInput,
+  type ConditionsDimension,
 } from "./contract";
 import {
   buildEconomicConditionsCalculations,
@@ -23,9 +25,11 @@ import {
 import { writeConditionsRelease } from "./ingest";
 import {
   buildFixedBoundReferenceSets,
+  conditionsReleaseManifestSha256,
   type ConditionsReferenceSet,
   type ConditionsReleaseInput,
 } from "./release";
+import type { ConditionsReleaseValidationExpectations } from "./release-live-validation";
 
 const HDI_SOURCE_ID = "undp_hdi";
 const HDI_SOURCE_DIMENSION = "human_development";
@@ -53,7 +57,12 @@ type CiDimensionScore = typeof ciDimensionScores.$inferSelect;
 export interface PreparedConditionsDimension {
   rows: ConditionScoreInput[];
   referenceSets: ConditionsReferenceSet[];
+  expectedCalculationCount: number;
 }
+
+export type ConditionsExpectedCalculationCounts = Readonly<
+  Record<ConditionsDimension, number>
+>;
 
 export interface WorldBankEconomicCaptureResponse {
   jurisdictionId: string;
@@ -109,6 +118,7 @@ export interface EconomicInputOptions {
 export interface RunConditionsWorkflowOptions extends EconomicInputOptions {
   releaseId: string;
   dryRun?: boolean;
+  releaseExpectations?: ConditionsReleaseValidationExpectations;
   dependencies?: Partial<ConditionsWorkflowDependencies>;
 }
 
@@ -120,9 +130,91 @@ function compareText(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+function compareOptionalText(
+  left: string | null,
+  right: string | null,
+): number {
+  if (left === right) return 0;
+  if (left === null) return 1;
+  if (right === null) return -1;
+  return compareText(right, left);
+}
+
 function referenceYear(quarter: string): number | null {
   const match = /^(\d{4})-Q[1-4]$/.exec(quarter);
   return match ? Number(match[1]) : null;
+}
+
+function periodOrdinal(quarter: string): number | null {
+  const match = /^(\d{4})-Q([1-4])$/.exec(quarter);
+  return match ? Number(match[1]) * 4 + Number(match[2]) : null;
+}
+
+function selectLatestSourceRows(
+  sourceRows: readonly CiDimensionScore[],
+): CiDimensionScore[] {
+  const ordered = [...sourceRows].sort((left, right) => {
+    const jurisdictionComparison = compareText(
+      left.jurisdictionId,
+      right.jurisdictionId,
+    );
+    if (jurisdictionComparison !== 0) return jurisdictionComparison;
+
+    const leftPeriod = periodOrdinal(left.quarter);
+    const rightPeriod = periodOrdinal(right.quarter);
+    if (leftPeriod !== rightPeriod) {
+      if (leftPeriod === null) return 1;
+      if (rightPeriod === null) return -1;
+      return rightPeriod - leftPeriod;
+    }
+
+    const leftCreatedAt = left.createdAt?.getTime() ?? Number.NEGATIVE_INFINITY;
+    const rightCreatedAt =
+      right.createdAt?.getTime() ?? Number.NEGATIVE_INFINITY;
+    if (leftCreatedAt !== rightCreatedAt) return rightCreatedAt - leftCreatedAt;
+
+    const releaseComparison = compareOptionalText(
+      left.releaseId,
+      right.releaseId,
+    );
+    if (releaseComparison !== 0) return releaseComparison;
+
+    const indicatorComparison = compareText(
+      left.indicatorId,
+      right.indicatorId,
+    );
+    if (indicatorComparison !== 0) return indicatorComparison;
+
+    return compareText(left.id, right.id);
+  });
+
+  const selected = new Map<string, CiDimensionScore>();
+  for (const row of ordered) {
+    if (!selected.has(row.jurisdictionId)) {
+      selected.set(row.jurisdictionId, row);
+    }
+  }
+  return [...selected.values()];
+}
+
+function assertExpectedCalculationCount(
+  dimension: ConditionsDimension,
+  rows: readonly ConditionScoreInput[],
+  expectedCalculationCount: number,
+): void {
+  if (
+    !Number.isSafeInteger(expectedCalculationCount) ||
+    expectedCalculationCount <= 0
+  ) {
+    throw new Error(
+      `Conditions ${dimension} expected calculation count must be a positive integer`,
+    );
+  }
+  if (rows.length !== expectedCalculationCount) {
+    throw new Error(
+      `Conditions ${dimension} produced ${rows.length} calculations; expected ${expectedCalculationCount}`,
+    );
+  }
 }
 
 function hdiRow(row: CiDimensionScore, releaseId: string): ConditionScoreInput {
@@ -252,7 +344,17 @@ export async function prepareHdiConditions(
   if (!sourceRows.length) {
     throw new Error("No HDI rows found in ci_dimension_scores. Run ingest:ci first.");
   }
-  const rows = sourceRows.map((row) => hdiRow(row, releaseId));
+  const expectedCalculationCount = new Set(
+    sourceRows.map((row) => row.jurisdictionId),
+  ).size;
+  const rows = selectLatestSourceRows(sourceRows).map((row) =>
+    hdiRow(row, releaseId),
+  );
+  assertExpectedCalculationCount(
+    "human_development",
+    rows,
+    expectedCalculationCount,
+  );
   return {
     rows,
     referenceSets: buildFixedBoundReferenceSets({
@@ -263,6 +365,7 @@ export async function prepareHdiConditions(
       lowerBound: 0,
       upperBound: 1,
     }),
+    expectedCalculationCount,
   };
 }
 
@@ -283,7 +386,17 @@ export async function prepareGpiConditions(
   if (!sourceRows.length) {
     throw new Error("No GPI rows found in ci_dimension_scores. Run ingest:ci first.");
   }
-  const rows = sourceRows.map((row) => gpiRow(row, releaseId));
+  const expectedCalculationCount = new Set(
+    sourceRows.map((row) => row.jurisdictionId),
+  ).size;
+  const rows = selectLatestSourceRows(sourceRows).map((row) =>
+    gpiRow(row, releaseId),
+  );
+  assertExpectedCalculationCount(
+    "peace_security",
+    rows,
+    expectedCalculationCount,
+  );
   return {
     rows,
     referenceSets: buildFixedBoundReferenceSets({
@@ -294,6 +407,7 @@ export async function prepareGpiConditions(
       lowerBound: 1,
       upperBound: 5,
     }),
+    expectedCalculationCount,
   };
 }
 
@@ -419,6 +533,15 @@ function parseWorldBankObservation(
       `World Bank returned invalid JSON for ${response.iso2}/${response.indicatorId}`,
     );
   }
+  const unavailableReason = recognizedWorldBankCountryUnavailableReason(payload);
+  if (unavailableReason) {
+    return {
+      value: null,
+      referenceYear: null,
+      valueStatus: "not_observed",
+      valueStatusReason: unavailableReason,
+    };
+  }
   if (
     !Array.isArray(payload) ||
     payload.length < 2 ||
@@ -457,6 +580,52 @@ function parseWorldBankObservation(
     valueStatus: "observed",
     valueStatusReason: null,
   };
+}
+
+function normalizeWorldBankMessage(value: string): string {
+  return value.trim().replace(/[.!]+$/, "");
+}
+
+function recognizedWorldBankCountryUnavailableReason(
+  payload: unknown,
+): string | null {
+  if (!Array.isArray(payload) || payload.length !== 1) return null;
+  const envelope = payload[0];
+  if (
+    typeof envelope !== "object" ||
+    envelope === null ||
+    !("message" in envelope)
+  ) {
+    return null;
+  }
+  const messages = (envelope as { message?: unknown }).message;
+  if (!Array.isArray(messages) || messages.length !== 1) return null;
+  const message = messages[0];
+  if (typeof message !== "object" || message === null) return null;
+  const { id, key, value } = message as {
+    id?: unknown;
+    key?: unknown;
+    value?: unknown;
+  };
+  if (
+    typeof id !== "string" ||
+    id.trim().length === 0 ||
+    typeof key !== "string" ||
+    key.trim().length === 0 ||
+    typeof value !== "string" ||
+    value.trim().length === 0
+  ) {
+    return null;
+  }
+  if (
+    id.trim() === "120" &&
+    normalizeWorldBankMessage(key) === "Invalid value" &&
+    normalizeWorldBankMessage(value) ===
+      "The provided parameter value is not valid"
+  ) {
+    return "World Bank does not support this jurisdiction's country code";
+  }
+  return null;
 }
 
 export async function captureWorldBankEconomicInputs(input: {
@@ -732,9 +901,16 @@ export async function prepareEconomicConditions(
       "World Bank coverage failed closed: no jurisdiction has all economic components aligned to one reference year",
     );
   }
+  const expectedCalculationCount = expectedJurisdictions.length;
+  assertExpectedCalculationCount(
+    "economic_stability",
+    rows,
+    expectedCalculationCount,
+  );
   return {
     rows,
     referenceSets,
+    expectedCalculationCount,
   };
 }
 
@@ -744,6 +920,11 @@ export async function runCombinedConditionsIngestion(
 ) {
   if (!/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/.test(options.releaseId)) {
     throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
+  }
+  if (!options.dryRun && !options.releaseExpectations) {
+    throw new Error(
+      "Conditions apply requires a pre-write release expectations artifact",
+    );
   }
   const dependencies: ConditionsWorkflowDependencies = {
     prepareHdi: prepareHdiConditions,
@@ -762,6 +943,26 @@ export async function runCombinedConditionsIngestion(
       now: options.now,
     }),
   ]);
+  assertExpectedCalculationCount(
+    "human_development",
+    hdi.rows,
+    hdi.expectedCalculationCount,
+  );
+  assertExpectedCalculationCount(
+    "peace_security",
+    gpi.rows,
+    gpi.expectedCalculationCount,
+  );
+  assertExpectedCalculationCount(
+    "economic_stability",
+    economic.rows,
+    economic.expectedCalculationCount,
+  );
+  const expectedCalculationCounts = {
+    human_development: hdi.expectedCalculationCount,
+    peace_security: gpi.expectedCalculationCount,
+    economic_stability: economic.expectedCalculationCount,
+  } satisfies ConditionsExpectedCalculationCounts;
   const release: ConditionsReleaseInput = {
     releaseId: options.releaseId,
     methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
@@ -772,8 +973,35 @@ export async function runCombinedConditionsIngestion(
     ],
   };
   const rows = [...hdi.rows, ...gpi.rows, ...economic.rows];
+  const releaseManifestSha256 = conditionsReleaseManifestSha256(release, rows);
+  if (options.releaseExpectations) {
+    if (
+      releaseManifestSha256 !==
+      options.releaseExpectations.releaseManifestSha256
+    ) {
+      throw new Error(
+        "Conditions prepared manifest does not match the pre-write expectations artifact",
+      );
+    }
+    for (const dimension of CONDITIONS_DIMENSIONS) {
+      if (
+        expectedCalculationCounts[dimension] !==
+        options.releaseExpectations.expectedCalculationCounts[dimension]
+      ) {
+        throw new Error(
+          `Conditions ${dimension} count does not match the pre-write expectations artifact`,
+        );
+      }
+    }
+  }
   const summary = await dependencies.writeRelease(db, release, rows, {
     dryRun: options.dryRun,
   });
-  return { release, rows, summary };
+  return {
+    release,
+    rows,
+    summary,
+    expectedCalculationCounts,
+    releaseManifestSha256,
+  };
 }

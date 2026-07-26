@@ -159,6 +159,18 @@ test("Conditions release writer commits one immutable release and rejects a chan
       referenceSets: buildFixedBoundReferenceSets({ calculations: [first], componentId: "hdi", direction: "higher_is_better", transformationId: first.transformationId, lowerBound: 0, upperBound: 1 }),
     };
     assert.equal((await writeConditionsRelease(db as never, release, [first])).written, 1);
+    const timestampOrder = (
+      await database.query<{ ordered: boolean; sameClock: boolean }>(`
+        SELECT
+          s.last_sync_at >= r.created_at AS ordered,
+          s.last_sync_at = r.created_at AS "sameClock"
+        FROM sources s
+        CROSS JOIN civica_conditions_releases r
+        WHERE s.id = 'undp_hdi'
+          AND r.id = '${release.releaseId}'
+      `)
+    ).rows[0];
+    assert.deepEqual(timestampOrder, { ordered: true, sameClock: true });
     assert.equal((await writeConditionsRelease(db as never, release, [first])).written, 0);
     await assert.rejects(writeConditionsRelease(db as never, release, [row(0.8)]), /different manifest/);
     assert.equal((await database.query<{ count: number }>("SELECT count(*)::int AS count FROM civica_conditions_scores")).rows[0].count, 1);

@@ -904,7 +904,6 @@ async function validateLiveFeeds(
 ): Promise<"checked" | "skipped"> {
   dotenvConfig({
     path: path.join(ROOT, ".env.local"),
-    override: true,
     quiet: true,
   });
   const databaseUrl = process.env.DATABASE_URL?.trim();

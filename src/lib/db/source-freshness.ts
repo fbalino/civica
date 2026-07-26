@@ -38,6 +38,9 @@
  *   await runAnotherStage({ markSynced: freshness.capture });
  *   // Call only after every stage has succeeded.
  *   await freshness.flush({ executor: db });
+ *
+ * A transactional publisher whose rows use PostgreSQL timestamp defaults can
+ * instead flush with `{ executor: tx, timestampSource: "database" }`.
  */
 import { eq, inArray, sql, type SQL } from "drizzle-orm";
 import type { NeonQueryFunctionInTransaction } from "@neondatabase/serverless";
@@ -66,10 +69,17 @@ export interface MarkSourcesSyncedOptions {
    */
   dryRun?: boolean;
   /**
-   * Timestamp to stamp. Defaults to `new Date()` (i.e. NOW()). Pass an
-   * explicit value to align the stamp with a run's `retrievedAt`.
+   * Timestamp to stamp. Defaults to `new Date()` from the application clock.
+   * Pass an explicit value to align the stamp with a run's `retrievedAt`.
    */
   at?: Date;
+  /**
+   * Clock used for the stamp. Existing callers default to the application
+   * clock. Transactional publishers can select the database clock so their
+   * freshness stamp shares PostgreSQL's CURRENT_TIMESTAMP with row defaults
+   * created in the same transaction.
+   */
+  timestampSource?: "application" | "database";
   /**
    * Executor to run the UPDATE against. Defaults to the shared `db`
    * client, so transaction callers can pass their `tx` and everyone
@@ -85,7 +95,7 @@ export type DeferredSourceFreshnessCaptureOptions = Pick<
 
 export type DeferredSourceFreshnessFlushOptions = Pick<
   MarkSourcesSyncedOptions,
-  "at" | "executor"
+  "at" | "executor" | "timestampSource"
 >;
 
 export interface DeferredSourceFreshness {
@@ -99,8 +109,9 @@ export interface DeferredSourceFreshness {
   ) => Promise<string[]>;
   /**
    * Stamp the accumulated source set in one `markSourcesSynced()` call.
-   * The first call fixes the timestamp/executor and every later call returns
-   * that same promise, so one accumulator can never issue a second stamp.
+   * The first call fixes the timestamp source, timestamp, and executor; every
+   * later call returns that same promise, so one accumulator can never issue
+   * a second stamp.
    */
   flush: (options?: DeferredSourceFreshnessFlushOptions) => Promise<string[]>;
 }
@@ -174,6 +185,7 @@ export function createDeferredSourceFreshness(): DeferredSourceFreshness {
         rowsWritten: totalRowsWritten,
         at: options.at,
         executor: options.executor,
+        timestampSource: options.timestampSource,
       });
     }
     return flushPromise;
@@ -201,7 +213,13 @@ export async function markSourcesSynced(
   sourceIds: string | string[],
   opts: MarkSourcesSyncedOptions,
 ): Promise<string[]> {
-  const { rowsWritten, dryRun = false, at, executor = db } = opts;
+  const {
+    rowsWritten,
+    dryRun = false,
+    at,
+    executor = db,
+    timestampSource = "application",
+  } = opts;
 
   // A dry run or an empty/failed sync must never advance freshness.
   if (!hasEligibleRows(rowsWritten, dryRun)) {
@@ -211,8 +229,17 @@ export async function markSourcesSynced(
   const ids = normalizeSourceIds(sourceIds);
   if (ids.length === 0) return [];
 
-  const stampedAt = at ?? new Date();
-  if (!Number.isFinite(stampedAt.getTime())) {
+  if (timestampSource === "database" && at) {
+    throw new RangeError(
+      "markSourcesSynced cannot combine an explicit timestamp with the database clock",
+    );
+  }
+  const stampedAt =
+    timestampSource === "database" ? sql`CURRENT_TIMESTAMP` : at ?? new Date();
+  if (
+    stampedAt instanceof Date &&
+    !Number.isFinite(stampedAt.getTime())
+  ) {
     throw new RangeError("markSourcesSynced received an invalid timestamp");
   }
 

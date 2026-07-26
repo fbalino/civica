@@ -1,0 +1,17 @@
+# PUL-040 runtime evidence-cut release note — 2026-07-26
+
+The public runtime contract's historical observed-evidence cut advances from
+2026-07-22 to 2026-07-26 because the verified, read-only production
+`raw_events` aggregate now reaches 2026-07-26. The observed source-ID set is
+unchanged.
+
+This is a provenance freshness correction. It is not a source-operating
+verdict, a retrieval-recall claim, a successful `pulse-v2.15-beta` automatic
+pipeline cycle, a production deployment, a prospective-window start, or a
+method change.
+
+The same candidate corrects Pulse run completion and score publication to use
+the database clock. That prevents application/database clock skew from
+recording completion before the database-authored start. It does not change
+event selection, corroboration confidence, dimensional deltas, decay,
+weighting, classification, or the published method version.

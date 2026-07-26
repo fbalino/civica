@@ -20,20 +20,22 @@ passing staging run.
 3. Disable staging jobs and prove no active lease remains. Do not use a
    deployment as a job-stop mechanism.
 
-The 2026-07-26 Vercel CLI isolation probe found that the current Preview
-connection resolves to the production Neon branch. Before another run, the
-owner/platform operator must enable **Required → Preview** and **Resource must
-be active before deployment** in the `civica` connection to
-`neon-claret-bucket`. The first action after that change is the same read-only
-target probe. Abort unless it returns project `ancient-art-58836757`, a branch
-different from `br-dawn-frog-amrf0h6a`, a distinct endpoint/host, and
-authoritative head `0032_sparkling_genesis`.
+The 2026-07-26 Vercel CLI isolation probe found that the persistent Preview
+connection resolves to the production Neon branch. Do not use that inherited
+value. Build the exact committed candidate from a clean detached worktree with
+the disposable branch URL already present in the process, then deploy the same
+prebuilt output with a deployment-scoped `DATABASE_URL` override. The Vercel
+CLI dotenv loader does not replace an existing process value, and the QA-018
+static target-inventory check rejects database scripts that use
+`override: true`.
 
-Vercel CLI 53.2.0 can list and inspect the attached resource but cannot update
-these connection-level deployment fields. The owner configuration change is
-made in Vercel, not Neon. Codex must not open an integration or Neon dashboard;
-all subsequent target inspection, migration, and validation remains
-Vercel-CLI-only.
+The deployment is accepted only after `vercel env pull --id <deployment-id>`
+proves its exact runtime target is project `ancient-art-58836757`, branch
+`br-bitter-fire-amcx8asi`, endpoint `ep-sparkling-pine-amdbr4ke`, a host
+different from production, and authoritative head
+`0048_entity_name_forms`. Abort on any mismatch. Do not persistently edit the
+Vercel project environment, invoke a browser-opening SSO command, promote the
+Preview, or open a Neon dashboard.
 
 The checked static-asset manifest means the complete Vercel Build Output API
 `static` tree, not the editorial illustration manifest or Next.js route-chunk
@@ -41,20 +43,23 @@ manifest. Build once, generate and verify the deterministic inventory, then
 deploy that same output without rebuilding:
 
 ```sh
-vercel build --target=preview --yes
+DATABASE_URL=<disposable-branch-url> vercel build --target=preview --yes
 node --import tsx scripts/staging-static-assets.ts \
   --root=.vercel/output/static \
   --out=plan/evidence/QA-018/staging-static-assets.v1.json
 node --import tsx scripts/staging-static-assets.ts \
   --root=.vercel/output/static \
   --verify=plan/evidence/QA-018/staging-static-assets.v1.json
-vercel deploy --prebuilt --target=preview --yes
+DATABASE_URL=<disposable-branch-url> vercel deploy --prebuilt \
+  --target=preview --yes --env DATABASE_URL
 ```
 
 The generator records every regular file's relative path, byte count, and
 SHA-256 in deterministic order and refuses an empty tree, a symbolic link, a
 changed file, or an unlisted extra file. Record the printed manifest SHA-256 in
-the run record.
+the run record. The placeholders above describe the variable binding only;
+operators pass the secret through a protected process environment and never
+place it in shell history or evidence.
 
 ## Closed migration scope
 

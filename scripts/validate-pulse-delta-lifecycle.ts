@@ -4,7 +4,7 @@ import { neon } from "@neondatabase/serverless";
 import { SCORE_WINDOW_DAYS } from "../src/lib/pulse/v2/taxonomy";
 import { PULSE_DELTA_ALGORITHM_VERSION } from "../src/lib/pulse/v2/versioning";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 function fail(message: string): never {
   throw new Error(`PUL-035 delta-lifecycle validation failed: ${message}`);

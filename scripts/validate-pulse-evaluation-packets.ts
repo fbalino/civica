@@ -32,7 +32,7 @@ import {
   loadPrivateEvidence,
 } from "./seed-pulse-evaluation-coding-studies";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 const LIVE = process.argv.includes("--live-workspace");
 const checked = JSON.parse(

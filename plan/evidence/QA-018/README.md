@@ -18,10 +18,11 @@ The validator also compares this plan to the checked authoritative manifest
 tail and fails if either drifts.
 
 The canonical smoke record remains `pending_external_authority` until an exact
-committed candidate is bound and the remaining checks run. Attempt 04 now
-retains the authorized Neon branch and migration/fingerprint results; it does
-not claim a Vercel deployment, release publication, cron invocation,
-production change, or owner sign-off.
+committed candidate is bound and the remaining checks run. Attempts 04 and 05
+now retain the authorized Neon branch, migration/fingerprint results, target
+isolation correction, and Pulse staging rehearsal; neither claims a Vercel
+deployment, production release, production cron invocation, production
+database change, or owner sign-off.
 
 ## Recorded staging attempts
 
@@ -52,35 +53,38 @@ production change, or owner sign-off.
   [`schema-fingerprint-replay.v1.json`](schema-fingerprint-replay.v1.json).
   Production remained untouched and the remaining Vercel/release/browser/API
   smoke checks are not yet claimed.
+- [`attempt-05-target-isolation-and-pulse-2026-07-26.md`](attempt-05-target-isolation-and-pulse-2026-07-26.md)
+  records the environment-precedence defect, the fail-closed script inventory,
+  the corrected model-free Pulse successor run, and the production-only
+  read-only PUL-040 refresh. The bounded Pulse record is
+  [`../PUL-027/qa-018-staging-rehearsal-2026-07-26.json`](../PUL-027/qa-018-staging-rehearsal-2026-07-26.json).
 
-When the authorized run occurs, Vercel tooling may handle bounded deployment
-actions and identity capture, while the operator separately proves the Neon
-branch, executes the single ordered database plan/apply, and retains the
-task-specific post-migration validators. A successful schema fingerprint alone
-does not close the migrations' owning tasks. The current concrete prerequisite
-is **Advanced Options → Deployments Configuration → Required Preview** plus
-**Resource must be active before deployment** for the `civica` connection to
-`neon-claret-bucket`. Vercel CLI 53.2.0 does not expose those
-deployment-configuration fields through `integration update`; this is an owner
-action in Vercel, not a Neon sign-in. Codex will not invoke the CLI's
-browser-opening SSO command.
+The existing automatic Preview integration still resolves the production
+branch by default, so it is not accepted as isolation evidence. The remaining
+run instead builds the exact committed candidate in a clean worktree with the
+disposable branch URL injected into the build process, then deploys that
+prebuilt output with a deployment-scoped `DATABASE_URL` override. This changes
+neither the project's persistent Preview environment nor the production
+deployment. Codex will not open an integration or Neon dashboard.
 
-After Vercel reports a deployment-scoped Preview environment, pull it into a
+After Vercel creates the deployment, pull its exact runtime environment into a
 temporary `0600` file with `vercel env pull --id <deployment-id>`, then run the
-guard before any migration:
+guard before accepting any smoke result:
 
 ```sh
 node --env-file=<temporary-preview-env> --import tsx \
   scripts/inspect-neon-target.ts \
   --expected-project=ancient-art-58836757 \
+  --expected-branch=br-bitter-fire-amcx8asi \
+  --expected-hostname-sha256=a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761 \
   --forbidden-branch=br-dawn-frog-amrf0h6a \
   --forbidden-hostname-sha256=c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b \
-  --required-migration-head=0032_sparkling_genesis
+  --required-migration-head=0048_entity_name_forms
 ```
 
-The temporary environment file is never checked in and is deleted immediately
-after the bounded identity result is retained. A rejected result prints only a
-sanitized fail-closed message.
+The temporary environment and deployment-scoped secret are never printed or
+checked in and are deleted after bounded evidence is retained. A rejected
+result prints only a sanitized fail-closed message.
 
 Verification:
 

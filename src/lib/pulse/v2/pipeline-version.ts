@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { pulsePipelineRuns } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
@@ -497,7 +497,7 @@ export async function finishPulsePipelineRun(
       status: input.status,
       counts: input.counts,
       failures: input.failures ?? [],
-      completedAt: new Date(),
+      completedAt: sql`CURRENT_TIMESTAMP`,
     })
     .where(eq(pulsePipelineRuns.id, runId));
 }

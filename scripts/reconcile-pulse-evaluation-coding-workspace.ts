@@ -24,7 +24,7 @@ import {
   loadPrivateEvidence,
 } from "./seed-pulse-evaluation-coding-studies";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 const APPLY = process.argv.includes("--apply");
 

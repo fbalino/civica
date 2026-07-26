@@ -35,7 +35,7 @@ const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as {
   crons?: Array<{ path: string; schedule: string }>;
 };
 
-dotenvConfig({ path: ".env.local", override: true, quiet: true });
+dotenvConfig({ path: ".env.local", quiet: true });
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) throw new Error("DATABASE_URL is required for the read-only preflight");
 const sql = neon(databaseUrl);

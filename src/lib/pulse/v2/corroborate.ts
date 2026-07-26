@@ -335,6 +335,9 @@ export async function corroborateEvents(
       db,
       planned.map((plan) => corroborationDecisionInput(plan, now)),
     );
+    // Use the database clock in production so a small application/database
+    // clock skew cannot make a run appear to complete before it started.
+    const completedAt = opts.now ?? sql`CURRENT_TIMESTAMP`;
     const batchQueries = [
       ...eventQueries,
       ...(decisions.query ? [decisions.query] : []),
@@ -344,7 +347,7 @@ export async function corroborateEvents(
           status: "completed",
           counts,
           failures: [],
-          completedAt: now,
+          completedAt,
         })
         .where(eq(pulsePipelineRuns.id, run.id)),
     ] as unknown as Parameters<typeof db.batch>[0];

@@ -469,8 +469,8 @@
     {
       "artifactId": "selected-product-code-8",
       "role": "selected-product-code",
-      "bytes": 3800,
-      "sha256": "0a39c0d5fa7b4600803a210ce1813661b6aeaf5a4f49504796727645c56f4988",
+      "bytes": 3784,
+      "sha256": "fe84ae32065eca23cbbf924633a5d6b15eea93e30c95c248ad2a9b60437147ea",
       "path": "scripts/validate-ci-series-provenance.ts"
     },
     {
@@ -551,5 +551,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "d871b7e9f3fe9365945937e3e7b0230522406777dcbc538d6784a3e482e9650d"
+  "bundleSemanticSha256": "31dc3ce3ab1542b92c7ef233b726513dd3168671c0d7dcbcce2091c1d69e01dd"
 }

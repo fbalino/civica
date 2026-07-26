@@ -1,7 +1,7 @@
 {
   "schemaVersion": "pulse-prospective-start-readiness/v1",
   "taskId": "PUL-040",
-  "checkedAt": "2026-07-23T07:36:19.328Z",
+  "checkedAt": "2026-07-26T16:00:20.208Z",
   "status": "blocked",
   "protocol": {
     "schemaVersion": "pulse-validation-protocol/v1",
@@ -13,9 +13,9 @@
   "runtime": {
     "codeMethodVersion": "pulse-v2.15-beta",
     "checkedContractVersion": "pulse-v2.15-beta",
-    "checkedContractHash": "45c7c12e315ab1b096a1d90615f383c5d4444dcbaa35e4c762b7003e6a26b0bc",
-    "checkedObservedEvidenceThrough": "2026-07-22",
-    "liveObservedEvidenceThrough": "2026-07-22"
+    "checkedContractHash": "992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20",
+    "checkedObservedEvidenceThrough": "2026-07-26",
+    "liveObservedEvidenceThrough": "2026-07-26"
   },
   "scheduledRoutes": [
     {
@@ -80,7 +80,7 @@
     {
       "id": "runtime_method_and_every_stage_version_frozen",
       "status": "pass",
-      "evidence": "runtime pulse-v2.15-beta contract 45c7c12e315ab1b096a1d90615f383c5d4444dcbaa35e4c762b7003e6a26b0bc"
+      "evidence": "runtime pulse-v2.15-beta contract 992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20"
     },
     {
       "id": "scheduled_ingest_cluster_classify_score_and_review_sla_routes_enabled",
@@ -116,5 +116,5 @@
   "earliestCompliantStart": null,
   "plannedEnd": null,
   "startCalculation": "After every prerequisite passes, record the boundary before the next eligible retrieval. The start is that first retained eligible retrieval timestamp; plannedEnd is exactly 90 consecutive UTC days later. Never backdate.",
-  "semanticSha256": "7b5cb3a6edf0f51fdace3774763f65a0f4b822d09b3c8a5ad832bc7a8688295e"
+  "semanticSha256": "ac3d5f7b79bc53fea4cecb090535c2b38cc313bc4237492996c308ff664665ac"
 }

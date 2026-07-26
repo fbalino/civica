@@ -10,6 +10,8 @@ export const NEON_TARGET_LEDGER_HEAD_SQL =
 
 export interface NeonTargetExpectations {
   expectedProjectId: string;
+  expectedBranchId: string;
+  expectedHostnameSha256: string;
   forbiddenBranchId: string;
   forbiddenHostnameSha256: string;
   requiredMigrationHead: string;
@@ -37,6 +39,42 @@ interface MigrationHeadRow {
 
 export interface ReadOnlyNeonSql {
   query(query: string, params: unknown[]): Promise<unknown>;
+}
+
+function requiredArgument(
+  argumentsList: readonly string[],
+  prefix: string,
+): string {
+  const value = argumentsList
+    .find((argument) => argument.startsWith(prefix))
+    ?.slice(prefix.length)
+    .trim();
+  if (!value) {
+    throw new Error(`Missing required argument ${prefix}<value>`);
+  }
+  return value;
+}
+
+export function neonTargetExpectationsFromArguments(
+  argumentsList: readonly string[],
+): NeonTargetExpectations {
+  return {
+    expectedProjectId: requiredArgument(argumentsList, "--expected-project="),
+    expectedBranchId: requiredArgument(argumentsList, "--expected-branch="),
+    expectedHostnameSha256: requiredArgument(
+      argumentsList,
+      "--expected-hostname-sha256=",
+    ),
+    forbiddenBranchId: requiredArgument(argumentsList, "--forbidden-branch="),
+    forbiddenHostnameSha256: requiredArgument(
+      argumentsList,
+      "--forbidden-hostname-sha256=",
+    ),
+    requiredMigrationHead: requiredArgument(
+      argumentsList,
+      "--required-migration-head=",
+    ),
+  };
 }
 
 function requiredText(value: unknown): string | null {
@@ -150,6 +188,25 @@ export function neonTargetErrors(
     errors.push("expected project ID is required");
   } else if (report.projectId !== expectations.expectedProjectId) {
     errors.push("Neon project does not match the expected project");
+  }
+  if (!requiredText(expectations.expectedBranchId)) {
+    errors.push("expected branch ID is required");
+  } else if (expectations.expectedBranchId === expectations.forbiddenBranchId) {
+    errors.push("expected branch must differ from the forbidden branch");
+  } else if (report.branchId !== expectations.expectedBranchId) {
+    errors.push("Neon branch does not match the expected branch");
+  }
+  if (!/^[a-f0-9]{64}$/.test(expectations.expectedHostnameSha256)) {
+    errors.push("expected hostname hash must be SHA-256");
+  } else if (
+    expectations.expectedHostnameSha256 ===
+    expectations.forbiddenHostnameSha256
+  ) {
+    errors.push("expected hostname must differ from the forbidden hostname");
+  } else if (
+    report.hostnameSha256 !== expectations.expectedHostnameSha256
+  ) {
+    errors.push("Neon hostname does not match the expected hostname");
   }
   if (!requiredText(expectations.forbiddenBranchId)) {
     errors.push("forbidden branch ID is required");

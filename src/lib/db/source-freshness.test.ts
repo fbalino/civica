@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
 import {
   createDeferredSourceFreshness,
   markSourcesSynced,
@@ -82,6 +84,51 @@ test("a successful row-writing run stamps the exact source and timestamp once", 
   assert.equal(state.wheres.length, 1);
 });
 
+test("database timestamp mode emits CURRENT_TIMESTAMP without changing the default clock", async () => {
+  const databaseState: FakeState = { updates: 0, values: [], wheres: [] };
+  assert.deepEqual(
+    await markSourcesSynced("world_bank", {
+      rowsWritten: 1,
+      timestampSource: "database",
+      executor: fakeExecutor(databaseState),
+    }),
+    ["world_bank"],
+  );
+  assert.equal(databaseState.updates, 1);
+  const databaseTimestamp = (
+    databaseState.values[0] as { lastSyncAt: unknown }
+  ).lastSyncAt;
+  assert.ok(databaseTimestamp instanceof SQL);
+  assert.equal(
+    new PgDialect().sqlToQuery(databaseTimestamp).sql,
+    "CURRENT_TIMESTAMP",
+  );
+
+  const applicationState: FakeState = { updates: 0, values: [], wheres: [] };
+  await markSourcesSynced("world_bank", {
+    rowsWritten: 1,
+    executor: fakeExecutor(applicationState),
+  });
+  assert.ok(
+    (applicationState.values[0] as { lastSyncAt: unknown }).lastSyncAt instanceof
+      Date,
+  );
+});
+
+test("database timestamp mode rejects an ambiguous explicit timestamp", async () => {
+  const state: FakeState = { updates: 0, values: [], wheres: [] };
+  await assert.rejects(
+    markSourcesSynced("world_bank", {
+      rowsWritten: 1,
+      at: new Date("2026-07-10T12:00:00.000Z"),
+      timestampSource: "database",
+      executor: fakeExecutor(state),
+    }),
+    /cannot combine an explicit timestamp with the database clock/,
+  );
+  assert.equal(state.updates, 0);
+});
+
 test("multi-source success trims, de-duplicates, and stamps in one statement", async () => {
   const state: FakeState = { updates: 0, values: [], wheres: [] };
   const stamped = await markSourcesSynced(
@@ -141,6 +188,24 @@ test("deferred freshness captures without stamping and flushes only when explici
   );
   assert.equal(state.updates, 1);
   assert.deepEqual(state.values, [{ lastSyncAt: at }]);
+});
+
+test("deferred freshness forwards database timestamp mode to its single flush", async () => {
+  const state: FakeState = { updates: 0, values: [], wheres: [] };
+  const freshness = createDeferredSourceFreshness();
+  await freshness.capture("world_bank", { rowsWritten: 4 });
+
+  assert.deepEqual(
+    await freshness.flush({
+      timestampSource: "database",
+      executor: fakeExecutor(state),
+    }),
+    ["world_bank"],
+  );
+  assert.equal(state.updates, 1);
+  assert.ok(
+    (state.values[0] as { lastSyncAt: unknown }).lastSyncAt instanceof SQL,
+  );
 });
 
 test("deferred freshness ignores dry, empty, invalid-count, and blank-id captures", async () => {

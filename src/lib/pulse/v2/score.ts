@@ -350,13 +350,16 @@ export async function calculateDimensionalDeltas(
         ).length,
       };
       try {
+        // Use the database clock in production so the run close and
+        // publication pointer cannot precede the database-authored start.
+        const completedAt = options.now ?? sql`CURRENT_TIMESTAMP`;
         const completeRun = db
           .update(pulsePipelineRuns)
           .set({
             status: "completed",
             counts,
             failures: [],
-            completedAt: today,
+            completedAt,
           })
           .where(eq(pulsePipelineRuns.id, run.id));
         const publishRun = db
@@ -366,7 +369,7 @@ export async function calculateDimensionalDeltas(
             computationRunId: run.id,
             versionKey: run.versionKey,
             scoreAsOf: todayDate,
-            publishedAt: today,
+            publishedAt: completedAt,
           })
           .onConflictDoUpdate({
             target: pulseScorePublicationPointers.product,
@@ -374,7 +377,7 @@ export async function calculateDimensionalDeltas(
               computationRunId: run.id,
               versionKey: run.versionKey,
               scoreAsOf: todayDate,
-              publishedAt: today,
+              publishedAt: completedAt,
             },
           });
         const batchQueries = [

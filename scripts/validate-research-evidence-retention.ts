@@ -10,7 +10,7 @@ import {
   RESEARCH_EVIDENCE_RETENTION_VERSION,
 } from "../src/lib/research/evidence-retention";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 const root = process.cwd();
 const migration =
   readFileSync(

@@ -33,3 +33,22 @@ relation or data, and replaces the fixed window check with the closed
    730-day current rows and append new history without rewriting 365-day rows.
 3. Record live lifecycle/runtime validation and the post-score publication
    pointer before checking PUL-027 in the master checklist.
+
+## Isolated QA-018 rehearsal — 2026-07-26
+
+The disposable Neon branch applied the authoritative migration history through
+`0048_entity_name_forms`, including `0043_pulse_decay_lifecycle`. A
+deterministic, model-free 730-day recomputation then published 325 current
+dimension rows for 65 jurisdictions and retained 2,600 immutable outputs across
+eight score runs. The canonical live lifecycle validator passed.
+
+The rehearsal also caught an application/database clock-skew defect: the first
+staging publications could record a completion fractionally before the
+database-authored start. The publisher now uses the database clock for run
+completion and pointer publication. The append-only successor score run
+`c96d8e5d-beb6-48e9-927d-edef7ecde6d1` and corroboration run
+`478abc07-020a-456c-9bc0-efde52b25911` both have ordered timestamps, and the
+publication pointer selects the corrected score run.
+
+This is staging evidence only. It did not migrate, recompute, deploy, or
+rewrite production, and it does not close PUL-027.

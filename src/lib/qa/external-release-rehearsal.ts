@@ -34,6 +34,49 @@ export const QA_018_REQUIRED_MIGRATIONS = [
   { id: "0048_entity_name_forms", ownerTaskId: "EXP-029" },
 ] as const;
 
+export const QA_018_DATABASE_TARGET_SCRIPT_PATHS = [
+  "scripts/inspect-neon-target.ts",
+  "scripts/plan-migration.ts",
+  "scripts/db-migrate.ts",
+  "scripts/validate-authoritative-migrations.ts",
+  "scripts/validate-research-evidence-retention.ts",
+  "scripts/validate-atlas-export.ts",
+  "scripts/validate-ci-series-provenance.ts",
+  "scripts/validate-pulse-runtime-method.ts",
+  "scripts/validate-pulse-delta-lifecycle.ts",
+  "scripts/validate-pulse-drift.ts",
+  "scripts/sync-pulse-v2-score.ts",
+  "scripts/audit-pulse-prospective-start.ts",
+  "scripts/validate-pulse-evaluation-packets.ts",
+  "scripts/reconcile-pulse-evaluation-coding-workspace.ts",
+  "scripts/seed-pulse-evaluation-coding-studies.ts",
+  "scripts/run-observed-production-pipeline.ts",
+  "scripts/ingest-conditions-all.ts",
+  "scripts/validate-conditions-release.ts",
+] as const;
+
+/**
+ * An explicitly injected staging target must win over a developer's local
+ * `.env.local`. Otherwise a nominal staging command can silently inspect or
+ * mutate the configured production database.
+ */
+export function stagingDatabaseTargetingErrors(
+  sources: Readonly<Record<string, string>>,
+): string[] {
+  const errors: string[] = [];
+  for (const path of QA_018_DATABASE_TARGET_SCRIPT_PATHS) {
+    const source = sources[path];
+    if (!source) {
+      errors.push(`staging database command source is unavailable: ${path}`);
+    } else if (/override\s*:\s*true/.test(source)) {
+      errors.push(
+        `${path} overrides an explicitly injected staging environment`,
+      );
+    }
+  }
+  return errors;
+}
+
 export const STAGING_CHECK_IDS = [
   "zero-write-migration-plan",
   "authoritative-migrations",

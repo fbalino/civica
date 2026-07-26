@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import stagingRecord from "../../../data/release-candidate-staging-smoke.v1.json";
 import recoveryRecord from "../../../data/rollback-forward-fix-rehearsal.v1.json";
 import {
   QA_018_DATABASE_HEAD,
+  QA_018_DATABASE_TARGET_SCRIPT_PATHS,
   QA_018_REQUIRED_MIGRATIONS,
   recoveryRehearsalErrors,
+  stagingDatabaseTargetingErrors,
   stagingSmokeErrors,
   type RecoveryRehearsalRecord,
   type StagingSmokeRecord,
@@ -45,6 +48,24 @@ test("pending external release records are complete protocols without fabricated
   assert.deepEqual(
     recoveryRehearsalErrors(recoveryRecord as RecoveryRehearsalRecord),
     [],
+  );
+});
+
+test("staging database commands preserve an explicitly injected target", () => {
+  const sources = Object.fromEntries(
+    QA_018_DATABASE_TARGET_SCRIPT_PATHS.map((path) => [
+      path,
+      readFileSync(path, "utf8"),
+    ]),
+  );
+  assert.deepEqual(stagingDatabaseTargetingErrors(sources), []);
+
+  const unsafe = structuredClone(sources);
+  unsafe[QA_018_DATABASE_TARGET_SCRIPT_PATHS[0]] +=
+    '\nconfig({ path: ".env.local", override: true });\n';
+  assert.match(
+    stagingDatabaseTargetingErrors(unsafe).join("\n"),
+    /overrides an explicitly injected staging environment/,
   );
 });
 

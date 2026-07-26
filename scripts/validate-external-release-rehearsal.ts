@@ -2,8 +2,10 @@ import { existsSync, readFileSync } from "node:fs";
 
 import {
   QA_018_DATABASE_HEAD,
+  QA_018_DATABASE_TARGET_SCRIPT_PATHS,
   QA_018_REQUIRED_MIGRATIONS,
   recoveryRehearsalErrors,
+  stagingDatabaseTargetingErrors,
   stagingSmokeErrors,
   type RecoveryRehearsalRecord,
   type StagingSmokeRecord,
@@ -67,6 +69,14 @@ const cliIsolation = JSON.parse(cliIsolationRaw) as CliIsolationProbe;
 const errors = [
   ...stagingSmokeErrors(staging).map((error) => `QA-018: ${error}`),
   ...recoveryRehearsalErrors(recovery).map((error) => `QA-019: ${error}`),
+  ...stagingDatabaseTargetingErrors(
+    Object.fromEntries(
+      QA_018_DATABASE_TARGET_SCRIPT_PATHS.map((path) => [
+        path,
+        readFileSync(path, "utf8"),
+      ]),
+    ),
+  ).map((error) => `QA-018: ${error}`),
 ];
 if (
   cliIsolation.schemaVersion !==

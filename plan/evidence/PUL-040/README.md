@@ -8,7 +8,7 @@ preregistered protocol hash, frozen `pulse-v2.15-beta` runtime contract, all
 five scheduled/review routes, current-method stage completions, live evidence
 cut, eight start prerequisites, and the exact non-backdating rule.
 
-The 2026-07-23 audit reports:
+The freshly regenerated 2026-07-26 production audit reports:
 
 - protocol and code/runtime versions are frozen;
 - all required routes exist in the repository, but deployed enabled state is
@@ -19,6 +19,11 @@ The 2026-07-23 audit reports:
   PUL-024/PUL-027/PUL-043 migration/reconciliation work;
 - the start-boundary source-coverage/observability snapshot does not exist; and
 - no prospective label/window/start record exists.
+
+The checked historical evidence cut now matches the production aggregate
+through 2026-07-26. The observed source-ID set is unchanged. This freshness
+correction is not an operating-feed verdict, a successful automatic-stage run,
+or permission to start the prospective window.
 
 Therefore `earliestCompliantStart` and `plannedEnd` are null. After every
 prerequisite passes, the start is recorded before and equals the first retained
