@@ -11,11 +11,11 @@ smoke, protected error handling, idempotent dry run, and unchanged freshness.
 
 The migration plan is bound to the complete authoritative ledger after the
 configured `0032_sparkling_genesis` head: `0033`–`0040`, `0042`–`0050` in exact
-order, with no `0041`. The disposable child now proves head
-`0050_index_release_header_contract`, 50 matching ledger entries, and the
-checked public-schema fingerprint. Each migration remains machine-mapped to
-its actual owning task; one shared schema pass is not substituted for each
-task's product validation.
+order, with no `0041`. Retained evidence from the now-deleted disposable child
+proves head `0050_index_release_header_contract`, 50 matching ledger entries,
+and the checked public-schema fingerprint. Each migration remains
+machine-mapped to its actual owning task; one shared schema pass is not
+substituted for each task's product validation.
 
 The canonical smoke record is now
 `run_complete_pending_owner_signoff`. The exact candidate, disposable child,
@@ -23,6 +23,12 @@ prebuilt Preview, release/method pointers, static manifest, twelve checks,
 responsive browser evidence, and unchanged freshness are retained without
 credentials. No production release, production cron invocation, production
 database change, promotion, or owner sign-off is claimed.
+
+After the bounded evidence and readiness reports were committed on 2026-07-26,
+the pinned Neon CLI deleted only unprotected child
+`br-bitter-fire-amcx8asi`. A post-delete branch listing confirmed that child
+absent and production branch `br-dawn-frog-amrf0h6a` (`main`) still present.
+The cleanup does not change QA-018's pending owner-sign-off state.
 
 ## Recorded staging attempts
 

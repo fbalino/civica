@@ -55,3 +55,9 @@ This run did not promote a deployment, alter the persistent Vercel Preview
 environment, invoke a production cron, mutate the production database, or
 record Fernando's approval. QA-018 remains open until his dated post-run
 decision.
+
+After the bounded run evidence and readiness reports were committed, the
+pinned Neon CLI deleted only the exact unprotected disposable child
+`br-bitter-fire-amcx8asi`. A follow-up listing proved that child absent and the
+production `main` branch `br-dawn-frog-amrf0h6a` still present. No production
+resource was deleted or changed.
