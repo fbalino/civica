@@ -2,8 +2,8 @@
 
 Date: 2026-07-26
 
-Status: selected for a live candidate under the owner release instruction;
-deployment and exact rendered owner approval are not yet recorded
+Status: deployed as a live candidate under the owner release instruction;
+exact rendered owner approval is not yet recorded
 
 ## Approval boundary
 
@@ -11,8 +11,8 @@ Fernando approved the corrected eight-image light-master batch on 2026-07-25.
 That approval did not approve the dark outputs, rendered menu, or deployment.
 On 2026-07-26 Fernando separately instructed the finished work to be committed
 and pushed live while the exact rendered decision remains pending. The forward
-records preserve both facts: production release is authorized, `deployed` is
-still false before the hosting platform reports Ready, and
+records preserve both facts: production release was authorized, Vercel later
+reported the exact production deployment Ready, and
 `ownerRenderedMenuApproval` remains false. The dated review field is named
 `releaseAuthorizedAtReview: false` because it records the earlier 2026-07-25
 review state; the later instruction is recorded separately as
@@ -68,10 +68,16 @@ map, 11-test navigation drift lock, and forward illustration-manifest gate also
 pass. All 16 optimized image assets have complete forward generation records.
 The existing home-art record is preserved unchanged.
 
+## Production deployment
+
+The exact Vercel production deployment reached `READY`. The apex HTML contains
+that deployment identity, and sampled light and dark navigation assets returned
+HTTP 200 from the production domain. The machine-readable identity, commit,
+verification time, and bounded checks are retained in
+[`deployment.v1.json`](deployment.v1.json).
+
 ## Pending state
 
-This repository state is deployable and authorized for the live candidate, but
-it does not claim a completed deployment or exact rendered owner approval.
-After the hosting platform reports Ready, deployment identity can be recorded
-separately. Fernando should then approve, revise, or reject the rendered
-candidate; until that decision is recorded, EXP-015 remains open.
+The candidate is live, but deployment does not constitute exact rendered owner
+approval. Fernando should approve, revise, or reject the rendered candidate;
+until that decision is recorded, EXP-015 remains open.

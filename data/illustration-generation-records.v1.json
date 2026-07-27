@@ -284,11 +284,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-countries-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -475,11 +476,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-world-atlas-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -664,11 +666,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-compare-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -855,11 +858,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-constitutions-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1038,11 +1042,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-parties-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1227,11 +1232,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-elections-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1418,11 +1424,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-rankings-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1601,11 +1608,12 @@
       },
       "release": {
         "releaseIdentity": "exp015-explore-organizations-2026-07-25-candidate-v1",
-        "status": "selected-for-live-candidate-under-owner-release-instruction",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": true
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
