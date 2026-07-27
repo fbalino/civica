@@ -8,14 +8,49 @@ import {
   QA_018_DATABASE_HEAD,
   QA_018_DATABASE_TARGET_SCRIPT_PATHS,
   QA_018_REQUIRED_MIGRATIONS,
+  QA_018_REHEARSAL_HEAD,
+  QA_018_REHEARSAL_LEDGER_ROWS,
+  QA_018_REHEARSAL_ORDERED_IDS_SHA256,
+  QA_018_REHEARSAL_SCHEMA_SHA256,
+  qa018CompletedDatabaseProofErrors,
   recoveryRehearsalErrors,
   stagingDatabaseTargetingErrors,
   stagingSmokeErrors,
+  type Qa018CompletedDatabaseProof,
   type RecoveryRehearsalRecord,
   type StagingSmokeRecord,
 } from "./external-release-rehearsal";
 
 const clone = <T>(value: T): T => structuredClone(value);
+
+function completedDatabaseProof(): Qa018CompletedDatabaseProof {
+  const snapshot = {
+    migrationLedger: {
+      rows: QA_018_REHEARSAL_LEDGER_ROWS,
+      head: QA_018_REHEARSAL_HEAD,
+      orderedIdsSha256: QA_018_REHEARSAL_ORDERED_IDS_SHA256,
+      hashesMatchRepository: true,
+    },
+    publicSchema: { sha256: QA_018_REHEARSAL_SCHEMA_SHA256 },
+  };
+  return {
+    isolation: {
+      productionDatabaseBranchId: "br-production",
+      productionDatabaseHostnameSha256: "d".repeat(64),
+      productionMigrationHeadBefore: QA_018_DATABASE_HEAD,
+      productionMigrationHeadAfter: QA_018_DATABASE_HEAD,
+    },
+    database: {
+      before: clone(snapshot),
+      after: clone(snapshot),
+    },
+  };
+}
+
+const canonicalProductionBoundary = {
+  forbiddenProductionBranchId: "br-production",
+  forbiddenProductionHostnameSha256: "d".repeat(64),
+};
 
 function pendingStagingRecord(): StagingSmokeRecord {
   const candidate = clone(stagingRecord) as StagingSmokeRecord;
@@ -223,6 +258,92 @@ test("deployment environment-pull proof cannot also claim fallback", () => {
 
   candidate.isolation.runtimeAttestation.envPullUnavailable = null;
   assert.deepEqual(stagingSmokeErrors(candidate), []);
+});
+
+test("exact Preview fallback accepts one truthful state-window rejection", () => {
+  const candidate = technicallyCompleteStagingRecord();
+  candidate.isolation.runtimeAttestation.envPullUnavailable!.rejectedStates = [
+    "READY",
+  ];
+  assert.deepEqual(stagingSmokeErrors(candidate), []);
+
+  candidate.isolation.runtimeAttestation.envPullUnavailable!.rejectedStates =
+    [];
+  assert.match(
+    stagingSmokeErrors(candidate).join("\n"),
+    /state-window failure/,
+  );
+});
+
+test("completed QA-018 database proof binds the fresh 0051 ledger and unchanged production", () => {
+  assert.deepEqual(
+    qa018CompletedDatabaseProofErrors(
+      completedDatabaseProof(),
+      canonicalProductionBoundary,
+    ),
+    [],
+  );
+});
+
+test("completed QA-018 database proof rejects a 50-row historical ledger", () => {
+  const proof = completedDatabaseProof();
+  proof.database.before.migrationLedger.rows = 50;
+  proof.database.after.migrationLedger.rows = 50;
+  assert.match(
+    qa018CompletedDatabaseProofErrors(
+      proof,
+      canonicalProductionBoundary,
+    ).join("\n"),
+    /must contain 51 rows/,
+  );
+});
+
+test("completed QA-018 database proof rejects an incorrect ordered-ID hash", () => {
+  const proof = completedDatabaseProof();
+  proof.database.after.migrationLedger.orderedIdsSha256 = "f".repeat(64);
+  assert.match(
+    qa018CompletedDatabaseProofErrors(
+      proof,
+      canonicalProductionBoundary,
+    ).join("\n"),
+    /ordered-ID SHA-256 is invalid/,
+  );
+});
+
+test("completed QA-018 database proof rejects an incorrect schema fingerprint", () => {
+  const proof = completedDatabaseProof();
+  proof.database.before.publicSchema.sha256 = "f".repeat(64);
+  assert.match(
+    qa018CompletedDatabaseProofErrors(
+      proof,
+      canonicalProductionBoundary,
+    ).join("\n"),
+    /public schema fingerprint is invalid/,
+  );
+});
+
+test("completed QA-018 database proof rejects production identity mismatch", () => {
+  const proof = completedDatabaseProof();
+  proof.isolation.productionDatabaseBranchId = "br-not-production";
+  assert.match(
+    qa018CompletedDatabaseProofErrors(
+      proof,
+      canonicalProductionBoundary,
+    ).join("\n"),
+    /does not match the canonical forbidden-production boundary/,
+  );
+});
+
+test("completed QA-018 database proof rejects a changed production head", () => {
+  const proof = completedDatabaseProof();
+  proof.isolation.productionMigrationHeadAfter = QA_018_REHEARSAL_HEAD;
+  assert.match(
+    qa018CompletedDatabaseProofErrors(
+      proof,
+      canonicalProductionBoundary,
+    ).join("\n"),
+    /must remain 0032_sparkling_genesis before and after/,
+  );
 });
 
 test("staging binds every post-0032 authoritative migration to its owning task", () => {

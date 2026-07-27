@@ -5,6 +5,7 @@ import {
   QA_018_DATABASE_HEAD,
   QA_018_DATABASE_TARGET_SCRIPT_PATHS,
   QA_018_REQUIRED_MIGRATIONS,
+  qa018CompletedDatabaseProofErrors,
   recoveryRehearsalErrors,
   stagingDatabaseTargetingErrors,
   stagingSmokeErrors,
@@ -72,6 +73,7 @@ interface PreviewDatabaseSnapshot {
   migrationLedger: {
     rows: number;
     head: string;
+    orderedIdsSha256: string;
     hashesMatchRepository: boolean;
   };
   publicSchema: { sha256: string };
@@ -109,7 +111,10 @@ interface PreviewSmokeEvidence {
     neonBranchId: string;
     neonEndpointId: string;
     databaseHostnameSha256: string;
+    productionDatabaseBranchId: string;
     productionDatabaseHostnameSha256: string;
+    productionMigrationHeadBefore: string;
+    productionMigrationHeadAfter: string;
     productionDatabaseExcluded: boolean;
     deploymentScopedEnvPull: {
       status: string;
@@ -368,6 +373,17 @@ if (staging.status !== "pending_external_authority") {
     if (runtime) {
       const before = runtime.database.before;
       const after = runtime.database.after;
+      errors.push(
+        ...qa018CompletedDatabaseProofErrors(
+          runtime,
+          {
+            forbiddenProductionBranchId:
+              attestation.forbiddenProductionBranchId,
+            forbiddenProductionHostnameSha256:
+              attestation.forbiddenProductionHostnameSha256,
+          },
+        ).map((error) => `QA-018: ${error}`),
+      );
       if (
         runtime.schemaVersion !==
           "civica-qa018-preview-smoke-evidence/v1" ||
@@ -413,7 +429,9 @@ if (staging.status !== "pending_external_authority") {
             [...runtime.isolation.deploymentScopedEnvPull.attempts].sort(),
           ) !==
             JSON.stringify(
-              ["BUILDING_expected_INITIALIZING", "READY_expected_INITIALIZING"],
+              (attestation.envPullUnavailable?.rejectedStates ?? [])
+                .map((state) => `${state}_expected_INITIALIZING`)
+                .sort(),
             ) ||
           !runtime.isolation.deploymentScopedEnvPull.alternativeProof.trim())
       ) {

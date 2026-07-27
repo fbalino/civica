@@ -29,15 +29,19 @@ CLI dotenv loader does not replace an existing process value, and the QA-018
 static target-inventory check rejects database scripts that use
 `override: true`.
 
-The preferred runtime proof is `vercel env pull --id <deployment-id>`, followed
-by the exact target guard. Vercel currently permits that pull only while a
+The preferred runtime proof is
+`vercel env pull <temporary-file> --id <deployment-id> --yes`, followed by the
+exact target guard. The output filename is mandatory: omitting it can overwrite
+`.env.local`, including a symlinked file. Delete the temporary file after the
+bounded identity check. Vercel currently permits that pull only while a
 deployment is `INITIALIZING`; a prebuilt deployment can pass through that state
 before the CLI can inspect it. The only accepted fallback is an exact Preview
-runtime attestation that retains sanitized `BUILDING` and `READY` rejections
-against the expected `INITIALIZING` state and binds the same deployment ID,
-Preview URL, candidate commit, child project/branch/endpoint/hostname hash,
-forbidden production branch/hostname hash, authoritative head, and a child-only
-Conditions release ID/method/manifest observed through that deployed host.
+runtime attestation that retains the truthful nonempty set of sanitized
+`BUILDING` and/or `READY` rejections against the expected `INITIALIZING` state
+and binds the same deployment ID, Preview URL, candidate commit, child
+project/branch/endpoint/hostname hash, forbidden production
+branch/hostname hash, authoritative head, and a child-only Conditions release
+ID/method/manifest observed through that deployed host.
 
 Both modes must prove a newly authorized disposable Neon child, a host
 different from production, and authoritative head `0051_eminent_jocasta`.
@@ -57,10 +61,10 @@ deploy that same output without rebuilding:
 DATABASE_URL=<disposable-branch-url> vercel build --target=preview --yes
 node --import tsx scripts/staging-static-assets.ts \
   --root=.vercel/output/static \
-  --out=plan/evidence/QA-018/staging-static-assets.v1.json
+  --out=plan/evidence/QA-018/staging-static-assets-attempt-07-0051.v1.json
 node --import tsx scripts/staging-static-assets.ts \
   --root=.vercel/output/static \
-  --verify=plan/evidence/QA-018/staging-static-assets.v1.json
+  --verify=plan/evidence/QA-018/staging-static-assets-attempt-07-0051.v1.json
 DATABASE_URL=<disposable-branch-url> vercel deploy --prebuilt \
   --target=preview --yes --env DATABASE_URL
 ```
@@ -112,10 +116,19 @@ pass; it does not imply that any owning task is complete.
 
 Follow the ordering and abort points in `data/DEPLOYMENT-REHEARSAL.md`, with
 the complete migration scope above controlling QA-018 wherever older prose
-stops at `0042`. Run `npm run db:plan -- --live` against the isolated branch,
-confirm that its starting ledger is exactly `0032_sparkling_genesis` and its
-pending set is the closed sequence above, then run `npm run db:migrate` once.
-Do not deploy if either identity differs.
+stops at `0042`. Against the isolated branch, first confirm that its starting
+ledger is exactly `0032_sparkling_genesis`. The exact planning commands are
+`npm run db:plan -- --all --live --out=plan/evidence/QA-018/migration-plan-attempt-07-0051.json`
+and `npm run db:migrate -- --plan`; both must report the same 18-migration tail
+with no `0041`. Only then run `npm run db:migrate` once. Do not deploy if either
+identity differs.
+
+Attempt 07 uses new evidence paths throughout:
+`migration-plan-attempt-07-0051.json`,
+`staging-static-assets-attempt-07-0051.v1.json`,
+`run-07-preview-smoke.v1.json`, `browser-matrix-attempt-07-0051.json`, and
+`attempt-07-isolated-preview-smoke-2026-07-26.md`. Never overwrite an
+attempt-06 artifact.
 
 After the shared apply, run the authoritative-ledger and schema-fingerprint
 checks plus every owning task's documented live validator. Retain each

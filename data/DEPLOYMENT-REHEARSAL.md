@@ -40,11 +40,14 @@ authoritative `0041` migration.
    Set only the staging project's database connection to that branch. Disable
    all staging Cron Jobs in Vercel, then verify no old staging lease is active.
    Abort if either isolation or job quiescence cannot be shown.
-3. Against the staging branch, run `npm run db:plan -- --live`. It must be a
-   zero-write plan for the expected authoritative migrations. Then run
-   `npm run db:migrate`, `npm run validate:authoritative-migrations:live`, and
-   the relevant live validators. Abort on a migration hash, ledger, or public
-   fingerprint mismatch; do not deploy the app to diagnose it.
+3. Against the staging branch, run
+   `npm run db:plan -- --all --live --out=<run-specific-path>`. It must be a
+   zero-write plan for the expected authoritative migrations. Run
+   `npm run db:migrate -- --plan` and require the same ordered pending tail
+   before running `npm run db:migrate` once. Then run
+   `npm run validate:authoritative-migrations:live` and the relevant live
+   validators. Abort on a migration hash, ledger, or public fingerprint
+   mismatch; do not deploy the app to diagnose it.
 4. Verify release data before readers: validate source-input and release
    artifacts, run the explicit Index `stage:ci-release`, `check:ci-release`,
    and `publish:ci-release` modes in declared predecessor order, and prove the

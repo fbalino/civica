@@ -13,6 +13,12 @@ export const RECOVERY_REHEARSAL_SCHEMA_VERSION =
  * shared migration pass.
  */
 export const QA_018_DATABASE_HEAD = "0032_sparkling_genesis" as const;
+export const QA_018_REHEARSAL_LEDGER_ROWS = 51 as const;
+export const QA_018_REHEARSAL_HEAD = "0051_eminent_jocasta" as const;
+export const QA_018_REHEARSAL_ORDERED_IDS_SHA256 =
+  "7c66b7aa06ed3aacbd01c9e1bcdd73b5de3df56c71741387a0e2435d86e7e384" as const;
+export const QA_018_REHEARSAL_SCHEMA_SHA256 =
+  "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b" as const;
 export const QA_018_REQUIRED_MIGRATIONS = [
   { id: "0033_flat_hardball", ownerTaskId: "PLT-009" },
   { id: "0034_superb_the_fallen", ownerTaskId: "PLT-010" },
@@ -200,6 +206,108 @@ export interface RecoveryRehearsalRecord {
   };
 }
 
+export interface Qa018CompletedDatabaseProof {
+  isolation: {
+    productionDatabaseBranchId: string;
+    productionDatabaseHostnameSha256: string;
+    productionMigrationHeadBefore: string;
+    productionMigrationHeadAfter: string;
+  };
+  database: {
+    before: {
+      migrationLedger: {
+        rows: number;
+        head: string;
+        orderedIdsSha256: string;
+        hashesMatchRepository: boolean;
+      };
+      publicSchema: { sha256: string };
+    };
+    after: {
+      migrationLedger: {
+        rows: number;
+        head: string;
+        orderedIdsSha256: string;
+        hashesMatchRepository: boolean;
+      };
+      publicSchema: { sha256: string };
+    };
+  };
+}
+
+export interface Qa018CanonicalProductionBoundary {
+  forbiddenProductionBranchId: string | null;
+  forbiddenProductionHostnameSha256: string | null;
+}
+
+/**
+ * A completed QA-018 run must be a fresh proof for the current 0051 ledger.
+ * The retained attempt-06 packet stops at 0050 and remains valid historical
+ * evidence, but it cannot satisfy this completed-run contract.
+ */
+export function qa018CompletedDatabaseProofErrors(
+  proof: Qa018CompletedDatabaseProof,
+  boundary: Qa018CanonicalProductionBoundary,
+): string[] {
+  const errors: string[] = [];
+  const snapshots = [
+    ["before", proof.database.before],
+    ["after", proof.database.after],
+  ] as const;
+
+  for (const [label, snapshot] of snapshots) {
+    if (snapshot.migrationLedger.rows !== QA_018_REHEARSAL_LEDGER_ROWS) {
+      errors.push(
+        `${label} migration ledger must contain ${QA_018_REHEARSAL_LEDGER_ROWS} rows`,
+      );
+    }
+    if (snapshot.migrationLedger.head !== QA_018_REHEARSAL_HEAD) {
+      errors.push(
+        `${label} migration ledger head must be ${QA_018_REHEARSAL_HEAD}`,
+      );
+    }
+    if (
+      snapshot.migrationLedger.orderedIdsSha256 !==
+      QA_018_REHEARSAL_ORDERED_IDS_SHA256
+    ) {
+      errors.push(`${label} migration ledger ordered-ID SHA-256 is invalid`);
+    }
+    if (snapshot.migrationLedger.hashesMatchRepository !== true) {
+      errors.push(
+        `${label} migration ledger hashes do not match the repository`,
+      );
+    }
+    if (
+      snapshot.publicSchema.sha256 !== QA_018_REHEARSAL_SCHEMA_SHA256
+    ) {
+      errors.push(`${label} public schema fingerprint is invalid`);
+    }
+  }
+
+  if (
+    !boundary.forbiddenProductionBranchId ||
+    !boundary.forbiddenProductionHostnameSha256 ||
+    proof.isolation.productionDatabaseBranchId !==
+      boundary.forbiddenProductionBranchId ||
+    proof.isolation.productionDatabaseHostnameSha256 !==
+      boundary.forbiddenProductionHostnameSha256
+  ) {
+    errors.push(
+      "fresh production database identity does not match the canonical forbidden-production boundary",
+    );
+  }
+  if (
+    proof.isolation.productionMigrationHeadBefore !== QA_018_DATABASE_HEAD ||
+    proof.isolation.productionMigrationHeadAfter !== QA_018_DATABASE_HEAD
+  ) {
+    errors.push(
+      `production migration head must remain ${QA_018_DATABASE_HEAD} before and after rehearsal`,
+    );
+  }
+
+  return errors;
+}
+
 function checkSetErrors(
   records: CheckRecord[],
   requiredIds: readonly string[],
@@ -358,11 +466,14 @@ function runtimeAttestationErrors(
     }
   } else if (attestation.proofMode === "exact_preview_runtime") {
     const fallback = attestation.envPullUnavailable;
-    const rejectedStates = [...(fallback?.rejectedStates ?? [])].sort();
+    const rejectedStates = fallback?.rejectedStates ?? [];
+    const allowedRejectedStates = new Set(["BUILDING", "READY"]);
     if (
       fallback?.expectedState !== "INITIALIZING" ||
       fallback.errorCode !== "deployment_state_window_unavailable" ||
-      JSON.stringify(rejectedStates) !== JSON.stringify(["BUILDING", "READY"])
+      rejectedStates.length === 0 ||
+      new Set(rejectedStates).size !== rejectedStates.length ||
+      rejectedStates.some((state) => !allowedRejectedStates.has(state))
     ) {
       errors.push(
         "exact Preview runtime proof lacks the bounded Vercel state-window failure",

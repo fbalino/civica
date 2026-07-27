@@ -139,16 +139,14 @@ The platform operator may be Fernando if he controls the relevant accounts.
 Otherwise use the person responsible for the Civica Vercel and Neon projects.
 Production promotion remains a separate decision.
 
-1. **[QA-018 first — review the completed isolated run](evidence/QA-018/README.md).**
-   The exact candidate has now passed the isolated Neon/Vercel Preview
-   migration, release, API, cache, protected-route, idempotent-dry-run, and
-   responsive-browser checks. Open the
-   [attempt-06 narrative](evidence/QA-018/attempt-06-isolated-preview-smoke-2026-07-26.md)
-   and its [bounded machine record](evidence/QA-018/run-06-preview-smoke.v1.json).
-   Confirm or reject the run and record the date. No provider setting, database
-   URL, password, production promotion, or Neon sign-in is needed for this
-   review. QA-018 remains unchecked only because Codex cannot invent your
-   sign-off.
+1. **[QA-018 first — wait for the new 0051 packet](evidence/QA-018/README.md).**
+   Attempt 06 is valid historical evidence for the earlier candidate through
+   migration `0050`; it does not prove the current `0051` candidate. Codex can
+   run the newly authorized CLI-only isolated rehearsal and will prepare a new
+   attempt-07 narrative and bounded machine record without changing persistent
+   Preview settings or opening Neon in a browser. After that exact run passes,
+   confirm or reject the new packet and record the date. Until then, do not
+   sign off attempt 06 as the current QA-018 candidate.
 2. **Conditions production batch — ATL-026 and ATL-027.** The isolated run
    completed the staging-verifiable ATL-016, ATL-029, and ATL-030 criteria.
    Production still needs explicit authority to apply the additive Conditions
