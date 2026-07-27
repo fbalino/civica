@@ -17,10 +17,17 @@ Both studies remain in `setup`. The live validator proves zero participants, cre
 
 ## Verification
 
-- `npm run validate:pulse-evaluation-packets`
+- `npm run validate:pulse-evaluation-packets` verifies the checked manifest,
+  its semantic hash and rights boundary, and its binding to the checked frozen
+  population artifact without consulting mutable current database projections.
 - `npm run seed:pulse-evaluation-coding-studies` (zero-write dry run)
 - `npm run seed:pulse-evaluation-coding-studies -- --apply` (idempotent private import)
-- `npm run validate:pulse-evaluation-packets:live`
+- `npm run validate:pulse-evaluation-packets:live` verifies the two isolated
+  setup studies against the checked frozen packet manifest.
+- `npm run diagnose:pulse-evaluation-packets:current-database` is an explicit
+  diagnostic only. It compares the frozen packet to a reconstruction from
+  current mutable projections and must never be used to rewrite the frozen
+  artifact when later classifications change those projections.
 - `npm run build`
 
 The import was applied twice. The second run detected both studies and converged without duplicate packets or access records.
@@ -35,3 +42,27 @@ The import was applied twice. The second run detected both studies and converged
 - `scripts/validate-pulse-evaluation-packets.ts`
 
 No reviewer or coder was contacted, no credential was issued, and no spending was authorized.
+
+## Validation correction — 2026-07-26
+
+The ordinary build gate previously reconstructed this frozen packet from
+current `raw_events.classification_disposition` values. Those values are a
+mutable projection: classifications recorded after the population cutoff
+legitimately changed the probability-frame strata while leaving the frozen
+identity population unchanged. The reconstruction therefore ceased to be a
+valid as-of proof and began failing unrelated releases.
+
+The frozen manifest and population artifact remain unchanged. Ordinary builds
+now validate their complete checked contents and mutual hash binding. Present
+database reconstruction remains available as a deliberately named diagnostic;
+a true as-of reconstruction would require an immutable snapshot of every
+sampling input, including historical strata and source links.
+
+The corrected ordinary validator passes. The two read-only live diagnostics
+remain intentionally outside the production build and currently report
+pre-existing operational drift: the mutable classification projection no
+longer reproduces the July sampling strata, and the disabled setup studies
+retain an earlier packet-set hash. Both studies still have zero participants
+and zero assignments and remain in `setup`. They must be reconciled through a
+new versioned study import, never by rewriting either frozen packet evidence or
+the existing study rows.
