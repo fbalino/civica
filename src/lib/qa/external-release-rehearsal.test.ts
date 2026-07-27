@@ -151,6 +151,48 @@ function technicallyCompleteStagingRecord(): StagingSmokeRecord {
   return candidate;
 }
 
+function technicallyCompleteRecoveryRecord(): RecoveryRehearsalRecord {
+  const candidate = clone(recoveryRecord) as RecoveryRehearsalRecord;
+  candidate.status = "run_complete_pending_owner_signoff";
+  candidate.blocker = "owner_status_record_and_post_run_signoff";
+  candidate.deliberatelyBadRelease = true;
+  candidate.candidateCommit = "1".repeat(40);
+  candidate.stagingDeploymentId = "dpl_Qa019BadRelease";
+  candidate.defectFixture = "fixture-route/cache-header-mismatch";
+  candidate.recoveryMode = "forward_fix";
+  candidate.recoveredCommit = "2".repeat(40);
+  candidate.recoveredDeploymentId = "dpl_Qa019RecoveredRelease";
+  candidate.checks = candidate.checks.map((check) => ({
+    ...check,
+    status: "pass",
+    evidence: `bounded QA-019 evidence for ${check.id}`,
+  }));
+  candidate.correction = {
+    incidentId: "qa019-staging-cache-header",
+    statusRecordId: null,
+    changelogPath: "plan/evidence/QA-019/correction-changelog.md",
+    correctionRecordId: "qa019-correction-staging-cache-header",
+  };
+  candidate.signoff.owner = null;
+  candidate.signoff.checkedAt = null;
+  candidate.signoff.remainingManualChecks = [
+    "Review and create the external status record without notifying subscribers.",
+    "Fernando reviews the retained recovery evidence and records approval or rejection.",
+  ];
+  return candidate;
+}
+
+function completeRecoveryRecord(): RecoveryRehearsalRecord {
+  const candidate = technicallyCompleteRecoveryRecord();
+  candidate.status = "complete";
+  candidate.blocker = null;
+  candidate.correction.statusRecordId = "status-record-qa019";
+  candidate.signoff.owner = "Fernando Baliño";
+  candidate.signoff.checkedAt = "2026-07-27T12:00:00-03:00";
+  candidate.signoff.remainingManualChecks = [];
+  return candidate;
+}
+
 test("checked external release records satisfy their fail-closed contracts", () => {
   assert.deepEqual(
     stagingSmokeErrors(stagingRecord as StagingSmokeRecord),
@@ -500,6 +542,194 @@ test("recovery cannot complete without a bad release and correction publication"
   candidate.status = "complete";
   candidate.blocker = null;
   assert.ok(recoveryRehearsalErrors(candidate).length > 0);
+});
+
+test("recovery can retain a technically complete run pending external status and owner review", () => {
+  assert.deepEqual(
+    recoveryRehearsalErrors(technicallyCompleteRecoveryRecord()),
+    [],
+  );
+});
+
+test("technically complete recovery requires all passing evidenced checks", () => {
+  const failed = technicallyCompleteRecoveryRecord();
+  failed.checks[0] = {
+    ...failed.checks[0],
+    status: "fail",
+  };
+  assert.match(
+    recoveryRehearsalErrors(failed).join("\n"),
+    /not a passing evidenced check/,
+  );
+
+  const missingEvidence = technicallyCompleteRecoveryRecord();
+  missingEvidence.checks[1] = {
+    ...missingEvidence.checks[1],
+    evidence: null,
+  };
+  assert.match(
+    recoveryRehearsalErrors(missingEvidence).join("\n"),
+    /not a passing evidenced check/,
+  );
+});
+
+test("technically complete recovery requires exact run and local correction identities", () => {
+  const mutations: Array<
+    [string, (record: RecoveryRehearsalRecord) => void, RegExp]
+  > = [
+    [
+      "deliberate release",
+      (record) => {
+        record.deliberatelyBadRelease = false;
+      },
+      /lacks deliberate bad release/,
+    ],
+    [
+      "candidate commit",
+      (record) => {
+        record.candidateCommit = "not-a-commit";
+      },
+      /lacks exact release\/recovery identities/,
+    ],
+    [
+      "deployment",
+      (record) => {
+        record.stagingDeploymentId = "preview-deployment";
+      },
+      /lacks exact release\/recovery identities/,
+    ],
+    [
+      "fixture",
+      (record) => {
+        record.defectFixture = " ";
+      },
+      /lacks exact release\/recovery identities/,
+    ],
+    [
+      "recovery mode",
+      (record) => {
+        record.recoveryMode = "restore_backup" as "forward_fix";
+      },
+      /lacks exact release\/recovery identities/,
+    ],
+    [
+      "recovered commit",
+      (record) => {
+        record.recoveredCommit = "3".repeat(39);
+      },
+      /lacks exact release\/recovery identities/,
+    ],
+    [
+      "recovered deployment",
+      (record) => {
+        record.recoveredDeploymentId = "preview-without-deployment-id";
+      },
+      /lacks exact release\/recovery identities/,
+    ],
+    [
+      "incident",
+      (record) => {
+        record.correction.incidentId = null;
+      },
+      /lacks incident\/correction\/changelog evidence/,
+    ],
+    [
+      "changelog",
+      (record) => {
+        record.correction.changelogPath = null;
+      },
+      /lacks incident\/correction\/changelog evidence/,
+    ],
+    [
+      "changelog outside QA-019 evidence",
+      (record) => {
+        record.correction.changelogPath = "/tmp/qa019-changelog.md";
+      },
+      /lacks incident\/correction\/changelog evidence/,
+    ],
+    [
+      "correction record",
+      (record) => {
+        record.correction.correctionRecordId = " ";
+      },
+      /lacks incident\/correction\/changelog evidence/,
+    ],
+  ];
+
+  for (const [label, mutate, expected] of mutations) {
+    const candidate = technicallyCompleteRecoveryRecord();
+    mutate(candidate);
+    assert.match(
+      recoveryRehearsalErrors(candidate).join("\n"),
+      expected,
+      label,
+    );
+  }
+});
+
+test("technically complete recovery keeps external status and owner sign-off pending", () => {
+  const wrongBlocker = technicallyCompleteRecoveryRecord();
+  wrongBlocker.blocker = "owner_post_run_signoff";
+  assert.match(
+    recoveryRehearsalErrors(wrongBlocker).join("\n"),
+    /must name the status-record and owner sign-off blocker/,
+  );
+
+  const externalStatus = technicallyCompleteRecoveryRecord();
+  externalStatus.correction.statusRecordId = "invented-status-record";
+  assert.match(
+    recoveryRehearsalErrors(externalStatus).join("\n"),
+    /must not fabricate an external status record/,
+  );
+
+  const signed = technicallyCompleteRecoveryRecord();
+  signed.signoff.owner = "Fernando Baliño";
+  signed.signoff.checkedAt = "2026-07-27T12:00:00-03:00";
+  assert.match(
+    recoveryRehearsalErrors(signed).join("\n"),
+    /must not fabricate owner sign-off/,
+  );
+
+  const noManualReview = technicallyCompleteRecoveryRecord();
+  noManualReview.signoff.remainingManualChecks = [];
+  assert.match(
+    recoveryRehearsalErrors(noManualReview).join("\n"),
+    /remaining owner and status-record review/,
+  );
+
+  const ownerOnly = technicallyCompleteRecoveryRecord();
+  ownerOnly.signoff.remainingManualChecks = [
+    "Fernando reviews the retained recovery evidence.",
+  ];
+  assert.match(
+    recoveryRehearsalErrors(ownerOnly).join("\n"),
+    /remaining owner and status-record review/,
+  );
+});
+
+test("complete recovery requires a real status record and dated owner sign-off", () => {
+  assert.deepEqual(recoveryRehearsalErrors(completeRecoveryRecord()), []);
+
+  const noStatus = completeRecoveryRecord();
+  noStatus.correction.statusRecordId = null;
+  assert.match(
+    recoveryRehearsalErrors(noStatus).join("\n"),
+    /lacks a real external status record/,
+  );
+
+  const noOwner = completeRecoveryRecord();
+  noOwner.signoff.owner = null;
+  assert.match(
+    recoveryRehearsalErrors(noOwner).join("\n"),
+    /lacks dated owner sign-off/,
+  );
+
+  const invalidDate = completeRecoveryRecord();
+  invalidDate.signoff.checkedAt = "not-a-date";
+  assert.match(
+    recoveryRehearsalErrors(invalidDate).join("\n"),
+    /lacks dated owner sign-off/,
+  );
 });
 
 test("pending records reject fabricated provider evidence", () => {

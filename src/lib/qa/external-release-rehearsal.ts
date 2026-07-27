@@ -112,8 +112,8 @@ export const RECOVERY_CHECK_IDS = [
   "verify-artifact-state",
   "verify-version-metadata",
   "publish-correction-record",
-  "publish-status-and-changelog",
-  "resume-after-verification",
+  "retain-local-changelog",
+  "keep-jobs-quiesced",
 ] as const;
 
 type CheckStatus = "not_run" | "pass" | "fail";
@@ -121,7 +121,10 @@ type StagingRunStatus =
   | "pending_external_authority"
   | "run_complete_pending_owner_signoff"
   | "complete";
-type RecoveryRunStatus = "pending_external_authority" | "complete";
+type RecoveryRunStatus =
+  | "pending_external_authority"
+  | "run_complete_pending_owner_signoff"
+  | "complete";
 type StagingRuntimeProofMode =
   | "deployment_env_pull"
   | "exact_preview_runtime";
@@ -203,6 +206,7 @@ export interface RecoveryRehearsalRecord {
   defectFixture: string | null;
   recoveryMode: "instant_rollback" | "forward_fix" | null;
   recoveredCommit: string | null;
+  recoveredDeploymentId: string | null;
   checks: CheckRecord[];
   correction: {
     incidentId: string | null;
@@ -690,6 +694,15 @@ export function recoveryRehearsalErrors(record: RecoveryRehearsalRecord) {
     errors.push(`unexpected recovery schema ${record.schemaVersion}`);
   }
   if (record.taskId !== "QA-019") errors.push("recovery record must own QA-019");
+  if (
+    ![
+      "pending_external_authority",
+      "run_complete_pending_owner_signoff",
+      "complete",
+    ].includes(record.status)
+  ) {
+    errors.push(`unexpected recovery status ${record.status}`);
+  }
   if (record.status === "pending_external_authority") {
     if (record.blocker !== "owner_platform_staging_authority") {
       errors.push("pending recovery record must name its authority blocker");
@@ -701,6 +714,7 @@ export function recoveryRehearsalErrors(record: RecoveryRehearsalRecord) {
       record.defectFixture !== null ||
       record.recoveryMode !== null ||
       record.recoveredCommit !== null ||
+      record.recoveredDeploymentId !== null ||
       Object.values(record.correction).some((value) => value !== null) ||
       record.signoff.owner !== null ||
       record.signoff.checkedAt !== null
@@ -708,24 +722,78 @@ export function recoveryRehearsalErrors(record: RecoveryRehearsalRecord) {
       errors.push("pending recovery record must not contain invented run evidence");
     }
   } else {
-    if (record.blocker !== null) errors.push("complete recovery record retains blocker");
     if (!record.deliberatelyBadRelease) {
-      errors.push("complete recovery record lacks deliberate bad release");
+      errors.push("completed recovery run lacks deliberate bad release");
     }
     if (
       !isCommit(record.candidateCommit) ||
-      !record.stagingDeploymentId ||
-      !record.defectFixture ||
-      !record.recoveryMode ||
-      !isCommit(record.recoveredCommit)
+      !isVercelDeploymentId(record.stagingDeploymentId) ||
+      !record.defectFixture?.trim() ||
+      !["instant_rollback", "forward_fix"].includes(
+        record.recoveryMode ?? "",
+      ) ||
+      !isCommit(record.recoveredCommit) ||
+      !isVercelDeploymentId(record.recoveredDeploymentId)
     ) {
-      errors.push("complete recovery record lacks release/recovery identities");
+      errors.push(
+        "completed recovery run lacks exact release/recovery identities",
+      );
     }
-    if (Object.values(record.correction).some((value) => !value?.trim())) {
-      errors.push("complete recovery record lacks correction/status/changelog evidence");
+    const changelogPath = record.correction.changelogPath?.trim();
+    if (
+      !record.correction.incidentId?.trim() ||
+      !changelogPath ||
+      !changelogPath.startsWith("plan/evidence/QA-019/") ||
+      changelogPath.includes("..") ||
+      !record.correction.correctionRecordId?.trim()
+    ) {
+      errors.push(
+        "completed recovery run lacks incident/correction/changelog evidence",
+      );
     }
-    if (!record.signoff.owner || !isTimestamp(record.signoff.checkedAt)) {
-      errors.push("complete recovery record lacks dated owner sign-off");
+
+    if (record.status === "run_complete_pending_owner_signoff") {
+      if (record.blocker !== "owner_status_record_and_post_run_signoff") {
+        errors.push(
+          "technically complete recovery record must name the status-record and owner sign-off blocker",
+        );
+      }
+      if (record.correction.statusRecordId !== null) {
+        errors.push(
+          "technically complete recovery record must not fabricate an external status record",
+        );
+      }
+      if (
+        record.signoff.owner !== null ||
+        record.signoff.checkedAt !== null
+      ) {
+        errors.push(
+          "technically complete recovery record must not fabricate owner sign-off",
+        );
+      }
+      const manualChecks = record.signoff.remainingManualChecks;
+      if (
+        manualChecks.length === 0 ||
+        manualChecks.some((item) => !item.trim()) ||
+        !manualChecks.some((item) => /(?:Fernando|owner)/i.test(item)) ||
+        !manualChecks.some((item) => /status(?:[- ]record)?/i.test(item))
+      ) {
+        errors.push(
+          "technically complete recovery record must identify the remaining owner and status-record review",
+        );
+      }
+    } else {
+      if (record.blocker !== null) {
+        errors.push("complete recovery record retains blocker");
+      }
+      if (!record.correction.statusRecordId?.trim()) {
+        errors.push(
+          "complete recovery record lacks a real external status record",
+        );
+      }
+      if (!record.signoff.owner || !isTimestamp(record.signoff.checkedAt)) {
+        errors.push("complete recovery record lacks dated owner sign-off");
+      }
     }
   }
   return errors;

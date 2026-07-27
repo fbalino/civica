@@ -363,6 +363,20 @@ const errors = [
   ).map((error) => `QA-018: ${error}`),
 ];
 
+if (recovery.status !== "pending_external_authority") {
+  const changelogPath = recovery.correction.changelogPath;
+  if (
+    !changelogPath ||
+    !changelogPath.startsWith("plan/evidence/QA-019/") ||
+    changelogPath.includes("..") ||
+    !existsSync(changelogPath)
+  ) {
+    errors.push(
+      "QA-019: completed technical run lacks its retained local correction changelog",
+    );
+  }
+}
+
 if (staging.status !== "pending_external_authority") {
   const attestation = staging.isolation.runtimeAttestation;
   const evidencePath = attestation?.evidencePath;

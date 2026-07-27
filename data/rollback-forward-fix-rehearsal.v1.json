@@ -9,6 +9,7 @@
   "defectFixture": null,
   "recoveryMode": null,
   "recoveredCommit": null,
+  "recoveredDeploymentId": null,
   "checks": [
     { "id": "detect-seeded-defect", "status": "not_run", "evidence": null },
     { "id": "quiesce-jobs", "status": "not_run", "evidence": null },
@@ -20,8 +21,8 @@
     { "id": "verify-artifact-state", "status": "not_run", "evidence": null },
     { "id": "verify-version-metadata", "status": "not_run", "evidence": null },
     { "id": "publish-correction-record", "status": "not_run", "evidence": null },
-    { "id": "publish-status-and-changelog", "status": "not_run", "evidence": null },
-    { "id": "resume-after-verification", "status": "not_run", "evidence": null }
+    { "id": "retain-local-changelog", "status": "not_run", "evidence": null },
+    { "id": "keep-jobs-quiesced", "status": "not_run", "evidence": null }
   ],
   "correction": {
     "incidentId": null,

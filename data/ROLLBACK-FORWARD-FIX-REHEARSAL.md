@@ -29,11 +29,27 @@ fact.
 5. Keep evidence-bearing schema/data in place; never reverse migrations or
    delete a frozen release to make the drill pass.
 6. Verify application, data, cache, artifact, and version identities.
-7. Exercise the real correction authority: create an incident/correction
-   record and the matching status/changelog evidence without notifying real
-   subscribers.
-8. Resume jobs only after every recovery check passes and Fernando signs off.
+7. Exercise the real local correction path: create an incident/correction
+   record and retain the matching changelog without notifying real subscribers
+   or fabricating an external status record.
+8. Keep jobs quiesced after technical verification. Resumption remains a
+   separate production action after Fernando signs off.
 
 All twelve closed check IDs in the JSON record must pass with evidence. The
-record rejects a `complete` status without a deliberate bad release, recovery
-identities, correction/status/changelog records, and dated owner sign-off.
+record has three fail-closed states:
+
+- `pending_external_authority` contains no run evidence and retains the
+  staging-authority blocker.
+- `run_complete_pending_owner_signoff` retains a completed isolated technical
+  run only when all twelve checks pass with evidence; the deliberate bad
+  release, exact staging and recovered commit/deployment identities, defect fixture, recovery
+  mode, incident/correction record, and local changelog are present. The
+  external `statusRecordId` and owner sign-off must remain null, the blocker is
+  `owner_status_record_and_post_run_signoff`, and the manual review list must
+  explicitly preserve both the status-record and Fernando review.
+- `complete` additionally requires a real external status record, no blocker,
+  and Fernando's dated sign-off.
+
+The intermediate state does not claim QA-019 is complete and does not authorize
+subscriber notification. It records only the technically agent-executable
+work while preserving the external publication and owner-decision boundary.
