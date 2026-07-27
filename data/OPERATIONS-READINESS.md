@@ -84,7 +84,7 @@ and P1 operational finding below is closed.
 
 ## Deployment, rollback, caches, and releases
 
-- `civica-deployment-rehearsal/v1` passes its local nine-migration staged-order,
+- `civica-deployment-rehearsal/v1` passes its local 18-migration staged-order,
   compatibility, abort, validation-only deployment, cache/release boundary,
   and forward-only recovery fixtures.
 - The 2026-07-26 isolated rehearsal migrated a disposable Neon child through
