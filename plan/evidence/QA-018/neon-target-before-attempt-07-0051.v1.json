@@ -1,0 +1,9 @@
+{
+  "projectId": "ancient-art-58836757",
+  "branchId": "br-gentle-paper-amsh6g7c",
+  "endpointId": "ep-holy-wave-amcnk005",
+  "hostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
+  "migrationHead": "0032_sparkling_genesis",
+  "ledgerPresent": true,
+  "writesPerformed": 0
+}

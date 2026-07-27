@@ -1,0 +1,19 @@
+{
+  "contract": "civica-conditions-release-expectations/v1",
+  "releaseId": "conditions-20260727-v1",
+  "releaseManifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+  "expectedCalculationCounts": {
+    "human_development": 51,
+    "peace_security": 50,
+    "economic_stability": 239
+  },
+  "databaseTarget": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-gentle-paper-amsh6g7c",
+    "endpointId": "ep-holy-wave-amcnk005",
+    "hostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
+    "migrationHead": "0051_eminent_jocasta",
+    "ledgerPresent": true,
+    "writesPerformed": 0
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "contract": "conditions-release-validation/v1",
+  "status": "pass",
+  "releaseId": "conditions-20260727-v1",
+  "methodologyVersion": "conditions-components/v1",
+  "manifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+  "manifestReplaySha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+  "counts": {
+    "calculations": 340,
+    "components": 818,
+    "scores": 101,
+    "referenceSets": 3,
+    "normalizationParameters": 5,
+    "sources": 3,
+    "retainedTablesWithTriggers": 6,
+    "mutationHistoryRows": 0
+  },
+  "dimensions": [
+    {
+      "dimension": "human_development",
+      "calculations": 51,
+      "aligned": 51,
+      "mixedYearRefused": 0,
+      "missingComponent": 0,
+      "components": 51,
+      "scores": 51,
+      "referenceSets": 1,
+      "normalizationParameters": 1
+    },
+    {
+      "dimension": "peace_security",
+      "calculations": 50,
+      "aligned": 50,
+      "mixedYearRefused": 0,
+      "missingComponent": 0,
+      "components": 50,
+      "scores": 50,
+      "referenceSets": 1,
+      "normalizationParameters": 1
+    },
+    {
+      "dimension": "economic_stability",
+      "calculations": 239,
+      "aligned": 162,
+      "mixedYearRefused": 6,
+      "missingComponent": 71,
+      "components": 717,
+      "scores": 0,
+      "referenceSets": 1,
+      "normalizationParameters": 3
+    }
+  ],
+  "externalExpectations": {
+    "releaseManifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+    "expectedCalculationCounts": {
+      "human_development": 51,
+      "peace_security": 50,
+      "economic_stability": 239
+    },
+    "storedManifestMatched": true,
+    "replayManifestMatched": true,
+    "calculationCountsMatched": true
+  },
+  "sourceFreshness": {
+    "policy": "immediate-post-release-exact-created-at/v1",
+    "globalMutableStateLimitation": "sources.last_sync_at is global mutable state; this gate is valid only immediately after release creation",
+    "requiredLastSyncAt": "2026-07-27T04:46:11.578Z",
+    "neverSynced": 0,
+    "exactReleaseTimestampMatches": 3,
+    "releaseTimestampMismatches": 0,
+    "earliestLastSyncAt": "2026-07-27T04:46:11.578Z",
+    "latestLastSyncAt": "2026-07-27T04:46:11.578Z",
+    "allExactlyAtRelease": true,
+    "allAtOrBeforeValidation": true
+  },
+  "replay": {
+    "calculationKeysReplayed": 340,
+    "calculationKeysMatched": 340,
+    "manifestMatched": true,
+    "retainedTablesCovered": true,
+    "mutationHistoryEmpty": true
+  },
+  "errorCount": 0,
+  "errorsTruncated": false,
+  "errors": [],
+  "expectationsArtifactSha256": "ea707e427b1c263596a2aa67124b2018350b50c9a325f6c0b052a2412b4ed05d",
+  "databaseTarget": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-gentle-paper-amsh6g7c",
+    "endpointId": "ep-holy-wave-amcnk005",
+    "hostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
+    "migrationHead": "0051_eminent_jocasta",
+    "ledgerPresent": true,
+    "writesPerformed": 0
+  }
+}

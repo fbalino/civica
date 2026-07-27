@@ -24,8 +24,17 @@ year, never pooled across years.
 
 ## Rollout boundary
 
-The configured database's authoritative ledger remains at `0032`. `0042`,
-the new explicit release-ID ingestion commands, and a reference-set inspection
-must first run on the disposable staging branch defined by PLT-019. ATL-027
-stays unchecked until that evidence and an authorized production promotion
-exist.
+The disposable QA-018 attempt-07 branch has now applied the complete
+authoritative tail through `0051_eminent_jocasta` and retained immutable
+release `conditions-20260727-v1`. The bound expectations artifact, stored and
+replayed manifest, three reference sets, five normalization-parameter rows,
+identical-input zero-write replay, and changed-manifest refusal all passed.
+See
+[`attempt-07-release-expectations-2026-07-27.v1.json`](attempt-07-release-expectations-2026-07-27.v1.json),
+[`attempt-07-release-validation.v1.json`](attempt-07-release-validation.v1.json),
+and
+[`../QA-018/attempt-07-conditions-release-2026-07-27.md`](../QA-018/attempt-07-conditions-release-2026-07-27.md).
+
+Production remains separately authority-gated. ATL-027 stays unchecked until
+the production ledger and public release pass the same manifest, replay,
+freshness, and immutability gates.

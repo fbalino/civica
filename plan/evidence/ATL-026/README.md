@@ -29,8 +29,16 @@ authoritative migration chain.
 
 ## Rollout boundary
 
-The configured Neon database remains at authoritative migration `0032`.
-`0040_closed_young_avengers`, Conditions ingestion, and an inspection of
-aligned/missing/mixed-year rows must first run in the isolated staging
-procedure recorded in `data/DEPLOYMENT-REHEARSAL.md`. A production migration
-requires Fernando's release authority. Until then, ATL-026 remains unchecked.
+The disposable QA-018 attempt-07 branch has now applied the complete
+authoritative tail through `0051_eminent_jocasta` and retained release
+`conditions-20260727-v1`: 340 calculations, 818 exact component rows, and 101
+scores, including 162 aligned, six mixed-year-refused, and 71 missing-component
+economic calculations. The immutable replay wrote zero score/component rows,
+and the post-refusal live validator remained unchanged. Bounded evidence is in
+[`../QA-018/attempt-07-conditions-release-2026-07-27.md`](../QA-018/attempt-07-conditions-release-2026-07-27.md)
+and
+[`../ATL-027/attempt-07-release-validation.v1.json`](../ATL-027/attempt-07-release-validation.v1.json).
+
+Production remains separately authority-gated. ATL-026 stays unchecked until
+the production ledger and selected public release pass the same live
+decomposition and public-read gates.
