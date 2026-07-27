@@ -1,8 +1,9 @@
 // Country engraving hero captions.
 // Each engraving in /public/engravings/countries/<iso3>.webp depicts the landmark
-// named below. This file is the caption record for the launch corpus; it is not
-// backed by a separate per-asset generation manifest (prompt/reference/model
-// history). See /licensing#imagery for the current imagery policy.
+// named below. The reconstructed per-asset manifest is generated at
+// src/lib/illustrations/illustration-manifest.generated.json. It records these
+// captions and all recoverable file/Git/edit provenance while leaving missing
+// prompt/reference/model history explicitly unknown. See /licensing#imagery.
 
 export const ENGRAVING_CAPTIONS: Record<string, string> = {
   afg: "The Minaret of Jam in a rugged mountain valley",

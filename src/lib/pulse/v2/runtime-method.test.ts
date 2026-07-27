@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.8-beta");
+  assert.equal(method.version, "pulse-v2.15-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -44,6 +44,34 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.equal(method.observability.absentNumericEffect, "withheld");
   assert.equal(method.observability.countryQualityInference, "prohibited");
   assert.equal(method.numericDeltas.trailingWindowDays, 365);
+  assert.equal(
+    method.numericDeltas.windowBoundary,
+    "inclusive_365_days_future_excluded",
+  );
+  assert.equal(
+    method.numericDeltas.noEventState,
+    "zero_tombstone_internal_public_null",
+  );
+  assert.equal(
+    method.numericDeltas.outputHistory,
+    "append_only_per_score_run_jurisdiction_dimension",
+  );
+  assert.equal(
+    method.numericDeltas.writeAtomicity,
+    "history_projection_and_run_completion_one_transaction",
+  );
+  assert.equal(
+    method.numericDeltas.absorptionEvidence,
+    "append_only_explicit_event_link_fixed_scale",
+  );
+  assert.equal(
+    method.numericDeltas.currentAbsorptionStanding,
+    "none_no_sequential_comparable_release",
+  );
+  assert.equal(
+    method.numericDeltas.absorbedIntoIndexPolicy,
+    "separate_versioned_decision_never_mutates_corroboration",
+  );
   assert.equal(method.evaluation.backtestMatchesCurrentProduction, false);
   assert.equal(
     method.evaluation.currentProductionValidatedByExistingBacktest,
@@ -70,6 +98,18 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.equal(
     method.corroboration.informationEnvironment.productionUse,
     "disabled_pending_rights_and_validation",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.coveragePolicy,
+    "one_observed_or_missing_row_per_supported_jurisdiction",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.rerunPolicy,
+    "classification_pin_is_append_only",
+  );
+  assert.equal(
+    method.corroboration.informationEnvironment.observabilityUse,
+    "disabled_until_rights_and_validation_pass",
   );
   assert.equal(
     method.corroboration.informationEnvironment.missingValuePolicy,
@@ -101,7 +141,10 @@ test("current contract states the non-negotiable publication boundaries", () => 
     method.providers.subject.attributionVersion,
     "pulse-jurisdiction-attribution/v2",
   );
-  assert.deepEqual(method.providers.subject.acceptedScopes, ["single", "multi"]);
+  assert.deepEqual(method.providers.subject.acceptedScopes, [
+    "single",
+    "multi",
+  ]);
   assert.equal(
     method.providers.subject.inputContext,
     "human_readable_versioned_entity_candidates",
@@ -172,8 +215,37 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
   );
   assert.equal(providers.classify.degradedRunsRecorded, false);
   assert.equal(providers.classify.successfulProviderRunsRecorded, true);
-  assert.equal(providers.classify.configuredProviderSetPersisted, false);
+  assert.equal(providers.classify.configuredProviderSetPersisted, true);
   assert.equal(providers.classify.providerFailuresPersisted, false);
+  assert.equal(
+    providers.classify.agreementEvidence,
+    "stored_provider_distinct_prompt_versioned_classify_runs",
+  );
+  assert.equal(providers.classify.singleEnginePublication, "queue_only");
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.publicationPolicy.automaticEligibility,
+    "stored_ensemble_and_gate_and_resolved_subject",
+  );
+  assert.equal(
+    providers.classify.stateSchemaVersion,
+    "pulse-classification-state/v1",
+  );
+  assert.deepEqual(providers.classify.statuses, [
+    "classified",
+    "none",
+    "retryable_failure",
+    "terminal_failure",
+  ]);
+  assert.equal(
+    providers.classify.queueOrder,
+    "new_then_due_retry_oldest_first",
+  );
+  assert.equal(
+    providers.classify.retryExhaustionDisposition,
+    "terminal_failure",
+  );
+  assert.equal(providers.classify.noneDisposition, "terminal_none_not_failure");
+  assert.equal(providers.classify.retryPolicy.maxAttempts, 3);
   assert.equal(
     providers.verify.malformedVerdictOrAxesPolicy,
     "reject_as_failed_objection",
@@ -238,6 +310,28 @@ test("review gates encode the actual ensemble boolean logic", () => {
     reviewStatus: "rejected",
     humanReviewed: false,
   });
+  assert.deepEqual(policy.states.legacyQuarantined, {
+    published: false,
+    reviewStatus: "legacy_quarantined",
+    humanReviewed: false,
+  });
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.version,
+    "pulse-review-sla/v1",
+  );
+  assert.deepEqual(CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.targets, {
+    critical: { escalationAfterMs: 0, dueAfterMs: 86_400_000 },
+    urgent: { escalationAfterMs: 86_400_000, dueAfterMs: 259_200_000 },
+    standard: { escalationAfterMs: 432_000_000, dueAfterMs: 604_800_000 },
+  });
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.dailyCompletenessRule,
+    "withheld_on_breach_or_unknown",
+  );
+  assert.equal(
+    CURRENT_PULSE_RUNTIME_METHOD.reviewServiceLevel.reportClockArithmetic,
+    "explicit_timestamp_cast_before_interval",
+  );
 });
 
 test("daily cadence includes corroboration and scoring in the score route", () => {

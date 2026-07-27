@@ -24,17 +24,29 @@
  * The World's Constitutions to Read, Search, and Compare."
  */
 import { parse, type HTMLElement, type Node } from "node-html-parser";
+import type { BatchItem } from "drizzle-orm/batch";
 
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
   constitutions,
+  constitutionPassages,
   constitutionTopicExcerpts,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { getTopicLabel } from "./topics";
+import {
+  CONSTITUTION_PASSAGE_LANGUAGE,
+  CONSTITUTION_PASSAGE_LANGUAGE_BASIS,
+  CONSTITUTION_PASSAGE_SCHEMA_VERSION,
+  CONSTITUTION_PASSAGE_TRANSLATION_STATUS,
+  CONSTITUTION_SEARCH_INDEX_VERSION,
+  constituteDocumentUrl,
+  constituteRetrievalUrl,
+  prepareConstitutionPassages,
+} from "@/lib/constitution/passage-index";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -298,13 +310,15 @@ function ownText(sec: HTMLElement): string {
 function topicKeysFromSection(sec: HTMLElement): string[] {
   const raw = sec.getAttribute("data-topics");
   if (!raw) return [];
-  return raw
-    .split(",")
-    .map((uri) => uri.trim())
-    .filter(Boolean)
-    // "…/ontology/lhterm" → "lhterm"
-    .map((uri) => uri.split("/").pop() ?? "")
-    .filter(Boolean);
+  return (
+    raw
+      .split(",")
+      .map((uri) => uri.trim())
+      .filter(Boolean)
+      // "…/ontology/lhterm" → "lhterm"
+      .map((uri) => uri.split("/").pop() ?? "")
+      .filter(Boolean)
+  );
 }
 
 /**
@@ -617,6 +631,7 @@ export async function upsertConstitution(
     yearUpdated: number | null;
     fullTextHtml: string;
     structuredArticles: StructuredArticle[];
+    retrievedAt?: Date;
   },
 ): Promise<string> {
   const existing = await db
@@ -631,7 +646,7 @@ export async function upsertConstitution(
     yearUpdated: values.yearUpdated,
     fullTextHtml: values.fullTextHtml,
     structuredArticles: values.structuredArticles,
-    lastFetched: new Date(),
+    lastFetched: values.retrievedAt ?? new Date(),
   };
 
   if (existing.length > 0) {
@@ -647,6 +662,115 @@ export async function upsertConstitution(
     .values({ jurisdictionId, ...row })
     .returning({ id: constitutions.id });
   return inserted[0].id;
+}
+
+export interface ReplaceConstitutionPassagesResult {
+  current: number;
+  written: number;
+  superseded: number;
+}
+
+/**
+ * Atomically replace the current passage projection while retaining every
+ * superseded, content-bound passage id for stable citation resolution.
+ */
+export async function replaceCurrentConstitutionPassages(
+  db: ConstituteSyncDb,
+  input: {
+    constitutionId: string;
+    jurisdictionId: string;
+    sourceDocumentId: string;
+    retrievedAt: Date;
+    articles: StructuredArticle[];
+  },
+): Promise<ReplaceConstitutionPassagesResult> {
+  const prepared = prepareConstitutionPassages(
+    input.sourceDocumentId,
+    input.articles,
+  );
+  const current = await db
+    .select({ passageId: constitutionPassages.passageId })
+    .from(constitutionPassages)
+    .where(
+      and(
+        eq(constitutionPassages.constitutionId, input.constitutionId),
+        eq(constitutionPassages.isCurrent, true),
+      ),
+    );
+  const currentIds = current.map((row) => row.passageId).sort();
+  const nextIds = prepared.map((row) => row.passageId).sort();
+  if (
+    currentIds.length === nextIds.length &&
+    currentIds.every((id, index) => id === nextIds[index])
+  ) {
+    return { current: prepared.length, written: 0, superseded: 0 };
+  }
+
+  const sourceUrl = constituteDocumentUrl(input.sourceDocumentId);
+  const retrievalUrl = constituteRetrievalUrl(input.sourceDocumentId);
+  const now = input.retrievedAt;
+
+  const rows = prepared.map((passage) => ({
+    ...passage,
+    schemaVersion: CONSTITUTION_PASSAGE_SCHEMA_VERSION,
+    searchIndexVersion: CONSTITUTION_SEARCH_INDEX_VERSION,
+    constitutionId: input.constitutionId,
+    jurisdictionId: input.jurisdictionId,
+    sourceDocumentId: input.sourceDocumentId,
+    languageCode: CONSTITUTION_PASSAGE_LANGUAGE,
+    languageBasis: CONSTITUTION_PASSAGE_LANGUAGE_BASIS,
+    translationStatus: CONSTITUTION_PASSAGE_TRANSLATION_STATUS,
+    originalLanguageCode: null,
+    translator: null,
+    sourceId: CONSTITUTE_SOURCE_ID,
+    sourceUrl,
+    retrievalUrl,
+    retrievedAt: now,
+    isCurrent: true,
+    supersededAt: null,
+  }));
+
+  const operations: BatchItem<"pg">[] = [
+    db
+      .update(constitutionPassages)
+      .set({ isCurrent: false, supersededAt: now })
+      .where(
+        and(
+          eq(constitutionPassages.constitutionId, input.constitutionId),
+          eq(constitutionPassages.isCurrent, true),
+        ),
+      ),
+  ];
+  for (let offset = 0; offset < rows.length; offset += 100) {
+    const batch = rows.slice(offset, offset + 100);
+    operations.push(
+      db.insert(constitutionPassages).values(batch).onConflictDoNothing(),
+    );
+  }
+  for (let offset = 0; offset < nextIds.length; offset += 500) {
+    const batch = nextIds.slice(offset, offset + 500);
+    operations.push(
+      db
+        .update(constitutionPassages)
+        .set({ isCurrent: true, supersededAt: null })
+        .where(
+          and(
+            inArray(constitutionPassages.passageId, batch),
+            eq(constitutionPassages.isCurrent, false),
+          ),
+        ),
+    );
+  }
+  const [first, ...rest] = operations;
+  if (first) {
+    await db.batch([first, ...rest] as [BatchItem<"pg">, ...BatchItem<"pg">[]]);
+  }
+
+  return {
+    current: prepared.length,
+    written: prepared.length,
+    superseded: currentIds.filter((id) => !nextIds.includes(id)).length,
+  };
 }
 
 /**
@@ -850,8 +974,7 @@ export async function syncConstitutions(
         (n, a) => n + (a.excerptHtml ? a.topics.length : 0),
         0,
       );
-      for (const a of articles)
-        for (const t of a.topics) seenTopicKeys.add(t);
+      for (const a of articles) for (const t of a.topics) seenTopicKeys.add(t);
 
       const result: CountryResult = {
         slug: j.slug,
@@ -876,6 +999,7 @@ export async function syncConstitutions(
             html: sectionHtml,
           }),
         );
+        const retrievedAt = new Date();
         const constitutionId = await withRetry(
           () =>
             upsertConstitution(db, j.id, {
@@ -884,6 +1008,7 @@ export async function syncConstitutions(
               yearUpdated: toYear(row.year_updated),
               fullTextHtml: html,
               structuredArticles: storedArticles,
+              retrievedAt,
             }),
           {
             label: `upsert ${row.id}`,
@@ -892,8 +1017,7 @@ export async function syncConstitutions(
           },
         );
         const written = await withRetry(
-          () =>
-            replaceTopicExcerpts(db, j.id, constitutionId, articles),
+          () => replaceTopicExcerpts(db, j.id, constitutionId, articles),
           {
             label: `excerpts ${row.id}`,
             log,
@@ -901,6 +1025,21 @@ export async function syncConstitutions(
           },
         );
         result.excerptCount = written;
+        await withRetry(
+          () =>
+            replaceCurrentConstitutionPassages(db, {
+              constitutionId,
+              jurisdictionId: j.id,
+              sourceDocumentId: row.id,
+              retrievedAt,
+              articles: storedArticles,
+            }),
+          {
+            label: `passages ${row.id}`,
+            log,
+            isRetryable: isRetryableDbError,
+          },
+        );
         summary.written++;
       }
 
@@ -943,13 +1082,16 @@ export function reportSyncSummary(
   log(`  In-force constitutions (Constitute): ${summary.inForceTotal}`);
   log(`  Matched to a Civica jurisdiction:    ${summary.matched}`);
   log(`  Considered this run:                 ${summary.considered}`);
-  if (!summary.dryRun) log(`  Written (constitutions rows):        ${summary.written}`);
+  if (!summary.dryRun)
+    log(`  Written (constitutions rows):        ${summary.written}`);
   log(`  Structured articles parsed:          ${summary.articlesTotal}`);
   log(`  Topic excerpts:                      ${summary.excerptsTotal}`);
   log(`  Distinct topic keys seen:            ${summary.distinctTopicKeys}`);
 
   if (summary.unmatched.length > 0) {
-    log(`\n  UNMATCHED countries (${summary.unmatched.length}) — no Civica jurisdiction:`);
+    log(
+      `\n  UNMATCHED countries (${summary.unmatched.length}) — no Civica jurisdiction:`,
+    );
     for (const u of summary.unmatched)
       log(`    · ${u.country} (${u.countryId}, isocode ${u.isocode ?? "—"})`);
   }

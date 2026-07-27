@@ -13,6 +13,8 @@ import {
   ORG_TYPE_COLOR,
   ORG_TYPE_LABEL,
 } from "./organizations";
+import { SourceDot } from "@/components/SourceDot";
+import "@/app/organizations-section.css";
 
 const ORG_MAP_MARKER_COORDS: Record<string, [number, number]> = {
   and: [1.52, 42.51],
@@ -65,16 +67,23 @@ export function OrgDetailPanel({
   const typeVar = ORG_TYPE_COLOR[o.type];
   const typeLabel = ORG_TYPE_LABEL[o.type];
 
-  const founding = detail.members.filter(
+  // ATL-012 — dated relationships, not timeless facts: a membership row can
+  // be historical (status: "withdrawn"). The stat band, map fill, and
+  // regional breakdown all describe the CURRENT footprint; the full roster
+  // below (including withdrawn rows) is where the dated history lives.
+  const currentMembers = detail.members.filter((m) => m.status !== "withdrawn");
+  const formerMembers = detail.members.filter((m) => m.status === "withdrawn");
+
+  const founding = currentMembers.filter(
     (m) => (m.role ?? "").toLowerCase() === "founding",
   ).length;
-  const observers = detail.members.filter(
+  const observers = currentMembers.filter(
     (m) => (m.role ?? "").toLowerCase() === "observer",
   ).length;
 
-  const memberIds = new Set(detail.members.map((m) => m.id));
+  const memberIds = new Set(currentMembers.map((m) => m.id));
   const memberBySlug = new Map(detail.members.map((m) => [m.slug, m]));
-  const highlightedCount = detail.members.length;
+  const highlightedCount = currentMembers.length;
   const mappedMemberIds = new Set(
     mapLoaded
       ? mapPaths
@@ -82,7 +91,7 @@ export function OrgDetailPanel({
           .filter((id): id is string => !!id && memberIds.has(id))
       : Object.keys(WORLD_PATHS).filter((id) => memberIds.has(id)),
   );
-  const markerMembers = detail.members
+  const markerMembers = currentMembers
     .filter((m) => !mappedMemberIds.has(m.id) && ORG_MAP_MARKER_COORDS[m.id])
     .map((m) => {
       const [lon, lat] = ORG_MAP_MARKER_COORDS[m.id];
@@ -91,11 +100,11 @@ export function OrgDetailPanel({
     });
 
   const regionCounts = new Map<string, number>();
-  for (const m of detail.members) {
+  for (const m of currentMembers) {
     regionCounts.set(m.region, (regionCounts.get(m.region) ?? 0) + 1);
   }
   const regionOrder = ["Americas", "Europe", "Africa", "Asia", "Oceania"];
-  const totalMembers = detail.members.length || 1;
+  const totalMembers = currentMembers.length || 1;
 
   const foundedLine = o.foundedYear ? `FOUNDED ${o.foundedYear}` : null;
   const hqLine = o.hqCountry ? `HQ ${o.hqCountry.toUpperCase()}` : null;
@@ -126,9 +135,7 @@ export function OrgDetailPanel({
             {eyebrowTail ? <> &middot; {eyebrowTail}</> : null}
           </div>
           <h1>{o.name}</h1>
-          <div className="full">
-            {o.fullName}
-          </div>
+          <div className="full">{o.fullName}</div>
           {o.description ? <div className="desc">{o.description}</div> : null}
           <div className="org-masthead-chips">
             <span className="type-chip">
@@ -162,10 +169,17 @@ export function OrgDetailPanel({
             <div className="k">Founding shown</div>
             <div className="v">{founding}</div>
           </div>
-          <div className="cell">
-            <div className="k">Observers shown</div>
-            <div className="v">{observers}</div>
-          </div>
+          {formerMembers.length > 0 ? (
+            <div className="cell">
+              <div className="k">Former members</div>
+              <div className="v">{formerMembers.length}</div>
+            </div>
+          ) : (
+            <div className="cell">
+              <div className="k">Observers shown</div>
+              <div className="v">{observers}</div>
+            </div>
+          )}
         </Reveal>
 
         <div className="intl-section-head">
@@ -180,74 +194,74 @@ export function OrgDetailPanel({
             preserveAspectRatio="xMidYMid meet"
             className="org-mini-map"
           >
-          {mapLoaded
-            ? mapPaths.map((p, i) => {
-                const isMember = !!(p.id && memberIds.has(p.id));
-                return (
-                  <path
-                    key={i}
-                    d={p.d}
-                    data-id={p.id || undefined}
-                    className={isMember ? "member" : ""}
-                    style={{
-                      fill: isMember ? typeVar : "var(--atlas-paper-3)",
-                      stroke: "var(--atlas-paper)",
-                      strokeWidth: 0.6,
-                      opacity: isMember ? 0.9 : 0.4,
-                      cursor: isMember && p.id ? "pointer" : "default",
-                    }}
-                    onClick={() => {
-                      if (isMember && p.id) {
-                        const m = detail.members.find((mm) => mm.id === p.id);
-                        if (m) goToCountry(m.slug);
-                      }
-                    }}
-                  />
-                );
-              })
-            : Object.entries(WORLD_PATHS).map(([id, data]) => {
-                const isMember = memberIds.has(id);
-                return (
-                  <path
-                    key={id}
-                    d={data.d}
-                    style={{
-                      fill: isMember ? typeVar : "var(--atlas-paper-3)",
-                      stroke: "var(--atlas-paper)",
-                      strokeWidth: 0.6,
-                      opacity: isMember ? 0.9 : 0.4,
-                      cursor: isMember ? "pointer" : "default",
-                    }}
-                    onClick={() => {
-                      if (isMember) {
-                        const m = detail.members.find((mm) => mm.id === id);
-                        if (m) goToCountry(m.slug);
-                      }
-                    }}
-                  />
-                );
-              })}
-          <g className="org-map-markers" aria-hidden="true">
-            {markerMembers.map((m) => (
-              <circle
-                key={m.id}
-                data-id={m.id}
-                cx={m.x}
-                cy={m.y}
-                r={8}
-                className="member-marker"
-                style={{
-                  fill: typeVar,
-                  stroke: "var(--atlas-paper)",
-                  strokeWidth: 3,
-                  cursor: m.inAtlas ? "pointer" : "default",
-                }}
-                onClick={() => {
-                  if (m.inAtlas) goToCountry(m.slug);
-                }}
-              />
-            ))}
-          </g>
+            {mapLoaded
+              ? mapPaths.map((p, i) => {
+                  const isMember = !!(p.id && memberIds.has(p.id));
+                  return (
+                    <path
+                      key={i}
+                      d={p.d}
+                      data-id={p.id || undefined}
+                      className={isMember ? "member" : ""}
+                      style={{
+                        fill: isMember ? typeVar : "var(--atlas-paper-3)",
+                        stroke: "var(--atlas-paper)",
+                        strokeWidth: 0.6,
+                        opacity: isMember ? 0.9 : 0.4,
+                        cursor: isMember && p.id ? "pointer" : "default",
+                      }}
+                      onClick={() => {
+                        if (isMember && p.id) {
+                          const m = detail.members.find((mm) => mm.id === p.id);
+                          if (m) goToCountry(m.slug);
+                        }
+                      }}
+                    />
+                  );
+                })
+              : Object.entries(WORLD_PATHS).map(([id, data]) => {
+                  const isMember = memberIds.has(id);
+                  return (
+                    <path
+                      key={id}
+                      d={data.d}
+                      style={{
+                        fill: isMember ? typeVar : "var(--atlas-paper-3)",
+                        stroke: "var(--atlas-paper)",
+                        strokeWidth: 0.6,
+                        opacity: isMember ? 0.9 : 0.4,
+                        cursor: isMember ? "pointer" : "default",
+                      }}
+                      onClick={() => {
+                        if (isMember) {
+                          const m = detail.members.find((mm) => mm.id === id);
+                          if (m) goToCountry(m.slug);
+                        }
+                      }}
+                    />
+                  );
+                })}
+            <g className="org-map-markers" aria-hidden="true">
+              {markerMembers.map((m) => (
+                <circle
+                  key={m.id}
+                  data-id={m.id}
+                  cx={m.x}
+                  cy={m.y}
+                  r={8}
+                  className="member-marker"
+                  style={{
+                    fill: typeVar,
+                    stroke: "var(--atlas-paper)",
+                    strokeWidth: 3,
+                    cursor: m.inAtlas ? "pointer" : "default",
+                  }}
+                  onClick={() => {
+                    if (m.inAtlas) goToCountry(m.slug);
+                  }}
+                />
+              ))}
+            </g>
           </svg>
         </Reveal>
 
@@ -258,90 +272,132 @@ export function OrgDetailPanel({
           as="div"
           className="org-region-grid"
           amount={0.3}
-          style={{
-            "--org-region-cols":
-              regionOrder.filter((r) => regionCounts.get(r)).length || 1,
-          } as CSSProperties}
+          style={
+            {
+              "--org-region-cols":
+                regionOrder.filter((r) => regionCounts.get(r)).length || 1,
+            } as CSSProperties
+          }
         >
-        {regionOrder.map((r) => {
-          const ct = regionCounts.get(r);
-          if (!ct) return null;
-          const pct = Math.round((ct / totalMembers) * 100);
-          return (
-            <div key={r} className="org-region-card">
-              <div className="org-region-label">
-                {r}
+          {regionOrder.map((r) => {
+            const ct = regionCounts.get(r);
+            if (!ct) return null;
+            const pct = Math.round((ct / totalMembers) * 100);
+            return (
+              <div key={r} className="org-region-card">
+                <div className="org-region-label">{r}</div>
+                <div className="org-region-value">
+                  {ct} <span>&middot; {pct}%</span>
+                </div>
+                <div className="org-region-bar">
+                  <div
+                    style={{
+                      width: `${pct}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="org-region-value">
-                {ct}{" "}
-                <span>
-                  &middot; {pct}%
-                </span>
-              </div>
-              <div className="org-region-bar">
-                <div
-                  style={{
-                    width: `${pct}%`,
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </Reveal>
 
         <div className="intl-section-head">
-          Members <span>join year ascending</span>
+          Members{" "}
+          <span>
+            join year ascending
+            {formerMembers.length > 0
+              ? ` · ${formerMembers.length} no longer members`
+              : ""}
+          </span>
         </div>
-        <Reveal as="div" className="intl-mem-list intl-mem-list--org" amount={0.1}>
+        <Reveal
+          as="div"
+          className="intl-mem-list intl-mem-list--org"
+          amount={0.1}
+        >
           <div className="intl-mem-group">
             {sortedMembers.map((m) => {
-            const role = (m.role ?? "").toLowerCase();
-            const isP5 = o.type === "un" && role === "permanent";
-            const badgeClass =
-              role === "founding"
-                ? "role-badge founding"
-                : isP5
-                  ? "role-badge p5"
-                  : role === "observer"
-                    ? "role-badge observer"
-                    : role
-                      ? "role-badge"
-                      : "";
-            const rowContent = (
-              <>
-                <span className="dot" style={{ background: typeVar }} />
-                <span className="name">
-                  {m.name}
-                  <span className="full">
-                    {m.region} &middot; {m.id.toUpperCase()}
+              const role = (m.role ?? "").toLowerCase();
+              const isP5 = o.type === "un" && role === "permanent";
+              // ATL-012 — status/endYear render as an explicit "Withdrawn"
+              // badge and a joinYear–endYear range, never silently as a
+              // present-tense member.
+              const isHistorical = m.status === "withdrawn";
+              const badgeParts: string[] = [];
+              if (isP5) badgeParts.push("P5");
+              else if (m.role) badgeParts.push(m.role);
+              if (isHistorical) badgeParts.push("Withdrawn");
+              const badgeClass = [
+                "role-badge",
+                role === "founding" ? "founding" : "",
+                isP5 ? "p5" : "",
+                role === "observer" ? "observer" : "",
+                isHistorical ? "historical" : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+              const yearLabel =
+                isHistorical && m.endYear
+                  ? `${m.joinYear ?? "—"}–${m.endYear}`
+                  : (m.joinYear ?? "—");
+              const rowClass = `intl-mem-row${isHistorical ? " intl-mem-row--historical" : ""}`;
+              const rowContent = (
+                <>
+                  <span className="dot" style={{ background: typeVar }} />
+                  <span className="name">
+                    {m.name}
+                    <span className="full">
+                      {m.region} &middot; {m.id.toUpperCase()}
+                    </span>
                   </span>
-                </span>
-                <span className="year">{m.joinYear ?? "—"}</span>
-                {m.role ? (
-                  <span className={badgeClass}>{isP5 ? "P5" : m.role}</span>
-                ) : null}
-              </>
-            );
-            return m.inAtlas ? (
-              <Link
-                key={m.id}
-                href={`/country/${m.slug}`}
-                className="intl-mem-row"
-              >
-                {rowContent}
-              </Link>
-            ) : (
-              <div
-                key={m.id}
-                className="intl-mem-row intl-mem-row--static"
-              >
-                {rowContent}
-              </div>
-            );
+                  <span className="year">{yearLabel}</span>
+                  {badgeParts.length > 0 ? (
+                    <span className={badgeClass}>{badgeParts.join(" · ")}</span>
+                  ) : null}
+                </>
+              );
+              return m.inAtlas ? (
+                <Link
+                  key={m.id}
+                  href={`/country/${m.slug}`}
+                  className={rowClass}
+                >
+                  {rowContent}
+                </Link>
+              ) : (
+                <div key={m.id} className={`${rowClass} intl-mem-row--static`}>
+                  {rowContent}
+                </div>
+              );
             })}
           </div>
         </Reveal>
+
+        <div className="org-section-source">
+          <SourceDot
+            source="civica_organization_roster_v1"
+            retrievedAt={detail.membershipSource.retrievedAt}
+          />
+          <span>
+            {detail.membershipSource.coverage === "complete"
+              ? "Complete checked roster in this release. "
+              : "Selected checked memberships; an absent country is not a non-membership claim. "}
+            Source:{" "}
+            <a
+              href={detail.membershipSource.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {detail.membershipSource.label}
+            </a>
+            {" · retrieved "}
+            <time dateTime={detail.membershipSource.retrievedAt}>
+              July 2026
+            </time>
+            {" · "}
+            {detail.membershipSource.license}.
+          </span>
+        </div>
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-11T06:08:28.901Z",
+  "generatedAt": "2026-07-13T04:24:30.570Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -9,40 +9,196 @@
   },
   "domains": [
     {
-      "id": "elections",
-      "label": "Elections",
-      "recordLabel": "election records",
-      "recordCount": 909,
-      "jurisdictionsCovered": 193,
+      "id": "jurisdictions",
+      "label": "Countries and entities",
+      "recordLabel": "sovereign-state jurisdiction records",
+      "recordCount": 194,
+      "jurisdictionsCovered": 194,
       "completeness": [
         {
-          "field": "election_date",
-          "label": "Election date",
-          "complete": 909,
-          "total": 909,
+          "field": "slug",
+          "label": "Stable slug",
+          "complete": 194,
+          "total": 194,
           "percent": 100
         },
         {
-          "field": "election_type",
-          "label": "Election type",
-          "complete": 909,
-          "total": 909,
+          "field": "status_source_ids",
+          "label": "Status source ids",
+          "complete": 194,
+          "total": 194,
           "percent": 100
         },
         {
-          "field": "turnout_percent",
-          "label": "Turnout",
-          "complete": 340,
-          "total": 909,
-          "percent": 37.4
+          "field": "status_reviewed_at",
+          "label": "Status reviewed date",
+          "complete": 194,
+          "total": 194,
+          "percent": 100
+        },
+        {
+          "field": "status_note",
+          "label": "Status note",
+          "complete": 194,
+          "total": 194,
+          "percent": 100
         }
       ],
       "sources": [
         {
-          "id": "ipu_parline",
-          "label": "IPU Parline",
-          "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "id": "jurisdiction_status_catalog",
+          "label": "Civica jurisdiction-status catalog",
+          "family": "reviewed_curation",
+          "lastSuccessfulRun": "2026-07-10T00:00:00.000Z"
+        }
+      ],
+      "lastSuccessfulRun": "2026-07-10T00:00:00.000Z",
+      "knownGaps": [
+        "The headline denominator is the closed sovereign_state class; dependencies, territories, associated states, limited-recognition entities, disputed areas, special entities, and aggregates remain in the full 253-row identity catalog but outside this coverage rate."
+      ],
+      "threshold": {
+        "countryCoverageWarnBelow": 80,
+        "fieldCompletenessWarnBelow": 80,
+        "staleAfterDays": 180
+      },
+      "eligibleJurisdictions": 194,
+      "countryCoveragePercent": 100,
+      "alerts": [],
+      "status": "current",
+      "releaseReadiness": "meets_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
+    },
+    {
+      "id": "facts",
+      "label": "Canonical facts",
+      "recordLabel": "active source-fact observations",
+      "recordCount": 23985,
+      "jurisdictionsCovered": 194,
+      "completeness": [
+        {
+          "field": "source_id",
+          "label": "Source identifier",
+          "complete": 23985,
+          "total": 23985,
+          "percent": 100
+        },
+        {
+          "field": "value_state",
+          "label": "Valid value or absence state",
+          "complete": 23985,
+          "total": 23985,
+          "percent": 100
+        },
+        {
+          "field": "as_of",
+          "label": "Observation/reference date",
+          "complete": 16590,
+          "total": 23985,
+          "percent": 69.2
+        }
+      ],
+      "sources": [
+        {
+          "id": "cia_factbook",
+          "label": "CIA World Factbook",
+          "family": "cia_factbook",
+          "lastSuccessfulRun": "2026-05-04T19:07:06.840Z"
+        },
+        {
+          "id": "eurostat",
+          "label": "Eurostat",
+          "family": "eurostat",
+          "lastSuccessfulRun": "2026-07-09T16:00:31.488Z"
+        },
+        {
+          "id": "fao_faostat",
+          "label": "FAO FAOSTAT",
+          "family": "fao_faostat",
+          "lastSuccessfulRun": "2026-07-08T15:00:40.082Z"
+        },
+        {
+          "id": "ibge_br",
+          "label": "IBGE (Brazil)",
+          "family": "ibge_br",
+          "lastSuccessfulRun": "2026-07-11T22:00:41.551Z"
+        },
+        {
+          "id": "ilo_ilostat",
+          "label": "ILO ILOSTAT",
+          "family": "ilo_ilostat",
+          "lastSuccessfulRun": "2026-05-04T23:43:21.841Z"
+        },
+        {
+          "id": "imf_weo",
+          "label": "IMF World Economic Outlook",
+          "family": "imf_weo",
+          "lastSuccessfulRun": "2026-05-04T18:36:37.381Z"
+        },
+        {
+          "id": "insee_fr",
+          "label": "INSEE (France)",
+          "family": "insee_fr",
+          "lastSuccessfulRun": "2026-07-01T04:00:31.645Z"
+        },
+        {
+          "id": "oecd_stat",
+          "label": "OECD.Stat",
+          "family": "oecd_stat",
+          "lastSuccessfulRun": "2026-07-07T14:00:36.430Z"
+        },
+        {
+          "id": "ons_uk",
+          "label": "Office for National Statistics (UK)",
+          "family": "ons_uk",
+          "lastSuccessfulRun": "2026-07-11T19:00:39.117Z"
+        },
+        {
+          "id": "statcan_ca",
+          "label": "Statistics Canada",
+          "family": "statcan_ca",
+          "lastSuccessfulRun": "2026-07-11T21:00:47.479Z"
+        },
+        {
+          "id": "stats_sa",
+          "label": "Statistics South Africa",
+          "family": "stats_sa",
+          "lastSuccessfulRun": "2026-07-11T23:02:07.293Z"
+        },
+        {
+          "id": "un_data",
+          "label": "UN Statistics Division",
+          "family": "un_data",
+          "lastSuccessfulRun": "2026-07-03T11:00:30.886Z"
+        },
+        {
+          "id": "undp_hdi",
+          "label": "UNDP Human Development Reports",
+          "family": "undp_hdi",
+          "lastSuccessfulRun": "2026-07-06T13:01:02.332Z"
+        },
+        {
+          "id": "unesco_uis",
+          "label": "UNESCO Institute for Statistics",
+          "family": "unesco_uis",
+          "lastSuccessfulRun": "2026-07-04T12:01:01.840Z"
+        },
+        {
+          "id": "us_census",
+          "label": "US Census Bureau",
+          "family": "us_census",
+          "lastSuccessfulRun": "2026-05-05T04:47:39.950Z"
+        },
+        {
+          "id": "vdem",
+          "label": "V-Dem (Varieties of Democracy)",
+          "family": "vdem",
+          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
+        },
+        {
+          "id": "who_gho",
+          "label": "WHO Global Health Observatory",
+          "family": "who_gho",
+          "lastSuccessfulRun": "2026-07-02T10:02:48.297Z"
         },
         {
           "id": "wikidata",
@@ -51,15 +207,21 @@
           "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
         },
         {
-          "id": "international_idea",
-          "label": "International IDEA Voter Turnout Database",
-          "family": "international_idea",
-          "lastSuccessfulRun": "2026-07-05T15:22:35.000Z"
+          "id": "world_bank",
+          "label": "World Bank Open Data",
+          "family": "world_bank",
+          "lastSuccessfulRun": "2026-05-04T18:49:56.252Z"
+        },
+        {
+          "id": "wto_stats",
+          "label": "WTO Stats",
+          "family": "wto_stats",
+          "lastSuccessfulRun": "2026-05-05T01:13:11.931Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
+      "lastSuccessfulRun": "2026-07-11T23:02:07.293Z",
       "knownGaps": [
-        "Presidential, legislative, and turnout coverage have different publisher scopes; a jurisdiction count does not imply every election type or result field is present."
+        "Record presence is not equivalent to canonical selection or independent corroboration; the separate fact-provenance report measures resolver support, source depth, disputes, and staleness by fact key."
       ],
       "threshold": {
         "countryCoverageWarnBelow": 80,
@@ -67,56 +229,77 @@
         "staleAfterDays": 180
       },
       "eligibleJurisdictions": 194,
-      "countryCoveragePercent": 99.5,
+      "countryCoveragePercent": 100,
       "alerts": [
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Elections: Turnout is 37.4% complete; alert threshold is 80%."
+          "message": "Canonical facts: Observation/reference date is 69.2% complete; alert threshold is 80%."
         }
       ],
-      "status": "attention"
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
-      "id": "constitutions",
-      "label": "Constitutions",
-      "recordLabel": "constitution records",
-      "recordCount": 183,
-      "jurisdictionsCovered": 183,
+      "id": "government_bodies",
+      "label": "Government bodies",
+      "recordLabel": "government-body records",
+      "recordCount": 476,
+      "jurisdictionsCovered": 194,
       "completeness": [
         {
-          "field": "year",
-          "label": "Adoption year",
-          "complete": 183,
-          "total": 183,
+          "field": "name",
+          "label": "Body name",
+          "complete": 476,
+          "total": 476,
           "percent": 100
         },
         {
-          "field": "full_text_html",
-          "label": "Full text",
-          "complete": 183,
-          "total": 183,
+          "field": "body_type",
+          "label": "Body type",
+          "complete": 476,
+          "total": 476,
           "percent": 100
         },
         {
-          "field": "structured_articles",
-          "label": "Structured articles",
-          "complete": 183,
-          "total": 183,
+          "field": "branch",
+          "label": "Government branch",
+          "complete": 476,
+          "total": 476,
+          "percent": 100
+        },
+        {
+          "field": "hierarchy_level",
+          "label": "Hierarchy level",
+          "complete": 476,
+          "total": 476,
           "percent": 100
         }
       ],
       "sources": [
         {
-          "id": "constitute_project",
-          "label": "Constitute Project",
-          "family": "constitute_project",
-          "lastSuccessfulRun": "2026-07-02T00:06:12.497Z"
+          "id": "cia_world_leaders",
+          "label": "CIA World Leaders",
+          "family": "cia_world_leaders",
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
+        },
+        {
+          "id": "wikidata",
+          "label": "Wikidata",
+          "family": "wikidata",
+          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+        },
+        {
+          "id": "ipu_parline",
+          "label": "IPU Parline",
+          "family": "ipu_parline",
+          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-02T00:06:12.497Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
-        "Constitute coverage and reuse terms limit the corpus; structured topic extraction is available only where parsable source HTML was retained."
+        "Coverage counts any stored body and does not establish that every constitutional branch, subnational body, or reporting relationship is complete."
       ],
       "threshold": {
         "countryCoverageWarnBelow": 80,
@@ -124,9 +307,11 @@
         "staleAfterDays": 180
       },
       "eligibleJurisdictions": 194,
-      "countryCoveragePercent": 94.3,
+      "countryCoveragePercent": 100,
       "alerts": [],
-      "status": "current"
+      "status": "current",
+      "releaseReadiness": "meets_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
       "id": "offices",
@@ -162,7 +347,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-11T01:01:41.845Z"
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
         },
         {
           "id": "wikidata",
@@ -177,7 +362,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T01:01:41.845Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
         "Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office."
       ],
@@ -195,7 +380,9 @@
           "message": "Offices: Wikidata identifier is 0.2% complete; alert threshold is 80%."
         }
       ],
-      "status": "attention"
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
       "id": "people",
@@ -224,7 +411,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-11T01:01:41.845Z"
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
         },
         {
           "id": "wikidata",
@@ -239,7 +426,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T01:01:41.845Z",
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
       "knownGaps": [
         "The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent."
       ],
@@ -262,7 +449,81 @@
           "message": "People: Date of birth is 37.2% complete; alert threshold is 80%."
         }
       ],
-      "status": "attention"
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
+    },
+    {
+      "id": "legislatures",
+      "label": "Legislatures",
+      "recordLabel": "legislative-body records",
+      "recordCount": 280,
+      "jurisdictionsCovered": 193,
+      "completeness": [
+        {
+          "field": "name",
+          "label": "Chamber name",
+          "complete": 280,
+          "total": 280,
+          "percent": 100
+        },
+        {
+          "field": "chamber_type",
+          "label": "Chamber type",
+          "complete": 280,
+          "total": 280,
+          "percent": 100
+        },
+        {
+          "field": "total_seats",
+          "label": "Total seats",
+          "complete": 280,
+          "total": 280,
+          "percent": 100
+        },
+        {
+          "field": "electoral_system_family",
+          "label": "Electoral-system family",
+          "complete": 219,
+          "total": 280,
+          "percent": 78.2
+        }
+      ],
+      "sources": [
+        {
+          "id": "ipu_parline",
+          "label": "IPU Parline",
+          "family": "ipu_parline",
+          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+        },
+        {
+          "id": "wikidata",
+          "label": "Wikidata",
+          "family": "wikidata",
+          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+        }
+      ],
+      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
+      "knownGaps": [
+        "A stored legislative body does not guarantee current party composition, electoral-system detail, upper-chamber coverage, or an independently verified total-seat count."
+      ],
+      "threshold": {
+        "countryCoverageWarnBelow": 80,
+        "fieldCompletenessWarnBelow": 80,
+        "staleAfterDays": 180
+      },
+      "eligibleJurisdictions": 194,
+      "countryCoveragePercent": 99.5,
+      "alerts": [
+        {
+          "code": "field_completeness",
+          "severity": "warning",
+          "message": "Legislatures: Electoral-system family is 78.2% complete; alert threshold is 80%."
+        }
+      ],
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
       "id": "parties",
@@ -329,48 +590,79 @@
           "message": "Parties: Wikidata identifier is 0% complete; alert threshold is 80%."
         }
       ],
-      "status": "attention"
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
-      "id": "organizations",
-      "label": "Organizations",
-      "recordLabel": "organization records",
-      "recordCount": 19,
-      "jurisdictionsCovered": 191,
+      "id": "elections",
+      "label": "Elections",
+      "recordLabel": "qualified conceptual election events",
+      "recordCount": 567,
+      "jurisdictionsCovered": 193,
       "completeness": [
         {
-          "field": "wikidata_qid",
-          "label": "Wikidata identifier",
-          "complete": 19,
-          "total": 19,
+          "field": "audit_disposition",
+          "label": "Row-level audit disposition",
+          "complete": 909,
+          "total": 909,
           "percent": 100
         },
         {
-          "field": "founded_year",
-          "label": "Founded year",
-          "complete": 19,
-          "total": 19,
-          "percent": 100
+          "field": "event_provenance",
+          "label": "Authoritative event provenance",
+          "complete": 888,
+          "total": 909,
+          "percent": 97.7
         },
         {
-          "field": "member_count",
-          "label": "Member count",
-          "complete": 19,
-          "total": 19,
-          "percent": 100
+          "field": "date_semantics",
+          "label": "Usable date basis and precision",
+          "complete": 866,
+          "total": 909,
+          "percent": 95.3
+        },
+        {
+          "field": "jurisdiction_identity",
+          "label": "Matching publisher jurisdiction identity",
+          "complete": 871,
+          "total": 909,
+          "percent": 95.8
+        },
+        {
+          "field": "public_qualification",
+          "label": "Qualified event or contest row",
+          "complete": 592,
+          "total": 909,
+          "percent": 65.1
         }
       ],
       "sources": [
         {
-          "id": "civica_curated_organizations",
-          "label": "Civica curated organization seed",
-          "family": "manual_curation",
-          "lastSuccessfulRun": null
+          "id": "ipu_parline",
+          "label": "IPU Parline",
+          "family": "ipu_parline",
+          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+        },
+        {
+          "id": "wikidata",
+          "label": "Wikidata",
+          "family": "wikidata",
+          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+        },
+        {
+          "id": "international_idea",
+          "label": "International IDEA Voter Turnout Database",
+          "family": "international_idea",
+          "lastSuccessfulRun": "2026-07-05T15:22:35.000Z"
         }
       ],
-      "lastSuccessfulRun": null,
+      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
       "knownGaps": [
-        "Organization memberships are a manually curated seed without a registered successful-run timestamp or complete source-level provenance; the alert remains open until that pipeline is replaced."
+        "The checked 915-row baseline contains 88 quarantined rows and 215 separately labelled term-length projection groups; neither is counted as a qualified event.",
+        "21 rows lack retained publisher jurisdiction identity and remain quarantined; no checked publisher jurisdiction mismatch is public.",
+        "Presidential history is uneven, indirect and subnational selections can leak through upstream ontology, and a jurisdiction count does not imply complete historical, presidential, turnout, or result coverage.",
+        "IPU Parline and International IDEA statement licenses are recorded as non-commercial, but their source-specific DAT-003 rights reviews remain pending and their rows stay out of the public bulk export."
       ],
       "threshold": {
         "countryCoverageWarnBelow": 80,
@@ -378,48 +670,157 @@
         "staleAfterDays": 180
       },
       "eligibleJurisdictions": 194,
-      "countryCoveragePercent": 98.5,
+      "countryCoveragePercent": 99.5,
       "alerts": [
         {
-          "code": "run_unknown",
+          "code": "field_completeness",
           "severity": "warning",
-          "message": "Organizations has no recorded successful-run timestamp."
-        },
-        {
-          "code": "source_run_unknown",
-          "severity": "warning",
-          "message": "Organizations: Civica curated organization seed has no recorded successful-run timestamp."
+          "message": "Elections: Qualified event or contest row is 65.1% complete; alert threshold is 80%."
         }
       ],
-      "status": "attention"
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
+    },
+    {
+      "id": "constitutions",
+      "label": "Constitutions",
+      "recordLabel": "constitution records",
+      "recordCount": 183,
+      "jurisdictionsCovered": 183,
+      "completeness": [
+        {
+          "field": "year",
+          "label": "Adoption year",
+          "complete": 183,
+          "total": 183,
+          "percent": 100
+        },
+        {
+          "field": "full_text_html",
+          "label": "Full text",
+          "complete": 183,
+          "total": 183,
+          "percent": 100
+        },
+        {
+          "field": "structured_articles",
+          "label": "Structured articles",
+          "complete": 183,
+          "total": 183,
+          "percent": 100
+        }
+      ],
+      "sources": [
+        {
+          "id": "constitute_project",
+          "label": "Constitute Project",
+          "family": "constitute_project",
+          "lastSuccessfulRun": "2026-07-02T00:06:12.497Z"
+        }
+      ],
+      "lastSuccessfulRun": "2026-07-02T00:06:12.497Z",
+      "knownGaps": [
+        "Constitute coverage and reuse terms limit the corpus; structured topic extraction is available only where parsable source HTML was retained."
+      ],
+      "threshold": {
+        "countryCoverageWarnBelow": 80,
+        "fieldCompletenessWarnBelow": 80,
+        "staleAfterDays": 180
+      },
+      "eligibleJurisdictions": 194,
+      "countryCoveragePercent": 94.3,
+      "alerts": [],
+      "status": "current",
+      "releaseReadiness": "meets_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
+    },
+    {
+      "id": "organizations",
+      "label": "Organizations",
+      "recordLabel": "organization records",
+      "recordCount": 23,
+      "jurisdictionsCovered": 163,
+      "completeness": [
+        {
+          "field": "wikidata_qid",
+          "label": "Wikidata identifier",
+          "complete": 18,
+          "total": 23,
+          "percent": 78.3
+        },
+        {
+          "field": "founded_year",
+          "label": "Founded year",
+          "complete": 23,
+          "total": 23,
+          "percent": 100
+        },
+        {
+          "field": "member_count",
+          "label": "Member count",
+          "complete": 23,
+          "total": 23,
+          "percent": 100
+        }
+      ],
+      "sources": [
+        {
+          "id": "civica_organization_roster_v1",
+          "label": "Civica organization roster v1",
+          "family": "civica_organization_roster_v1",
+          "lastSuccessfulRun": "2026-07-11T21:00:00.000Z"
+        }
+      ],
+      "lastSuccessfulRun": "2026-07-11T21:00:00.000Z",
+      "knownGaps": [
+        "Nine rosters are complete and fourteen are selected checked subsets; absence from a selected roster is never treated as non-membership. Organization Wikidata identifiers remain incomplete."
+      ],
+      "threshold": {
+        "countryCoverageWarnBelow": 80,
+        "fieldCompletenessWarnBelow": 80,
+        "staleAfterDays": 180
+      },
+      "eligibleJurisdictions": 194,
+      "countryCoveragePercent": 84,
+      "alerts": [
+        {
+          "code": "field_completeness",
+          "severity": "warning",
+          "message": "Organizations: Wikidata identifier is 78.3% complete; alert threshold is 80%."
+        }
+      ],
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
       "id": "bills",
       "label": "Bills",
       "recordLabel": "bill records",
-      "recordCount": 6942,
+      "recordCount": 7032,
       "jurisdictionsCovered": 6,
       "completeness": [
         {
           "field": "url",
           "label": "Source URL",
-          "complete": 6942,
-          "total": 6942,
+          "complete": 7032,
+          "total": 7032,
           "percent": 100
         },
         {
           "field": "raw_status",
           "label": "Publisher status",
-          "complete": 5045,
-          "total": 6942,
-          "percent": 72.7
+          "complete": 5135,
+          "total": 7032,
+          "percent": 73
         },
         {
           "field": "introduced_date",
           "label": "Introduction date",
           "complete": 537,
-          "total": 6942,
-          "percent": 7.7
+          "total": 7032,
+          "percent": 7.6
         }
       ],
       "sources": [
@@ -433,13 +834,13 @@
           "id": "camara_br",
           "label": "Câmara dos Deputados",
           "family": "camara_br",
-          "lastSuccessfulRun": "2026-07-11T04:30:30.205Z"
+          "lastSuccessfulRun": "2026-07-12T04:30:14.848Z"
         },
         {
           "id": "congress_gov",
           "label": "Congress.gov",
           "family": "congress_gov",
-          "lastSuccessfulRun": "2026-07-11T03:00:53.535Z"
+          "lastSuccessfulRun": "2026-07-13T03:01:27.228Z"
         },
         {
           "id": "data_assemblee_fr",
@@ -451,13 +852,13 @@
           "id": "legisinfo_ca",
           "label": "Parliament of Canada (LEGISinfo)",
           "family": "legisinfo_ca",
-          "lastSuccessfulRun": "2026-07-11T04:00:48.714Z"
+          "lastSuccessfulRun": "2026-07-12T04:01:47.013Z"
         },
         {
           "id": "senado_br",
           "label": "Senado Federal",
           "family": "senado_br",
-          "lastSuccessfulRun": "2026-07-11T04:30:30.205Z"
+          "lastSuccessfulRun": "2026-07-12T04:30:14.848Z"
         },
         {
           "id": "senat_fr",
@@ -469,10 +870,10 @@
           "id": "uk_parliament",
           "label": "UK Parliament",
           "family": "uk_parliament",
-          "lastSuccessfulRun": "2026-07-11T03:30:37.144Z"
+          "lastSuccessfulRun": "2026-07-12T03:30:38.614Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T05:30:36.495Z",
+      "lastSuccessfulRun": "2026-07-13T03:01:27.228Z",
       "knownGaps": [
         "Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers."
       ],
@@ -492,15 +893,17 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Publisher status is 72.7% complete; alert threshold is 80%."
+          "message": "Bills: Publisher status is 73% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Introduction date is 7.7% complete; alert threshold is 80%."
+          "message": "Bills: Introduction date is 7.6% complete; alert threshold is 80%."
         }
       ],
-      "status": "attention"
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
       "id": "indicators",
@@ -529,13 +932,13 @@
           "id": "freedom_house",
           "label": "Freedom House",
           "family": "freedom_house",
-          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
+          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
         },
         {
           "id": "transparency_intl",
           "label": "Transparency International CPI",
           "family": "transparency_intl",
-          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
+          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
         },
         {
           "id": "undp_hdi",
@@ -547,7 +950,7 @@
           "id": "vdem",
           "label": "V-Dem (Varieties of Democracy)",
           "family": "vdem",
-          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
+          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
         },
         {
           "id": "world_bank",
@@ -559,10 +962,10 @@
           "id": "worldbank_wgi",
           "label": "World Bank Worldwide Governance Indicators",
           "family": "worldbank_wgi",
-          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
+          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T06:04:23.248Z",
+      "lastSuccessfulRun": "2026-07-11T08:37:52.070Z",
       "knownGaps": [
         "This combines Atlas country metrics and research indicator history; source vintages and product eligibility differ, and presence does not imply inclusion in the Civica Index."
       ],
@@ -574,7 +977,9 @@
       "eligibleJurisdictions": 194,
       "countryCoveragePercent": 100,
       "alerts": [],
-      "status": "current"
+      "status": "current",
+      "releaseReadiness": "meets_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     },
     {
       "id": "images",
@@ -624,13 +1029,118 @@
       "eligibleJurisdictions": 194,
       "countryCoveragePercent": 100,
       "alerts": [],
-      "status": "current"
+      "status": "current",
+      "releaseReadiness": "meets_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
+    },
+    {
+      "id": "citations",
+      "label": "Statement citations",
+      "recordLabel": "statement-level provenance records",
+      "recordCount": 6669,
+      "jurisdictionsCovered": 194,
+      "completeness": [
+        {
+          "field": "source_id",
+          "label": "Source identifier",
+          "complete": 6669,
+          "total": 6669,
+          "percent": 100
+        },
+        {
+          "field": "source_url",
+          "label": "Source URL",
+          "complete": 6478,
+          "total": 6669,
+          "percent": 97.1
+        },
+        {
+          "field": "source_license",
+          "label": "Captured source license",
+          "complete": 6669,
+          "total": 6669,
+          "percent": 100
+        },
+        {
+          "field": "retrieved_at",
+          "label": "Retrieval time",
+          "complete": 6669,
+          "total": 6669,
+          "percent": 100
+        },
+        {
+          "field": "source_hash",
+          "label": "Source hash",
+          "complete": 0,
+          "total": 6669,
+          "percent": 0
+        }
+      ],
+      "sources": [
+        {
+          "id": "cia_factbook",
+          "label": "CIA World Factbook",
+          "family": "cia_factbook",
+          "lastSuccessfulRun": "2026-05-04T19:07:06.840Z"
+        },
+        {
+          "id": "cia_world_leaders",
+          "label": "CIA World Leaders",
+          "family": "cia_world_leaders",
+          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
+        },
+        {
+          "id": "constitute_project",
+          "label": "Constitute Project",
+          "family": "constitute_project",
+          "lastSuccessfulRun": "2026-07-02T00:06:12.497Z"
+        },
+        {
+          "id": "international_idea",
+          "label": "International IDEA Voter Turnout Database",
+          "family": "international_idea",
+          "lastSuccessfulRun": "2026-07-05T15:22:35.000Z"
+        },
+        {
+          "id": "ipu_parline",
+          "label": "IPU Parline",
+          "family": "ipu_parline",
+          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+        },
+        {
+          "id": "wikidata",
+          "label": "Wikidata",
+          "family": "wikidata",
+          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+        }
+      ],
+      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
+      "knownGaps": [
+        "Statement rows currently cover the closed polymorphic subject set only; canonical country facts use their own row-level provenance and are measured separately rather than being double-counted here."
+      ],
+      "threshold": {
+        "countryCoverageWarnBelow": 80,
+        "fieldCompletenessWarnBelow": 80,
+        "staleAfterDays": 180
+      },
+      "eligibleJurisdictions": 194,
+      "countryCoveragePercent": 100,
+      "alerts": [
+        {
+          "code": "field_completeness",
+          "severity": "warning",
+          "message": "Statement citations: Source hash is 0% complete; alert threshold is 80%."
+        }
+      ],
+      "status": "attention",
+      "releaseReadiness": "below_declared_minimums",
+      "publicBehavior": "publish_with_coverage_status_and_known_gaps"
     }
   ],
   "summary": {
-    "domains": 9,
-    "current": 3,
-    "attention": 6,
-    "alerts": 11
+    "domains": 14,
+    "current": 5,
+    "attention": 9,
+    "alerts": 13
   }
 }

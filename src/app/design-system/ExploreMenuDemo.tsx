@@ -24,9 +24,9 @@ export function ExploreMenuDemo() {
             >
               <span className="explore-item__engraving" aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="theme-engraving-light" src={`/engravings/spot-${item.engraving}.webp`} alt="" />
+                <img className="theme-engraving-light" src={`/engravings/spot-${item.engraving}.webp`} alt="" aria-hidden="true" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="theme-engraving-dark" src={`/engravings/spot-${item.engraving}-dark.webp`} alt="" />
+                <img className="theme-engraving-dark" src={`/engravings/spot-${item.engraving}-dark.webp`} alt="" aria-hidden="true" />
               </span>
               <span className="explore-item__body">
                 <span className="explore-item__name">{item.label}</span>

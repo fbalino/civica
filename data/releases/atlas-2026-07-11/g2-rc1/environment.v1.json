@@ -8,7 +8,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5"
   },
-  "packageLockSha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927",
+  "packageLockSha256": "9558f57eba3b959d92f0a83410297d26f348b243a38a6e4a9ff5a40e7e8439a4",
   "requiredConfiguration": [],
   "prohibitedForOfflineRebuild": [
     "DATABASE_URL",

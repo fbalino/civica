@@ -8,14 +8,14 @@ export const revalidate = 3600;
 
 export async function generateMetadata() {
   return {
-    title: "World Atlas — Interactive Map of Every Government",
+    title: "World Atlas — Interactive Government Map",
     description:
-      "An interactive world map of every government. Pan, zoom, and click any country to open its factbook entry and source-linked governance data.",
+      "An interactive map of map-eligible sovereign-state entries. Pan, zoom, and open a profile with source-linked governance data.",
     alternates: { canonical: "https://civicaatlas.org/atlas" },
     openGraph: withOg({
-      title: "World Atlas — Interactive Map of Every Government · Civica Atlas",
+      title: "World Atlas — Interactive Government Map · Civica Atlas",
       description:
-        "An interactive world map of every government. Click any country to open its factbook entry and governance data.",
+        "An interactive map of map-eligible sovereign-state entries. Open any mapped profile for governance data and sources.",
       url: "https://civicaatlas.org/atlas",
     }),
   };
@@ -33,7 +33,7 @@ export default async function AtlasMapPage({
   const sp = await searchParams;
   const layerParam = sp.layer;
   const initialLayer = parseLayerParam(
-    Array.isArray(layerParam) ? layerParam[0] : layerParam
+    Array.isArray(layerParam) ? layerParam[0] : layerParam,
   );
   const [{ countries: dbCountries }, layerData] = await Promise.all([
     loadAtlasData(),
@@ -53,6 +53,7 @@ export default async function AtlasMapPage({
     capital: c.capital,
     featured: c.featured,
     masthead: c.masthead,
+    jurisdictionStatus: c.jurisdictionStatus,
   }));
 
   return (

@@ -2,9 +2,10 @@
  * Phase 5.5 — Pulse v2 clustering runner.
  *
  * Pulls unclustered raw_events rows and compares normalized event identities
- * globally inside a 48-hour window. It uses multilingual embedding cosine
- * similarity when available and the declared canonical-token fallback
- * otherwise. Ingest-time country is diagnostic, not a partition.
+ * with the incoming batch and recent persisted incidents inside a 48-hour
+ * window. Exact identities can attach automatically; semantic and strong
+ * lexical matches become retained collision candidates. Ingest-time country
+ * is diagnostic, not a partition.
  *
  * Usage:
  *   npm run pulse:v2:cluster           # run on all unclustered rows
@@ -19,6 +20,11 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { inArray, sql } from "drizzle-orm";
 import * as schema from "../src/lib/db/schema";
 import { runClustering } from "../src/lib/pulse/v2/cluster";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+} from "../src/lib/pulse/v2/pipeline-version";
 
 async function main() {
   const dryRun = process.argv.includes("--dry-run");
@@ -35,7 +41,38 @@ async function main() {
   const db = drizzle({ client: sqlClient, schema });
 
   const start = Date.now();
-  const summary = await runClustering(db, { limit, dryRun });
+  const runRef = createPulsePipelineRunRef("cluster");
+  if (!dryRun) await startPulsePipelineRun(db, runRef);
+  let summary;
+  try {
+    summary = await runClustering(db, { limit, dryRun, runRef });
+    if (!dryRun) {
+      await finishPulsePipelineRun(db, runRef.id, {
+        status: "completed",
+        counts: {
+          candidates: summary.candidates,
+          clustered: summary.clustered,
+          clustersCreated: summary.clustersCreated,
+          matchedPersistedIncidents: summary.matchedPersistedIncidents,
+          collisionCandidates: summary.collisionCandidates,
+        },
+      });
+    }
+  } catch (error) {
+    if (!dryRun) {
+      await finishPulsePipelineRun(db, runRef.id, {
+        status: "failed",
+        counts: { candidates: 0, clustered: 0 },
+        failures: [
+          {
+            component: "cluster",
+            message: error instanceof Error ? error.message : String(error),
+          },
+        ],
+      });
+    }
+    throw error;
+  }
   const elapsedMs = Date.now() - start;
 
   console.log("\nClustering complete:");
@@ -45,6 +82,8 @@ async function main() {
   console.log(`  candidates:           ${summary.candidates}`);
   console.log(`  clustered:            ${summary.clustered}`);
   console.log(`  clusters created:     ${summary.clustersCreated}`);
+  console.log(`  persisted matches:    ${summary.matchedPersistedIncidents}`);
+  console.log(`  collision candidates: ${summary.collisionCandidates}`);
   console.log(`  candidate pairs:      ${summary.comparisonPairs}`);
   console.log(`  multi-source groups:  ${summary.multiSourceClusters}`);
   console.log(`  source-family groups: ${summary.multiSourceFamilyClusters}`);

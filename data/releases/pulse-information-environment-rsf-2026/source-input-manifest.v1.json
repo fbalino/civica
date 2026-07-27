@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "source-input-manifest/v1",
+  "releaseId": "pulse-information-environment-rsf-2026",
+  "generatedFrom": "checked-in-captures",
+  "pipelineIds": [
+    "pulse.information-environment"
+  ],
+  "inputs": [
+    {
+      "pipelineId": "pulse.information-environment",
+      "sourceId": "rsf_press_freedom",
+      "accessUrl": "https://rsf.org/sites/default/files/import_classement/2026.csv",
+      "retrievedAt": "2026-07-11T17:17:00.000Z",
+      "contentSha256": "65ec7bd9b9740e0f51e9b4eea585030b2226c1a96938ec06a4cbbdbd2639aae2",
+      "format": "csv",
+      "upstreamVersion": "RSF World Press Freedom Index 2026",
+      "upstreamVintage": "2025 primary observation year with RSF's stated later-event treatment",
+      "expectedCoverage": "all 180 publisher rows matched or explicitly missing across Civica's supported jurisdiction universe",
+      "redistributionPosture": "restricted-no-redistribution",
+      "adapterVersion": "sha256:1103513fc8b061e8b88e1a82f80bd26deff47633dc6569588ca23c5dc37ace28"
+    }
+  ]
+}

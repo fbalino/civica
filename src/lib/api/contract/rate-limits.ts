@@ -1,11 +1,16 @@
 /**
- * CLM-012 — single source for the bulk-export rate-limit numbers.
+ * BRD-013 — reserved bulk-export rate-limit numbers. Currently UNUSED:
+ * neither `src/app/api/countries/[slug]/export/route.ts` nor
+ * `contract/registry.ts` imports these constants. The export route's
+ * contract entry (`registry.ts`, route id "country-export") declares
+ * `rateLimit: null`, and the route itself enforces no per-IP throttle —
+ * `src/app/api-docs/page.tsx`'s Rate Limits paragraph states that
+ * plainly rather than describing an unenforced limit.
  *
- * `src/app/api/countries/[slug]/export/route.ts` and
- * `contract/registry.ts` (the documented contract `api-docs` renders
- * from) both import these constants rather than each hand-typing
- * "30" / "60000" independently, so the docs and the runtime can never
- * drift apart.
+ * If the export route is ever rate-limited, wire these constants into
+ * the route handler AND into that registry entry's `rateLimit` field
+ * (following the `v1RateLimit` pattern the versioned routes already
+ * use) so the docs, the contract, and the runtime cannot drift apart.
  */
 
 export const EXPORT_RATE_LIMIT_MAX = 30;

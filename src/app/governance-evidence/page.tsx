@@ -29,6 +29,7 @@ type Countries = Awaited<ReturnType<typeof getGovernanceEvidenceCountries>>;
 function GovernanceEvidenceLanding({ countries }: { countries: Countries }) {
   return (
     <>
+      {/* PageHero owns the required point-of-display non-documentary art disclosure. */}
       <PageHero
         eyebrow="Governance Evidence"
         titleId="governance-evidence-hero-title"

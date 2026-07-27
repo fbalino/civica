@@ -48,11 +48,98 @@ ingest-time jurisdiction attribution, and a captured source-rights posture.
 Every event-source row must retain its raw-evidence link; public payload
 redistribution remains blocked independently of site access.
 
+`0023_wide_gorilla_man` adds stable Pulse incident identities, append-only
+report-assignment and collision-resolution evidence, one-current-projection
+enforcement, blank-headline quarantine, and the historical linkage needed for
+the controlled PUL-031 duplicate repair.
+
+`0024_dark_maginty` adds version-keyed Pulse cluster-classification state,
+append-only attempt evidence, atomic leases, new-before-retry ordering,
+deterministic bounded backoff, terminal exhaustion, sanitized errors, and
+queue age/depth reporting. The backfill covers only directly provable event,
+non-event, and invalid outcomes; historic call counts and per-provider failure
+details remain unknown. Recovery uses an isolated pre-change backup or a
+reviewed forward compensation, never in-place evidence reversal.
+
+`0025_careful_the_professor` adds `pulse-review-sla/v1`: one retained
+obligation per queued event, severity-based deadlines, append-only escalation
+and bounded-exception evidence, a scheduled fail-closed monitor, and database
+queue-entry enforcement. The pre-contract pending backlog is retained
+unpublished as `legacy_quarantined`; the migration does not claim human review,
+approval, or rejection for those items.
+
+`0026_magenta_xavin` retires the empty `pulse_daily_scores` and
+`pulse_changelog` relations after PUL-034 removed every scalar Pulse v1 reader
+and writer. The migration fails closed if either relation contains a row and
+does not alter the retained legacy `pulse_events` evidence table.
+
+`0027_smart_tempest` adds the append-only
+`pulse-dimensional-delta-history/v1` output ledger and explicit inclusive
+365-day lookback metadata to the current Pulse dimensional projection. Existing
+current rows receive deterministic dates from `last_computed_at` and are copied
+once into history; later history rows reject updates and deletions.
+
+`0028_complex_carlie_cooper` adds the append-only
+`pulse-event-absorption/v1` evidence ledger. An absorption decision binds one
+explicit event link to two sequential fixed-scale Index releases, exact
+dimension scores, method, as-of date, rationale, and evidence references.
+Corroboration confidence remains unchanged; scoring reads the latest retained
+decision separately.
+
+`0029_whole_dazzler` replaces the mutable legacy press-context scalar with
+immutable release metadata, complete observed-or-explicit-missing coverage for
+every supported jurisdiction, and one classification-time context pin per
+Pulse event. Existing events are retained as historically unrecoverable rather
+than backfilled from a later release. New event inserts pin the then-adopted
+release automatically; release, value, and pin rows reject updates/deletes.
+The registered RSF 2026 context remains disabled for production weighting and
+observability while rights and validation are pending.
+
+`0030_cute_namora` adds the normalized, version-bound
+`constitution_passages` relation, partial GIN indexes for English lexical text
+and topic filtering, current-section uniqueness, exact source/language/hash
+metadata, and canonical passage-id history retention. The migration creates no
+passage rows by itself: after applying it, run
+`npm run backfill:constitution-passages -- --dry-run`, then the write command,
+and verify exactly 96,126 current non-empty passages with
+`npm run validate:constitution-search:live`. Superseded passage versions remain
+resolvable. Recovery uses the isolated pre-change backup or a reviewed forward
+compensation; do not drop retained passage/history rows as an ordinary rollback.
+
+`0031_hot_saracen` replaces destructive legislature-party reseating with a
+stable, source-keyed identity model. It adds `political_parties`, immutable
+`party_composition_runs`, and append-only `party_identity_events`; backfills
+one explicitly provisional identity per legacy chamber row; preserves every
+existing `legislature_parties.id` and `party_positions` foreign key; and adds
+current/retired state so later syncs update or soft-retire rows instead of
+deleting them. Split, merge, and succession edges require a named source,
+license, retrieval time, and explicit predecessor/successor IDs. The adoption
+does not infer cross-chamber continuity from party names. Recovery uses the
+isolated pre-change backup or a reviewed forward compensation; do not delete
+the new append-only evidence ledgers as an ordinary rollback.
+
+`0032_sparkling_genesis` adds membership interval, precision, status,
+dispute, source, rights, retrieval, and upstream-vintage fields to
+organization relationships, plus the same source bundle for organization
+identities. Existing blanket-seeded rows default to `unverified_legacy` and
+remain available to the research-evidence history trigger while public read
+boundaries exclude them. The migration does not declare any legacy row
+current; after application, the versioned organization-membership sync
+activates only the checked release and preserves ECOWAS withdrawals as dated
+history. Recovery uses an isolated pre-change backup or reviewed forward
+compensation rather than deleting retained rows.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·
 data-backfill-growth-methodology · data-backfill-methodology-version ·
 data-backfill-territory-iso2 · data-backfill-upstream-vintage-labels ·
 data-bridge-cia-legacy-to-canonical · data-cleanup-bad-offices ·
-data-create-rate-limits-table · data-reseed-bug3-corrupted ·
+data-create-rate-limits-table · data-repair-pulse-agreement · data-reseed-bug3-corrupted ·
 data-restore-overdemoted-disputes
+
+`data-repair-pulse-agreement` recomputes the current agreement projection from
+stored provider-distinct, prompt-versioned classify runs. Unsupported labels
+become `none`; automatic rows without that evidence enter legacy quarantine.
+Human-reviewed publication remains intact, and the retention trigger records
+every prior projection.

@@ -12,6 +12,7 @@ import {
 import { createPulsePipelineRunRef } from "./pipeline-version";
 import {
   RSF_2026_CANDIDATE_RELEASE,
+  missingInformationEnvironmentContext,
   observedInformationEnvironmentContext,
 } from "./press-freedom";
 
@@ -25,7 +26,6 @@ const event: EventRow = {
   severityTier: "moderate_neg",
   classifierAgreement: "all",
   category: "judicial_purge",
-  pressPinned: null,
   classificationRunId: "33333333-3333-4333-8333-333333333333",
 };
 
@@ -34,6 +34,9 @@ const sourceCounts = new Map<string, SourceCounts>([
     event.id,
     { specialist: new Set(["specialist-1"]), news: new Set(["news-1"]) },
   ],
+]);
+const informationContexts = new Map([
+  [event.id, missingInformationEnvironmentContext("fixture has no context")],
 ]);
 const runRef = createPulsePipelineRunRef("corroborate", {
   id: "55555555-5555-4555-8555-555555555555",
@@ -46,6 +49,7 @@ test("corroboration dry-run is stable and performs zero writes", async () => {
   const options = {
     events: [event],
     sourceCounts,
+    informationContexts,
     dryRun: true,
     write: async () => {
       writes++;
@@ -65,7 +69,13 @@ test("two corroboration applications converge on one canonical event", async () 
   const write = async (_db: Db, plan: CorroborationPlan) => {
     state.set(plan.eventId, structuredClone(plan));
   };
-  const options = { events: [event], sourceCounts, write, runRef };
+  const options = {
+    events: [event],
+    sourceCounts,
+    informationContexts,
+    write,
+    runRef,
+  };
   await corroborateEvents({} as Db, options);
   const first = structuredClone([...state.entries()]);
   await corroborateEvents({} as Db, options);
@@ -79,6 +89,7 @@ test("malformed corroboration fixtures fail before writes", async () => {
     corroborateEvents({} as Db, {
       events: [event, event],
       sourceCounts,
+      informationContexts,
       write: async () => {
         writes++;
       },
@@ -93,6 +104,7 @@ test("empty corroboration input is an explicit no-op", async () => {
   const result = await corroborateEvents({} as Db, {
     events: [],
     sourceCounts: new Map(),
+    informationContexts: new Map(),
     dryRun: true,
     runRef,
   });
@@ -147,7 +159,7 @@ test("information context changes only the declared sensitivity scenario", async
     rightsStatus: "pending",
     useStatus: "disabled_pending_rights_and_validation",
   });
-  const informationContexts = new Map([[positive.jurisdictionId, context]]);
+  const informationContexts = new Map([[positive.id, context]]);
   const common = {
     events: [positive],
     sourceCounts: newsOnly,

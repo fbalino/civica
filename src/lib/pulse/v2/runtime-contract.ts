@@ -51,6 +51,12 @@ import {
 import { PULSE_EMBEDDING_MODEL } from "./embed";
 import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
 import {
+  PULSE_INCIDENT_COMPARISON_WINDOW_HOURS,
+  PULSE_INCIDENT_RESOLUTION_VERSION,
+  PULSE_INCIDENT_SEMANTIC_CANDIDATE_THRESHOLD,
+  PULSE_INCIDENT_SEMANTIC_ONLY_CANDIDATE_THRESHOLD,
+} from "./incident-resolution";
+import {
   PULSE_SOURCE_INDEPENDENCE_VERSION,
   SOURCE_INDEPENDENCE_MIN_PRECISION,
   SOURCE_INDEPENDENCE_MIN_RECALL,
@@ -67,13 +73,34 @@ import {
   RSF_2026_CANDIDATE_RELEASE,
 } from "./press-freedom";
 import {
+  PULSE_INFORMATION_ENVIRONMENT_PIN_METHOD,
+  PULSE_INFORMATION_ENVIRONMENT_PIN_VERSION,
+  PULSE_INFORMATION_ENVIRONMENT_RELEASE_VERSION,
+} from "./information-environment-evidence";
+import {
   PULSE_DECISION_KINDS,
   PULSE_DECISION_LEDGER_VERSION,
   type PulseDecisionKind,
 } from "./decision-ledger";
+import {
+  PULSE_CLASSIFICATION_ATTEMPT_VERSION,
+  PULSE_CLASSIFICATION_CLAIM_LEASE_MS,
+  PULSE_CLASSIFICATION_CONFIG_VERSION,
+  PULSE_CLASSIFICATION_RETRY_POLICY,
+  PULSE_CLASSIFICATION_STATUSES,
+  PULSE_CLASSIFICATION_STATE_VERSION,
+} from "./classification-state";
+import {
+  PULSE_REVIEW_COMPLIANCE_STATES,
+  PULSE_REVIEW_HEALTH_STATES,
+  PULSE_REVIEW_OBLIGATION_STATES,
+  PULSE_REVIEW_PRIORITY_BY_SEVERITY,
+  PULSE_REVIEW_SLA_TARGETS,
+  PULSE_REVIEW_SLA_VERSION,
+} from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.7.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.8-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.14.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.15-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -133,7 +160,9 @@ export interface PulseRuntimeFacts {
     embeddingModel: string;
     dateWindowHours: number;
     semanticThreshold: number;
-    lexicalThreshold: number;
+    semanticOnlyThreshold: number;
+    lexicalTokenThreshold: number;
+    lexicalAnchorThreshold: number;
   }>;
 }
 
@@ -190,13 +219,30 @@ export interface PulseRuntimeMethodContract {
       decode: "deterministic";
       categoryConsensus: "strict_majority_of_successful_voters";
       minimumQuorum: 2;
+      agreementEvidence: "stored_provider_distinct_prompt_versioned_classify_runs";
+      singleEnginePublication: "queue_only";
+      legacyAgreementPolicy: "unsupported_labels_cleared_and_automatic_rows_quarantined";
       selfConfidenceRange: { lower: 0; upper: 1 };
       invalidSelfConfidencePolicy: "reject_response_as_unusable";
       severityValuePolicy: "require_finite_number_then_tier_clamp";
       degradedRunsRecorded: false;
       successfulProviderRunsRecorded: true;
-      configuredProviderSetPersisted: false;
+      configuredProviderSetPersisted: true;
       providerFailuresPersisted: false;
+      stateSchemaVersion: typeof PULSE_CLASSIFICATION_STATE_VERSION;
+      attemptSchemaVersion: typeof PULSE_CLASSIFICATION_ATTEMPT_VERSION;
+      configSchemaVersion: typeof PULSE_CLASSIFICATION_CONFIG_VERSION;
+      statuses: string[];
+      queueOrder: "new_then_due_retry_oldest_first";
+      retryExhaustionDisposition: "terminal_failure";
+      noneDisposition: "terminal_none_not_failure";
+      claimLeaseMinutes: number;
+      retryPolicy: {
+        maxAttempts: number;
+        initialDelayMinutes: number;
+        multiplier: number;
+        maximumDelayHours: number;
+      };
     };
     verify: {
       engine: PulseProviderRef;
@@ -280,7 +326,11 @@ export interface PulseRuntimeMethodContract {
     }>;
   };
   clustering: {
-    strategy: "semantic_or_lexical_fallback";
+    strategy: "stable_incident_resolution";
+    resolutionVersion: string;
+    persistedComparison: "incoming_against_recent_active_incidents";
+    automaticMergeRule: "exact_full_identity_inside_window_or_exact_headline_same_resolved_country_and_date_with_compatible_labels";
+    candidateLedger: "semantic_and_strong_anchor_matches_require_review";
     countryPartitioned: boolean;
     identityNormalization: {
       version: string;
@@ -292,11 +342,15 @@ export interface PulseRuntimeMethodContract {
       metric: "cosine_similarity";
       model: string;
       threshold: number;
+      unanchoredThreshold: number;
+      result: "candidate_only";
     };
     lexicalFallback: {
       condition: "embedding_model_unavailable";
       metric: "jaccard_token_similarity";
       threshold: number;
+      anchorOverlapThreshold: number;
+      result: "candidate_only";
     };
   };
   corroboration: {
@@ -320,7 +374,14 @@ export interface PulseRuntimeMethodContract {
     };
     informationEnvironment: {
       schemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_VERSION;
+      releaseSchemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_RELEASE_VERSION;
+      eventPinSchemaVersion: typeof PULSE_INFORMATION_ENVIRONMENT_PIN_VERSION;
+      eventPinMethodVersion: typeof PULSE_INFORMATION_ENVIRONMENT_PIN_METHOD;
       policyVersion: string;
+      coveragePolicy: "one_observed_or_missing_row_per_supported_jurisdiction";
+      historicalPinPolicy: "unrecoverable_remains_missing";
+      rerunPolicy: "classification_pin_is_append_only";
+      observabilityUse: "disabled_until_rights_and_validation_pass";
       productionUse: "disabled_pending_rights_and_validation";
       missingValuePolicy: "no_multiplier";
       validationStanding: "not_calibrated_bias_correction";
@@ -346,6 +407,7 @@ export interface PulseRuntimeMethodContract {
     };
   };
   publicationPolicy: {
+    automaticEligibility: "stored_ensemble_and_gate_and_resolved_subject";
     majorityNone: "drop_not_governance_event";
     severityAggregation: "majority_with_ties_to_more_severe";
     numericSeverityAggregation: "median_of_winning_category_voters_then_tier_clamp";
@@ -403,7 +465,30 @@ export interface PulseRuntimeMethodContract {
         reviewStatus: "rejected";
         humanReviewed: false;
       };
+      legacyQuarantined: {
+        published: false;
+        reviewStatus: "legacy_quarantined";
+        humanReviewed: false;
+      };
     };
+  };
+  reviewServiceLevel: {
+    version: typeof PULSE_REVIEW_SLA_VERSION;
+    priorityBySeverity: typeof PULSE_REVIEW_PRIORITY_BY_SEVERITY;
+    targets: typeof PULSE_REVIEW_SLA_TARGETS;
+    obligationStates: string[];
+    complianceStates: string[];
+    healthStates: string[];
+    queueOrder: "priority_then_due_then_queued_then_id";
+    monitor: {
+      route: "/api/cron/pulse/v2/review-sla";
+      cron: "10 */6 * * *";
+      delivery: "persisted_idempotent_event_plus_structured_server_log";
+    };
+    exceptionRule: "append_only_bounded_explanation_never_restores_completeness";
+    dailyCompletenessRule: "withheld_on_breach_or_unknown";
+    reportClockArithmetic: "explicit_timestamp_cast_before_interval";
+    legacyRule: string;
   };
   numericDeltas: {
     publicStatus: "public_experimental";
@@ -413,13 +498,21 @@ export interface PulseRuntimeMethodContract {
     includedEvents: "published_only";
     inputMethodCoverage: "row_level_versioned_with_explicit_legacy";
     trailingWindowDays: number;
+    windowBoundary: "inclusive_365_days_future_excluded";
+    currentProjection: "one_row_per_jurisdiction_dimension";
+    noEventState: "zero_tombstone_internal_public_null";
+    outputHistory: "append_only_per_score_run_jurisdiction_dimension";
+    writeAtomicity: "history_projection_and_run_completion_one_transaction";
     boundsPerDimension: {
       lower: number;
       upper: number;
     };
-    impactFormula: "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)";
+    impactFormula: "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)";
     scoreStageOrder: ["corroborate", "score"];
-    absorbedIntoIndexPolicy: "non_durable_zero_then_daily_recompute_can_restore";
+    absorptionEvidence: "append_only_explicit_event_link_fixed_scale";
+    absorptionMultiplier: "absorbed_zero_otherwise_one";
+    currentAbsorptionStanding: "none_no_sequential_comparable_release";
+    absorbedIntoIndexPolicy: "separate_versioned_decision_never_mutates_corroboration";
   };
   evaluation: {
     backtestMatchesCurrentProduction: false;
@@ -539,13 +632,34 @@ export function buildPulseRuntimeMethod(
         decode: "deterministic",
         categoryConsensus: "strict_majority_of_successful_voters",
         minimumQuorum: 2,
+        agreementEvidence:
+          "stored_provider_distinct_prompt_versioned_classify_runs",
+        singleEnginePublication: "queue_only",
+        legacyAgreementPolicy:
+          "unsupported_labels_cleared_and_automatic_rows_quarantined",
         selfConfidenceRange: { lower: 0, upper: 1 },
         invalidSelfConfidencePolicy: "reject_response_as_unusable",
         severityValuePolicy: "require_finite_number_then_tier_clamp",
         degradedRunsRecorded: false,
         successfulProviderRunsRecorded: true,
-        configuredProviderSetPersisted: false,
+        configuredProviderSetPersisted: true,
         providerFailuresPersisted: false,
+        stateSchemaVersion: PULSE_CLASSIFICATION_STATE_VERSION,
+        attemptSchemaVersion: PULSE_CLASSIFICATION_ATTEMPT_VERSION,
+        configSchemaVersion: PULSE_CLASSIFICATION_CONFIG_VERSION,
+        statuses: [...PULSE_CLASSIFICATION_STATUSES],
+        queueOrder: "new_then_due_retry_oldest_first",
+        retryExhaustionDisposition: "terminal_failure",
+        noneDisposition: "terminal_none_not_failure",
+        claimLeaseMinutes: PULSE_CLASSIFICATION_CLAIM_LEASE_MS / 60_000,
+        retryPolicy: {
+          maxAttempts: PULSE_CLASSIFICATION_RETRY_POLICY.maxAttempts,
+          initialDelayMinutes:
+            PULSE_CLASSIFICATION_RETRY_POLICY.initialDelayMs / 60_000,
+          multiplier: PULSE_CLASSIFICATION_RETRY_POLICY.multiplier,
+          maximumDelayHours:
+            PULSE_CLASSIFICATION_RETRY_POLICY.maxDelayMs / 3_600_000,
+        },
       },
       verify: {
         engine: providerRef(facts.verifyEngine),
@@ -622,7 +736,12 @@ export function buildPulseRuntimeMethod(
       stages,
     },
     clustering: {
-      strategy: "semantic_or_lexical_fallback",
+      strategy: "stable_incident_resolution",
+      resolutionVersion: PULSE_INCIDENT_RESOLUTION_VERSION,
+      persistedComparison: "incoming_against_recent_active_incidents",
+      automaticMergeRule:
+        "exact_full_identity_inside_window_or_exact_headline_same_resolved_country_and_date_with_compatible_labels",
+      candidateLedger: "semantic_and_strong_anchor_matches_require_review",
       countryPartitioned: facts.clustering.countryPartitioned,
       identityNormalization: {
         version: facts.clustering.identityVersion,
@@ -634,11 +753,15 @@ export function buildPulseRuntimeMethod(
         metric: "cosine_similarity",
         model: facts.clustering.embeddingModel,
         threshold: facts.clustering.semanticThreshold,
+        unanchoredThreshold: facts.clustering.semanticOnlyThreshold,
+        result: "candidate_only",
       },
       lexicalFallback: {
         condition: "embedding_model_unavailable",
         metric: "jaccard_token_similarity",
-        threshold: facts.clustering.lexicalThreshold,
+        threshold: facts.clustering.lexicalTokenThreshold,
+        anchorOverlapThreshold: facts.clustering.lexicalAnchorThreshold,
+        result: "candidate_only",
       },
     },
     corroboration: {
@@ -663,7 +786,15 @@ export function buildPulseRuntimeMethod(
       },
       informationEnvironment: {
         schemaVersion: PULSE_INFORMATION_ENVIRONMENT_VERSION,
+        releaseSchemaVersion: PULSE_INFORMATION_ENVIRONMENT_RELEASE_VERSION,
+        eventPinSchemaVersion: PULSE_INFORMATION_ENVIRONMENT_PIN_VERSION,
+        eventPinMethodVersion: PULSE_INFORMATION_ENVIRONMENT_PIN_METHOD,
         policyVersion: PULSE_INFORMATION_ENVIRONMENT_POLICY.version,
+        coveragePolicy:
+          "one_observed_or_missing_row_per_supported_jurisdiction",
+        historicalPinPolicy: "unrecoverable_remains_missing",
+        rerunPolicy: "classification_pin_is_append_only",
+        observabilityUse: "disabled_until_rights_and_validation_pass",
         productionUse: "disabled_pending_rights_and_validation",
         missingValuePolicy: "no_multiplier",
         validationStanding: "not_calibrated_bias_correction",
@@ -688,6 +819,7 @@ export function buildPulseRuntimeMethod(
       },
     },
     publicationPolicy: {
+      automaticEligibility: "stored_ensemble_and_gate_and_resolved_subject",
       majorityNone: "drop_not_governance_event",
       severityAggregation: "majority_with_ties_to_more_severe",
       numericSeverityAggregation:
@@ -748,7 +880,32 @@ export function buildPulseRuntimeMethod(
           reviewStatus: "rejected",
           humanReviewed: false,
         },
+        legacyQuarantined: {
+          published: false,
+          reviewStatus: "legacy_quarantined",
+          humanReviewed: false,
+        },
       },
+    },
+    reviewServiceLevel: {
+      version: PULSE_REVIEW_SLA_VERSION,
+      priorityBySeverity: PULSE_REVIEW_PRIORITY_BY_SEVERITY,
+      targets: PULSE_REVIEW_SLA_TARGETS,
+      obligationStates: [...PULSE_REVIEW_OBLIGATION_STATES],
+      complianceStates: [...PULSE_REVIEW_COMPLIANCE_STATES],
+      healthStates: [...PULSE_REVIEW_HEALTH_STATES],
+      queueOrder: "priority_then_due_then_queued_then_id",
+      monitor: {
+        route: "/api/cron/pulse/v2/review-sla",
+        cron: "10 */6 * * *",
+        delivery: "persisted_idempotent_event_plus_structured_server_log",
+      },
+      exceptionRule:
+        "append_only_bounded_explanation_never_restores_completeness",
+      dailyCompletenessRule: "withheld_on_breach_or_unknown",
+      reportClockArithmetic: "explicit_timestamp_cast_before_interval",
+      legacyRule:
+        "Pre-contract pending items remain unpublished in legacy quarantine and are not counted as reviewed, approved, rejected, or SLA-compliant.",
     },
     numericDeltas: {
       publicStatus: "public_experimental",
@@ -758,15 +915,24 @@ export function buildPulseRuntimeMethod(
       includedEvents: "published_only",
       inputMethodCoverage: "row_level_versioned_with_explicit_legacy",
       trailingWindowDays: facts.scoreWindowDays,
+      windowBoundary: "inclusive_365_days_future_excluded",
+      currentProjection: "one_row_per_jurisdiction_dimension",
+      noEventState: "zero_tombstone_internal_public_null",
+      outputHistory: "append_only_per_score_run_jurisdiction_dimension",
+      writeAtomicity:
+        "history_projection_and_run_completion_one_transaction",
       boundsPerDimension: {
         lower: facts.deltaBounds.lower,
         upper: facts.deltaBounds.upper,
       },
       impactFormula:
-        "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
+        "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)",
       scoreStageOrder: ["corroborate", "score"],
+      absorptionEvidence: "append_only_explicit_event_link_fixed_scale",
+      absorptionMultiplier: "absorbed_zero_otherwise_one",
+      currentAbsorptionStanding: "none_no_sequential_comparable_release",
       absorbedIntoIndexPolicy:
-        "non_durable_zero_then_daily_recompute_can_restore",
+        "separate_versioned_decision_never_mutates_corroboration",
     },
     evaluation: {
       backtestMatchesCurrentProduction: false,
@@ -974,9 +1140,11 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
     countryPartitioned: false,
     identityVersion: PULSE_EVENT_IDENTITY_VERSION,
     embeddingModel: PULSE_EMBEDDING_MODEL,
-    dateWindowHours: 48,
-    semanticThreshold: 0.75,
-    lexicalThreshold: 0.42,
+    dateWindowHours: PULSE_INCIDENT_COMPARISON_WINDOW_HOURS,
+    semanticThreshold: PULSE_INCIDENT_SEMANTIC_CANDIDATE_THRESHOLD,
+    semanticOnlyThreshold: PULSE_INCIDENT_SEMANTIC_ONLY_CANDIDATE_THRESHOLD,
+    lexicalTokenThreshold: 0.45,
+    lexicalAnchorThreshold: 0.8,
   },
 };
 

@@ -39,6 +39,7 @@ import {
   zPulseEventsResponse,
   zPulseChangelogResponse,
   zCountryExportJson,
+  zElectionResearchExport,
   type GovernmentClassificationShape,
 } from "./schemas";
 import {
@@ -67,6 +68,7 @@ import {
   CURRENT_CI_RELEASE_ID,
 } from "@/lib/ci/current-release";
 import { resolveCiRelease } from "@/lib/ci/release-selection";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 const currentCiSeries = resolveCiRelease(CURRENT_CI_RELEASE_ID).series;
 
@@ -203,6 +205,29 @@ const exampleProvenanceEntry = {
  * /api/v1/countries
  * ──────────────────────────────────────────────────────────────── */
 
+const exampleSovereignStatus: JurisdictionStatusPresentation = {
+  version: "jurisdiction-status/v1" as const,
+  type: "sovereign_state" as const,
+  label: "UN member state",
+  note: "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+  reviewedAt: "2026-07-10",
+  administeringJurisdictionIso3: null,
+  disputed: false,
+  includeInSovereignStateCounts: true,
+  sources: [
+    {
+      id: "un_member_states",
+      label: "United Nations Member States",
+      url: "https://www.un.org/en/about-us/member-states",
+    },
+    {
+      id: "un_m49",
+      label: "UN Statistics M49 countries or areas",
+      url: "https://unstats.un.org/unsd/methodology/m49/",
+    },
+  ],
+};
+
 const countriesExampleResponse = zCountriesListResponse.strict().parse({
   data: [
     shapeCountryListItem({
@@ -219,10 +244,11 @@ const countriesExampleResponse = zCountriesListResponse.strict().parse({
       areaSqKm: 9833520,
       flagUrl: "https://civicaatlas.org/flags/us.svg",
       governmentClassification: usaClassification,
+      jurisdictionStatus: exampleSovereignStatus,
     }),
   ],
   meta: shapeCountriesListMeta({
-    total: 195,
+    total: 253,
     limit: 50,
     offset: 0,
     hasMore: true,
@@ -269,6 +295,7 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
     governmentType: "semi-presidential republic",
     governmentTypeDetail: "semi-presidential republic",
     governmentClassification: franceClassification,
+    jurisdictionStatus: exampleSovereignStatus,
     flagUrl: "https://civicaatlas.org/flags/fr.svg",
     constitution: { year: 1958, yearUpdated: 2008 },
     government: {
@@ -939,6 +966,16 @@ function pulseVersionIdentityExample(
                 provider: "deepseek",
                 model: "deepseek-v4-flash",
               },
+              {
+                role: "classify" as const,
+                provider: "glm",
+                model: "glm-4.7",
+              },
+              {
+                role: "classify" as const,
+                provider: "anthropic",
+                model: "claude-haiku-4-5",
+              },
             ]
           : [],
       upstreamRunIds: [],
@@ -952,6 +989,48 @@ const pulseExampleVersionSet = {
   containsLegacy: false,
   comparableAsSingleSeries: true,
 };
+
+const pulseExamplePromptVersion = "pulse-classifier-prompt/example";
+const pulseExampleConfigurationHash = `pulse-classification-config/sha256:${"b".repeat(64)}`;
+
+function pulseUnanimousClassifierRuns() {
+  const shared = {
+    temp: 0,
+    role: "classify" as const,
+    promptVersion: pulseExamplePromptVersion,
+    methodVersion: pulseSnapshot.version,
+    configurationHash: pulseExampleConfigurationHash,
+    configuredEngineCount: 3,
+    category: "judicial_independence_rollback",
+    dimension: "rule_of_law",
+    severityTier: "moderate_neg",
+    severityValue: -1.2,
+  };
+
+  return [
+    {
+      ...shared,
+      run: 1,
+      provider: "deepseek",
+      model: "deepseek-v4-flash",
+      rationale: "Court decision restricts judicial review scope.",
+    },
+    {
+      ...shared,
+      run: 2,
+      provider: "glm",
+      model: "glm-4.7",
+      rationale: "The ruling narrows review of executive decrees.",
+    },
+    {
+      ...shared,
+      run: 3,
+      provider: "anthropic",
+      model: "claude-haiku-4-5",
+      rationale: "The institutional change reduces judicial oversight.",
+    },
+  ];
+}
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/pulse/[country_slug]/dimensions
@@ -1247,18 +1326,7 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
       severityTier: "moderate_neg",
       severityValue: -1.2,
       classifierAgreement: "all",
-      classifierRuns: [
-        {
-          run: 1,
-          temp: 0,
-          provider: "deepseek",
-          category: "judicial_independence_rollback",
-          dimension: "rule_of_law",
-          severityTier: "moderate_neg",
-          severityValue: -1.2,
-          rationale: "Court decision restricts judicial review scope.",
-        },
-      ],
+      classifierRuns: pulseUnanimousClassifierRuns(),
       corroborationConfidence: 0.42,
       legacyInformationContextPresent: true,
       humanReviewed: false,
@@ -1369,6 +1437,7 @@ const countryExportJsonExample = zCountryExportJson.parse({
     iso2: "FR",
     iso3: "FRA",
     status: "sovereign_state",
+    statusDetails: exampleSovereignStatus,
   },
   facts: [
     {
@@ -1435,6 +1504,89 @@ const countryExportJsonExample = zCountryExportJson.parse({
   rights: { manifest: "/api/rights-manifest", policy: "source-row-filtered" },
 });
 
+const electionResearchExample = zElectionResearchExport.parse({
+  schemaVersion: "election-research-export/v1",
+  generatedAt: "2026-07-12T00:00:00.000Z",
+  audit: { version: "election-corpus-audit/v1", asOf: "2026-07-12" },
+  dateSemantics: {
+    representation: "date_only",
+    time: null,
+    timeZone: null,
+    note: "Publisher records provide calendar dates without a time of day or source time zone; UTC is not asserted.",
+  },
+  filters: { type: "presidential" },
+  data: [
+    {
+      id: "example-election-id",
+      conceptualEventKey: "example-us|presidential|2024-11-05",
+      disposition: "qualified_event",
+      jurisdiction: {
+        id: "example-us",
+        slug: "united-states",
+        name: "United States",
+        iso2: "US",
+        iso3: "USA",
+        status: "sovereign_state",
+        statusLabel: "UN member state",
+        disputed: false,
+      },
+      event: {
+        name: "2024 United States presidential election",
+        type: "presidential",
+        date: {
+          value: "2024-11-05",
+          representation: "date_only",
+          time: null,
+          timeZone: null,
+          timeZoneStatus: "not_provided_by_source",
+          basis: "source_confirmed",
+          precision: "day",
+          role: "point_in_time",
+          temporalClass: "historical",
+          sourceStatus: "source_dated",
+        },
+        electoralSystem: null,
+      },
+      provenance: {
+        sourceId: "wikidata",
+        sourceUrl: "https://www.wikidata.org/wiki/Q101110072",
+        license: "CC0",
+        retrievedAt: "2026-07-05T14:03:06.491Z",
+        rightsReview: "verified",
+      },
+    },
+  ],
+  withheld: {
+    rows: 1,
+    projectionRows: 1,
+    bySource: [
+      {
+        sourceId: "ipu_parline",
+        count: 1,
+        reason:
+          "IPU Parline export rights remain pending and non-commercial-only.",
+      },
+    ],
+    fields: [
+      {
+        field: "electoralSystem",
+        count: 1,
+        reason:
+          "Stored electoral-system labels do not yet carry exact field-level statement provenance and are not exported.",
+      },
+    ],
+    reason:
+      "Only qualified Wikidata rows with verified CC0 export rights are emitted. IPU, IDEA, projections derived from IPU, and unknown-source rows are withheld.",
+  },
+  rights: { manifest: "/api/rights-manifest", policy: "source-row-filtered" },
+  meta: {
+    auditedRowsMatchingFilters: 2,
+    qualifiedEventOrContestRowsMatchingFilters: 1,
+    projectionRowsMatchingFilters: 1,
+    emittedRows: 1,
+  },
+});
+
 /* ────────────────────────────────────────────────────────────────
  * Public map + renderer
  * ──────────────────────────────────────────────────────────────── */
@@ -1457,6 +1609,7 @@ export const EXAMPLES = {
   pulseEvents: pulseEventsExampleResponse,
   pulseChangelog: pulseChangelogExampleResponse,
   countryExport: countryExportJsonExample,
+  elections: electionResearchExample,
 } as const;
 
 export type ExampleId = keyof typeof EXAMPLES;
@@ -1469,7 +1622,7 @@ export function renderExample(id: ExampleId): string {
 }
 
 export function renderCountryExportCsvExample(): string {
-  return `${COUNTRY_EXPORT_CSV_HEADER}\ncountry-research-export/v1,example-france-id,france,France,FR,FRA,sovereign_state,population_total,canonical,…`;
+  return `${COUNTRY_EXPORT_CSV_HEADER}\ncountry-research-export/v1,…,example-france-id,france,France,FR,FRA,sovereign_state,UN member state,…,population_total,canonical,…`;
 }
 
 export { COUNTRY_EXPORT_CSV_HEADER };

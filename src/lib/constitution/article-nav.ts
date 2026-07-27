@@ -51,7 +51,7 @@ function isPartHeading(label: string): boolean {
 }
 
 /** Slugify a section id (`section/8`) into a DOM-safe id (`sec-section-8`). */
-function domIdFor(sectionId: string, index: number): string {
+export function constitutionSectionDomId(sectionId: string, index = 0): string {
   const base = (sectionId || `s${index}`).replace(/[^a-zA-Z0-9]+/g, "-");
   return `sec-${base}`;
 }
@@ -81,7 +81,7 @@ export function buildArticleNav(
 
   articles.forEach((article, index) => {
     const label = article.headingLabel || "Untitled";
-    const domId = domIdFor(article.sectionId, index);
+    const domId = constitutionSectionDomId(article.sectionId, index);
     const partHeading = isPartHeading(label);
 
     if (partHeading) {

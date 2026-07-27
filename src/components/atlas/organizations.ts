@@ -30,6 +30,10 @@ export interface OrgMember {
   joinYear: number | null;
   role: string | null;
   inAtlas?: boolean;
+  /** ATL-012 — "withdrawn" marks a membership that has formally ended. */
+  status?: "current" | "withdrawn";
+  /** Year the membership ended, when status is "withdrawn". */
+  endYear?: number | null;
 }
 
 export interface OrgDetail {
@@ -46,6 +50,13 @@ export interface OrgDetail {
     extra: Record<string, unknown> | null;
   };
   members: OrgMember[];
+  membershipSource: {
+    label: string;
+    url: string;
+    license: string;
+    retrievedAt: string;
+    coverage: "complete" | "selected";
+  };
 }
 
 export const ORG_TYPE_LABEL: Record<OrgType, string> = {

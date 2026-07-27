@@ -2,6 +2,10 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
+/** The Civica Drizzle client type, shared so helpers (e.g. the live-read-only
+ *  test client) can annotate against it without re-deriving the generic. */
+export type CivicaDb = NeonHttpDatabase<typeof schema>;
+
 let _db: NeonHttpDatabase<typeof schema> | null = null;
 
 export function getDb() {

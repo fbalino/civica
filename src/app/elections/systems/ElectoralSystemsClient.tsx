@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Chip } from "@/components/editorial/Pill";
 import { Tooltip } from "@/components/editorial/Tooltip";
-import { SegmentedControl } from "@/components/editorial/SegmentedControl";
+import { Banner } from "@/components/editorial/Banner";
 import { SourceDot } from "@/components/SourceDot";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import type { SystemKey, SystemCountry } from "@/lib/elections/electoral-systems";
@@ -41,11 +41,11 @@ const SYSTEMS: SystemCopy[] = [
     howItWorks:
       "The country is divided into single-member districts. Each voter marks one candidate, and the candidate with the most votes in a district wins the seat — a simple plurality, with no requirement to reach an outright majority.",
     keyCharacteristic:
-      "It tends toward two-party competition (Duverger's Law) and single-party governments. Votes cast for losing candidates translate into no seats, so a party's share of seats can diverge sharply from its share of votes.",
+      "Plurality systems are often associated with concentrated party competition, but the pattern varies with district design and political context. Votes cast for losing candidates translate into no seats, so a party's share of seats can diverge sharply from its share of votes.",
     advantages: [
       "Simple to cast and to count",
       "One identifiable local representative per district",
-      "Usually produces a clear governing majority",
+      "Can make single-party governing majorities more likely",
     ],
     disadvantages: [
       "Large numbers of votes elect no one",
@@ -63,7 +63,7 @@ const SYSTEMS: SystemCopy[] = [
     howItWorks:
       "Voters choose a party list (open or closed) in multi-member districts. Seats are allocated to each party in proportion to its share of the vote, using a divisor or quota formula. A legal threshold — commonly 3–5% — filters out the smallest parties.",
     keyCharacteristic:
-      "List PR is the most widely used family worldwide. It produces multi-party legislatures and, frequently, coalition governments, and lets minority and dispersed constituencies win representation.",
+      "List PR is widely used and is often associated with multi-party legislatures and coalition government. Its effects vary with thresholds, district magnitude, party organization, and other institutional rules.",
     advantages: [
       "Seat share closely tracks vote share",
       "Few votes are wasted",
@@ -84,7 +84,7 @@ const SYSTEMS: SystemCopy[] = [
     howItWorks:
       "Voters cast two votes: one for a local district candidate and one for a party list. Some seats are filled by district winners; others come from the lists. Under Mixed-Member Proportional (MMP) the list seats compensate so the overall result is proportional; under Parallel (MMM) the two tiers are counted independently, so the result is only partly proportional.",
     keyCharacteristic:
-      "Mixed systems pair a local representative with a party-list tier. The compensatory MMP variant (Germany, New Zealand) delivers a proportional legislature; the parallel MMM variant keeps the tiers separate and sits closer to plurality outcomes.",
+      "Mixed systems pair a local representative with a party-list tier. The compensatory MMP variant is designed to make the overall result more proportional; the parallel MMM variant keeps the tiers separate and can produce less proportional outcomes.",
     advantages: [
       "Combines local representation with list seats",
       "MMP produces broadly proportional results",
@@ -105,7 +105,7 @@ const SYSTEMS: SystemCopy[] = [
     howItWorks:
       "Voters rank candidates in order of preference. Under the Alternative Vote, in a single-member seat, the lowest candidate is eliminated and their ballots transfer to the next preference until one candidate holds a majority. The Single Transferable Vote applies the same ranked ballot across multi-member districts to produce a proportional result.",
     keyCharacteristic:
-      "Ranked ballots let voters express more than a single choice and reduce the incentive to vote tactically. AV guarantees the single-seat winner has majority support; STV extends preferential voting to proportional, multi-member outcomes.",
+      "Ranked ballots let voters express more than a single choice and can change tactical incentives. AV identifies a single-seat winner after preference transfers; STV applies preferential transfers in multi-member contests.",
     advantages: [
       "Winners hold majority or quota-level support",
       "Voters can rank rather than pick one",
@@ -242,7 +242,7 @@ function PrVisual() {
         <BarRow label="Party C" color={PARTY.C} seatsPct={23} detail="23 seats · 23% of votes" />
       </div>
       <p className="elsys-note">
-        Each party's seat share mirrors its vote share. The 13-seat gap Party C
+        Each party&rsquo;s seat share mirrors its vote share. The 13-seat gap Party C
         faced under plurality rules closes. Figures are illustrative.
       </p>
     </>
@@ -378,9 +378,10 @@ function SystemCard({
   countries: SystemCountry[];
   sourceRetrievedAt: string | null;
 }) {
+  const [showAllCountries, setShowAllCountries] = useState(false);
   const Visual = VISUALS[copy.key];
-  const shown = countries.slice(0, CHIP_LIMIT);
-  const remaining = countries.length - shown.length;
+  const shown = showAllCountries ? countries : countries.slice(0, CHIP_LIMIT);
+  const countryListId = `elsys-country-list-${copy.key}`;
 
   return (
     <div className="elsys-card">
@@ -438,7 +439,7 @@ function SystemCard({
             <SourceDot source="ipu_parline" retrievedAt={sourceRetrievedAt} />
           </span>
         </div>
-        <div className="elsys-chips">
+        <div className="elsys-chips" id={countryListId}>
           {shown.length === 0 ? (
             <span className="elsys-chip-more">
               No countries in IPU Parline&rsquo;s current classification.
@@ -455,13 +456,23 @@ function SystemCard({
                   }
                 >
                   <Link href={`/country/${c.slug}`} className="elsys-chip">
-                    <CountryFlag iso2={c.iso2} size={16} />
+                    <CountryFlag iso2={c.iso2} size={16} decorative />
                     {c.name}
                   </Link>
                 </Tooltip>
               ))}
-              {remaining > 0 && (
-                <span className="elsys-chip-more">+{remaining} more</span>
+              {countries.length > CHIP_LIMIT && (
+                <button
+                  type="button"
+                  className="btn btn--text btn--sm"
+                  aria-expanded={showAllCountries}
+                  aria-controls={countryListId}
+                  onClick={() => setShowAllCountries((value) => !value)}
+                >
+                  {showAllCountries
+                    ? "Show fewer classifications"
+                    : `Show all ${countries.length} classifications`}
+                </button>
               )}
             </>
           )}
@@ -476,33 +487,109 @@ function SystemCard({
 export default function ElectoralSystemsClient({
   buckets,
   sourceRetrievedAt,
+  dataAvailable,
+  dataError,
 }: {
   buckets: Record<SystemKey, SystemCountry[]>;
   sourceRetrievedAt: string | null;
+  dataAvailable: boolean;
+  dataError: string | null;
 }) {
   const [active, setActive] = useState<SystemKey>("fptp");
   const activeCopy = SYSTEMS.find((s) => s.key === active)!;
+  const instanceId = useId().replaceAll(":", "");
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const activeIndex = SYSTEMS.findIndex((system) => system.key === active);
+  const panelId = `elsys-panel-${instanceId}`;
+
+  function selectTab(index: number) {
+    const next = (index + SYSTEMS.length) % SYSTEMS.length;
+    setActive(SYSTEMS[next].key);
+    tabRefs.current[next]?.focus();
+  }
+
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      selectTab(activeIndex + 1);
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      selectTab(activeIndex - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      selectTab(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      selectTab(SYSTEMS.length - 1);
+    }
+  }
+
+  if (!dataAvailable) {
+    return (
+      <div role="alert">
+        <Banner variant="warn">
+          <strong>Classification data unavailable.</strong>{" "}
+          {dataError ??
+            "The IPU-backed classification could not be loaded. Try again later."}
+        </Banner>
+      </div>
+    );
+  }
 
   return (
     <>
-      <Reveal as="div" amount={0.4} className="elsys-tabs">
-        <SegmentedControl<SystemKey>
-          ariaLabel="Choose an electoral system"
-          value={active}
-          onChange={setActive}
-          options={SYSTEMS.map((s) => ({ value: s.key, label: s.tab }))}
-        />
+      <Reveal
+        as="div"
+        amount={0.4}
+        className="elsys-tabs"
+      >
+        <div
+          role="tablist"
+          aria-label="Choose an electoral system"
+          className="segmented"
+        >
+          {SYSTEMS.map((system, index) => {
+            const selected = system.key === active;
+            const tabId = `elsys-tab-${instanceId}-${system.key}`;
+            return (
+              <button
+                key={system.key}
+                ref={(node) => {
+                  tabRefs.current[index] = node;
+                }}
+                id={tabId}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                aria-controls={panelId}
+                tabIndex={selected ? 0 : -1}
+                className={`segmented__item${selected ? " segmented__item--active" : ""}`}
+                onClick={() => setActive(system.key)}
+                onKeyDown={handleTabKeyDown}
+              >
+                {system.tab}
+              </button>
+            );
+          })}
+        </div>
       </Reveal>
 
-      <Stagger amount={0.1} key={active}>
-        <StaggerItem>
-          <SystemCard
-            copy={activeCopy}
-            countries={buckets[active]}
-            sourceRetrievedAt={sourceRetrievedAt}
-          />
-        </StaggerItem>
-      </Stagger>
+      <div
+        id={panelId}
+        role="tabpanel"
+        aria-labelledby={`elsys-tab-${instanceId}-${active}`}
+        tabIndex={0}
+      >
+        <Stagger amount={0.1} key={active}>
+          <StaggerItem>
+            <SystemCard
+              copy={activeCopy}
+              countries={buckets[active]}
+              sourceRetrievedAt={sourceRetrievedAt}
+            />
+          </StaggerItem>
+        </Stagger>
+      </div>
     </>
   );
 }

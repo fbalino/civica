@@ -726,3 +726,301 @@ This is the durable decision log for the active master plan. New entries append;
 **Decision:** Adopt `civica-advisory-board-charter/v1`. The board advises on Atlas stewardship, governance measurement, political event data, reproducibility, accessibility, and source rights. It has no publication veto and does not replace Fernando Balino as accountable decision-maker. Appointments run for 24 months with one possible renewal and approximately 8–16 hours of ordinary annual service. Standing service is unpaid; substantial reviews are separate, optional, and may receive an owner-approved outcome-independent honorarium. Conflicts may be managed, require recusal, or end participation. Names, affiliations, quotations, and review publication require specific consent. Board service validates neither Civica as a whole nor any particular claim, method, release, or later change.
 
 **Why:** A board can improve criticism and accountability only if members know the authority, time, confidentiality, conflict, payment, and publication terms before accepting. Separating ordinary board service from scoped review work prevents an honorary affiliation from becoming implied peer review. The public empty roster also prevents recruitment from being mistaken for an appointed body.
+
+### APR-D138 — Advisory applications use a bounded private recruitment record
+
+**Decision:** Adopt `civica-advisory-application-privacy/v1`. The form accepts private expressions of interest across the charter's five expertise lanes and requires explicit consent to the versioned notice. Fernando Balino is the current reader. Vercel and Neon are named as infrastructure processors. New application rows do not retain IP addresses; a hashed, expiring rate-limit key and honeypot provide abuse control. The application is deleted within 18 months even if the person is later appointed or accepts separate work; those relationships receive separate records and consent. Applicants may request access, correction, or earlier deletion through the contact route. The automatic acknowledgement is onscreen only, and no reply, appointment, assignment, or response date is promised.
+
+**Why:** Recruitment needs enough information to judge fit without turning an expression of interest into a permanent profile. A short retention period, separate later records, a visible deletion control, and honest response language keep the form useful while limiting personal-data exposure and false expectations.
+
+### APR-D139 — Japan light anchors a restrained, reproducible engraving family
+
+**Decision:** Adopt `civica-engraving-color/v1`. Japan light is the canonical light reference. The approved dark corpus uses the owner-selected strength-60 modulation (saturation ×0.730, hue −6°, brightness ×1.018) rather than the rejected cool split-tone. Exact hashes, light-reference and corpus ranges, tone-contrast floors, 1500×1000 sRGB WebP q88 delivery, and pixel-local line/geometry invariants are machine-validated. France remains a semantic/style regeneration candidate and the already-cool United Kingdom remains a family outlier; neither can pass merely because a broad color metric accepts it.
+
+**Why:** A uniform session-by-session tint created the inconsistency that prompted the work, but the first corrective pilot removed too much of the intended sepia identity. Anchoring the family to approved reference bytes and measurements preserves the owner's calibrated warmth while preventing later sessions from improvising a stronger orange cast or an equally unintended gray-blue look. Separating color compliance from landmark/style fidelity also prevents automated grading from certifying bad art.
+
+### APR-D140 — Every engraving grade produces a tamper-evident sidecar
+
+**Decision:** Adopt `civica-engraving-grade/1.0.0` as the only production grading path for existing engravings. Each preview or final output records input/output SHA-256, absolute paths, mode, exact approved recipe, source/result geometry, metadata policy, and before/after color metrics in an adjacent `.grade.json` sidecar. An exact rerun is a no-write. An existing graded output cannot be used as another input, and a conflicting sidecar requires explicit `--force` after review. Manifest outputs must be unique.
+
+**Why:** The pilot proved that a deterministic transform can still become unsafe if sessions invent paths, overwrite outputs, omit parameters, or grade an already graded file. The sidecar turns each result into a reproducible derivation and supplies the guard needed to prevent cumulative color drift. Preview and final modes use the same color recipe, differing only in WebP quality, so approval is based on the same transform that ships.
+
+### APR-D141 — Missing historical illustration prompts remain unknown
+
+**Decision:** Adopt `civica-editorial-illustration-manifest/v1` as the complete asset ledger for every tracked WebP under `public/engravings`. It records all recoverable entity, route, subject, caption, pair, file, Git-introduction, grading, rights/disclosure, and QA information. Original AI model, tool, prompt, seed, and source-reference sessions were not retained and are marked `unknown-not-retained` with `partial-irrecoverable-generation-session`; Git introduction dates are not represented as generation dates. The deterministic source-logo strip is separately classified and does not claim an AI model or prompt.
+
+**Why:** A fabricated reconstruction would make the provenance record look fuller while making it less trustworthy. The checked manifest closes current asset coverage and gives future work a durable schema, while explicit gaps tell readers and maintainers exactly what cannot be recovered. New and regenerated assets can now enter with complete metadata without rewriting the historical record.
+
+### APR-D142 — Reader engraving paths are WebP-only
+
+**Decision:** Country and territory reader routes no longer fall back to raw PNG generation exports. The country corpus permits the two existing production sizes, 1500×1000 and 1536×1024, because both are exact 3:2 assets; files must remain between 75KB and 750KB. Every ISO3 requires an exact light/dark pair, caption, manifest rows, and accepted dark color-contract state. The United Kingdom's recorded color-family exception is allowed only by its explicit manifest state.
+
+**Why:** A convenience fallback let an unoptimized multi-megabyte generation drop appear publicly before conversion, provenance capture, or QA. Removing it makes the release path match the documented workflow. Accepting the seven real 1536×1024 light assets avoids a meaningless resize while preserving the invariant that matters to layout—3:2 geometry—and the file bound still protects performance.
+
+### APR-D143 — Editorial art is disclosed at the point of display
+
+**Decision:** Every engraved landing-page hero visibly says `Editorial illustration · AI-assisted, non-documentary` and links to `/licensing#imagery`. Country and territory mastheads retain the shorter visible `Editorial engraving` / `AI-assisted illustration` register beside the landmark caption, while the link's accessible name adds `non-documentary editorial art`. Background images remain empty-alt and aria-hidden so the disclosure is announced once. The licensing policy names `civica-editorial-illustration-manifest/v1`, states that complete asset coverage does not restore missing generation-session metadata, and says the art is not source evidence.
+
+**Why:** A global policy link is too remote to prevent a decorative landmark scene from being mistaken for sourced visual evidence. Point-of-display language closes that ambiguity without turning every hero into a legal notice. Decorative image semantics prevent duplicate screen-reader announcements, while the adjacent text supplies the classification and policy path.
+
+### APR-D144 — Semantic figure structure must preserve the masthead grid
+
+**Decision:** Country and territory hero art and its caption share a real `<figure>` parent. The wrapper uses the canonical `display: contents` composition so image and caption remain direct participants in the existing hero grid: content occupies `minmax(0, 1fr)` and the caption occupies the final `auto` row. ParallaxImage resolves its scroll target with the nearest section, not its immediate parent, so the semantic wrapper cannot create a degenerate motion target. The shared header component is now part of Index presentation change control because it can render research-score metadata.
+
+**Why:** The earlier collision fix reserved the right space but left invalid HTML. A normal boxed figure would repair semantics while breaking grid placement and parallax. The contents wrapper keeps the layout invariant and gives the caption its correct structural owner. Protecting the shared header closes a gap in the existing append-only presentation registry.
+
+### APR-D145 — Map previews, activation, and attribution remain separate controls
+
+**Decision:** A country masthead map preview is noninteractive and cannot inject MapLibre controls. One native button overlays the preview and opens the interactive map. OpenStreetMap and Protomaps/OpenFreeMap attribution links sit outside that button with their own accessible names and focus stops. Closing the map returns focus to the activation button; explicit Enter and Space handling preserves keyboard operation in browser and assistive-technology paths.
+
+**Why:** Putting MapLibre attribution links inside a full-tile button created invalid nested interaction and ambiguous focus behavior. Separating the three responsibilities keeps attribution usable without weakening the large activation target or hiding the map's data and provider credits.
+
+### APR-D146 — Pulse events resolve through stable incidents
+
+**Decision:** Adopt `pulse-incident-resolution/v1`. A stable incident owns raw-report assignments and can carry successive event projections without erasing any source, decision, or prior projection. Incoming reports compare with the current batch and recent persisted incidents inside 48 hours. Compatible exact normalized identities may merge automatically. Exact normalized headlines may also merge when resolved country, calendar date, and labels agree. Multilingual semantic matches and the lexical fallback create review candidates only. Blank headlines are quarantined. Confirmed merges select one current projection and trigger new corroboration and dimensional-score runs under an incident-aware algorithm version.
+
+**Why:** Run-local cluster IDs allowed later reports about the same occurrence to become separate scored events. A narrow automatic gate repairs exact duplicates without turning approximate similarity into an irreversible merge. The candidate ledger preserves uncertain matches for review and future error analysis.
+
+### APR-D147 — Pulse classification state is configuration-keyed and bounded
+
+**Decision:** Adopt `pulse-classification-state/v1`. Each cluster and complete
+classifier configuration has one current state: `classified`, `none`,
+`retryable_failure`, or `terminal_failure`. Every claim and settlement also
+writes an append-only attempt phase. Never-attempted work precedes due retries.
+Retryable failures receive at most three attempts with bounded backoff;
+authentication errors and exhausted retries terminate. A valid `none` outcome
+is terminal but is not a failure. Configuration hashes include the actual
+models, prompts, method, ontology, publication gate, decoding modes, and retry
+policy, while excluding secrets and run-local identity.
+
+**Why:** Inferring pending work from missing events caused terminal outcomes to
+be reconsidered and made provider spending, failures, and backlog age
+unobservable. Stable configuration identity permits intentional re-evaluation
+after a real method change without repeating identical terminal work. Atomic
+leases prevent overlapping workers from paying for the same cluster, and the
+attempt ledger keeps operational failures available for later error studies.
+
+### APR-D148 — Pulse review deadlines are operational, not validity claims
+
+**Decision:** Adopt `pulse-review-sla/v1`. Catastrophic-negative items are
+critical and due within 24 hours; severe-negative and high-positive items are
+urgent and due within 72 hours; other review-gated items are due within seven
+days. Queue entry creates a database obligation with a frozen deadline.
+Escalations and bounded exceptions are append-only. An exception explains a
+delay but never restores daily-completeness wording. Pre-contract pending rows
+remain unpublished as `legacy_quarantined`, distinct from approval, rejection,
+or human review.
+
+**Why:** Severity sorting alone allowed older review work to disappear behind
+newer event dates and gave no operational account of delay. Explicit clocks
+and a fail-closed monitor make backlog state observable without presenting an
+internal response target as evidence that a classification is correct. Legacy
+quarantine preserves the old evidence without fabricating decisions.
+
+### APR-D149 — Scalar Pulse v1 is retired, not translated
+
+**Decision:** The abandoned Pulse v1 scalar score, CP ranking, and score embed
+are terminally retired. `sort=cp` returns a documented `410 Gone`; dimensional
+v2 effects remain named, separate, experimental API values and are never
+merged into a replacement scalar. The legacy v1 cron and CLI entry points fail
+before database or model access. The two empty scalar-output relations are
+dropped only through a migration that aborts if either contains a row. The
+separate legacy event ledger remains retained evidence.
+
+**Why:** Mapping multiple experimental dimensions onto one country number
+would invent a weighting and comparability decision before PUL-029. Leaving an
+empty table and executable writer in place would preserve a silent path back
+to a method the public contract already rejects. Fail-closed retirement removes
+that ambiguity without deleting the historical event records needed for audit
+and later evaluation.
+
+### APR-D150 — Pulse absence clears the projection and preserves the run
+
+**Decision:** Pulse scoring uses a closed 365-day window and evaluates the
+union of jurisdictions with eligible events and jurisdictions with an existing
+projection. A jurisdiction with no eligible event receives five internal zero
+tombstones with empty contributor lists. The country-dimensions API returns
+`null` for those rows. Each computation writes an append-only history row and
+the current projection with the same run, as-of date, window, value,
+contributors, and derivation envelope. History, projection, and successful run
+completion share one atomic database batch.
+
+**Why:** Leaving a prior nonzero row in place after its final event ages out
+turns yesterday's evidence into a current claim. Deleting the row would remove
+the record needed to reproduce the transition. An internal tombstone clears
+the current state while the public null preserves the distinction between no
+eligible event, low observation, and stability. Immutable per-run outputs make
+later method comparisons and exact historical replay possible.
+
+### APR-D151 — Pulse agreement is a stored-evidence derivation
+
+**Decision:** Adopt `pulse-stored-ensemble/v1` under runtime method
+`pulse-v2.13-beta`. A supported agreement label requires at least two
+provider-distinct classify runs with the same explicit prompt, method,
+configuration hash, and configured panel size. Duplicate providers, mixed
+versions, legacy evidence, and one-run results derive agreement `none`.
+Automatic publication additionally requires the publication gate and a
+resolved primary jurisdiction. Human approval remains independent and may
+publish an event without changing its ensemble agreement. Unsupported legacy
+automatic publications are retained as `legacy_quarantined` projections.
+
+**Why:** A label supplied by a script can make one model call look like an
+ensemble result. Deriving the label from retained evidence makes the claim
+reproducible and prevents a confidence estimate or subscription-agent run from
+becoming a false quorum. Separate human authority preserves valid editorial
+decisions without rewriting model evidence.
+
+### APR-D152 — Pulse absorption is separate append-only evidence
+
+**Decision:** Adopt `pulse-event-absorption/v1` under runtime method
+`pulse-v2.14-beta`. An event can be marked absorbed only when an exact,
+confirmed event-to-observation link joins sequential Index releases with the
+same fixed input/display scale and dimension identity, the movement clears the
+declared threshold in the event's direction, and the decision carries method,
+reason, evidence references, actor, and as-of time. Model-only candidates and
+aggregate movement cannot confirm absorption. Decisions are append-only and
+scoring reads the latest applicable decision without changing corroboration
+confidence. The current same-period release set supports no absorption.
+
+**Why:** Destructively zeroing confidence merges two different claims: whether
+an event is corroborated and whether a later Index observation already reflects
+it. Separate evidence preserves both histories, prevents later corroboration
+from erasing an earlier decision, and makes reruns deterministic. Requiring a
+fixed-scale sequential comparison and an explicit event link prevents ordinary
+country-level score movement from being attributed to an event by inference.
+
+### APR-D153 — Information context is pinned evidence, not an imputation
+
+**Decision:** Adopt immutable release, jurisdiction-value, and event-pin
+contracts under `pulse-v2.15-beta`. The exact official RSF 2026 capture has one
+observed-or-explicit-missing row for every supported non-aggregate
+jurisdiction. A database trigger copies the value or missing state, release,
+source, vintage, retrieval time, content hash, rights/use standing, and
+classification lineage when a new event is inserted. Historical events remain
+explicitly unrecoverable because no contemporaneous versioned pin existed.
+Release, value, and pin rows reject updates and deletes. Restricted country
+values remain internal; production weighting and restricted-information
+observability are disabled pending separate rights and validation gates.
+
+**Why:** A mutable country scalar cannot show which publisher release a model
+saw, and a default midpoint converts absent evidence into a fabricated
+observation. Complete missingness rows close the supported universe without
+imputation. Classification-time pins prevent later dataset or corroboration
+runs from rewriting history. Keeping the data inactive preserves the
+distinction between auditable context, a sensitivity assumption, and a
+validated correction for reporting asymmetry.
+
+### APR-D154 — Pulse validation has three non-substitutable lanes
+
+**Decision:** Adopt `pulse-validation-protocol/v1` as a locked but not-started
+protocol. The ten named historical shocks are regression fixtures with no
+inferential role. Retrospective validity uses the frozen event-candidate,
+system-negative, and country-day frames and counts end-to-end failures. A
+separate 90-day prospective window freezes the entire current production
+pipeline before independent human labels are opened. Semantic method changes
+end that window and require a new version. Results must be reported even when
+underpowered, inconclusive, or adverse.
+
+**Why:** Famous cases can expose software regressions but cannot estimate
+retrieval failures, false positives, or population accuracy. Retrospective
+sampling covers retained history; a future, label-blind window tests evidence
+that was unavailable when the method was locked. Keeping these purposes
+separate prevents a successful smoke test or high model agreement from being
+presented as external validity.
+
+### APR-D155 — Atlas surfaces have one machine-readable ownership matrix
+
+**Decision:** Adopt `civica-atlas-surface-data-matrix/v1` for every public
+data-bearing Atlas route and every module in the unified country reader. Each
+row binds the renderer to its query/loader, storage and fields, provenance,
+coverage, seven data/UI states, tests or a named test gap, owner, and exact
+relation to the frozen export. A route may display data that remains excluded
+from bulk release; redistribution follows row/source rights, never UI presence.
+
+**Why:** Route code alone cannot answer which table supplies a value, who owns
+its failure state, or whether the same data belongs in a frozen package. A
+checked matrix makes those boundaries reviewable and gives later coverage and
+state-repair tasks a stable inventory instead of another ad hoc audit.
+
+### APR-D156 — Atlas domain minimums disclose rather than erase weak coverage
+
+**Decision:** Expand `atlas-domain-coverage/v1` to 14 closed domains and apply
+one auditable operational floor: warn below 80 percent jurisdiction coverage,
+below 80 percent completeness for any measured field, after 180 days without a
+successful run, or when a domain/source run time is unknown. Every row derives
+a minimums standing and the public behavior
+`publish_with_coverage_status_and_known_gaps`. Below-threshold records may
+remain available subject to rights, but the domain cannot be called complete.
+
+**Why:** Removing sparse domains would make the report look healthier while
+concealing the exact gaps readers need to judge. A shared floor makes drift
+visible across very different datasets without pretending the threshold is a
+scientific validity result. Export rights and experimental-product gates remain
+separate decisions.
+
+### APR-D157 — Longitudinal history stays publisher-native and rights-filtered
+
+**Decision:** Make the five retained publisher series a first-class country and
+comparison surface without combining them into a Civica score. Charts and
+downloads preserve native units, observed years, explicit absence states,
+source freshness, captured release, artifact, transformation, and method
+lineage. Missing years never imply zero or no change. Public downloads are
+filtered per source through the rights manifest; a visible chart does not imply
+redistribution permission. The present history is identified as a current
+captured release's historical series, not historical as-published vintages.
+
+**Why:** Native longitudinal evidence is useful even when an original composite
+has not earned publication. Keeping series separate avoids manufacturing a new
+construct, while visible gaps and lineage let readers judge comparability.
+Rights filtering preserves the distinction between reading a value on Civica
+and receiving a reusable bulk copy of it.
+
+### APR-D158 — Source agreement is a claim-family property
+
+**Decision:** Present fact evidence as single-source, within-tolerance
+agreement, resolver-selected disagreement, or unavailable. Count distinct
+verified producing families rather than database source IDs; republishers share
+their upstream family, projections do not corroborate measurements, and
+compilation or unknown lineage cannot establish independence. Show the selected
+row, alternatives, vintages, and complete deterministic decision trace together.
+
+**Why:** Several branded source rows can carry the same underlying observation.
+Treating them as independent would overstate evidence. A reader also needs to
+distinguish genuine agreement from a rule-based selection among different
+values, while a single-source fact should remain useful without acquiring a
+false reconciliation claim.
+
+### APR-D160 — Reference identity and analytical scope are separate
+
+**Decision:** The full closed `jurisdiction-status/v1` catalog drives identity
+discovery: directory, search, Compare selection, sitemap, profile routes, and
+general country APIs. Research totals and map layers may retain a narrower
+sovereign or map-eligible universe only when the scope is stated. Every public
+identity carries its record-specific label, neutral note, review date,
+countability rule, administering relationship, and source links. A route or
+ISO code never manufactures sovereignty; schema.org `Country` is reserved for
+the closed sovereign-state class and other sourced identities use `Place`.
+
+**Why:** Hiding territories and disputed or associated identities makes the
+reference atlas incomplete, while silently mixing them into sovereign-state
+denominators changes research meaning. Separate contracts let readers find
+every profile without turning catalog inclusion into a political claim.
+
+### APR-D161 — Election storage, qualification, and display are separate
+
+**Decision:** Preserve the 915-row election baseline and qualify each row through
+`election-corpus-audit/v1`. A date is source-dated, imprecise, or term-derived;
+it does not by itself prove that an event is scheduled or completed. Event
+identity and chamber-contest identity remain separate. Turnout and results fail
+closed without field-specific statement evidence. Publisher jurisdiction
+assignment must match Wikidata P17 or the IPU election/chamber country code;
+missing and mismatched identity evidence fail closed. The public calendar
+consolidates unnamed chamber-derived projections by jurisdiction and election
+type, while detailed surfaces may retain separate named chamber contests.
+Limited-recognition records remain outside sovereign totals, and pending source
+rights remain outside public bulk export.
+
+**Why:** Deleting weak rows would conceal the audit trail, while publishing every
+stored row would turn estimates, collisions, imprecise dates, and unsupported
+fields into apparent facts. A checked qualification layer keeps the evidence
+available for repair and gives readers a narrower, reproducible corpus.

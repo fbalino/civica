@@ -116,7 +116,7 @@ test("an empty derived input is an explicit no-op", async () => {
   assert.equal(harness.writes(), 0);
 });
 
-test("normalized identity joins cross-family and cross-language reports despite conflicting provisional countries", async () => {
+test("exact multilingual canonical identity merges despite conflicting provisional countries", async () => {
   const fixture: CandidateRow[] = [
     {
       ...candidates[0],
@@ -146,6 +146,7 @@ test("normalized identity joins cross-family and cross-language reports despite 
     runRef,
   });
   assert.equal(result.clustersCreated, 1);
+  assert.equal(result.collisionCandidates, 0);
   assert.equal(result.multiSourceFamilyClusters, 1);
   assert.equal(result.multilingualClusters, 1);
   assert.equal(result.crossJurisdictionClusters, 1);

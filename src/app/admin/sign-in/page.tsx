@@ -1,3 +1,4 @@
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { CivicaLogo } from "@/components/CivicaLogo";
@@ -42,10 +43,10 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
 
   const error = params.error === "1";
   const googleError = params.error === "google";
-  const redirectAfter =
-    params.redirect && params.redirect.startsWith("/")
-      ? params.redirect
-      : "/admin/pulse-review";
+  const redirectAfter = safeInternalPathOr(
+    params.redirect,
+    "/admin/pulse-review",
+  );
   const googleConfigured = isGoogleSignInConfigured();
 
   return (
@@ -63,17 +64,27 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
           messages.
         </p>
 
+        {/* EXP-034: tabIndex + autoFocus move focus to the error banner on
+            load — this is a server-rendered POST-and-reload form, so the
+            native `autofocus` HTML attribute (not JS) is what actually moves
+            focus, giving keyboard/AT users an immediate landing point on the
+            problem instead of leaving focus stranded at the top of the
+            document. */}
         {error ? (
-          <Banner variant="danger" className="admin-signin-error">
-            That username or password did not match. Check your credentials and
-            try again.
-          </Banner>
+          <div role="alert" id="signin-error" tabIndex={-1} autoFocus>
+            <Banner variant="danger" className="admin-signin-error">
+              That username or password did not match. Check your credentials and
+              try again.
+            </Banner>
+          </div>
         ) : null}
 
         {googleError ? (
-          <Banner variant="danger" className="admin-signin-error">
-            That Google account isn&rsquo;t authorized for admin access.
-          </Banner>
+          <div role="alert" id="signin-google-error" tabIndex={-1} autoFocus>
+            <Banner variant="danger" className="admin-signin-error">
+              That Google account isn&rsquo;t authorized for admin access.
+            </Banner>
+          </div>
         ) : null}
 
         <form
@@ -97,6 +108,8 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
               autoCorrect="off"
               spellCheck={false}
               required
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "signin-error" : undefined}
             />
           </div>
 
@@ -111,6 +124,8 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
               name="password"
               autoComplete="current-password"
               required
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "signin-error" : undefined}
             />
           </div>
 
@@ -131,6 +146,7 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
             <a
               href={`/api/admin/google/start?redirect=${encodeURIComponent(redirectAfter)}`}
               className="btn btn--secondary admin-signin-google"
+              aria-describedby={googleError ? "signin-google-error" : undefined}
             >
               <span>Sign in with Google</span>
             </a>

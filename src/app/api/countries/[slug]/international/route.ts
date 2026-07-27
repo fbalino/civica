@@ -6,6 +6,11 @@ import {
 } from "@/lib/data/international-organizations";
 import { COUNTRIES } from "@/components/atlas/data";
 import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { getJurisdictionBySlug } from "@/lib/db/queries";
+import {
+  ORGANIZATION_MEMBERSHIP_RELEASE_VERSION,
+  releaseOrganizationMembership,
+} from "@/lib/organizations/membership-release";
 
 /**
  * GET /api/countries/[slug]/international
@@ -16,7 +21,7 @@ import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
  */
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const limited = enforceInMemoryRateLimit(req, {
     scope: "countries-international",
@@ -30,7 +35,11 @@ export async function GET(
   const country =
     COUNTRIES.find((c) => c.id === normalized) ||
     COUNTRIES.find((c) => c.slug === normalized);
-  const countryId = country?.id ?? normalized;
+  const jurisdiction = country
+    ? null
+    : await getJurisdictionBySlug(normalized).catch(() => null);
+  const countryId =
+    country?.id ?? jurisdiction?.iso3?.toLowerCase() ?? normalized;
 
   const memberships = getMembershipsForCountry(countryId);
   const orgById = new Map(ORGANIZATIONS.map((o) => [o.id, o]));
@@ -39,14 +48,28 @@ export async function GET(
     .map((m) => {
       const org = orgById.get(m.orgId);
       if (!org) return null;
+      const released = releaseOrganizationMembership(m);
       return {
         orgId: org.id,
         orgSlug: org.slug,
         orgName: org.name,
         orgFullName: org.fullName,
         type: org.type,
-        joinYear: m.joinYear,
+        joinYear: released.joinYear,
         role: m.role ?? null,
+        // ATL-012 — status/endYear distinguish current from historical
+        // (withdrawn) memberships; omitted status means current.
+        status: released.status,
+        endYear: released.endYear,
+        provenance: {
+          sourceId: released.sourceId,
+          sourceLabel: released.source.label,
+          sourceUrl: released.source.url,
+          retrievedAt: released.retrievedAt,
+          upstreamVintage: released.upstreamVintage,
+          license: released.source.license,
+          coverage: released.source.coverage,
+        },
       };
     })
     .filter(Boolean)
@@ -67,8 +90,9 @@ export async function GET(
     .filter(Boolean);
 
   return NextResponse.json({
-    country: country?.name ?? countryId.toUpperCase(),
+    country: country?.name ?? jurisdiction?.name ?? countryId.toUpperCase(),
     countryId,
+    release: ORGANIZATION_MEMBERSHIP_RELEASE_VERSION,
     memberships: responseMemberships,
     coMembers,
   });

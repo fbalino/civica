@@ -8,6 +8,7 @@
  * exchanging the authorization code.
  */
 
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import {
@@ -24,11 +25,10 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const redirectParam = request.nextUrl.searchParams.get("redirect");
-  const redirectPath =
-    redirectParam && redirectParam.startsWith("/")
-      ? redirectParam
-      : "/admin/pulse-review";
+  const redirectPath = safeInternalPathOr(
+    request.nextUrl.searchParams.get("redirect"),
+    "/admin/pulse-review",
+  );
 
   const state = randomBytes(24).toString("hex");
   const callbackUrl = new URL(

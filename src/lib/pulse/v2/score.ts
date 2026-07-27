@@ -11,9 +11,13 @@
  * the event ages out.
  */
 
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { pulseDimensionalDeltas } from "@/lib/db/schema";
+import {
+  pulseDimensionalDeltaHistory,
+  pulseDimensionalDeltas,
+  pulsePipelineRuns,
+} from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { decayedImpact, daysSince } from "./decay";
 import {
@@ -40,6 +44,8 @@ export interface ScoreSummary {
   eventsConsidered: number;
   countriesScored: number;
   dimensionRowsWritten: number;
+  /** Events excluded by a current append-only absorption decision. */
+  absorbedEventsExcluded: number;
   /** distinct (country, dimension) tuples with non-trivial deltas (|δ| ≥ 1) */
   significantDeltas: number;
   dryRun: boolean;
@@ -59,6 +65,8 @@ export interface PublishedEvent {
   sourceIds: string[];
   publicationRunId: string;
   corroborationRunId: string;
+  absorptionDecisionKey: string | null;
+  absorptionOutcome: "absorbed" | "not_absorbed" | null;
 }
 
 export interface DimensionalDeltaPlan {
@@ -69,6 +77,9 @@ export interface DimensionalDeltaPlan {
   derivationVersionKey: string;
   derivationVersions: DerivationVersionEnvelope;
   computationRunId: string;
+  scoreAsOf: string;
+  windowStart: string;
+  windowDays: number;
 }
 
 export interface ScoreOptions {
@@ -91,8 +102,16 @@ export async function calculateDimensionalDeltas(
     .toISOString()
     .slice(0, 10);
 
-  const events = options.events ?? await loadPublishedEvents(db, windowStart);
-  validatePublishedEvents(events);
+  const candidateEvents =
+    options.events ?? (await loadPublishedEvents(db, windowStart));
+  validatePublishedEvents(candidateEvents);
+  const todayDate = today.toISOString().slice(0, 10);
+  // Enforce the window in the pure scorer as well as its SQL loader. This
+  // keeps fixtures, replays, and future callers from reviving an aged-out or
+  // future event by supplying a preloaded array that bypasses the query.
+  const events = candidateEvents.filter(
+    (event) => event.eventDate >= windowStart && event.eventDate <= todayDate,
+  );
   const run =
     options.runRef ??
     createPulsePipelineRunRef("score", {
@@ -106,9 +125,13 @@ export async function calculateDimensionalDeltas(
         ],
       ),
     });
-  const persistRun = !options.dryRun && !options.events && !options.runRef;
+  const persistRun =
+    !options.dryRun && !options.events && !options.runRef && !options.write;
   if (persistRun) await startPulsePipelineRun(db, run);
   const existingJurisdictionIds = options.existingJurisdictionIds ?? await loadExistingJurisdictionIds(db);
+  if (existingJurisdictionIds.some((id) => !id.trim())) {
+    throw new Error("score fixture has a blank existing jurisdiction id");
+  }
 
   // Bucket by (jurisdictionId, dimension)
   type Key = string; // `${jurisdictionId}::${dimension}`
@@ -126,7 +149,7 @@ export async function calculateDimensionalDeltas(
     const days = daysSince(e.eventDate, today);
     const impact = decayedImpact(
       e.severityValue,
-      e.corroborationConfidence,
+      e.absorptionOutcome === "absorbed" ? 0 : e.corroborationConfidence,
       days,
       e.category
     );
@@ -180,27 +203,73 @@ export async function calculateDimensionalDeltas(
         derivationVersionKey: versions.key,
         derivationVersions: versions.envelope,
         computationRunId: run.id,
+        scoreAsOf: todayDate,
+        windowStart,
+        windowDays: SCORE_WINDOW_DAYS,
       };
       planned.push(plan);
-      if (!options.dryRun) {
-        if (options.write) await options.write(db, plan);
-        else await writeDimensionalDelta(db, plan, today);
-        written++;
-      }
       if (Math.abs(clamped) >= 1) significant++;
     }
   }
 
-  if (persistRun) {
-    await finishPulsePipelineRun(db, run.id, {
-      status: "completed",
-      counts: {
+  if (!options.dryRun) {
+    if (options.write) {
+      for (const plan of planned) {
+        await options.write(db, plan);
+        written++;
+      }
+    } else if (persistRun) {
+      const counts = {
         eventsConsidered: events.length,
         countriesScored: countriesSeen.size,
-        dimensionRowsWritten: written,
+        dimensionRowsWritten: planned.length,
         significantDeltas: significant,
-      },
-    });
+        absorbedEventsExcluded: events.filter(
+          (event) => event.absorptionOutcome === "absorbed",
+        ).length,
+      };
+      try {
+        const batchQueries = [
+          ...planned.flatMap((plan) =>
+            dimensionalDeltaWriteQueries(db, plan, today),
+          ),
+          db
+            .update(pulsePipelineRuns)
+            .set({
+              status: "completed",
+              counts,
+              failures: [],
+              completedAt: new Date(),
+            })
+            .where(eq(pulsePipelineRuns.id, run.id)),
+        ] as unknown as Parameters<typeof db.batch>[0];
+        // neon-http exposes atomic transactions through batch(); its callback
+        // transaction API deliberately throws. The batch contains every
+        // immutable output, current projection, and successful run close.
+        await db.batch(batchQueries);
+        written = planned.length;
+      } catch (error) {
+        await finishPulsePipelineRun(db, run.id, {
+          status: "failed",
+          counts: { ...counts, dimensionRowsWritten: 0 },
+          failures: [
+            {
+              component: "pulse_dimensional_delta_history",
+              message:
+                error instanceof Error
+                  ? error.message.slice(0, 500)
+                  : "Unknown atomic score write failure",
+            },
+          ],
+        });
+        throw error;
+      }
+    } else {
+      for (const plan of planned) {
+        await writeDimensionalDelta(db, plan, today);
+        written++;
+      }
+    }
   }
 
   return {
@@ -210,6 +279,9 @@ export async function calculateDimensionalDeltas(
     countriesScored: countriesSeen.size,
     dimensionRowsWritten: written,
     significantDeltas: significant,
+    absorbedEventsExcluded: events.filter(
+      (event) => event.absorptionOutcome === "absorbed",
+    ).length,
     dryRun: options.dryRun ?? false,
     planned: planned.sort((a, b) => `${a.jurisdictionId}:${a.dimension}`.localeCompare(`${b.jurisdictionId}:${b.dimension}`)),
   };
@@ -221,6 +293,8 @@ function validatePublishedEvents(events: PublishedEvent[]): void {
     if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("score fixture has a blank event or jurisdiction id");
     if (!event.publicationRunId.trim()) throw new Error(`score fixture has no publication run: ${event.id}`);
     if (!event.corroborationRunId.trim()) throw new Error(`score fixture has no corroboration run: ${event.id}`);
+    if (event.absorptionOutcome === "absorbed" && !event.absorptionDecisionKey)
+      throw new Error(`score fixture has absorbed status without decision evidence: ${event.id}`);
     if (!PULSE_DIMENSIONS.includes(event.dimension)) throw new Error(`score fixture has an invalid dimension: ${event.dimension}`);
     if (!Number.isFinite(event.severityValue) || !Number.isFinite(event.corroborationConfidence)) throw new Error(`score fixture has invalid numeric input: ${event.id}`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) throw new Error(`score fixture has an invalid event date: ${event.id}`);
@@ -235,8 +309,25 @@ async function loadExistingJurisdictionIds(db: Db): Promise<string[]> {
     .map((row) => String(row.jurisdiction_id));
 }
 
-async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Date): Promise<void> {
-  await db
+function dimensionalDeltaWriteQueries(
+  db: Db,
+  plan: DimensionalDeltaPlan,
+  now: Date,
+) {
+  const history = db.insert(pulseDimensionalDeltaHistory).values({
+    schemaVersion: "pulse-dimensional-delta-history/v1",
+    jurisdictionId: plan.jurisdictionId,
+    dimension: plan.dimension,
+    deltaValue: plan.deltaValue,
+    contributingEventIds: plan.contributingEventIds,
+    derivationVersionKey: plan.derivationVersionKey,
+    derivationVersions: plan.derivationVersions,
+    computationRunId: plan.computationRunId,
+    scoreAsOf: plan.scoreAsOf,
+    windowStart: plan.windowStart,
+    windowDays: plan.windowDays,
+  });
+  const projection = db
     .insert(pulseDimensionalDeltas)
     .values({
       jurisdictionId: plan.jurisdictionId,
@@ -246,6 +337,10 @@ async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Da
       derivationVersionKey: plan.derivationVersionKey,
       derivationVersions: plan.derivationVersions,
       computationRunId: plan.computationRunId,
+      scoreAsOf: plan.scoreAsOf,
+      windowStart: plan.windowStart,
+      windowDays: plan.windowDays,
+      lastComputedAt: now,
     })
     .onConflictDoUpdate({
       target: [pulseDimensionalDeltas.jurisdictionId, pulseDimensionalDeltas.dimension],
@@ -255,9 +350,23 @@ async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Da
         derivationVersionKey: plan.derivationVersionKey,
         derivationVersions: plan.derivationVersions,
         computationRunId: plan.computationRunId,
+        scoreAsOf: plan.scoreAsOf,
+        windowStart: plan.windowStart,
+        windowDays: plan.windowDays,
         lastComputedAt: now,
       },
     });
+  return [history, projection] as const;
+}
+
+async function writeDimensionalDelta(
+  db: Db,
+  plan: DimensionalDeltaPlan,
+  now: Date,
+): Promise<void> {
+  const [history, projection] = dimensionalDeltaWriteQueries(db, plan, now);
+  await history;
+  await projection;
 }
 
 async function loadPublishedEvents(
@@ -277,14 +386,26 @@ async function loadPublishedEvents(
       derivation_versions,
       publication_run_id,
       corroboration_run_id,
+      absorption.absorption_key,
+      absorption.outcome AS absorption_outcome,
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
-        WHERE ps.event_id = pulse_events_v2.id
+        JOIN pulse_events_v2 source_event ON source_event.id = ps.event_id
+        WHERE source_event.incident_id = pulse_events_v2.incident_id
         ORDER BY ps.source_id
       ) AS source_ids
     FROM pulse_events_v2
+    LEFT JOIN LATERAL (
+      SELECT a.absorption_key, a.outcome
+      FROM pulse_event_absorptions a
+      WHERE a.event_id = pulse_events_v2.id
+        AND a.as_of <= CURRENT_DATE
+      ORDER BY a.as_of DESC, a.decided_at DESC, a.absorption_key DESC
+      LIMIT 1
+    ) absorption ON true
     WHERE published = true
+      AND projection_status = 'current'
       AND publication_run_id IS NOT NULL
       AND corroboration_run_id IS NOT NULL
       AND review_status IN ('approved', 'edited')
@@ -294,7 +415,7 @@ async function loadPublishedEvents(
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>)
-    .map((r) => ({
+    .map((r): PublishedEvent => ({
       id: String(r.id),
       jurisdictionId: String(r.jurisdiction_id),
       dimension: r.dimension as PulseDimension,
@@ -306,6 +427,14 @@ async function loadPublishedEvents(
       derivationVersions: r.derivation_versions as DerivationVersionEnvelope,
       publicationRunId: String(r.publication_run_id),
       corroborationRunId: String(r.corroboration_run_id),
+      absorptionDecisionKey: r.absorption_key
+        ? String(r.absorption_key)
+        : null,
+      absorptionOutcome:
+        r.absorption_outcome === "absorbed" ||
+        r.absorption_outcome === "not_absorbed"
+          ? r.absorption_outcome
+          : null,
       sourceIds: Array.isArray(r.source_ids) ? r.source_ids.map(String) : [],
     }))
     .filter((event) => isPulseClassificationValid(event));

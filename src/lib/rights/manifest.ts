@@ -41,12 +41,13 @@ const verified = (
   derivatives: boolean,
   attributionRequired: boolean,
   restrictions: readonly string[] = [],
+  reviewedAt: string = VERIFIED_AT,
 ): SourceRightsRecord => ({
   sourceId,
   licenseId,
   termsUrl,
   reviewStatus: "verified",
-  reviewedAt: VERIFIED_AT,
+  reviewedAt,
   publicExport,
   commercialUse,
   derivatives,
@@ -56,6 +57,23 @@ const verified = (
 });
 
 const VERIFIED_SOURCE_RIGHTS: Readonly<Record<string, SourceRightsRecord>> = {
+  constitute_project: verified(
+    "constitute_project",
+    "CC-BY-NC-3.0",
+    "https://www.constituteproject.org/content/terms",
+    "non-commercial-only",
+    false,
+    true,
+    true,
+    [
+      "Interactive display is permitted only for a non-commercial, no-fee deployment",
+      "Attribute Constitute and preserve the CC BY-NC 3.0 notice",
+      "Commercial use and charging a fee are prohibited by the publisher terms",
+      "Bulk constitution-text export remains blocked by Civica policy",
+      "Official license statement: https://www.constituteproject.org/content/about?lang=e",
+    ],
+    "2026-07-12",
+  ),
   cia_factbook: verified(
     "cia_factbook",
     "US-PUBLIC-DOMAIN",
@@ -194,9 +212,51 @@ export interface ProductRightsRecord {
   fields: readonly ProductFieldRights[];
   reason: string;
   requiresDerivationVersions: boolean;
+  interactiveDisplay?: "allowed-non-commercial" | "blocked";
 }
 
 export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
+  {
+    productId: "constitution-search-display-v1",
+    routeOrArtifact: "/api/constitution/search",
+    publicBulkExport: "blocked",
+    interactiveDisplay: "allowed-non-commercial",
+    fields: [
+      {
+        fieldPattern: "data[].passage.highlightSegments",
+        lineage: "source-row",
+        exportRule: "blocked",
+      },
+      {
+        fieldPattern: "data[].provenance|data[].citationUrl|corpus|rights",
+        lineage: "civica-derived",
+        exportRule: "blocked",
+      },
+    ],
+    reason:
+      "Constitute text may be shown only as bounded, attributed interactive excerpts on a non-commercial, no-fee deployment. Bulk export and unrestricted corpus access remain blocked.",
+    requiresDerivationVersions: true,
+  },
+  {
+    productId: "election-qualified-export-v1",
+    routeOrArtifact: "/api/v1/elections?format=json|csv",
+    publicBulkExport: "allowed",
+    fields: [
+      {
+        fieldPattern: "data[].event|data[].jurisdiction|data[].provenance",
+        lineage: "source-row",
+        exportRule: "source-permission",
+      },
+      {
+        fieldPattern: "withheld|audit|dateSemantics|filters|meta",
+        lineage: "civica-derived",
+        exportRule: "source-permission",
+      },
+    ],
+    reason:
+      "The election research export emits only qualified source rows with verified public-export permission. IPU, IDEA, IPU-derived projections, and unknown-source rows remain visible only as withheld counts and reasons.",
+    requiresDerivationVersions: true,
+  },
   {
     productId: "atlas-reference-export-v1",
     routeOrArtifact: "/downloads/civica-atlas-2026-07-11.json.gz",
@@ -248,6 +308,26 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
     requiresDerivationVersions: true,
   },
   {
+    productId: "indicator-history-country-export",
+    routeOrArtifact: "/api/countries/{slug}/indicator-history?format=json|csv",
+    publicBulkExport: "allowed",
+    fields: [
+      {
+        fieldPattern: "series[].observations",
+        lineage: "source-row",
+        exportRule: "source-permission",
+      },
+      {
+        fieldPattern: "series[].lineage|withheld|jurisdiction",
+        lineage: "civica-derived",
+        exportRule: "source-permission",
+      },
+    ],
+    reason:
+      "Country indicator-history downloads include observation rows only when the source-specific rights record permits public export. Other visible series remain on the reader page but are named in the export's withheld manifest without their values.",
+    requiresDerivationVersions: true,
+  },
+  {
     productId: "index-bulk-release",
     routeOrArtifact: "future frozen Civica Index data package",
     publicBulkExport: "blocked",
@@ -289,9 +369,15 @@ const CI_BETA_RELEASE_SOURCE_IDS = [
 
 const CI_BETA_RELEASE_DERIVATION_VERSIONS = buildDerivationVersionEnvelope({
   methodology: versioned("ci-beta-2024-Q4/source-input-manifest-v1"),
-  algorithm: notApplicable("This release artifact contains captured-input metadata and hashes, not calculated scores."),
-  prompt: notApplicable("The release artifact is generated deterministically without a model prompt."),
-  taxonomy: notApplicable("The release artifact does not classify observations into a research taxonomy."),
+  algorithm: notApplicable(
+    "This release artifact contains captured-input metadata and hashes, not calculated scores.",
+  ),
+  prompt: notApplicable(
+    "The release artifact is generated deterministically without a model prompt.",
+  ),
+  taxonomy: notApplicable(
+    "The release artifact does not classify observations into a research taxonomy.",
+  ),
   sourceIds: CI_BETA_RELEASE_SOURCE_IDS,
 });
 
@@ -313,7 +399,9 @@ export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
     derivationVersions: buildDerivationVersionEnvelope({
       methodology: versioned("civica-atlas-export/v3"),
       algorithm: versioned("atlas-export-generator/v1"),
-      prompt: notApplicable("The export is generated deterministically without a model prompt."),
+      prompt: notApplicable(
+        "The export is generated deterministically without a model prompt.",
+      ),
       taxonomy: versioned("jurisdiction-status/v1"),
       sourceIds: ["cia_factbook", "wikidata", "world_bank"],
     }),
@@ -348,6 +436,64 @@ export interface ExportRightsDecision {
   productId: string;
   blockedSources: readonly string[];
   reason: string;
+}
+
+export interface InteractiveDisplayRightsDecision {
+  allowed: boolean;
+  productId: string;
+  sourceId: string;
+  reason: string;
+}
+
+export function evaluateInteractiveDisplay(
+  productId: string,
+  sourceId: string,
+  deployment: { commercial: boolean; feeBearing: boolean },
+): InteractiveDisplayRightsDecision {
+  const product = PRODUCT_RIGHTS.find((row) => row.productId === productId);
+  const source = sourceRights(sourceId);
+  if (!product || product.interactiveDisplay !== "allowed-non-commercial") {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason: "Product has no verified interactive-display permission.",
+    };
+  }
+  if (!source || source.reviewStatus !== "verified") {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason: "Source terms have not completed verification.",
+    };
+  }
+  if (
+    source.publicExport !== "non-commercial-only" ||
+    source.commercialUse !== false
+  ) {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason: "Source rights do not match the non-commercial display contract.",
+    };
+  }
+  if (deployment.commercial || deployment.feeBearing) {
+    return {
+      allowed: false,
+      productId,
+      sourceId,
+      reason:
+        "Constitution display is suspended on commercial or fee-bearing deployments.",
+    };
+  }
+  return {
+    allowed: true,
+    productId,
+    sourceId,
+    reason: "Verified non-commercial interactive display.",
+  };
 }
 
 export function evaluatePublicExport(

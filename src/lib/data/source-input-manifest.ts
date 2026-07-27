@@ -136,6 +136,16 @@ export const SOURCE_INPUT_SPECS: readonly SourceInputSpec[] = [
     "public-domain",
   ),
   spec(
+    "civica_organization_roster_v1",
+    "https://www.civicaatlas.org/methodology/source-coverage",
+    "derived-database",
+    "database-rows",
+    "organization-membership-release/2026-07-v1",
+    "official organization pages retrieved 2026-07-12",
+    "23 organization identities and 446 retained relationships; nine complete rosters and fourteen selected checked subsets",
+    "restricted-no-redistribution",
+  ),
+  spec(
     "civicus_monitor",
     "https://monitor.civicus.org/RSSFeed.xml",
     "rss",
@@ -528,6 +538,8 @@ const DERIVED_INPUTS: Readonly<Record<string, string>> = {
   "pulse.v2.cluster": "admitted Pulse v2 article rows from pulse.v2.ingest",
   "pulse.v2.classify": "Pulse v2 clusters from pulse.v2.cluster",
   "pulse.v2.score": "verified Pulse v2 classifications and corroboration state",
+  "pulse.v2.review-sla":
+    "current Pulse review obligations and append-only SLA event evidence",
 };
 
 export function productionPipelineContracts(): readonly PipelineInputContract[] {

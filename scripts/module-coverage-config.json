@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "civica-module-coverage/v1",
+  "modules": [
+    {
+      "name": "admin-session",
+      "testGlobs": ["src/lib/admin/session.test.ts"],
+      "includeGlobs": ["src/lib/admin/session.ts"],
+      "thresholds": { "lines": 85, "branch": 80, "functions": 70 },
+      "note": "Admin-auth-critical: cookie HMAC verify, username check, reviewer-name sanitization. Measured 2026-07-12: lines 92.89 / branch 90.48 / functions 79.17."
+    },
+    {
+      "name": "outcomes-reducer",
+      "testGlobs": ["src/components/outcomes/outcomesReducer.test.ts"],
+      "includeGlobs": ["src/components/outcomes/outcomesReducer.ts"],
+      "thresholds": { "lines": 90, "branch": 75, "functions": 90 },
+      "note": "Pure state-transition reducer extracted from CountryOutcomeBars.tsx for testability. Measured 2026-07-12: lines 100.00 / branch 85.71 / functions 100.00."
+    },
+    {
+      "name": "markdown-substitute",
+      "testGlobs": ["src/lib/content/markdown/substitute.test.ts"],
+      "includeGlobs": ["src/lib/content/markdown/substitute.ts"],
+      "thresholds": { "lines": 90, "branch": 85, "functions": 90 },
+      "note": "Content-templating {{path}} / {{path | \"fallback\"}} substitution engine shared by build-time README regen and runtime markdown rendering. Measured 2026-07-12: lines 100.00 / branch 94.44 / functions 100.00."
+    },
+    {
+      "name": "peer-grouping",
+      "testGlobs": [
+        "src/lib/peer-grouping/__tests__/atl-017-taxonomy-peer-lens.test.ts",
+        "src/lib/peer-grouping/__tests__/vdem-row-tier.test.ts"
+      ],
+      "includeGlobs": [
+        "src/lib/peer-grouping/index.ts",
+        "src/lib/peer-grouping/lens-metadata.ts",
+        "src/lib/peer-grouping/constants.ts"
+      ],
+      "thresholds": { "lines": 80, "branch": 75, "functions": 70 },
+      "note": "peer-grouping-resolution-v1 material/governance peer-lens resolvers. Measured 2026-07-12: lines 89.65 / branch 87.00 / functions 83.02."
+    },
+    {
+      "name": "ci-worked-examples",
+      "testGlobs": ["src/lib/ci/__tests__/worked-examples.test.ts"],
+      "includeGlobs": [
+        "src/lib/ci/normalize-v2.ts",
+        "src/lib/ci/dimensions-v2.ts",
+        "src/lib/ci/calculate-v2.ts",
+        "src/lib/ci/current-release.ts"
+      ],
+      "thresholds": { "lines": 60, "branch": 75, "functions": 70 },
+      "note": "Civica Index v2 composite: normalization, dimension weights, and published-methodology worked examples. calculate-v2.ts retains lower-coverage legacy (v1) code paths, so the lines threshold sits well below the other modules'. Measured 2026-07-12: lines 69.65 / branch 86.36 / functions 82.81."
+    },
+    {
+      "name": "rights-manifest",
+      "testGlobs": ["src/lib/rights/__tests__/manifest.test.ts"],
+      "includeGlobs": ["src/lib/rights/manifest.ts"],
+      "thresholds": { "lines": 85, "branch": 85, "functions": 70 },
+      "note": "Machine-readable source/field/product/release rights contract (/licensing#rights-manifest, /api/rights-manifest). Measured 2026-07-12: lines 95.04 / branch 94.87 / functions 81.48."
+    },
+    {
+      "name": "data-value-state",
+      "testGlobs": ["src/lib/data/value-state.test.ts"],
+      "includeGlobs": ["src/lib/data/value-state.ts"],
+      "thresholds": { "lines": 90, "branch": 75, "functions": 90 },
+      "note": "data-value-state/v1 seven-state availability contract (observed/missing/unknown/not_applicable/not_observed/disputed/withheld). Measured 2026-07-12: lines 100.00 / branch 87.10 / functions 100.00."
+    },
+    {
+      "name": "reconcile-resolver",
+      "testGlobs": ["src/lib/factbook/reconcile/__tests__/resolver.test.ts"],
+      "includeGlobs": ["src/lib/factbook/reconcile/resolver.ts"],
+      "thresholds": { "lines": 80, "branch": 65, "functions": 70 },
+      "note": "source-precedence/v1 canonical-fact resolver (resolveFromRows), methodology worked examples. Measured 2026-07-12: lines 87.39 / branch 72.46 / functions 79.69."
+    }
+  ]
+}

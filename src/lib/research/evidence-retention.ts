@@ -15,6 +15,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "ci_ingestion_runs",
   "civica_conditions_scores",
   "constitutions",
+  "constitution_passages",
   "constitution_topic_excerpts",
   "correction_log",
   "country_facts",
@@ -30,14 +31,35 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "offices",
   "organization_memberships",
   "persons",
+  "political_parties",
   "pulse_dimensional_deltas",
   "pulse_events_v2",
+  "pulse_incidents",
   "pulse_candidate_outcomes",
+  "pulse_cluster_classification_states",
+  "pulse_review_obligations",
   "pulse_review_audit_log",
   "pulse_sources",
   "raw_events",
   "statements",
   "terms",
+] as const;
+
+/** Relations whose evidence rows reject UPDATE and DELETE outright rather
+ * than copying a mutable projection into the generic history ledger. */
+export const APPEND_ONLY_EVIDENCE_RELATIONS = [
+  "party_composition_runs",
+  "party_identity_events",
+  "pulse_dimensional_delta_history",
+  "pulse_event_absorptions",
+  "pulse_event_information_environment_pins",
+  "pulse_event_decisions",
+  "pulse_incident_assignments",
+  "pulse_incident_resolutions",
+  "pulse_classification_attempts",
+  "pulse_review_sla_events",
+  "pulse_information_environment_releases",
+  "pulse_information_environment_values",
 ] as const;
 
 export type RetainedEvidenceRelation =
@@ -48,14 +70,22 @@ export type RetainedEvidenceRelation =
  * not source, interpretation, review, or evaluation evidence. */
 export const DESTRUCTIVE_WRITE_PATHS = [
   { path: "scripts/ingest-ci-all.ts", relations: ["ci_dimension_scores"] },
-  { path: "scripts/cleanup-bad-offices.ts", relations: ["government_bodies", "offices", "persons", "terms"] },
+  {
+    path: "scripts/cleanup-bad-offices.ts",
+    relations: ["government_bodies", "offices", "persons", "terms"],
+  },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },
-  { path: "scripts/seed-organizations.ts", relations: ["organization_memberships"] },
   { path: "scripts/sync-elections-ipu.ts", relations: ["elections"] },
-  { path: "src/lib/constitute/sync-constitutions.ts", relations: ["constitution_topic_excerpts"] },
+  {
+    path: "src/lib/constitute/sync-constitutions.ts",
+    relations: ["constitution_topic_excerpts"],
+  },
   { path: "src/lib/elections/writer.ts", relations: ["election_results"] },
-  { path: "src/lib/legislatures/composition-writer.ts", relations: ["legislature_parties"] },
-  { path: "src/lib/api/rate-limit.ts", relations: ["rate_limits"], exemption: "ephemeral abuse-control counters expire by design" },
+  {
+    path: "src/lib/api/rate-limit.ts",
+    relations: ["rate_limits"],
+    exemption: "ephemeral abuse-control counters expire by design",
+  },
 ] as const;
 
 export interface EvaluationEvidenceRow {
@@ -86,12 +116,11 @@ export interface PulseExclusionEvaluationCandidate {
 }
 
 function rows(result: unknown): Record<string, unknown>[] {
-  return (Array.isArray(result)
-    ? result
-    : ((result as { rows?: Record<string, unknown>[] }).rows ?? [])) as Record<
-    string,
-    unknown
-  >[];
+  return (
+    Array.isArray(result)
+      ? result
+      : ((result as { rows?: Record<string, unknown>[] }).rows ?? [])
+  ) as Record<string, unknown>[];
 }
 
 function mapEvidence(result: unknown): EvaluationEvidenceRow[] {
@@ -133,10 +162,14 @@ export async function getPulseExclusionEvaluationCandidates(): Promise<
   `);
   return rows(result).map((row) => ({
     outcomeKey: String(row.outcome_key),
-    evaluationStratum: String(row.evaluation_stratum) as PulseExclusionEvaluationCandidate["evaluationStratum"],
+    evaluationStratum: String(
+      row.evaluation_stratum,
+    ) as PulseExclusionEvaluationCandidate["evaluationStratum"],
     candidateKind: String(row.candidate_kind),
     candidateId: String(row.candidate_id),
-    canonicalCandidateId: row.canonical_candidate_id ? String(row.canonical_candidate_id) : null,
+    canonicalCandidateId: row.canonical_candidate_id
+      ? String(row.canonical_candidate_id)
+      : null,
     outcome: String(row.outcome),
     reasonCode: String(row.reason_code),
     reason: String(row.reason),
@@ -146,7 +179,10 @@ export async function getPulseExclusionEvaluationCandidates(): Promise<
     decisionKey: row.decision_key ? String(row.decision_key) : null,
     evidenceRefs: row.evidence_refs as string[],
     metadata: row.metadata,
-    occurredAt: row.occurred_at instanceof Date ? row.occurred_at.toISOString() : String(row.occurred_at),
+    occurredAt:
+      row.occurred_at instanceof Date
+        ? row.occurred_at.toISOString()
+        : String(row.occurred_at),
     stableSampleKey: String(row.stable_sample_key),
   }));
 }

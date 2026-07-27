@@ -58,6 +58,9 @@
   z-index: 0;
   will-change: transform;
 }
+.factbook-hero-art-figure {
+  display: contents;
+}
 .factbook-hero--art::after {
   content: "";
   position: absolute;
@@ -157,6 +160,9 @@
 }
 .factbook-government-type-row {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
   justify-content: flex-start;
   margin-top: var(--space-3);
   margin-bottom: var(--space-4);
@@ -1223,6 +1229,25 @@
   max-width: 38rem;
   margin: 0 0 var(--space-6);
 }
+.page-hero-art-disclosure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-muted);
+}
+.page-hero-art-disclosure a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.page-hero-art-disclosure a:hover,
+.page-hero-art-disclosure a:focus-visible {
+  color: var(--color-accent);
+}
 /* Left-aligned canonical combobox inside the hero. */
 .factbook-hero-search {
   max-width: 34rem;
@@ -2259,12 +2284,58 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 .country-map-tile {
   padding: 0;
 }
-.country-map-tile .country-map-preview {
+.country-map-activation {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: inherit;
+}
+.country-map-tile .country-map-preview,
+.country-map-tile .country-map-preview * {
   border-radius: inherit;
+  /* Preview maps are deliberately non-interactive. Keep MapLibre's canvas
+     from swallowing the tile activation click; the modal owns pan/zoom. */
+  pointer-events: none !important;
+}
+.country-map-attribution {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: var(--z-rule);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  max-width: calc(100% - var(--space-4));
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--color-bg) 92%, transparent);
+  font-family: var(--font-body);
+  font-size: var(--text-10);
+  line-height: var(--leading-tight);
+}
+.country-map-attribution a {
+  color: var(--color-text-60);
+  text-decoration: none;
+}
+.country-map-attribution a:hover,
+.country-map-attribution a:focus-visible {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
 }
 .country-map-explore-hint {
   position: absolute;
-  top: var(--space-3);
+  bottom: calc(var(--space-7) + var(--space-3));
   right: var(--space-3);
   z-index: 2;
   display: inline-flex;
@@ -2282,8 +2353,8 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   transition: opacity var(--motion-fast, 0.15s) ease;
   pointer-events: none;
 }
-.country-map-tile:hover .country-map-explore-hint,
-.country-map-tile:focus-visible .country-map-explore-hint {
+.country-map-activation:hover .country-map-explore-hint,
+.country-map-activation:focus-visible .country-map-explore-hint {
   opacity: 1;
 }
 

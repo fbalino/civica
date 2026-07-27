@@ -115,9 +115,8 @@ export const REDIRECTS: CivicaRedirect[] = [
     destination: "/country/:slug",
     permanent: true,
   },
-  // Phase 5.10 polish — the legacy v1 changelog page reads from
-  // pulse_changelog / pulse_daily_scores tables that are no longer
-  // surfaced post-cut-over. Public users get the v2 changelog at
+  // Phase 5.10 polish — the legacy v1 changelog and scalar output relations
+  // were retired post-cut-over. Public users get the v2 changelog at
   // /civica-index/pulse-changelog. Preserve any external links.
   // MUST precede the /civica-index/:slug country-detail catch-all
   // below so "changelog" is handled here rather than treated as a

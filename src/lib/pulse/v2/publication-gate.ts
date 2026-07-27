@@ -9,6 +9,9 @@ import { HUMAN_REVIEW_TIERS } from "./taxonomy";
 import type { VerifyResultLite } from "./classifier-prompt";
 import type { ClassifierAgreement, SeverityTier } from "./types";
 
+export const PULSE_PUBLICATION_GATE_VERSION =
+  "pulse-publication-gate/stored-ensemble-review-v3" as const;
+
 export interface EnsembleGateConsensus {
   agreement: ClassifierAgreement;
   selfConfidence: number;
@@ -43,10 +46,10 @@ export function verifierObjects(verify: VerifyResultLite | null): boolean {
 
 /** Single-engine mode has no ensemble consensus to outweigh an objection. */
 export function singleEngineRequiresReview(
-  severityTier: SeverityTier,
-  verify: VerifyResultLite | null,
+  _severityTier: SeverityTier,
+  _verify: VerifyResultLite | null,
 ): boolean {
-  return HUMAN_REVIEW_TIERS.has(severityTier) || verifierObjects(verify);
+  return true;
 }
 
 /** Apply the documented ensemble review gate to a classified candidate. */

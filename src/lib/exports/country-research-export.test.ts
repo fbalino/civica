@@ -107,6 +107,21 @@ function fixture() {
       iso2: "FR",
       iso3: "FRA",
       status: "sovereign_state",
+      statusDetails: {
+        version: "jurisdiction-status/v1",
+        type: "sovereign_state",
+        label: "UN member state",
+        note: "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+        reviewedAt: "2026-07-10",
+        administeringJurisdictionIso3: null,
+        disputed: false,
+        includeInSovereignStateCounts: true,
+        sources: [{
+          id: "un_member_states",
+          label: "United Nations Member States",
+          url: "https://www.un.org/en/about-us/member-states",
+        }],
+      },
     },
     resolutions: { population_total: resolution },
     sources: new Map(sourceIds.map((id) => [id, {

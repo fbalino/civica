@@ -1310,6 +1310,7 @@ legend.editorial-filter-label {
 .fact-value-panel {
   width: 360px;
   max-width: min(420px, calc(100vw - 2 * var(--space-3)));
+  max-height: calc(100vh - 2 * var(--space-3));
   box-sizing: border-box;
   background: var(--color-surface-primary);
   border: 1px solid var(--color-border-default);
@@ -1319,6 +1320,7 @@ legend.editorial-filter-label {
   text-align: left;
   white-space: normal;
   overflow-wrap: anywhere;
+  overflow-y: auto;
   color: var(--color-text-primary);
 }
 .fact-value-panel-host {
@@ -1370,6 +1372,58 @@ legend.editorial-filter-label {
   font-size: var(--text-14);
   color: var(--color-text-primary);
   line-height: 1.4;
+}
+
+.fact-value-evidence {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-hairline) solid var(--color-border-default);
+  border-left: var(--space-1) solid var(--color-status-info);
+  background: var(--color-select-bg);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.fact-value-evidence--agreement {
+  border-left-color: var(--color-status-success);
+}
+.fact-value-evidence--resolver_selected,
+.fact-value-evidence--unavailable {
+  border-left-color: var(--color-status-warning);
+}
+.fact-value-evidence p {
+  margin: 0;
+  color: var(--color-text-60);
+}
+.fact-value-evidence-rationale span {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+.fact-value-decision-trace summary {
+  cursor: pointer;
+  color: var(--color-text-60);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.fact-value-decision-trace ol {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+}
+.fact-value-decision-trace li strong,
+.fact-value-decision-trace li span,
+.fact-value-row-lineage {
+  display: block;
+}
+.fact-value-decision-trace li strong {
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+.fact-value-row-lineage {
+  margin-top: var(--space-1);
+  color: var(--color-text-50);
 }
 
 .fact-value-rows {
@@ -2137,8 +2191,8 @@ legend.editorial-filter-label {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: calc(var(--space-8) - var(--space-2));
+  height: calc(var(--space-8) - var(--space-2));
   padding: 0;
   border: none;
   background: transparent;
@@ -2149,6 +2203,22 @@ legend.editorial-filter-label {
 .constitution-country-chip__x:hover {
   color: var(--color-accent);
   background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+.constitution-country-chip__x:focus-visible,
+.constitution-add__trigger:focus-visible,
+.constitution-add__option:focus-visible,
+.constitution-reader-nav-toggle:focus-visible,
+.constitution-reader-nav-part:focus-visible,
+.constitution-reader-nav-article:focus-visible,
+.constitution-topic-chip:focus-visible,
+.constitution-xref-change:focus-visible,
+.constitution-topic-category-head:focus-visible,
+.constitution-topic-option:focus-visible,
+.constitution-xref-add:focus-visible,
+.constitution-xref-excerpt-meta a:focus-visible,
+.constitution-search-result a:focus-visible {
+  outline: var(--space-1) solid var(--color-accent);
+  outline-offset: var(--space-1);
 }
 
 .constitution-add {
@@ -2242,6 +2312,10 @@ legend.editorial-filter-label {
 .constitution-add__option:hover {
   background: var(--color-card-hover-bg);
 }
+.constitution-add__option.is-active {
+  background: var(--color-card-hover-bg);
+  color: var(--color-accent);
+}
 .constitution-add__option:disabled {
   cursor: default;
   color: var(--color-text-40);
@@ -2334,6 +2408,13 @@ legend.editorial-filter-label {
   gap: var(--space-6);
   align-items: start;
 }
+/* Country-tab variant: the outline lives in the shared <FactbookSidebar> left
+   rail, so the reading body spans the full content column with no in-column
+   nav gutter. */
+.constitution-reader-layout--no-outline {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
 .constitution-reader-nav {
   position: sticky;
   top: 72px;
@@ -2350,6 +2431,9 @@ legend.editorial-filter-label {
   text-transform: uppercase;
   color: var(--color-text-40);
   margin-bottom: var(--space-3);
+}
+.constitution-reader-nav-toggle {
+  display: none;
 }
 .constitution-reader-nav-list {
   list-style: none;
@@ -2411,6 +2495,13 @@ legend.editorial-filter-label {
 }
 .constitution-section {
   scroll-margin-top: 88px;
+}
+.constitution-section:focus {
+  outline: none;
+}
+.constitution-section:focus-visible {
+  outline: var(--space-1) solid var(--color-accent);
+  outline-offset: var(--space-3);
 }
 .constitution-section--part {
   margin-top: var(--space-7);
@@ -2653,6 +2744,10 @@ legend.editorial-filter-label {
   color: var(--color-accent);
   font-weight: 500;
 }
+.constitution-topic-option.is-active {
+  background: var(--color-card-hover-bg);
+  color: var(--color-accent);
+}
 .constitution-topic-empty {
   padding: var(--space-4) var(--space-3);
   font-family: var(--font-body);
@@ -2670,6 +2765,9 @@ legend.editorial-filter-label {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+.constitution-xref-skeleton {
+  height: calc(var(--space-9) + var(--space-7));
 }
 .constitution-xref-card {
   border: 1px solid var(--color-card-border);
@@ -2777,6 +2875,40 @@ a.constitution-xref-card-country:hover {
   font-size: var(--text-13);
   color: var(--color-text-40);
   margin: 0;
+}
+.constitution-xref-error {
+  margin-bottom: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.constitution-xref-excerpt-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: var(--leading-normal);
+  color: var(--color-text-40);
+}
+.constitution-xref-excerpt-source {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.constitution-xref-excerpt-meta a {
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.constitution-xref-excerpt-meta a:hover {
+  text-decoration: underline;
+}
+.constitution-xref-excerpt .cite-accordion {
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
 }
 .constitution-xref-notable {
   margin-top: var(--space-3);
@@ -2889,6 +3021,230 @@ a.constitution-xref-card-country:hover {
   gap: var(--space-2);
 }
 
+/* ── Cross-corpus constitutional text search ─────────────────────── */
+.constitution-landing-search {
+  max-width: calc(var(--space-9) * 10);
+  padding: var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+.constitution-search-form__label {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  color: var(--color-text-primary);
+}
+.constitution-search-form__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+.constitution-search-form__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-search);
+  background: var(--color-page-bg);
+}
+.constitution-search-form__field:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 var(--space-1)
+    color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.constitution-search-form__icon {
+  width: var(--space-5);
+  height: var(--space-5);
+  flex: 0 0 auto;
+  color: var(--color-text-40);
+}
+.constitution-search-form__field input {
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--space-8) - var(--space-2));
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+}
+.constitution-search-form__field input::placeholder {
+  color: var(--color-text-40);
+}
+.constitution-search-form__filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.constitution-search-form__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.constitution-search-form__filter input {
+  min-height: calc(var(--space-8) - var(--space-2));
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-search);
+  outline: 0;
+  background: var(--color-page-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  letter-spacing: var(--tracking-normal);
+  text-transform: none;
+}
+.constitution-search-form__filter input:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 var(--space-1)
+    color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.constitution-search-form__hint {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+  color: var(--color-text-40);
+}
+.constitution-search-form__catalog-warning {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.constitution-search-page-header {
+  margin-bottom: var(--space-7);
+}
+.constitution-search-page-header .constitution-search-form {
+  margin-top: var(--space-6);
+  max-width: calc(var(--space-9) * 10);
+}
+.constitution-search-results__summary {
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-card-border);
+}
+.constitution-search-results__summary h2 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-primary);
+}
+.constitution-search-results__summary p,
+.constitution-search-results__limit-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-50);
+}
+.constitution-search-results__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.constitution-search-result {
+  padding: var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+.constitution-search-result__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.constitution-search-result__flag {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-top: var(--space-1);
+}
+.constitution-search-result__identity {
+  flex: 1;
+  min-width: 0;
+}
+.constitution-search-result__country {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.constitution-search-result__section {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-50);
+}
+.constitution-search-result__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.constitution-search-result__excerpt {
+  margin: var(--space-5) 0;
+  padding-left: var(--space-5);
+  border-left: var(--space-1) solid var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+}
+.constitution-search-result__excerpt mark {
+  padding: 0 var(--space-1);
+  background: color-mix(in oklab, var(--color-status-warning) 28%, transparent);
+  color: inherit;
+}
+.constitution-search-result__context {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-card-border);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: var(--leading-normal);
+  color: var(--color-text-40);
+}
+.constitution-search-result__source {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.constitution-search-result__source a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.constitution-search-result__source a:hover {
+  text-decoration: underline;
+}
+.constitution-search-result__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+.constitution-search-results__limit-note {
+  margin-top: var(--space-5);
+}
+
 /* ── Responsive: collapse to a single column ────────────────────────── */
 @media (max-width: 1100px) {
   /* Stack the compare pane beneath the reading column (which keeps its own
@@ -2916,6 +3272,68 @@ a.constitution-xref-card-country:hover {
     margin-bottom: var(--space-5);
     padding-bottom: var(--space-5);
     border-bottom: 1px solid var(--color-card-border);
+  }
+  .constitution-reader-nav-title {
+    display: none;
+  }
+  .constitution-reader-nav-toggle {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: calc(var(--space-8) - var(--space-2));
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    background: var(--color-card-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-13);
+    text-align: left;
+    cursor: pointer;
+  }
+  .constitution-reader-nav-current {
+    overflow: hidden;
+    color: var(--color-text-50);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .constitution-reader-nav-toggle-icon {
+    transition: transform var(--motion-fast) var(--motion-ease-out);
+  }
+  .constitution-reader-nav-toggle[aria-expanded="true"]
+    .constitution-reader-nav-toggle-icon {
+    transform: rotate(180deg);
+  }
+  .constitution-reader-nav-list[data-mobile-open="false"] {
+    display: none;
+  }
+  .constitution-reader-nav-list {
+    margin-top: var(--space-3);
+  }
+  .constitution-reader-nav-part,
+  .constitution-reader-nav-article,
+  .constitution-topic-category-head,
+  .constitution-topic-option,
+  .constitution-add__option {
+    min-height: calc(var(--space-8) - var(--space-2));
+  }
+  .constitution-search-form__row,
+  .constitution-search-form__filters {
+    grid-template-columns: 1fr;
+  }
+  .constitution-search-form__row .btn {
+    width: 100%;
+  }
+  .constitution-search-result {
+    padding: var(--space-5);
+  }
+  .constitution-search-result__header {
+    flex-wrap: wrap;
+  }
+  .constitution-search-result__context {
+    flex-direction: column;
   }
   .constitution-page-title-sub {
     display: block;
@@ -3018,7 +3436,12 @@ a.constitution-xref-card-country:hover {
 
 .compare-section-nav {
   position: sticky;
-  top: 0;
+  /* EXP-034: was `top: 0`, which docked this bar at the same viewport
+     position as the sticky global header (#site-header, height
+     var(--header-height), z-index 100). Since the header's z-index beats
+     this bar's, the bar rendered completely hidden underneath the header on
+     scroll instead of appearing below it. */
+  top: var(--header-height);
   z-index: 40;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-card-border);
@@ -3062,7 +3485,11 @@ a.constitution-xref-card-country:hover {
 }
 
 .compare-section {
-  scroll-margin-top: calc(56px + var(--space-5)); /* 56px — sticky header offset literal */
+  /* EXP-034: clears both sticky bars now stacked above section content — the
+     global header (var(--header-height)) plus the now-correctly-positioned
+     .compare-section-nav bar, whose rendered height is close to another
+     header-height (~56px), plus breathing room. */
+  scroll-margin-top: calc(var(--header-height) * 2 + var(--space-5));
   padding: var(--space-7) 0;
 }
 .compare-section-eyebrow {
@@ -3544,6 +3971,11 @@ a.constitution-xref-card-country:hover {
 
 .elsys-tabs {
   margin: var(--space-6) 0 var(--space-7);
+  max-width: 100%;
+  overflow-x: auto;
+}
+.elsys-tabs .segmented {
+  min-width: max-content;
 }
 
 /* Card shell */
@@ -4370,11 +4802,81 @@ a.constitution-xref-card-country:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.country-directory__status {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-11);
+  white-space: nowrap;
+}
 .country-directory__dot {
   width: var(--space-3);
   height: var(--space-3);
   border-radius: var(--radius-full);
   flex-shrink: 0;
+}
+
+/* Shared, sourced entity-status disclosure. Used wherever a route or card
+   could otherwise imply that every Atlas identity is a sovereign country. */
+.jurisdiction-status-disclosure {
+  position: relative;
+  font-family: var(--font-body);
+}
+.jurisdiction-status-disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  list-style: none;
+}
+.jurisdiction-status-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.jurisdiction-status-disclosure__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-12);
+}
+.jurisdiction-status-disclosure__panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  inset-inline-start: 0;
+  z-index: var(--z-popover);
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard-md);
+  color: var(--color-text-primary);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+.jurisdiction-status-disclosure__panel p {
+  margin: 0 0 var(--space-3);
+}
+.jurisdiction-status-disclosure__panel p:last-child {
+  margin-bottom: 0;
+}
+.jurisdiction-status-disclosure__meta {
+  color: var(--color-text-muted);
+}
+.jurisdiction-status-disclosure__panel ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.jurisdiction-status-disclosure__panel a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-accent);
+}
+.jurisdiction-status-disclosure__panel svg {
+  width: var(--space-3);
+  height: var(--space-3);
 }
 @media (max-width: 1080px) {
   .country-directory { column-count: 3; }
@@ -4387,4 +4889,10 @@ a.constitution-xref-card-country:hover {
 }
 @media (max-width: 480px) {
   .country-directory { column-count: 1; }
+  .jurisdiction-status-disclosure__panel {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    width: calc(100vw - var(--space-8));
+    max-width: none;
+  }
 }

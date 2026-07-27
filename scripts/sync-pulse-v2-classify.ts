@@ -39,6 +39,19 @@ async function main() {
   console.log(`    flagged for review:${summary.flaggedForReview}`);
   console.log(`  none category:       ${summary.noneCategory}`);
   console.log(`  failed:              ${summary.failed}`);
+  console.log(`    retryable:         ${summary.retryableFailures}`);
+  console.log(`    terminal:          ${summary.terminalFailures}`);
+  console.log(`  model calls:         ${summary.modelCalls}`);
+  console.log(`  claim collisions:    ${summary.claimsSkipped}`);
+  console.log(`  config:              ${summary.configHash}`);
+  if (summary.queueAfter) {
+    console.log(`  queue eligible:      ${summary.queueAfter.eligibleDepth}`);
+    console.log(`    new:               ${summary.queueAfter.newDepth}`);
+    console.log(`    due retries:       ${summary.queueAfter.retryDueDepth}`);
+    console.log(`    scheduled retries: ${summary.queueAfter.retryScheduledDepth}`);
+    console.log(`    terminal failures: ${summary.queueAfter.terminalFailureCount}`);
+    console.log(`  oldest eligible:     ${summary.queueAfter.oldestEligibleAt ?? "none"}`);
+  }
   console.log(`  elapsed:             ${(elapsedMs / 1000).toFixed(1)}s`);
 }
 

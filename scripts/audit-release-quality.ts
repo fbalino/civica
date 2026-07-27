@@ -116,7 +116,7 @@ async function collectSnapshot(): Promise<ReleaseQualitySnapshot> {
         UNION ALL SELECT 'statements', count(*)::int FROM statements
         UNION ALL SELECT 'elections', count(*)::int FROM elections
         UNION ALL SELECT 'constitutions', count(*)::int FROM constitutions
-        UNION ALL SELECT 'legislature_parties', count(*)::int FROM legislature_parties
+        UNION ALL SELECT 'legislature_parties', count(*)::int FROM legislature_parties WHERE is_current = true
         UNION ALL SELECT 'terms', count(*)::int FROM terms
         ORDER BY table_name`,
   ]);

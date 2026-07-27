@@ -1,11 +1,21 @@
-import { sql, desc, asc, eq } from "drizzle-orm";
+import { and, sql, desc, asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   elections,
   governmentBodies,
   legislatureParties,
   sources,
+  statements,
 } from "@/lib/db/schema";
+import {
+  ELECTION_CORPUS_AUDIT,
+  getElectionAuditRow,
+  isAuditedProjection,
+  isAuditedPublicElection,
+  isEligibleElectionField,
+  isPrimaryElectionEvent,
+} from "@/lib/elections/corpus-audit-runtime";
+import { loadLiveElectionContentFingerprints } from "@/lib/elections/corpus-audit-live";
 
 /**
  * Section-scoped queries for the deepened Civica Data → Legislature section.
@@ -52,6 +62,10 @@ export interface LegislatureKeyFacts {
   lastElectionName: string | null;
   /** Four-digit year of the next scheduled legislative election, if any. */
   nextElectionYear: string | null;
+  /** A source date is not necessarily an official schedule; projections are separate. */
+  nextElectionBasis: "source_dated" | "term_projection" | null;
+  nextElectionStatus: "tentative" | "source_dated" | "held" | "unknown" | null;
+  lastElectionResultsStatus: "compiled" | "not_compiled" | null;
 }
 
 export interface LegislatureContext {
@@ -60,6 +74,18 @@ export interface LegislatureContext {
   coalitions: ChamberCoalition[];
   /** ISO timestamp of the last IPU Parline sync (drives the SourceDot). */
   partySyncAt: string | null;
+  electionEvidence: {
+    sourceId: string;
+    retrievedAt: string | null;
+  } | null;
+  turnoutEvidence: {
+    sourceId: string;
+    retrievedAt: string | null;
+  } | null;
+  systemEvidence: {
+    sourceId: string;
+    retrievedAt: string | null;
+  } | null;
 }
 
 /** Reads the last sync timestamp for the party-seat source (IPU Parline). */
@@ -88,7 +114,7 @@ function yearOf(value: unknown): string | null {
  * empty, which the UI renders as an absent cell rather than a placeholder.
  */
 export async function getLegislatureContext(
-  jurisdictionId: string
+  jurisdictionId: string,
 ): Promise<LegislatureContext> {
   const empty: LegislatureContext = {
     keyFacts: {
@@ -97,9 +123,15 @@ export async function getLegislatureContext(
       lastElectionYear: null,
       lastElectionName: null,
       nextElectionYear: null,
+      nextElectionBasis: null,
+      nextElectionStatus: null,
+      lastElectionResultsStatus: null,
     },
     coalitions: [],
     partySyncAt: null,
+    electionEvidence: null,
+    turnoutEvidence: null,
+    systemEvidence: null,
   };
 
   // 1. Coalition flags, scoped to this jurisdiction's legislative bodies.
@@ -108,7 +140,7 @@ export async function getLegislatureContext(
     .from(governmentBodies)
     .where(
       sql`${governmentBodies.jurisdictionId} = ${jurisdictionId}
-        AND ${governmentBodies.branch} = 'legislative'`
+        AND ${governmentBodies.branch} = 'legislative'`,
     );
 
   const bodyIds = legislativeBodies.map((b) => b.id);
@@ -125,7 +157,8 @@ export async function getLegislatureContext(
       .from(legislatureParties)
       .where(
         sql`${legislatureParties.bodyId} IN ${bodyIds}
-          AND ${legislatureParties.isRulingCoalition} = true`
+          AND ${legislatureParties.isRulingCoalition} = true
+          AND ${legislatureParties.isCurrent} = true`,
       );
 
     const byBody = new Map<string, ChamberCoalition>();
@@ -151,6 +184,7 @@ export async function getLegislatureContext(
   //    scope to the jurisdiction and treat the fact as legislature-level.
   const pastLegislative = await db
     .select({
+      id: elections.id,
       electoralSystem: elections.electoralSystem,
       turnoutPercent: elections.turnoutPercent,
       electionDate: elections.electionDate,
@@ -160,37 +194,127 @@ export async function getLegislatureContext(
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
         AND ${elections.electionType} ILIKE 'legislativ%'
-        AND ${elections.electionDate} <= CURRENT_DATE`
+        AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
-    .orderBy(desc(elections.electionDate))
-    .limit(1);
+    .orderBy(desc(elections.electionDate));
 
   const nextLegislative = await db
-    .select({ electionDate: elections.electionDate })
+    .select({ id: elections.id, electionDate: elections.electionDate })
     .from(elections)
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
         AND ${elections.electionType} ILIKE 'legislativ%'
-        AND ${elections.electionDate} > CURRENT_DATE`
+        AND ${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
-    .orderBy(asc(elections.electionDate))
-    .limit(1);
+    .orderBy(asc(elections.electionDate));
 
-  const past = pastLegislative[0];
-  const next = nextLegislative[0];
+  const liveFingerprints = await loadLiveElectionContentFingerprints([
+    ...pastLegislative.map((row) => row.id),
+    ...nextLegislative.map((row) => row.id),
+  ]);
+
+  const past = pastLegislative.find((row) =>
+    isAuditedPublicElection(row.id, liveFingerprints.get(row.id)),
+  );
+  const next = nextLegislative.find(
+    (row) =>
+      isPrimaryElectionEvent(row.id) &&
+      (isAuditedPublicElection(row.id, liveFingerprints.get(row.id)) ||
+        isAuditedProjection(row.id, liveFingerprints.get(row.id))),
+  );
+  const nextAudit = next ? getElectionAuditRow(next.id) : null;
+  const pastAudit = past ? getElectionAuditRow(past.id) : null;
+
+  const systemStatements = past
+    ? await db
+        .select({
+          sourceId: statements.sourceId,
+          retrievedAt: statements.retrievedAt,
+          objectValue: statements.objectValue,
+        })
+        .from(statements)
+        .where(
+          and(
+            eq(statements.subjectTable, "elections"),
+            eq(statements.subjectId, past.id),
+            eq(statements.predicate, "ipu_last_election"),
+            eq(statements.sourceId, "ipu_parline"),
+          ),
+        )
+        .limit(1)
+    : [];
+  const systemStatement = systemStatements.find((statement) => {
+    try {
+      const value = JSON.parse(statement.objectValue ?? "{}") as {
+        electoral_system?: unknown;
+      };
+      return (
+        typeof value.electoral_system === "string" &&
+        value.electoral_system.trim().length > 0
+      );
+    } catch {
+      return false;
+    }
+  });
 
   const partySyncAt = await getPartySourceSyncAt().catch(() => null);
 
   return {
     keyFacts: {
-      electoralSystem: past?.electoralSystem ?? null,
+      electoralSystem: systemStatement ? (past?.electoralSystem ?? null) : null,
       turnoutPercent:
-        past?.turnoutPercent != null ? Number(past.turnoutPercent) : null,
+        past?.turnoutPercent != null &&
+        isEligibleElectionField(past.id, "turnout")
+          ? Number(past.turnoutPercent)
+          : null,
       lastElectionYear: yearOf(past?.electionDate),
       lastElectionName: past?.electionName ?? null,
       nextElectionYear: yearOf(next?.electionDate),
+      nextElectionBasis:
+        nextAudit?.temporalClass === "source_dated_upcoming"
+          ? "source_dated"
+          : nextAudit?.temporalClass === "projection_due"
+            ? "term_projection"
+            : null,
+      nextElectionStatus:
+        nextAudit?.temporalClass === "projection_due"
+          ? "unknown"
+          : nextAudit?.sourceEventStatus === "tentative"
+            ? "tentative"
+            : nextAudit?.sourceEventStatus === "source_dated"
+              ? "source_dated"
+              : nextAudit?.sourceEventStatus === "held"
+                ? "held"
+                : nextAudit
+                  ? "unknown"
+                  : null,
+      lastElectionResultsStatus: past
+        ? isEligibleElectionField(past.id, "results")
+          ? "compiled"
+          : "not_compiled"
+        : null,
     },
     coalitions: coalitions.length > 0 ? coalitions : empty.coalitions,
     partySyncAt,
+    electionEvidence: (nextAudit ?? pastAudit)?.evidence.sourceId
+      ? {
+          sourceId: (nextAudit ?? pastAudit)!.evidence.sourceId!,
+          retrievedAt: (nextAudit ?? pastAudit)!.evidence.retrievedAt,
+        }
+      : null,
+    turnoutEvidence: pastAudit?.fieldEvidence.turnout
+      ? {
+          sourceId: pastAudit.fieldEvidence.turnout.sourceId,
+          retrievedAt: pastAudit.fieldEvidence.turnout.retrievedAt,
+        }
+      : null,
+    systemEvidence: systemStatement
+      ? {
+          sourceId: systemStatement.sourceId,
+          retrievedAt: systemStatement.retrievedAt
+            ? new Date(systemStatement.retrievedAt).toISOString()
+            : null,
+        }
+      : null,
   };
 }

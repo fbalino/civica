@@ -6,10 +6,8 @@ import { PageHero } from "@/components/PageHero";
 import {
   getPartiesForBrowser,
   getPartyBrowserFacets,
-  getPartySourceFreshness,
   type BrowserParty,
   type PartyBrowserFacets,
-  type PartySourceFreshness,
 } from "@/lib/db/queries-parties";
 import { PartyExplorer } from "@/components/parties/PartyExplorer";
 
@@ -42,16 +40,10 @@ export default async function PartiesPage() {
     totalSeats: 0,
     seatsWithPosition: 0,
   };
-  let freshness: PartySourceFreshness = {
-    seatsSyncedAt: null,
-    positionsSyncedAt: null,
-  };
-
   try {
-    [parties, facets, freshness] = await Promise.all([
+    [parties, facets] = await Promise.all([
       getPartiesForBrowser(),
       getPartyBrowserFacets(),
-      getPartySourceFreshness(),
     ]);
   } catch {
     // queries already soft-fail internally; this guards the Promise.all itself.
@@ -96,8 +88,6 @@ export default async function PartiesPage() {
             totalSeats: facets.totalSeats,
             seatsWithPosition: facets.seatsWithPosition,
           }}
-          seatsSyncedAt={freshness.seatsSyncedAt}
-          positionsSyncedAt={freshness.positionsSyncedAt}
         />
       ) : (
         <p className="editorial-empty">

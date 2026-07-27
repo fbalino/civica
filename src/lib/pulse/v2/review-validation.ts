@@ -17,6 +17,7 @@ export type PulsePublicationOrigin =
   | "human_edited"
   | "human_rejected"
   | "legacy_rejected_unverified"
+  | "legacy_quarantined"
   | "queued";
 
 export function publicationOriginFor(state: {
@@ -25,6 +26,9 @@ export function publicationOriginFor(state: {
   reviewStatus: string;
 }): PulsePublicationOrigin {
   if (!state.published) {
+    if (state.reviewStatus === "legacy_quarantined") {
+      return "legacy_quarantined";
+    }
     if (state.reviewStatus !== "rejected") return "queued";
     return state.humanReviewed
       ? "human_rejected"

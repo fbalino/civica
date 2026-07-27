@@ -6,10 +6,11 @@
 ## Scope
 
 Civica keeps the evidence needed to reproduce and challenge its factual and
-experimental outputs. The protected registry currently covers 30 relations:
+experimental outputs. The protected registry currently covers 35 relations:
 country facts and disputes, Index inputs and outputs, Pulse inputs and review
 records, elections, constitutions, legislatures, organizations, officeholders,
-provenance statements, corrections, and backtest records.
+provenance statements, corrections, backtest records, and version-bound
+constitution passages retained for stable citation.
 
 Every update or deletion on a protected relation writes the complete prior row
 to `research_evidence_history` before the mutation proceeds. Updates also store
@@ -26,6 +27,24 @@ or evaluation evidence.
 Raw Pulse inputs now carry one of four dispositions: `pending`, `event`,
 `non_governance`, or `invalid`. Terminal decisions retain the classifier output,
 reason, and decision time. The classifier queue reads only pending rows.
+
+Classifier execution also has a configuration-keyed state projection and an
+append-only attempt ledger. State updates retain their before/after rows; an
+attempt records its claim and completed outcome as separate immutable entries.
+Retryable failures keep a sanitized error and next-eligible time. Successful,
+none, and exhausted outcomes are terminal for that configuration.
+
+Human-review operations add a retained obligation projection and an append-only
+SLA event ledger. Queue entry, escalation, bounded exceptions, disposition, and
+the pre-contract legacy-quarantine boundary remain available for audit. A
+legacy-quarantined item is unpublished and is not a human review decision.
+
+Pulse dimensional scores have a mutable current-state projection and a separate
+append-only `pulse-dimensional-delta-history/v1` ledger. Every computation
+records its score run, jurisdiction, dimension, contributing event IDs,
+derivation envelope, score date, and trailing 365-day lookback. Zero-output
+clearing rows remain in that ledger so an aged-out signal can be reproduced
+without treating its deleted or zeroed current projection as historical truth.
 
 `pulse_evaluation_evidence` provides one internal query surface for:
 

@@ -132,7 +132,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/countries/route.ts",
     versioned: true,
     summary:
-      "Paginated list of sovereign states with basic metadata. Filter by continent or by a typed peer lens: region, income, V-Dem regime, CGV regime, or monarchy status.",
+      "Paginated list of the sourced Atlas jurisdiction catalog, including status labels, notes, and sources. Filter by jurisdiction status, continent, or a typed peer lens.",
     params: [
       {
         name: "as_of",
@@ -140,6 +140,13 @@ export const API_ROUTES: RouteContract[] = [
         type: "string",
         description:
           'Required: "live" or a complete immutable Civica Atlas vintage label.',
+      },
+      {
+        name: "status",
+        in: "query",
+        type: "string",
+        description:
+          "Optional jurisdiction-status/v1 class: sovereign_state | associated_state | dependency_or_territory | disputed_or_limited_recognition | aggregate_or_special_area.",
       },
       {
         name: "continent",
@@ -189,14 +196,14 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/countries/[code]/route.ts",
     versioned: true,
     summary:
-      "Detailed government structure for a single country. Look up by slug, ISO 3166-1 alpha-2, or alpha-3 code.",
+      "Detailed government structure and sourced status for a single Atlas jurisdiction. Look up by slug or an available ISO alpha-2/alpha-3 code.",
     params: [
       {
         name: ":code",
         in: "path",
         type: "string",
         description:
-          'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states").',
+          'Jurisdiction slug, ISO-2, or ISO-3 code when assigned (e.g. "us", "USA", "united-states", "puerto-rico").',
       },
       {
         name: "as_of",
@@ -212,6 +219,86 @@ export const API_ROUTES: RouteContract[] = [
     errorStatuses: [400, 404, 429, 500],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countryDetail",
+  },
+  {
+    id: "elections",
+    docSectionId: "elections",
+    method: "GET",
+    pathTemplate: "/api/v1/elections",
+    filePath: "src/app/api/v1/elections/route.ts",
+    versioned: true,
+    summary:
+      "Qualified election research rows with date-only semantics and source provenance. JSON and CSV emit only verified CC0 Wikidata rows; IPU, IDEA, and derived projections are reported as withheld counts.",
+    params: [
+      {
+        name: "format",
+        in: "query",
+        type: "string",
+        description: '"json" (default) or "csv".',
+      },
+      {
+        name: "jurisdiction",
+        in: "query",
+        type: "string",
+        description: "Filter by slug, ISO-2, or ISO-3.",
+      },
+      {
+        name: "type",
+        in: "query",
+        type: "string",
+        description: "legislative | presidential",
+      },
+      {
+        name: "temporal_class",
+        in: "query",
+        type: "string",
+        description: "historical | source_dated_upcoming | projection_due",
+      },
+      {
+        name: "source_status",
+        in: "query",
+        type: "string",
+        description: "held | source_dated | tentative | unknown",
+      },
+      {
+        name: "jurisdiction_status",
+        in: "query",
+        type: "string",
+        description: "Filter by jurisdiction-status/v1 class.",
+      },
+      {
+        name: "from",
+        in: "query",
+        type: "date",
+        description: "Inclusive YYYY-MM-DD lower bound.",
+      },
+      {
+        name: "to",
+        in: "query",
+        type: "date",
+        description: "Inclusive YYYY-MM-DD upper bound.",
+      },
+      {
+        name: "has_results",
+        in: "query",
+        type: "boolean",
+        description:
+          "Filter the qualified pre-rights corpus by compiled-results availability.",
+      },
+      {
+        name: "has_turnout",
+        in: "query",
+        type: "boolean",
+        description:
+          "Filter the qualified pre-rights corpus by sourced-turnout availability.",
+      },
+    ],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [400, 429, 500, 503],
+    deprecation: null,
+    exampleId: "elections",
   },
   {
     id: "government-types",
@@ -405,7 +492,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/rankings/route.ts",
     versioned: true,
     summary:
-      "DEPRECATED — preserved composite ranking endpoint. Civica no longer recommends a public country league table.",
+      "DEPRECATED — preserved composite ranking endpoint. The retired scalar Pulse sort value returns 410; Pulse is available only as named per-dimension experimental deltas.",
     params: [
       {
         name: "quarter",
@@ -426,7 +513,7 @@ export const API_ROUTES: RouteContract[] = [
         in: "query",
         type: "string",
         description:
-          'Must be "ci" (the only supported value) or omitted; any other value returns 400.',
+          'Omit or use "ci" for the preserved Index ranking. The retired "cp" value (case-insensitive) returns 410 with a link to the per-country dimensional successor; any other value returns 400.',
       },
       {
         name: "continent",
@@ -464,7 +551,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 429, 500],
+    errorStatuses: [400, 410, 429, 500],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexRankings",
   },

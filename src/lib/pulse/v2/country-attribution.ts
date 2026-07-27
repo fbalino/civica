@@ -10,6 +10,7 @@ import { sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
 import type * as schema from "@/lib/db/schema";
+import { contentVersion } from "@/lib/research/derivation-version";
 import type { PulseDecisionPayloads } from "./decision-ledger";
 import {
   PULSE_JURISDICTION_ATTRIBUTION_VERSION,
@@ -41,6 +42,11 @@ Rules:
 - supranational or unclear: primary_iso3 is null and attributions is empty.
 - ISO3 values are uppercase ISO 3166-1 alpha-3 codes.
 - evidence_refs contains only headline and/or description and is never empty.`;
+
+export const SUBJECT_ATTRIBUTION_PROMPT_VERSION = contentVersion(
+  "pulse-subject-attribution-prompt",
+  SUBJECT_ATTRIBUTION_SYSTEM_PROMPT,
+);
 
 export type SubjectScope = "single" | "multi" | "supranational" | "unclear";
 export type SubjectEvidenceRef = "headline" | "description";

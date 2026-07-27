@@ -228,7 +228,7 @@ export function FactValueDot({
           aria-hidden
         />
         <span className="fact-value-trigger-more" aria-hidden>
-          <SquarePlus focusable="false" />
+          <SquarePlus aria-hidden="true" focusable="false" />
         </span>
         {isDisputed && (
           <span className="fact-value-disputed-chip">disputed</span>

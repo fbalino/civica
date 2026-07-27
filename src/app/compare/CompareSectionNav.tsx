@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 const SECTIONS = [
   { id: "overview", label: "Overview" },
   { id: "governance-evidence", label: "Evidence" },
+  { id: "longitudinal", label: "History" },
   { id: "chambers", label: "Chambers" },
   { id: "elections", label: "Elections" },
   { id: "international", label: "International" },
@@ -19,7 +20,8 @@ export function CompareSectionNav({ countryLabels }: CompareSectionNavProps) {
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    const handlers: Record<string, (entry: IntersectionObserverEntry) => void> = {};
+    const handlers: Record<string, (entry: IntersectionObserverEntry) => void> =
+      {};
 
     for (const section of SECTIONS) {
       const el = document.getElementById(section.id);
@@ -32,7 +34,7 @@ export function CompareSectionNav({ countryLabels }: CompareSectionNavProps) {
             }
           }
         },
-        { rootMargin: "-20% 0px -70% 0px", threshold: 0 }
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
       );
       observer.observe(el);
       observers.push(observer);
@@ -46,7 +48,9 @@ export function CompareSectionNav({ countryLabels }: CompareSectionNavProps) {
       <div className="compare-section-nav-inner">
         <div className="compare-section-nav-countries" aria-hidden="true">
           {countryLabels.length === 0 ? (
-            <span style={{ color: "var(--color-text-25)" }}>Select countries</span>
+            <span style={{ color: "var(--color-text-25)" }}>
+              Select countries
+            </span>
           ) : (
             countryLabels.join(" · ")
           )}

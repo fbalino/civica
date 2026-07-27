@@ -91,10 +91,12 @@ function ParallaxImageLayer({
   // Scroll target = the hero SECTION (the img's parent), a stable non-moving box.
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  // Resolve the hero section once mounted. Motion reads sectionRef.current lazily
+  // Resolve the hero section once mounted. A semantic <figure> may sit between
+  // the image and section; tracking the figure would fail when it uses
+  // display:contents to preserve the hero grid.
   // on scroll/resize, so setting it here (before paint) is sufficient.
   useLayoutEffect(() => {
-    sectionRef.current = imgRef.current?.parentElement ?? null;
+    sectionRef.current = imgRef.current?.closest("section") ?? null;
   }, []);
 
   // Track the hero section's scroll: 0 when its top meets the viewport top, 1

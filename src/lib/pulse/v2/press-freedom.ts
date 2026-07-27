@@ -87,25 +87,39 @@ export function informationEnvironmentTier(
 
 export function missingInformationEnvironmentContext(
   reason = "No rights-cleared, versioned context observation is available.",
+  release?: {
+    sourceId: string;
+    sourceUrl: string;
+    upstreamRelease: string;
+    observationYear: number;
+    retrievedAt: string;
+    contentSha256: string;
+    publisherRows: number;
+    matchedJurisdictions: number;
+    supportedJurisdictions: number;
+    rightsStatus: "verified" | "pending";
+    useStatus:
+      "active_unvalidated_heuristic" | "disabled_pending_rights_and_validation";
+  },
 ): PulseInformationEnvironmentContext {
   return {
     schemaVersion: PULSE_INFORMATION_ENVIRONMENT_VERSION,
     valueStatus: "missing",
     score: null,
     tier: null,
-    sourceId: null,
-    sourceUrl: null,
-    upstreamRelease: null,
-    observationYear: null,
-    retrievedAt: null,
-    contentSha256: null,
+    sourceId: release?.sourceId ?? null,
+    sourceUrl: release?.sourceUrl ?? null,
+    upstreamRelease: release?.upstreamRelease ?? null,
+    observationYear: release?.observationYear ?? null,
+    retrievedAt: release?.retrievedAt ?? null,
+    contentSha256: release?.contentSha256 ?? null,
     sourceCoverage: {
-      publisherRows: null,
-      matchedJurisdictions: null,
-      supportedJurisdictions: null,
+      publisherRows: release?.publisherRows ?? null,
+      matchedJurisdictions: release?.matchedJurisdictions ?? null,
+      supportedJurisdictions: release?.supportedJurisdictions ?? null,
     },
-    rightsStatus: "not_registered",
-    useStatus: "not_available",
+    rightsStatus: release?.rightsStatus ?? "not_registered",
+    useStatus: release?.useStatus ?? "not_available",
     missingReason: reason,
   };
 }

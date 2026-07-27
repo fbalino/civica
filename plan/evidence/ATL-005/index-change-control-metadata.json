@@ -1,0 +1,16 @@
+{
+  "id": "atlas-neutral-evidence-coverage",
+  "toVersion": "civica-index-atlas-evidence-coverage-presentation-v25",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/ATL-005/README.md",
+      "plan/research/atlas-surface-data-matrix-v1.md"
+    ],
+    "registry": ["data/atlas-surface-data-matrix.v1.json"],
+    "release_note": ["plan/evidence/ATL-005/README.md"],
+    "migration_plan": ["plan/evidence/ATL-005/migration-plan.md"],
+    "golden_test": ["src/lib/provenance/country-evidence-coverage.test.ts"],
+    "contract_test": ["src/lib/atlas/surface-data-matrix.test.ts"]
+  }
+}

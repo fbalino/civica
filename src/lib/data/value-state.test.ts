@@ -93,19 +93,44 @@ test("all seven states have valid and mutually distinct storage shapes", () => {
 });
 
 test("zero is an observed value and absence states cannot smuggle zero or empty string", () => {
-  assert.deepEqual(validateDataValueState({ status: "observed", hasValue: true }), []);
-  for (const status of DATA_VALUE_STATUSES.filter((state) => state !== "observed" && state !== "disputed")) {
-    assert.match(validateDataValueState({ status, hasValue: true, reason: "fixture" }).join(" "), /must not expose/);
+  assert.deepEqual(
+    validateDataValueState({ status: "observed", hasValue: true }),
+    [],
+  );
+  for (const status of DATA_VALUE_STATUSES.filter(
+    (state) => state !== "observed" && state !== "disputed",
+  )) {
+    assert.match(
+      validateDataValueState({
+        status,
+        hasValue: true,
+        reason: "fixture",
+      }).join(" "),
+      /must not expose/,
+    );
   }
-  assert.match(validateDataValueState({ status: "unknown", hasValue: false, reason: "" }).join(" "), /requires a reason/);
+  assert.match(
+    validateDataValueState({
+      status: "unknown",
+      hasValue: false,
+      reason: "",
+    }).join(" "),
+    /requires a reason/,
+  );
 });
 
 test("country API status preserves every stored state and dispute/rights precedence", () => {
   for (const status of DATA_VALUE_STATUSES) {
     assert.equal(buildApiDataValueStatus(output(status)).status, status);
   }
-  assert.equal(publicDataValueStatus({ storedStatus: "observed", disputed: true }), "disputed");
-  assert.equal(publicDataValueStatus({ storedStatus: "disputed", withheld: true }), "withheld");
+  assert.equal(
+    publicDataValueStatus({ storedStatus: "observed", disputed: true }),
+    "disputed",
+  );
+  assert.equal(
+    publicDataValueStatus({ storedStatus: "disputed", withheld: true }),
+    "withheld",
+  );
 });
 
 test("indicator grouping keeps observed zero, retains disputed values, and records every absence", () => {
@@ -120,13 +145,24 @@ test("indicator grouping keeps observed zero, retains disputed values, and recor
     value: status === "observed" || status === "disputed" ? 0 : null,
     valueStatus: status,
     valueStatusReason: status === "observed" ? null : REASON[status],
+    upstreamRelease: "fixture-release",
+    artifactHash: "a".repeat(64),
+    artifactKind: "normalized_batch",
+    temporalCoverage: "2000/2006",
+    licenseUrl: "https://example.test/terms",
+    transformationId: "fixture/v1",
+    substitutionReason: null,
+    methodVersion: "fixture/v1",
   }));
   const [series] = buildIndicatorHistorySeries(rows);
   assert.deepEqual(series.points, [
     { year: 2000, value: 0 },
     { year: 2005, value: 0 },
   ]);
-  assert.deepEqual(series.availability.map((row) => row.status), DATA_VALUE_STATUSES.slice(1));
+  assert.deepEqual(
+    series.availability.map((row) => row.status),
+    DATA_VALUE_STATUSES.slice(1),
+  );
 });
 
 test("export rows preserve all states instead of collapsing absent values to zero or empty text", () => {
@@ -138,11 +174,36 @@ test("export rows preserve all states instead of collapsing absent values to zer
       factKey: `fixture_${status}`,
       factGroup: "B",
       category: "demographics",
-      value: { text: hasValue ? "0" : null, numeric: hasValue ? 0 : null, structured: null, unit: "people", status, statusReason: status === "observed" ? null : REASON[status], type: "measured" },
-      source: { id: "fixture", name: "Fixture", url: "https://example.test/value", license: "fixture", termsUrl: "https://example.test/terms", lastSyncedAt: null },
-      freshness: { asOf: "2025-01-01", observationYear: 2025, dataVintageYear: 2025, retrievedAt: "2026-01-01T00:00:00.000Z", upstreamVintage: "fixture" },
+      value: {
+        text: hasValue ? "0" : null,
+        numeric: hasValue ? 0 : null,
+        structured: null,
+        unit: "people",
+        status,
+        statusReason: status === "observed" ? null : REASON[status],
+        type: "measured",
+      },
+      source: {
+        id: "fixture",
+        name: "Fixture",
+        url: "https://example.test/value",
+        license: "fixture",
+        termsUrl: "https://example.test/terms",
+        lastSyncedAt: null,
+      },
+      freshness: {
+        asOf: "2025-01-01",
+        observationYear: 2025,
+        dataVintageYear: 2025,
+        retrievedAt: "2026-01-01T00:00:00.000Z",
+        upstreamVintage: "fixture",
+      },
       lifecycle: { status: "active", reason: null },
-      method: { rowMethodologyVersion: "fixture", reconciliationVersion: "source-precedence/v1", growthMethodology: null },
+      method: {
+        rowMethodologyVersion: "fixture",
+        reconciliationVersion: "source-precedence/v1",
+        growthMethodology: null,
+      },
       decision: { reason: "single_source", trace: [] },
       dispute: { openOrInReview: status === "disputed" },
     });
@@ -163,19 +224,30 @@ test("shared UI renders every state with a distinct label and never substitutes 
   );
   assert.equal(rendered[0], "0");
   for (let index = 1; index < rendered.length; index++) {
-    assert.match(rendered[index], new RegExp(dataValueStatusLabel(DATA_VALUE_STATUSES[index]), "i"));
+    assert.match(
+      rendered[index],
+      new RegExp(dataValueStatusLabel(DATA_VALUE_STATUSES[index]), "i"),
+    );
     assert.doesNotMatch(rendered[index], />—</);
   }
   assert.equal(new Set(rendered).size, DATA_VALUE_STATUSES.length);
 });
 
 test("forward migration constrains country facts and both indicator stores", () => {
-  const sql = readFileSync("drizzle/migrations/0023_data_value_states.sql", "utf8");
-  for (const table of ["country_facts", "indicator_history", "country_metrics"]) {
+  const sql = readFileSync(
+    "drizzle/migrations/0023_data_value_states.sql",
+    "utf8",
+  );
+  for (const table of [
+    "country_facts",
+    "indicator_history",
+    "country_metrics",
+  ]) {
     assert.match(sql, new RegExp(`ALTER TABLE "${table}"`));
     assert.match(sql, new RegExp(`${table}_value_status_allowed`));
     assert.match(sql, new RegExp(`${table}_value_status_shape`));
     assert.match(sql, new RegExp(`${table}_value_status_reason`));
   }
-  for (const status of DATA_VALUE_STATUSES) assert.match(sql, new RegExp(`'${status}'`));
+  for (const status of DATA_VALUE_STATUSES)
+    assert.match(sql, new RegExp(`'${status}'`));
 });

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import type { IndexedConstitutionCountry } from "@/lib/db/queries-constitution";
+import { ConstitutionSearchForm } from "./ConstitutionSearchForm";
 
 interface FeaturedTopic {
   key: string;
@@ -66,6 +67,10 @@ export function ConstitutionLanding({
         question.
       </p>
 
+      <section className="constitution-landing-section constitution-landing-search">
+        <ConstitutionSearchForm />
+      </section>
+
       <section className="constitution-landing-section">
         <h2 className="constitution-landing-heading">Start with a country</h2>
         <p className="constitution-landing-topic-note">
@@ -80,7 +85,7 @@ export function ConstitutionLanding({
               className="constitution-landing-card"
             >
               <span className="constitution-landing-card-flag" aria-hidden>
-                <CountryFlag iso2={c.iso2} size={22} />
+                <CountryFlag iso2={c.iso2} size={22} decorative />
               </span>
               <span className="constitution-landing-card-name">{c.name}</span>
               {c.year ? (

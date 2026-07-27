@@ -1,0 +1,40 @@
+{
+  "id": "pulse-review-sla-api-quarantine-closure",
+  "toVersion": "civica-index-pulse-review-sla-v16",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-033/change-control-followup.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "plan/evidence/PUL-033/change-control-followup.md"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-033/change-control-followup.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-033/migration-plan.md",
+      "plan/evidence/PUL-033/change-control-followup.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/review-sla.test.ts",
+      "src/lib/pulse/v2/review-validation.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/api/contract/__tests__/contract.test.ts",
+      "scripts/validate-pulse-review-sla.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:index-pulse-classification-state",
+    "validate:pulse-classification-state",
+    "validate:pulse-review-sla"
+  ]
+}

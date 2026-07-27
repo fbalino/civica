@@ -8,8 +8,8 @@
       "id": "frozen_release",
       "path": "data/releases/atlas-2026-07-11-g2-rc1.zip",
       "role": "Frozen G2 release candidate archive",
-      "bytes": 1869125,
-      "sha256": "6162bb64a92312244b8bcac5d2adc3e82d24de7731ff69e212b99341d903349e"
+      "bytes": 1869782,
+      "sha256": "decc2d31fbdb7b7ef4dd0341d78ed7d5e9be1a950c223e1f3687fd9f778e0fbf"
     },
     {
       "id": "bundle_manifest",
@@ -23,7 +23,7 @@
       "path": "data/releases/atlas-2026-07-11/g2-rc1/SHA256SUMS",
       "role": "Release checksums",
       "bytes": 1302,
-      "sha256": "4d81a170562fad6b36e218813e89bb95c05e8095f6eca14fb7b607411f8868b6"
+      "sha256": "ce47f55fd6b620b327af272916f500ba11e6d833acdbbcc45ee7b484e9b70edd"
     },
     {
       "id": "codebook",
@@ -36,15 +36,15 @@
       "id": "data_dictionary",
       "path": "data/schema-data-dictionary.v1.json",
       "role": "Complete schema data dictionary",
-      "bytes": 1128962,
-      "sha256": "7dd11d58e74b53141be03d9c4470b68fc2e55103f8a442fbe0b14f9e895631c3"
+      "bytes": 1527577,
+      "sha256": "ea7f74c76d910f409ce685b6fc39da68390b2943ba0af3083f4355391e83c00f"
     },
     {
       "id": "rights_manifest",
       "path": "data/releases/atlas-2026-07-11/g2-rc1/rights-manifest.v1.json",
       "role": "Source, field, product, and release rights",
-      "bytes": 32353,
-      "sha256": "16eeb3345e7ed77414673c950cb6e8edd2d5c0d028be95448efaf47823016b54"
+      "bytes": 35675,
+      "sha256": "68d43cd65e58b470e720fb9c1f3defac6f2831319c6b955da55efdcdb916355f"
     },
     {
       "id": "source_input_manifest",
@@ -85,8 +85,8 @@
       "id": "quality",
       "path": "data/release-quality-report.v1.json",
       "role": "Release-quality and anomaly report",
-      "bytes": 1404,
-      "sha256": "c08437c954cdeb94ee7b8086ea8dd4ceeb377b58c1bd5ef57f4cc3b3e7411ce7"
+      "bytes": 1870,
+      "sha256": "a9eb97e0c228d134ae80e8419dc78ef514ba605b5d3551dd69b4e22e5c7c85d6"
     },
     {
       "id": "limitations",
@@ -122,5 +122,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "905ec718eb2cdcd66d0e9225ded35236416b1141b09ff60796b717b285fbe2b2"
+  "semanticSha256": "dbf2816e64ccab5e0d93e2316dfd35a763c6c7731ca3bf9598a2a036c38a3f70"
 }

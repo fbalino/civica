@@ -1,0 +1,38 @@
+{
+  "id": "pulse-versioned-classification-state",
+  "toVersion": "civica-index-pulse-classification-state-v13",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-032/README.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-032/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-032/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/classification-state.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "scripts/validate-index-pulse-classification-state.ts",
+      "scripts/validate-pulse-classification-state.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:index-pulse-classification-state",
+    "validate:pulse-classification-state"
+  ]
+}

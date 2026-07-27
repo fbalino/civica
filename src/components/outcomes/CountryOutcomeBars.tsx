@@ -4,64 +4,22 @@ import { useEffect, useMemo, useReducer } from "react";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { Tooltip } from "@/components/editorial/Tooltip";
 import styles from "./CountryOutcomeBars.module.css";
+import {
+  outcomesReducer,
+  type MetricRow,
+  type OutcomesAction,
+  type OutcomesPayload,
+  type OutcomesState,
+  type PeerStats,
+} from "./outcomesReducer";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-interface PeerStats {
-  metricId: string;
-  peerCount: number;
-  peerMin: number;
-  peerMedian: number;
-  peerMax: number;
-}
-
-interface MetricRow {
-  metricId: string;
-  name: string;
-  category: string;
-  unit: string | null;
-  higherIsBetter: boolean;
-  value: number;
-  asOfYear: number;
-  rank: number | null;
-  totalRanked: number | null;
-  isStale: boolean;
-  peer: PeerStats | null;
-}
-
-interface OutcomesPayload {
-  countryId: string;
-  countrySlug: string;
-  countryName: string;
-  govType: string | null;
-  year: number;
-  metrics: MetricRow[];
-}
-
-type OutcomesState = {
-  data: OutcomesPayload | null;
-  loading: boolean;
-  error: string | null;
-};
-
-type OutcomesAction =
-  | { type: "start" }
-  | { type: "success"; payload: OutcomesPayload }
-  | { type: "error"; message: string };
-
-function outcomesReducer(
-  state: OutcomesState,
-  action: OutcomesAction,
-): OutcomesState {
-  switch (action.type) {
-    case "start":
-      return { ...state, loading: true, error: null };
-    case "success":
-      return { data: action.payload, loading: false, error: null };
-    case "error":
-      return { ...state, loading: false, error: action.message };
-  }
-}
+// Re-exported so `outcomesReducer` (+ its state/action types) is still
+// available from this module for any existing caller. The actual
+// implementation lives in `./outcomesReducer` — see that file's header
+// comment for why (CSS Module imports here block Node's native test
+// runner from importing this file directly).
+export { outcomesReducer };
+export type { OutcomesState, OutcomesAction };
 
 export interface CountryOutcomeBarsProps {
   slug: string;

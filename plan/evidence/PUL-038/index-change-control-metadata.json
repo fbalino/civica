@@ -1,0 +1,54 @@
+{
+  "id": "pulse-information-environment-evidence",
+  "toVersion": "civica-index-pulse-information-environment-v22",
+  "categories": [
+    "input",
+    "weight_or_model",
+    "missingness",
+    "presentation"
+  ],
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/research/pulse-information-environment-context-v1.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "data/releases/pulse-information-environment-rsf-2026/source-input-manifest.v1.json"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-038/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-038/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/information-environment-evidence.test.ts",
+      "src/lib/pulse/v2/press-freedom.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-information-environment.ts",
+      "scripts/validate-pulse-runtime-method.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-series-provenance",
+    "validate:ci-research-panel",
+    "validate:index-research-archive",
+    "validate:ci-missingness",
+    "validate:index-quarantine",
+    "validate:claims-docs",
+    "validate:index-disposition",
+    "validate:index-pulse-information-environment",
+    "validate:governance-evidence-review-packet",
+    "validate:pulse-information-environment",
+    "validate:source-input-manifest",
+    "validate:pulse-runtime",
+    "validate:data-dictionary",
+    "validate:authoritative-migrations"
+  ]
+}

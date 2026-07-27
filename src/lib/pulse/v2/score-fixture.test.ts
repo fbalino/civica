@@ -25,6 +25,8 @@ const event: PublishedEvent = {
   sourceIds: ["source-1"],
   publicationRunId: "33333333-3333-4333-8333-333333333333",
   corroborationRunId: "55555555-5555-4555-8555-555555555555",
+  absorptionDecisionKey: null,
+  absorptionOutcome: null,
 };
 const runRef = createPulsePipelineRunRef("score", {
   id: "44444444-4444-4444-8444-444444444444",
@@ -89,4 +91,101 @@ test("empty score input without prior state is an explicit no-op", async () => {
   });
   assert.equal(result.eventsConsidered, 0);
   assert.deepEqual(result.planned, []);
+});
+
+test("a 366-day-old event clears prior country state without publishing a signal", async () => {
+  const staleEvent: PublishedEvent = {
+    ...event,
+    eventDate: "2025-07-09",
+  };
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events: [staleEvent],
+    existingJurisdictionIds: [event.jurisdictionId],
+    dryRun: true,
+    now,
+    runRef,
+  });
+
+  assert.equal(result.eventsConsidered, 0);
+  assert.equal(result.countriesScored, 1);
+  assert.equal(result.significantDeltas, 0);
+  assert.equal(result.planned.length, 5);
+  for (const row of result.planned) {
+    assert.equal(row.deltaValue, 0);
+    assert.deepEqual(row.contributingEventIds, []);
+    assert.equal(row.computationRunId, runRef.id);
+    assert.equal(row.scoreAsOf, "2026-07-10");
+    assert.equal(row.windowStart, "2025-07-10");
+    assert.equal(row.windowDays, 365);
+    assert.equal(row.derivationVersions.algorithm.state, "versioned");
+    assert.equal(row.derivationVersions.sourceBasket.state, "not_applicable");
+  }
+});
+
+test("the 365-day boundary is included and future events are excluded", async () => {
+  const boundaryEvent: PublishedEvent = {
+    ...event,
+    id: "event-boundary",
+    eventDate: "2025-07-10",
+  };
+  const futureEvent: PublishedEvent = {
+    ...event,
+    id: "event-future",
+    eventDate: "2026-07-11",
+  };
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events: [boundaryEvent, futureEvent],
+    existingJurisdictionIds: [],
+    dryRun: true,
+    now,
+    runRef,
+  });
+
+  assert.equal(result.eventsConsidered, 1);
+  const ruleOfLaw = result.planned.find(
+    (row) => row.dimension === "rule_of_law",
+  );
+  assert.deepEqual(ruleOfLaw?.contributingEventIds, [boundaryEvent.id]);
+  assert.ok((ruleOfLaw?.deltaValue ?? 0) < 0);
+});
+
+test("current-event and prior-state jurisdictions form one deduplicated union", async () => {
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events: [event],
+    existingJurisdictionIds: ["jurisdiction-prior", "jurisdiction-prior"],
+    dryRun: true,
+    now,
+    runRef,
+  });
+
+  assert.equal(result.countriesScored, 2);
+  assert.equal(result.planned.length, 10);
+  const priorRows = result.planned.filter(
+    (row) => row.jurisdictionId === "jurisdiction-prior",
+  );
+  assert.equal(priorRows.length, 5);
+  assert.ok(priorRows.every((row) => row.deltaValue === 0));
+  assert.ok(priorRows.every((row) => row.contributingEventIds.length === 0));
+});
+
+test("absorption evidence suppresses impact without mutating corroboration", async () => {
+  const absorbed: PublishedEvent = {
+    ...event,
+    absorptionDecisionKey:
+      "pulse-absorption/sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    absorptionOutcome: "absorbed",
+  };
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events: [absorbed],
+    existingJurisdictionIds: [],
+    dryRun: true,
+    now,
+    runRef,
+  });
+  assert.equal(absorbed.corroborationConfidence, 0.8);
+  assert.equal(result.absorbedEventsExcluded, 1);
+  assert.ok(result.planned.every((row) => row.deltaValue === 0));
+  assert.ok(
+    result.planned.every((row) => row.contributingEventIds.length === 0),
+  );
 });

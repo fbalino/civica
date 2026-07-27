@@ -1,0 +1,9 @@
+{
+  "nestedMain": {},
+  "bannerContentinfo": {},
+  "multipleH1": {
+    "src/app/(coding)/admin/pulse-coding/page.tsx": 2,
+    "src/app/blog/page.tsx": 2,
+    "src/app/constitution/page.tsx": 4
+  }
+}

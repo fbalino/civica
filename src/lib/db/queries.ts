@@ -1,8 +1,14 @@
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, inArray, sql } from "drizzle-orm";
 import { db } from "./index";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
-import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
-import { resolveCiRelease, selectCiReleaseDimensionRows } from "@/lib/ci/release-selection";
+import {
+  CURRENT_CI_METHODOLOGY_VERSION,
+  CURRENT_CI_RELEASE_ID,
+} from "@/lib/ci/current-release";
+import {
+  resolveCiRelease,
+  selectCiReleaseDimensionRows,
+} from "@/lib/ci/release-selection";
 import { parseDataValueStatus } from "@/lib/data/value-state";
 import {
   buildGovernmentClassificationMap,
@@ -12,6 +18,17 @@ import {
   getGovernmentTaxonomyGroupingLabel,
   type GovernmentTaxonomyLens,
 } from "@/lib/government-taxonomy";
+import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import {
+  ELECTION_CORPUS_AUDIT,
+  getElectionAuditRow,
+  isAuditedProjection,
+  isAuditedPublicElection,
+  isEligibleElectionField,
+  getElectionPublicFutureKey,
+  isPrimaryElectionEvent,
+} from "@/lib/elections/corpus-audit-runtime";
+import { loadLiveElectionContentFingerprints } from "@/lib/elections/corpus-audit-live";
 import {
   jurisdictions,
   countryFactbookSections,
@@ -25,6 +42,7 @@ import {
   constitutions,
   elections,
   electionResults,
+  statements,
   ciCompositeScores,
   ciDimensionScores,
   ciMethodologyVersions,
@@ -47,6 +65,7 @@ export async function getJurisdictionBySlug(slug: string) {
   ]);
   return {
     ...jurisdiction,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(jurisdiction),
     governmentClassification: classificationMap.get(jurisdiction.id) ?? null,
   };
 }
@@ -56,32 +75,63 @@ export async function getAllJurisdictions() {
     .select()
     .from(jurisdictions)
     .where(
-      sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`
+      sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`,
     )
     .orderBy(
       sql`${jurisdictions.population} DESC NULLS LAST`,
-      asc(jurisdictions.name)
+      asc(jurisdictions.name),
     );
   const classificationMap = await buildGovernmentClassificationMap(rows);
   return rows.map((row) => ({
     ...row,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(row),
+    governmentClassification: classificationMap.get(row.id) ?? null,
+  }));
+}
+
+/** The complete sourced 253-row Atlas identity catalog. Unlike the legacy
+ * `getAllJurisdictions()` sovereign-state universe, this includes associated
+ * states, dependencies/territories, disputed or limited-recognition entries,
+ * and aggregate/special areas with their canonical status presentation. */
+export async function getAllReferenceJurisdictions() {
+  const rows = await db
+    .select()
+    .from(jurisdictions)
+    .where(sql`LOWER(${jurisdictions.name}) <> 'none'`)
+    .orderBy(asc(jurisdictions.name));
+  const classificationMap = await buildGovernmentClassificationMap(rows);
+  return rows.map((row) => ({
+    ...row,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(row),
     governmentClassification: classificationMap.get(row.id) ?? null,
   }));
 }
 
 export async function getFactbookCountryOptions() {
-  return db
+  const rows = await db
     .select({
       slug: jurisdictions.slug,
       name: jurisdictions.name,
       iso2: jurisdictions.iso2,
       iso3: jurisdictions.iso3,
+      type: jurisdictions.type,
+      statusSourceIds: jurisdictions.statusSourceIds,
+      statusReviewedAt: jurisdictions.statusReviewedAt,
+      statusNote: jurisdictions.statusNote,
+      administeringJurisdictionIso3:
+        jurisdictions.administeringJurisdictionIso3,
+      statusDisputed: jurisdictions.statusDisputed,
     })
     .from(jurisdictions)
-    .where(
-      sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`
-    )
+    .where(sql`LOWER(${jurisdictions.name}) <> 'none'`)
     .orderBy(asc(jurisdictions.name));
+  return rows.map((row) => ({
+    slug: row.slug,
+    name: row.name,
+    iso2: row.iso2,
+    iso3: row.iso3,
+    status: buildJurisdictionStatusPresentation(row),
+  }));
 }
 
 export async function getFactbookSections(jurisdictionId: string) {
@@ -94,13 +144,13 @@ export async function getFactbookSections(jurisdictionId: string) {
 
 export async function getFactbookSection(
   jurisdictionId: string,
-  sectionName: string
+  sectionName: string,
 ) {
   const results = await db
     .select()
     .from(countryFactbookSections)
     .where(
-      sql`${countryFactbookSections.jurisdictionId} = ${jurisdictionId} AND ${countryFactbookSections.sectionName} = ${sectionName}`
+      sql`${countryFactbookSections.jurisdictionId} = ${jurisdictionId} AND ${countryFactbookSections.sectionName} = ${sectionName}`,
     )
     .limit(1);
   return results[0] ?? null;
@@ -108,7 +158,7 @@ export async function getFactbookSection(
 
 export async function getCountryFacts(
   jurisdictionId: string,
-  category?: string
+  category?: string,
 ) {
   const query = db
     .select()
@@ -116,7 +166,7 @@ export async function getCountryFacts(
     .where(
       category
         ? sql`${countryFacts.jurisdictionId} = ${jurisdictionId} AND ${countryFacts.category} = ${category}`
-        : eq(countryFacts.jurisdictionId, jurisdictionId)
+        : eq(countryFacts.jurisdictionId, jurisdictionId),
     );
   return query;
 }
@@ -124,7 +174,7 @@ export async function getCountryFacts(
 export async function rankCountriesByFact(
   factKey: string,
   direction: "asc" | "desc" = "desc",
-  limit = 20
+  limit = 20,
 ) {
   // `country_facts` carries one row per (jurisdiction, fact_key, source).
   // Rank over a deduplicated set — one row per (jurisdiction, fact_key) —
@@ -138,14 +188,14 @@ export async function rankCountriesByFact(
     .selectDistinctOn([countryFacts.jurisdictionId, countryFacts.factKey])
     .from(countryFacts)
     .where(
-      sql`${countryFacts.factKey} = ${factKey} AND ${countryFacts.factValueNumeric} IS NOT NULL`
+      sql`${countryFacts.factKey} = ${factKey} AND ${countryFacts.factValueNumeric} IS NOT NULL`,
     )
     .orderBy(
       countryFacts.jurisdictionId,
       countryFacts.factKey,
       sql`(${countryFacts.status} = 'active' OR ${countryFacts.status} IS NULL) DESC`,
       sql`${countryFacts.asOf} DESC NULLS LAST`,
-      desc(countryFacts.retrievedAt)
+      desc(countryFacts.retrievedAt),
     )
     .as("canonical_fact");
 
@@ -165,12 +215,12 @@ export async function rankCountriesByFact(
     .from(canonicalFact)
     .innerJoin(
       jurisdictions,
-      eq(canonicalFact.jurisdictionId, jurisdictions.id)
+      eq(canonicalFact.jurisdictionId, jurisdictions.id),
     )
     .orderBy(
       direction === "desc"
         ? desc(canonicalFact.factValueNumeric)
-        : asc(canonicalFact.factValueNumeric)
+        : asc(canonicalFact.factValueNumeric),
     )
     .limit(limit);
 }
@@ -368,7 +418,7 @@ export async function getGovernmentStructure(jurisdictionId: string) {
     .from(terms)
     .innerJoin(persons, eq(terms.personId, persons.id))
     .where(
-      sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`
+      sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`,
     );
 
   return { bodies, offices: allOffices, currentTerms };
@@ -382,7 +432,8 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
     .orderBy(asc(governmentBodies.hierarchyLevel));
 
   const bodyIds = bodies.map((b) => b.id);
-  if (bodyIds.length === 0) return { bodies: [], offices: [], currentTerms: [], parties: [] };
+  if (bodyIds.length === 0)
+    return { bodies: [], offices: [], currentTerms: [], parties: [] };
 
   const allOffices = await db
     .select()
@@ -394,18 +445,24 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
 
   const officeIds = allOffices.map((o) => o.id);
 
-  const currentTerms = officeIds.length > 0
-    ? await db
-        .select({ term: terms, person: persons })
-        .from(terms)
-        .innerJoin(persons, eq(terms.personId, persons.id))
-        .where(sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`)
-    : [];
+  const currentTerms =
+    officeIds.length > 0
+      ? await db
+          .select({ term: terms, person: persons })
+          .from(terms)
+          .innerJoin(persons, eq(terms.personId, persons.id))
+          .where(
+            sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`,
+          )
+      : [];
 
   const rawParties = await db
     .select()
     .from(legislatureParties)
-    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .where(
+      sql`${legislatureParties.bodyId} IN ${bodyIds}
+        AND ${legislatureParties.isCurrent} = true`,
+    )
     .orderBy(desc(legislatureParties.seatCount));
 
   // Mirror the load-atlas-data normalisation: when the IPU/Wikidata
@@ -422,7 +479,8 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
   for (const body of bodies) {
     const bp = partiesByBody.get(body.id) ?? [];
     if (!bp.length) continue;
-    const totalSeats = body.totalSeats ?? bp.reduce((s, p) => s + p.seatCount, 0);
+    const totalSeats =
+      body.totalSeats ?? bp.reduce((s, p) => s + p.seatCount, 0);
     const sumSeats = bp.reduce((s, p) => s + p.seatCount, 0);
     const isAggregated = sumSeats > 0 && sumSeats > totalSeats * 1.2;
     for (const p of bp) {
@@ -446,12 +504,19 @@ export async function getJurisdictionsBySlugs(slugs: string[]) {
   const classificationMap = await buildGovernmentClassificationMap(rows);
   return rows.map((row) => ({
     ...row,
+    jurisdictionStatus: buildJurisdictionStatusPresentation(row),
     governmentClassification: classificationMap.get(row.id) ?? null,
   }));
 }
 
 export async function getCountryRankings(jurisdictionId: string) {
-  const keys = ["population", "gdp_ppp", "total_area", "life_expectancy", "gdp_per_capita_ppp"];
+  const keys = [
+    "population",
+    "gdp_ppp",
+    "total_area",
+    "life_expectancy",
+    "gdp_per_capita_ppp",
+  ];
   // `country_facts` carries one row per (jurisdiction, fact_key, source).
   // Rank/count over a deduplicated set — one canonical row per
   // (jurisdiction, fact_key) — so a second source row can never inflate a
@@ -485,8 +550,16 @@ export async function getCountryRankings(jurisdictionId: string) {
     ) ranked
     WHERE jurisdiction_id = ${jurisdictionId}
   `);
-  const rows = Array.isArray(result) ? result : (result as { rows: unknown[] }).rows ?? [];
-  return (rows as { fact_key: string; rank: string | number; total: string | number }[]).map((r) => ({
+  const rows = Array.isArray(result)
+    ? result
+    : ((result as { rows: unknown[] }).rows ?? []);
+  return (
+    rows as {
+      fact_key: string;
+      rank: string | number;
+      total: string | number;
+    }[]
+  ).map((r) => ({
     key: r.fact_key,
     rank: Number(r.rank),
     total: Number(r.total),
@@ -496,7 +569,7 @@ export async function getCountryRankings(jurisdictionId: string) {
 export async function getRelatedCountries(
   jurisdictionId: string,
   continent: string | null,
-  limit = 6
+  limit = 6,
 ) {
   if (!continent) return [];
   return db
@@ -509,7 +582,7 @@ export async function getRelatedCountries(
     })
     .from(jurisdictions)
     .where(
-      sql`${jurisdictions.continent} = ${continent} AND ${jurisdictions.id} != ${jurisdictionId} AND ${jurisdictions.type} = 'sovereign_state'`
+      sql`${jurisdictions.continent} = ${continent} AND ${jurisdictions.id} != ${jurisdictionId} AND ${jurisdictions.type} = 'sovereign_state'`,
     )
     .orderBy(desc(jurisdictions.population))
     .limit(limit);
@@ -520,7 +593,7 @@ export async function getLegislatureComposition(jurisdictionId: string) {
     .select()
     .from(governmentBodies)
     .where(
-      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = 'legislative'`
+      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = 'legislative'`,
     )
     .orderBy(asc(governmentBodies.hierarchyLevel));
 
@@ -530,7 +603,10 @@ export async function getLegislatureComposition(jurisdictionId: string) {
   const parties = await db
     .select()
     .from(legislatureParties)
-    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .where(
+      sql`${legislatureParties.bodyId} IN ${bodyIds}
+        AND ${legislatureParties.isCurrent} = true`,
+    )
     .orderBy(desc(legislatureParties.seatCount));
 
   return bodies.map((body) => ({
@@ -566,7 +642,7 @@ export async function getDemocracyScores(jurisdictionId: string) {
     .select()
     .from(countryFacts)
     .where(
-      sql`${countryFacts.jurisdictionId} = ${jurisdictionId} AND ${countryFacts.factKey} LIKE 'freedom_house%'`
+      sql`${countryFacts.jurisdictionId} = ${jurisdictionId} AND ${countryFacts.factKey} LIKE 'freedom_house%'`,
     );
 
   return {
@@ -578,7 +654,7 @@ export async function getDemocracyScores(jurisdictionId: string) {
 
 export async function getRegionalDemocracyComparison(
   jurisdictionId: string,
-  continent: string | null
+  continent: string | null,
 ) {
   if (!continent) return [];
   return db
@@ -591,7 +667,7 @@ export async function getRegionalDemocracyComparison(
     })
     .from(jurisdictions)
     .where(
-      sql`${jurisdictions.continent} = ${continent} AND ${jurisdictions.type} = 'sovereign_state' AND ${jurisdictions.democracyIndex} IS NOT NULL`
+      sql`${jurisdictions.continent} = ${continent} AND ${jurisdictions.type} = 'sovereign_state' AND ${jurisdictions.democracyIndex} IS NOT NULL`,
     )
     .orderBy(desc(jurisdictions.democracyIndex))
     .limit(20);
@@ -697,14 +773,22 @@ export async function getLeaderTimeline(jurisdictionId: string) {
 }
 
 export async function getElectionsByJurisdiction(jurisdictionId: string) {
-  const rows = await db
+  const rawRows = await db
     .select()
     .from(elections)
     .where(eq(elections.jurisdictionId, jurisdictionId))
     .orderBy(desc(elections.electionDate));
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    rawRows.map((row) => row.id),
+  );
+  const rows = rawRows.filter(
+    (row) =>
+      isAuditedPublicElection(row.id, liveFingerprints.get(row.id)) ||
+      isAuditedProjection(row.id, liveFingerprints.get(row.id)),
+  );
 
   const electionIds = rows.map((e) => e.id);
-  if (electionIds.length === 0) return rows.map((e) => ({ election: e, results: [] as typeof allResults }));
+  if (electionIds.length === 0) return [];
 
   const allResults = await db
     .select()
@@ -713,27 +797,182 @@ export async function getElectionsByJurisdiction(jurisdictionId: string) {
     .orderBy(desc(electionResults.votesPercent));
 
   return rows.map((election) => ({
-    election,
-    results: allResults.filter((r) => r.electionId === election.id),
+    election: {
+      ...election,
+      turnoutPercent: isEligibleElectionField(election.id, "turnout")
+        ? election.turnoutPercent
+        : null,
+    },
+    results: isEligibleElectionField(election.id, "results")
+      ? allResults.filter((r) => r.electionId === election.id)
+      : [],
+    audit: getElectionAuditRow(election.id),
   }));
 }
 
+/**
+ * Batch-qualified election research rows. This is the only global election
+ * research read path: one candidate query, one batch fingerprint load, and
+ * one results/provenance hydration pass. Unknown or content-drifted rows fail
+ * closed through the same checked audit used by reader surfaces.
+ */
+export async function getQualifiedElectionResearchRows() {
+  const candidates = await db
+    .select({
+      election: elections,
+      jurisdiction: {
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        name: jurisdictions.name,
+        iso2: jurisdictions.iso2,
+        iso3: jurisdictions.iso3,
+        continent: jurisdictions.continent,
+        type: jurisdictions.type,
+        statusSourceIds: jurisdictions.statusSourceIds,
+        statusReviewedAt: jurisdictions.statusReviewedAt,
+        statusNote: jurisdictions.statusNote,
+        administeringJurisdictionIso3:
+          jurisdictions.administeringJurisdictionIso3,
+        statusDisputed: jurisdictions.statusDisputed,
+      },
+    })
+    .from(elections)
+    .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
+    .orderBy(asc(elections.electionDate), asc(elections.id));
+
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    candidates.map((row) => row.election.id),
+  );
+  const qualified = candidates.filter(
+    (row) =>
+      isAuditedPublicElection(
+        row.election.id,
+        liveFingerprints.get(row.election.id),
+      ) ||
+      isAuditedProjection(
+        row.election.id,
+        liveFingerprints.get(row.election.id),
+      ),
+  );
+  const ids = qualified.map((row) => row.election.id);
+  if (ids.length === 0) return [];
+
+  const [resultRows, statementRows] = await Promise.all([
+    db
+      .select()
+      .from(electionResults)
+      .where(inArray(electionResults.electionId, ids))
+      .orderBy(asc(electionResults.id)),
+    db
+      .select({
+        subjectId: statements.subjectId,
+        sourceId: statements.sourceId,
+        sourceUrl: statements.sourceUrl,
+        sourceLicense: statements.sourceLicense,
+        retrievedAt: statements.retrievedAt,
+        predicate: statements.predicate,
+      })
+      .from(statements)
+      .where(
+        and(
+          eq(statements.subjectTable, "elections"),
+          inArray(statements.subjectId, ids),
+        ),
+      ),
+  ]);
+
+  return qualified.map((row) => {
+    const audit = getElectionAuditRow(row.election.id)!;
+    const eventStatement = statementRows.find(
+      (statement) =>
+        statement.subjectId === row.election.id &&
+        statement.sourceId === audit.evidence.sourceId &&
+        [
+          "ipu_last_election",
+          "wikidata_election_date",
+          "civica_estimated_next_election",
+        ].includes(statement.predicate),
+    );
+    return {
+      election: {
+        ...row.election,
+        turnoutPercent: isEligibleElectionField(row.election.id, "turnout")
+          ? row.election.turnoutPercent
+          : null,
+      },
+      jurisdiction: {
+        ...row.jurisdiction,
+        status: buildJurisdictionStatusPresentation(row.jurisdiction),
+      },
+      results: isEligibleElectionField(row.election.id, "results")
+        ? resultRows.filter((result) => result.electionId === row.election.id)
+        : [],
+      audit,
+      eventSourceUrl: eventStatement?.sourceUrl ?? null,
+    };
+  });
+}
+
 export async function getUpcomingElections(limit = 20) {
-  return db
+  const rows = await db
     .select({
       election: elections,
       jurisdiction: {
         slug: jurisdictions.slug,
         name: jurisdictions.name,
         iso2: jurisdictions.iso2,
+        iso3: jurisdictions.iso3,
         continent: jurisdictions.continent,
+        type: jurisdictions.type,
+        statusSourceIds: jurisdictions.statusSourceIds,
+        statusReviewedAt: jurisdictions.statusReviewedAt,
+        statusNote: jurisdictions.statusNote,
+        administeringJurisdictionIso3:
+          jurisdictions.administeringJurisdictionIso3,
+        statusDisputed: jurisdictions.statusDisputed,
       },
     })
     .from(elections)
     .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
-    .where(sql`${elections.electionDate} >= CURRENT_DATE`)
-    .orderBy(asc(elections.electionDate))
-    .limit(limit);
+    .where(sql`${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`)
+    .orderBy(asc(elections.electionDate));
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    rows.map((row) => row.election.id),
+  );
+  const seenPublicEvents = new Set<string>();
+  return rows
+    .filter((row) => {
+      const audit = getElectionAuditRow(row.election.id);
+      const eligible = Boolean(
+        audit &&
+        isPrimaryElectionEvent(row.election.id) &&
+        (audit.temporalClass === "source_dated_upcoming" ||
+          audit.temporalClass === "projection_due") &&
+        (isAuditedPublicElection(
+          row.election.id,
+          liveFingerprints.get(row.election.id),
+        ) ||
+          isAuditedProjection(
+            row.election.id,
+            liveFingerprints.get(row.election.id),
+          )),
+      );
+      if (!eligible) return false;
+      const publicKey = getElectionPublicFutureKey(row.election.id);
+      if (!publicKey || seenPublicEvents.has(publicKey)) return false;
+      seenPublicEvents.add(publicKey);
+      return true;
+    })
+    .slice(0, limit)
+    .map((row) => ({
+      ...row,
+      jurisdiction: {
+        ...row.jurisdiction,
+        status: buildJurisdictionStatusPresentation(row.jurisdiction),
+      },
+      election: { ...row.election, turnoutPercent: null },
+      audit: getElectionAuditRow(row.election.id),
+    }));
 }
 
 export async function getRecentElectionsWithResults(limit = 60) {
@@ -744,7 +983,15 @@ export async function getRecentElectionsWithResults(limit = 60) {
         slug: jurisdictions.slug,
         name: jurisdictions.name,
         iso2: jurisdictions.iso2,
+        iso3: jurisdictions.iso3,
         continent: jurisdictions.continent,
+        type: jurisdictions.type,
+        statusSourceIds: jurisdictions.statusSourceIds,
+        statusReviewedAt: jurisdictions.statusReviewedAt,
+        statusNote: jurisdictions.statusNote,
+        administeringJurisdictionIso3:
+          jurisdictions.administeringJurisdictionIso3,
+        statusDisputed: jurisdictions.statusDisputed,
       },
     })
     .from(elections)
@@ -760,18 +1007,31 @@ export async function getRecentElectionsWithResults(limit = 60) {
     // a Civica-computed "estimated" next date never has results and is excluded
     // here regardless. See plan/elections-data-sourcing-resolution-v1.md §6.
     .where(
-      sql`${elections.electionDate} < CURRENT_DATE
+      sql`${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}
         AND ${elections.dateConfidence} IS DISTINCT FROM 'estimated'
         AND EXISTS (
           SELECT 1 FROM ${electionResults}
           WHERE ${electionResults.electionId} = ${elections.id}
-        )`
+        )`,
     )
-    .orderBy(desc(elections.electionDate))
-    .limit(limit);
+    .orderBy(desc(elections.electionDate));
 
-  const electionIds = rows.map((r) => r.election.id);
-  if (electionIds.length === 0) return rows.map((r) => ({ ...r, results: [] as typeof allResults }));
+  const liveFingerprints = await loadLiveElectionContentFingerprints(
+    rows.map((row) => row.election.id),
+  );
+
+  const qualifiedRows = rows
+    .filter(
+      (row) =>
+        isAuditedPublicElection(
+          row.election.id,
+          liveFingerprints.get(row.election.id),
+        ) && isEligibleElectionField(row.election.id, "results"),
+    )
+    .slice(0, limit);
+
+  const electionIds = qualifiedRows.map((r) => r.election.id);
+  if (electionIds.length === 0) return [];
 
   const allResults = await db
     .select()
@@ -779,9 +1039,20 @@ export async function getRecentElectionsWithResults(limit = 60) {
     .where(sql`${electionResults.electionId} IN ${electionIds}`)
     .orderBy(desc(electionResults.votesPercent));
 
-  return rows.map((r) => ({
+  return qualifiedRows.map((r) => ({
     ...r,
+    jurisdiction: {
+      ...r.jurisdiction,
+      status: buildJurisdictionStatusPresentation(r.jurisdiction),
+    },
+    election: {
+      ...r.election,
+      turnoutPercent: isEligibleElectionField(r.election.id, "turnout")
+        ? r.election.turnoutPercent
+        : null,
+    },
     results: allResults.filter((res) => res.electionId === r.election.id),
+    audit: getElectionAuditRow(r.election.id),
   }));
 }
 
@@ -873,8 +1144,7 @@ export async function getMetricStripData(
 
   const filtered = typedRows
     .map((row) => {
-      const classification =
-        classificationMap.get(row.countryId) ?? null;
+      const classification = classificationMap.get(row.countryId) ?? null;
       const groupedGovType = classification
         ? getGovernmentTaxonomyGroupingLabel(classification, taxonomy)
         : row.govType;
@@ -1021,13 +1291,19 @@ export async function getCIRankings(
     methodologyVersion?: string;
     /** Exact closed release. Methodology-only selection is not sufficient. */
     releaseId?: string;
-  }
+  },
 ) {
   const release = resolveCiRelease(filters?.releaseId ?? CURRENT_CI_RELEASE_ID);
-  if (filters?.methodologyVersion && filters.methodologyVersion !== release.methodologyVersion) {
-    throw new Error(`${release.releaseId} does not use methodology ${filters.methodologyVersion}`);
+  if (
+    filters?.methodologyVersion &&
+    filters.methodologyVersion !== release.methodologyVersion
+  ) {
+    throw new Error(
+      `${release.releaseId} does not use methodology ${filters.methodologyVersion}`,
+    );
   }
-  if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
+  if (quarter && quarter !== release.quarter)
+    throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const methodologyVersion = release.methodologyVersion;
   const q = release.quarter;
   const continentFilter = filters?.continent
@@ -1116,13 +1392,15 @@ export async function getCIRankings(
   const rows = Array.isArray(result)
     ? result
     : ((result as { rows?: unknown[] }).rows ?? []);
-  const typedRows = rows as Array<{
-    jurisdictionId: string;
-    slug: string;
-    iso3?: string | null;
-    governmentType?: string | null;
-    governmentTypeDetail?: string | null;
-  } & Record<string, unknown>>;
+  const typedRows = rows as Array<
+    {
+      jurisdictionId: string;
+      slug: string;
+      iso3?: string | null;
+      governmentType?: string | null;
+      governmentTypeDetail?: string | null;
+    } & Record<string, unknown>
+  >;
   const classificationMap = await buildGovernmentClassificationMap(
     typedRows.map((row) => ({
       id: row.jurisdictionId,
@@ -1135,8 +1413,7 @@ export async function getCIRankings(
   );
   return typedRows.map((row) => ({
     ...row,
-    governmentClassification:
-      classificationMap.get(row.jurisdictionId) ?? null,
+    governmentClassification: classificationMap.get(row.jurisdictionId) ?? null,
   }));
 }
 
@@ -1146,7 +1423,8 @@ export async function getCICountryDetail(
   releaseId: string = CURRENT_CI_RELEASE_ID,
 ) {
   const release = resolveCiRelease(releaseId);
-  if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
+  if (quarter && quarter !== release.quarter)
+    throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
   const methodologyVersion = release.methodologyVersion;
 
@@ -1187,7 +1465,7 @@ export async function getCICountryDetail(
     .where(
       sql`${ciCompositeScores.jurisdictionId} = ${jId}
         AND ${ciCompositeScores.quarter} = ${q}
-        AND ${ciCompositeScores.methodologyVersion} = ${methodologyVersion}`
+        AND ${ciCompositeScores.methodologyVersion} = ${methodologyVersion}`,
     )
     .limit(1);
 
@@ -1211,10 +1489,13 @@ export async function getCICountryDetail(
       // v1.0 and beta rows (e.g. 2023-Q4) mix legacy raw values into a
       // beta-labeled breakdown. Matches the pin on the composite above and
       // on compareCICountries / getCIByGovernmentTypeDots.
-      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${methodologyVersion}`
+      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${methodologyVersion}`,
     );
 
-  const releaseDimensions = selectCiReleaseDimensionRows(dimensions, release.releaseId);
+  const releaseDimensions = selectCiReleaseDimensionRows(
+    dimensions,
+    release.releaseId,
+  );
   const classificationMap = await buildGovernmentClassificationMap([
     jurisdiction[0],
   ]);
@@ -1287,6 +1568,16 @@ export interface IndicatorHistorySeries {
     status: import("@/lib/data/value-state").DataValueStatus;
     reason: string | null;
   }>;
+  lineage: Array<{
+    upstreamRelease: string;
+    artifactHash: string;
+    artifactKind: string;
+    temporalCoverage: string;
+    licenseUrl: string;
+    transformationId: string;
+    substitutionReason: string | null;
+    methodVersion: string;
+  }>;
 }
 
 type IndicatorHistoryValueRow = {
@@ -1300,6 +1591,14 @@ type IndicatorHistoryValueRow = {
   value: number | null;
   valueStatus: string | null;
   valueStatusReason: string | null;
+  upstreamRelease: string;
+  artifactHash: string;
+  artifactKind: string;
+  temporalCoverage: string;
+  licenseUrl: string;
+  transformationId: string;
+  substitutionReason: string | null;
+  methodVersion: string;
 };
 
 export function buildIndicatorHistorySeries(
@@ -1307,7 +1606,8 @@ export function buildIndicatorHistorySeries(
 ): IndicatorHistorySeries[] {
   const byIndicator = new Map<string, IndicatorHistorySeries>();
   for (const r of rows) {
-    let series = byIndicator.get(r.indicator);
+    const seriesKey = `${r.sourceId}:${r.indicator}`;
+    let series = byIndicator.get(seriesKey);
     if (!series) {
       series = {
         dimension: r.dimension,
@@ -1318,8 +1618,30 @@ export function buildIndicatorHistorySeries(
         isInverted: r.isInverted,
         points: [],
         availability: [],
+        lineage: [],
       };
-      byIndicator.set(r.indicator, series);
+      byIndicator.set(seriesKey, series);
+    }
+    const lineage = {
+      upstreamRelease: r.upstreamRelease,
+      artifactHash: r.artifactHash,
+      artifactKind: r.artifactKind,
+      temporalCoverage: r.temporalCoverage,
+      licenseUrl: r.licenseUrl,
+      transformationId: r.transformationId,
+      substitutionReason: r.substitutionReason,
+      methodVersion: r.methodVersion,
+    };
+    if (
+      !series.lineage.some(
+        (entry) =>
+          entry.artifactHash === lineage.artifactHash &&
+          entry.upstreamRelease === lineage.upstreamRelease &&
+          entry.transformationId === lineage.transformationId &&
+          entry.methodVersion === lineage.methodVersion,
+      )
+    ) {
+      series.lineage.push(lineage);
     }
     const status = parseDataValueStatus(r.valueStatus);
     if ((status === "observed" || status === "disputed") && r.value != null) {
@@ -1333,7 +1655,24 @@ export function buildIndicatorHistorySeries(
       });
     }
   }
-  return Array.from(byIndicator.values());
+  return Array.from(byIndicator.values())
+    .map((series) => ({
+      ...series,
+      points: [...series.points].sort((a, b) => a.year - b.year),
+      availability: [...series.availability].sort(
+        (a, b) => a.year - b.year || a.status.localeCompare(b.status),
+      ),
+      lineage: [...series.lineage].sort(
+        (a, b) =>
+          a.upstreamRelease.localeCompare(b.upstreamRelease) ||
+          a.artifactHash.localeCompare(b.artifactHash),
+      ),
+    }))
+    .sort(
+      (a, b) =>
+        a.sourceId.localeCompare(b.sourceId) ||
+        a.indicator.localeCompare(b.indicator),
+    );
 }
 
 export async function getIndicatorHistoryForCountry(
@@ -1358,6 +1697,14 @@ export async function getIndicatorHistoryForCountry(
       value: indicatorHistory.value,
       valueStatus: indicatorHistory.valueStatus,
       valueStatusReason: indicatorHistory.valueStatusReason,
+      upstreamRelease: indicatorHistory.upstreamRelease,
+      artifactHash: indicatorHistory.artifactHash,
+      artifactKind: indicatorHistory.artifactKind,
+      temporalCoverage: indicatorHistory.temporalCoverage,
+      licenseUrl: indicatorHistory.licenseUrl,
+      transformationId: indicatorHistory.transformationId,
+      substitutionReason: indicatorHistory.substitutionReason,
+      methodVersion: indicatorHistory.methodVersion,
     })
     .from(indicatorHistory)
     .where(eq(indicatorHistory.jurisdictionId, jurisdiction[0].id))
@@ -1366,10 +1713,15 @@ export async function getIndicatorHistoryForCountry(
   return buildIndicatorHistorySeries(rows);
 }
 
-export async function compareCICountries(slugs: string[], quarter?: string, releaseId: string = CURRENT_CI_RELEASE_ID) {
+export async function compareCICountries(
+  slugs: string[],
+  quarter?: string,
+  releaseId: string = CURRENT_CI_RELEASE_ID,
+) {
   if (slugs.length === 0) return [];
   const release = resolveCiRelease(releaseId);
-  if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
+  if (quarter && quarter !== release.quarter)
+    throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
 
   const countries = await db
@@ -1402,16 +1754,19 @@ export async function compareCICountries(slugs: string[], quarter?: string, rele
     })
     .from(ciCompositeScores)
     .where(
-      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${release.methodologyVersion}`
+      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${release.methodologyVersion}`,
     );
 
   const dimensions = await db
     .select()
     .from(ciDimensionScores)
     .where(
-      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion}`
+      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion}`,
     );
-  const releaseDimensions = selectCiReleaseDimensionRows(dimensions, release.releaseId);
+  const releaseDimensions = selectCiReleaseDimensionRows(
+    dimensions,
+    release.releaseId,
+  );
 
   const classificationMap = await buildGovernmentClassificationMap(countries);
 
@@ -1421,13 +1776,19 @@ export async function compareCICountries(slugs: string[], quarter?: string, rele
       governmentClassification: classificationMap.get(country.id) ?? null,
     },
     composite: composites.find((c) => c.jurisdictionId === country.id) ?? null,
-    dimensions: releaseDimensions.filter((d) => d.jurisdictionId === country.id),
+    dimensions: releaseDimensions.filter(
+      (d) => d.jurisdictionId === country.id,
+    ),
   }));
 }
 
-export async function getCIByGovernmentTypeDots(quarter?: string, releaseId: string = CURRENT_CI_RELEASE_ID) {
+export async function getCIByGovernmentTypeDots(
+  quarter?: string,
+  releaseId: string = CURRENT_CI_RELEASE_ID,
+) {
   const release = resolveCiRelease(releaseId);
-  if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
+  if (quarter && quarter !== release.quarter)
+    throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
   const result = await db.execute(sql`
     SELECT
@@ -1471,8 +1832,7 @@ export async function getCIByGovernmentTypeDots(quarter?: string, releaseId: str
   );
   return typedRows.map((row) => ({
     ...row,
-    governmentClassification:
-      classificationMap.get(row.jurisdictionId) ?? null,
+    governmentClassification: classificationMap.get(row.jurisdictionId) ?? null,
   }));
 }
 
@@ -1518,8 +1878,7 @@ export async function getGovTypeTrajectory() {
   );
   return typedRows.map((row) => ({
     ...row,
-    governmentClassification:
-      classificationMap.get(row.jurisdictionId) ?? null,
+    governmentClassification: classificationMap.get(row.jurisdictionId) ?? null,
   }));
 }
 
@@ -1554,7 +1913,7 @@ export async function getCIMethodologyHistory() {
  * render a single row per org with a column per jurisdiction.
  */
 export async function getInternationalMembershipsBySlugs(
-  jurisdictionIds: string[]
+  jurisdictionIds: string[],
 ) {
   if (jurisdictionIds.length === 0) return [];
   const rows = await db
@@ -1567,20 +1926,28 @@ export async function getInternationalMembershipsBySlugs(
       orgType: organizations.type,
       foundedYear: organizations.foundedYear,
       joinDate: organizationMemberships.joinDate,
+      joinDatePrecision: organizationMemberships.joinDatePrecision,
+      endDate: organizationMemberships.endDate,
+      endDatePrecision: organizationMemberships.endDatePrecision,
       role: organizationMemberships.role,
+      status: organizationMemberships.status,
+      disputed: organizationMemberships.disputed,
+      sourceId: organizationMemberships.sourceId,
+      sourceUrl: organizationMemberships.sourceUrl,
+      sourceLicense: organizationMemberships.sourceLicense,
+      sourceRetrievedAt: organizationMemberships.sourceRetrievedAt,
+      upstreamVintage: organizationMemberships.upstreamVintage,
     })
     .from(organizationMemberships)
     .innerJoin(
       organizations,
-      eq(organizationMemberships.orgId, organizations.id)
+      eq(organizationMemberships.orgId, organizations.id),
     )
     .where(
-      sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`
+      sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}
+      AND ${organizationMemberships.status} <> 'unverified_legacy'`,
     )
-    .orderBy(
-      asc(organizations.type),
-      asc(organizations.name)
-    );
+    .orderBy(asc(organizations.type), asc(organizations.name));
   return rows;
 }
 
@@ -1592,7 +1959,11 @@ export async function getInternationalMembershipsBySlugs(
  */
 export async function getBillsForJurisdiction(slug: string, limit = 10) {
   const j = await db
-    .select({ id: jurisdictions.id, name: jurisdictions.name, iso2: jurisdictions.iso2 })
+    .select({
+      id: jurisdictions.id,
+      name: jurisdictions.name,
+      iso2: jurisdictions.iso2,
+    })
     .from(jurisdictions)
     .where(eq(jurisdictions.slug, slug))
     .limit(1);
@@ -1620,7 +1991,7 @@ export async function getBillsForJurisdiction(slug: string, limit = 10) {
  */
 export async function getCivicaConditionsForJurisdiction(
   jurisdictionId: string,
-  methodologyVersion: string = "beta"
+  methodologyVersion: string = "beta",
 ) {
   // For each dimension, pick the row with the latest quarter.
   const rows = await db.execute(sql`
@@ -1710,8 +2081,8 @@ export async function getAlmanacFilterFacts(): Promise<
     .where(
       and(
         sql`${countryFacts.status} = 'active'`,
-        sql`${countryFacts.factKey} IN ('world_bank_region', 'world_bank_income_group', 'vdem_row')`
-      )
+        sql`${countryFacts.factKey} IN ('world_bank_region', 'world_bank_income_group', 'vdem_row')`,
+      ),
     );
 
   for (const row of factRows) {

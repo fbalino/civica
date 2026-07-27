@@ -388,6 +388,7 @@ export function CivicaAIDrawer({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder={`Ask anything about ${countryName}…`}
+          aria-label={`Ask anything about ${countryName}`}
           disabled={streaming}
           style={{
             flex: 1,

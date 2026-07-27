@@ -1,0 +1,29 @@
+{
+  "note": "PLT-002 ratchet baseline. Keys are \"<file>\\t<ruleId>\" -> allowed error count. New keys or higher counts fail validate:lint. Ratchet DOWN only; never raise a count or add a key without cause.",
+  "generatedFrom": "npx eslint -f json (errors only, severity 2)",
+  "totalBaselinedErrors": 29,
+  "errors": {
+    "plan/evidence/EXP-006/grade.js\t@typescript-eslint/no-require-imports": 2,
+    "scripts/generate-index-incremental-information.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/generate-index-oos-validation.ts\t@typescript-eslint/no-explicit-any": 2,
+    "scripts/generate-index-sensitivity-analysis.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/generate-index-validity-analysis.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/generate-k1-uncertainty-inputs.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/reproduce-index-tournament-package.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/validate-index-misuse-audit.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/validate-index-subgroup-fairness.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/validate-index-tournament-package.ts\t@typescript-eslint/no-explicit-any": 1,
+    "scripts/validate-k1-uncertainty-inputs.ts\t@typescript-eslint/no-explicit-any": 3,
+    "scripts/validate-longitudinal-validation-inputs.ts\t@typescript-eslint/no-explicit-any": 1,
+    "src/components/MobileNav.tsx\treact-hooks/set-state-in-effect": 1,
+    "src/components/atlas/AtlasWorldMap.tsx\t@next/next/no-html-link-for-pages": 1,
+    "src/components/factbook/FactbookLightbox.tsx\treact-hooks/set-state-in-effect": 1,
+    "src/components/outcomes/MetricStripPlot.tsx\treact-hooks/set-state-in-effect": 1,
+    "src/components/parties/PartyExplorer.tsx\treact-hooks/set-state-in-effect": 1,
+    "src/lib/ci/governance-evidence-review-packet.test.ts\t@typescript-eslint/no-explicit-any": 3,
+    "src/lib/ci/tournament-evaluation-interface.ts\t@typescript-eslint/no-explicit-any": 1,
+    "src/lib/ci/tournament-results-package.ts\t@typescript-eslint/no-explicit-any": 1,
+    "src/lib/ci/validity-preregistration.test.ts\t@typescript-eslint/no-explicit-any": 2,
+    "src/lib/pulse/v2/decouple.ts\tprefer-const": 1
+  }
+}

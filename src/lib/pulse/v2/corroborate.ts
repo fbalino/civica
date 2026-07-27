@@ -34,6 +34,7 @@ import { isPositiveTier } from "./taxonomy";
 import {
   informationEnvironmentMultiplier,
   missingInformationEnvironmentContext,
+  observedInformationEnvironmentContext,
   type PulseInformationEnvironmentContext,
 } from "./press-freedom";
 import type { ClassifierAgreement, SeverityTier } from "./types";
@@ -65,13 +66,13 @@ export interface CorroborateSummary {
 
 export interface EventRow {
   id: string;
+  incidentId?: string;
   clusterId: string;
   jurisdictionId: string;
   iso3: string | null;
   severityTier: SeverityTier;
   classifierAgreement: ClassifierAgreement;
   category: string;
-  pressPinned: number | null;
   classificationRunId: string;
 }
 
@@ -94,10 +95,10 @@ export interface CorroborationPlan {
 }
 
 export interface CorroborateOptions {
-  onlyUnpinned?: boolean;
   dryRun?: boolean;
   events?: EventRow[];
   sourceCounts?: ReadonlyMap<string, SourceCounts>;
+  /** Fixture override keyed by event ID. Production loads the immutable pin. */
   informationContexts?: ReadonlyMap<string, PulseInformationEnvironmentContext>;
   informationContextMode?: "production" | "sensitivity";
   write?: (db: Db, plan: CorroborationPlan) => Promise<void>;
@@ -111,6 +112,8 @@ export async function corroborateEvents(
 ): Promise<CorroborateSummary> {
   const events = opts.events ?? (await loadEvents(db, opts));
   validateEvents(events);
+  const informationContexts =
+    opts.informationContexts ?? (await loadInformationContexts(db, events));
   const resolvedCounts = new Map<string, SourceCounts>();
   for (const event of events) {
     const fixtureCounts = opts.sourceCounts?.get(event.id);
@@ -144,17 +147,12 @@ export async function corroborateEvents(
   for (const event of events) {
     const counts = resolvedCounts.get(event.id)!;
     const informationContext =
-      opts.informationContexts?.get(event.jurisdictionId) ??
+      informationContexts.get(event.id) ??
       missingInformationEnvironmentContext(
-        "No rights-cleared, versioned production context is registered.",
+        "No immutable classification-time context pin exists.",
       );
-    if (
-      opts.informationContexts &&
-      !opts.informationContexts.has(event.jurisdictionId)
-    ) {
-      throw new Error(
-        `missing information-context fixture for jurisdiction: ${event.jurisdictionId}`,
-      );
+    if (!informationContexts.has(event.id)) {
+      throw new Error(`missing information-context pin for event: ${event.id}`);
     }
 
     let confidence = baselineConfidence(counts, event.classifierAgreement);
@@ -309,69 +307,144 @@ function baselineConfidence(
 
 async function loadEvents(
   db: Db,
-  opts: { onlyUnpinned?: boolean },
+  _opts: CorroborateOptions,
 ): Promise<EventRow[]> {
-  const where = opts.onlyUnpinned
-    ? sql`p.press_freedom_score_at_classification IS NULL`
-    : sql`TRUE`;
-
   const result = await db.execute(sql`
     SELECT
       p.id,
+      p.incident_id,
       p.cluster_id,
       p.jurisdiction_id,
       j.iso3,
       p.severity_tier,
       p.classifier_agreement,
       p.category,
-      p.press_freedom_score_at_classification AS press_pinned
-      ,p.classification_run_id
+      p.classification_run_id
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
-    WHERE ${where}
+    WHERE p.projection_status = 'current'
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>).map((r) => ({
     id: String(r.id),
+    incidentId: String(r.incident_id),
     clusterId: String(r.cluster_id),
     jurisdictionId: String(r.jurisdiction_id),
     iso3: r.iso3 ? String(r.iso3) : null,
     severityTier: r.severity_tier as SeverityTier,
     classifierAgreement: r.classifier_agreement as ClassifierAgreement,
     category: String(r.category),
-    pressPinned: r.press_pinned !== null ? Number(r.press_pinned) : null,
     classificationRunId: String(r.classification_run_id),
   }));
+}
+
+async function loadInformationContexts(
+  db: Db,
+  events: readonly EventRow[],
+): Promise<Map<string, PulseInformationEnvironmentContext>> {
+  if (events.length === 0) return new Map();
+  const ids = events.map(({ id }) => id);
+  const result = await db.execute(sql`
+    SELECT
+      pin.event_id,
+      pin.value_status,
+      pin.score,
+      pin.missing_reason,
+      pin.source_id,
+      pin.source_url,
+      pin.upstream_release,
+      pin.observation_year,
+      pin.retrieved_at,
+      pin.content_sha256,
+      pin.rights_status,
+      pin.use_status,
+      release.publisher_rows,
+      release.matched_jurisdictions,
+      release.supported_jurisdictions
+    FROM pulse_event_information_environment_pins pin
+    LEFT JOIN pulse_information_environment_releases release
+      ON release.release_id = pin.release_id
+    WHERE pin.event_id IN (${sql.join(
+      ids.map((id) => sql`${id}::uuid`),
+      sql`, `,
+    )})
+  `);
+  const rows =
+    (result as unknown as { rows?: Array<Record<string, unknown>> }).rows ??
+    (result as unknown as Array<Record<string, unknown>>);
+  return new Map(
+    rows.map((row) => {
+      const release = row.source_id
+        ? {
+            sourceId: String(row.source_id),
+            sourceUrl: String(row.source_url),
+            upstreamRelease: String(row.upstream_release),
+            observationYear: Number(row.observation_year),
+            retrievedAt: new Date(String(row.retrieved_at)).toISOString(),
+            contentSha256: String(row.content_sha256),
+            publisherRows: Number(row.publisher_rows),
+            matchedJurisdictions: Number(row.matched_jurisdictions),
+            supportedJurisdictions: Number(row.supported_jurisdictions),
+            rightsStatus: row.rights_status as "verified" | "pending",
+            useStatus: row.use_status as
+              | "active_unvalidated_heuristic"
+              | "disabled_pending_rights_and_validation",
+          }
+        : undefined;
+      const context =
+        row.value_status === "observed" && release
+          ? observedInformationEnvironmentContext({
+              score: Number(row.score),
+              ...release,
+            })
+          : missingInformationEnvironmentContext(
+              String(
+                row.missing_reason ?? "Classification-time context is missing.",
+              ),
+              release,
+            );
+      return [String(row.event_id), context] as const;
+    }),
+  );
 }
 
 async function loadSourceCounts(
   db: Db,
   eventId: string,
 ): Promise<SourceCounts> {
-  const rows = await db
-    .select({
-      sourceId: pulseSources.sourceId,
-      sourceType: pulseSources.sourceType,
-      rawEventId: pulseSources.rawEventId,
-      sourceUrl: pulseSources.sourceUrl,
-      title: rawEvents.title,
-      body: rawEvents.body,
-      evidencePublisher: rawEvents.evidencePublisher,
-    })
-    .from(pulseSources)
-    .innerJoin(rawEvents, eq(rawEvents.id, pulseSources.rawEventId))
-    .where(eq(pulseSources.eventId, eventId));
+  const result = await db.execute(sql`
+    SELECT
+      ps.source_id,
+      ps.source_type,
+      ps.raw_event_id,
+      ps.source_url,
+      r.title,
+      r.body,
+      r.evidence_publisher
+    FROM pulse_events_v2 current_event
+    JOIN pulse_events_v2 evidence_event
+      ON evidence_event.incident_id = current_event.incident_id
+    JOIN pulse_sources ps ON ps.event_id = evidence_event.id
+    JOIN raw_events r ON r.id = ps.raw_event_id
+    WHERE current_event.id = ${eventId}
+    ORDER BY ps.raw_event_id
+  `);
+  const rows = ((result as unknown as { rows?: unknown[] }).rows ??
+    result) as Array<Record<string, unknown>>;
 
   return sourceCountsFromEvidence(
     rows.map((row) => ({
-      rawEventId: row.rawEventId,
-      sourceId: row.sourceId,
-      sourceType: row.sourceType as "specialist" | "news",
-      sourceUrl: row.sourceUrl,
-      sourceFamilyId: row.evidencePublisher.sourceFamilyId,
-      itemPublisherHost: row.evidencePublisher.itemPublisherHost,
-      title: row.title,
-      body: row.body,
+      rawEventId: String(row.raw_event_id),
+      sourceId: String(row.source_id),
+      sourceType: row.source_type as "specialist" | "news",
+      sourceUrl: row.source_url ? String(row.source_url) : null,
+      sourceFamilyId: (row.evidence_publisher as { sourceFamilyId: string })
+        .sourceFamilyId,
+      itemPublisherHost: (
+        row.evidence_publisher as { itemPublisherHost: string }
+      ).itemPublisherHost,
+      title: String(row.title),
+      body: row.body ? String(row.body) : null,
     })),
   );
 }

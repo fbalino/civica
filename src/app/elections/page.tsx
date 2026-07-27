@@ -1,108 +1,158 @@
 import type { Metadata } from "next";
 import {
+  getFactbookCountryOptions,
+  getQualifiedElectionResearchRows,
   getUpcomingElections,
-  getRecentElectionsWithResults,
-  getSource,
 } from "@/lib/db/queries";
-import { db } from "@/lib/db/index";
-import { elections, jurisdictions } from "@/lib/db/schema";
-import { sql } from "drizzle-orm";
 import ElectionsClient from "./ElectionsClient";
 import { withOg } from "@/lib/og";
+import {
+  ELECTION_CORPUS_AUDIT,
+  getElectionProjectionDisplayGroupCount,
+} from "@/lib/elections/corpus-audit-runtime";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Elections Around the World — Calendar & Results",
+  title: "Cross-national Election Records — Calendar & Results",
   description:
-    "A worldwide election calendar: legislative dates, electoral systems, and party seat results from IPU Parline, plus presidential elections from Wikidata and voter turnout from International IDEA.",
+    "An audited multi-source collection of national election records: legislative contests from IPU Parline, uneven presidential records from Wikidata, turnout from International IDEA, and separately labelled term-length projections.",
   alternates: { canonical: "https://civicaatlas.org/elections" },
   openGraph: withOg({
-    title: "Elections Around the World — Calendar & Results · Civica Atlas",
+    title: "Cross-national Election Records — Calendar & Results · Civica Atlas",
     description:
-      "A worldwide election calendar: legislative dates and party seat results from IPU Parline, presidential elections from Wikidata, and voter turnout from International IDEA.",
+      "An audited multi-source collection of legislative contests, uneven presidential records, turnout, and separately labelled term-length projections.",
     url: "https://civicaatlas.org/elections",
   }),
 };
 
 export default async function ElectionsPage() {
   let upcoming: Awaited<ReturnType<typeof getUpcomingElections>> = [];
-  let recent: Awaited<ReturnType<typeof getRecentElectionsWithResults>> = [];
-  let stats: {
-    totalElections: number;
-    upcomingCount: number;
-    avgTurnout: number;
-    electionsThisYear: number;
-  } | null = null;
-  let electionDataAvailable = false;
-  // Sourced coverage framing (resolution §3, §5): legislative dates from IPU
-  // Parline, presidential dates from Wikidata, turnout from International IDEA.
-  // Numbers are live-from-DB so the foot-of-page sources note can never overstate
-  // coverage; all soft-fail to null when the DB is unreachable, and the client
-  // renders a static sourced line in that case.
-  let coverage: {
-    legislativeJurisdictions: number;
-    presidentialJurisdictions: number;
-    turnoutJurisdictions: number;
-    estimatedJurisdictions: number;
-    ipuRetrievedAt: string | null;
-    wikidataRetrievedAt: string | null;
-    ideaRetrievedAt: string | null;
-  } | null = null;
+  type ResearchRow = Awaited<
+    ReturnType<typeof getQualifiedElectionResearchRows>
+  >[number];
+  let recent: Array<ResearchRow & { relatedContests: ResearchRow[] }> = [];
+  let countryOptions: Awaited<ReturnType<typeof getFactbookCountryOptions>> = [];
+  const stats: {
+    qualifiedEvents: number;
+    sovereignJurisdictions: number;
+    sourceDatedUpcoming: number;
+    projectionGroups: number;
+  } = {
+    qualifiedEvents: ELECTION_CORPUS_AUDIT.qualified.conceptualEvents,
+    sovereignJurisdictions:
+      ELECTION_CORPUS_AUDIT.qualified.sovereignJurisdictions,
+    sourceDatedUpcoming:
+      ELECTION_CORPUS_AUDIT.qualified.sourceDatedUpcomingEvents,
+    projectionGroups: getElectionProjectionDisplayGroupCount(),
+  };
+  let upcomingDataAvailable = false;
+  let historicalDataAvailable = false;
+  const sourceById = new Map(
+    ELECTION_CORPUS_AUDIT.sourceRights.map((source) => [
+      source.sourceId,
+      source,
+    ]),
+  );
+  const coverage = {
+    asOf: ELECTION_CORPUS_AUDIT.asOf,
+    baselineRows: ELECTION_CORPUS_AUDIT.raw.rows,
+    qualifiedEvents: ELECTION_CORPUS_AUDIT.qualified.conceptualEvents,
+    quarantinedRows: ELECTION_CORPUS_AUDIT.qualified.quarantinedRows,
+    legislativeJurisdictions:
+      ELECTION_CORPUS_AUDIT.qualified.legislativeJurisdictions,
+    presidentialJurisdictions:
+      ELECTION_CORPUS_AUDIT.qualified.presidentialJurisdictions,
+    turnoutRows: ELECTION_CORPUS_AUDIT.qualified.turnoutEligibleRows,
+    projectionGroups: getElectionProjectionDisplayGroupCount(),
+    limitedRecognitionJurisdictions:
+      ELECTION_CORPUS_AUDIT.qualified.limitedRecognitionJurisdictions,
+    ipuRightsReview: sourceById.get("ipu_parline")?.reviewStatus ?? "pending",
+    ideaRightsReview:
+      sourceById.get("international_idea")?.reviewStatus ?? "pending",
+  };
 
-  try {
-    [upcoming, recent] = await Promise.all([
-      getUpcomingElections(60),
+  const [upcomingResult, recentResult, countryOptionsResult] =
+    await Promise.allSettled([
+      getUpcomingElections(500),
       // Load every past election that carries compiled results (≈195 today) so
       // the hero country filter is honest — a country's older results-bearing
       // election must still surface when a reader narrows to it, not fall
       // outside a short recency window. Grouped by year in the client.
-      getRecentElectionsWithResults(400),
-    ]);
-    electionDataAvailable = true;
-
-    const [statsRow] = await db
-      .select({
-        total: sql<number>`COUNT(*)`,
-        upcoming: sql<number>`COUNT(*) FILTER (WHERE ${elections.electionDate} >= CURRENT_DATE)`,
-        avgTurnout: sql<number>`ROUND((AVG(${elections.turnoutPercent}) FILTER (WHERE ${elections.turnoutPercent} IS NOT NULL))::numeric, 1)`,
-        thisYear: sql<number>`COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM ${elections.electionDate}::date) = EXTRACT(YEAR FROM CURRENT_DATE))`,
-        legislativeJur: sql<number>`COUNT(DISTINCT ${elections.jurisdictionId}) FILTER (WHERE LOWER(${elections.electionType}) = 'legislative')`,
-        presidentialJur: sql<number>`COUNT(DISTINCT ${elections.jurisdictionId}) FILTER (WHERE LOWER(${elections.electionType}) = 'presidential')`,
-        turnoutCount: sql<number>`COUNT(*) FILTER (WHERE ${elections.turnoutPercent} IS NOT NULL)`,
-        estimatedJur: sql<number>`COUNT(DISTINCT ${elections.jurisdictionId}) FILTER (WHERE ${elections.dateConfidence} = 'estimated')`,
-      })
-      .from(elections)
-      .innerJoin(jurisdictions, sql`${elections.jurisdictionId} = ${jurisdictions.id}`)
-      .where(sql`${jurisdictions.type} = 'sovereign_state'`);
-
-    stats = {
-      totalElections: Number(statsRow?.total ?? 0),
-      upcomingCount: Number(statsRow?.upcoming ?? 0),
-      avgTurnout: Number(statsRow?.avgTurnout ?? 0),
-      electionsThisYear: Number(statsRow?.thisYear ?? 0),
-    };
-
-    const [ipuSource, wikidataSource, ideaSource] = await Promise.all([
-      getSource("ipu_parline"),
-      getSource("wikidata"),
-      getSource("international_idea"),
+      getQualifiedElectionResearchRows(),
+      getFactbookCountryOptions(),
     ]);
 
-    coverage = {
-      legislativeJurisdictions: Number(statsRow?.legislativeJur ?? 0),
-      presidentialJurisdictions: Number(statsRow?.presidentialJur ?? 0),
-      turnoutJurisdictions: Number(statsRow?.turnoutCount ?? 0),
-      estimatedJurisdictions: Number(statsRow?.estimatedJur ?? 0),
-      ipuRetrievedAt: ipuSource?.lastSyncAt ? ipuSource.lastSyncAt.toISOString() : null,
-      wikidataRetrievedAt: wikidataSource?.lastSyncAt
-        ? wikidataSource.lastSyncAt.toISOString()
-        : null,
-      ideaRetrievedAt: ideaSource?.lastSyncAt ? ideaSource.lastSyncAt.toISOString() : null,
-    };
-  } catch (err) {
-    console.error("[elections] stats query failed:", err);
+  if (upcomingResult.status === "fulfilled") {
+    upcoming = upcomingResult.value;
+    upcomingDataAvailable = true;
+  } else {
+    console.error("[elections] future query failed:", upcomingResult.reason);
   }
+  if (recentResult.status === "fulfilled") {
+    const historicalRows = recentResult.value.filter(
+      (row) => row.audit.temporalClass === "historical",
+    );
+    recent = historicalRows
+      .filter((row) => row.audit.primaryRowId === row.election.id)
+      .map((row) => ({
+        ...row,
+        relatedContests: historicalRows.filter(
+          (candidate) =>
+            candidate.election.id !== row.election.id &&
+            candidate.audit.primaryRowId === row.election.id,
+        ),
+      }))
+      .sort((a, b) =>
+        (b.election.electionDate ?? "").localeCompare(
+          a.election.electionDate ?? "",
+        ),
+      );
+    historicalDataAvailable = true;
+  } else {
+    console.error("[elections] historical query failed:", recentResult.reason);
+  }
+  if (countryOptionsResult.status === "fulfilled") {
+    countryOptions = countryOptionsResult.value;
+  } else {
+    console.error(
+      "[elections] jurisdiction catalog query failed:",
+      countryOptionsResult.reason,
+    );
+  }
+
+  const countryCoverage = Object.fromEntries(
+    countryOptions.map((country) => {
+      const rows = ELECTION_CORPUS_AUDIT.rows.filter(
+        (row) => row.jurisdiction.slug === country.slug,
+      );
+      const publicRows = rows.filter(
+        (row) =>
+          row.disposition === "qualified_event" ||
+          row.disposition === "qualified_contest",
+      );
+      return [
+        country.slug,
+        {
+          historicalRecords: publicRows.filter(
+            (row) => row.temporalClass === "historical",
+          ).length,
+          sourceDatedFuture: publicRows.filter(
+            (row) => row.temporalClass === "source_dated_upcoming",
+          ).length,
+          hasProjection: rows.some(
+            (row) => row.disposition === "projection_only",
+          ),
+          compiledResults: publicRows.filter(
+            (row) => row.fieldEligibility.results,
+          ).length,
+          quarantinedRecords: rows.filter(
+            (row) => row.disposition === "quarantined",
+          ).length,
+        },
+      ];
+    }),
+  );
 
   // The full-bleed engraving hero (with the country typeahead) lives inside
   // ElectionsClient so the hero search can drive the client-side filter.
@@ -112,7 +162,10 @@ export default async function ElectionsPage() {
       recent={recent}
       stats={stats}
       coverage={coverage}
-      dataAvailable={electionDataAvailable}
+      countryOptions={countryOptions}
+      countryCoverage={countryCoverage}
+      upcomingDataAvailable={upcomingDataAvailable}
+      historicalDataAvailable={historicalDataAvailable}
     />
   );
 }

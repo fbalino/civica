@@ -1,0 +1,42 @@
+{
+  "id": "pulse-event-absorption-evidence",
+  "toVersion": "civica-index-pulse-absorption-evidence-v21",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/research/pulse-event-absorption-v1.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "src/lib/claims/public-claims.ts"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-037/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-037/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/absorption.test.ts",
+      "src/lib/pulse/v2/score-fixture.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-absorption.ts",
+      "scripts/validate-pulse-runtime-method.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:index-pulse-absorption",
+    "validate:pulse-absorption",
+    "validate:pulse-runtime",
+    "validate:data-dictionary",
+    "validate:authoritative-migrations"
+  ]
+}

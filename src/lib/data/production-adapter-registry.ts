@@ -282,6 +282,16 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
       sources: [],
       implementationPaths: ["src/lib/pulse/v2/score.ts"],
     },
+    {
+      id: "pulse.v2.review-sla",
+      route: "/api/cron/pulse/v2/review-sla",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/pulse/v2/review-sla/route.ts",
+        "src/lib/pulse/v2/review-sla-store.ts",
+      ],
+    },
   ] as const;
 
 export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] =
@@ -292,6 +302,16 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       sources: ["cia_factbook"],
       entrypoint: "scripts/seed-from-factbook.ts",
       implementationPaths: ["scripts/seed-from-factbook.ts"],
+    },
+    {
+      id: "atlas.organization-memberships",
+      product: "atlas",
+      sources: ["civica_organization_roster_v1"],
+      entrypoint: "scripts/sync-organization-memberships.ts",
+      implementationPaths: [
+        "scripts/sync-organization-memberships.ts",
+        "src/lib/organizations/membership-release.ts",
+      ],
     },
     {
       id: "atlas.constitutions",

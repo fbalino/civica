@@ -64,7 +64,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 
 ## Database
 
-- Schema: `src/lib/db/schema.ts` — **66 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **80 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -76,6 +76,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - The G2 Atlas release candidate is `data/releases/atlas-2026-07-11/g2-rc1/` with archival ZIP `data/releases/atlas-2026-07-11-g2-rc1.zip`. Regenerate with `npm run package:g2-atlas`; verify with `npm run validate:g2-atlas` and credential-free `npm run reproduce:g2-atlas`. Its input manifest covers normalized released observations, not unretained upstream publisher bytes; preserve that limitation.
 - `npm run validate:release-quality` is the strict live release gate. It writes `data/release-quality-report.v1.json` and fails on identifier, coverage, range, unit/vintage, provenance-orphan, canonical-duplicate, required-field, row-delta, or source-age anomalies. `npm run validate:release-quality-report` is the DB-free checked-report integrity gate used by builds.
 - `src/lib/data/value-state.ts` owns the closed data-availability contract. Country facts, indicator history, and country metrics store `value_status` plus `value_status_reason`; observed/disputed rows carry values and every absence state carries no value plus a reason. Run `npm run validate:data-value-states` after DB/API/UI/export changes and `npm run validate:data-value-states:live` after applying its migration.
+- Party identity is separate from chamber participation: `political_parties` is the canonical entity, `legislature_parties` rows are retained and soft-retired, and immutable composition runs plus sourced identity events preserve the evidence trail. Composition syncs must supply publisher party identifiers and must never infer split/merge lineage from names. Run `npm run validate:party-identity` after party schema/writer/query/UI changes and `npm run validate:party-identity:live` after applying a party migration.
 
 ## Design System (authoritative)
 
@@ -105,7 +106,7 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - Bjornskov-Rode / CGV regime taxonomy (QoG Standard Jan 2026) — underpins government classification
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
 - Pulse operating/degraded/inactive feed states come from `/api/v1/pulse/source-coverage`; the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json` are historical evidence coverage, not an operating verdict
-- Pulse country-period observability is `pulse-observability/country-period-v1` under runtime method `pulse-v2.6-beta`. The country-dimensions API separates observation state from event observation; absent events never create a zero, stability label, or country-quality inference. Information-environment context is versioned, remains missing when unavailable, and has no production weighting effect pending rights clearance and validation.
+- Pulse country-period observability is `pulse-observability/country-period-v1` under runtime method `pulse-v2.15-beta`. The country-dimensions API separates observation state from event observation; absent events never create a zero, stability label, or country-quality inference. Information-environment releases and event pins are immutable; unavailable values remain missing, and context has no production weighting or observability effect pending rights clearance and validation.
 
 ## Source-input manifests
 
@@ -137,7 +138,7 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 
 ## Research evidence retention
 
-- `research-evidence-retention/v1` protects 29 evidence-bearing relations with
+- `research-evidence-retention/v1` protects 35 registered evidence-bearing relations with
   synchronous UPDATE/DELETE history triggers. The ledger is append-only and
   records complete before/after state, reason, actor, operation, and time.
 - Pulse negative classifications remain in `raw_events` with a terminal

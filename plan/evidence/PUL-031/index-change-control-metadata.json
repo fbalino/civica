@@ -1,0 +1,38 @@
+{
+  "id": "pulse-stable-incident-resolution",
+  "toVersion": "civica-index-pulse-stable-incidents-v12",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/evidence/PUL-031/README.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": [
+      "data/migrations/CHANGELOG.md",
+      "plan/evidence/PUL-031/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-031/migration-plan.md",
+      "plan/evidence/DAT-013/preflight.json"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/incident-resolution.test.ts",
+      "src/lib/pulse/v2/incident-repair.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "src/lib/pulse/v2/incident-store.test.ts",
+      "scripts/validate-index-pulse-stable-incidents.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:index-pulse-stable-incidents"
+  ]
+}

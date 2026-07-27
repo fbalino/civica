@@ -38,7 +38,7 @@ const requiredFragments: Record<string, string[]> = {
   ],
   "src/lib/db/queries-pulse-v2.ts": [
     "evidenceIdentity",
-    "evidenceContentHash",
+    "evidence_content_hash",
     "JOIN raw_events re ON re.id = ps.raw_event_id",
   ],
   "src/lib/api/contract/schemas.ts": [

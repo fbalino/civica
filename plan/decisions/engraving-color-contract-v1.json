@@ -1,0 +1,59 @@
+{
+  "contract": "civica-engraving-color/v1",
+  "status": "adopted",
+  "adoptedAt": "2026-07-12",
+  "measurementWidth": 400,
+  "delivery": {
+    "width": 1500,
+    "height": 1000,
+    "aspectRatio": "3:2",
+    "format": "webp",
+    "colorSpace": "srgb",
+    "quality": 88,
+    "metadataPolicy": "stripped"
+  },
+  "light": {
+    "canonicalAsset": "public/engravings/countries/jpn.webp",
+    "sha256": "693729476e81c56fa6eb48ad7aead2da32d53aaaae5bf94fcfb40b1cbdd41ba2",
+    "ranges": {
+      "meanSat": [0.06, 0.16],
+      "satP95": [0.10, 0.28],
+      "lumaP05": [0.25, 0.50],
+      "lumaP50": [0.72, 0.90],
+      "lumaP95": [0.90, 0.99],
+      "toneRange": [0.45, 0.72],
+      "orangeFrac": [0, 0.05],
+      "warmFrac": [0.15, 0.55]
+    }
+  },
+  "dark": {
+    "canonicalAsset": "public/engravings/countries/jpn-dark.webp",
+    "sha256": "3e04f2c96c62ede82441366e60b8ea3fa5b4558d4ed19f4e2b9035621675eaa7",
+    "canonicalToneRangeMin": 0.18,
+    "corpusRanges": {
+      "meanSat": [0.30, 0.38],
+      "orangeFrac": [0.40, 0.50]
+    },
+    "recipe": {
+      "strength": 60,
+      "saturation": 0.73,
+      "hueDegrees": -6,
+      "brightness": 1.018
+    },
+    "report": "plan/evidence/EXP-006/corpus-batch-s60-report.json"
+  },
+  "invariants": {
+    "pixelLocalOnly": true,
+    "preserveDimensions": true,
+    "preserveAspectRatio": true,
+    "noBlurSharpenDenoise": true,
+    "noCropOrGeometryChange": true,
+    "noGenerativeEdit": true,
+    "landmarkChangeFails": true,
+    "endpointClipFractionMax": 0.005
+  },
+  "examples": {
+    "pass": ["current-japan-light", "current-japan-dark", "strength-60-corpus"],
+    "fail": ["pregrade-japan-too-warm", "recipe-b-japan-too-cool", "france-style", "gbr-family-outlier"]
+  }
+}

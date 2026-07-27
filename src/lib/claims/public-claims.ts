@@ -4,6 +4,7 @@ import { PROVENANCE_COVERAGE_SUMMARY } from "./provenance-coverage";
 export const PUBLIC_CLAIM_SURFACES = [
   "home",
   "country",
+  "elections",
   "index",
   "pulse",
   "methodology",
@@ -130,12 +131,13 @@ export const PUBLIC_CLAIMS = [
     surface: "country",
     routeOrArtifact: "/country/{slug}",
     exactClaim:
-      "How {country} is governed … sourced from the CIA World Factbook with Civica governance overlays.",
+      "{Status label}: how {country} is governed, with source-linked status context.",
     tier: "reconciled-fact",
     evidenceSources: [
       "src/app/(reader)/country/[slug]/layout.tsx",
       "src/lib/factbook/reconcile/api.ts",
       "src/lib/factbook/reconcile/resolver.ts",
+      "src/lib/jurisdictions/status-taxonomy.ts",
     ],
     implementationOwner: "Atlas reconciliation",
     methodologyVersion: "reconciliation-v0.2-beta",
@@ -143,7 +145,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/country/[slug]/layout.tsx",
       fragment:
-        "sourced from the CIA World Factbook with Civica governance overlays.",
+        "with branches of power, geography, people, economy, and source-linked status context.",
     },
   },
   {
@@ -183,7 +185,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.8-beta",
+    methodologyVersion: "pulse-v2.15-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
@@ -605,11 +607,14 @@ export const PUBLIC_CLAIMS = [
     surface: "licensing",
     routeOrArtifact: "/licensing#imagery",
     exactClaim:
-      "Civica does not currently retain a complete per-asset generation record — prompt text, reference imagery, and model version — for the launch corpus of country and territory engravings. Assets created or replaced going forward retain that record. Automated checks currently cover defined technical properties — asset presence, format, and dimensions — for territory engravings. Human visual review of what each engraving depicts and whether its caption correctly names the landmark is being strengthened over time; it is not yet complete or independently audited. Display of these engravings on Civica Atlas is authorized by Civica. Civica does not currently grant a separate license for third-party reuse of editorial illustrations outside the site; provenance and legal review of this imagery is pending.",
+      "The versioned illustration manifest covers every published engraving with route, subject, caption, pair, file identity, rights note, and QA state. Historical model, prompt, reference-image, and seed records remain incomplete. Automated inventory, pairing, format, file-bound, color-policy, and manifest-drift checks do not replace human landmark review, which is not yet complete or independently audited. Engravings are AI-assisted, non-documentary editorial illustrations and are not source evidence. Civica grants no separate third-party reuse license for them.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/app/licensing/page.tsx",
       "public/engravings/README.md",
+      "src/lib/illustrations/illustration-manifest.generated.json",
+      "scripts/generate-illustration-manifest.ts",
+      "scripts/validate-country-engravings.ts",
       "scripts/validate-territory-engravings.ts",
       "src/lib/data/engraving-captions.ts",
       "src/components/factbook/FactbookHeaderStrip.tsx",
@@ -620,7 +625,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/licensing/page.tsx",
       fragment:
-        "Civica does not currently retain a complete per-asset generation\n          record",
+        "Historical generation records remain incomplete: the launch\n          sessions did not retain prompt text",
     },
   },
   {
@@ -680,7 +685,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-pulse-runtime-method.ts",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.8-beta",
+    methodologyVersion: "pulse-v2.15-beta",
     gate: "G3",
     source: {
       // CLM-012: api-docs/page.tsx renders this route's description from
@@ -773,7 +778,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.8-beta",
+    methodologyVersion: "pulse-v2.15-beta",
     gate: "G3",
     source: {
       path: "README.template.md",
@@ -858,7 +863,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.8-beta",
+    methodologyVersion: "pulse-v2.15-beta",
     gate: "G3",
     source: {
       path: "CITATION.cff",
@@ -955,7 +960,7 @@ export const PUBLIC_CLAIMS = [
       "src/lib/pulse/v2/runtime-contract.ts",
     ],
     implementationOwner: "SEO and Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.8-beta",
+    methodologyVersion: "pulse-v2.15-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
@@ -982,6 +987,26 @@ export const PUBLIC_CLAIMS = [
       path: "content/methodology-pulse.md",
       fragment:
         "Pulse is being developed first as a versioned ledger of **documented governance-relevant event records**.",
+    },
+  },
+  {
+    id: "elections.qualified-corpus",
+    surface: "elections",
+    routeOrArtifact: "/elections",
+    exactClaim:
+      "Election records are published from a checked 915-row baseline only after deterministic row-level qualification; source-dated future records, projections, quarantined rows, and sovereign/limited-recognition scope are counted separately.",
+    tier: "source-reported-fact",
+    evidenceSources: [
+      "src/lib/elections/corpus-audit.generated.json",
+      "src/lib/elections/corpus-audit.ts",
+      "scripts/validate-election-corpus-audit.ts",
+    ],
+    implementationOwner: "Atlas elections",
+    methodologyVersion: "election-corpus-audit/v1",
+    gate: "G2",
+    source: {
+      path: "src/app/elections/ElectionsClient.tsx",
+      fragment: "National election records, audited row by row.",
     },
   },
   {

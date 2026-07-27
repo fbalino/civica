@@ -46,6 +46,7 @@ if (JSON.stringify(checked) !== JSON.stringify(expected)) {
   problems.push(`${checkedPath} has drifted; regenerate it`);
 }
 
+
 const allExternal = productionPipelineContracts()
   .filter((pipeline) => pipeline.inputKind === "external")
   .map((pipeline) => pipeline.pipelineId);

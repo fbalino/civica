@@ -81,6 +81,16 @@ export interface ClassifierRun {
   /** Vendor engine that produced this run (ensemble rows). Optional so
    *  legacy rows without it still satisfy the type. */
   provider?: ClassifierProvider;
+  /** Explicit pass role. Missing on retained legacy rows. */
+  role?: "classify" | "verify";
+  /** Exact classifier prompt bundle used for this pass. */
+  promptVersion?: string;
+  /** Public Pulse method in force for this pass. */
+  methodVersion?: string;
+  /** Complete classifier-configuration hash shared by one voter panel. */
+  configurationHash?: string;
+  /** Number of classify engines configured for the panel, including failures. */
+  configuredEngineCount?: number;
   category: string;
   dimension: PulseDimension;
   severityTier: SeverityTier;
@@ -101,12 +111,9 @@ export interface ClassifierRun {
  *  import cycle. */
 export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
 
-/** Persisted confidence signal on `pulse_events_v2.classifier_agreement`.
- *  The published classify→verify confidence maps onto it: high→"all",
- *  medium→"two_of_three", low→"none" (see
- *  `classifier-prompt.ts#agreementFromConfidence`). Retained under these
- *  legacy names so downstream readers (corroborate.ts, review UI,
- *  changelog) stay compatible. */
+/** Persisted voter-agreement signal on `pulse_events_v2.classifier_agreement`.
+ *  Current rows derive it only from provider-distinct, prompt-versioned
+ *  classify runs. The legacy labels remain for historical compatibility. */
 export type ClassifierAgreement = "all" | "two_of_three" | "none";
 
 /** A clustered event — what gets written to `pulse_events_v2`. */

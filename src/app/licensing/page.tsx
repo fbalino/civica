@@ -212,28 +212,26 @@ export default function LicensingPage() {
       <section id="imagery" className="editorial-section">
         <SectionHeader
           eyebrow="Imagery"
-          title="Country and territory engravings"
-          dek="Civica's hero engravings are AI-assisted editorial illustrations, not documentary photographs."
+          title="Editorial illustrations"
+          dek="Civica's engravings are AI-assisted editorial illustrations, not documentary photographs or source evidence."
         />
 
         {/* PUBLIC_CLAIM: licensing.imagery-policy */}
         <p>
-          Every country and territory masthead can carry an antique-style
-          engraving depicting a well-known landmark or landscape. These
-          images are AI-assisted editorial illustrations produced for
-          Civica&apos;s almanac design language — they are not photographs
-          and are not a claim about what a landmark currently looks like.
-          Pages that show one are captioned &ldquo;Editorial engraving&rdquo;
-          with a link back to this section.
+          Country and territory mastheads use antique-style scenes of named
+          landmarks or landscapes. Landing-page engravings use broader civic
+          and archival motifs. All are AI-assisted editorial illustrations.
+          They are not photographs, source evidence, or claims about what a
+          place currently looks like. Each surface links back to this section.
         </p>
 
         <SectionHeader eyebrow="Tools" title="How the engravings are made" />
         <p>
           Assets are produced with AI image-generation tooling (Codex-driven
-          generation), exported as PNG, then converted to WebP
-          (<code>cwebp -q 80 -resize 1500 0</code>) before being committed
-          under <code>public/engravings/countries/</code> and{" "}
-          <code>public/engravings/territories/</code>. See{" "}
+          generation), exported as source images, then converted to release
+          WebP before being committed. Existing country files use exact 3:2
+          dimensions and pass the checked format, size, caption, pair, and
+          color-state gate. See{" "}
           <a
             href="https://github.com/fbalino/civica/blob/main/public/engravings/README.md"
             target="_blank"
@@ -246,19 +244,28 @@ export default function LicensingPage() {
 
         <SectionHeader eyebrow="Records" title="What is and isn't retained" />
         <p>
-          Civica does not currently retain a complete per-asset generation
-          record — prompt text, reference imagery, and model version — for
-          the launch corpus of country and territory engravings. Assets
-          created or replaced going forward retain that record. Do not treat
-          an existing engraving as having a documented prompt/reference
-          history unless a record has been published for it.
+          The{" "}
+          <a
+            href="https://github.com/fbalino/civica/blob/main/src/lib/illustrations/illustration-manifest.generated.json"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <code>civica-editorial-illustration-manifest/v1</code>
+          </a>{" "}
+          covers every published engraving with its route, intended subject,
+          caption, light/dark partner, dimensions, hash, rights note, and QA
+          state. Historical generation records remain incomplete: the launch
+          sessions did not retain prompt text, reference imagery, model
+          version, or seed. Assets created or replaced going forward retain
+          that record. A Git capture date is not presented as a generation
+          date.
         </p>
 
         <SectionHeader eyebrow="Quality" title="Review and correction" />
         <p>
-          Automated checks currently cover defined technical properties —
-          asset presence, format, and dimensions — for territory engravings
-          (<code>npm run validate:territory-engravings</code>). Human visual
+          Automated checks cover inventory, hashes, exact pairing, captions,
+          format, dimensions, file bounds, color policy, manifest drift, and
+          raw-file release risk. Human visual
           review of what each engraving depicts and whether its caption
           correctly names the landmark is being strengthened over time; it is
           not yet complete or independently audited. If you notice a wrong

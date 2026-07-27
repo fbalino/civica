@@ -49,7 +49,10 @@ export default async function PulseCodingLayout({
       </div>
       <div className="admin-shell-grid">
         <CodingNav role={session.role} />
-        <main className="admin-content">{children}</main>
+        {/* Not a <main>: the root layout already provides the page's single
+            main landmark (src/app/layout.tsx) — same pattern as the
+            production admin shell (src/app/(admin)/layout.tsx). */}
+        <div className="admin-content">{children}</div>
       </div>
     </div>
   );

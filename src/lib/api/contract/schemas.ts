@@ -397,6 +397,30 @@ export const zApiErrorEnvelope = z.object({ error: z.string() }).strict();
  * /api/v1/countries
  * ──────────────────────────────────────────────────────────────── */
 
+export const zJurisdictionStatus = z
+  .object({
+    version: z.literal("jurisdiction-status/v1"),
+    type: z.enum([
+      "sovereign_state",
+      "associated_state",
+      "dependency_or_territory",
+      "disputed_or_limited_recognition",
+      "aggregate_or_special_area",
+    ]),
+    label: z.string(),
+    note: z.string(),
+    reviewedAt: z.string(),
+    administeringJurisdictionIso3: z.string().nullable(),
+    disputed: z.boolean(),
+    includeInSovereignStateCounts: z.boolean(),
+    sources: z.array(
+      z
+        .object({ id: z.string(), label: z.string(), url: z.string().url() })
+        .strict(),
+    ),
+  })
+  .strict();
+
 export const zCountryListItem = z
   .object({
     slug: z.string(),
@@ -412,6 +436,7 @@ export const zCountryListItem = z
     areaSqKm: z.number().nullable(),
     flagUrl: z.string().nullable(),
     governmentClassification: zGovernmentClassification.nullable(),
+    jurisdictionStatus: zJurisdictionStatus,
   })
   .strict();
 
@@ -513,6 +538,7 @@ export const zCountryDetail = z
     governmentType: z.string().nullable(),
     governmentTypeDetail: z.string().nullable(),
     governmentClassification: zGovernmentClassification.nullable(),
+    jurisdictionStatus: zJurisdictionStatus,
     flagUrl: z.string().nullable(),
     constitution: z
       .object({
@@ -1285,6 +1311,7 @@ export const zPulsePublicationOrigin = z.enum([
   "human_edited",
   "human_rejected",
   "legacy_rejected_unverified",
+  "legacy_quarantined",
   "queued",
 ]);
 
@@ -1315,7 +1342,11 @@ export const zPulseCountryEvent = z
         entityCatalogVersion: z.string().nullable(),
         entityCatalogHash: z.string().nullable(),
         aliasVersion: z.string().nullable(),
-        requestedJurisdictionRole: z.enum(["primary", "affected", "unresolved"]),
+        requestedJurisdictionRole: z.enum([
+          "primary",
+          "affected",
+          "unresolved",
+        ]),
         primary: z
           .object({
             jurisdictionId: z.string(),
@@ -1382,6 +1413,11 @@ export const zPulseClassifierRun = z
     temp: z.number(),
     model: z.string().optional(),
     provider: z.string().optional(),
+    role: z.enum(["classify", "verify"]).optional(),
+    promptVersion: z.string().optional(),
+    methodVersion: z.string().optional(),
+    configurationHash: z.string().optional(),
+    configuredEngineCount: z.number().int().positive().optional(),
     category: z.string(),
     dimension: z.string(),
     severityTier: z.string(),
@@ -1479,6 +1515,7 @@ export const zPulseMethodologySnapshot = z
     clustering: z.unknown(),
     corroboration: z.unknown(),
     publicationPolicy: z.unknown(),
+    reviewServiceLevel: z.unknown(),
     numericDeltas: z.unknown(),
     evaluation: z.unknown(),
     contractHash: z.string(),
@@ -1722,6 +1759,7 @@ export const zCountryExportJson = z
         iso2: z.string().nullable(),
         iso3: z.string().nullable(),
         status: z.string(),
+        statusDetails: zJurisdictionStatus,
       })
       .strict(),
     facts: z.array(
@@ -1760,6 +1798,136 @@ export const zCountryExportJson = z
       .object({
         manifest: z.literal("/api/rights-manifest"),
         policy: z.literal("source-row-filtered"),
+      })
+      .strict(),
+  })
+  .strict();
+
+/* /api/v1/elections — qualified, rights-filtered election research export. */
+export const zElectionResearchExport = z
+  .object({
+    schemaVersion: z.literal("election-research-export/v1"),
+    generatedAt: z.string().datetime(),
+    audit: z
+      .object({
+        version: z.literal("election-corpus-audit/v1"),
+        asOf: z.string(),
+      })
+      .strict(),
+    dateSemantics: z
+      .object({
+        representation: z.literal("date_only"),
+        time: z.null(),
+        timeZone: z.null(),
+        note: z.string(),
+      })
+      .strict(),
+    filters: z
+      .object({
+        jurisdiction: z.string().optional(),
+        type: z.enum(["legislative", "presidential"]).optional(),
+        temporalClass: z
+          .enum(["historical", "source_dated_upcoming", "projection_due"])
+          .optional(),
+        sourceStatus: z.string().optional(),
+        jurisdictionStatus: z.string().optional(),
+        from: z.string().optional(),
+        to: z.string().optional(),
+        hasResults: z.boolean().optional(),
+        hasTurnout: z.boolean().optional(),
+      })
+      .strict(),
+    data: z.array(
+      z
+        .object({
+          id: z.string(),
+          conceptualEventKey: z.string().nullable(),
+          disposition: z.enum(["qualified_event", "qualified_contest"]),
+          jurisdiction: z
+            .object({
+              id: z.string(),
+              slug: z.string(),
+              name: z.string(),
+              iso2: z.string().nullable(),
+              iso3: z.string().nullable(),
+              status: z.string(),
+              statusLabel: z.string(),
+              disputed: z.boolean(),
+            })
+            .strict(),
+          event: z
+            .object({
+              name: z.string().nullable(),
+              type: z.enum(["legislative", "presidential"]),
+              date: z
+                .object({
+                  value: z.string().nullable(),
+                  representation: z.literal("date_only"),
+                  time: z.null(),
+                  timeZone: z.null(),
+                  timeZoneStatus: z.literal("not_provided_by_source"),
+                  basis: z.literal("source_confirmed"),
+                  precision: z.enum(["day", "month", "year", "unknown"]),
+                  role: z.enum(["election_day", "point_in_time", "unknown"]),
+                  temporalClass: z.enum([
+                    "historical",
+                    "source_dated_upcoming",
+                  ]),
+                  sourceStatus: z.enum(["held", "source_dated", "tentative"]),
+                })
+                .strict(),
+              electoralSystem: z.string().nullable(),
+            })
+            .strict(),
+          provenance: z
+            .object({
+              sourceId: z.literal("wikidata"),
+              sourceUrl: z.string().url(),
+              license: z.string(),
+              retrievedAt: z.string().datetime(),
+              rightsReview: z.literal("verified"),
+            })
+            .strict(),
+        })
+        .strict(),
+    ),
+    withheld: z
+      .object({
+        rows: z.number().int().nonnegative(),
+        projectionRows: z.number().int().nonnegative(),
+        bySource: z.array(
+          z
+            .object({
+              sourceId: z.string(),
+              count: z.number().int().positive(),
+              reason: z.string(),
+            })
+            .strict(),
+        ),
+        fields: z.array(
+          z
+            .object({
+              field: z.string(),
+              count: z.number().int().positive(),
+              reason: z.string(),
+            })
+            .strict(),
+        ),
+        reason: z.string(),
+      })
+      .strict(),
+    rights: z
+      .object({
+        manifest: z.literal("/api/rights-manifest"),
+        policy: z.literal("source-row-filtered"),
+      })
+      .strict(),
+    meta: z
+      .object({
+        auditedRowsMatchingFilters: z.number().int().nonnegative(),
+        qualifiedEventOrContestRowsMatchingFilters: z.number().int().nonnegative(),
+        projectionRowsMatchingFilters: z.number().int().nonnegative(),
+        emittedRows: z.number().int().nonnegative(),
       })
       .strict(),
   })

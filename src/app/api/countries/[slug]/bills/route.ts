@@ -1,30 +1,32 @@
 import { NextResponse } from "next/server";
-import { inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { sources } from "@/lib/db/schema";
+import { bills as billsTable, governmentBodies, sources } from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
 import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import {
+  BILLS_SOURCE_LABELS,
+  BILLS_STAGE_LABELS,
+  BILLS_SUPPORTED_JURISDICTION_NAMES,
+  isBillsSupportedSlug,
+} from "@/lib/bills/coverage";
 
-const SOURCE_TAG: Record<string, string> = {
-  congress_gov: "U.S. Congress",
-  uk_parliament: "UK Parliament",
-  legisinfo_ca: "Parliament of Canada",
-  camara_br: "Câmara dos Deputados",
-  senado_br: "Senado Federal",
-  bundestag_dip: "Bundestag",
-  data_assemblee_fr: "Assemblée Nationale",
-  senat_fr: "Sénat",
-};
+const SOURCE_TAG = BILLS_SOURCE_LABELS;
 
 /**
- * Phase H.1 — DB-backed bills feed. Reads from the `bills` table
+ * Phase H.1 / ATL-013 — DB-backed bills feed. Reads from the `bills` table
  * populated by the per-source sync scripts under `scripts/sync-bills-*`
- * and the matching cron routes under `/api/cron/bills/*`. The legacy
- * live-fetch path is gone; for jurisdictions whose sync hasn't run
- * yet the response is `{ country, bills: [] }` and the UI shows the
- * existing empty state.
+ * and the matching cron routes under `/api/cron/bills/*`.
  *
- * Output shape preserved so `BillsTab` keeps rendering unchanged.
+ * This is a public-read API route (see `src/lib/api/route-inventory/registry.ts`)
+ * with no live UI caller today — `FactbookBills.tsx` on the Civica Data tab
+ * does its own direct DB query instead of fetching this route. It stays a
+ * documented, correct contract for external API consumers.
+ *
+ * For a jurisdiction outside the six-country bills coverage set (see
+ * `src/lib/bills/coverage.ts`), the response carries an explicit `coverage`
+ * object naming which jurisdictions ARE covered instead of a bare empty
+ * `bills: []` array with no explanation.
  */
 export async function GET(
   req: Request,
@@ -64,26 +66,85 @@ export async function GET(
     }
   }
 
-  const bills = result.rows.map((b) => ({
-    title: b.longTitle ? `${b.title} - ${b.longTitle}` : b.title,
-    summary: b.summary ?? "",
-    tags: [SOURCE_TAG[b.sourceId] ?? b.sourceId],
-    stage: b.stage,
-    votes:
-      b.voteYes != null && b.voteNo != null
-        ? {
-            yes: b.voteYes,
-            no: b.voteNo,
-            abs: b.voteAbstain ?? 0,
-          }
-        : null,
-    url: b.url,
-    status: b.rawStatus ?? undefined,
-    sponsor: b.sponsorName ?? undefined,
-    date: b.lastActionDate,
-    sourceId: b.sourceId,
-    sourceLastSyncAt: sourceMap.get(b.sourceId) ?? null,
-  }));
+  // Chamber — `bodyId` FK into `government_bodies`, populated for the
+  // DE/FR/BR/CA adapters only (see coverage.ts / ATL-013 evidence doc).
+  const bodyIds = Array.from(
+    new Set(result.rows.map((b) => b.bodyId).filter((id): id is string => !!id)),
+  );
+  const bodyMap = new Map<string, { name: string; chamberType: string | null }>();
+  if (bodyIds.length > 0) {
+    try {
+      const bodyRows = await db
+        .select({
+          id: governmentBodies.id,
+          name: governmentBodies.name,
+          chamberType: governmentBodies.chamberType,
+        })
+        .from(governmentBodies)
+        .where(inArray(governmentBodies.id, bodyIds));
+      for (const r of bodyRows) {
+        bodyMap.set(r.id, { name: r.name, chamberType: r.chamberType });
+      }
+    } catch {
+      /* best-effort */
+    }
+  }
 
-  return NextResponse.json({ country: result.jurisdiction.name, bills });
+  // Total row count for this jurisdiction, so a caller can tell "10 of 10"
+  // from "10 of 3,974" (pagination honesty for the fixed 10-row page size).
+  let totalCount: number | null = null;
+  try {
+    const countRows = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(billsTable)
+      .where(eq(billsTable.jurisdictionId, result.jurisdiction.id));
+    totalCount = countRows[0] ? Number(countRows[0].count) : null;
+  } catch {
+    /* best-effort */
+  }
+
+  const bills = result.rows.map((b) => {
+    const chamber = b.bodyId ? bodyMap.get(b.bodyId) : undefined;
+    return {
+      title: b.longTitle ? `${b.title} - ${b.longTitle}` : b.title,
+      summary: b.summary ?? "",
+      tags: [SOURCE_TAG[b.sourceId] ?? b.sourceId],
+      chamber: chamber
+        ? { name: chamber.name, chamberType: chamber.chamberType }
+        : null,
+      stage: b.stage,
+      stageLabel: BILLS_STAGE_LABELS[b.stage] ?? null,
+      votes:
+        b.voteYes != null && b.voteNo != null
+          ? {
+              yes: b.voteYes,
+              no: b.voteNo,
+              abs: b.voteAbstain ?? 0,
+            }
+          : null,
+      url: b.url,
+      status: b.rawStatus ?? undefined,
+      sponsor: b.sponsorName ?? undefined,
+      introducedDate: b.introducedDate ?? null,
+      date: b.lastActionDate,
+      sourceId: b.sourceId,
+      sourceLastSyncAt: sourceMap.get(b.sourceId) ?? null,
+    };
+  });
+
+  const supported = isBillsSupportedSlug(slug);
+  const coverage = {
+    supported,
+    supportedJurisdictions: BILLS_SUPPORTED_JURISDICTION_NAMES,
+    totalTrackedForJurisdiction: totalCount,
+    message: supported
+      ? null
+      : `Civica's bills/legislative-activity pipeline currently covers six jurisdictions (${BILLS_SUPPORTED_JURISDICTION_NAMES.join(", ")}). ${result.jurisdiction.name} is not yet in that set — an empty list here reflects missing coverage, not an absence of legislative activity.`,
+  };
+
+  return NextResponse.json({
+    country: result.jurisdiction.name,
+    bills,
+    coverage,
+  });
 }

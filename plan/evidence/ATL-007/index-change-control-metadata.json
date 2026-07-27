@@ -1,0 +1,37 @@
+{
+  "id": "atlas-election-research-utilities",
+  "toVersion": "civica-index-atlas-election-research-v28",
+  "evidence": {
+    "documentation": [
+      "plan/evidence/ATL-007/README.md",
+      "plan/evidence/ATL-008/README.md",
+      "plan/research/atlas-surface-data-matrix-v1.md"
+    ],
+    "registry": [
+      "src/lib/elections/corpus-audit.generated.json",
+      "src/lib/elections/jurisdiction-identity.generated.json",
+      "src/lib/api/contract/registry.ts",
+      "src/lib/rights/manifest.ts",
+      "data/atlas-surface-data-matrix.v1.json"
+    ],
+    "release_note": [
+      "plan/evidence/ATL-007/README.md",
+      "plan/evidence/ATL-008/README.md"
+    ],
+    "migration_plan": ["plan/evidence/ATL-007/migration-plan.md"],
+    "golden_test": [
+      "src/lib/elections/corpus-audit.test.ts",
+      "src/lib/elections/corpus-audit-runtime.test.ts",
+      "src/lib/elections/jurisdiction-scope.test.ts",
+      "src/lib/elections/research-export.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-election-corpus-audit.ts",
+      "scripts/validate-election-jurisdiction-identity.ts",
+      "src/lib/elections/jurisdiction-scope.ts",
+      "src/lib/elections/research-query-contract.test.ts",
+      "src/lib/elections/atl008-sparse-surfaces.test.ts",
+      "src/lib/elections/__tests__/writer-repeatability.test.ts"
+    ]
+  }
+}

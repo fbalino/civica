@@ -1,0 +1,27 @@
+{
+  "id": "editorial-art-point-of-display-disclosure",
+  "toVersion": "civica-index-editorial-art-disclosure-v10",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": [
+      "DESIGN.md",
+      "src/app/licensing/page.tsx"
+    ],
+    "registry": [
+      "src/lib/claims/public-claims.ts",
+      "src/lib/illustrations/illustration-manifest.generated.json"
+    ],
+    "release_note": [
+      "plan/evidence/EXP-012/README.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/EXP-012/migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/illustrations/__tests__/editorial-illustration-disclosure.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/illustrations/editorial-illustration-disclosure.ts"
+    ]
+  }
+}

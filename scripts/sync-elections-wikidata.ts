@@ -1,7 +1,7 @@
 /**
  * sync-elections-wikidata — populate the `elections` table with national
  * presidential elections (past + future) and source-CONFIRMED future national
- * legislative/general elections, from Wikidata SPARQL.
+ * legislative/general election dates, from Wikidata SPARQL.
  *
  * Wikidata is the ONLY assessed source that carries forward-dated national
  * elections as structured, queryable data (see
@@ -10,13 +10,15 @@
  * This sync fills those two gaps; IPU (`sync-elections-ipu.ts`) owns the
  * legislative-date + party-results spine.
  *
- * CONSERVATIVE v1 SCOPE (owner Q2 deferred): only SOURCE-CONFIRMED dates go on
- * the public page — never a Civica-computed projection. Wikidata models many
+ * CONSERVATIVE v1 SCOPE (owner Q2 deferred): only source-published day-precision
+ * dates enter the source-dated lane. They remain tentative unless an official
+ * schedule is independently verified. Wikidata models many
  * future elections at YEAR precision (P585 = `YYYY-01-01`, precision 9), which
  * is a scheduled cycle, not a confirmed calendar date; those render
- * misleadingly as "January 1". So future rows are gated to DAY precision
- * (`timePrecision = 11`). Past rows accept month/day precision. Every row
- * written carries dateConfidence = "confirmed".
+ * misleadingly as "January 1". Future rows are therefore gated to DAY precision
+ * (`timePrecision = 11`). Past rows accept month/day precision. The legacy
+ * `dateConfidence = "confirmed"` value means source-published day precision;
+ * it does not mean the official election schedule was independently verified.
  *
  * NATIONAL-ONLY discipline: Wikidata's generic election classes leak
  * sub-national results (US state, Australian state, Navajo Nation, Bosnian
@@ -316,6 +318,8 @@ async function main() {
 
     const stmtValue = JSON.stringify({
       wikidata_qid: r.qid,
+      country_wikidata_qid: r.countryQid,
+      country_iso2: r.iso2,
       election_date: r.date,
       election_type: r.type,
       date_precision: r.precision,

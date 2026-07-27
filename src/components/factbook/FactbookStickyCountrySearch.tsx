@@ -77,7 +77,7 @@ export function FactbookStickyCountrySearch({
     >
       <div className="factbook-sticky-country-search__inner">
         <div className="factbook-sticky-country-search__country">
-          <CountryFlag iso2={country.iso2} size={24} />
+          <CountryFlag iso2={country.iso2} size={24} decorative />
           <span>{country.name}</span>
         </div>
         <FactbookCountrySearch

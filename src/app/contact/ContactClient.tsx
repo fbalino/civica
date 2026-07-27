@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import Link from "next/link";
 import { Banner } from "@/components/editorial/Banner";
 import { Button } from "@/components/editorial/Button";
@@ -108,6 +108,32 @@ export default function ContactClient() {
   const emailId = useId();
   const messageId = useId();
 
+  // EXP-034: refs for moving focus to the first invalid field (or the error
+  // summary as a fallback) on a failed submit, so keyboard/AT users land on
+  // the problem instead of having to hunt for it.
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const firstChipRef = useRef<HTMLButtonElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  /** Focuses the first invalid field in the form's visual order (category →
+   *  name → email → message), falling back to the validation summary banner
+   *  if none of the known refs are available. */
+  const focusFirstInvalid = (fieldErrors: FieldErrors) => {
+    if (fieldErrors.subject && firstChipRef.current) {
+      firstChipRef.current.focus();
+    } else if (fieldErrors.name && nameRef.current) {
+      nameRef.current.focus();
+    } else if (fieldErrors.email && emailRef.current) {
+      emailRef.current.focus();
+    } else if (fieldErrors.message && messageRef.current) {
+      messageRef.current.focus();
+    } else if (summaryRef.current) {
+      summaryRef.current.focus();
+    }
+  };
+
   const handleChange =
     (field: keyof FormValues) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -133,6 +159,7 @@ export default function ContactClient() {
     if (Object.keys(next).length) {
       setErrors(next);
       setState("idle");
+      focusFirstInvalid(next);
       return;
     }
     setState("submitting");
@@ -147,8 +174,10 @@ export default function ContactClient() {
         setState("success");
       } else if (res.status === 422) {
         const data = await res.json().catch(() => ({}));
-        setErrors(data.errors ?? {});
+        const serverFieldErrors: FieldErrors = data.errors ?? {};
+        setErrors(serverFieldErrors);
         setState("idle");
+        focusFirstInvalid(serverFieldErrors);
       } else if (res.status === 429) {
         throw new Error("Too many submissions. Please wait a few minutes.");
       } else {
@@ -209,6 +238,17 @@ export default function ContactClient() {
                 />
               </label>
             </div>
+            {Object.keys(errors).length > 0 ? (
+              <div
+                role="alert"
+                className="contact-validation-summary"
+                tabIndex={-1}
+                ref={summaryRef}
+              >
+                <Banner variant="danger">Review the highlighted fields before submitting.</Banner>
+              </div>
+            ) : null}
+
             <div className="contact-field">
               <span className="contact-label" id="contact-category-label">
                 Category
@@ -217,13 +257,15 @@ export default function ContactClient() {
                 className="contact-chip-group"
                 role="group"
                 aria-labelledby="contact-category-label"
+                aria-describedby={errors.subject ? "contact-subject-error" : undefined}
               >
-                {SUBJECTS.map((s) => {
+                {SUBJECTS.map((s, i) => {
                   const active = values.subject === s.value;
                   return (
                     <button
                       key={s.value}
                       type="button"
+                      ref={i === 0 ? firstChipRef : undefined}
                       onClick={() => setSubject(s.value)}
                       aria-pressed={active}
                       className={`editorial-chip contact-chip${active ? " editorial-chip--accent" : ""}`}
@@ -233,7 +275,9 @@ export default function ContactClient() {
                   );
                 })}
               </div>
-              {errors.subject && <div className="contact-error">{errors.subject}</div>}
+              {errors.subject && (
+                <div className="contact-error" id="contact-subject-error">{errors.subject}</div>
+              )}
             </div>
 
             <div className="contact-field contact-row">
@@ -244,12 +288,14 @@ export default function ContactClient() {
                 <input
                   id={nameId}
                   type="text"
+                  ref={nameRef}
                   value={values.name}
                   onChange={handleChange("name")}
                   className="contact-input"
                   aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? `${nameId}-error` : undefined}
                 />
-                {errors.name && <div className="contact-error">{errors.name}</div>}
+                {errors.name && <div className="contact-error" id={`${nameId}-error`}>{errors.name}</div>}
               </div>
               <div>
                 <FieldLabel htmlFor={emailId} required>
@@ -258,12 +304,14 @@ export default function ContactClient() {
                 <input
                   id={emailId}
                   type="email"
+                  ref={emailRef}
                   value={values.email}
                   onChange={handleChange("email")}
                   className="contact-input"
                   aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? `${emailId}-error` : undefined}
                 />
-                {errors.email && <div className="contact-error">{errors.email}</div>}
+                {errors.email && <div className="contact-error" id={`${emailId}-error`}>{errors.email}</div>}
               </div>
             </div>
 
@@ -273,12 +321,16 @@ export default function ContactClient() {
               </FieldLabel>
               <textarea
                 id={messageId}
+                ref={messageRef}
                 value={values.message}
                 onChange={handleChange("message")}
                 className="contact-textarea"
                 aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? `${messageId}-error` : undefined}
               />
-              {errors.message && <div className="contact-error">{errors.message}</div>}
+              {errors.message && (
+                <div className="contact-error" id={`${messageId}-error`}>{errors.message}</div>
+              )}
             </div>
 
             {state === "error" && serverError && (

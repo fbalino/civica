@@ -12,7 +12,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "How Electoral Systems Work — FPTP, PR, Mixed & More",
   description:
-    "How the world's legislatures turn votes into seats: First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems, with per-country data from IPU Parline.",
+    "How the legislatures classified in IPU Parline turn votes into seats: First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems.",
   alternates: { canonical: "https://civicaatlas.org/elections/systems" },
   openGraph: withOg({
     title: "How Electoral Systems Work — FPTP, PR, Mixed & More · Civica Atlas",
@@ -32,18 +32,27 @@ export default async function ElectoralSystemsPage() {
     other: [],
   };
   let sourceRetrievedAt: string | null = null;
+  let dataAvailable = false;
+  let dataError: string | null = null;
 
   try {
-    const [loaded, source] = await Promise.all([
-      getElectoralSystemBuckets(),
-      getSource("ipu_parline"),
-    ]);
-    buckets = loaded;
-    sourceRetrievedAt = source?.lastSyncAt
-      ? source.lastSyncAt.toISOString()
-      : null;
+    buckets = await getElectoralSystemBuckets();
+    dataAvailable = true;
   } catch (err) {
-    console.error("[elections/systems] query failed:", err);
+    dataError =
+      "Electoral-system classifications are temporarily unavailable. The explanatory material remains available below.";
+    console.error("[elections/systems] classification query failed:", err);
+  }
+
+  if (dataAvailable) {
+    try {
+      const source = await getSource("ipu_parline");
+      sourceRetrievedAt = source?.lastSyncAt
+        ? source.lastSyncAt.toISOString()
+        : null;
+    } catch (err) {
+      console.error("[elections/systems] source freshness query failed:", err);
+    }
   }
 
   return (
@@ -55,9 +64,10 @@ export default async function ElectoralSystemsPage() {
         title="How electoral systems work."
         description={
           <>
-            Every democracy has to turn votes into seats. The rule it uses
-            shapes who governs — and Civica classifies each one from IPU
-            Parline&rsquo;s own data.
+            Elected legislatures need rules for turning votes into seats. Those
+            rules affect how ballots are translated, but they do not determine
+            political outcomes on their own. Civica groups the available records
+            from IPU Parline&rsquo;s own data.
           </>
         }
         engraving={{
@@ -81,41 +91,61 @@ export default async function ElectoralSystemsPage() {
         <Reveal as="p" amount={0.4} className="elsys-intro">
           An electoral system is the set of rules that converts the votes people
           cast into the seats parties and candidates hold. The choice of rule is
-          consequential: plurality rules tend to concentrate power in two large
-          parties, while proportional rules spread it across many. The six
-          groupings below follow IPU Parline&rsquo;s own classification of each
-          country&rsquo;s directly-elected chamber.
+          studied alongside party systems, district design, thresholds,
+          enforcement, and political context. Associations described here are
+          general patterns, not causal findings for every country. The six
+          groupings below follow IPU Parline&rsquo;s classification of each available
+          lower or unicameral chamber record.
         </Reveal>
 
         <ElectoralSystemsClient
           buckets={buckets}
           sourceRetrievedAt={sourceRetrievedAt}
+          dataAvailable={dataAvailable}
+          dataError={dataError}
         />
 
         <Reveal as="section" amount={0.2} className="elsys-sources">
           <p>
             <strong>Classifications:</strong> Inter-Parliamentary Union,{" "}
             <a
-              href="https://data.ipu.org/"
+              href="https://api.data.ipu.org/v1/documentation/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              IPU Parline
+              IPU Parline API documentation and field definitions
             </a>{" "}
-            (Creative Commons BY-NC-SA 4.0), recorded per chamber as an
-            electoral-system family and sub-type. Country counts reflect each
+            (the imported statements record CC BY-NC-SA 4.0). Civica&rsquo;s
+            formal source-specific rights review remains pending; these rows are
+            therefore excluded from public bulk export. The source records an
+            electoral-system family and sub-type per chamber. Country counts reflect each
             country&rsquo;s lower or unicameral chamber; countries IPU Parline
             does not classify are not shown. The five named systems and the
             residual &ldquo;Other&rdquo; grouping map directly from IPU
             Parline&rsquo;s own categories.
           </p>
           <p>
-            <strong>Explainer references:</strong> ACE Electoral Knowledge
-            Network; International IDEA, <em>Electoral System Design: The New
-            International IDEA Handbook</em>; and Maurice Duverger on the
-            party-system effects of plurality rules. The seats-versus-votes
-            diagrams use abstract parties and are illustrative, not results from
-            any specific election.
+            <strong>Explainer references:</strong>{" "}
+            <a
+              href="https://aceproject.org/ace-en/topics/es"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ACE Electoral Knowledge Network
+            </a>{" "}
+            and International IDEA&rsquo;s{" "}
+            <a
+              href="https://www.idea.int/publications/catalogue/electoral-system-design-new-international-idea-handbook"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <em>Electoral System Design: The New International IDEA Handbook</em>
+            </a>
+            . These references describe mechanisms and comparative patterns;
+            they do not establish that one rule causes a particular outcome in
+            every institutional setting. The seats-versus-votes diagrams use
+            abstract parties and are illustrative, not results from any specific
+            election.
           </p>
         </Reveal>
       </div>

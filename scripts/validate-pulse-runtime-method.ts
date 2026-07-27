@@ -199,10 +199,16 @@ function validateCadence(
   const actual = (vercel.crons ?? [])
     .filter((cron) => cron.path.startsWith("/api/cron/pulse/"))
     .map((cron) => ({ path: cron.path, schedule: cron.schedule }));
-  const expected = snapshot.cadence.stages.map((stage) => ({
-    path: stage.route,
-    schedule: stage.cron,
-  }));
+  const expected = [
+    ...snapshot.cadence.stages.map((stage) => ({
+      path: stage.route,
+      schedule: stage.cron,
+    })),
+    {
+      path: snapshot.reviewServiceLevel.monitor.route,
+      schedule: snapshot.reviewServiceLevel.monitor.cron,
+    },
+  ];
   checkEqual(
     state,
     actual,
@@ -333,8 +339,8 @@ function validateClassifierAndReview(
     state,
     classify.includes("singleEngineRequiresReview(") &&
       publicationGate.includes("export function singleEngineRequiresReview") &&
-      publicationGate.includes("verifierObjects(verify)"),
-    "Single-engine mode must route every verifier objection to review",
+      publicationGate.includes("return true"),
+    "Single-engine mode must always route to review",
   );
   check(
     state,
@@ -429,9 +435,9 @@ function validateClassifierAndReview(
     state,
     snapshot.providers.classify.degradedRunsRecorded === false &&
       snapshot.providers.classify.successfulProviderRunsRecorded === true &&
-      snapshot.providers.classify.configuredProviderSetPersisted === false &&
+      snapshot.providers.classify.configuredProviderSetPersisted === true &&
       snapshot.providers.classify.providerFailuresPersisted === false,
-    "Contract must not overstate persisted degradation/provider-failure evidence",
+    "Contract must distinguish persisted configuration from missing per-provider failure detail",
   );
   check(
     state,
@@ -582,14 +588,18 @@ function validateClusteringAndScoring(
   snapshot: PulseRuntimeMethodSnapshot,
 ): void {
   const cluster = relative("src/lib/pulse/v2/cluster.ts");
+  const resolution = relative("src/lib/pulse/v2/incident-resolution.ts");
+  const incidentStore = relative("src/lib/pulse/v2/incident-store.ts");
   check(
     state,
-    cluster.includes(
-      `const LEXICAL_SIM_THRESHOLD = ${snapshot.clustering.lexicalFallback.threshold}`,
+    resolution.includes(
+      `PULSE_INCIDENT_SEMANTIC_CANDIDATE_THRESHOLD = ${snapshot.clustering.semantic.threshold}`,
     ) &&
-      cluster.includes(
-        `export const CLUSTER_SIM_THRESHOLD = ${snapshot.clustering.semantic.threshold}`,
+      resolution.includes(
+        `PULSE_INCIDENT_SEMANTIC_ONLY_CANDIDATE_THRESHOLD = ${snapshot.clustering.semantic.unanchoredThreshold}`,
       ) &&
+      resolution.includes("identity.tokenSimilarity >= 0.45") &&
+      resolution.includes("identity.anchorOverlap >= 0.8") &&
       cluster.includes(
         `export const CLUSTER_DATE_WINDOW_HOURS = ${snapshot.clustering.dateWindowHours}`,
       ),
@@ -600,13 +610,14 @@ function validateClusteringAndScoring(
     cluster.includes("? (opts.embeddingResult ?? null)") &&
       cluster.includes(": await tryEmbedBatch(texts)") &&
       cluster.includes("const useEmbeddings = embeddings !== null") &&
-      cluster.includes(
-        "compareEventIdentities(identities[ia], identities[ib])",
-      ) &&
-      cluster.includes("semanticSimilarity >= CLUSTER_SIM_THRESHOLD") &&
-      cluster.includes("identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD") &&
+      cluster.includes("loadActiveIncidentCandidates") &&
+      cluster.includes("planIncidentResolution(incidentCandidates)") &&
+      cluster.includes('finding.disposition !== "confirmed_merge"') &&
+      resolution.includes('disposition = "candidate_merge"') &&
+      resolution.includes("exact_normalized_within_window_classification_compatible") &&
+      incidentStore.includes('eq(pulseEventsV2.projectionStatus, "current")') &&
       snapshot.clustering.countryPartitioned === false,
-    "Clustering must retain multilingual semantic and normalized lexical paths without a country partition",
+    "Clustering must compare persisted stable incidents, auto-merge only exact identities, and retain semantic/lexical candidates without a country partition",
   );
 
   const score = relative("src/lib/pulse/v2/score.ts");
@@ -649,9 +660,15 @@ function validateClusteringAndScoring(
   const calculateIndex = relative("scripts/calculate-ci-v2.ts");
   check(
     state,
-    decouple.includes("corroborationConfidence: 0") &&
-      calculateIndex.includes("decoupleAbsorbedEvents"),
-    "Events absorbed into an Index recompute must be zeroed before Pulse recomputation",
+    decouple.includes("pulseEventAbsorptions") &&
+      decouple.includes("onConflictDoNothing") &&
+      !decouple.includes("corroborationConfidence:") &&
+      !decouple.includes(".update(pulseEventsV2)") &&
+      calculateIndex.includes("decoupleAbsorbedEvents") &&
+      relative("src/lib/pulse/v2/score.ts").includes(
+        'e.absorptionOutcome === "absorbed" ? 0 : e.corroborationConfidence',
+      ),
+    "Absorption must be append-only event evidence and must not mutate corroboration confidence",
   );
 }
 
@@ -723,7 +740,8 @@ function validatePublicSurfaces(
   // src/lib/api/contract/examples.ts, which is where the runtime
   // snapshot is actually generated and schema-validated. Check both:
   // examples.ts does the generation, and page.tsx wires the endpoint
-  // in without ever publishing a forbidden scalar Pulse ranking.
+  // in while documenting the retired scalar parameter as a terminal 410,
+  // never as a supported Pulse ranking.
   const apiDocs = relative("src/app/api-docs/page.tsx");
   const contractExamples = relative("src/lib/api/contract/examples.ts");
   const contractRegistry = relative("src/lib/api/contract/registry.ts");
@@ -734,9 +752,10 @@ function validatePublicSurfaces(
       apiDocs.includes('"pulseMethodology"') &&
       !apiDocs.includes("sort=cp") &&
       !apiDocs.includes("ci | cp") &&
-      !contractRegistry.includes("sort=cp") &&
+      contractRegistry.includes('retired "cp" value') &&
+      contractRegistry.includes("returns 410") &&
       !contractRegistry.includes("ci | cp"),
-    "API docs must generate the Pulse runtime example and publish no scalar ranking contract",
+    "API docs must generate the Pulse runtime example and expose scalar CP only as a terminal 410 retirement contract",
   );
 
   const backtestPage = relative(

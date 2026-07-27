@@ -68,7 +68,7 @@ export const EXPLORE_NAV_GROUPS: ExploreNavGroup[] = [
       {
         href: "/elections",
         label: "Elections",
-        description: "Systems, turnout and results",
+        description: "Audited records, projections and gaps",
         engraving: "compass",
       },
       {

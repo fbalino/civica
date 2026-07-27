@@ -1,0 +1,19 @@
+{
+  "id": "lock-pulse-validation-protocol-v1",
+  "toVersion": "civica-index-pulse-validation-protocol-v23",
+  "categories": ["weight_or_model"],
+  "evidence": {
+    "documentation": ["plan/research/pulse-validation-protocol-v1.md"],
+    "registry": ["data/research/pulse-validation-protocol-v1.json"],
+    "release_note": ["plan/evidence/PUL-025/README.md"],
+    "migration_plan": ["plan/evidence/PUL-025/start-boundary.md"],
+    "golden_test": ["src/lib/pulse/v2/validation-protocol.test.ts"],
+    "contract_test": ["scripts/validate-pulse-validation-protocol.ts"]
+  },
+  "validations": [
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-validation-protocol",
+    "validate:index-research-archive"
+  ]
+}

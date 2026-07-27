@@ -36,6 +36,7 @@ import {
   checkCaptionLinkStyling,
   checkCountryCaptionDisclosure,
   checkLicensingImagerySection,
+  checkPageHeroDisclosure,
   extractParagraphContaining,
   extractSectionById,
   type DisclosureIssue,
@@ -47,14 +48,10 @@ const LICENSING_PAGE = "src/app/licensing/page.tsx";
 const ABOUT_CONTENT = "content/about.md";
 const COUNTRY_CAPTION_COMPONENT = "src/components/factbook/FactbookHeaderStrip.tsx";
 const CAPTION_STYLESHEET = "src/app/factbook.css";
+const PAGE_HERO_COMPONENT = "src/components/PageHero.tsx";
+const ILLUSTRATION_MANIFEST = "src/lib/illustrations/illustration-manifest.generated.json";
 const CAPTION_LINK_CLASS = "factbook-hero-caption-link";
 const ABOUT_POINTER_NEEDLE = "/licensing#imagery";
-
-// Fail closed. A future EXP/BRD task may set this from a validator that proves
-// every published asset has a complete manifest row. File existence alone is
-// deliberately insufficient because an empty or partial JSON file proves no
-// coverage.
-const COMPLETE_MANIFEST_COVERAGE_PROVEN = false;
 
 async function readFile(relativePath: string): Promise<string | null> {
   try {
@@ -77,13 +74,25 @@ function printIssues(label: string, issues: DisclosureIssue[]): void {
 }
 
 async function main(): Promise<void> {
-  const [licensingSource, aboutSource, captionComponentSource, captionStylesheet] =
+  const [licensingSource, aboutSource, captionComponentSource, captionStylesheet, pageHeroSource, manifestSource] =
     await Promise.all([
       readFile(LICENSING_PAGE),
       readFile(ABOUT_CONTENT),
       readFile(COUNTRY_CAPTION_COMPONENT),
       readFile(CAPTION_STYLESHEET),
+      readFile(PAGE_HERO_COMPONENT),
+      readFile(ILLUSTRATION_MANIFEST),
     ]);
+
+  let assetManifestCoverageProven = false;
+  if (manifestSource) {
+    const manifest = JSON.parse(manifestSource);
+    assetManifestCoverageProven =
+      manifest.contract === "civica-editorial-illustration-manifest/v1" &&
+      manifest.summary?.assetCount === manifest.assets?.length &&
+      manifest.summary?.missingPairs === 0 &&
+      manifest.summary?.missingCaptions === 0;
+  }
 
   const allIssues: DisclosureIssue[] = [];
 
@@ -100,9 +109,24 @@ async function main(): Promise<void> {
   } else {
     const imagerySection = extractSectionById(licensingSource, "imagery");
     const issues = checkLicensingImagerySection(imagerySection, {
-      manifestExists: COMPLETE_MANIFEST_COVERAGE_PROVEN,
+      assetManifestCoverageProven,
+      completeGenerationRecords: false,
     });
     printIssues(`${LICENSING_PAGE} (#imagery)`, issues);
+    allIssues.push(...issues);
+  }
+
+  if (pageHeroSource === null) {
+    const issue: DisclosureIssue = {
+      surface: "page-hero-disclosure",
+      ruleId: "missing-page-hero-component",
+      description: `${PAGE_HERO_COMPONENT} does not exist.`,
+    };
+    printIssues(PAGE_HERO_COMPONENT, [issue]);
+    allIssues.push(issue);
+  } else {
+    const issues = checkPageHeroDisclosure(pageHeroSource);
+    printIssues(PAGE_HERO_COMPONENT, issues);
     allIssues.push(...issues);
   }
 
@@ -150,7 +174,7 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    `\n${allIssues.length === 0 ? "PASS" : "FAIL"} — ${allIssues.length} issue${allIssues.length === 1 ? "" : "s"} across licensing, about, and country-caption surfaces.`,
+    `\n${allIssues.length === 0 ? "PASS" : "FAIL"} — ${allIssues.length} issue${allIssues.length === 1 ? "" : "s"} across licensing, about, page-hero, and country/territory-caption surfaces.`,
   );
 
   if (allIssues.length > 0) {

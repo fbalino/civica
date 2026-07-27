@@ -42,6 +42,8 @@
     "timezone": "UTC"
   },
   "clustering": {
+    "automaticMergeRule": "exact_full_identity_inside_window_or_exact_headline_same_resolved_country_and_date_with_compatible_labels",
+    "candidateLedger": "semantic_and_strong_anchor_matches_require_review",
     "countryPartitioned": false,
     "dateWindowHours": 48,
     "identityNormalization": {
@@ -50,18 +52,24 @@
       "version": "pulse-event-identity/multilingual-v1"
     },
     "lexicalFallback": {
+      "anchorOverlapThreshold": 0.8,
       "condition": "embedding_model_unavailable",
       "metric": "jaccard_token_similarity",
-      "threshold": 0.42
+      "result": "candidate_only",
+      "threshold": 0.45
     },
+    "persistedComparison": "incoming_against_recent_active_incidents",
+    "resolutionVersion": "pulse-incident-resolution/v1",
     "semantic": {
       "metric": "cosine_similarity",
       "model": "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
-      "threshold": 0.75
+      "result": "candidate_only",
+      "threshold": 0.84,
+      "unanchoredThreshold": 0.9
     },
-    "strategy": "semantic_or_lexical_fallback"
+    "strategy": "stable_incident_resolution"
   },
-  "contractHash": "13f501eef681b9561163869e8da7f889ff5a8542a23865f0660817912b1a2769",
+  "contractHash": "ddacc5691fe493732536605b726758f7fff85c45bb5f8b1438551421975264ad",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -78,9 +86,16 @@
         "termsUrl": "https://rsf.org/en/cgu",
         "upstreamRelease": "RSF World Press Freedom Index 2026"
       },
+      "coveragePolicy": "one_observed_or_missing_row_per_supported_jurisdiction",
+      "eventPinMethodVersion": "pulse-information-environment/classification-pin-v1",
+      "eventPinSchemaVersion": "pulse-information-environment-pin/v1",
+      "historicalPinPolicy": "unrecoverable_remains_missing",
       "missingValuePolicy": "no_multiplier",
+      "observabilityUse": "disabled_until_rights_and_validation_pass",
       "policyVersion": "pulse-information-environment-uncertainty/v1",
       "productionUse": "disabled_pending_rights_and_validation",
+      "releaseSchemaVersion": "pulse-information-environment-release/v1",
+      "rerunPolicy": "classification_pin_is_append_only",
       "schemaVersion": "pulse-information-environment-context/v1",
       "sensitivityOnly": {
         "partialAllEvents": 0.8,
@@ -331,11 +346,15 @@
   },
   "mixed_legacy_unversioned": false,
   "numericDeltas": {
-    "absorbedIntoIndexPolicy": "non_durable_zero_then_daily_recompute_can_restore",
+    "absorbedIntoIndexPolicy": "separate_versioned_decision_never_mutates_corroboration",
+    "absorptionEvidence": "append_only_explicit_event_link_fixed_scale",
+    "absorptionMultiplier": "absorbed_zero_otherwise_one",
     "boundsPerDimension": {
       "lower": -15,
       "upper": 10
     },
+    "currentAbsorptionStanding": "none_no_sequential_comparable_release",
+    "currentProjection": "one_row_per_jurisdiction_dimension",
     "dimensions": [
       "democratic_quality",
       "rule_of_law",
@@ -343,9 +362,11 @@
       "corruption_control",
       "stability"
     ],
-    "impactFormula": "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
+    "impactFormula": "severity_value * corroboration_confidence * absorption_multiplier * exp(-ln(2) * days_since_event / category_half_life_days)",
     "includedEvents": "published_only",
     "inputMethodCoverage": "row_level_versioned_with_explicit_legacy",
+    "noEventState": "zero_tombstone_internal_public_null",
+    "outputHistory": "append_only_per_score_run_jurisdiction_dimension",
     "publicStatus": "public_experimental",
     "scalar": "none",
     "scoreStageOrder": [
@@ -353,7 +374,9 @@
       "score"
     ],
     "shape": "per_dimension",
-    "trailingWindowDays": 365
+    "trailingWindowDays": 365,
+    "windowBoundary": "inclusive_365_days_future_excluded",
+    "writeAtomicity": "history_projection_and_run_completion_one_transaction"
   },
   "observability": {
     "absentNumericEffect": "withheld",
@@ -393,8 +416,12 @@
       "mode": "single_engine_classify_verify"
     },
     "classify": {
+      "agreementEvidence": "stored_provider_distinct_prompt_versioned_classify_runs",
+      "attemptSchemaVersion": "pulse-classification-attempt/v1",
       "categoryConsensus": "strict_majority_of_successful_voters",
-      "configuredProviderSetPersisted": false,
+      "claimLeaseMinutes": 30,
+      "configSchemaVersion": "pulse-classification-config/v1",
+      "configuredProviderSetPersisted": true,
       "decode": "deterministic",
       "degradedRunsRecorded": false,
       "engines": [
@@ -412,14 +439,32 @@
         }
       ],
       "invalidSelfConfidencePolicy": "reject_response_as_unusable",
+      "legacyAgreementPolicy": "unsupported_labels_cleared_and_automatic_rows_quarantined",
       "minimumQuorum": 2,
       "mode": "cross_vendor_ensemble",
+      "noneDisposition": "terminal_none_not_failure",
       "providerFailuresPersisted": false,
+      "queueOrder": "new_then_due_retry_oldest_first",
+      "retryExhaustionDisposition": "terminal_failure",
+      "retryPolicy": {
+        "initialDelayMinutes": 15,
+        "maxAttempts": 3,
+        "maximumDelayHours": 6,
+        "multiplier": 4
+      },
       "selfConfidenceRange": {
         "lower": 0,
         "upper": 1
       },
       "severityValuePolicy": "require_finite_number_then_tier_clamp",
+      "singleEnginePublication": "queue_only",
+      "stateSchemaVersion": "pulse-classification-state/v1",
+      "statuses": [
+        "classified",
+        "none",
+        "retryable_failure",
+        "terminal_failure"
+      ],
       "successfulProviderRunsRecorded": true
     },
     "reviewSummary": {
@@ -471,6 +516,7 @@
     }
   },
   "publicationPolicy": {
+    "automaticEligibility": "stored_ensemble_and_gate_and_resolved_subject",
     "majorityNone": "drop_not_governance_event",
     "numericSeverityAggregation": "median_of_winning_category_voters_then_tier_clamp",
     "reviewGates": {
@@ -522,6 +568,11 @@
         "published": false,
         "reviewStatus": "rejected"
       },
+      "legacyQuarantined": {
+        "humanReviewed": false,
+        "published": false,
+        "reviewStatus": "legacy_quarantined"
+      },
       "legacyRejectedUnverified": {
         "humanReviewed": false,
         "published": false,
@@ -534,7 +585,64 @@
       }
     }
   },
-  "schemaVersion": "1.7.0",
+  "reviewServiceLevel": {
+    "complianceStates": [
+      "within_sla",
+      "escalation_due",
+      "breached_unexcepted",
+      "breached_excepted",
+      "dispositioned_on_time",
+      "dispositioned_late",
+      "legacy_quarantined"
+    ],
+    "dailyCompletenessRule": "withheld_on_breach_or_unknown",
+    "exceptionRule": "append_only_bounded_explanation_never_restores_completeness",
+    "healthStates": [
+      "complete",
+      "current_reviews_pending",
+      "incomplete_review_sla",
+      "not_assessable"
+    ],
+    "legacyRule": "Pre-contract pending items remain unpublished in legacy quarantine and are not counted as reviewed, approved, rejected, or SLA-compliant.",
+    "monitor": {
+      "cron": "10 */6 * * *",
+      "delivery": "persisted_idempotent_event_plus_structured_server_log",
+      "route": "/api/cron/pulse/v2/review-sla"
+    },
+    "obligationStates": [
+      "open",
+      "claimed",
+      "dispositioned",
+      "legacy_quarantined"
+    ],
+    "priorityBySeverity": {
+      "catastrophic_neg": "critical",
+      "high_pos": "urgent",
+      "low_neg": "standard",
+      "low_pos": "standard",
+      "moderate_neg": "standard",
+      "moderate_pos": "standard",
+      "severe_neg": "urgent"
+    },
+    "queueOrder": "priority_then_due_then_queued_then_id",
+    "reportClockArithmetic": "explicit_timestamp_cast_before_interval",
+    "targets": {
+      "critical": {
+        "dueAfterMs": 86400000,
+        "escalationAfterMs": 0
+      },
+      "standard": {
+        "dueAfterMs": 604800000,
+        "escalationAfterMs": 432000000
+      },
+      "urgent": {
+        "dueAfterMs": 259200000,
+        "escalationAfterMs": 86400000
+      }
+    },
+    "version": "pulse-review-sla/v1"
+  },
+  "schemaVersion": "1.14.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -547,5 +655,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.8-beta"
+  "version": "pulse-v2.15-beta"
 }

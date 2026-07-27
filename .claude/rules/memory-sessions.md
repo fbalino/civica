@@ -106,6 +106,11 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   (amber); green is reserved for genuinely live feeds.
 - `sources.last_sync_at` is stamped ONLY via `markSourcesSynced()` (enforced by
   `validate:sync-freshness`). Never write it inline.
+- Public election qualification is content-bound, never UUID-only. Any change
+  to an election, result, statement, jurisdiction status/identity, or referenced
+  source makes the live row fail closed until the checked audit is regenerated.
+  Source-dated future rows remain tentative; term-derived projections use year
+  precision and never imply an official schedule.
 - **Robots-crawl-delay syncs can't use a single Vercel cron — shard by day-of-month.**
   The Wikidata syncs (`sync-officeholders`, `sync-wikidata`) finish in one monthly cron
   because SPARQL is a bulk endpoint. The CIA World Leaders cabinet sync
@@ -123,6 +128,25 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   unknown values rather than crashing.
 
 ## Admin auth / env / infra gotchas
+
+- **Adding ANY dependency drifts the reproducibility packets → cascade regen.**
+  Several frozen release artifacts pin the FULL `package-lock.json` (or a hash
+  chain rooted in it), so installing even an unrelated devDependency fails
+  `npm run build` with "artifact inventory drift" / "reproduction environment
+  drift". Observed chain (adding `@playwright/test` for QA-009): (1)
+  `governance-evidence-review-packet-2026-07-v2` pins package-lock → regen with
+  `npm run reproduce:governance-evidence-review-packet`; (2) the G2 Atlas
+  candidate pins the environment → `npm run package:g2-atlas` (changes the
+  `.zip` SHA-256); (3) the atlas review packet pins the G2 archive hash →
+  `npm run generate:atlas-review-packet`; (4) update the stale g2-hash refs in
+  `plan/PROGRESS.md`, `plan/evidence/DAT-022|DAT-024/README.md`,
+  `plan/evidence/ATL-009/completion.md`. The underlying DATA never changes —
+  only environment fingerprints + dependent hashes. Enumerate the full cascade
+  up front with `grep -rln package-lock scripts/ data/` (only governance packet
+  pins it directly; g2/atlas-review chain off it). `validate:index-review-packet`
+  and `validate:index-research-archive` do NOT pin live package-lock (they hash a
+  fixed code/artifact set), so they don't drift on dep changes. Run the FULL
+  `npm run build` (dev server STOPPED) to confirm green — each attempt is minutes.
 
 - **Next.js `.env` does dotenv-EXPANSION on `$`.** Any value in `.env.local` with an
   unescaped `$name` is treated as a variable reference and silently mangled at load
@@ -721,3 +745,161 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Published `civica-advisory-board-charter/v1` with five expertise lanes, advisory-only authority, two-year terms, bounded workload, conflict, confidentiality, compensation, departure, consented-publication, and nonendorsement rules.
 - Standing service is unpaid; substantial reviews remain separate, optional, and eligible only for outcome-independent owner-approved honoraria.
 - The public roster explicitly says no members have been appointed. GOV-007 is next.
+
+## 2026-07-12 — GOV-007 advisory application completed
+
+- The public form now matches all five charter lanes and requires consent to `civica-advisory-application-privacy/v1`.
+- Client/server validation, durable hashed rate limiting, honeypot handling, explicit storage failure, protected admin delivery, retention deadline, and confirmed deletion are executable.
+- New rows retain no applicant IP. The form and `/privacy#applications` publish the fields, purpose, access, processors, 18-month retention, deletion, security, and onscreen-only response terms.
+- While verifying GOV-007, the build exposed reference-header drift that shortened the required country-art disclosure; EXP-043 restored `Editorial engraving` and the licensing gate.
+
+## 2026-07-12 — EXP-005 engraving contract completed
+
+- Adopted the owner-approved Japan light reference and strength-60 dark grade as `civica-engraving-color/v1`.
+- Added exact asset hashes, measurable tone/saturation/warmth/contrast ranges, line/geometry and landmark invariants, delivery rules, and too-warm/too-cool/style/outlier examples.
+- Added a machine contract and validator, chained through the editorial-illustration build gate.
+
+## 2026-07-12 — EXP-007 engraving grader completed
+
+- Productionized the approved grade as `civica-engraving-grade/1.0.0` with single-file and manifest CLI modes.
+- Every preview/final output receives a parameter/hash/geometry/metric sidecar; exact reruns are no-writes and graded inputs are rejected.
+- Golden hash/metric, geometry, repeatability, manifest, and double-processing tests run in the editorial-illustration build gate.
+
+## 2026-07-12 — EXP-010 illustration manifest completed
+
+- Reconstructed `civica-editorial-illustration-manifest/v1` for all 538 tracked WebP assets with complete pairs/captions and recoverable file, route, Git, edit, rights, and QA metadata.
+- Original generation model/tool/prompt/reference sessions remain explicitly irrecoverable/unknown; Git capture dates are not generation dates.
+- Deterministic regeneration and drift checking now run in the editorial-illustration build gate.
+
+## 2026-07-12 — EXP-011 country engraving gate completed
+
+- Added a build gate for all 394 country WebPs/197 exact pairs, approved 3:2 sizes and file bounds, captions, manifest rows, dark color states, and duplicate/missing risks.
+- Removed the country/territory route's raw PNG fallback; unoptimized generation exports cannot silently become public.
+- Seeded tests catch every required failure class.
+
+## 2026-07-12 — EXP-012 art disclosure completed
+
+- Every engraved PageHero now carries a visible AI-assisted/non-documentary policy link; country/territory captions add the same classification to the accessible name.
+- Licensing links the complete 538-asset manifest while preserving the irrecoverable historical model/prompt/reference/seed limit and the incomplete human-review disclosure.
+- Representative About, Greenland, Japan, and licensing surfaces passed desktop/mobile/light/dark browser checks with no overflow or console errors.
+
+## 2026-07-12 — EXP-013 country caption structure completed
+
+- Moved engraving layers and figcaption under a semantic figure while preserving the caption's dedicated grid row through the shared display-contents composition.
+- Parallax now tracks the nearest section, so the semantic wrapper cannot become a boxless scroll target.
+- Exact 769px dark and 1440px light geometry passed with no content/media overlap, overflow, or console errors; the shared header entered Index presentation change control.
+
+## 2026-07-12 — EXP-037 country map controls completed
+
+- Split the noninteractive map preview, full-tile activation button, and provider attribution into sibling elements with independent accessible names.
+- Disabled MapLibre attribution injection for previews while retaining it in interactive maps; OpenStreetMap and Protomaps/OpenFreeMap remain separately linked beside the tile.
+- Pointer activation, focus restoration, Enter activation, zero nested controls, and two attribution links passed in the local browser.
+
+## 2026-07-12 — PUL-031 stable incident repair completed
+
+- Added stable Pulse incidents, append-only report assignments and resolution findings, current/superseded/quarantined event projections, and exact live invariants.
+- Applied the hash-pinned repair: five confirmed duplicate pairs, 474 review-only candidates, 380 current projections, and fresh corroboration and score runs.
+- Drained all 128 waiting reports after recovering one failed partial cluster run without deleting evidence. Claims, 883 tests, TypeScript, build, migration, retention, runtime, live invariants, and the Pulse methodology browser check passed.
+
+## 2026-07-12 — PUL-032 classification state completed
+
+- Added configuration-keyed cluster state, append-only attempt phases, atomic
+  claims, new-before-retry ordering, bounded backoff, and queue observability.
+- Applied authoritative migration 0024 and verified the 25/25 production
+  ledger. Backfill retained 384 classified and one terminal state without
+  inventing provider history.
+- The live queue remains 841 never-attempted clusters. This task made no model
+  calls. Claims, design, build, migration, retention, runtime, live invariant,
+  and methodology browser checks passed.
+
+## 2026-07-12 — PUL-033 review SLA completed
+
+- Added versioned severity deadlines, database-created obligations,
+  append-only escalation/exceptions, a six-hour monitor, and dashboard age and
+  breach metrics.
+- Retained 175 pre-contract pending events as unpublished, non-human legacy
+  quarantine. Production migration and live retention invariants pass.
+- Claims, 898 tests, design tokens, API contracts, full build, and light/dark
+  reader browser checks passed.
+
+## 2026-07-12 — PUL-035 dimensional lifecycle completed
+
+- Added exact 365-day inclusion and 366-day/future exclusion, prior-state
+  clearing, internal zero tombstones, and public null behavior.
+- Applied migration 0027; production is at 28/28 migrations with 72 public
+  tables and 650 immutable dimensional outputs across two score runs.
+- Live lifecycle checks, 907 tests, claims, TypeScript, light/dark browser QA,
+  and the full production build passed.
+
+## 2026-07-12 — PUL-036 stored agreement completed
+
+- Agreement now derives from provider-distinct, prompt-versioned stored runs;
+  single-run and subscription-agent classifications always queue.
+- The production repair cleared 355 unsupported labels, quarantined 191
+  unsupported automatic publications, and preserved 13 human-reviewed ones.
+- Runtime `pulse-v2.13-beta`, live invariants, 912 tests, API contracts,
+  light/dark browser QA, and the full production build passed.
+
+## 2026-07-12 — PUL-037 absorption evidence completed
+
+- Replaced destructive decoupling with append-only, exact-event absorption
+  decisions gated by sequential comparable fixed-scale Index observations.
+- Applied authoritative migration 0028; production is at 29/29 migrations and
+  73 tables. The live ledger contains zero invented absorption decisions.
+- Scoring excludes a confirmed absorbed event without changing its
+  corroboration confidence. Runtime `pulse-v2.14-beta`, 920 tests, TypeScript,
+  live migration/retention/absorption invariants, browser QA, and the full
+  production build passed.
+
+## 2026-07-12 — PUL-038 information context completed
+
+- Replaced the legacy mutable scalar path with immutable release metadata,
+  complete observed-or-missing jurisdiction coverage, and one event pin.
+- Applied migration 0029; production is at 30/30 migrations and 76 tables.
+  The official RSF capture yields 176 observed and 75 explicit missing rows
+  across 251 supported non-aggregate jurisdictions. All 384 historical events
+  remain marked unrecoverable rather than receiving a later value.
+- Production weighting and observability remain disabled. Runtime
+  `pulse-v2.15-beta`, the real scoring rerun, 924 tests, TypeScript, live
+  invariants, light/dark browser QA, and the full build passed.
+
+## 2026-07-12 — ATL-003 longitudinal history completed
+
+- Added first-class publisher-native history to country Civica Data and
+  Compare with explicit gaps/value states, source lineage, time/series controls,
+  and rights-filtered downloads.
+- Added the country-history API, five-series catalog, query/export tests, and a
+  checked Atlas surface-matrix row; live Japan query execution was 0.725 ms.
+- Refreshed the additive rights manifest through G2 and reviewer packet
+  inventories. Browser QA, all 936 tests, claims gates, and the 105-page build
+  passed.
+
+## 2026-07-12 — ATL-004 evidence reasoning completed
+
+- Extended the shared fact-source panel with evidence posture, producing-family
+  independence, precedence rationale, and the complete six-step trace.
+- Argentina population verified that World Bank and UN Data collapse to UN WPP
+  while CIA/Wikidata remain non-independent compilations and IMF projection
+  stays visible without corroborating measurements.
+- Desktop/mobile light/dark browser QA and all 939 claims tests passed.
+
+## 2026-07-12 — ATL-005 neutral evidence coverage completed
+
+- Added an always-visible country Evidence Coverage section backed by the
+  checked DAT-005 snapshot and current DAT-006/DAT-007 resolver output.
+- Kept nine evidence properties separate, used an eligible multi-source
+  denominator for agreement, and added explicit missing-report and resolver-
+  outage states without country grading.
+- Registered the ninth Civica Data module in the 39-row Atlas surface matrix;
+  focused tests, browser QA, claims gates, and the production build passed.
+
+## 2026-07-12 — ATL-006 sourced jurisdiction status completed
+
+- Made the closed `jurisdiction-status/v1` record the shared public identity
+  contract while keeping sovereign-state analytical and map scopes separate.
+- The full 253-entry reference catalog now powers discovery; profile and
+  Compare disclosures carry neutral notes, sources, review dates, countability,
+  and administering relationships; APIs, exports, sitemap, Atlas scope, and
+  Country-versus-Place JSON-LD use the same contract.
+- Politically sensitive fixtures and desktop/mobile browser QA passed. Index
+  change-control v26, all 949 tests, and the 105-page production build passed.

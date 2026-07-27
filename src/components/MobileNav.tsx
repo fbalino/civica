@@ -17,11 +17,11 @@ import {
   EXPLORE_NAV_GROUPS,
   type ExploreNavItem,
 } from "@/components/exploreNavItems";
-
-const EDITORIAL_LINKS = [
-  { href: "/blog", label: "The Record", descriptor: "Essays and dispatches" },
-  { href: "/about", label: "About", descriptor: "Mission and editorial standards" },
-];
+import { EDITORIAL_NAV_ITEMS } from "@/components/editorialNavItems";
+import {
+  isGovernanceEvidenceGroupActive,
+  isMethodologyGroupActive,
+} from "@/components/navActiveState";
 
 const UTILITY_LINKS = [
   { href: "/about#sources", label: "Sources" },
@@ -164,12 +164,14 @@ function MenuOverlay({
           className="theme-engraving-light"
           src="/engravings/hero.webp"
           alt=""
+          aria-hidden="true"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="theme-engraving-dark"
           src="/engravings/hero-dark.webp"
           alt=""
+          aria-hidden="true"
         />
       </div>
       <div className="mobile-menu__wash" aria-hidden="true" />
@@ -238,15 +240,17 @@ function MenuOverlay({
             href="/governance-evidence"
             items={INDEX_NAV_ITEMS}
             isActive={isActive}
+            groupActive={isGovernanceEvidenceGroupActive(pathname)}
           />
           <MenuLinkGroup
             title="Methodology"
             href="/methodology"
             items={METHODOLOGY_NAV_ITEMS}
             isActive={isActive}
+            groupActive={isMethodologyGroupActive(pathname)}
           />
           <nav className="mobile-menu__editorial-links" aria-label="Editorial">
-            {EDITORIAL_LINKS.map((item) => (
+            {EDITORIAL_NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -299,12 +303,14 @@ function ExploreLink({
           className="theme-engraving-light"
           src={`/engravings/spot-${item.engraving}.webp`}
           alt=""
+          aria-hidden="true"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="theme-engraving-dark"
           src={`/engravings/spot-${item.engraving}-dark.webp`}
           alt=""
+          aria-hidden="true"
         />
       </span>
       <span className="mobile-menu__explore-copy">
@@ -321,15 +327,20 @@ function MenuLinkGroup({
   href,
   items,
   isActive,
+  groupActive,
 }: {
   title: string;
   href: string;
   items: ReadonlyArray<{ href: string; label: string; descriptor: string }>;
   isActive: (href: string) => boolean;
+  groupActive: boolean;
 }) {
   return (
     <section className="mobile-menu__link-group mobile-menu__reveal">
-      <Link className="mobile-menu__link-group-title" href={href}>
+      <Link
+        className={`mobile-menu__link-group-title${groupActive ? " is-active" : ""}`}
+        href={href}
+      >
         {title}<span aria-hidden="true">→</span>
       </Link>
       <nav aria-label={title}>

@@ -4,7 +4,10 @@ import { Banner } from "@/components/editorial/Banner";
 import { DataTable } from "@/components/editorial/DataTable";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Chip } from "@/components/editorial/Pill";
-import { ReaderSidebar, type ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
+import {
+  ReaderSidebar,
+  type ReaderSidebarItem,
+} from "@/components/editorial/ReaderSidebar";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import rawReport from "@/lib/provenance/domain-coverage.generated.json";
 import type { DomainCoverageReport } from "@/lib/provenance/domain-coverage";
@@ -12,8 +15,10 @@ import type { DomainCoverageReport } from "@/lib/provenance/domain-coverage";
 export const metadata: Metadata = {
   title: "Source Coverage by Domain — Methodology",
   description:
-    "Generated source freshness, jurisdiction coverage, field completeness, source-family, gap, and alert reporting for nine Civica Atlas domains.",
-  alternates: { canonical: "https://civicaatlas.org/methodology/source-coverage" },
+    "Generated source freshness, jurisdiction coverage, field completeness, source-family, gap, and alert reporting for every declared Civica Atlas domain.",
+  alternates: {
+    canonical: "https://civicaatlas.org/methodology/source-coverage",
+  },
 };
 
 const report = rawReport as DomainCoverageReport;
@@ -73,9 +78,13 @@ export default function SourceCoveragePage() {
             <tbody>
               {report.domains.map((domain) => (
                 <tr key={domain.id}>
-                  <td><Link href={`#${domain.id}`}>{domain.label}</Link></td>
                   <td>
-                    <Chip variant={domain.status === "current" ? "sage" : "sand"}>
+                    <Link href={`#${domain.id}`}>{domain.label}</Link>
+                  </td>
+                  <td>
+                    <Chip
+                      variant={domain.status === "current" ? "sage" : "sand"}
+                    >
                       {domain.status === "current" ? "Current" : "Attention"}
                     </Chip>
                   </td>
@@ -84,8 +93,13 @@ export default function SourceCoveragePage() {
                     {number.format(domain.jurisdictionsCovered)} /{" "}
                     {number.format(domain.eligibleJurisdictions)}
                   </td>
-                  <td className="num">{domain.countryCoveragePercent.toFixed(1)}%</td>
-                  <td>{date(domain.lastSuccessfulRun)}{domain.lastSuccessfulRun ? " UTC" : ""}</td>
+                  <td className="num">
+                    {domain.countryCoveragePercent.toFixed(1)}%
+                  </td>
+                  <td>
+                    {date(domain.lastSuccessfulRun)}
+                    {domain.lastSuccessfulRun ? " UTC" : ""}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -98,15 +112,23 @@ export default function SourceCoveragePage() {
             <p>
               {number.format(domain.recordCount)} {domain.recordLabel};{" "}
               {number.format(domain.jurisdictionsCovered)} of{" "}
-              {number.format(domain.eligibleJurisdictions)} eligible jurisdictions
-              have at least one record.
+              {number.format(domain.eligibleJurisdictions)} eligible
+              jurisdictions have at least one record.
             </p>
             {domain.alerts.length > 0 && (
               <Banner variant="warn">
-                <strong>{domain.alerts.length} threshold alert{domain.alerts.length === 1 ? "" : "s"}.</strong>{" "}
+                <strong>
+                  {domain.alerts.length} threshold alert
+                  {domain.alerts.length === 1 ? "" : "s"}.
+                </strong>{" "}
                 {domain.alerts.map((alert) => alert.message).join(" ")}
               </Banner>
             )}
+            <p>
+              Release readiness: {domain.releaseReadiness.replaceAll("_", " ")}.
+              Below-threshold domains remain visible with this status and their
+              known gaps; they are not described as complete.
+            </p>
             <h3>Field completeness</h3>
             <DataTable>
               <thead>
@@ -142,13 +164,20 @@ export default function SourceCoveragePage() {
                   <tr key={source.id}>
                     <td>{source.label}</td>
                     <td>{source.family.replaceAll("_", " ")}</td>
-                    <td>{date(source.lastSuccessfulRun)}{source.lastSuccessfulRun ? " UTC" : ""}</td>
+                    <td>
+                      {date(source.lastSuccessfulRun)}
+                      {source.lastSuccessfulRun ? " UTC" : ""}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </DataTable>
             <h3>Known gaps</h3>
-            <ul>{domain.knownGaps.map((gap) => <li key={gap}>{gap}</li>)}</ul>
+            <ul>
+              {domain.knownGaps.map((gap) => (
+                <li key={gap}>{gap}</li>
+              ))}
+            </ul>
           </section>
         ))}
 
@@ -157,12 +186,12 @@ export default function SourceCoveragePage() {
           <p>
             The checked policy currently warns when jurisdiction coverage falls
             below {alertPolicy.countryCoverageWarnBelow}% or a measured field
-            falls below {alertPolicy.fieldCompletenessWarnBelow}%,
-            when the latest successful run is older than{" "}
-            {alertPolicy.staleAfterDays} days, or when a run timestamp is unavailable. Source
-            families are checked separately so a recent source cannot conceal a
-            stale or unrecorded companion source. Alerts disclose operating debt;
-            they do not convert partial coverage into a release claim.
+            falls below {alertPolicy.fieldCompletenessWarnBelow}%, when the
+            latest successful run is older than {alertPolicy.staleAfterDays}{" "}
+            days, or when a run timestamp is unavailable. Source families are
+            checked separately so a recent source cannot conceal a stale or
+            unrecorded companion source. Alerts disclose operating debt; they do
+            not convert partial coverage into a release claim.
           </p>
         </section>
 
@@ -170,9 +199,15 @@ export default function SourceCoveragePage() {
           <h2>Machine-readable report</h2>
           <p>
             The same checked rows and alert messages are available at{" "}
-            <Link href="/api/source-coverage"><code>/api/source-coverage</code></Link>.
-            The separate <Link href="/methodology/provenance-coverage">fact provenance report</Link>{" "}
-            measures source linkage and independent-source depth at fact-key level.
+            <Link href="/api/source-coverage">
+              <code>/api/source-coverage</code>
+            </Link>
+            . The separate{" "}
+            <Link href="/methodology/provenance-coverage">
+              fact provenance report
+            </Link>{" "}
+            measures source linkage and independent-source depth at fact-key
+            level.
           </p>
         </section>
       </article>

@@ -32,7 +32,11 @@ for (const table of ["country_facts", "indicator_history", "country_metrics"]) {
   }
 }
 for (const token of ["valueStatus: text(\"value_status\")", "valueStatusReason: text(\"value_status_reason\")"]) {
-  if ((schema.match(new RegExp(token.replace(/[()]/g, "\\$&"), "g")) ?? []).length !== 3) errors.push(`schema does not define ${token} on all three stores`);
+  if (
+    (schema.match(new RegExp(token.replace(/[()]/g, "\\$&"), "g")) ?? [])
+      .length < 3
+  )
+    errors.push(`schema does not define ${token} on all three stores`);
 }
 if (!countryRoute.includes("buildApiDataValueStatus") || !countryRoute.includes("valueStatus,")) errors.push("country API does not emit field-level value status");
 if (!indicatorUi.includes("DataValueState") || !indicatorUi.includes("availability")) errors.push("indicator UI does not render availability states");

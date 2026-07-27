@@ -20,6 +20,38 @@ const migration = readFileSync(
 const summary = getJurisdictionStatusCatalogSummary();
 const errors: string[] = [];
 
+const surfaceContracts: Array<[string, string[]]> = [
+  ["src/app/(reader)/country/page.tsx", ["getAllReferenceJurisdictions"]],
+  ["src/components/GlobalSearchWrapper.tsx", ["getAllReferenceJurisdictions"]],
+  ["src/components/home/HomeGrid.tsx", ["getAllReferenceJurisdictions"]],
+  ["src/app/compare/page.tsx", ["getAllReferenceJurisdictions"]],
+  ["src/app/sitemap.ts", ["getAllReferenceJurisdictions"]],
+  [
+    "src/app/(reader)/country/[slug]/layout.tsx",
+    ["jurisdictionStatus", "buildJurisdiction"],
+  ],
+  [
+    "src/components/factbook/FactbookHeaderStrip.tsx",
+    ["JurisdictionStatusDisclosure"],
+  ],
+  [
+    "src/app/api/v1/countries/route.ts",
+    ["buildJurisdictionStatusPresentation", 'searchParams.get("status")'],
+  ],
+  [
+    "src/app/api/v1/countries/[code]/route.ts",
+    ["buildJurisdictionStatusPresentation"],
+  ],
+  [
+    "src/components/atlas/AtlasWorldMap.tsx",
+    ["jurisdiction-status/v1", "full reference catalog", "statusLabel"],
+  ],
+  [
+    "src/lib/exports/country-research-export.ts",
+    ["jurisdiction_status_sources_json", "statusDetails"],
+  ],
+];
+
 if (summary.total !== 253) {
   errors.push(`closed catalog contains ${summary.total} entries, expected 253`);
 }
@@ -43,7 +75,18 @@ if (!seeder.includes("classifyJurisdictionStatus")) {
   errors.push("Factbook seeder does not call classifyJurisdictionStatus");
 }
 if (!queries.includes("type} = 'sovereign_state'")) {
-  errors.push("public country queries no longer enforce sovereign_state scope");
+  errors.push("sovereign-state analytical query no longer fails closed");
+}
+if (!queries.includes("getAllReferenceJurisdictions")) {
+  errors.push("full reference-catalog query is missing");
+}
+for (const [path, markers] of surfaceContracts) {
+  const source = readFileSync(resolve(root, path), "utf8");
+  for (const marker of markers) {
+    if (!source.includes(marker)) {
+      errors.push(`${path} is missing status contract marker ${marker}`);
+    }
+  }
 }
 if (
   !migration.includes("jurisdictions_status_type_check") ||

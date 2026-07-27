@@ -237,6 +237,7 @@ test("negative fixture: a shape function itself rejects a smuggled extra field",
     areaSqKm: 100,
     flagUrl: null,
     governmentClassification: null,
+    jurisdictionStatus: EXAMPLES.countries.data[0]!.jurisdictionStatus,
     id: "internal-db-uuid-should-never-be-public",
   };
   assert.throws(

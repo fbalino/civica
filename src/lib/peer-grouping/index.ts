@@ -189,12 +189,178 @@ function pairWithSlugs(
 }
 
 /* ────────────────────────────────────────────────────────────────
+ * Pure resolver seams (ATL-017)
+ * ────────────────────────────────────────────────────────────────
+ *
+ * The fallback-ladder / minimum-n / non-coverage decision logic is
+ * separated from the database reads so it can be exercised by
+ * source-backed fixtures with no DB (the DAT-012 pure-seam pattern).
+ * The async `get*PeerSet` functions fetch the classification map and
+ * provenance, then delegate to these deterministic functions. Passing
+ * the same inputs must always produce the same peer set.
+ * ──────────────────────────────────────────────────────────────── */
+
+export interface JurisdictionRef {
+  id: string;
+  slug: string;
+}
+
+export interface PeerProvenance {
+  sourceId: string | null;
+  retrievedAt: string | null;
+}
+
+/* ────────────────────────────────────────────────────────────────
  * Material peer set — World Bank region × income
  * ──────────────────────────────────────────────────────────────── */
 
 export interface MaterialPeerSet extends PeerSetResult {
   region: WorldBankRegionKey | string | null;
   incomeGroup: WorldBankIncomeGroupKey | string | null;
+}
+
+/**
+ * Pure material peer-set resolver. Walks the documented fallback
+ * ladder region+income → region → income → global, honouring the
+ * minimum-n threshold at every rung. A subject with neither
+ * classification returns an explicit `non_sovereign_or_uncovered`
+ * unavailable marker (never a silent global cohort).
+ */
+export function resolveMaterialPeerSet(args: {
+  subjectId: string;
+  refs: JurisdictionRef[];
+  regionByJur: Record<string, string | null | undefined>;
+  incomeByJur: Record<string, string | null | undefined>;
+  regionProvenance: PeerProvenance;
+  incomeProvenance: PeerProvenance;
+  minN: number;
+}): MaterialPeerSet {
+  const {
+    subjectId,
+    refs,
+    regionByJur,
+    incomeByJur,
+    regionProvenance,
+    incomeProvenance,
+    minN,
+  } = args;
+  const allIds = refs.map((r) => r.id);
+  const subjectRegion = regionByJur[subjectId] ?? null;
+  const subjectIncome = incomeByJur[subjectId] ?? null;
+
+  const baseSet: Pick<MaterialPeerSet, "region" | "incomeGroup"> = {
+    region: subjectRegion,
+    incomeGroup: subjectIncome,
+  };
+
+  if (!subjectRegion && !subjectIncome) {
+    return {
+      ...baseSet,
+      available: false,
+      lensUsed: "global",
+      cohortValue: null,
+      cohortLabel: "Unavailable",
+      peerJurisdictionIds: [],
+      peerJurisdictionSlugs: [],
+      n: 0,
+      fallbackChain: ["non_sovereign_or_uncovered"],
+      sourceId: regionProvenance.sourceId ?? "world_bank",
+      retrievedAt: regionProvenance.retrievedAt,
+    };
+  }
+
+  // Tier 1: region+income.
+  const fallbackChain: PeerSetFallbackReason[] = [];
+  if (subjectRegion && subjectIncome) {
+    const peers = allIds.filter(
+      (id) =>
+        (regionByJur[id] ?? null) === subjectRegion &&
+        (incomeByJur[id] ?? null) === subjectIncome,
+    );
+    if (peers.length >= minN) {
+      const paired = pairWithSlugs(peers, refs);
+      return {
+        ...baseSet,
+        available: true,
+        lensUsed: "world_bank_region",
+        cohortValue: `${subjectRegion}+${subjectIncome}`,
+        cohortLabel: `${subjectRegion} · ${subjectIncome}`,
+        peerJurisdictionIds: paired.ids,
+        peerJurisdictionSlugs: paired.slugs,
+        n: peers.length,
+        fallbackChain,
+        sourceId: regionProvenance.sourceId ?? "world_bank",
+        retrievedAt: regionProvenance.retrievedAt,
+      };
+    }
+    fallbackChain.push("n_below_threshold");
+  } else {
+    fallbackChain.push("no_classification");
+  }
+
+  // Tier 2: region only.
+  if (subjectRegion) {
+    const peers = allIds.filter(
+      (id) => (regionByJur[id] ?? null) === subjectRegion,
+    );
+    if (peers.length >= minN) {
+      const paired = pairWithSlugs(peers, refs);
+      return {
+        ...baseSet,
+        available: true,
+        lensUsed: "world_bank_region",
+        cohortValue: subjectRegion,
+        cohortLabel: subjectRegion,
+        peerJurisdictionIds: paired.ids,
+        peerJurisdictionSlugs: paired.slugs,
+        n: peers.length,
+        fallbackChain,
+        sourceId: regionProvenance.sourceId ?? "world_bank",
+        retrievedAt: regionProvenance.retrievedAt,
+      };
+    }
+    fallbackChain.push("n_below_threshold");
+  }
+
+  // Tier 3: income only.
+  if (subjectIncome) {
+    const peers = allIds.filter(
+      (id) => (incomeByJur[id] ?? null) === subjectIncome,
+    );
+    if (peers.length >= minN) {
+      const paired = pairWithSlugs(peers, refs);
+      return {
+        ...baseSet,
+        available: true,
+        lensUsed: "world_bank_income_group",
+        cohortValue: subjectIncome,
+        cohortLabel: subjectIncome,
+        peerJurisdictionIds: paired.ids,
+        peerJurisdictionSlugs: paired.slugs,
+        n: peers.length,
+        fallbackChain,
+        sourceId: incomeProvenance.sourceId ?? "world_bank",
+        retrievedAt: incomeProvenance.retrievedAt,
+      };
+    }
+    fallbackChain.push("n_below_threshold");
+  }
+
+  // Tier 4: global.
+  const paired = pairWithSlugs(allIds, refs);
+  return {
+    ...baseSet,
+    available: true,
+    lensUsed: "global",
+    cohortValue: null,
+    cohortLabel: "Global",
+    peerJurisdictionIds: paired.ids,
+    peerJurisdictionSlugs: paired.slugs,
+    n: allIds.length,
+    fallbackChain,
+    sourceId: regionProvenance.sourceId ?? "world_bank",
+    retrievedAt: regionProvenance.retrievedAt,
+  };
 }
 
 /**
@@ -215,149 +381,30 @@ export async function getMaterialPeerSet(
     PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup,
   ]);
 
-  const subjectRegion =
-    facts[jurisdictionId]?.[PEER_GROUPING_FACT_KEYS.worldBankRegion] ?? null;
-  const subjectIncome =
-    facts[jurisdictionId]?.[PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup] ??
-    null;
+  const regionByJur: Record<string, string | null | undefined> = {};
+  const incomeByJur: Record<string, string | null | undefined> = {};
+  for (const id of allIds) {
+    regionByJur[id] = facts[id]?.[PEER_GROUPING_FACT_KEYS.worldBankRegion];
+    incomeByJur[id] = facts[id]?.[PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup];
+  }
 
-  const baseSet: Pick<MaterialPeerSet, "region" | "incomeGroup"> = {
-    region: subjectRegion,
-    incomeGroup: subjectIncome,
-  };
-
-  if (!subjectRegion && !subjectIncome) {
-    const provenance = await fetchProvenance(
+  const [regionProvenance, incomeProvenance] = await Promise.all([
+    fetchProvenance(jurisdictionId, PEER_GROUPING_FACT_KEYS.worldBankRegion),
+    fetchProvenance(
       jurisdictionId,
-      PEER_GROUPING_FACT_KEYS.worldBankRegion,
-    );
-    return {
-      ...baseSet,
-      available: false,
-      lensUsed: "global",
-      cohortValue: null,
-      cohortLabel: "Unavailable",
-      peerJurisdictionIds: [],
-      peerJurisdictionSlugs: [],
-      n: 0,
-      fallbackChain: ["non_sovereign_or_uncovered"],
-      sourceId: provenance.sourceId ?? "world_bank",
-      retrievedAt: provenance.retrievedAt,
-    };
-  }
+      PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup,
+    ),
+  ]);
 
-  // Tier 1: region+income.
-  const fallbackChain: PeerSetFallbackReason[] = [];
-  if (subjectRegion && subjectIncome) {
-    const peers = allIds.filter(
-      (id) =>
-        facts[id]?.[PEER_GROUPING_FACT_KEYS.worldBankRegion] === subjectRegion &&
-        facts[id]?.[PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup] ===
-          subjectIncome,
-    );
-    if (peers.length >= minN) {
-      const provenance = await fetchProvenance(
-        jurisdictionId,
-        PEER_GROUPING_FACT_KEYS.worldBankRegion,
-      );
-      const paired = pairWithSlugs(peers, allRefs);
-      return {
-        ...baseSet,
-        available: true,
-        lensUsed: "world_bank_region",
-        cohortValue: `${subjectRegion}+${subjectIncome}`,
-        cohortLabel: `${subjectRegion} · ${subjectIncome}`,
-        peerJurisdictionIds: paired.ids,
-        peerJurisdictionSlugs: paired.slugs,
-        n: peers.length,
-        fallbackChain,
-        sourceId: provenance.sourceId ?? "world_bank",
-        retrievedAt: provenance.retrievedAt,
-      };
-    }
-    fallbackChain.push("n_below_threshold");
-  } else {
-    fallbackChain.push("no_classification");
-  }
-
-  // Tier 2: region only.
-  if (subjectRegion) {
-    const peers = allIds.filter(
-      (id) =>
-        facts[id]?.[PEER_GROUPING_FACT_KEYS.worldBankRegion] === subjectRegion,
-    );
-    if (peers.length >= minN) {
-      const provenance = await fetchProvenance(
-        jurisdictionId,
-        PEER_GROUPING_FACT_KEYS.worldBankRegion,
-      );
-      const paired = pairWithSlugs(peers, allRefs);
-      return {
-        ...baseSet,
-        available: true,
-        lensUsed: "world_bank_region",
-        cohortValue: subjectRegion,
-        cohortLabel: subjectRegion,
-        peerJurisdictionIds: paired.ids,
-        peerJurisdictionSlugs: paired.slugs,
-        n: peers.length,
-        fallbackChain,
-        sourceId: provenance.sourceId ?? "world_bank",
-        retrievedAt: provenance.retrievedAt,
-      };
-    }
-    fallbackChain.push("n_below_threshold");
-  }
-
-  // Tier 3: income only.
-  if (subjectIncome) {
-    const peers = allIds.filter(
-      (id) =>
-        facts[id]?.[PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup] ===
-        subjectIncome,
-    );
-    if (peers.length >= minN) {
-      const provenance = await fetchProvenance(
-        jurisdictionId,
-        PEER_GROUPING_FACT_KEYS.worldBankIncomeGroup,
-      );
-      const paired = pairWithSlugs(peers, allRefs);
-      return {
-        ...baseSet,
-        available: true,
-        lensUsed: "world_bank_income_group",
-        cohortValue: subjectIncome,
-        cohortLabel: subjectIncome,
-        peerJurisdictionIds: paired.ids,
-        peerJurisdictionSlugs: paired.slugs,
-        n: peers.length,
-        fallbackChain,
-        sourceId: provenance.sourceId ?? "world_bank",
-        retrievedAt: provenance.retrievedAt,
-      };
-    }
-    fallbackChain.push("n_below_threshold");
-  }
-
-  // Tier 4: global.
-  const provenance = await fetchProvenance(
-    jurisdictionId,
-    PEER_GROUPING_FACT_KEYS.worldBankRegion,
-  );
-  const paired = pairWithSlugs(allIds, allRefs);
-  return {
-    ...baseSet,
-    available: true,
-    lensUsed: "global",
-    cohortValue: null,
-    cohortLabel: "Global",
-    peerJurisdictionIds: paired.ids,
-    peerJurisdictionSlugs: paired.slugs,
-    n: allIds.length,
-    fallbackChain,
-    sourceId: provenance.sourceId ?? "world_bank",
-    retrievedAt: provenance.retrievedAt,
-  };
+  return resolveMaterialPeerSet({
+    subjectId: jurisdictionId,
+    refs: allRefs,
+    regionByJur,
+    incomeByJur,
+    regionProvenance,
+    incomeProvenance,
+    minN,
+  });
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -374,22 +421,21 @@ export interface GovernancePeerSet extends PeerSetResult {
   vdemRowTier: VDemRowKey | string | null;
 }
 
-export async function getGovernancePeerSet(
-  jurisdictionId: string,
-  options: { minN?: number } = {},
-): Promise<GovernancePeerSet> {
-  const minN = options.minN ?? DEFAULT_MIN_N;
-  const allRefs = await readAllJurisdictionRefs();
-  const allIds = allRefs.map((r) => r.id);
-  const facts = await fetchClassifications(allIds, [
-    PEER_GROUPING_FACT_KEYS.vdemRow,
-  ]);
-  const subjectTier =
-    facts[jurisdictionId]?.[PEER_GROUPING_FACT_KEYS.vdemRow] ?? null;
-  const provenance = await fetchProvenance(
-    jurisdictionId,
-    PEER_GROUPING_FACT_KEYS.vdemRow,
-  );
+/**
+ * Pure governance peer-set resolver. Flat fallback (V-Dem RoW tier →
+ * global) because RoW has only four buckets. A subject without a RoW
+ * tier returns an explicit unavailable marker.
+ */
+export function resolveGovernancePeerSet(args: {
+  subjectId: string;
+  refs: JurisdictionRef[];
+  vdemRowByJur: Record<string, string | null | undefined>;
+  provenance: PeerProvenance;
+  minN: number;
+}): GovernancePeerSet {
+  const { subjectId, refs, vdemRowByJur, provenance, minN } = args;
+  const allIds = refs.map((r) => r.id);
+  const subjectTier = vdemRowByJur[subjectId] ?? null;
 
   if (!subjectTier) {
     return {
@@ -409,10 +455,10 @@ export async function getGovernancePeerSet(
 
   const fallbackChain: PeerSetFallbackReason[] = [];
   const peers = allIds.filter(
-    (id) => facts[id]?.[PEER_GROUPING_FACT_KEYS.vdemRow] === subjectTier,
+    (id) => (vdemRowByJur[id] ?? null) === subjectTier,
   );
   if (peers.length >= minN) {
-    const paired = pairWithSlugs(peers, allRefs);
+    const paired = pairWithSlugs(peers, refs);
     return {
       vdemRowTier: subjectTier,
       available: true,
@@ -428,7 +474,7 @@ export async function getGovernancePeerSet(
     };
   }
   fallbackChain.push("n_below_threshold");
-  const paired = pairWithSlugs(allIds, allRefs);
+  const paired = pairWithSlugs(allIds, refs);
   return {
     vdemRowTier: subjectTier,
     available: true,
@@ -442,6 +488,34 @@ export async function getGovernancePeerSet(
     sourceId: provenance.sourceId ?? "vdem",
     retrievedAt: provenance.retrievedAt,
   };
+}
+
+export async function getGovernancePeerSet(
+  jurisdictionId: string,
+  options: { minN?: number } = {},
+): Promise<GovernancePeerSet> {
+  const minN = options.minN ?? DEFAULT_MIN_N;
+  const allRefs = await readAllJurisdictionRefs();
+  const allIds = allRefs.map((r) => r.id);
+  const facts = await fetchClassifications(allIds, [
+    PEER_GROUPING_FACT_KEYS.vdemRow,
+  ]);
+  const vdemRowByJur: Record<string, string | null | undefined> = {};
+  for (const id of allIds) {
+    vdemRowByJur[id] = facts[id]?.[PEER_GROUPING_FACT_KEYS.vdemRow];
+  }
+  const provenance = await fetchProvenance(
+    jurisdictionId,
+    PEER_GROUPING_FACT_KEYS.vdemRow,
+  );
+
+  return resolveGovernancePeerSet({
+    subjectId: jurisdictionId,
+    refs: allRefs,
+    vdemRowByJur,
+    provenance,
+    minN,
+  });
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -459,18 +533,19 @@ export interface RegimeAlternateLens extends PeerSetResult {
   cgvType: string | null;
 }
 
-export async function getRegimeAlternateLens(
-  jurisdictionId: string,
-  options: { minN?: number } = {},
-): Promise<RegimeAlternateLens> {
-  const minN = options.minN ?? DEFAULT_MIN_N;
-  const allRefs = await readAllJurisdictionRefs();
-  const subjectRow = await db
-    .select({ regimeTypeCgv: governmentTaxonomies.regimeTypeCgv })
-    .from(governmentTaxonomies)
-    .where(eq(governmentTaxonomies.jurisdictionId, jurisdictionId))
-    .limit(1);
-  const subjectCgv = subjectRow[0]?.regimeTypeCgv ?? null;
+/**
+ * Pure BR/CGV alternate-lens resolver. `cgvPeerIds` are the
+ * jurisdictions sharing the subject's CGV regime type (the subject
+ * included). Flat fallback (CGV type → global); no subject type
+ * returns an explicit unavailable marker.
+ */
+export function resolveRegimeAlternateLens(args: {
+  refs: JurisdictionRef[];
+  subjectCgv: string | null;
+  cgvPeerIds: string[];
+  minN: number;
+}): RegimeAlternateLens {
+  const { refs, subjectCgv, cgvPeerIds, minN } = args;
 
   if (!subjectCgv) {
     return {
@@ -488,14 +563,8 @@ export async function getRegimeAlternateLens(
     };
   }
 
-  const peerRows = await db
-    .select({ jurisdictionId: governmentTaxonomies.jurisdictionId })
-    .from(governmentTaxonomies)
-    .where(eq(governmentTaxonomies.regimeTypeCgv, subjectCgv));
-  const peers = peerRows.map((r) => r.jurisdictionId);
-
-  if (peers.length >= minN) {
-    const paired = pairWithSlugs(peers, allRefs);
+  if (cgvPeerIds.length >= minN) {
+    const paired = pairWithSlugs(cgvPeerIds, refs);
     return {
       cgvType: subjectCgv,
       available: true,
@@ -504,14 +573,14 @@ export async function getRegimeAlternateLens(
       cohortLabel: subjectCgv,
       peerJurisdictionIds: paired.ids,
       peerJurisdictionSlugs: paired.slugs,
-      n: peers.length,
+      n: cgvPeerIds.length,
       fallbackChain: [],
       sourceId: "bjornskov_rode",
       retrievedAt: null,
     };
   }
-  const allIds = allRefs.map((r) => r.id);
-  const paired = pairWithSlugs(allIds, allRefs);
+  const allIds = refs.map((r) => r.id);
+  const paired = pairWithSlugs(allIds, refs);
   return {
     cgvType: subjectCgv,
     available: true,
@@ -525,5 +594,35 @@ export async function getRegimeAlternateLens(
     sourceId: "bjornskov_rode",
     retrievedAt: null,
   };
+}
+
+export async function getRegimeAlternateLens(
+  jurisdictionId: string,
+  options: { minN?: number } = {},
+): Promise<RegimeAlternateLens> {
+  const minN = options.minN ?? DEFAULT_MIN_N;
+  const allRefs = await readAllJurisdictionRefs();
+  const subjectRow = await db
+    .select({ regimeTypeCgv: governmentTaxonomies.regimeTypeCgv })
+    .from(governmentTaxonomies)
+    .where(eq(governmentTaxonomies.jurisdictionId, jurisdictionId))
+    .limit(1);
+  const subjectCgv = subjectRow[0]?.regimeTypeCgv ?? null;
+
+  let cgvPeerIds: string[] = [];
+  if (subjectCgv) {
+    const peerRows = await db
+      .select({ jurisdictionId: governmentTaxonomies.jurisdictionId })
+      .from(governmentTaxonomies)
+      .where(eq(governmentTaxonomies.regimeTypeCgv, subjectCgv));
+    cgvPeerIds = peerRows.map((r) => r.jurisdictionId);
+  }
+
+  return resolveRegimeAlternateLens({
+    refs: allRefs,
+    subjectCgv,
+    cgvPeerIds,
+    minN,
+  });
 }
 

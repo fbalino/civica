@@ -1,0 +1,23 @@
+Running module-scoped coverage for 8 registered modules (schema civica-module-coverage/v1)...
+
+[PASS] admin-session — lines 92.89% (>=85), branch 90.48% (>=80), functions 79.17% (>=70)
+[PASS] outcomes-reducer — lines 100.00% (>=90), branch 85.71% (>=75), functions 100.00% (>=90)
+[PASS] markdown-substitute — lines 100.00% (>=90), branch 94.44% (>=85), functions 100.00% (>=90)
+[PASS] peer-grouping — lines 89.65% (>=80), branch 87.00% (>=75), functions 83.02% (>=70)
+[PASS] ci-worked-examples — lines 69.65% (>=60), branch 86.36% (>=75), functions 82.81% (>=70)
+[PASS] rights-manifest — lines 95.04% (>=85), branch 94.87% (>=85), functions 81.48% (>=70)
+[PASS] data-value-state — lines 100.00% (>=90), branch 87.10% (>=75), functions 100.00% (>=90)
+[PASS] reconcile-resolver — lines 87.39% (>=80), branch 72.46% (>=65), functions 79.69% (>=70)
+
+module              | lines (thr) | branch (thr) | funcs (thr) | status
+-----------------------------------------------------------------------------
+admin-session       |  92.89 ( 85) |  90.48 ( 80) |  79.17 ( 70) | PASS
+outcomes-reducer    | 100.00 ( 90) |  85.71 ( 75) | 100.00 ( 90) | PASS
+markdown-substitute | 100.00 ( 90) |  94.44 ( 85) | 100.00 ( 90) | PASS
+peer-grouping       |  89.65 ( 80) |  87.00 ( 75) |  83.02 ( 70) | PASS
+ci-worked-examples  |  69.65 ( 60) |  86.36 ( 75) |  82.81 ( 70) | PASS
+rights-manifest     |  95.04 ( 85) |  94.87 ( 85) |  81.48 ( 70) | PASS
+data-value-state    | 100.00 ( 90) |  87.10 ( 75) | 100.00 ( 90) | PASS
+reconcile-resolver  |  87.39 ( 80) |  72.46 ( 65) |  79.69 ( 70) | PASS
+
+PASS — all 8 registered modules meet their declared thresholds.

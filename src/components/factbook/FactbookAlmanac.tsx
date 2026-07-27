@@ -14,6 +14,7 @@ import {
   type FilterCategory,
   type FilterState,
 } from "@/components/factbook/AlmanacFilters";
+import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 /** One country row as fed to the almanac. */
 export interface FactbookAlmanacCountry {
@@ -31,6 +32,7 @@ export interface FactbookAlmanacCountry {
   incomeGroup?: string | null;
   /** Phase F V-Dem Regimes of the World — canonical human-readable string. */
   regimeType?: string | null;
+  status: JurisdictionStatusPresentation;
 }
 
 /* ── Region model ──────────────────────────────────────────────────────
@@ -238,6 +240,7 @@ export function FactbookAlmanac({
         iso2: c.iso2,
         iso3: c.iso3,
         capital: c.capital,
+        status: c.status,
       })),
     [countries],
   );
@@ -276,10 +279,10 @@ export function FactbookAlmanac({
         <div className="factbook-hero-scrim" aria-hidden="true" />
         <HeroReveal className="factbook-hero-inner">
           <HeroRevealItem className="factbook-hero-eyebrow">
-            Countries
+            Countries &amp; areas
           </HeroRevealItem>
           <HeroRevealItem as="h1" id="factbook-hero-title" className="factbook-hero-title">
-            Every country, in full.
+            Every country and area, in full.
           </HeroRevealItem>
           <HeroRevealItem as="p" className="factbook-hero-dek">
             Start typing &mdash; or browse the complete index below. Every entry is
@@ -290,8 +293,8 @@ export function FactbookAlmanac({
             <CountrySearchCombobox
               countries={searchOptions}
               countryPathPrefix="/country"
-              placeholder="Search any country&hellip;"
-              ariaLabel="Search countries"
+              placeholder="Search any country or area&hellip;"
+              ariaLabel="Search countries and areas"
             />
           </HeroRevealItem>
 

@@ -10,18 +10,38 @@ export function CountryFlag({
   iso2,
   size = 32,
   className,
+  decorative = true,
 }: {
   iso2: string | null;
   size?: number;
   className?: string;
+  /**
+   * Alt-text mode (DESIGN.md "Alternative text"). Defaults to `true`
+   * (decorative: `alt="" aria-hidden`) because a visible country name sits
+   * adjacent at essentially every current call site. Pass `decorative={false}`
+   * for the rare standalone flag with no adjacent name (e.g. a bare legend
+   * key) to get a descriptive `Flag of {ISO2}` alt. The default keeps flags on
+   * Index-change-control-protected surfaces (e.g. RankingsMatrix) accessible
+   * without editing those files.
+   */
+  decorative?: boolean;
 }) {
-  if (!iso2) return <span style={{ fontSize: size, lineHeight: 1 }} className={className} />;
+  if (!iso2)
+    return (
+      <span
+        style={{ fontSize: size, lineHeight: 1 }}
+        className={className}
+        aria-hidden={decorative ? true : undefined}
+      />
+    );
 
   const code = iso2.toLowerCase();
+  const alt = decorative ? "" : `Flag of ${iso2.toUpperCase()}`;
 
   return (
     <span
       className={className}
+      aria-hidden={decorative ? true : undefined}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -33,7 +53,8 @@ export function CountryFlag({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`https://flagcdn.com/${code}.svg`}
-        alt={`Flag of ${iso2.toUpperCase()}`}
+        alt={alt}
+        aria-hidden={decorative ? true : undefined}
         width={size}
         // Reserve a flag-shaped box (~5:3) BEFORE load. Critical with
         // loading="lazy": an `height:auto` image is 0px tall pre-load, so the

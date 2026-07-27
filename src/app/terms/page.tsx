@@ -28,6 +28,8 @@ export const metadata: Metadata = {
 const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "use", label: "Using the site" },
   { id: "data-reuse", label: "Reusing the data" },
+  { id: "downloads", label: "Downloads & bulk exports" },
+  { id: "embedding", label: "Embedding" },
   { id: "assistant", label: "The AI assistant" },
   { id: "accuracy", label: "Accuracy & availability" },
   { id: "index-status", label: "Civica Index beta" },
@@ -109,6 +111,51 @@ export default function TermsPage() {
           </p>
         </section>
 
+        <section id="downloads" className="editorial-section">
+          <SectionHeader
+            eyebrow="Downloads"
+            title="Downloads and bulk exports"
+            dek="Free, no-account access to a download is not itself a reuse license."
+          />
+
+          <p>
+            Civica publishes a frozen, rights-filtered Atlas package and a
+            per-country research export (
+            <code>/api/countries/:slug/export</code>, JSON or CSV). Both
+            include only facts whose selected source carries verified
+            public-export terms; when a fact&rsquo;s canonical source lacks
+            that permission, the fact is withheld from the download rather
+            than silently reassigned to a different source. No account is
+            required to download either. Downloading is free, but it is not
+            a reuse license — reuse rights remain source-by-source, exactly
+            as described on <Link href="/licensing#reuse">Licensing</Link>.
+            See <Link href="/api-docs#bulk-data">API Docs</Link> for current
+            package contents and export formats.
+          </p>
+        </section>
+
+        <section id="embedding" className="editorial-section">
+          <SectionHeader
+            eyebrow="Embeds"
+            title="Embedding Civica data"
+            dek="The legacy score widget is retired."
+          />
+
+          <p>
+            The legacy <code>/embed/[slug]</code> iframe widget that once
+            rendered a Civica Index score is retired. Every request,
+            including existing embedded iframes, now returns{" "}
+            <code>410 Gone</code> with a short retirement notice linking to
+            the successor <Link href="/governance-evidence">Governance
+            Evidence</Link> page. Civica does not currently offer a
+            replacement scalar score, rank, or live embeddable widget. See{" "}
+            <Link href="/licensing#source-licenses">Licensing</Link> for the
+            current reuse posture on retired embeds, and{" "}
+            <Link href="/api-docs#widget-embed">API Docs</Link> for the
+            exact retirement behavior.
+          </p>
+        </section>
+
         <section id="assistant" className="editorial-section">
           <SectionHeader
             eyebrow="Ask Civica"
@@ -137,8 +184,10 @@ export default function TermsPage() {
             and keep provenance attached to each fact, but we make no warranty
             that every data point is complete, current, or error-free, and the
             service may change or be unavailable at times. Governance is a
-            moving subject; some figures are frozen at a stated vintage. If
-            you spot an error, please tell us through the{" "}
+            moving subject; some figures are frozen at a stated vintage. To
+            the extent permitted by law, Civica is not liable for losses
+            arising from your use of, or reliance on, the site, the API, or
+            its data. If you spot an error, please tell us through the{" "}
             <Link href="/contact">contact page</Link> or the published{" "}
             <Link href="/civica-index/corrections">corrections</Link> process.
           </p>

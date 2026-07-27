@@ -68,7 +68,6 @@ import {
   VERIFY_SYSTEM_PROMPT,
   type ClassifyResultLite,
   type VerifyResultLite,
-  agreementFromConfidence,
   parseClassify,
   parseVerify,
 } from "./classifier-prompt";
@@ -76,6 +75,7 @@ import {
   resolveSubjectJurisdiction,
   subjectAttributionDecisionPayload,
   SUBJECT_ATTRIBUTION_MODEL,
+  SUBJECT_ATTRIBUTION_PROMPT_VERSION,
   SUBJECT_ATTRIBUTION_PROVIDER,
 } from "./country-attribution";
 // Provider abstraction — the engine (Anthropic / DeepSeek / GLM / OpenAI) is
@@ -90,22 +90,30 @@ import {
   resolveProviderConfig,
   type ResolvedProviderConfig,
 } from "./provider";
-import { clampSeverityToTier, computeConsensus } from "./ensemble";
+import { clampSeverityToTier } from "./ensemble";
 import type { EnsembleRun } from "./ensemble";
 import {
   ensembleRequiresReview,
   normalizeInvalidConsensusForReview,
+  PULSE_PUBLICATION_GATE_VERSION,
   singleEngineRequiresReview,
   verifierObjects,
 } from "./publication-gate";
-import { pulseEventVersionEnvelope } from "./versioning";
+import {
+  PULSE_CLASSIFICATION_ALGORITHM_VERSION,
+  PULSE_CLASSIFIER_PROMPT_VERSION,
+  pulseEventVersionEnvelope,
+} from "./versioning";
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
-import { PULSE_RUNTIME_METHOD_VERSION } from "./runtime-contract";
+import {
+  PULSE_RUNTIME_METHOD_VERSION,
+  PULSE_TAXONOMY_VERSION,
+} from "./runtime-contract";
 import {
   reviewsFromVerifier,
   type PulseDecisionActor,
@@ -113,6 +121,22 @@ import {
   type PulseDecisionPayloads,
 } from "./decision-ledger";
 import { persistPulseDecisions } from "./decision-ledger-store";
+import {
+  PULSE_CLASSIFICATION_RETRY_POLICY,
+  buildClassificationConfigHash,
+  type ClassificationConfigInput,
+} from "./classification-state";
+import {
+  claimClassificationAttempt,
+  loadClassificationQueueMetrics,
+  settleClassificationAttempt,
+  type ClassificationQueueMetricsRow,
+} from "./classification-state-store";
+import { PULSE_JURISDICTION_ATTRIBUTION_VERSION } from "./jurisdiction-entities";
+import {
+  deriveStoredEnsemble,
+  storedRunsPermitAutomaticPublication,
+} from "./stored-ensemble";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -146,12 +170,51 @@ const VERIFY_CONFIG: ResolvedProviderConfig = IS_ENSEMBLE
   ? ENSEMBLE_VERIFY_CONFIG
   : SINGLE_VERIFY_CONFIG;
 
+export function currentClassificationConfig(): ClassificationConfigInput {
+  return {
+    methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+    ontologyVersion: PULSE_TAXONOMY_VERSION,
+    algorithmVersion: PULSE_CLASSIFICATION_ALGORITHM_VERSION,
+    classifierPromptVersion: PULSE_CLASSIFIER_PROMPT_VERSION,
+    publicationGateVersion: PULSE_PUBLICATION_GATE_VERSION,
+    classifyEngines: CLASSIFY_ENSEMBLE,
+    verifyEngine: VERIFY_CONFIG,
+    subjectAttribution: {
+      provider: SUBJECT_ATTRIBUTION_PROVIDER,
+      model: SUBJECT_ATTRIBUTION_MODEL,
+      attributionVersion: PULSE_JURISDICTION_ATTRIBUTION_VERSION,
+      promptVersion: SUBJECT_ATTRIBUTION_PROMPT_VERSION,
+    },
+    decodeMode: "temperature-0-json",
+    thinkingMode:
+      process.env.PULSE_COMPAT_THINKING === "enabled" ? "enabled" : "disabled",
+    retryPolicy: PULSE_CLASSIFICATION_RETRY_POLICY,
+  };
+}
+
+export const CURRENT_CLASSIFICATION_CONFIG = currentClassificationConfig();
+export const CURRENT_CLASSIFICATION_CONFIG_HASH =
+  buildClassificationConfigHash(CURRENT_CLASSIFICATION_CONFIG);
+
 /** Verify-run ordinal in classifierRuns (kept distinct from the classify
  *  runs' 1..N ordinals so React keys and audit rows never collide). */
 const VERIFY_RUN_ORDINAL = 10;
 
+function runEvidence(role: "classify" | "verify") {
+  return {
+    role,
+    promptVersion: PULSE_CLASSIFIER_PROMPT_VERSION,
+    methodVersion: PULSE_RUNTIME_METHOD_VERSION,
+    configurationHash: CURRENT_CLASSIFICATION_CONFIG_HASH,
+    configuredEngineCount: CLASSIFY_ENSEMBLE.length,
+  } as const;
+}
+
 export interface ClusterToClassify {
   clusterId: string;
+  /** PUL-031 stable incident identity. Legacy/fixture callers may omit it
+   * during migration; their cluster id is the compatibility identity. */
+  incidentId?: string;
   jurisdictionId: string;
   eventDate: string;
   title: string;
@@ -182,6 +245,13 @@ export interface ClassifySummary {
   flaggedForReview: number;
   noneCategory: number;
   failed: number;
+  modelCalls: number;
+  retryableFailures: number;
+  terminalFailures: number;
+  claimsSkipped: number;
+  configHash: string;
+  queueBefore: ClassificationQueueMetricsRow | null;
+  queueAfter: ClassificationQueueMetricsRow | null;
   dryRun: boolean;
   planned: Array<{
     clusterId: string;
@@ -206,7 +276,12 @@ export interface ClassifyClustersOptions {
   ) => Promise<
     Awaited<ReturnType<typeof resolveSubjectJurisdiction>> | null
   >;
-  write?: typeof writeEvent;
+  write?: (
+    db: Db,
+    cluster: ClusterToClassify,
+    result: ClassifyOneResult,
+    classificationRunId: string,
+  ) => Promise<string | null | void>;
   runRef?: PulsePipelineRunRef;
   failOnError?: boolean;
 }
@@ -258,7 +333,13 @@ export async function classifyClusters(
 ): Promise<ClassifySummary> {
   const limit = opts.limit ?? 200;
 
-  const clusters = opts.clusters ?? (await loadUnclassifiedClusters(db, limit));
+  const clusters =
+    opts.clusters ??
+    (await loadUnclassifiedClusters(
+      db,
+      limit,
+      CURRENT_CLASSIFICATION_CONFIG_HASH,
+    ));
   validateClusterFixtures(clusters);
   const classify = opts.classify ?? classifyOne;
   const resolveSubject = opts.resolveSubject ?? resolveSubjectJurisdiction;
@@ -270,8 +351,32 @@ export async function classifyClusters(
         ? clusters.flatMap(({ sourceIds }) => sourceIds)
         : undefined,
       upstreamRunIds: clusters.flatMap(({ clusterRunIds }) => clusterRunIds),
+      models: [
+        ...CLASSIFY_ENSEMBLE.map(({ provider, model }) => ({
+          role: "classify" as const,
+          provider,
+          model,
+        })),
+        {
+          role: "verify" as const,
+          provider: VERIFY_CONFIG.provider,
+          model: VERIFY_CONFIG.model,
+        },
+        {
+          role: "subject_attribution" as const,
+          provider: SUBJECT_ATTRIBUTION_PROVIDER,
+          model: SUBJECT_ATTRIBUTION_MODEL,
+        },
+      ],
     });
   const persistRun = !opts.dryRun && !opts.clusters && !opts.runRef;
+  const persistState = !opts.dryRun && !opts.clusters;
+  const queueBefore = persistState
+    ? await loadClassificationQueueMetrics(
+        db,
+        CURRENT_CLASSIFICATION_CONFIG_HASH,
+      )
+    : null;
   if (persistRun) await startPulsePipelineRun(db, run);
 
   const summary: ClassifySummary = {
@@ -283,16 +388,55 @@ export async function classifyClusters(
     flaggedForReview: 0,
     noneCategory: 0,
     failed: 0,
+    modelCalls: 0,
+    retryableFailures: 0,
+    terminalFailures: 0,
+    claimsSkipped: 0,
+    configHash: CURRENT_CLASSIFICATION_CONFIG_HASH,
+    queueBefore,
+    queueAfter: null,
     dryRun: opts.dryRun ?? false,
     planned: [],
   };
 
   for (const cluster of clusters) {
+    let claim = null;
     try {
+      claim = persistState
+        ? await claimClassificationAttempt(db, {
+            clusterId: cluster.clusterId,
+            incidentId: cluster.incidentId,
+            configHash: CURRENT_CLASSIFICATION_CONFIG_HASH,
+            config: CURRENT_CLASSIFICATION_CONFIG,
+            runId: run.id,
+          })
+        : null;
+    } catch (err) {
+      console.error(`[classify] cluster ${cluster.clusterId} claim failed:`, err);
+      summary.failed++;
+      continue;
+    }
+    if (persistState && !claim) {
+      summary.claimsSkipped++;
+      continue;
+    }
+    let claimSettled = false;
+    try {
+      summary.modelCalls++;
       const result = await classify(cluster);
       if (!result) {
         if (!opts.dryRun) {
           await persistClassificationFailureDecision(db, cluster, run.id);
+        }
+        if (claim) {
+          const status = await settleClassificationAttempt(db, claim, {
+            outcome: "failure",
+            error: new Error("No usable classifier result was produced."),
+            modelCallCount: 1,
+          });
+          claimSettled = true;
+          if (status === "retryable_failure") summary.retryableFailures++;
+          else summary.terminalFailures++;
         }
         summary.failed++;
         continue;
@@ -311,6 +455,13 @@ export async function classifyClusters(
             run.id,
           );
           await persistNonEventDecision(db, cluster, run.id);
+        }
+        if (claim) {
+          await settleClassificationAttempt(db, claim, {
+            outcome: "none",
+            modelCallCount: 1,
+          });
+          claimSettled = true;
         }
         continue;
       }
@@ -339,12 +490,60 @@ export async function classifyClusters(
         category: ok.classified.category,
         autoPublished: ok.autoPublished,
       });
-      if (!opts.dryRun) await write(db, cluster, ok, run.id);
+      const writtenEventId = !opts.dryRun
+        ? await write(db, cluster, ok, run.id)
+        : null;
+      if (claim) {
+        const eventId =
+          typeof writtenEventId === "string"
+            ? writtenEventId
+            : await loadEventIdForCluster(db, cluster.clusterId);
+        if (!eventId) {
+          throw new Error(
+            `Classified cluster ${cluster.clusterId} has no persisted event projection`,
+          );
+        }
+        await settleClassificationAttempt(db, claim, {
+          outcome: "classified",
+          eventId,
+          modelCallCount: 1,
+        });
+        claimSettled = true;
+      }
       summary.classified++;
       if (ok.autoPublished) summary.publishedAuto++;
       else summary.flaggedForReview++;
     } catch (err) {
-      if (opts.failOnError) throw err;
+      if (claim && !claimSettled) {
+        const status = await settleClassificationAttempt(db, claim, {
+          outcome: "failure",
+          error: err,
+          modelCallCount: 1,
+        });
+        claimSettled = true;
+        if (status === "retryable_failure") summary.retryableFailures++;
+        else summary.terminalFailures++;
+      }
+      if (opts.failOnError) {
+        if (persistRun) {
+          await finishPulsePipelineRun(db, run.id, {
+            status: "failed",
+            counts: {
+              clustersExamined: summary.clustersExamined,
+              classified: summary.classified,
+              failed: summary.failed + 1,
+              modelCalls: summary.modelCalls,
+            },
+            failures: [
+              {
+                component: `classification:${cluster.clusterId}`,
+                message: err instanceof Error ? err.message : String(err),
+              },
+            ],
+          });
+        }
+        throw err;
+      }
       console.error(`[classify] cluster ${cluster.clusterId} failed:`, err);
       summary.failed++;
     }
@@ -353,6 +552,33 @@ export async function classifyClusters(
   summary.planned.sort((left, right) =>
     left.clusterId.localeCompare(right.clusterId),
   );
+  try {
+    summary.queueAfter = persistState
+      ? await loadClassificationQueueMetrics(
+          db,
+          CURRENT_CLASSIFICATION_CONFIG_HASH,
+        )
+      : null;
+  } catch (err) {
+    if (persistRun) {
+      await finishPulsePipelineRun(db, run.id, {
+        status: "failed",
+        counts: {
+          clustersExamined: summary.clustersExamined,
+          classified: summary.classified,
+          failed: summary.failed,
+          modelCalls: summary.modelCalls,
+        },
+        failures: [
+          {
+            component: "classification_queue_metrics",
+            message: err instanceof Error ? err.message : String(err),
+          },
+        ],
+      });
+    }
+    throw err;
+  }
   if (persistRun) {
     await finishPulsePipelineRun(db, run.id, {
       status: summary.failed > 0 ? "partial" : "completed",
@@ -363,6 +589,10 @@ export async function classifyClusters(
         flaggedForReview: summary.flaggedForReview,
         nonGovernance: summary.noneCategory,
         failed: summary.failed,
+        modelCalls: summary.modelCalls,
+        retryableFailures: summary.retryableFailures,
+        terminalFailures: summary.terminalFailures,
+        claimsSkipped: summary.claimsSkipped,
       },
       failures:
         summary.failed > 0
@@ -440,15 +670,13 @@ async function classifyOneSingle(
   // A failed verify pass is conservative: treat as low confidence so the
   // event routes to human review rather than auto-publishing unverified.
   const confidence = verify?.confidence ?? "low";
-  const effectiveConfidence = verifierObjects(verify) ? "low" : confidence;
-  const agreement: ClassifierAgreement =
-    agreementFromConfidence(effectiveConfidence);
 
   const classifyRun: ClassifierRun = {
     run: 1,
     temp: 0,
     provider: CLASSIFY_CONFIG.provider,
     model: CLASSIFY_CONFIG.model,
+    ...runEvidence("classify"),
     category: first.category,
     dimension: cat.dimension,
     severityTier: first.severityTier,
@@ -462,6 +690,7 @@ async function classifyOneSingle(
     temp: 0,
     provider: VERIFY_CONFIG.provider,
     model: VERIFY_CONFIG.model,
+    ...runEvidence("verify"),
     category: first.category,
     dimension: cat.dimension,
     severityTier: first.severityTier,
@@ -482,7 +711,7 @@ async function classifyOneSingle(
     severityTier: first.severityTier,
     severityValue,
     classifierRuns: [classifyRun, verifyRun],
-    classifierAgreement: agreement,
+    classifierAgreement: "none",
     headline: cluster.title.slice(0, 200),
     description: cluster.body.slice(0, 1500),
   };
@@ -546,6 +775,7 @@ async function classifyOneEnsemble(
       temp: 0,
       provider: cfg.provider,
       model: cfg.model,
+      ...runEvidence("classify"),
       category: result.category,
       dimension: cat?.dimension ?? "stability",
       severityTier: result.severityTier,
@@ -559,7 +789,13 @@ async function classifyOneEnsemble(
   // No engine returned anything usable — treat as a hard failure.
   if (runs.length === 0) return null;
 
-  const consensus = computeConsensus(runs, CLASSIFY_ENSEMBLE.length);
+  const storedDerivation = deriveStoredEnsemble(classifyRuns);
+  if (!storedDerivation.valid) {
+    throw new Error(
+      `Stored ensemble evidence is invalid: ${storedDerivation.reasons.join(", ")}`,
+    );
+  }
+  const consensus = storedDerivation.consensus;
 
   // Majority "none" (or a plurality "none" deadlock resolving to none) means
   // the ensemble agrees this is not a governance event — drop the cluster.
@@ -671,6 +907,7 @@ function buildEnsembleResult(
       temp: 0,
       provider: VERIFY_CONFIG.provider,
       model: VERIFY_CONFIG.model,
+      ...runEvidence("verify"),
       category: consensus.category,
       dimension,
       severityTier: consensus.severityTier,
@@ -821,6 +1058,7 @@ ${cluster.body}`;
 export async function loadUnclassifiedClusters(
   db: Db,
   limit: number,
+  configHash = CURRENT_CLASSIFICATION_CONFIG_HASH,
 ): Promise<ClusterToClassify[]> {
   // Group only by event cluster. Members may carry different ingest-time
   // jurisdictions; a deterministic provisional value supports classification,
@@ -828,6 +1066,7 @@ export async function loadUnclassifiedClusters(
   const result = await db.execute(sql`
     SELECT
       r.cluster_id,
+      (ARRAY_REMOVE(ARRAY_AGG(DISTINCT r.incident_id), NULL))[1] AS incident_id,
       MIN(COALESCE(r.event_date, CURRENT_DATE)) AS event_date,
       ARRAY_REMOVE(ARRAY_AGG(r.jurisdiction_id ORDER BY r.id), NULL) AS jurisdiction_ids,
       ARRAY_AGG(r.id ORDER BY r.id) AS raw_event_ids,
@@ -839,14 +1078,25 @@ export async function loadUnclassifiedClusters(
       ARRAY_AGG(COALESCE(r.body, '') ORDER BY r.id) AS bodies,
       ARRAY_AGG(r.title ORDER BY r.id) AS titles
     FROM raw_events r
+    LEFT JOIN pulse_cluster_classification_states cs
+      ON cs.cluster_id = r.cluster_id
+     AND cs.config_hash = ${configHash}
     WHERE r.cluster_id IS NOT NULL
       AND r.classification_disposition = 'pending'
+      AND (
+        cs.id IS NULL OR
+        (cs.status = 'retryable_failure' AND cs.next_retry_at <= NOW())
+      )
       AND NOT EXISTS (
         SELECT 1 FROM pulse_sources ps
         WHERE ps.raw_event_id = r.id
       )
-    GROUP BY r.cluster_id
+    GROUP BY r.cluster_id, cs.id, cs.status, cs.next_retry_at
     HAVING COUNT(r.jurisdiction_id) > 0
+    ORDER BY
+      CASE WHEN cs.id IS NULL THEN 0 ELSE 1 END,
+      MIN(COALESCE(r.clustered_at, r.retrieved_at, r.created_at)),
+      r.cluster_id
     LIMIT ${limit}
   `);
 
@@ -855,6 +1105,7 @@ export async function loadUnclassifiedClusters(
       result as unknown as {
         rows?: Array<{
           cluster_id: string;
+          incident_id: string | null;
           jurisdiction_ids: string[];
           event_date: string;
           raw_event_ids: string[];
@@ -870,6 +1121,7 @@ export async function loadUnclassifiedClusters(
     ).rows ??
     (result as unknown as Array<{
       cluster_id: string;
+      incident_id: string | null;
       jurisdiction_ids: string[];
       event_date: string;
       raw_event_ids: string[];
@@ -903,6 +1155,7 @@ export async function loadUnclassifiedClusters(
 
     return {
       clusterId: row.cluster_id,
+      incidentId: row.incident_id ?? undefined,
       jurisdictionId: selectProvisionalJurisdiction(row.jurisdiction_ids),
       eventDate: row.event_date,
       title: row.first_title,
@@ -1223,7 +1476,36 @@ export async function writeEvent(
   cluster: ClusterToClassify,
   result: ClassifyOneResult,
   classificationRunId: string,
-): Promise<void> {
+): Promise<string | null> {
+  const storedDerivation = deriveStoredEnsemble(
+    result.classified.classifierRuns,
+  );
+  if (
+    result.classified.classifierAgreement !==
+    storedDerivation.consensus.agreement
+  ) {
+    throw new Error(
+      `Classifier agreement must be derived from stored independent runs; received ${result.classified.classifierAgreement}, derived ${storedDerivation.consensus.agreement}.`,
+    );
+  }
+  const verifyStored = result.classified.classifierRuns.some(
+    (run) => run.role === "verify",
+  );
+  const gateRequiresReview = ensembleRequiresReview(
+    storedDerivation.consensus,
+    result.verification,
+    { forceReview: false, verifySkipped: !verifyStored },
+  );
+  if (
+    result.autoPublished &&
+    (!storedRunsPermitAutomaticPublication(result.classified.classifierRuns) ||
+      gateRequiresReview ||
+      !result.subjectAttribution?.primaryJurisdictionId)
+  ) {
+    throw new Error(
+      "Automatic publication requires stored provider-distinct versioned votes, the publication gate, and resolved subject attribution.",
+    );
+  }
   // Initial corroborationConfidence — provisional. Phase 5.7's
   // corroborate.ts can recompute. For now use a baseline based on
   // agreement and the LLM's averaged self-confidence.
@@ -1239,6 +1521,7 @@ export async function writeEvent(
     .insert(pulseEventsV2)
     .values({
       clusterId: cluster.clusterId,
+      incidentId: cluster.incidentId ?? cluster.clusterId,
       jurisdictionId: result.classified.jurisdictionId,
       eventDate: result.classified.eventDate,
       category: result.classified.category,
@@ -1269,7 +1552,7 @@ export async function writeEvent(
       .limit(1);
     eventId = existing[0]?.id;
   }
-  if (!eventId) return;
+  if (!eventId) return null;
 
   await persistPulseDecisions(
     db,
@@ -1312,6 +1595,19 @@ export async function writeEvent(
   // rows actually written. The classifier pass performs no upstream fetch,
   // so it must NOT advance sources.last_sync_at — doing so overstates how
   // fresh the underlying source data is (a load-bearing provenance signal).
+  return eventId;
+}
+
+async function loadEventIdForCluster(
+  db: Db,
+  clusterId: string,
+): Promise<string | null> {
+  const rows = await db
+    .select({ id: pulseEventsV2.id })
+    .from(pulseEventsV2)
+    .where(eq(pulseEventsV2.clusterId, clusterId))
+    .limit(1);
+  return rows[0]?.id ?? null;
 }
 
 export async function markClusterDisposition(

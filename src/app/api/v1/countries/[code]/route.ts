@@ -1,4 +1,9 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+} from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import {
@@ -19,10 +24,18 @@ import {
   type ApiDataValueStatus,
 } from "@/lib/factbook/reconcile/api";
 import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
-import { shapeCountryDetail, shapeCountryDetailMeta } from "@/lib/api/contract/shapes";
+import {
+  shapeCountryDetail,
+  shapeCountryDetailMeta,
+} from "@/lib/api/contract/shapes";
 import type { zCountryDetail } from "@/lib/api/contract/schemas";
 import type { z } from "zod";
-import { getFrozenFactsForJurisdiction, metadataFromResolutions, parseAtlasReadSelection } from "@/lib/factbook/read-selection";
+import {
+  getFrozenFactsForJurisdiction,
+  metadataFromResolutions,
+  parseAtlasReadSelection,
+} from "@/lib/factbook/read-selection";
+import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 type CountryDetailGovernment = z.infer<typeof zCountryDetail>["government"];
 type CountryDetailBody = CountryDetailGovernment[string][number];
@@ -59,14 +72,19 @@ type FlatFieldName = keyof typeof FACT_FIELDS;
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ code: string }> }
+  { params }: { params: Promise<{ code: string }> },
 ) {
   const rateLimited = withRateLimit(request);
   if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
-    const parsedSelection = parseAtlasReadSelection(new URL(request.url).searchParams.get("as_of"));
-    if (!parsedSelection.selection) return withStructuralFamilyDeprecation(apiError(parsedSelection.error, 400));
+    const parsedSelection = parseAtlasReadSelection(
+      new URL(request.url).searchParams.get("as_of"),
+    );
+    if (!parsedSelection.selection)
+      return withStructuralFamilyDeprecation(
+        apiError(parsedSelection.error, 400),
+      );
     const selection = parsedSelection.selection;
     const { code } = await params;
     const lookup = code.toLowerCase();
@@ -75,7 +93,7 @@ export async function GET(
       .select()
       .from(jurisdictions)
       .where(
-        sql`(LOWER(${jurisdictions.slug}) = ${lookup} OR LOWER(${jurisdictions.iso2}) = ${lookup} OR LOWER(${jurisdictions.iso3}) = ${lookup})`
+        sql`(LOWER(${jurisdictions.slug}) = ${lookup} OR LOWER(${jurisdictions.iso2}) = ${lookup} OR LOWER(${jurisdictions.iso3}) = ${lookup})`,
       )
       .limit(1);
 
@@ -96,7 +114,10 @@ export async function GET(
     const bodyIds = bodies.map((b) => b.id);
 
     let allOffices: (typeof offices.$inferSelect)[] = [];
-    let currentTerms: { term: typeof terms.$inferSelect; person: typeof persons.$inferSelect }[] = [];
+    let currentTerms: {
+      term: typeof terms.$inferSelect;
+      person: typeof persons.$inferSelect;
+    }[] = [];
     let parties: (typeof legislatureParties.$inferSelect)[] = [];
 
     if (bodyIds.length > 0) {
@@ -108,7 +129,10 @@ export async function GET(
         db
           .select()
           .from(legislatureParties)
-          .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+          .where(
+            sql`${legislatureParties.bodyId} IN ${bodyIds}
+              AND ${legislatureParties.isCurrent} = true`,
+          )
           .orderBy(desc(legislatureParties.seatCount)),
       ]);
 
@@ -118,7 +142,9 @@ export async function GET(
           .select({ term: terms, person: persons })
           .from(terms)
           .innerJoin(persons, eq(terms.personId, persons.id))
-          .where(sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`);
+          .where(
+            sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`,
+          );
       }
     }
 
@@ -134,12 +160,26 @@ export async function GET(
     // Phase F.4 — resolver-direct fetch for every reconciled fact.
     // One batch query covers all 11 in-scope fact-keys.
     const factKeys = Object.values(FACT_FIELDS);
-    const frozen = selection.mode === "vintage"
-      ? await getFrozenFactsForJurisdiction(country.id, factKeys, selection.asOf)
-      : null;
-    if (frozen && !frozen.exists) return withStructuralFamilyDeprecation(apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400));
-    const facts = frozen?.resolutions ?? await getCanonicalFactsForJurisdiction(country.id, factKeys);
-    const selectionMetadata = metadataFromResolutions(selection, facts, frozen ?? undefined);
+    const frozen =
+      selection.mode === "vintage"
+        ? await getFrozenFactsForJurisdiction(
+            country.id,
+            factKeys,
+            selection.asOf,
+          )
+        : null;
+    if (frozen && !frozen.exists)
+      return withStructuralFamilyDeprecation(
+        apiError(`Unsupported immutable vintage: ${selection.asOf}`, 400),
+      );
+    const facts =
+      frozen?.resolutions ??
+      (await getCanonicalFactsForJurisdiction(country.id, factKeys));
+    const selectionMetadata = metadataFromResolutions(
+      selection,
+      facts,
+      frozen ?? undefined,
+    );
     const liveFallback = selection.mode === "live";
 
     /**
@@ -179,13 +219,18 @@ export async function GET(
         popResolver.numeric != null
           ? Math.round(popResolver.numeric)
           : (liveFallback ? country.population : null),
-      gdpBillions: gdpResolver.numeric ?? (liveFallback ? country.gdpBillions : null),
+      gdpBillions:
+        gdpResolver.numeric ?? (liveFallback ? country.gdpBillions : null),
       areaSqKm:
         areaResolver.numeric != null
           ? Math.round(areaResolver.numeric)
-          : (liveFallback ? country.areaSqKm : null),
-      languages: languagesResolver.text ?? (liveFallback ? country.languages : null),
-      currency: currencyResolver.text ?? (liveFallback ? country.currency : null),
+          : liveFallback
+            ? country.areaSqKm
+            : null,
+      languages:
+        languagesResolver.text ?? (liveFallback ? country.languages : null),
+      currency:
+        currencyResolver.text ?? (liveFallback ? country.currency : null),
       worldBankRegion: wbRegionResolver.text,
       worldBankIncomeGroup: wbIncomeResolver.text,
       vdemRow: vdemRowResolver.text,
@@ -214,96 +259,97 @@ export async function GET(
       if (entry) provenance[flatField] = entry;
     }
 
-    const branches = bodies.reduce<CountryDetailGovernment>(
-      (acc, body) => {
-        const branch = body.branch ?? "other";
-        if (!acc[branch]) acc[branch] = [];
+    const branches = bodies.reduce<CountryDetailGovernment>((acc, body) => {
+      const branch = body.branch ?? "other";
+      if (!acc[branch]) acc[branch] = [];
 
-        const bodyOffices = allOffices
-          .filter((o) => o.bodyId === body.id)
-          .map((office) => {
-            const holder = currentTerms.find(
-              (t) => t.term.officeId === office.id
-            );
-            return {
-              id: office.id,
-              name: office.name,
-              type: office.officeType,
-              isElected: office.isElected,
-              currentHolder: holder
-                ? {
-                    name: holder.person.name,
-                    party: holder.term.partyName,
-                    since: holder.term.startDate,
-                    photoUrl: holder.person.photoUrl,
-                  }
-                : null,
-            };
-          });
+      const bodyOffices = allOffices
+        .filter((o) => o.bodyId === body.id)
+        .map((office) => {
+          const holder = currentTerms.find(
+            (t) => t.term.officeId === office.id,
+          );
+          return {
+            id: office.id,
+            name: office.name,
+            type: office.officeType,
+            isElected: office.isElected,
+            currentHolder: holder
+              ? {
+                  name: holder.person.name,
+                  party: holder.term.partyName,
+                  since: holder.term.startDate,
+                  photoUrl: holder.person.photoUrl,
+                }
+              : null,
+          };
+        });
 
-        const bodyParties = parties
-          .filter((p) => p.bodyId === body.id)
-          .map((p) => ({
-            name: p.partyName,
-            seats: p.seatCount,
-            color: p.partyColor,
-            isRulingCoalition: p.isRulingCoalition,
-          }));
+      const bodyParties = parties
+        .filter((p) => p.bodyId === body.id)
+        .map((p) => ({
+          name: p.partyName,
+          seats: p.seatCount,
+          color: p.partyColor,
+          isRulingCoalition: p.isRulingCoalition,
+        }));
 
-        const entry: CountryDetailBody = {
-          id: body.id,
-          name: body.name,
-          type: body.bodyType,
-          chamberType: body.chamberType,
-          totalSeats: body.totalSeats,
-          offices: bodyOffices,
-          parties: bodyParties.length > 0 ? bodyParties : undefined,
-        };
-        acc[branch].push(entry);
+      const entry: CountryDetailBody = {
+        id: body.id,
+        name: body.name,
+        type: body.bodyType,
+        chamberType: body.chamberType,
+        totalSeats: body.totalSeats,
+        offices: bodyOffices,
+        parties: bodyParties.length > 0 ? bodyParties : undefined,
+      };
+      acc[branch].push(entry);
 
-        return acc;
-      },
-      {},
-    );
+      return acc;
+    }, {});
 
-    return withStructuralFamilyDeprecation(apiResponse({
-      data: shapeCountryDetail({
-        slug: country.slug,
-        name: country.name,
-        iso2: country.iso2,
-        iso3: country.iso3,
-        continent: country.continent,
-        // ── Reconciled flat fields. Resolver canonical takes
-        // precedence over the `jurisdictions` cache; cache is the
-        // back-compat fallback for fields the resolver doesn't
-        // cover yet.
-        capital: flatValues.capital as string | null,
-        population: flatValues.population as number | null,
-        gdpBillions: flatValues.gdpBillions as number | null,
-        areaSqKm: flatValues.areaSqKm as number | null,
-        languages: flatValues.languages as string | null,
-        currency: flatValues.currency as string | null,
-        democracyIndex: country.democracyIndex,
-        // ── Phase F.4 — peer-grouping classifications (new fields).
-        worldBankRegion: flatValues.worldBankRegion as string | null,
-        worldBankIncomeGroup: flatValues.worldBankIncomeGroup as string | null,
-        vdemRow: flatValues.vdemRow as string | null,
-        monarchyStatus: flatValues.monarchyStatus as string | null,
-        governmentFormDescription:
-          flatValues.governmentFormDescription as string | null,
-        // ── Existing fields ──
-        governmentType: country.governmentType,
-        governmentTypeDetail: country.governmentTypeDetail,
-        governmentClassification: classificationMap.get(country.id) ?? null,
-        flagUrl: country.flagUrl,
-        constitution: constitutionResults[0] ?? null,
-        government: branches,
-        // ── Phase F.4 — provenance block keyed by flat field ──
-        provenance,
-        valueStatus,
+    return withStructuralFamilyDeprecation(
+      apiResponse({
+        data: shapeCountryDetail({
+          slug: country.slug,
+          name: country.name,
+          iso2: country.iso2,
+          iso3: country.iso3,
+          continent: country.continent,
+          // ── Reconciled flat fields. Resolver canonical takes
+          // precedence over the `jurisdictions` cache; cache is the
+          // back-compat fallback for fields the resolver doesn't
+          // cover yet.
+          capital: flatValues.capital as string | null,
+          population: flatValues.population as number | null,
+          gdpBillions: flatValues.gdpBillions as number | null,
+          areaSqKm: flatValues.areaSqKm as number | null,
+          languages: flatValues.languages as string | null,
+          currency: flatValues.currency as string | null,
+          democracyIndex: country.democracyIndex,
+          // ── Phase F.4 — peer-grouping classifications (new fields).
+          worldBankRegion: flatValues.worldBankRegion as string | null,
+          worldBankIncomeGroup: flatValues.worldBankIncomeGroup as
+            string | null,
+          vdemRow: flatValues.vdemRow as string | null,
+          monarchyStatus: flatValues.monarchyStatus as string | null,
+          governmentFormDescription: flatValues.governmentFormDescription as
+            string | null,
+          // ── Existing fields ──
+          governmentType: country.governmentType,
+          governmentTypeDetail: country.governmentTypeDetail,
+          governmentClassification: classificationMap.get(country.id) ?? null,
+          jurisdictionStatus: buildJurisdictionStatusPresentation(country),
+          flagUrl: country.flagUrl,
+          constitution: constitutionResults[0] ?? null,
+          government: branches,
+          // ── Phase F.4 — provenance block keyed by flat field ──
+          provenance,
+          valueStatus,
+        }),
+        meta: shapeCountryDetailMeta(selectionMetadata),
       }),
-      meta: shapeCountryDetailMeta(selectionMetadata),
-    }));
+    );
   } catch (e) {
     console.error("API /v1/countries/[code] error:", e);
     return withStructuralFamilyDeprecation(

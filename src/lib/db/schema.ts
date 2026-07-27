@@ -38,7 +38,14 @@ import {
   foreignKey,
   check,
   primaryKey,
+  customType,
 } from "drizzle-orm/pg-core";
+
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
 
 export const jurisdictions = pgTable("jurisdictions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -176,17 +183,182 @@ export const terms = pgTable("terms", {
   isCurrent: boolean("is_current").default(true),
 });
 
-export const legislatureParties = pgTable("legislature_parties", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  bodyId: uuid("body_id")
-    .references(() => governmentBodies.id)
-    .notNull(),
-  partyName: text("party_name").notNull(),
-  partyColor: text("party_color"),
-  seatCount: integer("seat_count").notNull(),
-  isRulingCoalition: boolean("is_ruling_coalition").default(false),
-  wikidataQid: text("wikidata_qid"),
-});
+/**
+ * Stable party identity, separate from a party's current seat holding in one
+ * chamber. Source identifiers are adopted only when a publisher supplies one;
+ * legacy name-only rows remain explicitly provisional instead of being merged
+ * across chambers by a guessed name match.
+ */
+export const politicalParties = pgTable(
+  "political_parties",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    canonicalName: text("canonical_name").notNull(),
+    identityStatus: text("identity_status")
+      .notNull()
+      .default("provisional_legacy"),
+    identitySourceId: text("identity_source_id").references(() => sources.id),
+    identityExternalId: text("identity_external_id"),
+    identitySourceUrl: text("identity_source_url"),
+    identitySourceLicense: text("identity_source_license"),
+    identityRetrievedAt: timestamp("identity_retrieved_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("political_parties_source_external_idx").on(
+      table.identitySourceId,
+      table.identityExternalId,
+    ),
+    index("political_parties_jurisdiction_idx").on(table.jurisdictionId),
+    check(
+      "political_parties_identity_status_check",
+      dsql`${table.identityStatus} in ('source_verified', 'provisional_legacy', 'disputed')`,
+    ),
+    check(
+      "political_parties_source_identity_pair_check",
+      dsql`(${table.identitySourceId} is null and ${table.identityExternalId} is null) or (${table.identitySourceId} is not null and ${table.identityExternalId} is not null)`,
+    ),
+  ],
+);
+
+/** One immutable source retrieval that established a chamber composition. */
+export const partyCompositionRuns = pgTable(
+  "party_composition_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    runKey: text("run_key").notNull().unique(),
+    bodyId: uuid("body_id")
+      .references(() => governmentBodies.id)
+      .notNull(),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    payloadSha256: text("payload_sha256").notNull(),
+    partyCount: integer("party_count").notNull(),
+    writerVersion: text("writer_version").notNull(),
+    recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("party_composition_runs_body_recorded_idx").on(
+      table.bodyId,
+      table.recordedAt,
+    ),
+    check(
+      "party_composition_runs_payload_sha256_check",
+      dsql`${table.payloadSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "party_composition_runs_party_count_check",
+      dsql`${table.partyCount} > 0`,
+    ),
+  ],
+);
+
+/**
+ * Current or retained chamber participation for one stable party identity.
+ * Rows are updated/soft-retired, never delete-and-reinserted during a resync,
+ * so `party_positions.legislature_party_id` remains valid across reseats.
+ */
+export const legislatureParties = pgTable(
+  "legislature_parties",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bodyId: uuid("body_id")
+      .references(() => governmentBodies.id)
+      .notNull(),
+    partyId: uuid("party_id")
+      .references(() => politicalParties.id, { onDelete: "restrict" })
+      .notNull(),
+    compositionRunId: uuid("composition_run_id")
+      .references(() => partyCompositionRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    /** Source-scoped composition identity; never a display-name primary key. */
+    identityKey: text("identity_key").notNull(),
+    partyName: text("party_name").notNull(),
+    partyColor: text("party_color"),
+    seatCount: integer("seat_count").notNull(),
+    isRulingCoalition: boolean("is_ruling_coalition").default(false),
+    wikidataQid: text("wikidata_qid"),
+    isCurrent: boolean("is_current").default(true).notNull(),
+    firstRecordedAt: timestamp("first_recorded_at").defaultNow().notNull(),
+    lastRecordedAt: timestamp("last_recorded_at").defaultNow().notNull(),
+    retiredAt: timestamp("retired_at"),
+  },
+  (table) => [
+    uniqueIndex("legislature_parties_body_identity_idx").on(
+      table.bodyId,
+      table.identityKey,
+    ),
+    index("legislature_parties_party_idx").on(table.partyId),
+    index("legislature_parties_current_body_idx").on(
+      table.bodyId,
+      table.isCurrent,
+    ),
+    check(
+      "legislature_parties_current_retired_check",
+      dsql`(${table.isCurrent} = true and ${table.retiredAt} is null) or (${table.isCurrent} = false and ${table.retiredAt} is not null)`,
+    ),
+  ],
+);
+
+/**
+ * Append-only, source-bound party identity event edges. A split or merge is
+ * represented by multiple edges sharing `event_group_key`; composition syncs
+ * never infer those relationships from disappearing names.
+ */
+export const partyIdentityEvents = pgTable(
+  "party_identity_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventKey: text("event_key").notNull().unique(),
+    eventGroupKey: text("event_group_key").notNull(),
+    eventType: text("event_type").notNull(),
+    predecessorPartyId: uuid("predecessor_party_id").references(
+      () => politicalParties.id,
+      { onDelete: "restrict" },
+    ),
+    successorPartyId: uuid("successor_party_id").references(
+      () => politicalParties.id,
+      { onDelete: "restrict" },
+    ),
+    legislaturePartyId: uuid("legislature_party_id").references(
+      () => legislatureParties.id,
+      { onDelete: "restrict" },
+    ),
+    previousName: text("previous_name"),
+    currentName: text("current_name"),
+    effectiveDate: date("effective_date"),
+    evidenceStatus: text("evidence_status").notNull(),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    methodVersion: text("method_version").notNull(),
+    recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("party_identity_events_group_idx").on(table.eventGroupKey),
+    index("party_identity_events_predecessor_idx").on(table.predecessorPartyId),
+    index("party_identity_events_successor_idx").on(table.successorPartyId),
+    check(
+      "party_identity_events_type_check",
+      dsql`${table.eventType} in ('identity_adopted', 'identity_created', 'identity_upgraded', 'name_change_observed', 'retired_from_chamber', 'reactivated_in_chamber', 'split_into', 'merged_into', 'succeeded_by')`,
+    ),
+    check(
+      "party_identity_events_evidence_status_check",
+      dsql`${table.evidenceStatus} in ('verified', 'provisional', 'disputed')`,
+    ),
+    check(
+      "party_identity_events_participant_check",
+      dsql`${table.predecessorPartyId} is not null or ${table.successorPartyId} is not null`,
+    ),
+  ],
+);
 
 /**
  * Expert-coded ideology positions for the cross-country party browser +
@@ -194,11 +366,12 @@ export const legislatureParties = pgTable("legislature_parties", {
  * `vparty`). See `plan/party-ideology-sourcing-resolution-v1.md` (§4) — the
  * adopted contract for this table.
  *
- * Keyed 1:1 to a specific Civica `legislature_parties` row (unique on
- * `legislature_party_id`) so the ideology attaches to that party and travels
- * with it. A separate table (not columns on `legislature_parties`) because:
- * (a) `legislature_parties` is a seat-snapshot refreshed by legislature syncs,
- * a different vintage + cadence from the frozen 2022 V-Party release;
+ * Keyed 1:1 to a retained Civica `legislature_parties` chamber-participation
+ * row (unique on `legislature_party_id`) so the ideology attachment survives
+ * composition refreshes and renames. A separate table (not columns on
+ * `legislature_parties`) because:
+ * (a) chamber composition has a different vintage + cadence from the frozen
+ * 2022 V-Party release;
  * (b) it lets us carry the match provenance (which V-Party party, what year,
  * what method) and swap in a future V-Party vintage without touching seats.
  *
@@ -363,6 +536,77 @@ export const constitutionTopicExcerpts = pgTable(
     index("idx_constitution_topic_excerpts_topic").on(table.topicKey),
     index("idx_constitution_topic_excerpts_jurisdiction").on(
       table.jurisdictionId,
+    ),
+  ],
+);
+
+/**
+ * Version-bound, passage-grain search and citation index for Constitute's
+ * English-language service representation. Superseded rows remain resolvable;
+ * only `is_current` rows enter public search.
+ */
+export const constitutionPassages = pgTable(
+  "constitution_passages",
+  {
+    passageId: text("passage_id").primaryKey(),
+    schemaVersion: text("schema_version").notNull(),
+    searchIndexVersion: text("search_index_version").notNull(),
+    constitutionId: uuid("constitution_id")
+      .references(() => constitutions.id, { onDelete: "restrict" })
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    sourceDocumentId: text("source_document_id").notNull(),
+    sourceSectionId: text("source_section_id").notNull(),
+    sectionOrder: integer("section_order").notNull(),
+    anchorId: text("anchor_id").notNull(),
+    headingLabel: text("heading_label"),
+    topicKeys: jsonb("topic_keys").$type<string[]>().notNull(),
+    plainText: text("plain_text").notNull(),
+    contentSha256: text("content_sha256").notNull(),
+    languageCode: text("language_code").notNull(),
+    languageBasis: text("language_basis").notNull(),
+    translationStatus: text("translation_status").notNull(),
+    originalLanguageCode: text("original_language_code"),
+    translator: text("translator"),
+    sourceId: text("source_id")
+      .references(() => sources.id, { onDelete: "restrict" })
+      .notNull(),
+    sourceUrl: text("source_url").notNull(),
+    retrievalUrl: text("retrieval_url").notNull(),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    isCurrent: boolean("is_current").notNull().default(true),
+    supersededAt: timestamp("superseded_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    searchVector: tsvector("search_vector")
+      .generatedAlwaysAs(
+        dsql`setweight(to_tsvector('english'::regconfig, coalesce("heading_label", '')), 'A') || setweight(to_tsvector('english'::regconfig, coalesce("plain_text", '')), 'B')`,
+      )
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_constitution_passages_current_section")
+      .on(table.constitutionId, table.sourceSectionId)
+      .where(dsql`${table.isCurrent} = true`),
+    index("idx_constitution_passages_search")
+      .using("gin", table.searchVector)
+      .where(dsql`${table.isCurrent} = true`),
+    index("idx_constitution_passages_topics")
+      .using("gin", table.topicKeys)
+      .where(dsql`${table.isCurrent} = true`),
+    index("idx_constitution_passages_jurisdiction").on(
+      table.jurisdictionId,
+      table.isCurrent,
+    ),
+    index("idx_constitution_passages_document_order").on(
+      table.constitutionId,
+      table.isCurrent,
+      table.sectionOrder,
+    ),
+    check(
+      "constitution_passages_contract_check",
+      dsql`${table.schemaVersion} = 'constitution-passage/v1' AND ${table.searchIndexVersion} = 'constitution-search-index/english-v1' AND ${table.passageId} ~ '^constitution-passage/sha256:[a-f0-9]{64}$' AND btrim(${table.sourceDocumentId}) <> '' AND btrim(${table.sourceSectionId}) <> '' AND ${table.sectionOrder} >= 0 AND ${table.anchorId} ~ '^sec-[A-Za-z0-9-]+$' AND jsonb_typeof(${table.topicKeys}) = 'array' AND btrim(${table.plainText}) <> '' AND ${table.contentSha256} ~ '^[a-f0-9]{64}$' AND ${table.languageCode} = 'en' AND ${table.languageBasis} = 'constitute-service-lang-parameter' AND ${table.translationStatus} = 'publisher-supplied-language-version-translation-status-unknown' AND ${table.originalLanguageCode} IS NULL AND ${table.translator} IS NULL AND ${table.sourceId} = 'constitute_project' AND ${table.sourceUrl} ~ '^https://www[.]constituteproject[.]org/constitution/' AND ${table.retrievalUrl} ~ '^https://www[.]constituteproject[.]org/service/html[?]' AND ((${table.isCurrent} = true AND ${table.supersededAt} IS NULL) OR (${table.isCurrent} = false AND ${table.supersededAt} IS NOT NULL))`,
     ),
   ],
 );
@@ -1672,80 +1916,36 @@ export const pulseEvents = pgTable(
   ],
 );
 
-export const pulseDailyScores = pgTable(
-  "pulse_daily_scores",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    jurisdictionId: uuid("jurisdiction_id")
-      .references(() => jurisdictions.id)
-      .notNull(),
-    scoreDate: date("score_date").notNull(),
-    ciBaseline: real("ci_baseline").notNull(),
-    eventImpact: real("event_impact").notNull(),
-    pulseScore: real("pulse_score").notNull(),
-    activeEvents: integer("active_events").notNull(),
-    isLowConfidence: boolean("is_low_confidence").notNull().default(false),
-    // See the identical note on ciDimensionScores.methodologyVersion above:
-    // explicit named foreignKey() below, not inline .references(), because
-    // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
-    methodologyVersion: text("methodology_version").notNull(),
-    calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
-  },
-  (table) => [
-    uniqueIndex("idx_pulse_daily_unique").on(
-      table.jurisdictionId,
-      table.scoreDate,
-    ),
-    index("idx_pulse_daily_date").on(table.scoreDate),
-    index("idx_pulse_daily_jurisdiction").on(table.jurisdictionId),
-    foreignKey({
-      name: "pulse_daily_scores_methodology_version_ci_methodology_versions_",
-      columns: [table.methodologyVersion],
-      foreignColumns: [ciMethodologyVersions.id],
-    }),
-  ],
-);
-
-export const pulseChangelog = pgTable(
-  "pulse_changelog",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    jurisdictionId: uuid("jurisdiction_id")
-      .references(() => jurisdictions.id)
-      .notNull(),
-    scoreDate: date("score_date").notNull(),
-    eventId: uuid("event_id")
-      .references(() => pulseEvents.id)
-      .notNull(),
-    decayedImpact: real("decayed_impact").notNull(),
-    daysSinceEvent: integer("days_since_event").notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
-  },
-  (table) => [
-    index("idx_pulse_changelog_jurisdiction_date").on(
-      table.jurisdictionId,
-      table.scoreDate,
-    ),
-    index("idx_pulse_changelog_event").on(table.eventId),
-  ],
-);
-
 // --- International organizations (CIV-163) ---
 
-export const organizations = pgTable("organizations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  slug: text("slug").unique().notNull(),
-  name: text("name").notNull(),
-  fullName: text("full_name").notNull(),
-  type: text("type").notNull(),
-  foundedYear: integer("founded_year"),
-  hqCountry: text("hq_country"),
-  memberCount: integer("member_count"),
-  wikidataQid: text("wikidata_qid"),
-  extra: jsonb("extra"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").unique().notNull(),
+    name: text("name").notNull(),
+    fullName: text("full_name").notNull(),
+    type: text("type").notNull(),
+    foundedYear: integer("founded_year"),
+    hqCountry: text("hq_country"),
+    memberCount: integer("member_count"),
+    wikidataQid: text("wikidata_qid"),
+    extra: jsonb("extra"),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    upstreamVintage: text("upstream_vintage"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    check(
+      "organizations_source_bundle_check",
+      dsql`(${table.sourceId} is null and ${table.sourceUrl} is null and ${table.sourceLicense} is null and ${table.sourceRetrievedAt} is null and ${table.upstreamVintage} is null) or (${table.sourceId} is not null and ${table.sourceUrl} is not null and ${table.sourceLicense} is not null and ${table.sourceRetrievedAt} is not null and ${table.upstreamVintage} is not null)`,
+    ),
+  ],
+);
 
 export const organizationMemberships = pgTable(
   "organization_memberships",
@@ -1758,8 +1958,20 @@ export const organizationMemberships = pgTable(
       .references(() => jurisdictions.id)
       .notNull(),
     joinDate: date("join_date"),
+    joinDatePrecision: text("join_date_precision").notNull().default("unknown"),
+    endDate: date("end_date"),
+    endDatePrecision: text("end_date_precision").notNull().default("unknown"),
     role: text("role"),
+    status: text("status").notNull().default("unverified_legacy"),
+    statusNote: text("status_note"),
+    disputed: boolean("disputed").notNull().default(false),
+    sourceId: text("source_id").references(() => sources.id),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    upstreamVintage: text("upstream_vintage"),
     createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => [
     uniqueIndex("idx_org_memberships_unique").on(
@@ -1768,6 +1980,31 @@ export const organizationMemberships = pgTable(
     ),
     index("idx_org_memberships_jurisdiction").on(table.jurisdictionId),
     index("idx_org_memberships_org").on(table.orgId),
+    index("idx_org_memberships_public").on(table.status, table.jurisdictionId),
+    check(
+      "organization_memberships_status_check",
+      dsql`${table.status} in ('current', 'former', 'withdrawn', 'suspended', 'unverified_legacy')`,
+    ),
+    check(
+      "organization_memberships_join_precision_check",
+      dsql`${table.joinDatePrecision} in ('day', 'year', 'unknown')`,
+    ),
+    check(
+      "organization_memberships_end_precision_check",
+      dsql`${table.endDatePrecision} in ('day', 'year', 'unknown')`,
+    ),
+    check(
+      "organization_memberships_interval_check",
+      dsql`${table.endDate} is null or ${table.joinDate} is null or ${table.endDate} >= ${table.joinDate}`,
+    ),
+    check(
+      "organization_memberships_terminal_date_check",
+      dsql`${table.status} not in ('former', 'withdrawn') or ${table.endDate} is not null`,
+    ),
+    check(
+      "organization_memberships_source_bundle_check",
+      dsql`${table.status} = 'unverified_legacy' or (${table.sourceId} is not null and ${table.sourceUrl} is not null and ${table.sourceLicense} is not null and ${table.sourceRetrievedAt} is not null and ${table.upstreamVintage} is not null)`,
+    ),
   ],
 );
 
@@ -1869,9 +2106,8 @@ export const correctionLog = pgTable("correction_log", {
 });
 
 /**
- * Placeholder schema for the academic advisory board described in
- * v2 methodology spec §3.1. Table ships empty; rows arrive via
- * manual INSERT once recruitment happens.
+ * Consented public profiles for appointed advisory-board members. The table
+ * ships empty; an application never creates a member row automatically.
  */
 export const advisoryBoardMembers = pgTable("advisory_board_members", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -1888,8 +2124,7 @@ export const advisoryBoardMembers = pgTable("advisory_board_members", {
 });
 
 /**
- * Inbound applications to join the academic advisory board
- * (v2 methodology spec §3.1). Populated by the public
+ * Private expressions of interest in the advisory board. Populated by the public
  * `/about/advisory-board/apply` form, which POSTs to the
  * `/api/advisory-applications` route handler. The owner reads new
  * applications through the authed admin surface at
@@ -1918,6 +2153,7 @@ export const advisoryApplications = pgTable("advisory_applications", {
   links: text("links"),
   /** Applicant-supplied CV link (scholar page / personal site / hosted PDF) */
   cvUrl: text("cv_url"),
+  /** Legacy nullable column. New submissions do not retain applicant IPs. */
   ipAddress: text("ip_address"),
   /** Triage lifecycle: new → reviewed → contacted → archived */
   status: text("status").notNull().default("new"),
@@ -1979,6 +2215,51 @@ export const pulsePipelineRuns = pgTable(
 );
 
 /**
+ * Stable real-world incident identity for Pulse. Raw clustering can change as
+ * new reports arrive; the incident UUID does not. A confirmed merge preserves
+ * the losing row and points it at the surviving incident.
+ */
+export const pulseIncidents = pgTable(
+  "pulse_incidents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    status: text("status").$type<"active" | "merged">().notNull(),
+    mergedIntoIncidentId: uuid("merged_into_incident_id"),
+    representativeTitle: text("representative_title").notNull(),
+    eventDateStart: date("event_date_start"),
+    eventDateEnd: date("event_date_end"),
+    identityVersion: text("identity_version").notNull(),
+    identityKey: text("identity_key").notNull(),
+    identityTokens: text("identity_tokens").array().notNull(),
+    identityAnchors: text("identity_anchors").array().notNull(),
+    representativeEmbedding: real("representative_embedding").array(),
+    createdRunId: uuid("created_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "pulse_incidents_merged_into_fk",
+      columns: [table.mergedIntoIncidentId],
+      foreignColumns: [table.id],
+    }).onDelete("restrict"),
+    index("idx_pulse_incidents_status_date").on(
+      table.status,
+      table.eventDateStart,
+      table.eventDateEnd,
+    ),
+    index("idx_pulse_incidents_identity").on(table.identityKey),
+    index("idx_pulse_incidents_created_run").on(table.createdRunId),
+    check(
+      "pulse_incidents_contract_check",
+      dsql`${table.status} IN ('active','merged') AND btrim(${table.representativeTitle}) <> '' AND ${table.identityVersion} <> '' AND ${table.identityKey} ~ '^pulse-incident-identity/sha256:[a-f0-9]{64}$' AND ((${table.status} = 'active' AND ${table.mergedIntoIncidentId} IS NULL) OR (${table.status} = 'merged' AND ${table.mergedIntoIncidentId} IS NOT NULL AND ${table.mergedIntoIncidentId} <> ${table.id}))`,
+    ),
+  ],
+);
+
+/**
  * Staging table for raw events ingested from specialist + news feeds.
  * One row per source-record. Drained by the clustering step which
  * groups near-duplicate records into governance-event clusters.
@@ -2032,6 +2313,10 @@ export const rawEvents = pgTable(
     embedding: real("embedding").array(),
     /** Set when row joins a cluster; null until then */
     clusterId: uuid("cluster_id"),
+    /** Stable real-world incident assigned by PUL-031 clustering. */
+    incidentId: uuid("incident_id").references(() => pulseIncidents.id, {
+      onDelete: "restrict",
+    }),
     clusteredAt: timestamp("clustered_at"),
     /** pending | event | non_governance | invalid. Rejected classifier input
      * remains queryable for prospective false-negative studies. */
@@ -2062,6 +2347,7 @@ export const rawEvents = pgTable(
     ),
     index("idx_raw_events_unclustered").on(table.clusteredAt),
     index("idx_raw_events_cluster").on(table.clusterId),
+    index("idx_raw_events_incident").on(table.incidentId),
     index("idx_raw_events_ingest_run").on(table.ingestRunId),
     index("idx_raw_events_cluster_run").on(table.clusterRunId),
     index("idx_raw_events_classification_run").on(table.classificationRunId),
@@ -2074,6 +2360,52 @@ export const rawEvents = pgTable(
     check(
       "raw_events_evidence_identity_check",
       dsql`${table.evidenceIdentityKey} ~ '^pulse-evidence/sha256:[a-f0-9]{64}$' AND ${table.evidenceContentHash} ~ '^[a-f0-9]{64}$' AND ${table.evidenceLanguage} <> '' AND ${table.evidencePublisher}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceAttribution}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRights}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRetention}->>'schemaVersion' = 'pulse-raw-evidence/v1' AND ${table.evidenceRetention}->>'publicPayloadDistribution' = 'blocked'`,
+    ),
+  ],
+);
+
+/** Append-only evidence for assigning one retained report to an incident. */
+export const pulseIncidentAssignments = pgTable(
+  "pulse_incident_assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    assignmentKey: text("assignment_key").notNull(),
+    incidentId: uuid("incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    rawEventId: uuid("raw_event_id")
+      .references(() => rawEvents.id, { onDelete: "restrict" })
+      .notNull(),
+    rawClusterId: uuid("raw_cluster_id").notNull(),
+    matchKind: text("match_kind")
+      .$type<
+        "new" | "persisted_match" | "post_classification_merge" | "backfill"
+      >()
+      .notNull(),
+    semanticSimilarity: real("semantic_similarity"),
+    tokenSimilarity: real("token_similarity").notNull(),
+    anchorOverlap: real("anchor_overlap").notNull(),
+    exactNormalizedMatch: boolean("exact_normalized_match").notNull(),
+    algorithmVersion: text("algorithm_version").notNull(),
+    embeddingModel: text("embedding_model"),
+    fallbackMode: text("fallback_mode").notNull(),
+    stageRunId: uuid("stage_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    actor: jsonb("actor").$type<Record<string, unknown>>().notNull(),
+    rationale: text("rationale").notNull(),
+    assignedAt: timestamp("assigned_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_incident_assignments_key").on(table.assignmentKey),
+    uniqueIndex("idx_pulse_incident_assignments_raw").on(table.rawEventId),
+    index("idx_pulse_incident_assignments_incident").on(table.incidentId),
+    index("idx_pulse_incident_assignments_run").on(table.stageRunId),
+    check(
+      "pulse_incident_assignments_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-incident-assignment/v1' AND ${table.assignmentKey} ~ '^pulse-incident-assignment/sha256:[a-f0-9]{64}$' AND ${table.matchKind} IN ('new','persisted_match','post_classification_merge','backfill') AND ${table.tokenSimilarity} BETWEEN 0 AND 1 AND ${table.anchorOverlap} BETWEEN 0 AND 1 AND (${table.semanticSimilarity} IS NULL OR ${table.semanticSimilarity} BETWEEN -1 AND 1) AND ${table.algorithmVersion} <> '' AND ${table.fallbackMode} IN ('semantic','conservative_lexical','historical_backfill') AND jsonb_typeof(${table.actor}) = 'object' AND btrim(${table.rationale}) <> ''`,
     ),
   ],
 );
@@ -2095,13 +2427,21 @@ export const pulseEventsV2 = pgTable(
     /** Stable idempotency key from raw_events.cluster_id. Legacy rows are
      * backfilled to their event id by migration 0022. */
     clusterId: uuid("cluster_id").notNull(),
+    /** Stable incident identity; unlike a raw cluster, it survives new reports. */
+    incidentId: uuid("incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    projectionStatus: text("projection_status")
+      .$type<"current" | "superseded_duplicate" | "quarantined_invalid">()
+      .notNull()
+      .default("current"),
     jurisdictionId: uuid("jurisdiction_id")
       .references(() => jurisdictions.id)
       .notNull(),
     eventDate: date("event_date").notNull(),
     /** Taxonomy category from spec §3.2 (e.g. "judicial_purge") */
     category: text("category").notNull(),
-    /** dq | rol | fnr | cc | stability */
+    /** democratic_quality | rule_of_law | freedom_rights | corruption_control | stability */
     dimension: text("dimension").notNull(),
     /**
      * low_pos | moderate_pos | high_pos |
@@ -2113,15 +2453,16 @@ export const pulseEventsV2 = pgTable(
     /** Computed by the corroboration step, range [0, 1] */
     corroborationConfidence: real("corroboration_confidence").notNull(),
     /** Reasoning passes preserved for audit. Current ensemble rows contain
-     *  one entry per successful classify voter plus the verify entry;
+     *  one provider/model/prompt/method/config-versioned entry per successful
+     *  classify voter plus the verify entry;
      *  retained single-engine rows contain classify + verify; older agent and
      *  temperature-variant rows use other unversioned shapes. Shape:
      *  [{run, temp, model, category, dimension, severity, confidence, raw}, ...] */
     classifierRuns: jsonb("classifier_runs").notNull(),
     /** 'all' | 'two_of_three' | 'none' — drives confidence boost/penalty.
-     *  Current ensemble rows store voter consensus. Retained single-engine
-     *  rows map verify confidence to these compatibility labels; older rows
-     *  are mixed and unversioned. */
+     *  Current rows derive this only from stored provider-distinct,
+     *  prompt-versioned classify runs. Unsupported legacy labels are cleared
+     *  to none without rewriting the retained run evidence. */
     classifierAgreement: text("classifier_agreement").notNull(),
     derivationVersionKey: text("derivation_version_key").notNull(),
     derivationVersions: jsonb("derivation_versions")
@@ -2178,6 +2519,354 @@ export const pulseEventsV2 = pgTable(
     index("idx_pulse_v2_publication_run").on(table.publicationRunId),
     index("idx_pulse_v2_corroboration_run").on(table.corroborationRunId),
     uniqueIndex("idx_pulse_v2_cluster_unique").on(table.clusterId),
+    uniqueIndex("idx_pulse_v2_one_current_projection")
+      .on(table.incidentId)
+      .where(dsql`${table.projectionStatus} = 'current'`),
+    index("idx_pulse_v2_incident").on(table.incidentId),
+    check(
+      "pulse_events_v2_projection_check",
+      dsql`${table.projectionStatus} IN ('current','superseded_duplicate','quarantined_invalid') AND ((${table.projectionStatus} = 'quarantined_invalid' AND ${table.published} = false) OR (${table.projectionStatus} <> 'quarantined_invalid' AND btrim(${table.headline}) <> '')) AND ((${table.projectionStatus} = 'current') OR (${table.published} = false))`,
+    ),
+  ],
+);
+
+/** Immutable metadata for one captured official information-environment release. */
+export const pulseInformationEnvironmentReleases = pgTable(
+  "pulse_information_environment_releases",
+  {
+    releaseId: text("release_id").primaryKey(),
+    schemaVersion: text("schema_version").notNull(),
+    sourceId: text("source_id").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    methodologyUrl: text("methodology_url").notNull(),
+    termsUrl: text("terms_url").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    observationYear: integer("observation_year").notNull(),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    contentSha256: text("content_sha256").notNull(),
+    publisherRows: integer("publisher_rows").notNull(),
+    matchedJurisdictions: integer("matched_jurisdictions").notNull(),
+    supportedJurisdictions: integer("supported_jurisdictions").notNull(),
+    redistributionPosture: text("redistribution_posture").notNull(),
+    rightsStatus: text("rights_status").notNull(),
+    useStatus: text("use_status").notNull(),
+    adoptedAt: timestamp("adopted_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_information_release_hash").on(table.contentSha256),
+    check(
+      "pulse_information_environment_releases_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-information-environment-release/v1' AND btrim(${table.releaseId}) <> '' AND btrim(${table.sourceId}) <> '' AND ${table.sourceUrl} ~ '^https://' AND ${table.methodologyUrl} ~ '^https://' AND ${table.termsUrl} ~ '^https://' AND btrim(${table.upstreamRelease}) <> '' AND ${table.observationYear} >= 1900 AND ${table.contentSha256} ~ '^[a-f0-9]{64}$' AND ${table.publisherRows} > 0 AND ${table.matchedJurisdictions} >= 0 AND ${table.supportedJurisdictions} > 0 AND ${table.matchedJurisdictions} <= ${table.supportedJurisdictions} AND ${table.matchedJurisdictions} <= ${table.publisherRows} AND ${table.rightsStatus} IN ('verified','pending') AND ${table.useStatus} IN ('active_unvalidated_heuristic','disabled_pending_rights_and_validation')`,
+    ),
+  ],
+);
+
+/** Complete observed-or-missing coverage for every supported jurisdiction in a release. */
+export const pulseInformationEnvironmentValues = pgTable(
+  "pulse_information_environment_values",
+  {
+    releaseId: text("release_id")
+      .references(() => pulseInformationEnvironmentReleases.releaseId, {
+        onDelete: "restrict",
+      })
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    iso3: text("iso3"),
+    valueStatus: text("value_status").$type<"observed" | "missing">().notNull(),
+    score: real("score"),
+    tier: text("tier").$type<"free" | "partial" | "restricted">(),
+    missingReason: text("missing_reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "pulse_information_environment_values_pk",
+      columns: [table.releaseId, table.jurisdictionId],
+    }),
+    index("idx_pulse_information_values_jurisdiction").on(table.jurisdictionId),
+    check(
+      "pulse_information_environment_values_contract_check",
+      dsql`${table.valueStatus} IN ('observed','missing') AND ((${table.valueStatus} = 'observed' AND ${table.score} BETWEEN 0 AND 100 AND ${table.score} <> 'NaN'::real AND ${table.tier} IN ('free','partial','restricted') AND ${table.missingReason} IS NULL) OR (${table.valueStatus} = 'missing' AND ${table.score} IS NULL AND ${table.tier} IS NULL AND btrim(${table.missingReason}) <> ''))`,
+    ),
+  ],
+);
+
+/** One immutable classification-time context pin per Pulse event projection. */
+export const pulseEventInformationEnvironmentPins = pgTable(
+  "pulse_event_information_environment_pins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    contextSchemaVersion: text("context_schema_version").notNull(),
+    pinKey: text("pin_key").notNull().unique(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    classificationRunId: uuid("classification_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    releaseId: text("release_id").references(
+      () => pulseInformationEnvironmentReleases.releaseId,
+      { onDelete: "restrict" },
+    ),
+    valueStatus: text("value_status").$type<"observed" | "missing">().notNull(),
+    score: real("score"),
+    tier: text("tier").$type<"free" | "partial" | "restricted">(),
+    sourceId: text("source_id"),
+    sourceUrl: text("source_url"),
+    upstreamRelease: text("upstream_release"),
+    observationYear: integer("observation_year"),
+    retrievedAt: timestamp("retrieved_at"),
+    contentSha256: text("content_sha256"),
+    rightsStatus: text("rights_status").notNull(),
+    useStatus: text("use_status").notNull(),
+    missingReason: text("missing_reason"),
+    methodVersion: text("method_version").notNull(),
+    classifiedAt: timestamp("classified_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_information_pins_jurisdiction_time").on(
+      table.jurisdictionId,
+      table.classifiedAt,
+    ),
+    index("idx_pulse_information_pins_release").on(table.releaseId),
+    check(
+      "pulse_event_information_environment_pins_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-information-environment-pin/v1' AND ${table.contextSchemaVersion} = 'pulse-information-environment-context/v1' AND ${table.pinKey} ~ '^pulse-information-environment-pin/sha256:[a-f0-9]{64}$' AND ${table.methodVersion} = 'pulse-information-environment/classification-pin-v1' AND ${table.valueStatus} IN ('observed','missing') AND ${table.rightsStatus} IN ('verified','pending','not_registered') AND ${table.useStatus} IN ('active_unvalidated_heuristic','disabled_pending_rights_and_validation','not_available') AND ((${table.valueStatus} = 'observed' AND ${table.releaseId} IS NOT NULL AND ${table.score} BETWEEN 0 AND 100 AND ${table.score} <> 'NaN'::real AND ${table.tier} IN ('free','partial','restricted') AND btrim(${table.sourceId}) <> '' AND ${table.sourceUrl} ~ '^https://' AND btrim(${table.upstreamRelease}) <> '' AND ${table.observationYear} >= 1900 AND ${table.retrievedAt} IS NOT NULL AND ${table.contentSha256} ~ '^[a-f0-9]{64}$' AND ${table.missingReason} IS NULL) OR (${table.valueStatus} = 'missing' AND ${table.score} IS NULL AND ${table.tier} IS NULL AND btrim(${table.missingReason}) <> ''))`,
+    ),
+  ],
+);
+
+/**
+ * Current classifier state for one raw cluster under one stable classifier
+ * configuration. The row is a mutable projection; research-evidence history
+ * retains every prior value while `pulse_classification_attempts` preserves
+ * the attempt ledger directly.
+ */
+export const pulseClusterClassificationStates = pgTable(
+  "pulse_cluster_classification_states",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    clusterId: uuid("cluster_id").notNull(),
+    incidentId: uuid("incident_id").references(() => pulseIncidents.id, {
+      onDelete: "restrict",
+    }),
+    configHash: text("config_hash").notNull(),
+    config: jsonb("config").$type<Record<string, unknown>>().notNull(),
+    status: text("status")
+      .$type<"classified" | "none" | "retryable_failure" | "terminal_failure">()
+      .notNull(),
+    attemptCount: integer("attempt_count").notNull(),
+    maxAttempts: integer("max_attempts").notNull(),
+    firstAttemptAt: timestamp("first_attempt_at").notNull(),
+    lastAttemptAt: timestamp("last_attempt_at").notNull(),
+    nextRetryAt: timestamp("next_retry_at"),
+    terminalAt: timestamp("terminal_at"),
+    leaseExpiresAt: timestamp("lease_expires_at"),
+    lastErrorCode: text("last_error_code"),
+    lastErrorMessage: text("last_error_message"),
+    lastRunId: uuid("last_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    eventId: uuid("event_id").references(() => pulseEventsV2.id, {
+      onDelete: "restrict",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_classification_state_cluster_config").on(
+      table.clusterId,
+      table.configHash,
+    ),
+    index("idx_pulse_classification_state_queue").on(
+      table.configHash,
+      table.status,
+      table.nextRetryAt,
+    ),
+    index("idx_pulse_classification_state_incident").on(table.incidentId),
+    index("idx_pulse_classification_state_run").on(table.lastRunId),
+    check(
+      "pulse_classification_state_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-classification-state/v1' AND ${table.configHash} ~ '^pulse-classification-config/v1/sha256:[a-f0-9]{64}$' AND jsonb_typeof(${table.config}) = 'object' AND ${table.status} IN ('classified','none','retryable_failure','terminal_failure') AND ${table.attemptCount} BETWEEN 1 AND ${table.maxAttempts} AND ${table.maxAttempts} BETWEEN 1 AND 10 AND ${table.lastAttemptAt} >= ${table.firstAttemptAt} AND ((${table.status} = 'retryable_failure' AND ${table.nextRetryAt} IS NOT NULL AND ${table.terminalAt} IS NULL AND ${table.eventId} IS NULL AND ${table.lastErrorCode} IS NOT NULL AND ${table.lastErrorMessage} IS NOT NULL) OR (${table.status} = 'terminal_failure' AND ${table.nextRetryAt} IS NULL AND ${table.terminalAt} IS NOT NULL AND ${table.eventId} IS NULL AND ${table.lastErrorCode} IS NOT NULL AND ${table.lastErrorMessage} IS NOT NULL) OR (${table.status} = 'none' AND ${table.nextRetryAt} IS NULL AND ${table.terminalAt} IS NOT NULL AND ${table.eventId} IS NULL AND ${table.lastErrorCode} IS NULL AND ${table.lastErrorMessage} IS NULL) OR (${table.status} = 'classified' AND ${table.nextRetryAt} IS NULL AND ${table.terminalAt} IS NOT NULL AND ${table.eventId} IS NOT NULL AND ${table.lastErrorCode} IS NULL AND ${table.lastErrorMessage} IS NULL))`,
+    ),
+  ],
+);
+
+/** Append-only evidence for every claimed classifier attempt. */
+export const pulseClassificationAttempts = pgTable(
+  "pulse_classification_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    attemptKey: text("attempt_key").notNull(),
+    clusterId: uuid("cluster_id").notNull(),
+    incidentId: uuid("incident_id").references(() => pulseIncidents.id, {
+      onDelete: "restrict",
+    }),
+    configHash: text("config_hash").notNull(),
+    ordinal: integer("ordinal").notNull(),
+    runId: uuid("run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    outcome: text("outcome")
+      .$type<
+        | "started"
+        | "classified"
+        | "none"
+        | "retryable_failure"
+        | "terminal_failure"
+      >()
+      .notNull(),
+    modelCallCount: integer("model_call_count").notNull(),
+    startedAt: timestamp("started_at").notNull(),
+    completedAt: timestamp("completed_at"),
+    nextRetryAt: timestamp("next_retry_at"),
+    errorCode: text("error_code"),
+    errorMessage: text("error_message"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_classification_attempt_key").on(table.attemptKey),
+    uniqueIndex("idx_pulse_classification_attempt_phase").on(
+      table.clusterId,
+      table.configHash,
+      table.ordinal,
+      table.outcome,
+    ),
+    index("idx_pulse_classification_attempt_run").on(table.runId),
+    index("idx_pulse_classification_attempt_cluster").on(
+      table.clusterId,
+      table.configHash,
+      table.startedAt,
+    ),
+    check(
+      "pulse_classification_attempt_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-classification-attempt/v1' AND ${table.attemptKey} ~ '^pulse-classification-attempt/sha256:[a-f0-9]{64}$' AND ${table.configHash} ~ '^pulse-classification-config/v1/sha256:[a-f0-9]{64}$' AND ${table.ordinal} BETWEEN 1 AND 10 AND ${table.outcome} IN ('started','classified','none','retryable_failure','terminal_failure') AND ${table.modelCallCount} >= 0 AND jsonb_typeof(${table.metadata}) = 'object' AND ((${table.outcome} = 'started' AND ${table.completedAt} IS NULL AND ${table.errorCode} IS NULL AND ${table.errorMessage} IS NULL) OR (${table.outcome} IN ('classified','none') AND ${table.completedAt} IS NOT NULL AND ${table.nextRetryAt} IS NULL AND ${table.errorCode} IS NULL AND ${table.errorMessage} IS NULL) OR (${table.outcome} = 'retryable_failure' AND ${table.completedAt} IS NOT NULL AND ${table.nextRetryAt} IS NOT NULL AND ${table.errorCode} IS NOT NULL AND ${table.errorMessage} IS NOT NULL) OR (${table.outcome} = 'terminal_failure' AND ${table.completedAt} IS NOT NULL AND ${table.nextRetryAt} IS NULL AND ${table.errorCode} IS NOT NULL AND ${table.errorMessage} IS NOT NULL))`,
+    ),
+  ],
+);
+
+/** Append-only candidate and confirmed resolution ledger for incident clashes. */
+export const pulseIncidentResolutions = pgTable(
+  "pulse_incident_resolutions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    resolutionKey: text("resolution_key").notNull(),
+    leftIncidentId: uuid("left_incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    rightIncidentId: uuid("right_incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    outcome: text("outcome")
+      .$type<"candidate" | "confirmed_merge" | "rejected" | "unresolved">()
+      .notNull(),
+    canonicalIncidentId: uuid("canonical_incident_id").references(
+      () => pulseIncidents.id,
+      { onDelete: "restrict" },
+    ),
+    signals: jsonb("signals").$type<Record<string, unknown>>().notNull(),
+    methodVersion: text("method_version").notNull(),
+    stageRunId: uuid("stage_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    actor: jsonb("actor").$type<Record<string, unknown>>().notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    decidedAt: timestamp("decided_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_incident_resolutions_key").on(table.resolutionKey),
+    index("idx_pulse_incident_resolutions_pair").on(
+      table.leftIncidentId,
+      table.rightIncidentId,
+      table.decidedAt,
+    ),
+    index("idx_pulse_incident_resolutions_run").on(table.stageRunId),
+    check(
+      "pulse_incident_resolutions_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-incident-resolution/v1' AND ${table.resolutionKey} ~ '^pulse-incident-resolution/sha256:[a-f0-9]{64}$' AND ${table.leftIncidentId} <> ${table.rightIncidentId} AND ${table.outcome} IN ('candidate','confirmed_merge','rejected','unresolved') AND jsonb_typeof(${table.signals}) = 'object' AND jsonb_typeof(${table.actor}) = 'object' AND ${table.methodVersion} <> '' AND btrim(${table.rationale}) <> '' AND cardinality(${table.evidenceRefs}) > 0 AND ((${table.outcome} = 'confirmed_merge' AND ${table.canonicalIncidentId} IN (${table.leftIncidentId}, ${table.rightIncidentId})) OR (${table.outcome} <> 'confirmed_merge' AND ${table.canonicalIncidentId} IS NULL))`,
+    ),
+  ],
+);
+
+/**
+ * Append-only evidence that an explicitly linked Pulse event is already
+ * represented by a later, comparable fixed-scale Index observation. This
+ * ledger never mutates corroboration confidence; scoring reads its latest
+ * as-of decision separately.
+ */
+export const pulseEventAbsorptions = pgTable(
+  "pulse_event_absorptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    absorptionKey: text("absorption_key").notNull().unique(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    outcome: text("outcome").$type<"absorbed" | "not_absorbed">().notNull(),
+    previousCiReleaseId: text("previous_ci_release_id").notNull(),
+    currentCiReleaseId: text("current_ci_release_id").notNull(),
+    previousScore: real("previous_score").notNull(),
+    currentScore: real("current_score").notNull(),
+    scoreDelta: real("score_delta").notNull(),
+    threshold: real("threshold").notNull(),
+    fixedScaleId: text("fixed_scale_id").notNull(),
+    linkStanding: text("link_standing")
+      .$type<"confirmed" | "candidate">()
+      .notNull(),
+    linkActorType: text("link_actor_type")
+      .$type<
+        "human_reviewer" | "source_native_exact_link" | "model_candidate"
+      >()
+      .notNull(),
+    linkMethodVersion: text("link_method_version").notNull(),
+    methodVersion: text("method_version").notNull(),
+    asOf: date("as_of").notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    reasons: text("reasons").array().notNull(),
+    supersedesAbsorptionKey: text("supersedes_absorption_key"),
+    decidedAt: timestamp("decided_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_event_absorptions_event_as_of").on(
+      table.eventId,
+      table.asOf,
+      table.decidedAt,
+    ),
+    index("idx_pulse_event_absorptions_release").on(
+      table.currentCiReleaseId,
+      table.dimension,
+    ),
+    foreignKey({
+      name: "pulse_event_absorptions_supersedes_key_fk",
+      columns: [table.supersedesAbsorptionKey],
+      foreignColumns: [table.absorptionKey],
+    }).onDelete("restrict"),
+    check(
+      "pulse_event_absorptions_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-event-absorption/v1' AND ${table.absorptionKey} ~ '^pulse-absorption/sha256:[a-f0-9]{64}$' AND ${table.dimension} IN ('democratic_quality','rule_of_law','freedom_rights','corruption_control') AND ${table.outcome} IN ('absorbed','not_absorbed') AND ${table.previousCiReleaseId} <> ${table.currentCiReleaseId} AND ${table.previousScore} <> 'NaN'::real AND ${table.currentScore} <> 'NaN'::real AND ${table.scoreDelta} <> 'NaN'::real AND ${table.threshold} > 0 AND btrim(${table.fixedScaleId}) <> '' AND ${table.linkStanding} IN ('confirmed','candidate') AND ${table.linkActorType} IN ('human_reviewer','source_native_exact_link','model_candidate') AND btrim(${table.linkMethodVersion}) <> '' AND btrim(${table.methodVersion}) <> '' AND btrim(${table.rationale}) <> '' AND cardinality(${table.evidenceRefs}) >= 2 AND ((${table.outcome} = 'absorbed' AND ${table.linkStanding} = 'confirmed' AND ${table.linkActorType} IN ('human_reviewer','source_native_exact_link') AND cardinality(${table.reasons}) = 0) OR (${table.outcome} = 'not_absorbed' AND cardinality(${table.reasons}) > 0))`,
+    ),
   ],
 );
 
@@ -2402,6 +3091,12 @@ export const pulseDimensionalDeltas = pgTable(
     computationRunId: uuid("computation_run_id")
       .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
       .notNull(),
+    /** Inclusive end date of the score window. */
+    scoreAsOf: date("score_as_of").notNull(),
+    /** Inclusive start date of the score window. */
+    windowStart: date("window_start").notNull(),
+    /** Closed production contract: trailing 365 calendar days. */
+    windowDays: integer("window_days").notNull(),
     lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
   },
   (table) => [
@@ -2412,6 +3107,83 @@ export const pulseDimensionalDeltas = pgTable(
     index("idx_pulse_dim_jurisdiction").on(table.jurisdictionId),
     index("idx_pulse_dim_derivation_version").on(table.derivationVersionKey),
     index("idx_pulse_dim_computation_run").on(table.computationRunId),
+    check(
+      "pulse_dimensional_deltas_dimension_check",
+      dsql`${table.dimension} IN ('democratic_quality', 'rule_of_law', 'freedom_rights', 'corruption_control', 'stability')`,
+    ),
+    check(
+      "pulse_dimensional_deltas_value_check",
+      dsql`${table.deltaValue} <> 'NaN'::real AND ${table.deltaValue} >= -15 AND ${table.deltaValue} <= 10`,
+    ),
+    check(
+      "pulse_dimensional_deltas_window_check",
+      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
+  ],
+);
+
+/**
+ * Immutable history of every versioned Pulse dimensional output.
+ *
+ * The mutable table above is the current-state projection. This relation is
+ * the reproducibility ledger: each score run records exactly one row for every
+ * jurisdiction/dimension output it computed, including zero-output clearing
+ * rows. Database triggers reject UPDATE and DELETE.
+ */
+export const pulseDimensionalDeltaHistory = pgTable(
+  "pulse_dimensional_delta_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version")
+      .notNull()
+      .default("pulse-dimensional-delta-history/v1"),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    deltaValue: real("delta_value").notNull(),
+    contributingEventIds: uuid("contributing_event_ids").array().notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
+    computationRunId: uuid("computation_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    scoreAsOf: date("score_as_of").notNull(),
+    windowStart: date("window_start").notNull(),
+    windowDays: integer("window_days").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_dim_history_run_jurisdiction_dimension").on(
+      table.computationRunId,
+      table.jurisdictionId,
+      table.dimension,
+    ),
+    index("idx_pulse_dim_history_jurisdiction_as_of").on(
+      table.jurisdictionId,
+      table.scoreAsOf,
+    ),
+    index("idx_pulse_dim_history_derivation_version").on(
+      table.derivationVersionKey,
+    ),
+    check(
+      "pulse_dimensional_delta_history_schema_check",
+      dsql`${table.schemaVersion} = 'pulse-dimensional-delta-history/v1'`,
+    ),
+    check(
+      "pulse_dimensional_delta_history_dimension_check",
+      dsql`${table.dimension} IN ('democratic_quality', 'rule_of_law', 'freedom_rights', 'corruption_control', 'stability')`,
+    ),
+    check(
+      "pulse_dimensional_delta_history_value_check",
+      dsql`${table.deltaValue} <> 'NaN'::real AND ${table.deltaValue} >= -15 AND ${table.deltaValue} <= 10`,
+    ),
+    check(
+      "pulse_dimensional_delta_history_window_check",
+      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
   ],
 );
 
@@ -2453,6 +3225,110 @@ export const pulseReviewAuditLog = pgTable(
       table.createdAt,
     ),
     index("idx_pulse_review_audit_run").on(table.runId),
+  ],
+);
+
+/**
+ * PUL-033 — one operational human-review obligation for each event admitted
+ * to the pending queue under a named SLA contract. Historic pre-contract work
+ * is retained as `legacy_quarantined`; that state is not a human decision.
+ */
+export const pulseReviewObligations = pgTable(
+  "pulse_review_obligations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull(),
+    incidentId: uuid("incident_id")
+      .references(() => pulseIncidents.id, { onDelete: "restrict" })
+      .notNull(),
+    slaVersion: text("sla_version").notNull(),
+    priority: text("priority")
+      .$type<"critical" | "urgent" | "standard">()
+      .notNull(),
+    triggerReason: text("trigger_reason").notNull(),
+    queuedAt: timestamp("queued_at").notNull(),
+    queuedAtBasis: text("queued_at_basis")
+      .$type<"recorded" | "created_at_proxy">()
+      .notNull(),
+    escalateAt: timestamp("escalate_at").notNull(),
+    dueAt: timestamp("due_at").notNull(),
+    state: text("state")
+      .$type<"open" | "claimed" | "dispositioned" | "legacy_quarantined">()
+      .notNull(),
+    claimedBy: text("claimed_by"),
+    claimedAt: timestamp("claimed_at"),
+    claimExpiresAt: timestamp("claim_expires_at"),
+    disposition: text("disposition"),
+    dispositionedBy: text("dispositioned_by"),
+    dispositionedAt: timestamp("dispositioned_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_review_obligation_event_version").on(
+      table.eventId,
+      table.slaVersion,
+    ),
+    index("idx_pulse_review_obligation_active_due").on(
+      table.state,
+      table.dueAt,
+    ),
+    index("idx_pulse_review_obligation_priority_due").on(
+      table.priority,
+      table.dueAt,
+    ),
+    index("idx_pulse_review_obligation_incident").on(table.incidentId),
+    check(
+      "pulse_review_obligation_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-review-obligation/v1' AND ${table.slaVersion} = 'pulse-review-sla/v1' AND ${table.priority} IN ('critical','urgent','standard') AND ${table.queuedAtBasis} IN ('recorded','created_at_proxy') AND ${table.state} IN ('open','claimed','dispositioned','legacy_quarantined') AND btrim(${table.triggerReason}) <> '' AND ${table.queuedAt} <= ${table.escalateAt} AND ${table.escalateAt} <= ${table.dueAt} AND ((${table.state} = 'open' AND ${table.claimedBy} IS NULL AND ${table.claimedAt} IS NULL AND ${table.claimExpiresAt} IS NULL AND ${table.disposition} IS NULL AND ${table.dispositionedBy} IS NULL AND ${table.dispositionedAt} IS NULL) OR (${table.state} = 'claimed' AND btrim(${table.claimedBy}) <> '' AND ${table.claimedAt} IS NOT NULL AND ${table.claimExpiresAt} > ${table.claimedAt} AND ${table.disposition} IS NULL AND ${table.dispositionedBy} IS NULL AND ${table.dispositionedAt} IS NULL) OR (${table.state} IN ('dispositioned','legacy_quarantined') AND btrim(${table.disposition}) <> '' AND btrim(${table.dispositionedBy}) <> '' AND ${table.dispositionedAt} IS NOT NULL))`,
+    ),
+  ],
+);
+
+/** Append-only operational record for queue entry, escalation and exceptions. */
+export const pulseReviewSlaEvents = pgTable(
+  "pulse_review_sla_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    eventKey: text("event_key").notNull(),
+    obligationId: uuid("obligation_id")
+      .references(() => pulseReviewObligations.id, { onDelete: "restrict" })
+      .notNull(),
+    kind: text("kind")
+      .$type<
+        | "enqueued"
+        | "claimed"
+        | "released"
+        | "escalated"
+        | "exception_granted"
+        | "exception_expired"
+        | "dispositioned"
+        | "legacy_quarantined"
+      >()
+      .notNull(),
+    actor: jsonb("actor").$type<Record<string, unknown>>().notNull(),
+    reasonCode: text("reason_code").notNull(),
+    note: text("note").notNull(),
+    effectiveAt: timestamp("effective_at").notNull(),
+    expiresAt: timestamp("expires_at"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_review_sla_event_key").on(table.eventKey),
+    index("idx_pulse_review_sla_event_obligation").on(
+      table.obligationId,
+      table.effectiveAt,
+    ),
+    index("idx_pulse_review_sla_event_kind").on(table.kind, table.effectiveAt),
+    check(
+      "pulse_review_sla_event_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-review-sla-event/v1' AND ${table.eventKey} ~ '^pulse-review-sla-event/sha256:[a-f0-9]{64}$' AND ${table.kind} IN ('enqueued','claimed','released','escalated','exception_granted','exception_expired','dispositioned','legacy_quarantined') AND jsonb_typeof(${table.actor}) = 'object' AND jsonb_typeof(${table.metadata}) = 'object' AND btrim(${table.reasonCode}) <> '' AND btrim(${table.note}) <> '' AND ((${table.kind} = 'exception_granted' AND ${table.expiresAt} > ${table.effectiveAt}) OR (${table.kind} <> 'exception_granted' AND ${table.expiresAt} IS NULL))`,
+    ),
   ],
 );
 
@@ -2627,9 +3503,7 @@ export const pulseCodingComparisons = pgTable(
     generatedAt: timestamp("generated_at").defaultNow().notNull(),
   },
   (table) => [
-    index("idx_pulse_coding_comparison_disagreements").on(
-      table.generatedAt,
-    ),
+    index("idx_pulse_coding_comparison_disagreements").on(table.generatedAt),
     check(
       "pulse_coding_comparisons_contract_check",
       dsql`${table.coderAssignmentAId} <> ${table.coderAssignmentBId} AND ${table.comparisonSha256} ~ '^[a-f0-9]{64}$' AND jsonb_typeof(${table.comparison}) = 'object'`,

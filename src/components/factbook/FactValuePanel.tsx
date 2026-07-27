@@ -16,6 +16,10 @@ import { reconciliation } from "@/lib/content/site-state";
 import { growthMethodologyLabel } from "@/lib/data/growth-methodology";
 import { DataValueState } from "@/components/DataValueState";
 import { parseDataValueStatus } from "@/lib/data/value-state";
+import {
+  buildFactEvidenceSummary,
+  lineageForFactRow,
+} from "@/lib/factbook/reconcile/fact-evidence-summary";
 
 const SOURCE_LABELS: Record<string, string> = {
   cia_factbook: "CIA World Factbook",
@@ -156,6 +160,7 @@ export function FactValuePanel({
 }: FactValuePanelProps) {
   const isDisputed = disputed ?? resolverOutput.isDisputed;
   const canonicalId = resolverOutput.canonical?.id ?? null;
+  const evidence = buildFactEvidenceSummary(resolverOutput);
 
   // Order rows: canonical first, then other active, then rejected.
   const ordered = [...resolverOutput.all].sort((a, b) => {
@@ -188,6 +193,30 @@ export function FactValuePanel({
         </div>
       )}
 
+      <section
+        className={`fact-value-evidence fact-value-evidence--${evidence.posture}`}
+        aria-label="Evidence relationship"
+      >
+        <strong>{evidence.heading}</strong>
+        <p>{evidence.explanation}</p>
+        <p className="fact-value-evidence-rationale">
+          <span>Why this value:</span> {evidence.rationale}
+        </p>
+        {resolverOutput.decisionTrace.length > 0 ? (
+          <details className="fact-value-decision-trace">
+            <summary>Show the complete resolver trace</summary>
+            <ol>
+              {resolverOutput.decisionTrace.map((step) => (
+                <li key={step.code}>
+                  <strong>{step.code.replaceAll("_", " ")}</strong>
+                  <span>{step.detail}</span>
+                </li>
+              ))}
+            </ol>
+          </details>
+        ) : null}
+      </section>
+
       <ul className="fact-value-rows">
         {ordered.map((row) => {
           const isCanonical = row.id === canonicalId;
@@ -195,6 +224,7 @@ export function FactValuePanel({
           const isRejected = row.status === "rejected";
           const isProjected = row.valueType === "projected";
           const value = formatValue(row, factKey);
+          const lineage = lineageForFactRow(row, factKey);
           return (
             <li
               key={row.id}
@@ -259,6 +289,13 @@ export function FactValuePanel({
                 {isRejected && row.statusReason ? (
                   <> · {row.statusReason}</>
                 ) : null}
+                <span className="fact-value-row-lineage">
+                  Producing family: {lineage.familyId.replaceAll("_", " ")} ·{" "}
+                  {lineage.relationship}
+                  {!lineage.independentEligible
+                    ? " · not counted as independent evidence"
+                    : ""}
+                </span>
               </div>
             </li>
           );

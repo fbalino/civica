@@ -7,6 +7,7 @@ interface Country {
   name: string;
   iso2: string | null;
   capital: string | null;
+  status: import("@/lib/jurisdictions/status-presentation").JurisdictionStatusPresentation;
 }
 
 export function GlobalSearch({ countries }: { countries: Country[] }) {
@@ -14,8 +15,8 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
     <CountrySearchCombobox
       countries={countries}
       countryPathPrefix="/country"
-      placeholder="Search countries..."
-      ariaLabel="Search countries"
+      placeholder="Search countries and areas..."
+      ariaLabel="Search countries and areas"
       showShortcut
       enableShortcut
       compact

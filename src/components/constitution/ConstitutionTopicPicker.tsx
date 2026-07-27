@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import type { TopicCategory, TopicLeaf } from "@/lib/constitute/topics";
 
@@ -26,6 +26,8 @@ export function ConstitutionTopicPicker({
 }: ConstitutionTopicPickerProps) {
   const [query, setQuery] = useState("");
   const [openCats, setOpenCats] = useState<Set<string>>(() => new Set());
+  const [activeResultKey, setActiveResultKey] = useState<string | null>(null);
+  const listboxId = useId();
 
   const q = query.trim().toLowerCase();
 
@@ -81,6 +83,18 @@ export function ConstitutionTopicPicker({
       return next;
     });
 
+  const moveActiveResult = (direction: 1 | -1) => {
+    if (!filtered || filtered.length === 0) return;
+    const current = filtered.findIndex((leaf) => leaf.key === activeResultKey);
+    const next =
+      current < 0
+        ? direction > 0
+          ? 0
+          : filtered.length - 1
+        : (current + direction + filtered.length) % filtered.length;
+    setActiveResultKey(filtered[next].key);
+  };
+
   return (
     <div className="constitution-topic-picker">
       <div className="constitution-topic-search">
@@ -88,15 +102,49 @@ export function ConstitutionTopicPicker({
         <input
           type="search"
           value={query}
-          placeholder="Search 414 topics…"
-          onChange={(e) => setQuery(e.target.value)}
+          placeholder={`Search ${new Set(leaves.map((leaf) => leaf.key)).size} topics…`}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setActiveResultKey(null);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              moveActiveResult(e.key === "ArrowDown" ? 1 : -1);
+            } else if (e.key === "Home" && filtered?.length) {
+              e.preventDefault();
+              setActiveResultKey(filtered[0].key);
+            } else if (e.key === "End" && filtered?.length) {
+              e.preventDefault();
+              setActiveResultKey(filtered[filtered.length - 1].key);
+            } else if (e.key === "Enter" && activeResultKey) {
+              e.preventDefault();
+              onSelect(activeResultKey);
+            } else if (e.key === "Escape" && query) {
+              e.preventDefault();
+              setQuery("");
+              setActiveResultKey(null);
+            }
+          }}
           aria-label="Search constitution topics"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={filtered != null}
+          aria-controls={filtered ? listboxId : undefined}
+          aria-activedescendant={
+            activeResultKey ? `${listboxId}-${activeResultKey}` : undefined
+          }
           autoComplete="off"
         />
       </div>
 
       {filtered ? (
-        <ul className="constitution-topic-results" role="listbox">
+        <ul
+          className="constitution-topic-results"
+          id={listboxId}
+          role="listbox"
+          aria-label="Constitution topics"
+        >
           {filtered.length === 0 ? (
             <li className="constitution-topic-empty">
               No topics match “{query}”.
@@ -106,11 +154,15 @@ export function ConstitutionTopicPicker({
               <li key={leaf.key}>
                 <button
                   type="button"
+                  id={`${listboxId}-${leaf.key}`}
                   role="option"
                   aria-selected={leaf.key === selectedKey}
                   className={`constitution-topic-option${
                     leaf.key === selectedKey ? " is-selected" : ""
+                  }${activeResultKey === leaf.key ? " is-active" : ""
                   }`}
+                  tabIndex={-1}
+                  onMouseMove={() => setActiveResultKey(leaf.key)}
                   onClick={() => onSelect(leaf.key)}
                 >
                   {leaf.label}
@@ -131,6 +183,7 @@ export function ConstitutionTopicPicker({
                   type="button"
                   className="constitution-topic-category-head"
                   aria-expanded={open}
+                  aria-controls={`constitution-topic-category-${cat.key}`}
                   onClick={() => toggleCat(cat.key)}
                 >
                   <span>{cat.label}</span>
@@ -139,7 +192,10 @@ export function ConstitutionTopicPicker({
                   </span>
                 </button>
                 {open ? (
-                  <ul className="constitution-topic-category-list">
+                  <ul
+                    className="constitution-topic-category-list"
+                    id={`constitution-topic-category-${cat.key}`}
+                  >
                     {catLeaves.map((leaf) => (
                       <li key={leaf.key}>
                         <button

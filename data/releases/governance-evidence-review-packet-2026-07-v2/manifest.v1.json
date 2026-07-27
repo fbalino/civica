@@ -427,8 +427,8 @@
     {
       "artifactId": "package-lock",
       "role": "environment",
-      "bytes": 406742,
-      "sha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927",
+      "bytes": 408861,
+      "sha256": "9558f57eba3b959d92f0a83410297d26f348b243a38a6e4a9ff5a40e7e8439a4",
       "path": "package-lock.json"
     },
     {
@@ -490,8 +490,8 @@
     {
       "artifactId": "selected-product-code-4",
       "role": "selected-product-code",
-      "bytes": 7518,
-      "sha256": "20ded2ea1d1d858477972507dfbdb7e8fb75a796721aa02482f1fcfe800e7f6f",
+      "bytes": 7608,
+      "sha256": "b22abb81de1da099ddb92c5195479c4c21e4f6ebcb24aee00f7a9577740196b3",
       "path": "src/app/governance-evidence/page.tsx"
     },
     {
@@ -539,10 +539,10 @@
     {
       "artifactId": "rights-manifest-code",
       "role": "rights",
-      "bytes": 12228,
-      "sha256": "3114b8b433cedc9f4008c907da6e2713fa5b4efbbac9df1ee714f64dd8be2878",
+      "bytes": 16767,
+      "sha256": "a1071ab37e61aaffd9604ec4092fa2eb22a7d9aefc3ad8d392e25851b5054d45",
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "3019ec0dad84c5455e04f5141b2ae8422bd71cd2e16ef2827e0616e0bad14fc3"
+  "bundleSemanticSha256": "812526963c3c706301b28bea478b5f40e4467a5ac1bfbec74eff92afdb5a9659"
 }

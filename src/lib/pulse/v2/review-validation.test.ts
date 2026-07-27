@@ -127,4 +127,12 @@ test("publication origin distinguishes every review outcome", () => {
     }),
     "legacy_rejected_unverified",
   );
+  assert.equal(
+    publicationOriginFor({
+      published: false,
+      humanReviewed: false,
+      reviewStatus: "legacy_quarantined",
+    }),
+    "legacy_quarantined",
+  );
 });

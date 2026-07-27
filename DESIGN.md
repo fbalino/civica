@@ -30,6 +30,8 @@ tokens:
   elevation:
     hard: var(--shadow-hard)
     dark: var(--shadow-dark)
+  border:
+    hairline: var(--border-hairline)
 ---
 
 # Civica Design System
@@ -76,7 +78,25 @@ Use the standard container widths:
 
 **Hero sections** are full-bleed bands (`width: 100vw; margin-left: calc(50% - 50vw)`) and MUST share one canonical height via **`var(--hero-height)`** (`clamp(460px, 44vw, 640px)`) so every hero reads as one design language. **The single canonical page hero is the `<PageHero>` component** (`src/components/PageHero.tsx`) — every browse/landing page uses it, never a hand-rolled hero (see the Hero subsection under "Editorial layout classes" below). It composes the `.factbook-landing-hero` / `.factbook-hero-*` class family, which the homepage (`.home-hero`) also mirrors. On mobile heroes relax to content height. The per-country factbook masthead (`.factbook-hero--art`) is a distinct engraving-overlay pattern, not a section hero. Do NOT give a new hero a one-off height, width, or markup; use `<PageHero>`. Whenever a country/territory masthead renders an engraving (`engravingSrc` set), `FactbookHeaderStrip` always renders the `.factbook-hero-caption` disclosure — the "Editorial engraving" label plus a `.factbook-hero-caption-link` linking to `/licensing#imagery` — even when no landmark caption text is available for that page. The link uses `pointer-events: auto` against the caption's own `pointer-events: none`; keep that override if you touch the caption styles.
 
+**Engraving color is versioned, not session-tuned.** Japan light is the canonical owner-approved reference, and the current dark corpus uses the approved strength-60 grade. Exact hashes, tone/saturation/warmth ranges, contrast floors, output format, line/geometry invariants, and pass/fail references live in `plan/decisions/engraving-color-contract-v1.md` and its machine-readable JSON companion. Run `npm run validate:engraving-color-contract` after changing a canonical reference, grading parameters, or the batch report. Color grading may not disguise a semantic or landmark defect; those assets enter regeneration review.
+
+Every `<PageHero>` with engraving art visibly renders the canonical `Editorial illustration · AI-assisted, non-documentary` policy link. Country and territory mastheads use their landmark caption plus the equivalent accessible policy disclosure. Background art remains `alt=""` and `aria-hidden="true"` because the adjacent disclosure/caption carries the meaning once. Do not remove, rename, or page-localize these disclosures.
+
+### Alternative text
+
+Every image on the site is either **meaningful** (it conveys information a screen-reader user cannot get from surrounding text) or **decorative** (adjacent visible text already names it, or it is pure ornament). This is a closed policy — every image class below resolves to exactly one treatment. Meaningful images carry a real descriptive `alt`; decorative images carry `alt=""`, and inline SVG icons additionally carry `aria-hidden="true"` paired with the existing `focusable="false"`. `npm run validate:alt-text-policy` enforces the mechanical half of this (missing `alt`, decorative images missing `aria-hidden`) with the same baseline-ratchet approach as `validate:design-tokens` — run it before any UI commit that touches an image.
+
+- **Flags** (`<CountryFlag>`) — the `decorative` prop is REQUIRED (no default), forcing every call site to choose explicitly. `true` renders `alt="" aria-hidden`; `false` renders a descriptive `Flag of {ISO2}`. Every current call site has a visible country name immediately adjacent (a card title, table cell, or heading), so `decorative` is `true` almost everywhere — pass `false` only for a flag with no adjacent name (e.g. a bare legend key).
+- **Portraits** (`<LeaderPortrait>`) — always `alt="" aria-hidden`. The person's name always renders next to the portrait (card heading or row name), so the photo itself never carries unique information; the instant `<Tooltip>` still exposes the office and photo credit on hover/focus.
+- **Maps and charts** — data-bearing visualizations (the interactive Civica map, the legislature hemicycle, PCA/eigenvalue charts, the weights bar) are meaningful: give them a real accessible name/description (`aria-label`, `<title>`/`<desc>`, or an adjacent heading) plus a tabular or text alternative where one already exists (the hemicycle's stats grid, a ranking's `DataTable`). Static map/photo thumbnails and the enlarged lightbox image are decorative (`alt=""`) precisely because a caption with the same description renders immediately beside them (`FactbookHeaderStrip` cover tiles, `FactbookLightbox` thumbnails and main image) — a matching `alt` would announce the same sentence twice.
+- **Engravings and Record (blog) art** — always decorative (`alt="" aria-hidden="true"`). The `Editorial engraving` / `AI-assisted illustration` disclosure link documented above carries the accessible description, not the image. Blog inline figures (`post-figure`) already follow this rule (EXP-036) — leave that file alone.
+- **Organization marks / logos** — meaningful only when the mark is the sole identifier on its row (no adjacent name); decorative when a name label sits next to the mark.
+- **Icons** — inline SVG icons (chevrons, the info glyph, the "more sources" plus glyph, the `<CivicaLogo>` mark) are ornamentation next to a control that already has its own accessible name/label. They carry both `focusable="false"` (removes the legacy IE/Edge SVG tab stop) and `aria-hidden="true"` (removes the icon from the accessibility tree so assistive tech announces the control's label once, not "chevron down, Explore" or "plus, more sources").
+
 Use `var(--space-*)` for new spacing decisions unless an existing component contract requires a fixed dimension.
+
+Hairline rules use `var(--border-hairline)`. New components must not repeat a
+raw pixel border width.
 
 ## Elevation
 
@@ -131,14 +151,14 @@ Reader-style pages (methodology, replication, corrections, changelog, etc.) comp
 
 Page type drives the layout, not the prose length. **Do not default to `width="narrow"` because the prose is long.** The narrow column is for short-form editorial content (blog posts, single-topic essays). Methodology pages, regardless of how long the prose is, use the methodology layout with a sidebar.
 
-| Page type | Class / prop | Width | Sidebar? | Examples |
-|---|---|---|---|---|
-| Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
-| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/privacy`, `/terms` |
-| Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/pulse-changelog` |
-| Standard product/editorial page | `<EditorialPage width="full">` | 1200px | No | Atlas-scale layouts |
-| Multi-pane reference surface | `<EditorialPage width="reference">` | 1280px content + gutters | Optional | `/constitution`, `/country/[slug]` tabs |
-| Short-form editorial / blog | `<EditorialPage>` (default `width="narrow"`) | 760px | No | Single-topic blog posts, short essays |
+| Page type                                        | Class / prop                                                         | Width                    | Sidebar?                            | Examples                                                                                                                                                                                  |
+| ------------------------------------------------ | -------------------------------------------------------------------- | ------------------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Methodology page or methodology subpage          | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px                   | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
+| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px                   | Yes (left, sticky, section anchors) | `/privacy`, `/terms`                                                                                                                                                                      |
+| Filterable list / changelog                      | `<EditorialPage width="wide">`                                       | 960px                    | No                                  | `/civica-index/pulse-changelog`                                                                                                                                                           |
+| Standard product/editorial page                  | `<EditorialPage width="full">`                                       | 1200px                   | No                                  | Atlas-scale layouts                                                                                                                                                                       |
+| Multi-pane reference surface                     | `<EditorialPage width="reference">`                                  | 1280px content + gutters | Optional                            | `/constitution`, `/country/[slug]` tabs                                                                                                                                                   |
+| Short-form editorial / blog                      | `<EditorialPage>` (default `width="narrow"`)                         | 760px                    | No                                  | Single-topic blog posts, short essays                                                                                                                                                     |
 
 **Default disambiguation rule**: if the URL is under `/methodology`, `/*/methodology`, or otherwise documents a methodology decision, use `methodology-layout`. Reaching for `width="narrow"` on a methodology page is wrong even if the prose feels short — methodology pages share a sidebar convention readers expect to find.
 
@@ -146,11 +166,11 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 
 **The page hero is orthogonal to the container.** A browse/landing page opens with the canonical `<PageHero>` full-bleed band (see the Hero subsection below), then drops its body into one of the container rows above. Never hand-roll a hero, and never give one a one-off width — the government-types-vs-pulse-changelog width mismatch that this replaced is exactly the drift to avoid.
 
-The `<EditorialPage>` component's prop docstring describes what each width prop *technically* does. This document describes which one to *pick*. When they conflict, this document wins.
+The `<EditorialPage>` component's prop docstring describes what each width prop _technically_ does. This document describes which one to _pick_. When they conflict, this document wins.
 
 ### Page hero — `<PageHero>` (the one canonical hero)
 
-**Every browse/landing page opens with `<PageHero>` (`src/components/PageHero.tsx`) — there is exactly one hero shell, and it never varies.** Same full-bleed band, same shared `var(--hero-height)`, same 1200px inner column, same eyebrow → serif H1 → dek type scale, same optional engraving + scrim, same on-mount stagger. Only the *content* changes per page. Given the same content it renders pixel-for-pixel identical to the home, `/country`, and `/about` heroes. Demoed live on `/design-system` (section 05).
+**Every browse/landing page opens with `<PageHero>` (`src/components/PageHero.tsx`) — there is exactly one hero shell, and it never varies.** Same full-bleed band, same shared `var(--hero-height)`, same 1200px inner column, same eyebrow → serif H1 → dek type scale, same optional engraving + scrim, same on-mount stagger. Only the _content_ changes per page. Given the same content it renders pixel-for-pixel identical to the home, `/country`, and `/about` heroes. Demoed live on `/design-system` (section 05).
 
 Props:
 

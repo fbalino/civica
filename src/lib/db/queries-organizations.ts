@@ -47,8 +47,18 @@ export interface OrgMembershipDetail {
   wikidataQid: string | null;
   /** This country's accession date (date string) — never null in the seed. */
   joinDate: string | null;
+  joinDatePrecision: "day" | "year" | "unknown";
+  endDate: string | null;
+  endDatePrecision: "day" | "year" | "unknown";
   /** founding | permanent | observer | null. */
   role: string | null;
+  status: "current" | "former" | "withdrawn" | "suspended";
+  disputed: boolean;
+  sourceId: string;
+  sourceUrl: string;
+  sourceLicense: string;
+  sourceRetrievedAt: string;
+  upstreamVintage: string;
 }
 
 export interface OrgCoMember {
@@ -126,7 +136,17 @@ export async function getCountryOrganizationsData(
       hqName: sql<string | null>`${hq}.name`,
       wikidataQid: organizations.wikidataQid,
       joinDate: organizationMemberships.joinDate,
+      joinDatePrecision: organizationMemberships.joinDatePrecision,
+      endDate: organizationMemberships.endDate,
+      endDatePrecision: organizationMemberships.endDatePrecision,
       role: organizationMemberships.role,
+      status: organizationMemberships.status,
+      disputed: organizationMemberships.disputed,
+      sourceId: organizationMemberships.sourceId,
+      sourceUrl: organizationMemberships.sourceUrl,
+      sourceLicense: organizationMemberships.sourceLicense,
+      sourceRetrievedAt: organizationMemberships.sourceRetrievedAt,
+      upstreamVintage: organizationMemberships.upstreamVintage,
     })
     .from(organizationMemberships)
     .innerJoin(
@@ -137,7 +157,12 @@ export async function getCountryOrganizationsData(
       sql`jurisdictions AS hq_juris`,
       sql`${hq}.slug = ${organizations.hqCountry}`,
     )
-    .where(eq(organizationMemberships.jurisdictionId, jurisdictionId))
+    .where(
+      and(
+        eq(organizationMemberships.jurisdictionId, jurisdictionId),
+        ne(organizationMemberships.status, "unverified_legacy"),
+      ),
+    )
     .orderBy(asc(organizations.type), asc(organizations.name));
 
   const memberships: OrgMembershipDetail[] = rows.map((r) => ({
@@ -157,15 +182,29 @@ export async function getCountryOrganizationsData(
         : typeof r.joinDate === "string"
           ? r.joinDate
           : new Date(r.joinDate).toISOString().slice(0, 10),
+    joinDatePrecision: r.joinDatePrecision as "day" | "year" | "unknown",
+    endDate:
+      r.endDate == null
+        ? null
+        : typeof r.endDate === "string"
+          ? r.endDate
+          : new Date(r.endDate).toISOString().slice(0, 10),
+    endDatePrecision: r.endDatePrecision as "day" | "year" | "unknown",
     role: r.role ?? null,
+    status: r.status as "current" | "former" | "withdrawn" | "suspended",
+    disputed: r.disputed,
+    sourceId: r.sourceId!,
+    sourceUrl: r.sourceUrl!,
+    sourceLicense: r.sourceLicense!,
+    sourceRetrievedAt: new Date(r.sourceRetrievedAt!).toISOString(),
+    upstreamVintage: r.upstreamVintage!,
   }));
 
   // 2. Co-membership context. Only worth fetching for non-universal orgs that
   //    this country actually belongs to.
   const eligible = memberships.filter(
     (m) =>
-      (m.totalMembers ?? 0) > 1 &&
-      (m.totalMembers ?? 0) <= UNIVERSAL_THRESHOLD,
+      (m.totalMembers ?? 0) > 1 && (m.totalMembers ?? 0) <= UNIVERSAL_THRESHOLD,
   );
 
   const coMembership: Record<string, OrgCoMembership> = {};
@@ -190,6 +229,7 @@ export async function getCountryOrganizationsData(
         and(
           sql`${organizationMemberships.orgId} IN ${eligibleOrgIds}`,
           ne(organizationMemberships.jurisdictionId, jurisdictionId),
+          eq(organizationMemberships.status, "current"),
         ),
       );
 

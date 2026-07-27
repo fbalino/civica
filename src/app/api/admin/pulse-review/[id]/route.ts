@@ -22,7 +22,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { pulseEventsV2, pulseReviewAuditLog } from "@/lib/db/schema";
 import { getAdminSession } from "@/lib/admin/session";
@@ -115,6 +115,18 @@ export async function POST(
   if (!existing) {
     return NextResponse.json({ error: "event not found" }, { status: 404 });
   }
+  if (existing.projectionStatus !== "current") {
+    return NextResponse.json(
+      { error: "event projection is no longer current" },
+      { status: 409 },
+    );
+  }
+  if (existing.reviewStatus !== "pending" || existing.published) {
+    return NextResponse.json(
+      { error: "event is no longer pending human review" },
+      { status: 409 },
+    );
+  }
 
   const before = {
     category: existing.category,
@@ -131,8 +143,8 @@ export async function POST(
   let dimension = existing.dimension;
   let severityTier = existing.severityTier;
   let severityValue = existing.severityValue;
-  let published = existing.published;
-  let reviewStatus = existing.reviewStatus;
+  let published: boolean = existing.published;
+  let reviewStatus: string = existing.reviewStatus;
 
   if (body.action === "approve") {
     published = true;
@@ -193,7 +205,7 @@ export async function POST(
   const superseded = await latestPulseDecisionKeys(db, id, decisionKinds);
   const decidedAt = new Date();
 
-  await db
+  const updated = await db
     .update(pulseEventsV2)
     .set({
       category,
@@ -208,7 +220,31 @@ export async function POST(
       updatedAt: decidedAt,
       publicationRunId: published ? reviewRun.id : null,
     })
-    .where(eq(pulseEventsV2.id, id));
+    .where(
+      and(
+        eq(pulseEventsV2.id, id),
+        eq(pulseEventsV2.projectionStatus, "current"),
+        eq(pulseEventsV2.reviewStatus, "pending"),
+        eq(pulseEventsV2.published, false),
+      ),
+    )
+    .returning({ id: pulseEventsV2.id });
+  if (!updated[0]) {
+    await finishPulsePipelineRun(db, reviewRun.id, {
+      status: "failed",
+      counts: { reviewed: 0 },
+      failures: [
+        {
+          component: "current_projection_guard",
+          message: "Event projection changed before the review write.",
+        },
+      ],
+    });
+    return NextResponse.json(
+      { error: "event projection is no longer current" },
+      { status: 409 },
+    );
+  }
 
   await db.insert(pulseReviewAuditLog).values({
     eventId: id,

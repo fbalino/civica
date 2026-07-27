@@ -101,6 +101,22 @@
       ]
     },
     {
+      "sourceId": "civica_organization_roster_v1",
+      "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+      "termsUrl": "https://www.civicaatlas.org/methodology/source-coverage",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "blocked",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
       "sourceId": "civicus_monitor",
       "licenseId": "PUBLISHER-TERMS-PENDING:open-share-alike",
       "termsUrl": "https://monitor.civicus.org/RSSFeed.xml",
@@ -134,18 +150,21 @@
     },
     {
       "sourceId": "constitute_project",
-      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
-      "termsUrl": "https://www.constituteproject.org/service/",
-      "reviewStatus": "pending",
-      "reviewedAt": null,
+      "licenseId": "CC-BY-NC-3.0",
+      "termsUrl": "https://www.constituteproject.org/content/terms",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-12",
       "publicExport": "non-commercial-only",
       "commercialUse": false,
-      "derivatives": null,
-      "attributionRequired": null,
+      "derivatives": true,
+      "attributionRequired": true,
       "shareAlikeRequired": false,
       "restrictions": [
-        "Source-specific terms have not completed DAT-003 verification",
-        "Bulk export remains blocked until the terms record is verified"
+        "Interactive display is permitted only for a non-commercial, no-fee deployment",
+        "Attribute Constitute and preserve the CC BY-NC 3.0 notice",
+        "Commercial use and charging a fee are prohibited by the publisher terms",
+        "Bulk constitution-text export remains blocked by Civica policy",
+        "Official license statement: https://www.constituteproject.org/content/about?lang=e"
       ]
     },
     {
@@ -695,6 +714,45 @@
   ],
   "products": [
     {
+      "productId": "constitution-search-display-v1",
+      "routeOrArtifact": "/api/constitution/search",
+      "publicBulkExport": "blocked",
+      "interactiveDisplay": "allowed-non-commercial",
+      "fields": [
+        {
+          "fieldPattern": "data[].passage.highlightSegments",
+          "lineage": "source-row",
+          "exportRule": "blocked"
+        },
+        {
+          "fieldPattern": "data[].provenance|data[].citationUrl|corpus|rights",
+          "lineage": "civica-derived",
+          "exportRule": "blocked"
+        }
+      ],
+      "reason": "Constitute text may be shown only as bounded, attributed interactive excerpts on a non-commercial, no-fee deployment. Bulk export and unrestricted corpus access remain blocked.",
+      "requiresDerivationVersions": true
+    },
+    {
+      "productId": "election-qualified-export-v1",
+      "routeOrArtifact": "/api/v1/elections?format=json|csv",
+      "publicBulkExport": "allowed",
+      "fields": [
+        {
+          "fieldPattern": "data[].event|data[].jurisdiction|data[].provenance",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "withheld|audit|dateSemantics|filters|meta",
+          "lineage": "civica-derived",
+          "exportRule": "source-permission"
+        }
+      ],
+      "reason": "The election research export emits only qualified source rows with verified public-export permission. IPU, IDEA, IPU-derived projections, and unknown-source rows remain visible only as withheld counts and reasons.",
+      "requiresDerivationVersions": true
+    },
+    {
       "productId": "atlas-reference-export-v1",
       "routeOrArtifact": "/downloads/civica-atlas-2026-07-11.json.gz",
       "publicBulkExport": "allowed",
@@ -740,6 +798,25 @@
         }
       ],
       "reason": "The country research export contains resolver-selected canonical observations and separately typed alternates, projections, and rejected rows. Every emitted observation must have verified public-export terms; restricted rows are omitted, and a fact is withheld rather than reassigned when its selected canonical source cannot be distributed.",
+      "requiresDerivationVersions": true
+    },
+    {
+      "productId": "indicator-history-country-export",
+      "routeOrArtifact": "/api/countries/{slug}/indicator-history?format=json|csv",
+      "publicBulkExport": "allowed",
+      "fields": [
+        {
+          "fieldPattern": "series[].observations",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "series[].lineage|withheld|jurisdiction",
+          "lineage": "civica-derived",
+          "exportRule": "source-permission"
+        }
+      ],
+      "reason": "Country indicator-history downloads include observation rows only when the source-specific rights record permits public export. Other visible series remain on the reader page but are named in the export's withheld manifest without their values.",
       "requiresDerivationVersions": true
     },
     {

@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Link from "next/link";
-import { getAllJurisdictions } from "@/lib/db/queries";
+import { getAllReferenceJurisdictions } from "@/lib/db/queries";
 import {
   readCachedFieldFromRow,
   getCanonicalFactsForJurisdictions,
@@ -40,7 +40,7 @@ function SpotEngraving({
   );
 }
 
-type FeaturedCountryRow = Awaited<ReturnType<typeof getAllJurisdictions>>[number];
+type FeaturedCountryRow = Awaited<ReturnType<typeof getAllReferenceJurisdictions>>[number];
 
 /** Human-readable population (e.g. "123.3M", "1.41B"). Null-safe. */
 function formatPopulation(pop: number | string | null): string | null {
@@ -69,17 +69,17 @@ function buildCardStats(row: FeaturedCountryRow): CountryCardStat[] {
 
 export async function HomeGrid() {
   // Country list for the hero search (graceful empty on DB error).
-  let countries: { slug: string; name: string; iso2: string | null; capital: string | null }[] =
-    [];
-  let allJurisdictions: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
+  let countries: Parameters<typeof GlobalSearch>[0]["countries"] = [];
+  let allJurisdictions: Awaited<ReturnType<typeof getAllReferenceJurisdictions>> = [];
   try {
-    allJurisdictions = await getAllJurisdictions();
+    allJurisdictions = await getAllReferenceJurisdictions();
     const all = allJurisdictions;
     countries = all.map((c) => ({
       slug: c.slug,
       name: c.name,
       iso2: c.iso2,
       capital: readCachedFieldFromRow(c, "capital"),
+      status: c.jurisdictionStatus,
     }));
   } catch {}
 

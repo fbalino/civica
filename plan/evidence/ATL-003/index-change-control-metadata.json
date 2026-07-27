@@ -1,0 +1,19 @@
+{
+  "id": "publish-atlas-native-indicator-history",
+  "toVersion": "civica-index-atlas-history-presentation-v24",
+  "categories": ["input", "presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/ATL-003/README.md",
+      "DESIGN.md"
+    ],
+    "registry": [
+      "src/lib/claims/public-numeric-claims.ts",
+      "src/lib/rights/manifest.ts"
+    ],
+    "release_note": ["plan/evidence/ATL-003/README.md"],
+    "migration_plan": ["plan/evidence/ATL-003/migration-plan.md"],
+    "golden_test": ["src/lib/indicators/history-catalog.test.ts"],
+    "contract_test": ["src/lib/atlas/surface-data-matrix.test.ts"]
+  }
+}

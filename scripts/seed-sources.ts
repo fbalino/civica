@@ -43,6 +43,15 @@ const SOURCES = [
     lastSyncAt: null,
   },
   {
+    id: "civica_organization_roster_v1",
+    name: "Civica organization roster v1",
+    baseUrl: "https://www.civicaatlas.org/methodology/source-coverage",
+    license:
+      "Mixed official-publisher terms; factual reference only; source content is not redistributed",
+    isCommercialUseAllowed: false,
+    lastSyncAt: null,
+  },
+  {
     id: "ipu_parline",
     name: "IPU Parline",
     baseUrl: "https://api.data.ipu.org/v1",
@@ -54,7 +63,7 @@ const SOURCES = [
     id: "constitute_project",
     name: "Constitute Project",
     baseUrl: "https://www.constituteproject.org/service/",
-    license: "non-commercial",
+    license: "CC-BY-NC-3.0",
     isCommercialUseAllowed: false,
     lastSyncAt: null,
   },

@@ -69,6 +69,7 @@ export async function GET(
       iso2: jurisdiction.iso2,
       iso3: jurisdiction.iso3,
       status: jurisdiction.type,
+      statusDetails: jurisdiction.jurisdictionStatus,
     },
     resolutions,
     sources: new Map(

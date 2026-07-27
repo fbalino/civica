@@ -106,16 +106,58 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     deprecation: active,
   },
   legislature_parties: {
-    definition: "Party seat holdings for a legislative body.",
-    rowGrain: "One party in one legislature seat snapshot.",
+    definition:
+      "Current or retained party seat holdings for a legislative body, linked to a stable political-party identity and immutable composition run.",
+    rowGrain: "One stable party participation row in one legislature.",
     releaseScope: "atlas_public",
     sourceOrDerivation:
       "IPU Parline with Wikidata fallback and Civica normalization.",
     cadence: "Scheduled legislature sync and post-election correction.",
     vintageSemantics:
-      "Current seat snapshot; the table does not yet carry a complete row-level observation vintage.",
+      "composition_run_id identifies the exact source retrieval; is_current and retired_at preserve superseded chamber participation without deleting identity or ideology links.",
     rights:
       "Mixed; IPU-derived records remain subject to non-commercial share-alike terms.",
+    deprecation: active,
+  },
+  political_parties: {
+    definition:
+      "Stable political-party identities independent of a seat snapshot or mutable display name.",
+    rowGrain: "One political-party identity within one jurisdiction.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Source-native IPU or Wikidata identifiers when available; legacy rows remain explicitly provisional until a source identifier is observed.",
+    cadence: "Updated when a legislature composition source is retrieved.",
+    vintageSemantics:
+      "identity_retrieved_at dates the source identifier observation; provisional_legacy identities make no historical continuity claim.",
+    rights:
+      "Identity provenance retains the source URL and license; source-specific reuse restrictions continue to apply.",
+    deprecation: active,
+  },
+  party_composition_runs: {
+    definition:
+      "Immutable source retrievals that established a legislature composition.",
+    rowGrain: "One body, source, payload, and writer-version run.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "IPU Parline or Wikidata payload hash plus exact source URL, license, and retrieval time; legacy adoption runs may have unavailable source fields.",
+    cadence: "One row for each materially new composition retrieval.",
+    vintageSemantics:
+      "source_retrieved_at is publisher retrieval time; recorded_at is the Civica ledger insertion time.",
+    rights: "Inherited from the named source and recorded per run.",
+    deprecation: active,
+  },
+  party_identity_events: {
+    definition:
+      "Append-only, source-bound party identity changes and lineage edges.",
+    rowGrain:
+      "One observed rename/retirement/reactivation or one sourced predecessor-successor edge within a grouped split, merge, or succession event.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Composition writers record observed identity lifecycle changes; split, merge, and succession edges require explicit source evidence and are never inferred from names.",
+    cadence: "Event-driven.",
+    vintageSemantics:
+      "effective_date is the political event date when sourced; source_retrieved_at and recorded_at remain separate.",
+    rights: "Inherited from the source recorded on each event.",
     deprecation: active,
   },
   party_positions: {
@@ -168,6 +210,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "year and year_updated describe the constitution; last_fetched is retrieval time.",
     rights:
       "Constitute Project non-commercial terms; document redistribution must remain rights-filtered.",
+    deprecation: active,
+  },
+  constitution_passages: {
+    definition:
+      "Version-bound searchable and citable passages derived from Constitute's English-language service representation.",
+    rowGrain:
+      "One source document version, source section, language representation, and normalized content version.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Deterministically normalized from one parsed Constitute section; heading and body feed the English PostgreSQL full-text index.",
+    cadence:
+      "Current rows are replaced on successful source sync or local parser re-derivation; superseded rows remain resolvable.",
+    vintageSemantics:
+      "retrieved_at is the source retrieval time; passage identity binds source document, section, language, and content hash.",
+    rights:
+      "CC BY-NC 3.0 interactive non-commercial display only; public bulk constitution-text export remains blocked.",
     deprecation: active,
   },
   constitution_topic_excerpts: {
@@ -546,43 +604,18 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Article metadata and excerpts follow publisher terms; model output is experimental.",
     deprecation: legacyPulse("pulse_events_v2"),
   },
-  pulse_daily_scores: {
-    definition: "Legacy Pulse v1 daily aggregate score rows.",
-    rowGrain: "One jurisdiction and calendar day.",
-    releaseScope: "research_beta",
-    sourceOrDerivation: "Legacy aggregation of pulse_events.",
-    cadence: "Historical only.",
-    vintageSemantics:
-      "date is aggregation day; calculated_at is computation time.",
-    rights:
-      "Derived experimental output; source-event restrictions remain applicable.",
-    deprecation: legacyPulse(
-      "pulse_dimensional_deltas and the Pulse v2 event ledger",
-    ),
-  },
-  pulse_changelog: {
-    definition: "Legacy Pulse v1 change log entries.",
-    rowGrain: "One recorded legacy Pulse change.",
-    releaseScope: "research_beta",
-    sourceOrDerivation:
-      "Civica-generated change metadata from legacy Pulse scores.",
-    cadence: "Historical only.",
-    vintageSemantics:
-      "created_at is change-record time; version identifies the legacy method state.",
-    rights: "Civica-authored metadata with linked event-source restrictions.",
-    deprecation: legacyPulse("Pulse v2 corrections and review ledger"),
-  },
   organizations: {
     definition:
       "International and regional organization identities and descriptors.",
     rowGrain: "One organization.",
     releaseScope: "atlas_public",
-    sourceOrDerivation: "Wikidata and curated official-organization metadata.",
-    cadence: "Periodic source sync and manual correction.",
+    sourceOrDerivation:
+      "Versioned Civica compilation of exact official organization pages, with Wikidata identifiers retained only where separately known.",
+    cadence: "Versioned official-roster compilation and reviewed correction.",
     vintageSemantics:
-      "Current reference record; founded/dissolved years describe the organization.",
+      "source_retrieved_at dates the official organization page check; upstream_vintage identifies the immutable Civica compilation; founded year remains a separate organization event date.",
     rights:
-      "Wikidata fields are CC0; curated/official fields retain source-specific terms.",
+      "Each identity retains its exact publisher URL and source-specific terms; publisher content is not redistributed.",
     deprecation: active,
   },
   organization_memberships: {
@@ -590,11 +623,12 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rowGrain: "One jurisdiction-organization membership.",
     releaseScope: "atlas_public",
     sourceOrDerivation:
-      "Wikidata and official organization membership sources.",
-    cadence: "Periodic source sync and event-driven correction.",
+      "Versioned compilation of exact official organization membership pages; legacy blanket seeds remain explicitly unverified and are excluded from public reads.",
+    cadence: "Versioned roster release and event-driven correction.",
     vintageSemantics:
-      "joined/left dates describe membership validity; record timestamps describe ingestion.",
-    rights: "Inherited from membership source lineage.",
+      "join/end dates describe the relationship interval at their stored precision; source_retrieved_at dates evidence capture; upstream_vintage fixes the compilation; created/updated timestamps describe storage only.",
+    rights:
+      "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
     deprecation: active,
   },
   civica_conditions_scores: {
@@ -667,6 +701,81 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
     deprecation: active,
   },
+  pulse_incidents: {
+    definition:
+      "Stable real-world Pulse incident identities that survive later reports and retain confirmed merge lineage.",
+    rowGrain: "One active or merged real-world incident identity.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Versioned normalized report identity, bounded date evidence, and retained incident-resolution decisions over raw Pulse reports.",
+    cadence:
+      "Created during clustering; updated only by a confirmed, append-only incident-resolution decision.",
+    vintageSemantics:
+      "event_date_start/end bound source-reported occurrence dates; created_at/updated_at are Civica processing clocks.",
+    rights:
+      "Civica-generated identity metadata; linked report evidence retains publisher-specific rights restrictions.",
+    deprecation: active,
+  },
+  pulse_incident_assignments: {
+    definition:
+      "Append-only evidence explaining why one retained Pulse report was assigned to a stable incident.",
+    rowGrain: "One assignment of one raw_event to one incident.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Versioned semantic, normalized-token, anchor, exact-match, or explicitly scoreless historical-backfill evidence.",
+    cadence:
+      "Append-only when clustering assigns a newly retained report or the historical backfill is installed.",
+    vintageSemantics:
+      "assigned_at is the matching decision time; stage_run_id and algorithm_version identify the processing context.",
+    rights:
+      "Civica-generated matching metadata; referenced report content remains private or rights-filtered.",
+    deprecation: active,
+  },
+  pulse_incident_resolutions: {
+    definition:
+      "Append-only candidate, confirmation, rejection, and unresolved decisions for possible duplicate Pulse incidents.",
+    rowGrain: "One versioned decision about one ordered incident pair.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Pre- and post-classification identity signals evaluated under the versioned incident-resolution method.",
+    cadence:
+      "Append-only whenever collision detection or qualified review issues a new pair decision.",
+    vintageSemantics:
+      "decided_at is the resolution decision time; created_at is storage time; evidence_refs preserve the evaluated inputs.",
+    rights:
+      "Civica-generated resolution metadata; referenced report evidence retains publisher-specific restrictions.",
+    deprecation: active,
+  },
+  pulse_cluster_classification_states: {
+    definition:
+      "Current terminal or retryable classifier state for a Pulse cluster under one content-addressed configuration.",
+    rowGrain: "One raw cluster and classifier-configuration pair.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica classifier orchestration state covering the actual voter, verifier, subject-attribution, prompt, method, gate, and retry configuration.",
+    cadence:
+      "Claimed and updated once per bounded attempt; terminal states are immutable and every mutation is retained in research history.",
+    vintageSemantics:
+      "Attempt and retry timestamps are Civica processing clocks; event occurrence time remains on the linked raw and event rows.",
+    rights:
+      "Civica-generated operational research metadata; sanitized errors exclude credentials and linked publisher evidence retains its own restrictions.",
+    deprecation: active,
+  },
+  pulse_classification_attempts: {
+    definition:
+      "Append-only start and terminal evidence for each claimed Pulse classifier attempt.",
+    rowGrain:
+      "One started or completed phase for one cluster, configuration, attempt ordinal, and run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica classifier orchestration evidence with run lineage, model-call count, sanitized error, and retry outcome.",
+    cadence: "Append-only when an attempt is claimed and when it settles.",
+    vintageSemantics:
+      "started_at/completed_at record processing; next_retry_at is the scheduled eligibility boundary and carries no event-time meaning.",
+    rights:
+      "Civica-generated metadata; no credentials or publisher payloads may be stored in error or metadata fields.",
+    deprecation: active,
+  },
   raw_events: {
     definition:
       "Deduplicated raw Pulse v2 inputs plus retained terminal classification dispositions.",
@@ -696,6 +805,64 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
     deprecation: active,
   },
+  pulse_event_absorptions: {
+    definition:
+      "Append-only decisions about whether one explicitly linked Pulse event is already represented in a later comparable fixed-scale Index observation.",
+    rowGrain:
+      "One event, prior/current Index release pair, link method, and absorption outcome under pulse-event-absorption/v1.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica assessment of a confirmed event-level link against exact closed-release dimension scores, scale identity, direction, and threshold rules.",
+    cadence:
+      "Only when a later closed Index release and a reviewed explicit event link are available; the current registry produces no rows.",
+    vintageSemantics:
+      "as_of is the Index comparison date; decided_at is the decision time; a reversal appends a row through supersedes_absorption_key.",
+    rights:
+      "Civica-generated research metadata; referenced event and source evidence retain their original rights restrictions.",
+    deprecation: active,
+  },
+  pulse_information_environment_releases: {
+    definition:
+      "Immutable metadata for one exact official information-environment dataset capture adopted for classification-time context.",
+    rowGrain: "One source release and content hash.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Publisher release metadata verified against the captured input SHA-256; raw publisher rows are not redistributed.",
+    cadence: "Append-only when a new official release is reviewed and adopted.",
+    vintageSemantics:
+      "observation_year is the assessed period, retrieved_at is capture time, and adopted_at is the earliest classification time eligible to pin the release.",
+    rights:
+      "Release-level metadata is retained; publisher values remain internal while redistribution rights are pending.",
+    deprecation: active,
+  },
+  pulse_information_environment_values: {
+    definition:
+      "Complete observed-or-explicit-missing jurisdiction coverage for one immutable information-environment release.",
+    rowGrain: "One release and one supported jurisdiction.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Exact ISO3 match to the official release, or an explicit missing row when no match exists; no midpoint or other imputation is allowed.",
+    cadence: "Append-only with its release.",
+    vintageSemantics:
+      "Inherits the release observation year, capture time, content hash, and adoption time.",
+    rights:
+      "Restricted publisher values are internal and excluded from public bulk export; missingness metadata is Civica-generated.",
+    deprecation: active,
+  },
+  pulse_event_information_environment_pins: {
+    definition:
+      "Immutable snapshot of the exact information-environment value or missing state available when a Pulse event was classified.",
+    rowGrain: "One Pulse event projection and classification run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Database-triggered copy of the then-adopted release row; historical events without a contemporaneous pin remain explicitly unrecoverable.",
+    cadence: "Exactly once at event insertion.",
+    vintageSemantics:
+      "classified_at matches event creation; source release, observation year, retrieval time, and content hash never change on rerun.",
+    rights:
+      "Public products expose only permitted context metadata; restricted values remain internal and source rights continue to apply.",
+    deprecation: active,
+  },
   pulse_event_decisions: {
     definition:
       "Append-only, axis-specific Pulse decisions and refutations underlying the current event projection.",
@@ -719,7 +886,8 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Direct ingestion deduplication outcomes and database-trigger projections of versioned Pulse decisions, with retained legacy projections where the underlying evidence still exists.",
-    cadence: "Append-only whenever a candidate is excluded or a decision axis is refuted.",
+    cadence:
+      "Append-only whenever a candidate is excluded or a decision axis is refuted.",
     vintageSemantics:
       "occurred_at is the exclusion or decision time; created_at is storage time; method_version and stage_run_id identify the processing context.",
     rights:
@@ -744,7 +912,8 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   pulse_coding_studies: {
     definition:
       "Version-pinned independent-coding studies kept separate from production Pulse review and scoring.",
-    rowGrain: "One coding study over one frozen packet set and method contract.",
+    rowGrain:
+      "One coding study over one frozen packet set and method contract.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Created by an authorized study administrator from a label-blind packet manifest.",
@@ -772,14 +941,16 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   pulse_coding_participants: {
     definition:
       "Pseudonymous role-bearing participants with hashed, revocable coding-workspace credentials.",
-    rowGrain: "One coder, adjudicator, or study administrator identity in one study.",
+    rowGrain:
+      "One coder, adjudicator, or study administrator identity in one study.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Issued by the study administrator; random access codes are stored only as SHA-256 hashes.",
     cadence: "On invitation, access, expiry, or revocation.",
     vintageSemantics:
       "created_at, last_access_at, expires_at, and revoked_at describe access lifecycle rather than research-event time.",
-    rights: "Private access-control metadata; never part of a public research release.",
+    rights:
+      "Private access-control metadata; never part of a public research release.",
     deprecation: active,
   },
   pulse_coding_assignments: {
@@ -803,20 +974,24 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Deterministically recomputed from two locked raw submissions using comparePulseCoderSubmissions.",
-    cadence: "Once when the second coder locks, with idempotent repair after interruption.",
+    cadence:
+      "Once when the second coder locks, with idempotent repair after interruption.",
     vintageSemantics:
       "generated_at is comparison time; comparison_sha256 binds both raw submission hashes.",
-    rights: "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
+    rights:
+      "Civica-generated research metadata; underlying evidence restrictions remain applicable.",
     deprecation: active,
   },
   pulse_coding_adjudications: {
     definition:
       "Separate terminal adjudication records that preserve rather than overwrite both raw coder submissions.",
-    rowGrain: "One resolved or explicitly unresolved adjudication for one comparison.",
+    rowGrain:
+      "One resolved or explicitly unresolved adjudication for one comparison.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Recorded by the independently assigned adjudicator with canonical reason codes, rationale, and evidence-grounded resolution.",
-    cadence: "Once after both coder submissions lock; terminal rows are immutable.",
+    cadence:
+      "Once after both coder submissions lock; terminal rows are immutable.",
     vintageSemantics:
       "created_at is record creation and resolved_at is the terminal decision time under the pinned comparison.",
     rights:
@@ -826,14 +1001,16 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   pulse_coding_audit_log: {
     definition:
       "Append-only access and state-transition history for independent coding studies.",
-    rowGrain: "One access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
+    rowGrain:
+      "One access, assignment, save, lock, comparison, adjudication, export, or revocation action.",
     releaseScope: "internal_operational",
     sourceOrDerivation:
       "Generated by role-gated coding services and database-enforced workflow transitions.",
     cadence: "Append-only for every meaningful coding-workspace action.",
     vintageSemantics:
       "created_at is action time; before and after hashes identify affected immutable state without copying credentials.",
-    rights: "Private operational audit metadata; exports omit credential hashes.",
+    rights:
+      "Private operational audit metadata; exports omit credential hashes.",
     deprecation: active,
   },
   pulse_sources: {
@@ -851,14 +1028,31 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
   },
   pulse_dimensional_deltas: {
     definition:
-      "Experimental per-dimension effects assigned to reviewed Pulse v2 events.",
-    rowGrain: "One event, Civica Index dimension, and scoring method version.",
+      "Current experimental Pulse effect for one jurisdiction and Civica Index dimension.",
+    rowGrain:
+      "One current-state row per jurisdiction and Civica Index dimension.",
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Versioned experimental scoring from verified Pulse v2 event classifications.",
     cadence: "Daily after classification/corroboration and on rescore.",
     vintageSemantics:
-      "created_at is scoring time; method_version fixes the scoring interpretation.",
+      "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+    rights:
+      "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+    deprecation: active,
+  },
+  pulse_dimensional_delta_history: {
+    definition:
+      "Immutable, versioned history of every computed Pulse dimensional output, including zero-output clearing rows.",
+    rowGrain:
+      "One score run, jurisdiction, and Civica Index dimension under pulse-dimensional-delta-history/v1.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Copied atomically from each versioned Pulse score computation with its contributing event IDs and derivation envelope.",
+    cadence:
+      "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
+    vintageSemantics:
+      "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
     rights:
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
     deprecation: active,
@@ -874,6 +1068,35 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "created_at is review-action time; payloads preserve the state at that time.",
     rights:
       "Internal review metadata; embedded source evidence retains publisher rights.",
+    deprecation: active,
+  },
+  pulse_review_obligations: {
+    definition:
+      "Current operational human-review obligation under a versioned Pulse service-level contract.",
+    rowGrain: "One Pulse event and review-SLA version.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Created by the database queue trigger from an unpublished current event; pre-contract rows are explicitly legacy quarantined.",
+    cadence:
+      "Created at queue entry and retained through claim or terminal disposition transitions.",
+    vintageSemantics:
+      "queued_at starts the operating clock; escalate_at and due_at are frozen from the SLA version and priority at entry.",
+    rights:
+      "Civica-generated operational metadata; linked event evidence retains publisher restrictions.",
+    deprecation: active,
+  },
+  pulse_review_sla_events: {
+    definition:
+      "Append-only operational events for Pulse queue entry, escalation, bounded exceptions, disposition, and legacy quarantine.",
+    rowGrain: "One content-addressed SLA event on one review obligation.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated by database queue transitions, authenticated reviewers, migration boundaries, and the scheduled SLA monitor.",
+    cadence: "Append-only when a review obligation changes operational state.",
+    vintageSemantics:
+      "effective_at records the operational event time; exception expiry is prospective and never erases an earlier breach.",
+    rights:
+      "Internal operational metadata; explanatory notes must not copy restricted publisher evidence.",
     deprecation: active,
   },
   backtest_cases: {

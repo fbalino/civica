@@ -17,6 +17,11 @@ import {
 } from "@/components/atlas/organizations";
 import type { OrgDetail, OrgGroup } from "@/components/atlas/organizations";
 import { withOg } from "@/lib/og";
+import {
+  ORGANIZATION_MEMBERSHIP_RETRIEVED_AT,
+  ORGANIZATION_MEMBERSHIP_SOURCES,
+  releaseOrganizationMembership,
+} from "@/lib/organizations/membership-release";
 
 export const revalidate = 3600;
 
@@ -63,14 +68,17 @@ export default async function OrgDetailPage({
       const c = countries.find((x) => x.id === m.countryId);
       const fallback = c ? null : getOrgMemberCountryFallback(m.countryId);
       if (!c && !fallback) return null;
+      const released = releaseOrganizationMembership(m);
       return {
         id: c?.id ?? fallback!.id,
         name: c?.name ?? fallback!.name,
         slug: c?.slug ?? fallback!.slug,
         region: c?.region ?? fallback!.region,
-        joinYear: m.joinYear,
+        joinYear: released.joinYear,
         role: m.role ?? null,
         inAtlas: !!c,
+        status: released.status,
+        endYear: released.endYear,
       };
     })
     .filter((m): m is NonNullable<typeof m> => m !== null)
@@ -90,6 +98,10 @@ export default async function OrgDetailPage({
       extra: (org.extra ?? null) as Record<string, unknown> | null,
     },
     members,
+    membershipSource: {
+      ...ORGANIZATION_MEMBERSHIP_SOURCES[org.id],
+      retrievedAt: ORGANIZATION_MEMBERSHIP_RETRIEVED_AT,
+    },
   };
 
   const groups: OrgGroup[] = ORG_TYPE_ORDER.map((type) => ({
@@ -110,7 +122,10 @@ export default async function OrgDetailPage({
 
   return (
     <div className="org-standalone">
-      <aside className="org-standalone__sidebar" aria-label="Organization picker">
+      <aside
+        className="org-standalone__sidebar"
+        aria-label="Organization picker"
+      >
         <div className="org-standalone__sidebar-head">
           <div className="kicker">Atlas</div>
           <div className="title">Organizations</div>

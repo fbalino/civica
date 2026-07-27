@@ -19,7 +19,7 @@ A regression fixture supplies deliberately changed current values, source, and m
 ## Verification
 
 - `npm run validate:release-bom:live`: pass; semantic SHA-256 `60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc`.
-- `npm run validate:g2-atlas`: pass; archive SHA-256 `bb845c3d6e0b17ceb834399afc84b3f52baaf272e02a993efd2112ebc9de9543`.
+- `npm run validate:g2-atlas`: pass; archive SHA-256 `978476a32355767eac6e73e792cd31580f850d9b498d576b4926fa4e10c9e53d`.
 - `npm run reproduce:g2-atlas`: exact offline semantic and file hashes.
 - `npm run validate:clean-room`: exact v2 fixture and export hashes without credentials or network.
 - `npm run validate:backup-restore`: release archive matches the refreshed BOM.

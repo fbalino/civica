@@ -6,6 +6,14 @@ import {
   legislatureParties,
 } from "@/lib/db/schema";
 import { resolvePartyColor } from "@/lib/data/party-colors";
+import {
+  ELECTION_CORPUS_AUDIT,
+  getElectionAuditRow,
+  isAuditedProjection,
+  isAuditedPublicElection,
+  isPrimaryElectionEvent,
+} from "@/lib/elections/corpus-audit-runtime";
+import { loadLiveElectionContentFingerprints } from "@/lib/elections/corpus-audit-live";
 
 export interface LegislatureParty {
   id: string;
@@ -35,6 +43,8 @@ export interface LegislatureData {
   coalition: string | null;
   /** ISO year of the next scheduled election, when known. */
   nextElection: string | null;
+  nextElectionBasis: "source_dated" | "term_projection" | null;
+  nextElectionStatus: "tentative" | "source_dated" | "unknown" | null;
 }
 
 /**
@@ -48,14 +58,14 @@ export interface LegislatureData {
  * hide the section entirely in that case.
  */
 export async function getLegislatureForJurisdiction(
-  jurisdictionId: string
+  jurisdictionId: string,
 ): Promise<LegislatureData | null> {
   const bodies = await db
     .select()
     .from(governmentBodies)
     .where(
       sql`${governmentBodies.jurisdictionId} = ${jurisdictionId}
-        AND ${governmentBodies.branch} = 'legislative'`
+        AND ${governmentBodies.branch} = 'legislative'`,
     )
     .orderBy(asc(governmentBodies.hierarchyLevel));
 
@@ -68,12 +78,15 @@ export async function getLegislatureForJurisdiction(
   const allParties = await db
     .select()
     .from(legislatureParties)
-    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .where(
+      sql`${legislatureParties.bodyId} IN ${bodyIds}
+        AND ${legislatureParties.isCurrent} = true`,
+    )
     .orderBy(desc(legislatureParties.seatCount));
 
   function buildChamber(
     body: typeof lowerBody,
-    slot: "lower" | "upper"
+    slot: "lower" | "upper",
   ): LegislatureChamber {
     const bp = allParties.filter((p) => p.bodyId === body.id);
     const totalSeats =
@@ -83,8 +96,7 @@ export async function getLegislatureForJurisdiction(
     // Same data-quality guard as the atlas loader: if the sum of party
     // seats is 20%+ over the chamber total (multi-election aggregation
     // bug in some IPU/Wikidata syncs), normalise into the chamber total.
-    const isAggregated =
-      sumPartySeats > 0 && sumPartySeats > totalSeats * 1.2;
+    const isAggregated = sumPartySeats > 0 && sumPartySeats > totalSeats * 1.2;
 
     const seen = new Set<string>();
     let parties: LegislatureParty[] = bp.map((p, i) => {
@@ -133,35 +145,57 @@ export async function getLegislatureForJurisdiction(
   // Pull most-recent past election to extrapolate "next election" hints.
   // We don't have a future-election table, but the latest past election
   // year is informative as a "last election" stat for the masthead.
-  const latestPast = await db
-    .select({ electionDate: elections.electionDate })
+  const latestPastRows = await db
+    .select({ id: elections.id, electionDate: elections.electionDate })
     .from(elections)
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
-        AND ${elections.electionDate} <= CURRENT_DATE`
+        AND ${elections.electionType} ILIKE 'legislativ%'
+        AND ${elections.electionDate} <= ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
-    .orderBy(desc(elections.electionDate))
-    .limit(1);
+    .orderBy(desc(elections.electionDate));
 
-  const futureElection = await db
-    .select({ electionDate: elections.electionDate })
+  const futureElectionRows = await db
+    .select({ id: elections.id, electionDate: elections.electionDate })
     .from(elections)
     .where(
       sql`${elections.jurisdictionId} = ${jurisdictionId}
-        AND ${elections.electionDate} > CURRENT_DATE`
+        AND ${elections.electionType} ILIKE 'legislativ%'
+        AND ${elections.electionDate} > ${ELECTION_CORPUS_AUDIT.asOf}`,
     )
-    .orderBy(asc(elections.electionDate))
-    .limit(1);
+    .orderBy(asc(elections.electionDate));
+
+  const liveFingerprints = await loadLiveElectionContentFingerprints([
+    ...latestPastRows.map((row) => row.id),
+    ...futureElectionRows.map((row) => row.id),
+  ]);
+
+  const latestPast = latestPastRows.find((row) =>
+    isAuditedPublicElection(row.id, liveFingerprints.get(row.id)),
+  );
+  const futureElection = futureElectionRows.find(
+    (row) =>
+      isPrimaryElectionEvent(row.id) &&
+      (isAuditedPublicElection(row.id, liveFingerprints.get(row.id)) ||
+        isAuditedProjection(row.id, liveFingerprints.get(row.id))),
+  );
+  const futureAudit = futureElection
+    ? getElectionAuditRow(futureElection.id)
+    : null;
 
   let nextElection: string | null = null;
-  if (futureElection[0]?.electionDate) {
-    nextElection = String(
-      new Date(futureElection[0].electionDate as unknown as string).getUTCFullYear()
-    );
-  } else if (latestPast[0]?.electionDate) {
+  if (futureElection?.electionDate) {
+    const year = new Date(
+      futureElection.electionDate as unknown as string,
+    ).getUTCFullYear();
+    nextElection =
+      futureAudit?.temporalClass === "projection_due"
+        ? `Est. due ${year}`
+        : `Source-dated ${year}`;
+  } else if (latestPast?.electionDate) {
     // No upcoming election scheduled, show the year of the most recent.
     nextElection = `Last: ${new Date(
-      latestPast[0].electionDate as unknown as string
+      latestPast.electionDate as unknown as string,
     ).getUTCFullYear()}`;
   }
 
@@ -170,5 +204,21 @@ export async function getLegislatureForJurisdiction(
     upper,
     coalition: null, // Coalition copy is not currently in the schema.
     nextElection,
+    nextElectionBasis:
+      futureAudit?.temporalClass === "projection_due"
+        ? "term_projection"
+        : futureAudit?.temporalClass === "source_dated_upcoming"
+          ? "source_dated"
+          : null,
+    nextElectionStatus:
+      futureAudit?.temporalClass === "projection_due"
+        ? "unknown"
+        : futureAudit?.sourceEventStatus === "tentative"
+          ? "tentative"
+          : futureAudit?.sourceEventStatus === "source_dated"
+            ? "source_dated"
+            : futureAudit
+              ? "unknown"
+              : null,
   };
 }

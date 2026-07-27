@@ -1,0 +1,15 @@
+{
+  "id": "atlas-sourced-jurisdiction-status",
+  "toVersion": "civica-index-atlas-jurisdiction-status-presentation-v26",
+  "evidence": {
+    "documentation": [
+      "plan/evidence/ATL-006/README.md",
+      "plan/research/atlas-surface-data-matrix-v1.md"
+    ],
+    "registry": ["data/atlas-surface-data-matrix.v1.json"],
+    "release_note": ["plan/evidence/ATL-006/README.md"],
+    "migration_plan": ["plan/evidence/ATL-006/migration-plan.md"],
+    "golden_test": ["src/lib/jurisdictions/status-presentation.test.ts"],
+    "contract_test": ["src/lib/seo/__tests__/jurisdiction-jsonld.test.ts"]
+  }
+}

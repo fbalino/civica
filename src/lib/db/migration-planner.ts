@@ -5,13 +5,13 @@ import type { MigrationArtifact } from "./migration-registry";
 
 export function affectedRelations(entry: MigrationArtifact, source: string): string[] {
   const names = new Set<string>();
+  const declared = source.match(/(?:--|\/\/)\s*civica-affected-relations:\s*([^\n]+)/i)?.[1];
+  for (const name of declared?.split(",") ?? []) {
+    const normalized = name.trim();
+    if (/^[a-z][a-z0-9_]*$/.test(normalized)) names.add(normalized);
+  }
+  if (declared) return [...names].sort();
   if (entry.path.endsWith(".sql")) {
-    const declared = source.match(/--\s*civica-affected-relations:\s*([^\n]+)/i)?.[1];
-    for (const name of declared?.split(",") ?? []) {
-      const normalized = name.trim();
-      if (/^[a-z][a-z0-9_]*$/.test(normalized)) names.add(normalized);
-    }
-    if (declared) return [...names].sort();
     const sqlOnly = source.replace(/--[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/'(?:''|[^'])*'/g, "''");
     const keywords = new Set(["all", "delete", "update", "cascade", "restrict", "conflict", "on", "set", "select", "where", "values", "when", "current_date", "no", "public"]);
     for (const match of sqlOnly.matchAll(/(?:TABLE|INTO|UPDATE|FROM|JOIN|REFERENCES|ON)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?["']?([a-z][a-z0-9_]*)["']?/gi)) if (!keywords.has(match[1].toLowerCase())) names.add(match[1]);

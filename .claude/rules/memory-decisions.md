@@ -935,3 +935,110 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The preparation baseline covers 1,456 initial packets and 2,912 blind assignments, including work that later proves unusable.
 - Four coders and two separate adjudicators are the working structure. All training, qualification, clarification, and adjudication time is paid hourly.
 - The $45,615 base plan is unapproved and must be replaced by a 30-packet human timing pilot. No contact before G4 or PUL-041. Durable record: APR-D126.
+
+## 2026-07-12 — Pulse events resolve through stable incidents
+
+- `pulse-incident-resolution/v1` gives raw reports and event projections a stable incident identity while retaining every prior source, decision, assignment, and projection.
+- Exact, label-compatible matches can merge inside 48 hours. Semantic and lexical matches remain review candidates and cannot change publication or scores by themselves.
+- Confirmed merges trigger fresh corroboration and incident-aware deltas. Blank headlines cannot publish. Durable record: APR-D146.
+
+## 2026-07-12 — Pulse classification state is explicit and bounded
+
+- Each cluster and classifier configuration has one closed current state plus
+  append-only claim and settlement evidence.
+- Never-attempted work precedes retries; retryable failures receive at most
+  three attempts. Terminal `none` is distinct from failure and is not called
+  again under an identical configuration.
+- Configuration identity includes models, prompts, method, ontology,
+  publication gate, decoding, and retry policy. Durable record: APR-D147.
+
+## 2026-07-12 — Pulse review SLAs are operational safeguards
+
+- Review targets are 24 hours for catastrophic-negative, 72 hours for
+  severe-negative/high-positive, and seven days for other queued items.
+- Exceptions are append-only and bounded; they never restore completeness.
+- Pre-contract pending items are unpublished legacy quarantine, not human
+  decisions. Durable record: APR-D148.
+
+## 2026-07-12 — Pulse expiry uses internal tombstones and public nulls
+
+- Scoring covers the union of eligible-event and existing-projection
+  jurisdictions under an inclusive 365-day window.
+- No-event dimensions receive internal zero tombstones; public reads return
+  `null` and make no stability inference.
+- Every score run writes immutable history and the current projection in one
+  atomic batch. Durable record: APR-D150.
+
+## 2026-07-12 — Pulse agreement derives from retained votes
+
+- Supported agreement requires provider-distinct stored classify runs sharing
+  prompt, method, configuration, and panel identity.
+- Single-run and legacy evidence derive `none`; automatic publication also
+  requires the publication gate and resolved primary jurisdiction.
+- Human review remains a separate publication authority and never rewrites
+  model agreement. Durable record: APR-D151.
+
+## 2026-07-12 — Pulse absorption is separate append-only evidence
+
+- Absorption requires an exact confirmed event link and sequential comparable
+  fixed-scale Index observations; model-only and aggregate links fail closed.
+- The decision stores method, reason, evidence, actor, and as-of time without
+  mutating corroboration confidence. The current same-period release set
+  supports no absorption. Durable record: APR-D152.
+
+## 2026-07-12 — Information context is immutable and nonimputed
+
+- Official context releases have complete observed-or-missing jurisdiction
+  coverage; unknown never becomes a midpoint or inherited territorial value.
+- Each new event pins the then-adopted release at classification. Historical
+  events remain explicitly unrecoverable, and every release/value/pin row is
+  append-only.
+- RSF values remain internal and have no production weighting or observability
+  effect pending rights and method validation. Durable record: APR-D153.
+
+## 2026-07-12 — Longitudinal history remains publisher-native
+
+- Country and Compare history use five separate publisher series, never a new
+  Civica composite, grade, or change verdict.
+- Missing years remain missing; every series names native units, captured
+  release, artifact, transformation, method, and comparability limits.
+- Downloads are filtered per source through the rights manifest; visible data
+  does not imply redistribution permission. Durable record: APR-D157.
+
+## 2026-07-12 — Agreement counts producing families
+
+- Fact panels distinguish single-source, agreement, resolver-selected
+  disagreement, and unavailable states.
+- Republishers collapse to the upstream producing family; projections,
+  compilations, and unknown lineage cannot manufacture corroboration.
+- Selected values, alternatives, vintages, and the deterministic trace appear
+  together. Durable record: APR-D158.
+
+## 2026-07-12 — Evidence confidence remains faceted
+
+- Country evidence coverage reports held and missing groups, linkage,
+  producing-family depth, freshness, disputes, and eligible multi-source
+  resolver agreement as separate properties of Civica's evidence.
+- No composite confidence score, letter grade, traffic light, or country-quality
+  judgment is calculated.
+- Dated DAT-005 snapshot metrics remain visibly separate from the current
+  DAT-006/DAT-007 resolver query. Durable record: APR-D159.
+
+## 2026-07-12 — Reference identity is broader than analytical scope
+
+- The 253-entry status catalog drives directory, search, Compare selection,
+  sitemap, profiles, and general country APIs.
+- Sovereign/map-eligible universes remain separate and must be named wherever
+  used; route or ISO presence never implies sovereignty.
+- Public status disclosures include the neutral note, review, countability,
+  administering relationship, and sources. Durable record: APR-D160.
+
+## 2026-07-12 — Election rows require a qualification layer
+
+- Keep raw election storage separate from public qualification; weak rows stay
+  auditable but do not render as facts.
+- Date basis, temporal class, and lifecycle status are separate. A future date
+  does not prove that an event is officially scheduled.
+- Event and chamber-contest identity remain separate; calendar projections
+  collapse unnamed chamber estimates, while detailed named contests may remain
+  distinct. Durable record: APR-D161.

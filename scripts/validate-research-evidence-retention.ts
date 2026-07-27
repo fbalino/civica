@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
 import {
+  APPEND_ONLY_EVIDENCE_RELATIONS,
   DESTRUCTIVE_WRITE_PATHS,
   RETAINED_EVIDENCE_RELATIONS,
   RESEARCH_EVIDENCE_RETENTION_VERSION,
@@ -10,12 +11,53 @@ import {
 
 config({ path: ".env.local", override: true });
 const root = process.cwd();
-const migration = readFileSync(
-  resolve(root, "drizzle/migrations/0024_research_evidence_retention.sql"),
-  "utf8",
-) + readFileSync(resolve(root, "drizzle/authoritative/0003_mixed_mockingbird.sql"), "utf8");
+const migration =
+  readFileSync(
+    resolve(root, "drizzle/migrations/0024_research_evidence_retention.sql"),
+    "utf8",
+  ) +
+  readFileSync(
+    resolve(root, "drizzle/authoritative/0003_mixed_mockingbird.sql"),
+    "utf8",
+  );
 const exclusionMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0019_careless_avengers.sql"),
+  "utf8",
+);
+const decisionMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0016_loving_maggott.sql"),
+  "utf8",
+);
+const incidentMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0023_wide_gorilla_man.sql"),
+  "utf8",
+);
+const classificationMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0024_dark_maginty.sql"),
+  "utf8",
+);
+const reviewSlaMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0025_careful_the_professor.sql"),
+  "utf8",
+);
+const deltaHistoryMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0027_smart_tempest.sql"),
+  "utf8",
+);
+const absorptionMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0028_complex_carlie_cooper.sql"),
+  "utf8",
+);
+const informationEnvironmentMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0029_whole_dazzler.sql"),
+  "utf8",
+);
+const constitutionPassageMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0030_cute_namora.sql"),
+  "utf8",
+);
+const partyIdentityMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0031_hot_saracen.sql"),
   "utf8",
 );
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
@@ -46,8 +88,44 @@ function sourceFiles(directory: string): string[] {
 }
 
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
-  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`) && !exclusionMigration.includes(`ON ${relation}`)) {
+  if (
+    !migration.includes(`'${relation}'`) &&
+    !migration.includes(`ON ${relation}`) &&
+    !exclusionMigration.includes(`ON ${relation}`) &&
+    !incidentMigration.includes(`ON ${relation}`) &&
+    !classificationMigration.includes(`ON ${relation}`) &&
+    !reviewSlaMigration.includes(`ON ${relation}`) &&
+    !deltaHistoryMigration.includes(`ON ${relation}`) &&
+    !absorptionMigration.includes(`ON ${relation}`) &&
+    !informationEnvironmentMigration.includes(`ON ${relation}`) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
+      constitutionPassageMigration,
+    ) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(partyIdentityMigration)
+  ) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
+  }
+}
+for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
+  const sources = [
+    decisionMigration,
+    exclusionMigration,
+    incidentMigration,
+    classificationMigration,
+    reviewSlaMigration,
+    deltaHistoryMigration,
+    absorptionMigration,
+    informationEnvironmentMigration,
+    partyIdentityMigration,
+  ];
+  const guarded = sources.some((source) =>
+    new RegExp(
+      `CREATE\\s+TRIGGER\\s+[a-z0-9_]+_append_only[\\s\\S]{0,160}BEFORE\\s+UPDATE\\s+OR\\s+DELETE\\s+ON\\s+"?${relation}"?[\\s\\S]{0,160}EXECUTE\\s+FUNCTION`,
+      "i",
+    ).test(source),
+  );
+  if (!guarded) {
+    fail(`append-only relation ${relation} is missing its mutation guard`);
   }
 }
 for (const required of [
@@ -59,13 +137,16 @@ for (const required of [
   "materialize_pulse_candidate_outcome",
   "pulse_candidate_outcomes_append_only",
 ]) {
-  if (!exclusionMigration.includes(required)) fail(`exclusion migration is missing ${required}`);
+  if (!exclusionMigration.includes(required))
+    fail(`exclusion migration is missing ${required}`);
 }
 
 for (const path of DESTRUCTIVE_WRITE_PATHS) {
   const source = readFileSync(resolve(root, path.path), "utf8");
   if (!/\.delete\s*\(|DELETE\s+FROM/i.test(source)) {
-    fail(`registered destructive path no longer contains a database deletion: ${path.path}`);
+    fail(
+      `registered destructive path no longer contains a database deletion: ${path.path}`,
+    );
   }
   for (const relation of path.relations) {
     if (
@@ -83,13 +164,19 @@ const registeredPaths = new Set<string>(
   DESTRUCTIVE_WRITE_PATHS.map((row) => row.path),
 );
 const discoveredPaths = [...sourceFiles("scripts"), ...sourceFiles("src/lib")]
-  .filter((path) => /\.delete\s*\(|DELETE\s+FROM/i.test(readFileSync(resolve(root, path), "utf8")))
+  .filter((path) =>
+    /\.delete\s*\(|DELETE\s+FROM/i.test(
+      readFileSync(resolve(root, path), "utf8"),
+    ),
+  )
   .sort();
 for (const path of discoveredPaths) {
-  if (!registeredPaths.has(path)) fail(`unregistered destructive path: ${path}`);
+  if (!registeredPaths.has(path))
+    fail(`unregistered destructive path: ${path}`);
 }
 for (const path of registeredPaths) {
-  if (!discoveredPaths.includes(path)) fail(`stale destructive-path registration: ${path}`);
+  if (!discoveredPaths.includes(path))
+    fail(`stale destructive-path registration: ${path}`);
 }
 
 for (const required of [
@@ -104,7 +191,7 @@ for (const required of [
   if (!migration.includes(required)) fail(`migration is missing ${required}`);
 }
 
-if (!schema.includes('export const researchEvidenceHistory = pgTable(')) {
+if (!schema.includes("export const researchEvidenceHistory = pgTable(")) {
   fail("Drizzle schema is missing the append-only history table");
 }
 for (const field of [
@@ -113,7 +200,8 @@ for (const field of [
   "classificationDecision",
   "classifiedAt",
 ]) {
-  if (!schema.includes(field)) fail(`raw-event retention field missing: ${field}`);
+  if (!schema.includes(field))
+    fail(`raw-event retention field missing: ${field}`);
 }
 if (!classify.includes("r.classification_disposition = 'pending'")) {
   fail("the classifier queue does not exclude retained terminal decisions");
@@ -135,16 +223,52 @@ async function main() {
   if (process.argv.includes("--live")) {
     if (!process.env.DATABASE_URL) fail("DATABASE_URL is required for --live");
     const sql = neon(process.env.DATABASE_URL);
-    const [objects, triggers, appendOnly, foreignKeys, invalidRaw, invalidHistory, historyRows, pulseRows, reconciliationRows] =
-      await Promise.all([
+    const [
+      objects,
+      triggers,
+      appendOnly,
+      appendOnlyEvidence,
+      foreignKeys,
+      invalidRaw,
+      invalidHistory,
+      historyRows,
+      pulseRows,
+      reconciliationRows,
+    ] = await Promise.all([
       sql`SELECT
         to_regclass('research_evidence_history') IS NOT NULL AS history,
         to_regclass('pulse_evaluation_evidence') IS NOT NULL AS pulse_view,
         to_regclass('reconciliation_evaluation_evidence') IS NOT NULL AS reconciliation_view`,
-      sql`SELECT count(*)::int AS n FROM pg_trigger
-          WHERE tgname = 'dat_016_retain_mutation' AND NOT tgisinternal`,
+      sql`SELECT count(DISTINCT c.relname)::int AS n
+          FROM pg_trigger t
+          JOIN pg_class c ON c.oid = t.tgrelid
+          JOIN pg_proc p ON p.oid = t.tgfoid
+          WHERE NOT t.tgisinternal
+            AND c.relname = ANY(${[...RETAINED_EVIDENCE_RELATIONS]})
+            AND p.proname IN (
+              'civica_capture_research_evidence_history',
+              'civica_capture_constitution_passage_history'
+            )`,
       sql`SELECT count(*)::int AS n FROM pg_trigger
           WHERE tgname = 'research_evidence_history_append_only' AND NOT tgisinternal`,
+      sql`SELECT count(*)::int AS n
+          FROM pg_trigger t
+          JOIN pg_class c ON c.oid = t.tgrelid
+          WHERE NOT t.tgisinternal
+            AND (c.relname, t.tgname) IN (
+              ('party_composition_runs', 'party_composition_runs_append_only'),
+              ('party_identity_events', 'party_identity_events_append_only'),
+              ('pulse_event_decisions', 'pulse_event_decisions_append_only'),
+              ('pulse_incident_assignments', 'pulse_incident_assignments_append_only'),
+              ('pulse_incident_resolutions', 'pulse_incident_resolutions_append_only'),
+              ('pulse_classification_attempts', 'pulse_classification_attempts_append_only'),
+              ('pulse_dimensional_delta_history', 'pulse_dimensional_delta_history_append_only'),
+              ('pulse_event_absorptions', 'pulse_event_absorptions_append_only'),
+              ('pulse_event_information_environment_pins', 'pulse_event_information_environment_pins_append_only'),
+              ('pulse_information_environment_releases', 'pulse_information_environment_releases_append_only'),
+              ('pulse_information_environment_values', 'pulse_information_environment_values_append_only'),
+              ('pulse_review_sla_events', 'pulse_review_sla_events_append_only')
+            )`,
       sql`SELECT count(*)::int AS n FROM pg_constraint
           WHERE conname IN (
             'pulse_sources_event_id_pulse_events_v2_id_fk',
@@ -162,7 +286,7 @@ async function main() {
       sql`SELECT count(*)::int AS n FROM research_evidence_history`,
       sql`SELECT count(*)::int AS n FROM pulse_evaluation_evidence`,
       sql`SELECT count(*)::int AS n FROM reconciliation_evaluation_evidence`,
-      ]);
+    ]);
     const object = objects[0] as Record<string, boolean>;
     if (!object.history || !object.pulse_view || !object.reconciliation_view) {
       fail(`live objects are incomplete: ${JSON.stringify(object)}`);
@@ -173,7 +297,14 @@ async function main() {
       );
     }
     if (Number(appendOnly[0]?.n) !== 1) {
-      fail("live append-only guard trigger is missing");
+      fail("live generic history append-only guard trigger is missing");
+    }
+    if (
+      Number(appendOnlyEvidence[0]?.n) !== APPEND_ONLY_EVIDENCE_RELATIONS.length
+    ) {
+      fail(
+        `live append-only evidence trigger count ${appendOnlyEvidence[0]?.n} does not match ${APPEND_ONLY_EVIDENCE_RELATIONS.length}`,
+      );
     }
     if (Number(foreignKeys[0]?.n) !== 2) {
       fail("live Pulse evidence foreign keys are not both restrictive");
@@ -182,7 +313,9 @@ async function main() {
       fail(`live raw-events ledger has ${invalidRaw[0]?.n} invalid rows`);
     }
     if (Number(invalidHistory[0]?.n) !== 0) {
-      fail(`live retained-history ledger has ${invalidHistory[0]?.n} invalid rows`);
+      fail(
+        `live retained-history ledger has ${invalidHistory[0]?.n} invalid rows`,
+      );
     }
     console.log(
       `Live: ${triggers[0]?.n} triggers; ${historyRows[0]?.n} history rows; ` +

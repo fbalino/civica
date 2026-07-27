@@ -11,6 +11,7 @@ import { pulse, disputeSla } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
 import { PULSE_EVENT_ONTOLOGY } from "@/lib/pulse/v2/event-ontology";
+import { PULSE_CLASSIFICATION_RETRY_POLICY } from "@/lib/pulse/v2/classification-state";
 import {
   loadPulseSourceCoverageReport,
   type PulseFeedCoverage,
@@ -188,9 +189,16 @@ export default async function PulseMethodologyPage() {
         (tier) => REVIEW_TIER_LABELS[tier] ?? tier,
       ),
     ),
+    reviewSlaVersion: method.reviewServiceLevel.version,
+    reviewSlaTargetsProse: `catastrophic-negative items within ${method.reviewServiceLevel.targets.critical.dueAfterMs / 3_600_000} hours; severe-negative and high-positive items within ${method.reviewServiceLevel.targets.urgent.dueAfterMs / 3_600_000} hours; and other queued items within ${method.reviewServiceLevel.targets.standard.dueAfterMs / 86_400_000} days`,
     weakConfidenceThreshold:
       method.publicationPolicy.reviewGates.verifierObjectionWithWeakConsensus
         .selfConfidenceBelow,
+    classificationMaxAttempts: PULSE_CLASSIFICATION_RETRY_POLICY.maxAttempts,
+    classificationInitialRetryMinutes:
+      PULSE_CLASSIFICATION_RETRY_POLICY.initialDelayMs / 60_000,
+    classificationMaximumRetryHours:
+      PULSE_CLASSIFICATION_RETRY_POLICY.maxDelayMs / 3_600_000,
     scheduleProse: proseList(
       method.cadence.stages.map((stage) => {
         const operation = stage.operations.join("/").replaceAll("_", " ");
@@ -201,7 +209,11 @@ export default async function PulseMethodologyPage() {
     clusterEmbeddingModel: method.clustering.semantic.model,
     clusterWindowHours: method.clustering.dateWindowHours,
     clusterSemanticThreshold: method.clustering.semantic.threshold,
+    clusterSemanticOnlyThreshold:
+      method.clustering.semantic.unanchoredThreshold,
     clusterLexicalThreshold: method.clustering.lexicalFallback.threshold,
+    clusterLexicalAnchorThreshold:
+      method.clustering.lexicalFallback.anchorOverlapThreshold,
     sourceIndependenceVersion: method.corroboration.sourceIndependence.version,
     sourceIndependencePrecisionPct:
       method.corroboration.sourceIndependence.reviewedPairThresholds.precision *
